@@ -90,8 +90,6 @@ const excludePatterns = [
   'next.config',
   '/app/api/',
   'constants/designTokens.ts',
-  '/actions/feedback',
-  '/api/indexnow',
   'email',
   'mail',
   'components/atoms/ui/badge.tsx',

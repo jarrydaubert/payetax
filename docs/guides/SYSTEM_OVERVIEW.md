@@ -9,15 +9,14 @@ PayeTax is a Next.js and TypeScript public R&D project for UK tax calculation.
 - Tax tools
 - Blog
 - About, privacy, compliance, install
-- Feedback and email-results flows
+- Email-results flows
 
 ## Integrations
 
 - Vercel hosting
 - GA4 analytics
 - Sentry monitoring and source maps
-- Linear issue tracking and Sentry webhook triage
-- Brevo SMTP for transactional email
+- Brevo API for transactional results email
 - Upstash Redis for distributed rate limiting
 
 ## Key Files

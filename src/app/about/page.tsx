@@ -9,7 +9,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
-import { FeedbackDialog } from '@/components/organisms/FeedbackDialog';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -330,11 +329,6 @@ export default function AboutPage() {
                 <li>Uses automated unit and E2E checks before production releases.</li>
               </ul>
               <div className='mt-6 flex flex-wrap gap-3'>
-                <FeedbackDialog
-                  triggerLabel='Send feedback'
-                  triggerVariant='outline'
-                  triggerClassName='rounded-lg border-border/70 bg-card/70 hover:bg-card'
-                />
                 <Button asChild variant='brandOutline' className='rounded-lg'>
                   <Link href='/install'>
                     <Workflow className='size-4' />

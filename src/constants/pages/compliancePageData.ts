@@ -117,7 +117,7 @@ const COMPLIANCE_FEATURES: ComplianceFeature[] = [
       'Automated testing against HMRC examples',
       'Manual verification of edge cases',
       'Cross-platform calculation consistency',
-      'Professional user feedback integration',
+      'Release checks before production updates',
     ],
     icon: Shield,
     lastUpdated: COMPLIANCE_LAST_REVIEWED,

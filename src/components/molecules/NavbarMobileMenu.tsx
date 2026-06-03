@@ -20,10 +20,6 @@ interface NavbarMobileMenuProps {
   onLinkClick: (label: string) => void;
   onBackdropClick: () => void;
   onExitComplete?: () => void;
-  /**
-   * Optional utility components rendered after nav links (e.g., FeedbackDialog).
-   * Styled consistently with nav links for visual coherence.
-   */
   utilities?: ReactNode;
 }
 
@@ -73,14 +69,13 @@ export function NavbarMobileMenu({
       const target = event.target;
       if (!(target instanceof Node)) return;
 
-      // If another modal dialog is open (e.g., Feedback), let it own focus.
+      // If another modal dialog is open, let it own focus.
       const hasOpenPortalDialog = Boolean(
         document.querySelector('[data-radix-portal] [role="dialog"]'),
       );
       if (hasOpenPortalDialog) return;
 
       // If focus moved to a Radix dialog/portal, let Radix handle focus trapping
-      // This prevents infinite focus loops when FeedbackDialog opens from mobile menu
       const isInRadixPortal = (target as Element).closest?.('[data-radix-portal]');
       if (isInRadixPortal) return;
 
@@ -155,11 +150,6 @@ export function NavbarMobileMenu({
                 );
               })}
 
-              {/*
-               * Utilities section (e.g., FeedbackDialog)
-               * Rendered after nav links for logical flow - users navigate first, then provide feedback.
-               * No separate CTA button needed since "Calculator" link above serves that purpose.
-               */}
               {utilities}
             </nav>
           </motion.div>

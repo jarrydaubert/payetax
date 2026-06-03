@@ -1,6 +1,6 @@
 # Kanban Operating Rules
 
-Linear tracks execution. `docs/BACKLOG.md` tracks the work that exists.
+`docs/BACKLOG.md` tracks the work that exists. If Linear is reconnected later, it should track execution against backlog IDs rather than replace the backlog.
 
 ## Board States
 

@@ -36,26 +36,14 @@ Set production and preview values in Vercel Project Settings.
 
 Email:
 
-- `BREVO_SMTP_HOST`
-- `BREVO_SMTP_PORT`
-- `BREVO_SMTP_LOGIN`
-- `BREVO_SMTP_PASSWORD`
+- `BREVO_API_KEY`
 - `BREVO_FROM_EMAIL`
-- `FEEDBACK_TO_EMAIL`
 
 Analytics and monitoring:
 
 - `NEXT_PUBLIC_GA_ID`
 - `NEXT_PUBLIC_SENTRY_DSN`
 - `SENTRY_AUTH_TOKEN`
-- `SENTRY_WEBHOOK_SECRET`
-- `LINEAR_API_KEY`
-- `LINEAR_TEAM_KEY`
-
-Linear:
-
-- Reconfirm `LINEAR_TEAM_KEY` and project names after account, workspace, or project moves.
-- The local CLI and Sentry webhook both default to the legacy `PAYTAX` team key unless env overrides are set.
 
 Rate limiting:
 
@@ -74,7 +62,6 @@ Rate limiting:
 After deploy:
 
 - Open the homepage and main tools.
-- Submit feedback with a test message.
 - Send PAYE results email.
 - Send Director Intelligence results email.
 - Check Sentry for new errors.

@@ -153,13 +153,13 @@ export type SectionBadgeData = z.infer<typeof SectionBadgeSchema>;
 /**
  * Contact Link validation schema
  *
- * Used for contact footer links (email, feedback forms, etc).
+ * Used for contact footer links (email, support pages, etc).
  *
  * @example
  * ```typescript
  * const links = [
  *   { text: 'support@example.com', href: 'mailto:support@example.com', type: 'email' },
- *   { text: 'Feedback Form', href: '/feedback' },
+ *   { text: 'Support', href: '/support' },
  * ] satisfies z.infer<typeof ContactLinkSchema>[];
  * ```
  */

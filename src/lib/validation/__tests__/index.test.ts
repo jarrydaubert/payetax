@@ -2,15 +2,14 @@ import * as validation from '../index';
 
 describe('validation barrel exports', () => {
   it('re-exports core schemas and helpers', () => {
-    expect(validation.FeedbackFormSchema).toBeDefined();
+    expect(validation.CategoryFilterSchema).toBeDefined();
     expect(validation.WarningTypeSchema).toBeDefined();
     expect(validation.TaxYearSchema).toBeDefined();
 
-    const feedbackResult = validation.validateFeedbackForm({
-      email: '',
-      message: 'This feedback message is valid length.',
+    const categoryResult = validation.validateCategoryFilter({
+      selectedCategory: 'tax-basics',
     });
-    expect(feedbackResult.success).toBe(true);
+    expect(categoryResult.success).toBe(true);
 
     const taxYearResult = validation.validateTaxYear('2025-2026');
     expect(taxYearResult.success).toBe(true);

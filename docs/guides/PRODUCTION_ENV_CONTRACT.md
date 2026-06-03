@@ -8,14 +8,10 @@ This document lists production environment variables for the public R&D version 
 | --- | --- |
 | Public site URL and metadata | `NEXT_PUBLIC_SITE_URL` |
 | Basic analytics | `NEXT_PUBLIC_GA_ID` |
-| PAYE and director results email | `BREVO_SMTP_HOST`, `BREVO_SMTP_PORT`, `BREVO_SMTP_LOGIN`, `BREVO_SMTP_PASSWORD`, `BREVO_FROM_EMAIL` |
-| Feedback email | `BREVO_SMTP_HOST`, `BREVO_SMTP_PORT`, `BREVO_SMTP_LOGIN`, `BREVO_SMTP_PASSWORD`, `BREVO_FROM_EMAIL`, `FEEDBACK_TO_EMAIL` |
+| PAYE and director results email | `BREVO_API_KEY`, `BREVO_FROM_EMAIL` |
 | Distributed API rate limiting | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
 | Sentry browser monitoring | `NEXT_PUBLIC_SENTRY_DSN` |
 | Sentry source maps | `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` |
-| Sentry to Linear webhook | `SENTRY_WEBHOOK_SECRET`, `LINEAR_API_KEY`, optional `LINEAR_TEAM_KEY` |
-
-After Linear account, workspace, or project moves, treat old local values as stale until `LINEAR_TEAM_KEY` and the target project names have been confirmed against the current Linear workspace.
 
 ## Local Development
 

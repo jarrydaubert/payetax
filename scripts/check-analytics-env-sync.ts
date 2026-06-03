@@ -24,7 +24,7 @@ const REQUIRED_PUBLIC_ENV_KEYS = [
   'NEXT_PUBLIC_GA_ID',
 ] as const;
 
-const REQUIRED_SERVER_ENV_KEYS = ['SENTRY_WEBHOOK_SECRET', 'LINEAR_API_KEY'] as const;
+const REQUIRED_SERVER_ENV_KEYS = ['BREVO_API_KEY'] as const;
 
 const NON_TEMPLATE_RUNTIME_ENV = new Set([
   // Platform/system-provided at runtime
@@ -101,7 +101,11 @@ function collectSourceFiles(dir: string): string[] {
     }
 
     const extension = extname(entry);
-    if (SOURCE_FILE_EXTENSIONS.has(extension)) {
+    if (
+      SOURCE_FILE_EXTENSIONS.has(extension) &&
+      !entry.includes('.test.') &&
+      !entry.includes('.spec.')
+    ) {
       files.push(entryPath);
     }
   }

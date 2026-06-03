@@ -1,5 +1,3 @@
-import { createTransport } from 'nodemailer';
-
 export interface OutboundEmailMessage {
   from: string;
   to: string | string[];
@@ -13,6 +11,13 @@ export type SendOutboundEmailResult =
   | { ok: true }
   | { ok: false; reason: 'not_configured' | 'delivery_failed' | 'unexpected_error' };
 
+interface BrevoEmailIdentity {
+  email: string;
+  name?: string;
+}
+
+const BREVO_TRANSACTIONAL_EMAIL_ENDPOINT = 'https://api.brevo.com/v3/smtp/email';
+
 function formatErrorForLog(error: unknown): { name?: string; message?: string } {
   if (error instanceof Error) {
     return { name: error.name, message: error.message };
@@ -21,54 +26,76 @@ function formatErrorForLog(error: unknown): { name?: string; message?: string } 
   return { message: 'Unknown error' };
 }
 
-function getSmtpConfig() {
-  const host = process.env.BREVO_SMTP_HOST;
-  const login = process.env.BREVO_SMTP_LOGIN;
-  const password = process.env.BREVO_SMTP_PASSWORD;
-  const port = Number(process.env.BREVO_SMTP_PORT || '587');
+function getBrevoApiKey(): string | null {
+  const apiKey = process.env.BREVO_API_KEY?.trim();
+  return apiKey || null;
+}
 
-  if (!(host && login && password && Number.isFinite(port))) return null;
+function parseEmailIdentity(value: string): BrevoEmailIdentity {
+  const trimmed = value.trim();
+  const match = trimmed.match(/^(?<name>.+?)\s*<(?<email>[^>]+)>$/u);
 
-  return { host, login, password, port };
+  if (match?.groups?.email) {
+    const name = (match.groups.name ?? '').trim().replace(/^["']|["']$/g, '');
+    const email = match.groups.email.trim();
+
+    return name ? { email, name } : { email };
+  }
+
+  return { email: trimmed };
+}
+
+function normalizeRecipients(recipients: string | string[]): BrevoEmailIdentity[] {
+  const values = Array.isArray(recipients) ? recipients : recipients.split(',');
+  return values.map(parseEmailIdentity).filter((recipient) => recipient.email.length > 0);
 }
 
 export function isOutboundEmailConfigured(): boolean {
-  return Boolean(getSmtpConfig());
+  return Boolean(getBrevoApiKey());
 }
 
 export async function sendOutboundEmail(
   message: OutboundEmailMessage,
   logPrefix: string,
 ): Promise<SendOutboundEmailResult> {
-  const config = getSmtpConfig();
-  if (!config) {
-    console.error(`[${logPrefix}] Brevo SMTP not configured`);
+  const apiKey = getBrevoApiKey();
+  if (!apiKey) {
+    console.error(`[${logPrefix}] Brevo API not configured`);
     return { ok: false, reason: 'not_configured' };
   }
 
   try {
-    const transporter = createTransport({
-      host: config.host,
-      port: config.port,
-      secure: config.port === 465,
-      auth: {
-        user: config.login,
-        pass: config.password,
+    const payload = {
+      sender: parseEmailIdentity(message.from),
+      to: normalizeRecipients(message.to),
+      subject: message.subject,
+      htmlContent: message.html,
+      textContent: message.text,
+      ...(message.replyTo ? { replyTo: parseEmailIdentity(message.replyTo) } : {}),
+    };
+
+    const response = await fetch(BREVO_TRANSACTIONAL_EMAIL_ENDPOINT, {
+      method: 'POST',
+      headers: {
+        accept: 'application/json',
+        'api-key': apiKey,
+        'content-type': 'application/json',
       },
+      body: JSON.stringify(payload),
     });
 
-    await transporter.sendMail({
-      from: message.from,
-      to: message.to,
-      subject: message.subject,
-      html: message.html,
-      text: message.text,
-      replyTo: message.replyTo,
-    });
+    if (!response.ok) {
+      const body = await response.text();
+      console.error(`[${logPrefix}] Brevo API error:`, {
+        status: response.status,
+        body: body.slice(0, 500),
+      });
+      return { ok: false, reason: 'delivery_failed' };
+    }
 
     return { ok: true };
   } catch (error) {
-    console.error(`[${logPrefix}] Brevo SMTP error:`, formatErrorForLog(error));
+    console.error(`[${logPrefix}] Brevo API error:`, formatErrorForLog(error));
     return { ok: false, reason: 'delivery_failed' };
   }
 }

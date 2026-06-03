@@ -509,34 +509,12 @@ export const EnvSchema = z.object({
   NEXT_PUBLIC_SENTRY_DSN: z.string().url('Sentry DSN must be a valid URL').optional(),
   SENTRY_AUTH_TOKEN: z.string().optional(),
 
-  // Optional API keys
-  LINEAR_API_KEY: z
-    .string()
-    .startsWith('lin_api_', 'Linear API key must start with lin_api_')
-    .optional(),
-
   // Build info
   NEXT_PUBLIC_VERCEL_ENV: z.enum(['production', 'preview', 'development']).optional(),
   NEXT_PUBLIC_VERCEL_URL: z.string().optional(),
 });
 
 export type Env = z.infer<typeof EnvSchema>;
-
-/**
- * Feedback Form Validation Schema
- * Used in /api/feedback endpoint
- */
-export const FeedbackSchema = z.object({
-  email: z.string().trim().toLowerCase().pipe(z.string().email('Invalid email address')),
-  message: z
-    .string()
-    .min(10, 'Message must be at least 10 characters')
-    .max(5000, 'Message must not exceed 5000 characters'),
-  page: z.string().url('Page must be a valid URL').optional(),
-  userAgent: z.string().optional(),
-});
-
-export type Feedback = z.infer<typeof FeedbackSchema>;
 
 /**
  * Search Query Validation Schema

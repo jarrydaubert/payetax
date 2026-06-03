@@ -54,7 +54,7 @@ For backlog closure, automated tests are the default proof path. Add or update t
 - routing, browser API, critical journey, or cross-page behavior: E2E or scripted browser test
 - SEO metadata, sitemap, redirects, or canonical behavior: route/config/sitemap test plus live validation when relevant
 
-Use manual validation only when automation is the wrong layer, and keep the validation steps in the PR or linked Linear issue rather than creating standalone evidence docs.
+Use manual validation only when automation is the wrong layer, and keep the validation steps in the PR or linked issue rather than creating standalone evidence docs.
 
 Target state for "no issues found" audits:
 - `bun run check:test-skips` passes with no unexpected debt.
