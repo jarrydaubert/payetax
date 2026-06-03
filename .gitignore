@@ -85,3 +85,6 @@ playwright/.auth/
 # Local caches
 .npm/
 .lighthouseci/
+
+# Sentry Config File
+.env.sentry-build-plugin

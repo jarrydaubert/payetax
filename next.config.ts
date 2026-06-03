@@ -196,11 +196,10 @@ const nextConfig: NextConfig = {
 };
 
 const configWithSentry = withSentryConfig(withBundleAnalyzer(nextConfig), {
-  org: 'payetax',
-  project: 'javascript-nextjs',
+  org: 'jgf-projects',
+  project: 'payetax',
   silent: !process.env.CI,
   widenClientFileUpload: true,
-  tunnelRoute: '/monitoring',
   bundleSizeOptimizations: {
     excludeDebugStatements: true,
     excludeReplayShadowDom: true,

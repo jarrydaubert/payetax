@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
  *
  * Clean, minimal design with:
  * - Logo (paye<span>tax</span>)
- * - Essential links (Blog, About, Privacy, Compliance, Support)
+ * - Essential links (Blog, Tools, About, Privacy, Compliance, Support)
  * - Copyright
  */
 interface FooterProps {
@@ -38,11 +38,6 @@ export function Footer({ className }: FooterProps) {
         <nav className='footer-links-new' aria-label='Footer navigation'>
           <Link href='/blog'>Blog</Link>
           <Link href='/tools'>Tools</Link>
-          <Link href='/tools/tax-code-decoder'>Tax Code Decoder</Link>
-          <Link href='/tools/scottish-tax-calculator'>Scottish Tax</Link>
-          <Link href='/tools/marriage-allowance-calculator'>Marriage Allowance</Link>
-          <Link href='/tools/national-insurance-calculator'>National Insurance</Link>
-          <Link href='/tools/director-guide'>Director Intelligence</Link>
           <Link href='/install'>Install App</Link>
           <Link href='/about'>About</Link>
           <Link href='/privacy'>Privacy</Link>
