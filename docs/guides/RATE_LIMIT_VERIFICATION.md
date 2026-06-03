@@ -6,7 +6,6 @@ Distributed rate limiting uses Upstash Redis when configured.
 
 - `/api/send-results`
 - `/api/send-director-results`
-- `/api/sentry-webhook`
 - `/api/ops/rate-limit-health`
 
 ## Local Command

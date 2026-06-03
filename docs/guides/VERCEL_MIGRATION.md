@@ -4,14 +4,14 @@
 
 Move PayeTax deployment to the intended Vercel account/organisation used by `jarrydaubert` and `prosepal-web`, without accidentally deploying to a previous, incorrect, or ambiguous PayeTax project.
 
-This migration is not complete yet. Until it is complete, production deployment from this repo is blocked.
+This migration is not complete yet. Until it is complete, do not use this repo to move production traffic.
 
 ## Current State
 
 - Source control: GitHub repo `jarrydaubert/payetax`.
 - CI: GitHub Actions `CI` plus CodeQL.
 - Production deployment: pending correct Vercel project linkage.
-- `bun run deploy`: intentionally blocked until this migration is complete.
+- `bun run deploy`: local release-readiness command only; do not treat it as permission to deploy production traffic during the migration.
 
 ## Target State
 
@@ -86,9 +86,9 @@ Before moving production domains:
 2. Confirm GitHub `CI` and CodeQL are green.
 3. Verify key routes on the preview URL:
    - `/`
-   - `/calculator`
-   - `/calculator/50000-after-tax`
+   - `/tools`
    - `/tools/director-guide`
+   - `/tools/national-insurance-calculator`
    - `/privacy`
    - `/robots.txt`
    - `/sitemap.xml`
@@ -109,7 +109,7 @@ Only start this after preview validation passes.
 ```bash
 curl -sS -I https://www.payetax.co.uk/
 curl -sS -I https://www.payetax.co.uk/blog/scottish-vs-english-tax-rates-2026-comparison
-curl -sS -I https://www.payetax.co.uk/calculator/50000-after-tax
+curl -sS -I https://www.payetax.co.uk/tools/director-guide
 ```
 
 Pass criteria:
@@ -158,4 +158,4 @@ Migration is complete only when:
 - Production deployment passes post-release validation.
 - `payetax.co.uk` and `www.payetax.co.uk` resolve through the intended project.
 - Any previous or incorrect project is disconnected, archived, renamed, or clearly marked as retired.
-- `bun run deploy` can be safely replaced or restored in a follow-up PR.
+- `bun run deploy` remains aligned with the final release/deployment process.

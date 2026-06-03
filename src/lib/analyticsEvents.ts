@@ -17,8 +17,6 @@ export const ANALYTICS_EVENT_ACTIONS = [
   'director_guide_mode_changed',
   'director_guide_safe_draw_calculated',
   'export_failed',
-  'feedback_dialog_opened',
-  'feedback_submitted',
   'guide_calculation_run',
   'guide_email_opened',
   'guide_email_sent',

@@ -107,6 +107,11 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: '/calculator',
+        destination: '/#tax-calculator',
+        permanent: true,
+      },
+      {
         source: '/blog/category/tax-tools',
         destination: '/blog/category/tax-basics',
         permanent: true,
@@ -196,11 +201,10 @@ const nextConfig: NextConfig = {
 };
 
 const configWithSentry = withSentryConfig(withBundleAnalyzer(nextConfig), {
-  org: 'payetax',
-  project: 'javascript-nextjs',
+  org: 'jgf-projects',
+  project: 'payetax',
   silent: !process.env.CI,
   widenClientFileUpload: true,
-  tunnelRoute: '/monitoring',
   bundleSizeOptimizations: {
     excludeDebugStatements: true,
     excludeReplayShadowDom: true,

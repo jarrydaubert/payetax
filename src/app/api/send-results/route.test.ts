@@ -97,7 +97,7 @@ describe('/api/send-results POST', () => {
   });
 
   it('rejects invalid origins', async () => {
-    const POST = await loadRoute({ BREVO_SMTP_PASSWORD: 'test' });
+    const POST = await loadRoute({ BREVO_API_KEY: 'test' });
     const request = buildRequest(validPayload, { origin: 'https://evil.com' });
     const response = await POST(request);
 
@@ -106,7 +106,7 @@ describe('/api/send-results POST', () => {
 
   it('rate limits when the limiter denies the client', async () => {
     const POST = await loadRoute(
-      { BREVO_SMTP_PASSWORD: 'test' },
+      { BREVO_API_KEY: 'test' },
       { allowed: false, reason: 'rate_limited' },
     );
     const request = buildRequest(validPayload, {
@@ -131,7 +131,7 @@ describe('/api/send-results POST', () => {
 
   it('returns 503 when distributed rate-limit protection is unavailable in production', async () => {
     const POST = await loadRoute(
-      { BREVO_SMTP_PASSWORD: 'test', NODE_ENV: 'production' },
+      { BREVO_API_KEY: 'test', NODE_ENV: 'production' },
       { allowed: false, reason: 'distributed_unavailable' },
     );
     const request = buildRequest(validPayload, {
@@ -159,7 +159,7 @@ describe('/api/send-results POST', () => {
   });
 
   it('rejects invalid JSON payloads', async () => {
-    const POST = await loadRoute({ BREVO_SMTP_PASSWORD: 'test' });
+    const POST = await loadRoute({ BREVO_API_KEY: 'test' });
     const request = buildRequest('{', { origin: 'https://payetax.co.uk' });
     const response = await POST(request);
     const json = await response.json();
@@ -169,7 +169,7 @@ describe('/api/send-results POST', () => {
   });
 
   it('rejects invalid request bodies', async () => {
-    const POST = await loadRoute({ BREVO_SMTP_PASSWORD: 'test' });
+    const POST = await loadRoute({ BREVO_API_KEY: 'test' });
     const request = buildRequest({ email: 'bad' }, { origin: 'https://payetax.co.uk' });
     const response = await POST(request);
     const json = await response.json();
@@ -180,7 +180,7 @@ describe('/api/send-results POST', () => {
   });
 
   it('rejects likely bot requests using honeypot fields', async () => {
-    const POST = await loadRoute({ BREVO_SMTP_PASSWORD: 'test' });
+    const POST = await loadRoute({ BREVO_API_KEY: 'test' });
     const request = buildRequest(
       { ...validPayload, homepage: 'https://spam.example' },
       { origin: 'https://payetax.co.uk' },
@@ -194,7 +194,7 @@ describe('/api/send-results POST', () => {
 
   it('sends the email when inputs are valid', async () => {
     sendResultsEmailMock.mockResolvedValue({ ok: true });
-    const POST = await loadRoute({ BREVO_SMTP_PASSWORD: 'test' });
+    const POST = await loadRoute({ BREVO_API_KEY: 'test' });
     const request = buildRequest(validPayload, { origin: 'https://payetax.co.uk' });
     const response = await POST(request);
     const json = await response.json();
@@ -206,7 +206,7 @@ describe('/api/send-results POST', () => {
 
   it('returns 500 when outbound email delivery fails', async () => {
     sendResultsEmailMock.mockResolvedValue({ ok: false, reason: 'delivery_failed' });
-    const POST = await loadRoute({ BREVO_SMTP_PASSWORD: 'test' });
+    const POST = await loadRoute({ BREVO_API_KEY: 'test' });
     const request = buildRequest(validPayload, { origin: 'https://payetax.co.uk' });
     const response = await POST(request);
     const json = await response.json();

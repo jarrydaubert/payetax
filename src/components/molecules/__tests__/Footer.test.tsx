@@ -77,36 +77,13 @@ describe('Footer Component', () => {
       expect(link).toHaveAttribute('href', 'mailto:support@payetax.co.uk');
     });
 
-    it('should render Tax Code Decoder link', () => {
+    it('should render Tools link', () => {
       render(<Footer />);
 
-      const link = screen.getByRole('link', { name: /Tax Code Decoder/i });
+      // Strip-back consolidated the individual tool links into one /tools entry.
+      const link = screen.getByRole('link', { name: /Tools/i });
       expect(link).toBeInTheDocument();
-      expect(link).toHaveAttribute('href', '/tools/tax-code-decoder');
-    });
-
-    it('should render Scottish Tax link', () => {
-      render(<Footer />);
-
-      const link = screen.getByRole('link', { name: /Scottish Tax/i });
-      expect(link).toBeInTheDocument();
-      expect(link).toHaveAttribute('href', '/tools/scottish-tax-calculator');
-    });
-
-    it('should render Marriage Allowance link', () => {
-      render(<Footer />);
-
-      const link = screen.getByRole('link', { name: /Marriage Allowance/i });
-      expect(link).toBeInTheDocument();
-      expect(link).toHaveAttribute('href', '/tools/marriage-allowance-calculator');
-    });
-
-    it('should render National Insurance link', () => {
-      render(<Footer />);
-
-      const link = screen.getByRole('link', { name: /National Insurance/i });
-      expect(link).toBeInTheDocument();
-      expect(link).toHaveAttribute('href', '/tools/national-insurance-calculator');
+      expect(link).toHaveAttribute('href', '/tools');
     });
 
     it('should render Install App link', () => {
@@ -121,8 +98,9 @@ describe('Footer Component', () => {
       render(<Footer />);
 
       const links = screen.getAllByRole('link');
-      // Includes brand link + nav links
-      expect(links.length).toBeGreaterThanOrEqual(11);
+      // Brand + Blog, Tools, Install, About, Privacy, Compliance, Support
+      // (Cookie Settings is a button, not a link). Exact count guards against link creep.
+      expect(links).toHaveLength(8);
     });
   });
 

@@ -11,8 +11,7 @@ The repo is public. Real secrets must live in Vercel or local ignored env files 
 - Jest and Playwright
 - GA4 for basic analytics
 - Sentry for error monitoring
-- Linear issue creation from Sentry webhooks
-- Brevo SMTP for transactional email flows
+- Brevo API for transactional results email
 
 ## Current Scope
 
@@ -22,7 +21,7 @@ Kept:
 - Director Intelligence calculator
 - Tax tools
 - Blog
-- Feedback and email-results flows
+- Email-results flows
 - PWA support
 
 Removed:
@@ -52,20 +51,14 @@ Copy `.env.template` to `.env.local` for local development. Do not commit `.env.
 
 Required for production email flows:
 
-- `BREVO_SMTP_HOST`
-- `BREVO_SMTP_PORT`
-- `BREVO_SMTP_LOGIN`
-- `BREVO_SMTP_PASSWORD`
+- `BREVO_API_KEY`
 - `BREVO_FROM_EMAIL`
-- `FEEDBACK_TO_EMAIL`
 
 Other production controls:
 
 - `NEXT_PUBLIC_GA_ID`
 - `NEXT_PUBLIC_SENTRY_DSN`
 - `SENTRY_AUTH_TOKEN`
-- `SENTRY_WEBHOOK_SECRET`
-- `LINEAR_API_KEY`
 - `UPSTASH_REDIS_REST_URL`
 - `UPSTASH_REDIS_REST_TOKEN`
 

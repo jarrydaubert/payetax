@@ -6,7 +6,7 @@
  *
  * @example
  * ```typescript
- * import { NumberInputSchema, FeedbackFormSchema } from '@/lib/validation/index';
+ * import { NumberInputSchema, CategoryFilterSchema } from '@/lib/validation/index';
  * ```
  */
 
@@ -86,14 +86,11 @@ export {
   TaxBandSchema,
   TaxYearStringSchema,
 } from './emailValidation';
-// Molecules layer validation (feedback forms, filters)
+// Molecules layer validation (filters)
 export {
   type CategoryFilterData,
   CategoryFilterSchema,
-  type FeedbackFormData,
-  FeedbackFormSchema,
   validateCategoryFilter,
-  validateFeedbackForm,
 } from './moleculesValidation';
 // Page data validation
 export * from './pageDataValidation';

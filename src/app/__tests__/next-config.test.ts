@@ -12,6 +12,11 @@ describe('next.config canonical redirects', () => {
     expect(redirects).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
+          source: '/calculator',
+          destination: '/#tax-calculator',
+          permanent: true,
+        }),
+        expect.objectContaining({
           source: '/blog/category/tax-tools',
           destination: '/blog/category/tax-basics',
           permanent: true,

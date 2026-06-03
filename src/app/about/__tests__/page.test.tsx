@@ -32,11 +32,6 @@ describe('AboutPage', () => {
     });
     expect(installLink).toHaveAttribute('href', '/install');
     expect(installLink).toHaveClass('w-full');
-
-    expect(
-      screen.getByRole('button', {
-        name: /Send feedback/i,
-      }),
-    ).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Send feedback/i })).not.toBeInTheDocument();
   });
 });

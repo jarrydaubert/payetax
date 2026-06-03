@@ -56,9 +56,9 @@ export const PRODUCTION_ENV_FEATURE_CONTRACT: readonly ProductionEnvFeatureContr
   },
   {
     id: 'results-email',
-    label: 'PAYE, director results, and feedback email delivery',
+    label: 'PAYE and director results email delivery',
     enabled: true,
-    requiredEnv: ['BREVO_SMTP_HOST', 'BREVO_SMTP_PORT', 'BREVO_SMTP_LOGIN', 'BREVO_SMTP_PASSWORD'],
+    requiredEnv: ['BREVO_API_KEY', 'BREVO_FROM_EMAIL'],
     verificationMode: 'env',
   },
   {
@@ -70,14 +70,6 @@ export const PRODUCTION_ENV_FEATURE_CONTRACT: readonly ProductionEnvFeatureContr
     notes: [
       'Verified via the live health endpoint because Vercel env pull may return blank values for sensitive vars.',
     ],
-  },
-  {
-    id: 'sentry-webhook',
-    label: 'Sentry webhook to Linear integration',
-    enabled: true,
-    requiredEnv: ['SENTRY_WEBHOOK_SECRET', 'LINEAR_API_KEY'],
-    verificationMode: 'env',
-    notes: ['LINEAR_TEAM_KEY is optional because the route defaults to PAYTAX when unset.'],
   },
 ] as const;
 

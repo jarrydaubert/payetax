@@ -56,10 +56,9 @@ describe('NavbarMobileMenu', () => {
 
     it('should render utilities when provided', () => {
       render(
-        <NavbarMobileMenu {...defaultProps} utilities={<button type='button'>Feedback</button>} />,
+        <NavbarMobileMenu {...defaultProps} utilities={<button type='button'>Utility</button>} />,
       );
-      // Utilities (e.g., FeedbackDialog) render after nav links - no separate CTA button
-      expect(screen.getByRole('button', { name: 'Feedback' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Utility' })).toBeInTheDocument();
     });
   });
 

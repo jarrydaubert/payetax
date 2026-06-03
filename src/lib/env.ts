@@ -30,12 +30,8 @@ export const PublicEnvSchema = z.object({
 });
 
 export const ServerEnvSchema = z.object({
-  BREVO_SMTP_HOST: z.string().min(1, 'Brevo SMTP host must not be empty').optional(),
-  BREVO_SMTP_PORT: z.string().regex(/^\d+$/, 'Brevo SMTP port must be numeric').optional(),
-  BREVO_SMTP_LOGIN: z.string().min(1, 'Brevo SMTP login must not be empty').optional(),
-  BREVO_SMTP_PASSWORD: z.string().min(1, 'Brevo SMTP password must not be empty').optional(),
+  BREVO_API_KEY: z.string().min(1, 'Brevo API key must not be empty').optional(),
   BREVO_FROM_EMAIL: z.string().min(1, 'Brevo from email must not be empty').optional(),
-  FEEDBACK_TO_EMAIL: z.string().email('Feedback recipient must be a valid email').optional(),
   UPSTASH_REDIS_REST_URL: z.string().url('Upstash Redis REST URL must be a valid URL').optional(),
   UPSTASH_REDIS_REST_TOKEN: z
     .string()
@@ -48,14 +44,11 @@ export const ServerEnvSchema = z.object({
   SENTRY_AUTH_TOKEN: z.string().optional(),
   SENTRY_ORG: z.string().optional(),
   SENTRY_PROJECT: z.string().optional(),
-  SENTRY_WEBHOOK_SECRET: z.string().min(1, 'Sentry webhook secret must not be empty').optional(),
   VERCEL_URL: z.string().min(1, 'VERCEL_URL must not be empty').optional(),
   VERCEL_PROJECT_PRODUCTION_URL: z
     .string()
     .min(1, 'VERCEL_PROJECT_PRODUCTION_URL must not be empty')
     .optional(),
-  LINEAR_API_KEY: z.string().min(1, 'Linear API key must not be empty').optional(),
-  LINEAR_TEAM_KEY: z.string().min(1, 'Linear team key must not be empty').optional(),
   ANALYZE: z
     .string()
     .transform((val) => val === 'true')
@@ -75,19 +68,13 @@ export const EnvSchema = z.object({
 export const RequiredProductionEnvSchema = z
   .object({
     NEXT_PUBLIC_SITE_URL: z.string().url('Site URL must be a valid URL'),
-    BREVO_SMTP_HOST: z.string().min(1, 'Brevo SMTP host is required'),
-    BREVO_SMTP_PORT: z.string().regex(/^\d+$/, 'Brevo SMTP port must be numeric'),
-    BREVO_SMTP_LOGIN: z.string().min(1, 'Brevo SMTP login is required'),
-    BREVO_SMTP_PASSWORD: z.string().min(1, 'Brevo SMTP password is required'),
+    BREVO_API_KEY: z.string().min(1, 'Brevo API key is required'),
     BREVO_FROM_EMAIL: z.string().min(1, 'Brevo from email is required'),
-    FEEDBACK_TO_EMAIL: z.string().email('Feedback recipient must be a valid email'),
     NEXT_PUBLIC_ENABLE_ANALYTICS: z
       .string()
       .transform((val) => val === 'true')
       .optional(),
     NEXT_PUBLIC_GA_ID: GA_ID_SCHEMA.optional(),
-    SENTRY_WEBHOOK_SECRET: z.string().optional(),
-    LINEAR_API_KEY: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     const analyticsEnabled = data.NEXT_PUBLIC_ENABLE_ANALYTICS ?? true;
@@ -98,25 +85,6 @@ export const RequiredProductionEnvSchema = z
           'Google Analytics ID is required in production when analytics are enabled (set NEXT_PUBLIC_ENABLE_ANALYTICS=false to disable analytics).',
         path: ['NEXT_PUBLIC_GA_ID'],
       });
-    }
-
-    const webhookConfigured = Boolean(data.SENTRY_WEBHOOK_SECRET || data.LINEAR_API_KEY);
-    if (webhookConfigured) {
-      if (!data.SENTRY_WEBHOOK_SECRET) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message:
-            'SENTRY_WEBHOOK_SECRET is required when Linear webhook integration is configured.',
-          path: ['SENTRY_WEBHOOK_SECRET'],
-        });
-      }
-      if (!data.LINEAR_API_KEY) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'LINEAR_API_KEY is required when Sentry webhook integration is configured.',
-          path: ['LINEAR_API_KEY'],
-        });
-      }
     }
   });
 
@@ -150,23 +118,16 @@ export function validatePublicEnv(): PublicEnv {
 
 export function validateServerEnv(): ServerEnv {
   const result = ServerEnvSchema.safeParse({
-    BREVO_SMTP_HOST: process.env.BREVO_SMTP_HOST,
-    BREVO_SMTP_PORT: process.env.BREVO_SMTP_PORT,
-    BREVO_SMTP_LOGIN: process.env.BREVO_SMTP_LOGIN,
-    BREVO_SMTP_PASSWORD: process.env.BREVO_SMTP_PASSWORD,
+    BREVO_API_KEY: process.env.BREVO_API_KEY,
     BREVO_FROM_EMAIL: process.env.BREVO_FROM_EMAIL,
-    FEEDBACK_TO_EMAIL: process.env.FEEDBACK_TO_EMAIL,
     UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
     UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
     RATE_LIMIT_HEALTH_SECRET: process.env.RATE_LIMIT_HEALTH_SECRET,
     SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
     SENTRY_ORG: process.env.SENTRY_ORG,
     SENTRY_PROJECT: process.env.SENTRY_PROJECT,
-    SENTRY_WEBHOOK_SECRET: process.env.SENTRY_WEBHOOK_SECRET,
     VERCEL_URL: process.env.VERCEL_URL,
     VERCEL_PROJECT_PRODUCTION_URL: process.env.VERCEL_PROJECT_PRODUCTION_URL,
-    LINEAR_API_KEY: process.env.LINEAR_API_KEY,
-    LINEAR_TEAM_KEY: process.env.LINEAR_TEAM_KEY,
     ANALYZE: process.env.ANALYZE,
     SKIP_CONFIG_VALIDATION: process.env.SKIP_CONFIG_VALIDATION,
     NODE_ENV: process.env.NODE_ENV,
@@ -192,16 +153,10 @@ export function validateEnv(): Env {
 export function validateProductionEnv(): RequiredProductionEnv {
   const result = RequiredProductionEnvSchema.safeParse({
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
-    BREVO_SMTP_HOST: process.env.BREVO_SMTP_HOST,
-    BREVO_SMTP_PORT: process.env.BREVO_SMTP_PORT,
-    BREVO_SMTP_LOGIN: process.env.BREVO_SMTP_LOGIN,
-    BREVO_SMTP_PASSWORD: process.env.BREVO_SMTP_PASSWORD,
+    BREVO_API_KEY: process.env.BREVO_API_KEY,
     BREVO_FROM_EMAIL: process.env.BREVO_FROM_EMAIL,
-    FEEDBACK_TO_EMAIL: process.env.FEEDBACK_TO_EMAIL,
     NEXT_PUBLIC_ENABLE_ANALYTICS: process.env.NEXT_PUBLIC_ENABLE_ANALYTICS,
     NEXT_PUBLIC_GA_ID: process.env.NEXT_PUBLIC_GA_ID,
-    SENTRY_WEBHOOK_SECRET: process.env.SENTRY_WEBHOOK_SECRET,
-    LINEAR_API_KEY: process.env.LINEAR_API_KEY,
   });
 
   if (!result.success) {

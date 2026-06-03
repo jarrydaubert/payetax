@@ -1,8 +1,7 @@
 // src/components/organisms/SimpleNavbar.tsx
 'use client';
 
-import { Menu, MessageSquare, X } from 'lucide-react';
-import dynamic from 'next/dynamic';
+import { Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
@@ -27,23 +26,8 @@ interface SimpleNavbarProps {
   className?: string;
 }
 
-// Keep feedback UI off the critical path for initial mobile render.
-const FeedbackDialog = dynamic(
-  () => import('@/components/organisms/FeedbackDialog').then((mod) => mod.FeedbackDialog),
-  {
-    ssr: false,
-    loading: () => (
-      <span className='flex min-h-11 items-center rounded-md px-4 py-2.5 font-medium text-on-brand-muted text-sm'>
-        Feedback
-      </span>
-    ),
-  },
-);
-
 const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMobileFeedbackOpen, setIsMobileFeedbackOpen] = useState(false);
-  const [pendingMobileFeedbackOpen, setPendingMobileFeedbackOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -93,20 +77,8 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
   );
 
   const handleMobileLinkClick = useCallback(() => {
-    setPendingMobileFeedbackOpen(false);
     setIsMobileMenuOpen(false);
   }, []);
-
-  const handleMobileFeedbackClick = useCallback(() => {
-    setPendingMobileFeedbackOpen(true);
-    setIsMobileMenuOpen(false);
-  }, []);
-
-  const handleMobileMenuExitComplete = useCallback(() => {
-    if (!pendingMobileFeedbackOpen) return;
-    setPendingMobileFeedbackOpen(false);
-    setIsMobileFeedbackOpen(true);
-  }, [pendingMobileFeedbackOpen]);
 
   return (
     <>
@@ -159,7 +131,6 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
 
         {/* Desktop Utilities */}
         <div className={cn('hidden items-center justify-end md:flex', SPACING.GAP_2)}>
-          <FeedbackDialog />
           <Button
             asChild
             size='touch'
@@ -178,7 +149,6 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           size='icon'
           className='col-start-3 justify-self-end text-on-brand md:hidden'
           onClick={() => {
-            setPendingMobileFeedbackOpen(false);
             setIsMobileMenuOpen(!isMobileMenuOpen);
           }}
           aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
@@ -195,7 +165,6 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
       {/*
        * Mobile Menu - Outside nav to allow backdrop-filter to work.
        * Calculator navigation handled by links array (/#tax-calculator).
-       * FeedbackDialog passed as utility, rendered after nav links.
        */}
       <NavbarMobileMenu
         isOpen={isMobileMenuOpen}
@@ -203,28 +172,8 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
         pathname={pathname}
         onLinkClick={handleMobileLinkClick}
         onBackdropClick={() => {
-          setPendingMobileFeedbackOpen(false);
           setIsMobileMenuOpen(false);
         }}
-        onExitComplete={handleMobileMenuExitComplete}
-        utilities={
-          <button
-            type='button'
-            onClick={handleMobileFeedbackClick}
-            className='flex min-h-11 items-center gap-2 rounded-lg px-4 py-3 font-medium text-on-brand-muted text-sm transition-colors hover:text-on-brand'
-            aria-haspopup='dialog'
-            data-testid='mobile-feedback-button'
-          >
-            <MessageSquare className={ICON_SIZES.SIZE_4} aria-hidden='true' />
-            Feedback
-          </button>
-        }
-      />
-
-      <FeedbackDialog
-        open={isMobileFeedbackOpen}
-        onOpenChange={setIsMobileFeedbackOpen}
-        hideTrigger={true}
       />
 
       {/* Spacer for fixed navbar */}

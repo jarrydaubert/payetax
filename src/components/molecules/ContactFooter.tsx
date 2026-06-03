@@ -47,7 +47,7 @@ export interface ContactFooterProps {
  * <ContactFooter
  *   links={[
  *     { text: 'support@example.com', href: 'mailto:support@example.com', type: 'email' },
- *     { text: 'Feedback Form', href: '/feedback', type: 'link' },
+ *     { text: 'Support', href: '/support', type: 'link' },
  *   ]}
  * />
  * ```

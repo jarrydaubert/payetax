@@ -10,9 +10,10 @@ It is not a commercial growth site. Keep the product useful, accurate, and simpl
 
 ## Scope Guardrails
 
-- Keep the main calculator, tools, Director Intelligence, blog, feedback, email-results, PWA, GA4, Sentry, Linear, and Brevo SMTP.
+- Keep the main calculator, tools, Director Intelligence, blog, email-results, PWA, GA4, Sentry, Brevo API email, and Upstash-backed rate limiting.
 - Do not reintroduce growth page families, competitor-style SEO pages, partner lead capture, or mailing-list plumbing unless explicitly requested.
 - Do not add extra analytics vendors beyond GA4 unless there is a specific implementation task.
+- Do not reintroduce the feedback feature or active Linear integration unless explicitly requested.
 - Do not invent tax behaviour, provider support, production status, usage metrics, or security controls.
 - Do not commit secrets.
 
@@ -50,10 +51,9 @@ Use `.env.template` as the source of local env names. Never commit `.env.local`.
 
 Production secrets belong in Vercel project settings:
 
-- Brevo SMTP values for feedback and email-results flows
+- Brevo API values for email-results flows
 - Upstash Redis for distributed rate limiting
 - Sentry values for monitoring and source maps
-- Linear API key for issue creation from Sentry webhooks
 - GA4 measurement id for basic analytics
 
 If a Vercel CLI command cannot retrieve project settings, check `.vercel/project.json`. A stale local link should be replaced by relinking to the current project.
@@ -74,7 +74,7 @@ If a Vercel CLI command cannot retrieve project settings, check `.vercel/project
 - Director Intelligence calculator
 - Blog and category pages
 - About, privacy, compliance, install
-- API routes for sending results, feedback, Sentry webhook, and operational rate-limit health
+- API routes for sending results and operational rate-limit health
 
 ## Pull Request Expectations
 

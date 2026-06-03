@@ -184,7 +184,7 @@ export function CalculatorContainer() {
     // Clear any pending scroll timeout
     if (whatIfScrollTimeoutRef.current) clearTimeout(whatIfScrollTimeoutRef.current);
 
-    // Scroll to results and show feedback
+    // Scroll to results after the comparison updates
     whatIfScrollTimeoutRef.current = window.setTimeout(() => {
       resultsRef.current?.scrollIntoView({
         behavior: shouldReduceMotion ? 'auto' : 'smooth',
