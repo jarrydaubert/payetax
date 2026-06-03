@@ -107,6 +107,11 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: '/calculator',
+        destination: '/#tax-calculator',
+        permanent: true,
+      },
+      {
         source: '/blog/category/tax-tools',
         destination: '/blog/category/tax-basics',
         permanent: true,
