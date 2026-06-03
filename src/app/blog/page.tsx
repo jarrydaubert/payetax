@@ -6,7 +6,6 @@ import { notFound } from 'next/navigation';
 import { AllPostsGrid } from '@/components/organisms/AllPostsGrid';
 import { EditorsPicksSticky } from '@/components/organisms/EditorsPicks';
 import { LatestArticles } from '@/components/organisms/LatestArticles';
-import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { POSTS_PER_PAGE } from '@/constants/blogCategories';
 import {
@@ -226,11 +225,6 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             totalPages={totalPages}
             totalPosts={totalPosts}
           />
-        </div>
-
-        {/* Newsletter CTA */}
-        <div className='container mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8'>
-          <NewsletterCTA className='mx-auto max-w-4xl' />
         </div>
       </div>
     </>

@@ -1,59 +1,22 @@
-# Production Env Contract
+# Production Environment Contract
 
-## Purpose
+This document lists production environment variables for the public R&D version of PayeTax.
 
-Define which shipped, release-sensitive features are expected to work in production and which environment variables those enabled features require.
+## Required For Core Production
 
-Scope:
+| Flow | Variables |
+| --- | --- |
+| Public site URL and metadata | `NEXT_PUBLIC_SITE_URL` |
+| Basic analytics | `NEXT_PUBLIC_GA_ID` |
+| PAYE and director results email | `BREVO_SMTP_HOST`, `BREVO_SMTP_PORT`, `BREVO_SMTP_LOGIN`, `BREVO_SMTP_PASSWORD`, `BREVO_FROM_EMAIL` |
+| Feedback email | `BREVO_SMTP_HOST`, `BREVO_SMTP_PORT`, `BREVO_SMTP_LOGIN`, `BREVO_SMTP_PASSWORD`, `BREVO_FROM_EMAIL`, `FEEDBACK_TO_EMAIL` |
+| Distributed API rate limiting | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
+| Sentry browser monitoring | `NEXT_PUBLIC_SENTRY_DSN` |
+| Sentry source maps | `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` |
+| Sentry to Linear webhook | `SENTRY_WEBHOOK_SECRET`, `LINEAR_API_KEY`, optional `LINEAR_TEAM_KEY` |
 
-- Shipped flows only.
-- Dormant or unshipped experiments are excluded by default.
+## Local Development
 
-Canonical sources:
+Use `.env.template` for names and `.env.local` for local values.
 
-- Contract definition: `src/lib/productionEnvContract.ts`
-- Live verification command: `bun run check:production-env-contract`
-
-## Current Contract
-
-| Feature | Enabled In Production Contract | Verification Method | Required Env |
-|---|---|---|---|
-| Canonical site/origin configuration | Yes | Env snapshot | `NEXT_PUBLIC_SITE_URL` |
-| Production analytics | Yes, unless `NEXT_PUBLIC_ENABLE_ANALYTICS=false` | Env snapshot | `NEXT_PUBLIC_GA_ID` |
-| Newsletter subscribe flow | Yes | Env snapshot | `KIT_API_SECRET`, `KIT_FORM_ID` |
-| Newsletter unsubscribe flow | Yes | Env snapshot | `KIT_API_SECRET`, `UNSUBSCRIBE_SECRET` |
-| PAYE and director results email delivery | Yes | Env snapshot | `RESEND_API_KEY` |
-| Referral lead confirmation and partner notification | No | Env snapshot | `RESEND_API_KEY`, `REFERRAL_PARTNER_EMAIL` |
-| Distributed rate-limit verification path | Yes | Runtime verification | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `RATE_LIMIT_HEALTH_SECRET` |
-| Sentry webhook to Linear integration | Yes | Env snapshot | `SENTRY_WEBHOOK_SECRET`, `LINEAR_API_KEY` |
-| Authenticated IndexNow submission | No | Env snapshot | `INDEXNOW_SUBMIT_SECRET`, `INDEXNOW_KEY` |
-
-Notes:
-
-- `LINEAR_TEAM_KEY` is not required because the webhook route defaults to `PAYTAX`.
-- Referral remains in the contract as a disabled feature until the CTA is actually rolled out on shipped surfaces.
-- The distributed rate-limit path is verified at runtime because Vercel `env pull` may return blank values for sensitive vars even when production is configured correctly.
-- IndexNow remains in the contract as a disabled feature so enabling it is explicit and reviewable, rather than hidden in ad hoc env changes.
-
-## Release Use
-
-This check applies only after PayeTax has been migrated to the intended Vercel project. See `docs/guides/VERCEL_MIGRATION.md`.
-
-Run this command against live Vercel Production before marking a release report complete:
-
-```bash
-RATE_LIMIT_VERIFY_BASE_URL="https://payetax.co.uk" \
-RATE_LIMIT_HEALTH_SECRET="..." \
-bun run check:production-env-contract
-```
-
-Alternative for captured env-snapshot evidence:
-
-```bash
-bun run check:production-env-contract -- --from-env-file /path/to/pulled-production.env
-```
-
-The command fails if:
-
-- an env-snapshot-verified feature is missing one of its required production variables, or
-- the runtime-verified distributed rate-limit check fails.
+Do not create placeholder secrets in committed files. Leave unknown values blank in templates.

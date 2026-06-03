@@ -1,4 +1,4 @@
-import { Resend } from 'resend';
+import { createTransport } from 'nodemailer';
 
 export interface OutboundEmailMessage {
   from: string;
@@ -7,7 +7,6 @@ export interface OutboundEmailMessage {
   html: string;
   text: string;
   replyTo?: string;
-  tags?: Array<{ name: string; value: string }>;
 }
 
 export type SendOutboundEmailResult =
@@ -22,31 +21,54 @@ function formatErrorForLog(error: unknown): { name?: string; message?: string } 
   return { message: 'Unknown error' };
 }
 
-function getResendClient(): Resend | null {
-  return process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+function getSmtpConfig() {
+  const host = process.env.BREVO_SMTP_HOST;
+  const login = process.env.BREVO_SMTP_LOGIN;
+  const password = process.env.BREVO_SMTP_PASSWORD;
+  const port = Number(process.env.BREVO_SMTP_PORT || '587');
+
+  if (!(host && login && password && Number.isFinite(port))) return null;
+
+  return { host, login, password, port };
+}
+
+export function isOutboundEmailConfigured(): boolean {
+  return Boolean(getSmtpConfig());
 }
 
 export async function sendOutboundEmail(
   message: OutboundEmailMessage,
   logPrefix: string,
 ): Promise<SendOutboundEmailResult> {
-  const resend = getResendClient();
-  if (!resend) {
-    console.error(`[${logPrefix}] Resend not configured`);
+  const config = getSmtpConfig();
+  if (!config) {
+    console.error(`[${logPrefix}] Brevo SMTP not configured`);
     return { ok: false, reason: 'not_configured' };
   }
 
   try {
-    const { error } = await resend.emails.send(message);
+    const transporter = createTransport({
+      host: config.host,
+      port: config.port,
+      secure: config.port === 465,
+      auth: {
+        user: config.login,
+        pass: config.password,
+      },
+    });
 
-    if (error) {
-      console.error(`[${logPrefix}] Resend error:`, formatErrorForLog(error));
-      return { ok: false, reason: 'delivery_failed' };
-    }
+    await transporter.sendMail({
+      from: message.from,
+      to: message.to,
+      subject: message.subject,
+      html: message.html,
+      text: message.text,
+      replyTo: message.replyTo,
+    });
 
     return { ok: true };
   } catch (error) {
-    console.error(`[${logPrefix}] Error:`, formatErrorForLog(error));
-    return { ok: false, reason: 'unexpected_error' };
+    console.error(`[${logPrefix}] Brevo SMTP error:`, formatErrorForLog(error));
+    return { ok: false, reason: 'delivery_failed' };
   }
 }

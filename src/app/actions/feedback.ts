@@ -8,11 +8,9 @@
 
 import { headers } from 'next/headers';
 import { after } from 'next/server';
-import { Resend } from 'resend';
+import { isOutboundEmailConfigured, sendOutboundEmail } from '@/lib/email/emailDelivery';
 import { checkRateLimitWithPolicy } from '@/lib/rateLimit';
 import { validateFeedbackForm } from '@/lib/validation/moleculesValidation';
-
-const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 // Max message length to prevent abuse (10KB)
 const MAX_MESSAGE_LENGTH = 10000;
@@ -110,9 +108,8 @@ export async function submitFeedback(
     };
   }
 
-  // Early exit if Resend not configured (don't leak implementation details)
-  if (!resend) {
-    console.error('Feedback submission failed: RESEND_API_KEY not configured');
+  if (!isOutboundEmailConfigured()) {
+    console.error('Feedback submission failed: Brevo SMTP not configured');
     return {
       success: false,
       error: 'Something went wrong. Please try again later.',
@@ -126,23 +123,16 @@ export async function submitFeedback(
   const safeTimestamp = escapeHtml(timestamp || new Date().toLocaleString());
   const safeUserAgent = escapeHtml((userAgent || 'N/A').slice(0, 200));
   const safeIp = escapeHtml(ipAddress);
-
-  const resendClient = resend;
-
   // Send email AFTER response is returned (non-blocking)
   after(async () => {
-    if (!resendClient) return;
     try {
-      const { error } = await resendClient.emails.send({
-        from: 'PayeTax <support@payetax.co.uk>',
-        to: ['support@payetax.co.uk'],
-        replyTo: email || undefined,
-        subject: `New Feedback from ${safeEmail} on PayeTax`,
-        tags: [
-          { name: 'source', value: 'website' },
-          { name: 'type', value: 'feedback' },
-        ],
-        html: `
+      const result = await sendOutboundEmail(
+        {
+          from: process.env.BREVO_FROM_EMAIL || 'PayeTax <support@payetax.co.uk>',
+          to: process.env.FEEDBACK_TO_EMAIL || 'support@payetax.co.uk',
+          replyTo: email || undefined,
+          subject: `New Feedback from ${safeEmail} on PayeTax`,
+          html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <h2 style="color: #7c3aed; border-bottom: 2px solid #7c3aed; padding-bottom: 10px;">
               💬 New User Feedback
@@ -171,7 +161,7 @@ export async function submitFeedback(
             </p>
           </div>
         `,
-        text: `New feedback from ${email || 'Anonymous'}
+          text: `New feedback from ${email || 'Anonymous'}
 
 Message: ${message}
 
@@ -181,10 +171,12 @@ Timestamp: ${timestamp || new Date().toLocaleString()}
 IP: ${ipAddress}
 
 Submitted via PayeTax.co.uk`,
-      });
+        },
+        'feedback',
+      );
 
-      if (error) {
-        console.error('Feedback email failed:', error.message);
+      if (!result.ok) {
+        console.error('Feedback email failed:', result.reason);
       }
     } catch (err) {
       console.error('Feedback email failed:', err);

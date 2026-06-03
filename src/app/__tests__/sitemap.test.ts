@@ -5,24 +5,9 @@ jest.mock('@/lib/blog', () => ({
   getBlogCategories: jest.fn(),
 }));
 
-jest.mock('@/data/competitors', () => ({
-  getAllCompetitorSlugs: jest.fn(() => ['listentotaxman']),
-}));
-
-jest.mock('@/data/scenarios', () => ({
-  getAllScenarioSlugs: jest.fn(() => ['tax-trap-100k']),
-}));
-
-jest.mock('@/data/useCases', () => ({
-  getAllUseCaseSlugs: jest.fn(() => ['contractors']),
-}));
-
 const { getBlogPosts, getBlogCategories } = jest.requireMock('@/lib/blog') as {
   getBlogPosts: jest.Mock;
   getBlogCategories: jest.Mock;
-};
-const { getAllCompetitorSlugs } = jest.requireMock('@/data/competitors') as {
-  getAllCompetitorSlugs: jest.Mock;
 };
 
 describe('sitemap', () => {
@@ -34,7 +19,7 @@ describe('sitemap', () => {
     jest.clearAllMocks();
   });
 
-  it('includes static, blog, competitor, scenario, and use case entries', async () => {
+  it('includes retained static routes, tools, blog posts, and blog categories', async () => {
     process.env.NEXT_PUBLIC_SITE_URL = 'https://example.com';
 
     getBlogPosts.mockResolvedValue([
@@ -45,7 +30,7 @@ describe('sitemap', () => {
         featured: true,
       },
     ]);
-    getBlogCategories.mockResolvedValue([{ slug: 'tax-basics' }]);
+    getBlogCategories.mockResolvedValue([{ slug: 'tax-basics', count: 1 }]);
 
     const { default: sitemap } = await import('../sitemap');
     const entries = (await sitemap()) as MetadataRoute.Sitemap;
@@ -58,13 +43,10 @@ describe('sitemap', () => {
         }),
         expect.objectContaining({ url: 'https://example.com/privacy' }),
         expect.objectContaining({ url: 'https://example.com/install' }),
-        expect.objectContaining({ url: 'https://example.com/blog/salary-guide', priority: 0.9 }),
+        expect.objectContaining({ url: 'https://example.com/tools/director-guide' }),
+        expect.objectContaining({ url: 'https://example.com/tools/national-insurance-calculator' }),
+        expect.objectContaining({ url: 'https://example.com/blog/salary-guide', priority: 0.85 }),
         expect.objectContaining({ url: 'https://example.com/blog/category/tax-basics' }),
-        expect.objectContaining({ url: 'https://example.com/alternatives/listentotaxman' }),
-        expect.objectContaining({ url: 'https://example.com/scenarios' }),
-        expect.objectContaining({ url: 'https://example.com/scenarios/tax-trap-100k' }),
-        expect.objectContaining({ url: 'https://example.com/best-for/contractors' }),
-        expect.objectContaining({ url: 'https://example.com/calculator/30000-after-tax' }),
       ]),
     );
   });
@@ -81,17 +63,9 @@ describe('sitemap', () => {
     for (const entry of entries) {
       expect(entry.priority).toBe(Number(entry.priority?.toFixed(2)));
     }
-    expect(entries).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          url: 'https://example.com/calculator/110000-after-tax',
-          priority: 0.72,
-        }),
-      ]),
-    );
   });
 
-  it('falls back to default blog/category entries when data fetch fails', async () => {
+  it('falls back to static routes when blog data fetch fails', async () => {
     process.env.NEXT_PUBLIC_SITE_URL = 'https://example.com';
 
     getBlogPosts.mockRejectedValueOnce(new Error('blog fail'));
@@ -99,55 +73,11 @@ describe('sitemap', () => {
 
     const { default: sitemap } = await import('../sitemap');
     const entries = (await sitemap()) as MetadataRoute.Sitemap;
-
-    expect(entries).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          url: 'https://example.com/blog/understanding-uk-tax-codes',
-        }),
-        expect.objectContaining({
-          url: 'https://example.com/blog/category/tax-basics',
-        }),
-      ]),
-    );
-  });
-
-  it('caps long-tail programmatic URLs for crawl-budget focus', async () => {
-    process.env.NEXT_PUBLIC_SITE_URL = 'https://example.com';
-
-    getBlogPosts.mockResolvedValue([]);
-    getBlogCategories.mockResolvedValue([]);
-    getAllCompetitorSlugs.mockReturnValue([
-      'gov-uk-calculator',
-      'salary-calculator',
-      'listentotaxman',
-      'moneysavingexpert',
-      'xero-calculator',
-      'sage-calculator',
-      'quickbooks-calculator',
-      'reed-calculator',
-      'freelancer-calculator',
-      'contractor-calculator',
-      'taxscouts',
-      'salarybot',
-      'extra-1',
-      'extra-2',
-    ]);
-
-    const { default: sitemap } = await import('../sitemap');
-    const entries = (await sitemap()) as MetadataRoute.Sitemap;
     const urls = entries.map((entry) => entry.url);
 
-    expect(urls).toContain('https://example.com/calculator/30000-after-tax');
-    expect(urls).toContain('https://example.com/calculator/57000-after-tax');
-    expect(urls).toContain('https://example.com/calculator/78000-after-tax');
-    expect(urls).not.toContain('https://example.com/calculator/19000-after-tax');
-    expect(urls).not.toContain('https://example.com/calculator/104000-after-tax');
-    expect(urls).not.toContain('https://example.com/calculator/275000-after-tax');
-    expect(urls).not.toContain('https://example.com/calculator/370000-after-tax');
-
-    const alternativesCount = urls.filter((url) => url.includes('/alternatives/')).length;
-    expect(alternativesCount).toBeLessThanOrEqual(12);
-    expect(urls.some((url) => url.includes('/vs/'))).toBe(false);
+    expect(urls).toContain('https://example.com/');
+    expect(urls).toContain('https://example.com/tools');
+    expect(urls.some((url) => url.includes('/calculator/'))).toBe(false);
+    expect(urls.some((url) => url.includes('/scenarios'))).toBe(false);
   });
 });

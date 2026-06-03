@@ -6,7 +6,6 @@
  */
 
 export const ANALYTICS_EVENT_ACTIONS = [
-  'affiliate_click',
   'blog_article_read',
   'calculator_action',
   'calculator_completed',
@@ -27,17 +26,12 @@ export const ANALYTICS_EVENT_ACTIONS = [
   'guide_results_shown',
   'guide_started',
   'guide_warning_shown',
-  'newsletter_subscribe_failed',
-  'newsletter_subscribed',
   'performance_metric',
   'pro_calculator_completed',
   'pro_calculator_started',
   'pro_calendar_downloaded',
   'pro_strategy_selected',
   'pwa_installed',
-  'referral_cta_clicked',
-  'referral_cta_dismissed',
-  'referral_lead_submitted',
   'result_shared',
   'result_viewed',
   'scroll_depth',
@@ -47,7 +41,6 @@ export const ANALYTICS_EVENT_ACTIONS = [
 export type AnalyticsAction = (typeof ANALYTICS_EVENT_ACTIONS)[number];
 
 export const SEO_ACTIONS = [
-  'affiliate_click',
   'download',
   'external_link',
   'form_interaction',

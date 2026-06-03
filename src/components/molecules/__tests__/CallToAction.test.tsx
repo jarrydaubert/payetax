@@ -31,32 +31,12 @@ describe('CallToAction Component', () => {
     });
   });
 
-  describe('Newsletter Variant', () => {
-    it('should render newsletter variant with correct content', () => {
-      render(<CallToAction variant='newsletter' />);
-
-      expect(screen.getByText('Stay Updated')).toBeInTheDocument();
-      expect(screen.getByText(/Get the latest UK tax insights/i)).toBeInTheDocument();
-      expect(screen.getByPlaceholderText(/Enter your email/i)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Subscribe/i })).toBeInTheDocument();
-      expect(screen.getByRole('link', { name: /Try Tax Calculator/i })).toBeInTheDocument();
-    });
-
-    it('should have email input field', () => {
-      render(<CallToAction variant='newsletter' />);
-
-      const emailInput = screen.getByPlaceholderText(/Enter your email/i);
-      expect(emailInput).toHaveAttribute('type', 'email');
-      expect(emailInput).toBeRequired();
-    });
-  });
-
   describe('Calculator Variant', () => {
     it('should render calculator variant with correct content', () => {
       render(<CallToAction variant='calculator' />);
 
       expect(screen.getByText('Ready to Calculate?')).toBeInTheDocument();
-      expect(screen.getByText(/Use our free UK tax calculator/i)).toBeInTheDocument();
+      expect(screen.getByText(/Use the UK tax calculator/i)).toBeInTheDocument();
       expect(screen.getByRole('link', { name: /Start Calculating/i })).toBeInTheDocument();
       expect(screen.getByRole('link', { name: /Learn More/i })).toBeInTheDocument();
     });

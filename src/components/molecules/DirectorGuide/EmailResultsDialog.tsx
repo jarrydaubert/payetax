@@ -2,7 +2,7 @@
  * Email Results Dialog - Send director tax strategy report to user's inbox
  *
  * Security/Privacy notes:
- * - Email sent via Resend (third-party provider subject to their privacy policy)
+ * - Email sent via Brevo SMTP (third-party provider subject to their privacy policy)
  * - No results stored on our servers after email is sent
  * - Rate limited server-side (5 emails/min per client)
  */

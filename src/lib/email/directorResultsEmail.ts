@@ -9,7 +9,6 @@
 
 import type { TaxYear } from '@/constants/taxRates';
 import { CT_RATES, TAX_RATES } from '@/constants/taxRates';
-import { resolveNewsletterBaseUrl } from '@/lib/newsletter/emailConfig';
 import { formatCurrency } from '@/lib/utils';
 import type { DirectorStrategy } from '@/lib/validation/emailValidation';
 
@@ -22,7 +21,7 @@ export function escapeHtml(str: string): string {
     .replace(/'/g, '&#39;');
 }
 
-const BASE_URL = resolveNewsletterBaseUrl();
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://payetax.co.uk';
 
 function normalizeTaxYear(taxYear?: string): TaxYear {
   if (!taxYear) return '2025-2026';

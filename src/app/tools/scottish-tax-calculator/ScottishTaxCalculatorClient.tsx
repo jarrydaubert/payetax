@@ -4,7 +4,6 @@
 import { ArrowRight, Calculator, Info, MapPin, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import { useId, useState } from 'react';
-import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -357,13 +356,6 @@ export function ScottishTaxCalculatorClient() {
           </div>
         </CardContent>
       </Card>
-
-      <NewsletterCTA
-        className='mb-8'
-        title='Get Scottish Tax Updates by Email'
-        description='Scottish rate changes, HMRC updates, and practical PAYE guidance.'
-      />
-
       {/* CTA */}
       <div className='mt-12 text-center'>
         <p className={cn('mb-4 text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>

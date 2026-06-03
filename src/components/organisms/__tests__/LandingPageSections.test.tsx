@@ -3,13 +3,19 @@ import { render, screen } from '@/test/testing-library';
 import LandingPageSections from '../LandingPageSections';
 
 describe('LandingPageSections', () => {
-  it('renders major landing sections', () => {
+  it('renders the retained supporting sections', () => {
     render(<LandingPageSections />);
 
-    expect(screen.getByText('How It Works')).toBeInTheDocument();
-    expect(screen.getByText('Features')).toBeInTheDocument();
     expect(screen.getByText('FAQ')).toBeInTheDocument();
-    expect(screen.getByText('For Directors')).toBeInTheDocument();
+    expect(screen.getByText(/HMRC rates verified/)).toBeInTheDocument();
+  });
+
+  it('does not render removed promotional sections', () => {
+    render(<LandingPageSections />);
+
+    expect(screen.queryByText('How It Works')).not.toBeInTheDocument();
+    expect(screen.queryByText('Features')).not.toBeInTheDocument();
+    expect(screen.queryByText('For Directors')).not.toBeInTheDocument();
   });
 
   it('renders proof strip with verification date and links', () => {
@@ -21,13 +27,6 @@ describe('LandingPageSections', () => {
       '/privacy',
     );
     expect(screen.getByRole('link', { name: 'Compliance' })).toHaveAttribute('href', '/compliance');
-  });
-
-  it('renders director spotlight with CTA', () => {
-    render(<LandingPageSections />);
-
-    const directorLink = screen.getByRole('link', { name: /Open Director Intelligence/i });
-    expect(directorLink).toHaveAttribute('href', '/tools/director-guide');
   });
 
   it('includes offline availability FAQ entry', () => {

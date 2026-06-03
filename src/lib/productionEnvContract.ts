@@ -31,8 +31,7 @@ export interface ProductionEnvContractEvaluation {
   }>;
 }
 
-export const PRODUCTION_ENV_CONTRACT_SCOPE =
-  'Shipped flows only. Dormant or unshipped experiments are excluded by default.';
+export const PRODUCTION_ENV_CONTRACT_SCOPE = 'Retained R&D project flows only.';
 
 function isAnalyticsEnabled(env: ProductionEnvMap): boolean {
   return env.NEXT_PUBLIC_ENABLE_ANALYTICS !== 'false';
@@ -45,44 +44,22 @@ export const PRODUCTION_ENV_FEATURE_CONTRACT: readonly ProductionEnvFeatureContr
     enabled: true,
     requiredEnv: ['NEXT_PUBLIC_SITE_URL'],
     verificationMode: 'env',
-    notes: ['Used by metadata, sitemap generation, newsletter URLs, and origin validation.'],
+    notes: ['Used by metadata, sitemap generation, email URLs, and origin validation.'],
   },
   {
     id: 'analytics',
-    label: 'Production analytics',
+    label: 'Basic GA4 analytics',
     enabled: isAnalyticsEnabled,
     requiredEnv: ['NEXT_PUBLIC_GA_ID'],
     verificationMode: 'env',
     notes: ['Analytics defaults to enabled unless NEXT_PUBLIC_ENABLE_ANALYTICS=false is set.'],
   },
   {
-    id: 'newsletter-subscribe',
-    label: 'Newsletter subscribe flow',
-    enabled: true,
-    requiredEnv: ['KIT_API_SECRET', 'KIT_FORM_ID'],
-    verificationMode: 'env',
-  },
-  {
-    id: 'newsletter-unsubscribe',
-    label: 'Newsletter unsubscribe flow',
-    enabled: true,
-    requiredEnv: ['KIT_API_SECRET', 'UNSUBSCRIBE_SECRET'],
-    verificationMode: 'env',
-  },
-  {
     id: 'results-email',
-    label: 'PAYE and director results email delivery',
+    label: 'PAYE, director results, and feedback email delivery',
     enabled: true,
-    requiredEnv: ['RESEND_API_KEY'],
+    requiredEnv: ['BREVO_SMTP_HOST', 'BREVO_SMTP_PORT', 'BREVO_SMTP_LOGIN', 'BREVO_SMTP_PASSWORD'],
     verificationMode: 'env',
-  },
-  {
-    id: 'referral-lead',
-    label: 'Referral lead confirmation and partner notification',
-    enabled: false,
-    requiredEnv: ['RESEND_API_KEY', 'REFERRAL_PARTNER_EMAIL'],
-    verificationMode: 'env',
-    notes: ['Held out until the referral CTA is intentionally rolled out on shipped surfaces.'],
   },
   {
     id: 'rate-limit-health',
@@ -91,7 +68,7 @@ export const PRODUCTION_ENV_FEATURE_CONTRACT: readonly ProductionEnvFeatureContr
     requiredEnv: ['UPSTASH_REDIS_REST_URL', 'UPSTASH_REDIS_REST_TOKEN', 'RATE_LIMIT_HEALTH_SECRET'],
     verificationMode: 'runtime',
     notes: [
-      'Verified via the live health endpoint + throttle probe because Vercel env pull may return blank values for sensitive vars.',
+      'Verified via the live health endpoint because Vercel env pull may return blank values for sensitive vars.',
     ],
   },
   {
@@ -102,42 +79,26 @@ export const PRODUCTION_ENV_FEATURE_CONTRACT: readonly ProductionEnvFeatureContr
     verificationMode: 'env',
     notes: ['LINEAR_TEAM_KEY is optional because the route defaults to PAYTAX when unset.'],
   },
-  {
-    id: 'indexnow-submit',
-    label: 'Authenticated IndexNow submission',
-    enabled: false,
-    requiredEnv: ['INDEXNOW_SUBMIT_SECRET', 'INDEXNOW_KEY'],
-    verificationMode: 'env',
-    notes: [
-      'Disabled by contract until the production submission path is intentionally turned on.',
-    ],
-  },
 ] as const;
 
 export function parseDotEnvContent(content: string): ProductionEnvMap {
   const env: ProductionEnvMap = {};
   const lines = content.split(/\r?\n/u);
-  const DOUBLE_QUOTE = '"';
-  const SINGLE_QUOTE = "'";
 
   for (const line of lines) {
     const trimmed = line.trim();
-    if (trimmed.length === 0 || trimmed.startsWith('#')) {
-      continue;
-    }
+    if (trimmed.length === 0 || trimmed.startsWith('#')) continue;
 
     const normalized = trimmed.startsWith('export ') ? trimmed.slice(7).trim() : trimmed;
     const separatorIndex = normalized.indexOf('=');
-    if (separatorIndex <= 0) {
-      continue;
-    }
+    if (separatorIndex <= 0) continue;
 
     const key = normalized.slice(0, separatorIndex).trim();
     let value = normalized.slice(separatorIndex + 1).trim();
 
     if (
-      (value.startsWith(DOUBLE_QUOTE) && value.endsWith(DOUBLE_QUOTE)) ||
-      (value.startsWith(SINGLE_QUOTE) && value.endsWith(SINGLE_QUOTE))
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
     ) {
       value = value.slice(1, -1);
     }

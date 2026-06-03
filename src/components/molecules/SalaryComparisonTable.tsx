@@ -125,7 +125,7 @@ export function SalaryComparisonTable() {
                     >
                       <td className={SPACING.P_4}>
                         <Link
-                          href={`/calculator/${row.salary}-after-tax`}
+                          href='/'
                           className='font-semibold text-foreground hover:text-primary hover:underline'
                         >
                           £{row.salary.toLocaleString()}

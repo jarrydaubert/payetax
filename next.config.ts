@@ -28,47 +28,21 @@ const scriptSrcHosts = [
   'https://www.googletagmanager.com',
   'https://www.google-analytics.com',
   'https://js.sentry-cdn.com',
-  'https://va.vercel-scripts.com',
-  'https://analytics.ahrefs.com',
-  'https://www.clarity.ms',
-  'https://scripts.clarity.ms',
   'https://giscus.app',
-  'https://payetax.kit.com',
-  'https://app.kit.com',
-  'https://f.convertkit.com',
 ];
 
 const connectSrcHosts = [
   'https://www.google-analytics.com',
   'https://region1.google-analytics.com',
   'https://www.googletagmanager.com',
-  'https://vitals.vercel-insights.com',
-  'https://va.vercel-scripts.com',
   'https://*.ingest.sentry.io',
-  'https://analytics.ahrefs.com',
-  'https://www.clarity.ms',
-  'https://*.clarity.ms',
   'https://vercel.live',
   'https://giscus.app',
-  'https://payetax.kit.com',
-  'https://app.kit.com',
-  'https://api.kit.com',
-  'https://f.convertkit.com',
-  'https://app.convertkit.com',
 ];
 
-const frameSrcHosts = [
-  'https://giscus.app',
-  'https://payetax.kit.com',
-  'https://app.kit.com',
-  'https://f.convertkit.com',
-];
+const frameSrcHosts = ['https://giscus.app'];
 
-const formActionHosts = [
-  'https://payetax.kit.com',
-  'https://app.kit.com',
-  'https://f.convertkit.com',
-];
+const formActionHosts: string[] = [];
 
 function buildCsp(isDevelopment: boolean): string {
   const scriptSrc = ["'self'", "'unsafe-inline'"];
@@ -132,16 +106,6 @@ const nextConfig: NextConfig = {
 
   async redirects() {
     return [
-      {
-        source: '/vs',
-        destination: '/alternatives',
-        permanent: true,
-      },
-      {
-        source: '/vs/:competitor',
-        destination: '/alternatives/:competitor',
-        permanent: true,
-      },
       {
         source: '/blog/category/tax-tools',
         destination: '/blog/category/tax-basics',

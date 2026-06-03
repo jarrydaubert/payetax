@@ -4,7 +4,6 @@
 import { AlertCircle, ArrowRight, CheckCircle, HelpCircle, Info, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useId, useState } from 'react';
-import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -245,13 +244,6 @@ export function TaxCodeDecoderClient() {
           </div>
         </CardContent>
       </Card>
-
-      <NewsletterCTA
-        className='mt-8'
-        title='Get HMRC Tax Code Updates'
-        description='Tax code changes, PAYE updates, and practical explanations in plain English.'
-      />
-
       {/* Calculator CTA */}
       <div className='mt-12 text-center'>
         <p className={cn('mb-4 text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>

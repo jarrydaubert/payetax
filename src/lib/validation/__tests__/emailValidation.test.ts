@@ -1,8 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 import {
-  NewsletterSubscribeRequestSchema,
   PayeEmailInputSchema,
-  ReferralLeadRequestSchema,
   SendDirectorResultsRequestSchema,
   SendResultsRequestSchema,
   TaxYearStringSchema,
@@ -141,50 +139,6 @@ describe('SendDirectorResultsRequestSchema', () => {
       SendDirectorResultsRequestSchema.safeParse({
         email: 'director@example.com',
         input: { ...validDirectorInput, contractStartMonth: 13 },
-      }).success,
-    ).toBe(false);
-  });
-});
-
-describe('Newsletter and referral schemas', () => {
-  it('newsletter schema is strict and rejects unknown keys', () => {
-    expect(
-      NewsletterSubscribeRequestSchema.safeParse({
-        email: 'newsletter@example.com',
-      }).success,
-    ).toBe(true);
-    expect(
-      NewsletterSubscribeRequestSchema.safeParse({
-        email: 'newsletter@example.com',
-        role: 'admin',
-      }).success,
-    ).toBe(false);
-  });
-
-  it('referral schema rejects invalid enums', () => {
-    expect(
-      ReferralLeadRequestSchema.safeParse({
-        email: 'referral@example.com',
-        salaryRange: '100k-125k',
-        reason: 'high-earner',
-        isScottish: false,
-      }).success,
-    ).toBe(true);
-
-    expect(
-      ReferralLeadRequestSchema.safeParse({
-        email: 'referral@example.com',
-        salaryRange: '50k-75k',
-        reason: 'high-earner',
-        isScottish: false,
-      }).success,
-    ).toBe(false);
-    expect(
-      ReferralLeadRequestSchema.safeParse({
-        email: 'referral@example.com',
-        salaryRange: '100k-125k',
-        reason: 'other',
-        isScottish: false,
       }).success,
     ).toBe(false);
   });

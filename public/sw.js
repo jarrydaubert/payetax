@@ -107,17 +107,11 @@ self.addEventListener('fetch', (event) => {
   const requestUrl = new URL(url);
 
   // Never proxy third-party requests through SW cache logic.
-  // This avoids CSP/connect-src conflicts for vendor scripts (Kit/ConvertKit, analytics, etc.).
+  // This avoids CSP/connect-src conflicts for analytics and monitoring scripts.
   if (requestUrl.origin !== self.location.origin) return;
 
   // Skip analytics/tracking domains
-  const skipDomains = [
-    'googletagmanager.com',
-    'google-analytics.com',
-    'va.vercel-scripts.com',
-    'vercel-insights.com',
-    'analytics.ahrefs.com',
-  ];
+  const skipDomains = ['googletagmanager.com', 'google-analytics.com'];
 
   if (skipDomains.some((domain) => url.includes(domain))) return;
 

@@ -38,7 +38,7 @@ export async function ensureCalculatorVisible(page: Page): Promise<void> {
   if (becameVisible) return;
 
   // Fallback to canonical calculator page to keep tests deterministic.
-  await page.goto('/calculator/45000-after-tax', { waitUntil: 'domcontentloaded' });
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
   await page.waitForLoadState('networkidle').catch(() => {});
   await expect(salaryInput).toBeVisible({ timeout: 15000 });
 }

@@ -20,12 +20,7 @@ import { isAnalyticsConsented } from '@/lib/cookieUtils';
 export type { AnalyticsAction, SEOActionType } from '@/lib/analyticsEvents';
 
 /** High-signal events that warrant Sentry breadcrumbs */
-const HIGH_SIGNAL_ACTIONS: ReadonlySet<string> = new Set([
-  'calculator_error',
-  'export_failed',
-  'newsletter_subscribe_failed',
-  'affiliate_click',
-]);
+const HIGH_SIGNAL_ACTIONS: ReadonlySet<string> = new Set(['calculator_error', 'export_failed']);
 
 const shouldLogWarnings = process.env.NODE_ENV !== 'production';
 
@@ -210,41 +205,6 @@ export function trackFormInteraction(form_name: string, action: string, field_na
     source: form_name,
     action_type: action,
     target: field_name,
-  });
-}
-
-/**
- * Track affiliate link clicks for monetization tracking
- *
- * @param competitorSlug - The slug of the competitor being clicked
- * @param competitorName - Display name of the competitor
- * @param affiliateProgram - The affiliate program name (e.g., 'xero-partner')
- * @param pageType - The page type where click occurred ('alternative' | 'vs' | 'hub')
- */
-export function trackAffiliateClick(
-  competitorSlug: string,
-  competitorName: string,
-  affiliateProgram: string | undefined,
-  pageType: 'alternative' | 'vs' | 'hub',
-): void {
-  trackSEOAction('affiliate_click', {
-    source: `${pageType}_page`,
-    target: competitorSlug,
-    action_type: affiliateProgram ?? 'direct_link',
-    destination: competitorName,
-  });
-
-  // Also track as a custom event for easier revenue attribution
-  trackEvent({
-    action: 'affiliate_click',
-    category: 'monetization',
-    label: competitorSlug,
-    custom_data: {
-      competitor_name: competitorName,
-      affiliate_program: affiliateProgram,
-      page_type: pageType,
-      is_affiliate: !!affiliateProgram,
-    },
   });
 }
 
