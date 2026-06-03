@@ -36,6 +36,7 @@ const connectSrcHosts = [
   'https://region1.google-analytics.com',
   'https://www.googletagmanager.com',
   'https://*.ingest.sentry.io',
+  'https://*.ingest.de.sentry.io',
   'https://vercel.live',
   'https://giscus.app',
 ];
