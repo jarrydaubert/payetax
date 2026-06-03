@@ -270,6 +270,24 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       expect(result.taxFreeAmount).toBe(12570);
     });
 
+    it('User £50,270, partner £10k - allowance granted (top of basic rate)', () => {
+      // Annual higher-rate threshold guard (£50,270), lower side.
+      // The monthly PAYE engine derives band thresholds via Math.ceil(annual/12),
+      // so a £1-£4 drift in bands[].threshold leaves income-tax output unchanged
+      // and is invisible to magnitude assertions. Marriage-allowance eligibility
+      // reads the ANNUAL threshold directly, so this £50,270 (granted) /
+      // £50,271 (denied) pair is the canonical, two-sided guard against
+      // higher-rate threshold drift. Values are hand-anchored; no TAX_RATES import.
+      const result = calculateTax(
+        createInput({
+          salary: 50270,
+          isMarried: true,
+          partnerGrossWage: 10000,
+        }),
+      );
+      expect(result.taxFreeAmount).toBe(13830);
+    });
+
     it('Scottish taxpayer £43,662, partner £10k - at Scottish higher rate boundary', () => {
       const result = calculateTax(
         createInput({

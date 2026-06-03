@@ -120,11 +120,46 @@ bun run clean:test      # One-shot cleanup for unit + E2E test artifacts
 
 ## HMRC Verification
 
-The golden master suite is the regression oracle for calculation accuracy.
-- Test file: `e2e/golden-master-PERFECT.spec.ts`
-- Fixtures: `e2e/fixtures/`
+Calculation correctness is guarded by distinct oracle layers. They are NOT
+interchangeable — know which one actually proves correctness:
 
-Keep HMRC values anchored to source documents and code references.
+1. **Independent correctness oracle — `src/lib/__tests__/taxCalculator.hmrcVerification.test.ts`**
+   (and sibling `taxCalculator.*` / `tax/*` unit suites).
+   - Hand-anchored expected values typed from HMRC examples; imports only `calculateTax`,
+     never `TAX_RATES`.
+   - This is the ONLY layer that can catch an engine bug or a rate/threshold typo in
+     `taxRates.ts`, because its expected numbers do not derive from the production constants.
+   - Keep HMRC values anchored to source documents and code references.
+
+2. **Drift / UI-regression oracle — `e2e/golden-master-PERFECT.spec.ts`** (fixtures in `e2e/fixtures/`).
+   - ⚠️ The fixture is AUTO-GENERATED from `taxRates.ts` + `calculateTax()` via
+     `e2e/scripts/generate-golden-master.ts`. It therefore CANNOT catch an engine that is
+     wrong-but-self-consistent — break the engine and the regenerated fixture moves with it.
+   - Its job is form/rendering/extraction/browser-regression drift between engine and UI,
+     not calculation correctness.
+
+3. **E2E helper — `e2e/helpers/tax-test-helpers.ts`** reimplements band/NI/loan *logic*
+   independently, but imports `TAX_RATES` from the production constants. It is
+   logic-independent but constant-dependent: a rate or threshold error passes both the
+   engine and the helper. Do not treat it as the correctness oracle.
+
+Rule of thumb: every calculation fix needs a failing-then-passing assertion in layer (1).
+Layers (2) and (3) are supporting nets, not the source of truth.
+
+### Threshold Sensitivity (non-obvious)
+
+The engine applies annual band thresholds via `Math.ceil(annualThreshold / 12)` (whole-pound
+monthly PAYE, matching HMRC payroll behaviour). Consequence: a sub-£5 drift in a
+`bands[].threshold` yields IDENTICAL income-tax output and is invisible to magnitude
+assertions — adding another `toBeCloseTo` income-tax case will NOT catch a £1 threshold typo.
+
+Annual thresholds are guarded instead by paths that read them directly:
+- Marriage-allowance eligibility — the two-sided `£50,270 (granted) / £50,271 (denied)` pair
+  in `taxCalculator.hmrcVerification.test.ts` pins the higher-rate threshold in both directions.
+- HICBC taper boundaries pin the `£60,000` / `£80,000` thresholds.
+
+When changing or adding a band threshold, update/extend these eligibility-boundary tests —
+not just value assertions.
 
 ### HMRC Rounding Divergence Policy
 
