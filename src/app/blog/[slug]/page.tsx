@@ -181,6 +181,29 @@ function hasVisibleUpdateDate(publishedAt: string, updatedAt?: string): boolean 
   return new Date(updatedAt).getTime() > new Date(publishedAt).getTime();
 }
 
+function stripHtmlTags(input: string): string {
+  let output = '';
+  let insideTag = false;
+
+  for (const char of input) {
+    if (char === '<') {
+      insideTag = true;
+      continue;
+    }
+
+    if (char === '>') {
+      insideTag = false;
+      continue;
+    }
+
+    if (!insideTag) {
+      output += char;
+    }
+  }
+
+  return output;
+}
+
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
   const post = await getCachedBlogPost(resolvedParams.slug);
@@ -201,12 +224,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const howToSteps = extractHowToSteps(post.content);
 
   // Strip markdown and HTML before counting words.
-  const plainText = post.content
-    .replace(/```[\s\S]*?```/g, '')
-    .replace(/`[^`]*`/g, '')
-    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
-    .replace(/[#*_~>\-|]/g, '')
-    .replace(/<[^>]*>/g, '')
+  const plainText = stripHtmlTags(
+    post.content
+      .replace(/```[\s\S]*?```/g, '')
+      .replace(/`[^`]*`/g, '')
+      .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+      .replace(/[#*_~>\-|]/g, ''),
+  )
     .replace(/\s+/g, ' ')
     .trim();
   const wordCount = plainText.split(/\s+/).filter(Boolean).length;

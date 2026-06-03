@@ -15,7 +15,12 @@ export const dynamic = 'force-static';
 export const revalidate = 3600;
 
 function sanitize(text: string): string {
-  return text.replace(/\n/g, ' ').replace(/\[/g, '\\[').replace(/\]/g, '\\]').trim();
+  return text
+    .replace(/\\/g, '\\\\')
+    .replace(/\n/g, ' ')
+    .replace(/\[/g, '\\[')
+    .replace(/\]/g, '\\]')
+    .trim();
 }
 
 export async function GET() {
