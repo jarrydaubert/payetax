@@ -1,6 +1,8 @@
 import { submitFeedback } from '../feedback';
 
 const checkRateLimitWithPolicy = jest.fn();
+const isOutboundEmailConfiguredMock = jest.fn();
+const sendOutboundEmailMock = jest.fn();
 const ORIGINAL_ENV = process.env;
 
 jest.mock('next/headers', () => ({
@@ -16,9 +18,18 @@ jest.mock('@/lib/rateLimit', () => ({
     checkRateLimitWithPolicy(ip, config, policy),
 }));
 
+jest.mock('@/lib/email/emailDelivery', () => ({
+  isOutboundEmailConfigured: () => isOutboundEmailConfiguredMock(),
+  sendOutboundEmail: (...args: unknown[]) => sendOutboundEmailMock(...args),
+}));
+
 describe('submitFeedback', () => {
   beforeEach(() => {
     checkRateLimitWithPolicy.mockReset();
+    isOutboundEmailConfiguredMock.mockReset();
+    sendOutboundEmailMock.mockReset();
+    isOutboundEmailConfiguredMock.mockReturnValue(true);
+    sendOutboundEmailMock.mockResolvedValue({ ok: true });
     process.env = { ...ORIGINAL_ENV };
   });
 
@@ -55,8 +66,9 @@ describe('submitFeedback', () => {
     expect(result.error).toBe('Too many requests. Please try again in a minute.');
   });
 
-  it('returns a generic error when Resend is not configured', async () => {
+  it('returns a generic error when outbound email is not configured', async () => {
     checkRateLimitWithPolicy.mockReturnValue({ allowed: true, reason: 'allowed' });
+    isOutboundEmailConfiguredMock.mockReturnValue(false);
     const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
 
     const formData = new FormData();

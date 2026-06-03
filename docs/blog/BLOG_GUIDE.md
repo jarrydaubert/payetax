@@ -52,4 +52,3 @@ Apply this on every new post before publish:
 - Secondary CTA present: link to `/tools/director-guide` when relevant.
 - Trust/compliance path present: link to `/compliance`.
 - At least one contextual internal tool link beyond the three default links when relevant to the topic.
-- Newsletter block included in the post template.

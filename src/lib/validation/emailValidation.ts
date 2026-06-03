@@ -4,8 +4,6 @@
  * Consolidates validation from:
  * - /api/send-results
  * - /api/send-director-results
- * - /api/newsletter/subscribe
- * - /api/referral/lead
  */
 
 import { z } from 'zod';
@@ -224,54 +222,6 @@ export const SendDirectorResultsRequestSchema = z
   })
   .strict();
 
-// ============================================================================
-// NEWSLETTER SCHEMAS
-// ============================================================================
-
-/**
- * Request body for /api/newsletter/subscribe
- */
-export const NewsletterSubscribeRequestSchema = z
-  .object({
-    email: EmailSchema,
-  })
-  .strict();
-
-// ============================================================================
-// REFERRAL SCHEMAS
-// ============================================================================
-
-/**
- * Salary range options for referral leads
- */
-export const SalaryRangeSchema = z.enum(['75k-100k', '100k-125k', '125k+']);
-
-/**
- * Referral reason options
- */
-export const ReferralReasonSchema = z.enum([
-  'tax-trap',
-  'high-earner',
-  'scottish-high',
-  'additional-rate',
-]);
-
-/**
- * Request body for /api/referral/lead
- */
-export const ReferralLeadRequestSchema = z
-  .object({
-    email: EmailSchema,
-    salaryRange: SalaryRangeSchema,
-    reason: ReferralReasonSchema,
-    isScottish: z.boolean(),
-  })
-  .strict();
-
-// ============================================================================
-// TYPE EXPORTS
-// ============================================================================
-
 export type PayPeriodValues = z.infer<typeof PayPeriodValuesSchema>;
 export type TaxBand = z.infer<typeof TaxBandSchema>;
 export type PayeResults = z.infer<typeof PayeResultsSchema>;
@@ -280,21 +230,3 @@ export type SendResultsRequest = z.infer<typeof SendResultsRequestSchema>;
 export type DirectorStrategy = z.infer<typeof DirectorStrategySchema>;
 export type DirectorEmailInput = z.infer<typeof DirectorEmailInputSchema>;
 export type SendDirectorResultsRequest = z.infer<typeof SendDirectorResultsRequestSchema>;
-export type NewsletterSubscribeRequest = z.infer<typeof NewsletterSubscribeRequestSchema>;
-export type SalaryRange = z.infer<typeof SalaryRangeSchema>;
-export type ReferralReason = z.infer<typeof ReferralReasonSchema>;
-export type ReferralLeadRequest = z.infer<typeof ReferralLeadRequestSchema>;
-
-// ============================================================================
-// HELPER CONSTANTS
-// ============================================================================
-
-/**
- * Human-readable labels for referral reasons
- */
-export const REFERRAL_REASON_LABELS: Record<ReferralReason, string> = {
-  'tax-trap': '£100k Tax Trap (Personal Allowance Taper)',
-  'high-earner': 'High Earner (£75k-£100k)',
-  'scottish-high': 'Scottish High Earner',
-  'additional-rate': 'Additional Rate Taxpayer (£125k+)',
-};

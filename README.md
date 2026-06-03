@@ -1,40 +1,78 @@
 # PayeTax
 
-PayeTax is a UK PAYE take-home pay calculator focused on accuracy, privacy, and clear user outcomes.
+PayeTax is a UK PAYE take-home pay calculator and tax-tool R&D project. It is built to test deterministic tax logic, edge cases, API hardening, and public deployment hygiene.
 
-Start here:
+The repo is public. Real secrets must live in Vercel or local ignored env files only.
 
-- Canonical project docs: [`docs/README.md`](docs/README.md)
-- Product direction: [`docs/business/PRODUCT_DIRECTION.md`](docs/business/PRODUCT_DIRECTION.md)
-- Agent contract: [`AGENTS.md`](AGENTS.md)
-- Testing standard: [`docs/guides/TESTING.md`](docs/guides/TESTING.md)
-- Ops runbook: [`docs/guides/OPS_RUNBOOK.md`](docs/guides/OPS_RUNBOOK.md)
+## Stack
 
-Protected sources of truth:
+- Next.js, React, TypeScript
+- Bun package manager
+- Jest and Playwright
+- GA4 for basic analytics
+- Sentry for error monitoring
+- Linear issue creation from Sentry webhooks
+- Brevo SMTP for transactional email flows
 
-- Tax rates: [`src/constants/taxRates.ts`](src/constants/taxRates.ts)
-- PAYE calculator engine: [`src/lib/taxCalculator.ts`](src/lib/taxCalculator.ts)
-- Director Intelligence tax logic: [`src/lib/tax/`](src/lib/tax/)
+## Current Scope
 
-Common commands:
+Kept:
+
+- Main PAYE calculator
+- Director Intelligence calculator
+- Tax tools
+- Blog
+- Feedback and email-results flows
+- PWA support
+
+Removed:
+
+- Growth landing-page families
+- Mailing-list setup
+- Partner lead capture
+- Competitor-style SEO pages
+- Extra analytics vendors beyond GA4
+
+## Common Commands
 
 ```bash
-bun run dev                 # Start local dev server with webpack
-bun run check:repo          # Read-only lint/type/version/env/event/test-skip checks
-bun run fix-all             # Mutating format/lint pass plus repo checks
-bun run test:no-coverage    # Fast Jest suite
-bun run build               # Production build
+bun install --frozen-lockfile
+bun run dev
+bun run check:repo
+bun run test:no-coverage
+bun run build
+bun audit
 ```
 
 Use `bun run dev:turbo` only when explicitly checking the Turbopack dev path.
 
-## Repo quality
+## Environment Variables
 
-PayeTax allows AI-assisted changes, but unverified AI-assisted code is not acceptable. Public GitHub pull requests are protected by:
+Copy `.env.template` to `.env.local` for local development. Do not commit `.env.local`.
 
-- `CI`: install from `bun.lock`, repo checks, dependency audit, and production build.
-- `CodeQL`: JavaScript and TypeScript code scanning.
-- Dependabot dependency monitoring through `.github/dependabot.yml`.
-- Secret scanning and push protection in GitHub repository settings.
+Required for production email flows:
 
-Local environment values should be copied from `.env.template` when needed. Do not commit real `.env` files.
+- `BREVO_SMTP_HOST`
+- `BREVO_SMTP_PORT`
+- `BREVO_SMTP_LOGIN`
+- `BREVO_SMTP_PASSWORD`
+- `BREVO_FROM_EMAIL`
+- `FEEDBACK_TO_EMAIL`
+
+Other production controls:
+
+- `NEXT_PUBLIC_GA_ID`
+- `NEXT_PUBLIC_SENTRY_DSN`
+- `SENTRY_AUTH_TOKEN`
+- `SENTRY_WEBHOOK_SECRET`
+- `LINEAR_API_KEY`
+- `UPSTASH_REDIS_REST_URL`
+- `UPSTASH_REDIS_REST_TOKEN`
+
+## Docs
+
+- Agent contract: [AGENTS.md](AGENTS.md)
+- Product direction: [docs/business/PRODUCT_DIRECTION.md](docs/business/PRODUCT_DIRECTION.md)
+- Testing: [docs/guides/TESTING.md](docs/guides/TESTING.md)
+- Ops: [docs/guides/OPS_RUNBOOK.md](docs/guides/OPS_RUNBOOK.md)
+- Env contract: [docs/guides/PRODUCTION_ENV_CONTRACT.md](docs/guides/PRODUCTION_ENV_CONTRACT.md)

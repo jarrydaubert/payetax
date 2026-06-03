@@ -189,7 +189,6 @@ function getSurface(filePath: string): Surface {
     rel === 'src/app/page.tsx' ||
     rel.startsWith('src/app/calculator/') ||
     rel === 'src/components/pages/HomePageContent.tsx' ||
-    rel === 'src/components/pages/SalaryCalculatorPage.tsx' ||
     rel.startsWith('src/components/organisms/Calculator')
   ) {
     return 'homecalc';

@@ -1,201 +1,93 @@
-# AGENTS.md - PayeTax
+# AGENTS.md: PayeTax
 
-This file is the canonical agent contract for this repo.
-`CLAUDE.md` defers to this file.
+Instructions for coding agents and contributors working in this repository.
 
-## Purpose
+## What This Is
 
-PayeTax is a UK PAYE tax calculator focused on accuracy, privacy, and clear user outcomes.
-Product direction lives in `docs/business/PRODUCT_DIRECTION.md`: PayeTax is the UK take-home pay calculator that explains payroll reality, not a broad finance app or generic tax content site.
+PayeTax is Jarryd Aubert's UK tax-calculator R&D project. It exists to exercise deterministic calculation correctness, edge-case handling, API hardening, observability, deployment hygiene, and clear public documentation.
 
-## Priorities
+It is not a commercial growth site. Keep the product useful, accurate, and simple.
 
-- Accuracy first: calculations must match HMRC rules.
-- Single source of truth: tax rates live in `src/constants/taxRates.ts`.
-- Test behavior: cover user-visible outcomes over implementation details.
-- Accessibility + performance: ship fast and inclusive UI.
-- Portfolio-first guardrail: by default assess shipped free flows and hobby-project positioning unless explicitly requested otherwise.
+## Scope Guardrails
 
-## Source Of Truth
+- Keep the main calculator, tools, Director Intelligence, blog, feedback, email-results, PWA, GA4, Sentry, Linear, and Brevo SMTP.
+- Do not reintroduce growth page families, competitor-style SEO pages, partner lead capture, or mailing-list plumbing unless explicitly requested.
+- Do not add extra analytics vendors beyond GA4 unless there is a specific implementation task.
+- Do not invent tax behaviour, provider support, production status, usage metrics, or security controls.
+- Do not commit secrets.
 
-- Product direction: `docs/business/PRODUCT_DIRECTION.md`
-- Tax rates: `src/constants/taxRates.ts`
-- Calculator logic: `src/lib/taxCalculator.ts`
-- Director Intelligence logic: `src/lib/tax/`
-- Open work only: `docs/BACKLOG.md`
-- Testing standard: `docs/guides/TESTING.md`
-- Ops/dev workflow: `docs/guides/OPS_RUNBOOK.md`
-- Documentation rules: `docs/DOCS_POLICY.md`
-
-## Working Rules
-
-- Before using skills for audits, planning, SEO, content, CRO, or feature ideation, read `docs/business/PRODUCT_DIRECTION.md` and keep recommendations focused on that direction.
-- Preserve existing architecture unless a change is required for accuracy, safety, reliability, or maintainability.
-- Keep important behavior testable: explicit inputs/outputs, injectable dependencies where practical, and assertions against real user-visible or business-visible outcomes.
-- Do not log sensitive user data or leak server env vars into client components.
-- Keep evergreen docs free of TODOs, progress markers, and stale status; open work belongs in `docs/BACKLOG.md`.
-- Prefer a small number of high-signal tests over broad low-signal coverage.
-- Treat tests and validation as the primary proof of completion; do not create standalone evidence docs for backlog closure.
-
-## Verification
-
-- Do not present guesses as facts.
-- Verify files, commands, and behavior before claiming they exist or passed.
-- If something is uncertain or unverified, say so clearly.
-
-## Before You Change Code
-
-- Check existing patterns in the codebase.
-- Verify any tax changes against `src/constants/taxRates.ts`.
-- Avoid hardcoding tax figures in UI/MDX; reference `taxRates.ts`.
-- Consider accessibility impacts.
-- Validate user input and privacy/security implications.
-
-## Required Validation Before Handoff
-
-Validation is conditional by change type.
-
-For code or runtime behavior changes, run the smallest relevant validation set:
-
-- Baseline:
+## Commands
 
 ```bash
-bun run fix-all
+bun install --frozen-lockfile
+bun run check:repo
 bun run test:no-coverage
+bun run build
+bun audit
 ```
 
-- If the change affects critical user journeys, layout, calculator outputs, or release-sensitive behavior, also run the smallest relevant higher-level gate (for example `bun run test:e2e:critical`, `bun run harness:local`, or a targeted Playwright/Jest command).
+Use the smallest relevant check while developing, then run `bun run check:repo` and `bun run build` before committing broad changes.
 
-For docs or process-only changes:
+## CI And Repo Quality
 
-- Update the relevant docs in the same change set.
-- Check referenced commands, file paths, and source-of-truth links for accuracy.
-- Do not claim runtime validation you did not run.
+The repo follows a lean AI-assisted quality standard:
 
-For workflow changes:
+**AI-assisted code is allowed. Unverified AI-assisted code is not.**
 
-- Update `docs/guides/OPS_RUNBOOK.md`.
-- Update `docs/DOCS_POLICY.md` or `docs/guides/TESTING.md` if the contract itself changed.
-- Run any changed workflow commands if practical; otherwise state clearly what still needs live verification.
+The hard gate should stay small and deterministic:
 
-If any required validation cannot be run, state that clearly.
+- install from lockfile
+- lint and repo checks
+- typecheck
+- tests where configured
+- production build
 
-## Security Checks (When Relevant)
+Do not add visual-regression, Lighthouse, flake-audit, governance, release, or marketing-audit workflows by default.
 
-- Scan for hardcoded secrets in `src/`.
-- Validate user input.
-- Do not log sensitive user data.
+## Environment
 
-## Tech Stack
+Use `.env.template` as the source of local env names. Never commit `.env.local`.
 
-- Next.js, React, TypeScript, Tailwind CSS
-- Zod, Zustand
-- Jest, Playwright
-- Biome, Bun
+Production secrets belong in Vercel project settings:
 
-## Quick Commands
+- Brevo SMTP values for feedback and email-results flows
+- Upstash Redis for distributed rate limiting
+- Sentry values for monitoring and source maps
+- Linear API key for issue creation from Sentry webhooks
+- GA4 measurement id for basic analytics
 
-```bash
-bun run dev                 # Start webpack-backed dev server
-bun run dev:turbo           # Opt-in Turbopack dev path
-bun run fix-all             # Format, lint, typecheck
-bun run check:repo          # Read-only repo verification gate
-bun run audit:deps          # Bun dependency audit with allowlist policy
-bun run harness:local       # Repo gate + quick tests + build
-bun run test:no-coverage    # Fast tests
-bun run test                # Full tests with coverage
-bun run test:e2e            # Playwright E2E
-bun run bundle:analyze      # Bundle analysis
-bun run check:env-contract  # Verify critical env/template/schema sync
-bun run check:production-env-contract # Verify enabled-feature production env contract against Vercel
-bun run release:verify      # Fix, test, and build release gate
-bun run linear:me           # View Linear issues
-bun run skills:review       # Review latest upstream marketing skill versions and changes
-bun run skills:check        # Validate current local skill pin/profile + setup
-bun run skills:sync         # Sync pinned marketing skills + apply PayeTax profile
-```
+If a Vercel CLI command cannot retrieve project settings, check `.vercel/project.json`. A stale local link should be replaced by relinking to the current project.
 
-## More Docs
+## Editing Rules
 
-See `docs/README.md` and `docs/guides/` for detail:
-- `TESTING.md`
-- `SYSTEM_OVERVIEW.md`
-- `LINEAR.md`
-- `OPS_RUNBOOK.md`
-- `PRODUCTION_ENV_CONTRACT.md`
+- Prefer existing patterns in `src/`, `scripts/`, and `docs/`.
+- Edit source files, not generated output, unless the repo clearly treats the file as committed source.
+- Keep docs aligned with code in the same change.
+- Verify commands before claiming they pass.
+- When touching frontend UI, inspect the changed route locally when practical.
+- For email, privacy, security, and tax claims, confirm the implementation before changing wording.
 
-## Skills (Agent Reference)
+## Current Public Surface
 
-Skills are agents-native in PayeTax:
-- canonical skills path: `.agents/skills/`
-- shared product context: `.agents/product-marketing-context.md`
-- shared project constraints: `.agents/skills/payetax-context/SKILL.md`
-- version tracking: `.agents/skills/VERSIONS.md`
+- Main PAYE calculator
+- Tax tools hub and tool pages
+- Director Intelligence calculator
+- Blog and category pages
+- About, privacy, compliance, install
+- API routes for sending results, feedback, Sentry webhook, and operational rate-limit health
 
-### SEO & Content
-- `seo-audit` — full-site SEO audit (incl. AI bot access, llms.txt)
-- `ai-seo` — AI search optimisation (AEO/GEO/LLMO), AI Overviews, citations
-- `programmatic-seo` — salary pages, template-based SEO at scale
-- `schema-markup` — JSON-LD structured data
-- `content-strategy` — blog planning, topic clusters, content pillars
-- `competitor-alternatives` — vs pages, alternative pages
-- `competitor-profiling` — competitor research and profile documents
+## Pull Request Expectations
 
-### Copy & Creative
-- `copywriting` — page copy, headlines, CTAs
-- `copy-editing` — editing passes on existing copy
-- `ad-creative` — ad copy variations, headlines, platform-specific creative
-- `cold-email` — B2B cold outreach emails and follow-up sequences
-- `social-content` — LinkedIn, Twitter/X, Reddit, and short-form video scripts
-- `image` — marketing images, blog heroes, social graphics, product mockups, and visual optimization
-- `video` — marketing video production workflows, AI video, explainers, and product demos
+For code changes, report:
 
-### Conversion & UX
-- `page-cro` — page-level conversion optimisation
-- `form-cro` — calculator inputs, email forms, newsletter signup
-- `onboarding-cro` — first-visit experience, WelcomeDialog
-- `popup-cro` — dialogs and banners (WelcomeDialog, EmailResultsDialog, CookieBanner, PWA)
-- `ab-test-setup` — experiment design and statistical rigour
+- what changed
+- commands run
+- pass/fail status
+- any unverified follow-up
 
-### Marketing & Growth
-- `marketing-ideas` — 139 categorised tactics, filtered for PayeTax
-- `customer-research` — VOC, persona, ICP, and community research synthesis
-- `community-marketing` — community-led growth, brand advocates, and owned/community channel strategy
-- `launch-strategy` — feature releases, tax calendar events
-- `free-tool-strategy` — new calculator planning and evaluation
-- `marketing-psychology` — mental models and behavioural science
-- `directory-submissions` — directory listing, launch surfaces, and backlink planning
-- `churn-prevention` — retention, cancel flows, dunning, win-back
-- `email-sequence` — Kit newsletter + Resend transactional email
-- `product-marketing-context` — shared context doc for all skills
-- `payetax-context` — project-specific calculator, trust, privacy, and tax-accuracy constraints for marketing skills
+For CI, docs, or repo-control changes, report:
 
-### Engineering & Analytics
-- `engineering` — Next.js, React, TypeScript, performance
-- `codebase-cleanup-sweep` — broad cleanup, deduplication, unused-code review, and quality sweeps
-- `frontend-design` — bold, polished, non-generic page/component UI design and implementation
-- `tdd` — test-driven development (Red/Green/Refactor) for regression-safe delivery
-- `design-an-interface` — compare multiple interface/module designs before implementation
-- `prd-to-issues` — break PRDs into vertical, testable execution slices
-- `accessibility` — WCAG 2.2 AA compliance
-- `analytics-tracking` — GA4, Vercel Analytics, Ahrefs, event tracking
-
-### Slash Commands
-- `/debug` — systematic debugging session
-- `/audit` — deep code/architecture audit
-- `/finance` — UK tax specialist for HMRC verification
-- `/compliance` — compliance auditor
-- `/cleanup` — find duplicates, orphans, junk
-- `/security` — OWASP web security review
-
-## Tools & Integrations
-
-- Tool registry: `.claude/tools/REGISTRY.md`
-- Integration guides: `.claude/tools/integrations/` (60 guides — Kit, Resend, Ahrefs, GA4, etc.)
-- CLI tool scripts: `.claude/tools/clis/` (51 vendor scripts)
-
-## Email Infrastructure
-
-Split provider model (see `docs/guides/RESEND.md`):
-- **Kit** — newsletter (subscribe/unsubscribe, broadcasts, automations)
-- **Resend** — transactional (PAYE results, director results, referral leads, feedback)
+- workflows or checks affected
+- branch-protection implications
+- environment or secret changes
+- why the change is a practical safety net rather than scaffolding

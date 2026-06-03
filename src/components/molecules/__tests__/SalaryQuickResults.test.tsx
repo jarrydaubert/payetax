@@ -66,8 +66,6 @@ describe('SalaryQuickResults', () => {
     { amount: 35000, label: '£5k more' },
   ];
 
-  // Note: h1 heading moved to SalaryCalculatorPage parent component
-
   describe('Monthly Take-Home Display', () => {
     it('should display monthly take-home pay prominently', () => {
       render(
@@ -225,10 +223,10 @@ describe('SalaryQuickResults', () => {
       );
 
       const link28k = screen.getByRole('link', { name: /£28,000/i });
-      expect(link28k).toHaveAttribute('href', '/calculator/28000-after-tax');
+      expect(link28k).toHaveAttribute('href', '/');
 
       const link35k = screen.getByRole('link', { name: /£35,000/i });
-      expect(link35k).toHaveAttribute('href', '/calculator/35000-after-tax');
+      expect(link35k).toHaveAttribute('href', '/');
     });
 
     it('should format comparison amounts with commas', () => {
@@ -388,7 +386,7 @@ describe('SalaryQuickResults', () => {
         <SalaryQuickResults salary={30000} results={mockResults} comparisons={mockComparisons} />,
       );
 
-      // h1 is rendered in parent SalaryCalculatorPage; this component has h2
+      // This component owns a section-level heading.
       expect(screen.getByRole('heading', { level: 2 })).toBeInTheDocument();
     });
 

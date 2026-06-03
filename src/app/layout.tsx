@@ -5,14 +5,10 @@ import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
 import { generateMetadata as metadataGenerator, SITE_URL } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
 import './globals.css';
-import { Analytics as VercelAnalytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/next';
 import Script from 'next/script';
 import { Suspense } from 'react';
 import { inter, spaceGrotesk } from '@/app/fonts';
-import { AhrefsAnalytics } from '@/components/organisms/AhrefsAnalytics';
 import Analytics from '@/components/organisms/Analytics';
-import { ClarityAnalytics } from '@/components/organisms/ClarityAnalytics';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import Layout from '@/components/templates/Layout';
 import { ThemeProvider } from '@/lib/theme';
@@ -76,24 +72,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         )}
       >
         <StructuredData type='organization' />
-        {analyticsEnabled ? (
-          /* Ahrefs Web Analytics - Only loads after user accepts cookies */
-          <>
-            <AhrefsAnalytics />
-            <ClarityAnalytics />
-          </>
-        ) : null}
 
         <ThemeProvider>
           <Suspense fallback={null}>{analyticsEnabled ? <Analytics /> : null}</Suspense>
           <Layout>{children}</Layout>
-          {analyticsEnabled ? (
-            <>
-              {/* Vercel Analytics & Speed Insights - Privacy-first Web Vitals tracking */}
-              <VercelAnalytics />
-              <SpeedInsights />
-            </>
-          ) : null}
         </ThemeProvider>
 
         {/* Service Worker Registration - lazyOnload to avoid competing with initial hydration */}

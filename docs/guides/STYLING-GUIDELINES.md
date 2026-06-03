@@ -74,9 +74,7 @@ bun run fix-all
 
 For visually risky UI changes, also run the smallest relevant browser check, for example:
 
-```bash
-bun run test:e2e:visual
-```
+Run the app locally or inspect the Vercel preview, check the affected route at desktop and mobile sizes, and record the reviewed states in the PR.
 
 ## Backlog Exceptions
 

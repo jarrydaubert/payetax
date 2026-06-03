@@ -42,7 +42,6 @@ export default function HomePage() {
       <StructuredData type='website' />
       <StructuredData type='financialservice' />
       <StructuredData type='calculator' />
-      <StructuredData type='howto' />
       <StructuredData type='dataset' />
       <StructuredData type='faq' faqs={faqs} />
 

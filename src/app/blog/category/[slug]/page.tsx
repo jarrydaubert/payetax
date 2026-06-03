@@ -7,7 +7,6 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { cache } from 'react';
-import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { POSTS_PER_PAGE } from '@/constants/blogCategories';
 import { getBlogCategories, getBlogPosts } from '@/lib/blog';
@@ -256,15 +255,7 @@ export default async function CategoryPage({
           </nav>
         )}
       </div>
-
-      {/* Newsletter CTA */}
-      <div className='container mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8'>
-        <NewsletterCTA
-          className='mx-auto max-w-4xl'
-          title='Get Tax Articles in Your Inbox'
-          description='Subscribe for new UK tax explainers, deadline reminders, and PAYE updates.'
-        />
-      </div>
+      <div className='container mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8'> </div>
     </div>
   );
 }

@@ -6,7 +6,7 @@
  * - Origin allowlist regressions (CSRF bypass)
  * - Rate-limit bypass
  * - Validation guard regressions
- * - Resend configuration/response handling failures
+ * - outbound email configuration/response handling failures
  */
 
 import { NextRequest } from 'next/server';
@@ -23,14 +23,10 @@ jest.mock('@/lib/rateLimit', () => ({
   }),
 }));
 
-const sendMock = jest.fn();
+const sendResultsEmailMock = jest.fn();
 
-jest.mock('resend', () => ({
-  Resend: jest.fn().mockImplementation(() => ({
-    emails: {
-      send: sendMock,
-    },
-  })),
+jest.mock('@/lib/email/outboundResultsDelivery', () => ({
+  sendDirectorResultsEmail: (...args: unknown[]) => sendResultsEmailMock(...args),
 }));
 
 const ORIGINAL_ENV = process.env;
@@ -91,7 +87,8 @@ describe('/api/send-director-results POST', () => {
   let consoleErrorSpy: jest.SpyInstance;
 
   beforeEach(() => {
-    sendMock.mockReset();
+    sendResultsEmailMock.mockReset();
+    sendResultsEmailMock.mockResolvedValue({ ok: true });
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
@@ -101,7 +98,7 @@ describe('/api/send-director-results POST', () => {
   });
 
   it('rejects invalid origins', async () => {
-    const POST = await loadRoute({ RESEND_API_KEY: 'test' });
+    const POST = await loadRoute({ BREVO_SMTP_PASSWORD: 'test' });
     const request = buildRequest(validPayload, { origin: 'https://evil.com' });
     const response = await POST(request);
 
@@ -110,7 +107,7 @@ describe('/api/send-director-results POST', () => {
 
   it('rate limits when the limiter denies the client', async () => {
     const POST = await loadRoute(
-      { RESEND_API_KEY: 'test' },
+      { BREVO_SMTP_PASSWORD: 'test' },
       { allowed: false, reason: 'rate_limited' },
     );
     const request = buildRequest(validPayload, {
@@ -135,7 +132,7 @@ describe('/api/send-director-results POST', () => {
 
   it('returns 503 when distributed rate-limit protection is unavailable in production', async () => {
     const POST = await loadRoute(
-      { RESEND_API_KEY: 'test', NODE_ENV: 'production' },
+      { BREVO_SMTP_PASSWORD: 'test', NODE_ENV: 'production' },
       { allowed: false, reason: 'distributed_unavailable' },
     );
     const request = buildRequest(validPayload, {
@@ -151,8 +148,9 @@ describe('/api/send-director-results POST', () => {
     });
   });
 
-  it('returns 503 when Resend is not configured', async () => {
-    const POST = await loadRoute({ RESEND_API_KEY: undefined });
+  it('returns 503 when outbound email is not configured', async () => {
+    sendResultsEmailMock.mockResolvedValue({ ok: false, reason: 'not_configured' });
+    const POST = await loadRoute();
     const request = buildRequest(validPayload, { origin: 'https://payetax.co.uk' });
     const response = await POST(request);
     const json = await response.json();
@@ -162,7 +160,7 @@ describe('/api/send-director-results POST', () => {
   });
 
   it('rejects invalid JSON payloads', async () => {
-    const POST = await loadRoute({ RESEND_API_KEY: 'test' });
+    const POST = await loadRoute({ BREVO_SMTP_PASSWORD: 'test' });
     const request = buildRequest('{', { origin: 'https://payetax.co.uk' });
     const response = await POST(request);
     const json = await response.json();
@@ -172,7 +170,7 @@ describe('/api/send-director-results POST', () => {
   });
 
   it('rejects invalid request bodies', async () => {
-    const POST = await loadRoute({ RESEND_API_KEY: 'test' });
+    const POST = await loadRoute({ BREVO_SMTP_PASSWORD: 'test' });
     const request = buildRequest({ email: 'bad' }, { origin: 'https://payetax.co.uk' });
     const response = await POST(request);
     const json = await response.json();
@@ -183,20 +181,20 @@ describe('/api/send-director-results POST', () => {
   });
 
   it('sends the email when inputs are valid', async () => {
-    sendMock.mockResolvedValue({ error: null });
-    const POST = await loadRoute({ RESEND_API_KEY: 'test' });
+    sendResultsEmailMock.mockResolvedValue({ ok: true });
+    const POST = await loadRoute({ BREVO_SMTP_PASSWORD: 'test' });
     const request = buildRequest(validPayload, { origin: 'https://payetax.co.uk' });
     const response = await POST(request);
     const json = await response.json();
 
     expect(response.status).toBe(200);
     expect(json).toEqual({ success: true });
-    expect(sendMock).toHaveBeenCalledTimes(1);
+    expect(sendResultsEmailMock).toHaveBeenCalledTimes(1);
   });
 
-  it('returns 500 when Resend returns an error', async () => {
-    sendMock.mockResolvedValue({ error: { message: 'failed' } });
-    const POST = await loadRoute({ RESEND_API_KEY: 'test' });
+  it('returns 500 when outbound email delivery fails', async () => {
+    sendResultsEmailMock.mockResolvedValue({ ok: false, reason: 'delivery_failed' });
+    const POST = await loadRoute({ BREVO_SMTP_PASSWORD: 'test' });
     const request = buildRequest(validPayload, { origin: 'https://payetax.co.uk' });
     const response = await POST(request);
     const json = await response.json();

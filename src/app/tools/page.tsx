@@ -3,8 +3,6 @@ import { ArrowRight, Wrench } from 'lucide-react';
 import Link from 'next/link';
 import { GradientText } from '@/components/atoms/GradientText';
 import { PageHero } from '@/components/molecules/PageHero';
-import { BestForAudienceSection } from '@/components/organisms/BestForAudienceSection';
-import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { Card } from '@/components/ui/card';
 import { LAYOUT, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
@@ -133,20 +131,6 @@ export default function ToolsPage() {
                 </Link>
               ))}
             </div>
-          </div>
-        </section>
-
-        <BestForAudienceSection
-          title='Choose a Tax Calculator by Situation'
-          subtitle='Audience-specific entry points with tailored defaults for students, contractors, high earners, and other common PAYE scenarios.'
-        />
-
-        <section className={LAYOUT.SECTION}>
-          <div className={LAYOUT.CONTAINER_SM}>
-            <NewsletterCTA
-              title='Get HMRC Updates and Tax Tips'
-              description='Practical UK tax updates and deadline reminders, straight to your inbox.'
-            />
           </div>
         </section>
       </div>

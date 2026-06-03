@@ -45,6 +45,8 @@ yarn-error.log*
 
 # vercel
 .vercel
+.vercel.*
+.vercel*
 
 # typescript
 *.tsbuildinfo
@@ -79,8 +81,6 @@ tsconfig.tsbuildinfo
 playwright/.auth/
 .env*.local
 
-# Newsletter tracking
-.announced-posts.json
 
 # Local caches
 .npm/

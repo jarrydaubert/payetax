@@ -33,7 +33,7 @@ import { ensureCalculatorVisible } from './helpers/calculator-ui';
 const TEST_CONFIG = {
   pages: [
     { name: 'homepage', url: '/', critical: true },
-    { name: 'calculator', url: '/calculator/45000-after-tax', critical: true },
+    { name: 'calculator', url: '/', critical: true },
     { name: 'blog', url: '/blog', critical: false },
     { name: 'about', url: '/about', critical: false },
     { name: 'privacy', url: '/privacy', critical: false },
@@ -224,7 +224,7 @@ test.describe('WCAG 2.2 AA - Interactive Elements', () => {
 
       test('tooltips should be accessible', async ({ page }) => {
         await setTheme(page, theme);
-        await page.goto('/calculator/45000-after-tax');
+        await page.goto('/');
         await page.waitForLoadState('networkidle');
         await dismissCookieBanner(page);
 
@@ -246,7 +246,7 @@ test.describe('WCAG 2.2 AA - Interactive Elements', () => {
 
       test('form checkboxes should be accessible', async ({ page }) => {
         await setTheme(page, theme);
-        await page.goto('/calculator/45000-after-tax');
+        await page.goto('/');
         await page.waitForLoadState('networkidle');
         await dismissCookieBanner(page);
 

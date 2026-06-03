@@ -69,7 +69,6 @@ Target state for "no issues found" audits:
 bun run test:no-coverage    # Unit tests (fast)
 bun run test:ci             # Full unit suite with coverage (CI-safe)
 bun run test:e2e:critical   # Critical-path E2E suite (smoke + golden)
-bun run test:e2e:visual     # Visual regression pilot (Chromium snapshots)
 bun run test:e2e            # Full multi-browser E2E
 bun run test:quick          # Fast local gate: unit fast + critical E2E
 bun run test:full           # Full gate: coverage unit + full E2E
@@ -90,24 +89,7 @@ Notes:
 - GitHub `CI` runs `bun run audit:deps` as a separate dependency-advisory gate after repo checks.
 - `bun run harness:local` is the recommended pre-refactor confidence gate.
 - `bun run harness:release` keeps the dependency advisory check in the stricter release-oriented validation path.
-- `bun run test:e2e:visual:update` refreshes the checked-in Chromium baselines after an intentional UI change.
-
-### Visual Regression Pilot
-
-Current pilot surfaces:
-
-- homepage hero
-- homepage calculator results
-- Director Intelligence dashboard main results
-
-Commands:
-
-```bash
-bun run test:e2e:visual
-bun run test:e2e:visual:update
-```
-
-Use the update command only when a visual change is intentional and the new screenshots have been reviewed.
+- Visual review is handled manually in the developer/agent loop for UI changes. Do not maintain checked-in visual-regression baselines by default.
 
 ---
 
@@ -160,7 +142,6 @@ Keep HMRC values anchored to source documents and code references.
 - `bun run build`
 - `bun run test:e2e:critical`
 - `bun run release:report:init` (before manual post-release checks)
-- Confirm `docs/guides/VERCEL_MIGRATION.md` is complete before the first GitHub-sourced production deploy
 - `RATE_LIMIT_VERIFY_BASE_URL="https://payetax.co.uk" RATE_LIMIT_HEALTH_SECRET="..." bun run check:production-env-contract` (against the intended Vercel Production project before release completion)
 - `bun run release:report:check` (after checklist completion)
 - Post-release production validation checklist (manual/high-confidence checks)

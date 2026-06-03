@@ -1,8 +1,7 @@
-import { resolveNewsletterBaseUrl } from '@/lib/newsletter/emailConfig';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
 
-const BASE_URL = resolveNewsletterBaseUrl();
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://payetax.co.uk';
 
 export function escapeHtml(str: string): string {
   return str

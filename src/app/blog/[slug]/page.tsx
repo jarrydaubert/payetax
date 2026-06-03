@@ -9,13 +9,11 @@ import { BlogDisclaimer } from '@/components/molecules/BlogDisclaimer';
 import { ReadingProgress } from '@/components/molecules/ReadingProgress';
 import { TrackedNavigationLink } from '@/components/molecules/TrackedNavigationLink';
 import { BlogArticleAnalytics } from '@/components/organisms/BlogArticleAnalytics';
-import { NewsletterCTA } from '@/components/organisms/NewsletterCTA';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { TableOfContents } from '@/components/organisms/TableOfContents';
 import { Button } from '@/components/ui/button';
 import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { BLUR_DATA_URL, IMAGE_SIZES } from '@/constants/images';
-import { getSalaryIntentTargetFromTextValues } from '@/constants/salaryPageTargets';
 import { getBlogPostBySlug, getBlogPosts, getRelatedPosts } from '@/lib/blog';
 import { compileMDXContent, extractFAQs, extractHowToSteps } from '@/lib/mdx';
 import { generateMetadata as generateMetadataHelper, LOGO_URL, SITE_URL } from '@/lib/metadata';
@@ -183,6 +181,29 @@ function hasVisibleUpdateDate(publishedAt: string, updatedAt?: string): boolean 
   return new Date(updatedAt).getTime() > new Date(publishedAt).getTime();
 }
 
+function stripHtmlTags(input: string): string {
+  let output = '';
+  let insideTag = false;
+
+  for (const char of input) {
+    if (char === '<') {
+      insideTag = true;
+      continue;
+    }
+
+    if (char === '>') {
+      insideTag = false;
+      continue;
+    }
+
+    if (!insideTag) {
+      output += char;
+    }
+  }
+
+  return output;
+}
+
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
   const post = await getCachedBlogPost(resolvedParams.slug);
@@ -203,12 +224,13 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const howToSteps = extractHowToSteps(post.content);
 
   // Strip markdown and HTML before counting words.
-  const plainText = post.content
-    .replace(/```[\s\S]*?```/g, '')
-    .replace(/`[^`]*`/g, '')
-    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
-    .replace(/[#*_~>\-|]/g, '')
-    .replace(/<[^>]*>/g, '')
+  const plainText = stripHtmlTags(
+    post.content
+      .replace(/```[\s\S]*?```/g, '')
+      .replace(/`[^`]*`/g, '')
+      .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+      .replace(/[#*_~>\-|]/g, ''),
+  )
     .replace(/\s+/g, ' ')
     .trim();
   const wordCount = plainText.split(/\s+/).filter(Boolean).length;
@@ -218,12 +240,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const authorName =
     post.author && post.author !== 'PayeTax Team' ? post.author : 'PayeTax Editorial Team';
   const showUpdatedDate = hasVisibleUpdateDate(post.publishedAt, post.updatedAt);
-  const salaryIntentTarget = getSalaryIntentTargetFromTextValues([
-    post.title,
-    ...(post.tags ?? []),
-  ]);
-  const salaryIntentLabel =
-    salaryIntentTarget === null ? null : salaryIntentTarget.toLocaleString('en-GB');
   const internalToolLinks = getInternalToolLinks(post);
 
   const articleData = {
@@ -376,7 +392,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 </div>
               </div>
             </header>
-
             {post.image && (
               <div className='relative -mx-4 mb-8 aspect-video overflow-hidden md:-mx-6 md:mb-12 md:rounded-xl lg:-mx-8'>
                 <Image
@@ -391,7 +406,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 />
               </div>
             )}
-
             <div className='relative xl:flex xl:gap-8'>
               <TableOfContents content={post.content} className='w-56 shrink-0' />
 
@@ -414,9 +428,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 {mdxContent}
               </div>
             </div>
-
             <BlogDisclaimer className='mt-12 md:mt-16' />
-
             <section className='mt-8 rounded-xl border border-primary/20 bg-primary/5 p-6 md:p-8'>
               <h3 className='mb-2 font-semibold text-foreground'>Useful tools for this topic</h3>
               <p className={cn('mb-4 text-foreground/70', TYPOGRAPHY.TEXT_SM)}>
@@ -437,7 +449,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 ))}
               </div>
             </section>
-
             <div className='mt-8 rounded-xl border border-primary/20 bg-primary/5 p-6 md:p-8'>
               <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
                 <div>
@@ -456,13 +467,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   </Link>
                 </Button>
               </div>
-            </div>
-
-            <NewsletterCTA
-              className='mx-auto mt-8 max-w-4xl'
-              title='Get UK Tax Updates by Email'
-              description='Practical PAYE and tax-planning guidance whenever rules or thresholds change.'
-            />
+            </div>{' '}
           </article>
 
           {relatedPosts.length > 0 && (
@@ -470,26 +475,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <h2 className={cn('mb-6 font-bold text-foreground md:mb-8', TYPOGRAPHY.TEXT_2XL)}>
                 Related Articles
               </h2>
-              {salaryIntentTarget !== null && salaryIntentLabel !== null && (
-                <div className='mb-6 rounded-lg border border-primary/25 bg-primary/5 p-4'>
-                  <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
-                    <p className={cn('text-foreground/80', TYPOGRAPHY.TEXT_SM)}>
-                      Need numbers for this scenario? Calculate your take-home pay on £
-                      {salaryIntentLabel}.
-                    </p>
-                    <Button asChild size='sm' className='shrink-0'>
-                      <TrackedNavigationLink
-                        href={`/calculator/${salaryIntentTarget}-after-tax`}
-                        source='blog_salary_intent_cta'
-                        target={`calculator:${salaryIntentTarget}`}
-                        destination='salary_calculator'
-                      >
-                        Calculate your take-home pay
-                      </TrackedNavigationLink>
-                    </Button>
-                  </div>
-                </div>
-              )}
               <div className='grid gap-6 md:grid-cols-3'>
                 {relatedPosts.map((relatedPost) => (
                   <TrackedNavigationLink

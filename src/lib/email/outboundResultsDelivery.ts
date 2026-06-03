@@ -39,7 +39,7 @@ export function sendPayeResultsEmail(args: {
 
   return sendOutboundEmail(
     {
-      from: 'PayeTax <noreply@payetax.co.uk>',
+      from: process.env.BREVO_FROM_EMAIL || 'PayeTax <support@payetax.co.uk>',
       to: args.email,
       subject: `Your UK Tax Calculation - ${formatCurrency(results.netPay.annually)} take-home`,
       html: generatePayeEmailHtml(results, taxYearLabel),
@@ -65,7 +65,7 @@ export function sendDirectorResultsEmail(args: {
 
   return sendOutboundEmail(
     {
-      from: 'PayeTax <noreply@payetax.co.uk>',
+      from: process.env.BREVO_FROM_EMAIL || 'PayeTax <support@payetax.co.uk>',
       to: args.email,
       subject: `Director Tax Strategy Report - ${formatCurrency(recommendedStrategy.takeHome)} Take-Home`,
       html: generateDirectorEmailHtml({

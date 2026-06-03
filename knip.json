@@ -1,17 +1,13 @@
 {
   "$schema": "./node_modules/knip/schema.json",
-  "ignoreFiles": [
-    ".claude/tools/clis/*.js",
-    "docs/guides/KIT_EMBED_CSS.css",
-    "public/register-sw.js",
-    "public/sw.js"
-  ],
-  "ignoreBinaries": ["open"],
+  "ignoreFiles": ["src/lib/env.ts", "public/register-sw.js", "public/sw.js"],
+  "ignoreBinaries": ["open", "scripts/import-blog-image.sh"],
   "ignoreIssues": {
     "**/*.test.ts": ["unlisted"],
     "**/*.test.tsx": ["unlisted"],
     "**/*.spec.ts": ["unlisted"],
     "**/*.spec.tsx": ["unlisted"],
-    "postcss.config.mjs": ["unlisted"]
+    "postcss.config.mjs": ["unlisted"],
+    "src/test/testing-library.tsx": ["unlisted"]
   }
 }

@@ -2,25 +2,19 @@ import { render, screen } from '@testing-library/react';
 import ToolsPage from '../page';
 
 describe('ToolsPage', () => {
-  it('renders tools list with key links', () => {
+  it('renders the tools list with key links', () => {
     render(<ToolsPage />);
 
     expect(screen.getByText('Free UK Tax')).toBeInTheDocument();
     expect(screen.getByTestId('tools-link-director-guide')).toBeInTheDocument();
     expect(screen.getByTestId('tools-link-tax-code-decoder')).toBeInTheDocument();
+    expect(screen.getByTestId('tools-link-national-insurance-calculator')).toBeInTheDocument();
   });
 
-  it('renders best-for audience links alongside the tools hub', () => {
+  it('does not render removed audience-marketing links', () => {
     render(<ToolsPage />);
 
-    expect(screen.getByText('Choose a Tax Calculator by Situation')).toBeInTheDocument();
-    expect(screen.getByTestId('best-for-link-high-earners')).toHaveAttribute(
-      'href',
-      '/best-for/high-earners',
-    );
-    expect(screen.getByTestId('best-for-link-first-job')).toHaveAttribute(
-      'href',
-      '/best-for/first-job',
-    );
+    expect(screen.queryByText('Choose a Tax Calculator by Situation')).not.toBeInTheDocument();
+    expect(screen.queryByText(/HMRC Updates/i)).not.toBeInTheDocument();
   });
 });

@@ -107,7 +107,7 @@ export function SalaryQuickResults({ salary, results, comparisons }: SalaryQuick
           {comparisons.map((comp) => (
             <Link
               key={comp.amount}
-              href={`/calculator/${comp.amount}-after-tax`}
+              href='/'
               className={cn(
                 'rounded-md px-3 py-2 text-center',
                 TYPOGRAPHY.TEXT_SM,
