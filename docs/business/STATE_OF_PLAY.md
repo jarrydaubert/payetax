@@ -15,3 +15,4 @@ PayeTax is now a public R&D project.
 - Vercel env values need confirming after the account migration.
 - Brevo SMTP needs a rotated password and verified sender.
 - Upstash configuration should be checked against production errors.
+- Linear project/team keys may be stale after the project move and should be re-confirmed.

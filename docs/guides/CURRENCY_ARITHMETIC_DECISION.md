@@ -1,4 +1,4 @@
-# Currency Arithmetic Decision (P1-2)
+# Currency Arithmetic Decision
 
 Date: February 20, 2026  
 Status: Accepted  
@@ -96,4 +96,4 @@ This is the best risk/performance tradeoff for current production flows.
 
 - Decision documented here.
 - Linked from `docs/guides/SYSTEM_OVERVIEW.md`.
-- `docs/BACKLOG.md` item `P1-2` marked complete by removal from active backlog.
+- Original arithmetic migration backlog item was completed and removed from the active backlog.

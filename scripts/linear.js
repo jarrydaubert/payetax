@@ -9,6 +9,7 @@ const path = require('node:path');
 // Configuration
 const LINEAR_API_KEY = process.env.LINEAR_API_KEY;
 const TEAM_KEY = process.env.LINEAR_TEAM_KEY || 'PAYTAX'; // Team identifier
+const DEFAULT_PROJECT_NAME = process.env.LINEAR_PROJECT_NAME || 'PayeTax';
 const BACKLOG_PATH = path.resolve(process.cwd(), 'docs/BACKLOG.md');
 
 if (!LINEAR_API_KEY) {
@@ -1237,7 +1238,11 @@ async function main() {
           teamOnly: args.includes('--team-only'),
         };
 
-        // Check for --project flag
+        // Check for project selection flags
+        if (args.includes('--project-default')) {
+          listOptions.projectName = DEFAULT_PROJECT_NAME;
+        }
+
         if (args.includes('--project')) {
           const projectIndex = args.indexOf('--project');
           const projectName = args[projectIndex + 1];
@@ -1418,6 +1423,10 @@ async function main() {
         log('  list, ls                List all issues', 'dim');
         log('    --me                  List issues assigned to you', 'dim');
         log('    --project NAME        List issues in specific project', 'dim');
+        log(
+          '    --project-default     List issues in LINEAR_PROJECT_NAME [default: PayeTax]',
+          'dim',
+        );
         log('    --team-only           List only team issues (no project)', 'dim');
         log('  create, new             Create new issue (interactive)', 'dim');
         log('  create "title"          Create issue with title', 'dim');
@@ -1455,6 +1464,7 @@ async function main() {
         log('  help                    Show this help', 'dim');
         log('\nExamples:', 'bright');
         log('  bun run linear list', 'cyan');
+        log('  bun run linear list --project-default', 'cyan');
         log('  bun run linear list --project PayeTax', 'cyan');
         log('  bun run linear list --team-only', 'cyan');
         log('  bun run linear create', 'cyan');
@@ -1466,8 +1476,12 @@ async function main() {
         log('  bun run linear burn-down-cleanup', 'cyan');
         log('  bun run linear kanban-check --strict', 'cyan');
         log('\nEnvironment:', 'bright');
-        log('  LINEAR_API_KEY     Your Linear API key (required)', 'dim');
-        log('  LINEAR_TEAM_KEY    Team identifier [default: PAYTAX]', 'dim');
+        log('  LINEAR_API_KEY       Your Linear API key (required)', 'dim');
+        log('  LINEAR_TEAM_KEY      Team identifier [default: PAYTAX]', 'dim');
+        log(
+          '  LINEAR_PROJECT_NAME  Default project for --project-default [default: PayeTax]',
+          'dim',
+        );
         log('');
         break;
     }

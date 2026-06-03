@@ -5,6 +5,15 @@ Linear is execution tracking.
 
 For full board operating rules, see `docs/guides/KANBAN.md`.
 
+## Migration Note
+
+The operating model in this guide should survive account, workspace, and project moves.
+Treat concrete identifiers as configuration:
+
+- `LINEAR_TEAM_KEY` controls the Linear team key. Current code defaults to `PAYTAX`.
+- `LINEAR_PROJECT_NAME` controls the default project used by helper commands. Current code defaults to `PayeTax`.
+- Real API keys, webhook secrets, team keys, and project names must be re-confirmed after a Linear move.
+
 ---
 
 ## Issue Creation Rules
@@ -53,13 +62,13 @@ Use Linear for execution tracking, not idea storage:
 
 - Add or change work in `docs/BACKLOG.md` first.
 - Create a Linear issue only when the work is ready to execute.
-- Treat the `PayeTax` project as the main board for planned delivery work.
-- Treat team-level `PAYTAX-*` issues without a project as triage inputs, especially for Sentry-created issues.
+- Treat the configured Linear project, currently defaulting to `PayeTax`, as the main board for planned delivery work.
+- Treat team-level issues without a project as triage inputs, especially for Sentry-created issues.
 
 In practice:
 
 - `bun run linear:me` is useful for your assigned project work.
-- `bun run linear list --project PayeTax` is the main project view.
+- `bun run linear list --project-default` is the configured main project view.
 - `bun run linear list --team-only` is the team-level triage view and should be checked when reviewing Sentry-created issues.
 
 ---
@@ -70,7 +79,10 @@ In practice:
 # List my issues in the PayeTax project
 bun run linear:me
 
-# List issues in the PayeTax project
+# List issues in the configured default project
+bun run linear list --project-default
+
+# List issues in an explicitly named project
 bun run linear list --project PayeTax
 
 # List team-level issues with no project
@@ -102,7 +114,7 @@ bun run linear kanban-check --strict
 
 ## SDK Features (Verified In Repo)
 
-Installed SDK: `@linear/sdk@78.0.0` (`package.json` / lockfile).
+Installed SDK: `@linear/sdk@86.0.0` (`package.json` / lockfile).
 
 The SDK supports a broad surface area; useful capabilities for PayeTax include:
 
@@ -125,14 +137,15 @@ Current script (`scripts/linear.js`) mainly uses:
 
 ### Sentry Webhook Issue Placement
 
-`/api/sentry-webhook` creates issues at the `PAYTAX` team level.
+`/api/sentry-webhook` creates issues at the configured Linear team level.
 
 Operational note:
 
 - This is currently acceptable and expected.
-- Auto-created Sentry issues do not need to be assigned to the `PayeTax` project to be valid triage inputs.
+- Auto-created Sentry issues do not need to be assigned to the configured project to be valid triage inputs.
 - `bun run linear:me` will not show unassigned team-level Sentry issues.
 - When reviewing error backlog, check `bun run linear list --team-only` as well as project-filtered views.
+- If the Linear team or project changes, update `LINEAR_TEAM_KEY` and `LINEAR_PROJECT_NAME` before trusting these commands.
 
 ### Production Issue Triage
 

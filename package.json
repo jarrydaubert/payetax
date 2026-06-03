@@ -69,7 +69,7 @@
     "deploy": "bun run clean && bun run release && echo '✅ Ready for deployment!'",
     "debug": "bun run clean && bun run typecheck && bun run build",
     "linear": "bun scripts/linear.js",
-    "linear:me": "bun scripts/linear.js list --me --project PayeTax",
+    "linear:me": "bun scripts/linear.js list --me --project-default",
     "linear:create": "bun scripts/linear.js create",
     "linear:done": "bun scripts/linear.js update-status",
     "blog:image:import": "scripts/import-blog-image.sh",

@@ -15,6 +15,8 @@ This document lists production environment variables for the public R&D version 
 | Sentry source maps | `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` |
 | Sentry to Linear webhook | `SENTRY_WEBHOOK_SECRET`, `LINEAR_API_KEY`, optional `LINEAR_TEAM_KEY` |
 
+After Linear account, workspace, or project moves, treat old local values as stale until `LINEAR_TEAM_KEY` and the target project names have been confirmed against the current Linear workspace.
+
 ## Local Development
 
 Use `.env.template` for names and `.env.local` for local values.

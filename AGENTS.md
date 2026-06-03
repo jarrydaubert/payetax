@@ -53,7 +53,7 @@ Production secrets belong in Vercel project settings:
 - Brevo SMTP values for feedback and email-results flows
 - Upstash Redis for distributed rate limiting
 - Sentry values for monitoring and source maps
-- Linear API key for issue creation from Sentry webhooks
+- Linear API key for issue creation from Sentry webhooks and local issue tooling
 - GA4 measurement id for basic analytics
 
 If a Vercel CLI command cannot retrieve project settings, check `.vercel/project.json`. A stale local link should be replaced by relinking to the current project.

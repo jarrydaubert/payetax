@@ -11,7 +11,7 @@ The repo is public. Real secrets must live in Vercel or local ignored env files 
 - Jest and Playwright
 - GA4 for basic analytics
 - Sentry for error monitoring
-- Linear issue creation from Sentry webhooks
+- Linear issue tracking and Sentry webhook triage
 - Brevo SMTP for transactional email flows
 
 ## Current Scope
@@ -66,6 +66,7 @@ Other production controls:
 - `SENTRY_AUTH_TOKEN`
 - `SENTRY_WEBHOOK_SECRET`
 - `LINEAR_API_KEY`
+- `LINEAR_TEAM_KEY`
 - `UPSTASH_REDIS_REST_URL`
 - `UPSTASH_REDIS_REST_TOKEN`
 

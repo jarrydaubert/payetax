@@ -52,6 +52,11 @@ Analytics and monitoring:
 - `LINEAR_API_KEY`
 - `LINEAR_TEAM_KEY`
 
+Linear:
+
+- Reconfirm `LINEAR_TEAM_KEY` and project names after account, workspace, or project moves.
+- The local CLI and Sentry webhook both default to the legacy `PAYTAX` team key unless env overrides are set.
+
 Rate limiting:
 
 - `UPSTASH_REDIS_REST_URL`

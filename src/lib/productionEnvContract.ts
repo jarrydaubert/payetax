@@ -77,7 +77,10 @@ export const PRODUCTION_ENV_FEATURE_CONTRACT: readonly ProductionEnvFeatureContr
     enabled: true,
     requiredEnv: ['SENTRY_WEBHOOK_SECRET', 'LINEAR_API_KEY'],
     verificationMode: 'env',
-    notes: ['LINEAR_TEAM_KEY is optional because the route defaults to PAYTAX when unset.'],
+    notes: [
+      'LINEAR_TEAM_KEY is optional because the route defaults to PAYTAX when unset.',
+      'Reconfirm LINEAR_TEAM_KEY after Linear workspace or project moves.',
+    ],
   },
 ] as const;
 

@@ -3,7 +3,7 @@
 Purpose:
 - keep styling decisions predictable,
 - point contributors at the rules we can actually verify,
-- keep exceptions visible in the backlog instead of hidden in prose.
+- keep exceptions visible in docs or the active backlog instead of hidden in prose.
 
 ## Canonical UI Direction
 
@@ -45,7 +45,7 @@ import { Button } from '@/components/ui/button';
 Do not add new imports from the legacy shim surface unless there is a documented reason.
 
 Current exception:
-- older `@/components/atoms/ui/*` imports still exist and are tracked in backlog item `P2-19`
+- older `@/components/atoms/ui/*` imports still exist; do not add new ones without a documented reason
 
 ### 3. Shared patterns must earn tokens
 
@@ -76,10 +76,10 @@ For visually risky UI changes, also run the smallest relevant browser check, for
 
 Run the app locally or inspect the Vercel preview, check the affected route at desktop and mobile sizes, and record the reviewed states in the PR.
 
-## Backlog Exceptions
+## Known Exceptions
 
-- `P2-19`: consolidate the remaining mixed UI import surface
-- `P2-32`: continue replacing shipped raw palette classes with semantic usage
-- `P2-33`: continue design-token hygiene cleanup
+- Remaining mixed UI import surface: older `@/components/atoms/ui/*` imports exist from earlier component passes.
+- Raw palette classes: existing allowlisted brand, chart, and one-off visual classes are tolerated by `bun run audit:tokens`.
+- Token hygiene: continue opportunistic cleanup when touching nearby UI, but do not create broad styling-only churn.
 
-If a styling rule is not backed by an existing script, test, or named backlog exception, it should not be treated as a hard constraint in this guide.
+If a styling rule is not backed by an existing script, test, or documented exception, it should not be treated as a hard constraint in this guide.
