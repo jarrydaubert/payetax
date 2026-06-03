@@ -4,11 +4,9 @@ import { toHaveNoViolations } from 'jest-axe';
 // Extend Jest matchers with jest-axe accessibility matchers
 expect.extend(toHaveNoViolations);
 
-// Many components (Analytics, etc.) read NEXT_PUBLIC_* env vars at module init time.
+// Components read NEXT_PUBLIC_* env vars at module init time.
 // Provide stable defaults in Jest to avoid tests depending on local developer env.
 process.env.NEXT_PUBLIC_GA_ID ||= 'G-ABCDEFGHIJ';
-process.env.NEXT_PUBLIC_CLARITY_ID ||= 'vmbk1d0ng2';
-process.env.NEXT_PUBLIC_AHREFS_KEY ||= 'ahrefs-test-key';
 
 // Note: TextEncoder/TextDecoder and Fetch API polyfills (Request/Response/Headers)
 // are in jest.setup.fetch.js which runs via setupFiles before module imports
@@ -64,15 +62,6 @@ jest.mock('lucide-react', () => {
     },
   );
 });
-
-// Mock Resend so app/action tests do not parse its ESM-only transitive dependencies.
-jest.mock('resend', () => ({
-  Resend: jest.fn().mockImplementation(() => ({
-    emails: {
-      send: jest.fn().mockResolvedValue({ data: { id: 'test-email-id' }, error: null }),
-    },
-  })),
-}));
 
 // Mock ResizeObserver (not available in jsdom)
 global.ResizeObserver = jest.fn().mockImplementation(() => ({
