@@ -211,8 +211,8 @@ describe('Metadata Module', () => {
 
       expect(metadata.manifest).toBe('/manifest.json');
       expect(metadata.other).toEqual({
-        'msapplication-TileColor': '#1f2937',
-        'theme-color': '#1f2937',
+        'msapplication-TileColor': '#f8f5ed',
+        'theme-color': '#f8f5ed',
       });
     });
 
@@ -241,16 +241,16 @@ describe('Metadata Module', () => {
   });
 
   describe('generateViewport', () => {
-    test('should generate viewport configuration (dark mode only)', () => {
+    test('should generate viewport configuration', () => {
       const viewport = generateViewport();
 
       expect(viewport).toEqual({
-        themeColor: '#1f2937',
+        themeColor: '#f8f5ed',
         width: 'device-width',
         initialScale: 1,
         maximumScale: 5, // WCAG 2.2 AA - Allow 500% zoom
         userScalable: true,
-        colorScheme: 'dark',
+        colorScheme: 'light dark',
         viewportFit: 'cover',
       });
     });

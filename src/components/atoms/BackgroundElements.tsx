@@ -1,6 +1,5 @@
 // src/components/atoms/BackgroundElements.tsx
-// Geometric background with rotating circles and grid pattern
-// Matches payetax-web design system
+// Static ledger grid background.
 
 export default function BackgroundElements() {
   return (
@@ -8,9 +7,8 @@ export default function BackgroundElements() {
       {/* Grid pattern */}
       <div className='absolute inset-0 bg-grid' />
 
-      {/* Rotating circles */}
-      <div className='bg-circle bg-circle-1' />
-      <div className='bg-circle bg-circle-2' />
+      <div className='bg-circle bg-circle-1' aria-hidden='true' />
+      <div className='bg-circle bg-circle-2' aria-hidden='true' />
     </div>
   );
 }

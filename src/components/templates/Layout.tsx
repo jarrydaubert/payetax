@@ -37,7 +37,7 @@ export function Layout({ children }: LayoutProps): React.ReactElement {
   }
 
   return (
-    <div className='relative flex min-h-screen flex-col bg-surface-brand'>
+    <div className='relative flex min-h-screen flex-col bg-background'>
       {/* Background geometric elements */}
       <BackgroundElements />
 

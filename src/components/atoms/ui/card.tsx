@@ -23,7 +23,7 @@ const Card = forwardRef<ElementRef<'div'>, ComponentPropsWithoutRef<'div'>>(
     <div
       ref={ref}
       className={cn(
-        'rounded-xl border border-border bg-card text-card-foreground shadow-sm',
+        'rounded-sm border border-border bg-card text-card-foreground shadow-none',
         className,
       )}
       {...props}

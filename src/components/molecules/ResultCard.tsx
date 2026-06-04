@@ -94,7 +94,9 @@ export const ResultCard = memo(function ResultCard({
           <p className={cn('font-medium text-foreground/80', TYPOGRAPHY.TEXT_SM)}>{label}</p>
           {Icon && <Icon className={cn(ICON_SIZES.SIZE_4, styles.icon)} aria-hidden='true' />}
         </div>
-        <p className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>{value}</p>
+        <p className={cn('font-mono font-semibold text-foreground', TYPOGRAPHY.TEXT_2XL)}>
+          {value}
+        </p>
       </div>
     </Card>
   );

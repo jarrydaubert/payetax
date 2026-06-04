@@ -32,7 +32,7 @@ export default function ServerHero({ className }: ServerHeroProps) {
       </p>
 
       {/* Heading */}
-      <h1 className='mx-auto mb-6 max-w-4xl font-bold font-display text-5xl text-on-brand leading-tight tracking-tight sm:text-6xl lg:text-7xl'>
+      <h1 className='mx-auto mb-6 max-w-4xl font-display font-semibold text-5xl text-on-brand leading-[0.98] tracking-tight sm:text-6xl lg:text-7xl'>
         See Your Take-Home Pay
         <br />
         <span className='text-gradient-brand'>Free UK PAYE Tax Calculator</span>
@@ -51,7 +51,7 @@ export default function ServerHero({ className }: ServerHeroProps) {
           trackingLabel='hero_start_calculating'
           className={cn(
             buttonVariants({ variant: 'brandOutline', size: 'touch' }),
-            'group rounded-xl px-8 text-on-brand hover:-translate-y-0.5',
+            'group px-8 text-on-brand',
           )}
         >
           See My Take Home Pay
@@ -60,7 +60,7 @@ export default function ServerHero({ className }: ServerHeroProps) {
           asChild
           variant='outline'
           size='touch'
-          className='rounded-xl border-white/10 bg-transparent px-8 text-on-brand hover:border-brand/30 hover:bg-white/5 hover:text-on-brand'
+          className='border-border bg-transparent px-8 text-on-brand hover:border-primary/30 hover:bg-accent hover:text-on-brand'
         >
           <Link href='/tools'>
             Explore Tax Tools

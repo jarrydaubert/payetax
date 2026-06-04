@@ -329,7 +329,7 @@ const NumberInput = memo(
               : undefined
           }
           className={cn(
-            'flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 shadow-sm',
+            'flex h-9 w-full rounded-sm border border-input bg-background px-3 py-1 shadow-none',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
             'disabled:cursor-not-allowed disabled:opacity-50',
             'placeholder:text-muted-foreground',
@@ -363,8 +363,8 @@ const NumberInput = memo(
             className={cn(
               'absolute inset-y-1 right-1 flex flex-col border-l',
               'border-input bg-background',
-              'overflow-hidden rounded-r-md',
-              'shadow-sm',
+              'overflow-hidden rounded-r-sm',
+              'shadow-none',
               disabled ? 'opacity-30' : 'opacity-70 hover:opacity-100',
             )}
           >

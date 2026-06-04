@@ -1,5 +1,5 @@
 // src/components/molecules/__tests__/Footer.test.tsx
-// Tests for new simplified footer design (payetax-web design system)
+// Tests for the simplified Ledger footer
 
 import { fireEvent, render, screen } from '@testing-library/react';
 import { Footer } from '../Footer';
@@ -16,7 +16,7 @@ describe('Footer Component', () => {
       expect(footerDiv).toHaveClass('footer-new');
     });
 
-    it('should render brand name with gradient', () => {
+    it('should render brand name', () => {
       const { container } = render(<Footer />);
 
       const brand = container.querySelector('.footer-brand');

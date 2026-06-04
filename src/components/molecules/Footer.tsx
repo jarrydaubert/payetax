@@ -1,5 +1,5 @@
 // src/components/molecules/Footer.tsx
-// Simplified footer matching payetax-web design system
+// Simplified footer matching the Ledger shell
 'use client';
 
 import Link from 'next/link';
@@ -7,12 +7,12 @@ import { useCallback } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
- * Footer molecule component - New design system
+ * Footer molecule component
  *
  * IMPORTANT: This is a MOLECULE - it does NOT own the <footer> semantic tag.
  * The parent TEMPLATE (Layout.tsx) must wrap this in <footer></footer>.
  *
- * Clean, minimal design with:
+ * Clean Ledger design with:
  * - Logo (paye<span>tax</span>)
  * - Essential links (Blog, Tools, About, Privacy, Compliance, Support)
  * - Copyright
@@ -52,7 +52,9 @@ export function Footer({ className }: FooterProps) {
         <div className='footer-copy'>
           &copy; 2026 PayeTax
           {process.env.NEXT_PUBLIC_APP_VERSION && (
-            <span className='ml-2 text-white/50'>v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
+            <span className='ml-2 text-muted-foreground'>
+              v{process.env.NEXT_PUBLIC_APP_VERSION}
+            </span>
           )}
         </div>
       </div>

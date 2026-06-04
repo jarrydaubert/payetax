@@ -7,23 +7,22 @@
  * across webpack and Turbopack builds.
  */
 
-import { Inter, Space_Grotesk } from 'next/font/google';
+import { IBM_Plex_Mono, Newsreader, Public_Sans } from 'next/font/google';
 import type { FontLike } from './fonts';
 
-/** Space Grotesk for headings and display text */
-export const spaceGrotesk: FontLike = Space_Grotesk({
+/** Newsreader for display and editorial headings */
+export const newsreader: FontLike = Newsreader({
   subsets: ['latin'],
-  variable: '--font-space-grotesk',
-  fallback: ['system-ui', 'sans-serif'],
-  // weight omitted = variable font (single file, all weights 400-700)
+  variable: '--font-newsreader',
+  fallback: ['Georgia', 'Times New Roman', 'serif'],
+  weight: ['400', '500', '600', '700'],
 });
 
-/** Inter for body text and UI elements */
-export const inter: FontLike = Inter({
+/** Public Sans for body text and interface labels */
+export const publicSans: FontLike = Public_Sans({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-public-sans',
   fallback: [
-    'Helvetica Neue',
     '-apple-system',
     'BlinkMacSystemFont',
     'Segoe UI',
@@ -31,5 +30,13 @@ export const inter: FontLike = Inter({
     'system-ui',
     'sans-serif',
   ],
-  // weight omitted = variable font (single file, all weights 100-900)
+  weight: ['400', '500', '600', '700'],
+});
+
+/** IBM Plex Mono for figures, money, and code */
+export const ibmPlexMono: FontLike = IBM_Plex_Mono({
+  subsets: ['latin'],
+  variable: '--font-ibm-plex-mono',
+  fallback: ['SFMono-Regular', 'Consolas', 'Liberation Mono', 'monospace'],
+  weight: ['400', '500', '600', '700'],
 });

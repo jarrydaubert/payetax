@@ -1,6 +1,6 @@
 /**
- * PayeTax - Minimalist Design System
- * Tailwind v4 + Shadcn + Framer Motion + Fluid Typography
+ * PayeTax - Ledger Design System
+ * Tailwind v4 + Shadcn + civic/editorial typography
  */
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -8,15 +8,15 @@
 
 :root {
   /* Typography - Wire design tokens to Next.js font variables */
-  /* --font-inter and --font-space-grotesk are set by next/font when enabled */
-  --font-inter: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+  --font-newsreader: Georgia, 'Times New Roman', serif;
+  --font-public-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
     sans-serif;
-  --font-space-grotesk: ui-sans-serif, system-ui, sans-serif;
-  --font-sans: var(--font-inter), system-ui, -apple-system, sans-serif;
-  --font-display: var(--font-space-grotesk), system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
-  --font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-  --radius: 0.625rem;
+  --font-ibm-plex-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', ui-monospace, monospace;
+  --font-sans: var(--font-public-sans), system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-newsreader), Georgia, serif;
+  --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
+  --font-size-base: clamp(0.95rem, 0.925rem + 0.125vw, 1.0625rem);
+  --radius: 0.25rem;
 
   /* Blog-Specific Fluid Typography (distinct from Tailwind classes) */
   /* Use these CSS vars only in blog content for optimal readability */
@@ -28,71 +28,83 @@
   --blog-font-size-3xl: clamp(1.875rem, 1.65rem + 1.125vw, 2.25rem);
   --blog-font-size-4xl: clamp(2.25rem, 1.95rem + 1.5vw, 3rem);
 
-  /* Brand Colors - Cyan/Emerald design system (January 2026) */
-  --brand-primary: #06b6d4;                     /* Cyan */
-  --brand-accent: #10b981;                      /* Emerald */
-  --brand-gradient-start: #06b6d4;              /* Cyan */
-  --brand-gradient-end: #10b981;                /* Emerald */
+  /* Ledger primitives */
+  --ledger-paper: oklch(0.982 0.012 82);
+  --ledger-paper-raised: oklch(0.997 0.006 82);
+  --ledger-ink: oklch(0.18 0.026 255);
+  --ledger-ink-muted: oklch(0.45 0.03 255);
+  --ledger-rule: oklch(0.82 0.018 82);
+  --ledger-blue: oklch(0.33 0.095 255);
+  --ledger-blue-quiet: oklch(0.93 0.035 255);
+  --ledger-focus: oklch(0.84 0.18 92);
 
-  /* Chart Colors - High contrast for both light and dark modes */
-  --chart-1: 210 100% 42%;    /* Blue - Employment income (darker) */
-  --chart-2: 280 70% 52%;     /* Purple - Other income / Pension (darker) */
-  --chart-3: 0 80% 48%;       /* Red - Income Tax (darker, more saturated) */
-  --chart-4: 38 95% 47%;      /* Amber - National Insurance (darker) */
-  --chart-5: 33 100% 47%;     /* Orange - Student Loan (darker) */
-  --chart-6: 142 75% 40%;     /* Green - Net Pay (darker) */
-  --chart-7: 200 85% 47%;     /* Cyan - Gross salary bars (darker) */
-  --chart-8: 320 65% 50%;     /* Pink - Additional data */
+  /* Brand aliases retained while components migrate off gradient-era names */
+  --brand-primary: var(--ledger-blue);
+  --brand-accent: var(--ledger-blue);
+  --brand-gradient-start: var(--ledger-blue);
+  --brand-gradient-end: var(--ledger-blue);
 
-  /* Shadcn Official Light Theme (OKLCH) */
-  --background: oklch(0.98 0 0);                /* Softer white */
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.45 0 0);          /* Darkened for WCAG AA (4.5:1+) */
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0 0);
-  --success: oklch(0.56 0.16 154);
-  --success-foreground: oklch(0.985 0 0);
-  --warning: oklch(0.72 0.14 80);
-  --warning-foreground: oklch(0.18 0.02 80);
-  --border: oklch(0.90 0 0);
-  --input: oklch(0.92 0 0);
-  --ring: oklch(0.708 0 0);
+  /* Chart Colors - restrained ledger palette */
+  --chart-1: 214 46% 32%;
+  --chart-2: 212 22% 46%;
+  --chart-3: 8 58% 44%;
+  --chart-4: 39 62% 45%;
+  --chart-5: 25 52% 45%;
+  --chart-6: 151 42% 36%;
+  --chart-7: 203 38% 40%;
+  --chart-8: 256 30% 42%;
+
+  /* Light-first Ledger theme */
+  --background: var(--ledger-paper);
+  --foreground: var(--ledger-ink);
+  --card: var(--ledger-paper-raised);
+  --card-foreground: var(--ledger-ink);
+  --popover: var(--ledger-paper-raised);
+  --popover-foreground: var(--ledger-ink);
+  --primary: var(--ledger-blue);
+  --primary-foreground: oklch(0.985 0.006 82);
+  --secondary: oklch(0.945 0.018 82);
+  --secondary-foreground: var(--ledger-ink);
+  --muted: oklch(0.935 0.016 82);
+  --muted-foreground: var(--ledger-ink-muted);
+  --accent: var(--ledger-blue-quiet);
+  --accent-foreground: var(--ledger-blue);
+  --destructive: oklch(0.46 0.13 25);
+  --destructive-foreground: oklch(0.985 0.006 82);
+  --success: oklch(0.42 0.09 155);
+  --success-foreground: oklch(0.985 0.006 82);
+  --warning: oklch(0.58 0.11 75);
+  --warning-foreground: oklch(0.18 0.026 255);
+  --border: var(--ledger-rule);
+  --input: oklch(0.86 0.018 82);
+  --ring: var(--ledger-focus);
 }
 
-/* Brand surface tokens for dark homepage/navigation surfaces */
+/* Brand surface tokens now map to the light Ledger shell */
 :root {
-  --surface-brand: #020617;
-  --surface-brand-alt: #0f172a;
-  --on-brand: #f8fafc;
-  --on-brand-muted: #94a3b8;
-  --on-brand-dim: #94a3b8;
-  --chrome-brand: rgba(255, 255, 255, 0.08);
-  --chrome-brand-strong: rgba(255, 255, 255, 0.14);
+  --surface-brand: var(--background);
+  --surface-brand-alt: var(--secondary);
+  --on-brand: var(--foreground);
+  --on-brand-muted: var(--muted-foreground);
+  --on-brand-dim: var(--muted-foreground);
+  --chrome-brand: color-mix(in oklch, var(--border) 82%, transparent);
+  --chrome-brand-strong: var(--foreground);
 }
 
 /* Background Elements - Geometric patterns */
 .bg-grid {
   background-image:
-    linear-gradient(rgba(6, 182, 212, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(6, 182, 212, 0.03) 1px, transparent 1px);
+    linear-gradient(color-mix(in oklch, var(--ledger-blue) 10%, transparent) 1px, transparent 1px),
+    linear-gradient(
+      90deg,
+      color-mix(in oklch, var(--ledger-blue) 10%, transparent) 1px,
+      transparent 1px
+    );
   background-size: 60px 60px;
 }
 
 .bg-circle {
-  position: absolute;
-  border-radius: 50%;
-  border: 1px solid rgba(6, 182, 212, 0.1);
+  display: none;
 }
 
 .bg-circle-1 {
@@ -100,7 +112,7 @@
   height: 600px;
   top: -200px;
   right: -200px;
-  animation: bg-rotate 60s linear infinite;
+  animation: none;
 }
 
 .bg-circle-2 {
@@ -108,8 +120,8 @@
   height: 800px;
   bottom: -300px;
   left: -300px;
-  border-color: rgba(16, 185, 129, 0.08);
-  animation: bg-rotate 80s linear infinite reverse;
+  border-color: transparent;
+  animation: none;
 }
 
 @keyframes bg-rotate {
@@ -121,21 +133,21 @@
 .brand-wordmark {
   font-family: var(--font-display);
   font-weight: 600;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.015em;
   line-height: 1;
 }
 
 /* Mobile menu blur - with webkit support */
 .mobile-menu-blur {
-  background: rgba(2, 6, 23, 0.6);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
+  background: var(--card);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 /* Shared horizontal scroll styling for comparison tables */
 .scroll-area-thin {
   scrollbar-width: thin;
-  scrollbar-color: oklch(var(--muted-foreground)) transparent;
+  scrollbar-color: var(--muted-foreground) transparent;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -242,10 +254,7 @@
 }
 
 .footer-brand span {
-  background: linear-gradient(135deg, var(--brand-gradient-start), var(--brand-gradient-end));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--primary);
 }
 
 .footer-links-new {
@@ -285,11 +294,11 @@
 }
 
 .footer-links-new a:hover {
-  color: var(--brand-primary);
+  color: var(--primary);
 }
 
 .footer-link-button:hover {
-  color: var(--brand-primary);
+  color: var(--primary);
 }
 
 .footer-copy {
@@ -329,54 +338,62 @@
   }
 }
 
-/* Dark Mode Theme (Updated January 2026) */
+/* Dark Mode Theme */
 .dark {
-  /* Brand colors - Cyan/Emerald (slightly brighter for dark mode contrast) */
-  --brand-primary: #22d3ee;                     /* Cyan-400 (brighter) */
-  --brand-accent: #34d399;                      /* Emerald-400 (brighter) */
-  --brand-gradient-start: #22d3ee;              /* Cyan-400 */
-  --brand-gradient-end: #34d399;                /* Emerald-400 */
-  --surface-brand: #020617;
-  --surface-brand-alt: #0f172a;
-  --on-brand: #f8fafc;
-  --on-brand-muted: #cbd5e1;
-  --on-brand-dim: #cbd5e1;
-  --chrome-brand: rgba(255, 255, 255, 0.1);
-  --chrome-brand-strong: rgba(255, 255, 255, 0.16);
+  --ledger-paper: oklch(0.18 0.026 255);
+  --ledger-paper-raised: oklch(0.22 0.026 255);
+  --ledger-ink: oklch(0.955 0.009 82);
+  --ledger-ink-muted: oklch(0.76 0.018 82);
+  --ledger-rule: oklch(0.34 0.028 255);
+  --ledger-blue: oklch(0.78 0.075 245);
+  --ledger-blue-quiet: oklch(0.28 0.045 250);
+  --ledger-focus: oklch(0.86 0.18 92);
+
+  --brand-primary: var(--ledger-blue);
+  --brand-accent: var(--ledger-blue);
+  --brand-gradient-start: var(--ledger-blue);
+  --brand-gradient-end: var(--ledger-blue);
+  --surface-brand: var(--background);
+  --surface-brand-alt: var(--secondary);
+  --on-brand: var(--foreground);
+  --on-brand-muted: var(--muted-foreground);
+  --on-brand-dim: var(--muted-foreground);
+  --chrome-brand: color-mix(in oklch, var(--border) 82%, transparent);
+  --chrome-brand-strong: var(--foreground);
 
   /* Chart Colors - Brighter for dark mode visibility */
-  --chart-1: 210 100% 68%;    /* Much brighter blue */
-  --chart-2: 280 70% 73%;     /* Much lighter purple */
-  --chart-3: 0 80% 68%;       /* Much brighter red */
-  --chart-4: 38 95% 68%;      /* Much brighter amber */
-  --chart-5: 33 100% 68%;     /* Much brighter orange */
-  --chart-6: 142 75% 62%;     /* Much brighter green */
-  --chart-7: 200 85% 68%;     /* Much brighter cyan - CRITICAL for gross bars */
-  --chart-8: 320 65% 70%;     /* Brighter pink */
+  --chart-1: 212 62% 72%;
+  --chart-2: 212 24% 70%;
+  --chart-3: 8 64% 70%;
+  --chart-4: 39 68% 68%;
+  --chart-5: 25 58% 68%;
+  --chart-6: 151 48% 64%;
+  --chart-7: 203 46% 68%;
+  --chart-8: 256 36% 70%;
 
-  --background: oklch(0.18 0.02 260);           /* Warm dark slate - easier on eyes */
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.22 0.02 260);                 /* Slightly elevated card */
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.24 0.02 260);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.86 0.12 240);              /* WCAG AA compliant - blue with ≥4.5:1 contrast */
-  --primary-foreground: oklch(0.15 0 0);
-  --secondary: oklch(0.26 0.02 260);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.26 0.02 260);
-  --muted-foreground: oklch(0.84 0 0);          /* WCAG AA compliant - ≥4.5:1 contrast on dark bg */
-  --accent: oklch(0.32 0.02 260);
-  --accent-foreground: oklch(0.93 0 0);         /* WCAG AA compliant - ≥4.5:1 contrast on dark bg */
-  --destructive: oklch(0.85 0.16 27);           /* WCAG AA compliant - ≥4.5:1 contrast on dark bg */
-  --destructive-foreground: oklch(0.985 0 0);
-  --success: oklch(0.78 0.16 154);
-  --success-foreground: oklch(0.18 0.02 154);
-  --warning: oklch(0.84 0.13 80);
-  --warning-foreground: oklch(0.22 0.03 80);
-  --border: oklch(0.32 0.02 260);               /* Subtle but visible */
-  --input: oklch(0.24 0.02 260);
-  --ring: oklch(0.556 0 0);
+  --background: var(--ledger-paper);
+  --foreground: var(--ledger-ink);
+  --card: var(--ledger-paper-raised);
+  --card-foreground: var(--ledger-ink);
+  --popover: var(--ledger-paper-raised);
+  --popover-foreground: var(--ledger-ink);
+  --primary: var(--ledger-blue);
+  --primary-foreground: oklch(0.15 0.026 255);
+  --secondary: oklch(0.25 0.026 255);
+  --secondary-foreground: var(--ledger-ink);
+  --muted: oklch(0.25 0.026 255);
+  --muted-foreground: var(--ledger-ink-muted);
+  --accent: var(--ledger-blue-quiet);
+  --accent-foreground: var(--ledger-ink);
+  --destructive: oklch(0.76 0.13 25);
+  --destructive-foreground: oklch(0.15 0.026 255);
+  --success: oklch(0.72 0.09 155);
+  --success-foreground: oklch(0.15 0.026 255);
+  --warning: oklch(0.82 0.13 80);
+  --warning-foreground: oklch(0.16 0.026 255);
+  --border: var(--ledger-rule);
+  --input: oklch(0.28 0.026 255);
+  --ring: var(--ledger-focus);
 }
 
 /* Tailwind v4 Theme Directive */
@@ -426,13 +443,13 @@
   }
 
   html {
-    color-scheme: dark;
+    color-scheme: light;
     overflow-x: hidden;
     scrollbar-gutter: stable;
     max-width: 100vw;
     /* Smooth scrolling for anchor links */
     scroll-behavior: smooth;
-    /* Smooth color-scheme transition for dark mode toggle (2025 enhancement) */
+    /* Smooth color-scheme transition for theme changes */
     transition: color-scheme 0.2s ease;
     /* Safe area support for notched devices (iPhone X+, iPad Pro) */
     padding-top: 0;
@@ -445,6 +462,7 @@
     background: var(--background);
     color: var(--foreground);
     font-family: var(--font-sans);
+    font-feature-settings: 'tnum' 1;
     font-size: var(--font-size-base); /* Fluid base typography */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -455,12 +473,10 @@
 
   /* Text gradient utility using brand colors */
   .text-gradient {
-    background: linear-gradient(to right, var(--brand-gradient-start), var(--brand-gradient-end));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    /* Add shadow for better contrast */
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+    color: var(--primary);
+    background: none;
+    -webkit-text-fill-color: currentColor;
+    filter: none;
   }
 
   /**
@@ -468,26 +484,25 @@
    * Common patterns for gradient text (used 12+ times across components)
    */
   .text-gradient-brand {
-    background: linear-gradient(to right, var(--color-brand-gradient-start), var(--color-brand-gradient-end));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+    color: var(--primary);
+    background: none;
+    -webkit-text-fill-color: currentColor;
+    filter: none;
   }
 
   .text-gradient-brand-emphasis {
-    background: linear-gradient(135deg, var(--color-brand-gradient-start), var(--color-brand-accent));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
-    transition: filter 0.2s ease;
+    color: var(--primary);
+    background: none;
+    -webkit-text-fill-color: currentColor;
+    filter: none;
+    transition: color 0.2s ease;
   }
 
   /* Hover enhancement for text gradients (2025 addition) */
   .text-gradient-brand:hover,
   .text-gradient-brand-emphasis:hover {
-    filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.15));
+    color: color-mix(in oklch, var(--primary) 82%, var(--foreground));
+    filter: none;
   }
 
   /**
@@ -495,16 +510,14 @@
    * Keeps interior dark while preserving a clearly visible brand border.
    */
   .btn-brand-outline {
-    background:
-      linear-gradient(rgba(2, 6, 23, 0.88), rgba(2, 6, 23, 0.88)) padding-box,
-      linear-gradient(90deg, var(--brand-gradient-start), var(--brand-gradient-end)) border-box;
+    background: transparent;
+    border-color: var(--primary);
     transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   }
 
   .btn-brand-outline:hover {
-    background:
-      linear-gradient(rgba(7, 14, 31, 0.94), rgba(7, 14, 31, 0.94)) padding-box,
-      linear-gradient(90deg, var(--brand-gradient-start), var(--brand-gradient-end)) border-box;
+    background: var(--accent);
+    box-shadow: none;
   }
 
   /**
@@ -513,25 +526,25 @@
    * Enhanced with OKLCH alpha support for better color consistency (2025)
    */
   .glass {
-    @apply backdrop-blur-sm bg-card/80 border border-border/50;
+    @apply border border-border bg-card shadow-none;
   }
 
   .glass-card {
-    @apply backdrop-blur-sm bg-card/95 border border-border/50 shadow-xl;
+    @apply border border-border bg-card shadow-none;
   }
 
   .glass-card-inner {
-    @apply backdrop-blur-sm bg-card/50;
+    @apply border border-border bg-background shadow-none;
   }
 
   /* Glass overlay with OKLCH alpha for overlays */
   .glass-overlay {
-    background: oklch(0.18 0.02 260 / 0.7);
-    backdrop-filter: blur(12px);
+    background: color-mix(in oklch, var(--background) 92%, transparent);
+    backdrop-filter: none;
   }
 
   .dark .glass-overlay {
-    background: oklch(0.18 0.02 260 / 0.85);
+    background: color-mix(in oklch, var(--background) 92%, transparent);
   }
 
   /* Safe area utilities for fixed/sticky elements */
@@ -545,6 +558,21 @@
 
   .safe-right {
     right: calc(1.5rem + env(safe-area-inset-right));
+  }
+}
+
+@layer utilities {
+  .font-sans {
+    font-family: var(--font-sans);
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  .font-mono {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
   }
 }
 

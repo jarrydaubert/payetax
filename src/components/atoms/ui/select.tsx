@@ -19,7 +19,7 @@ const SelectTrigger = forwardRef<ElementRef<typeof SelectPrimitive.Trigger>, Sel
       ref={ref}
       className={cn(
         // Layout
-        'flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md px-3 py-2 shadow-sm',
+        'flex h-9 w-full items-center justify-between whitespace-nowrap rounded-sm px-3 py-2 shadow-none',
         // Border - neutral by default
         'border border-border',
         // Background
@@ -105,7 +105,7 @@ const SelectContent = forwardRef<ElementRef<typeof SelectPrimitive.Content>, Sel
         ref={ref}
         className={cn(
           // Base
-          'relative z-50 overflow-hidden rounded-md shadow-md',
+          'relative z-50 overflow-hidden rounded-sm shadow-none',
           // Border - neutral
           'border border-border',
           // Background

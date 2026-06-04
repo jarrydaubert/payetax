@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import './globals.css';
 import Script from 'next/script';
 import { Suspense } from 'react';
-import { inter, spaceGrotesk } from '@/app/fonts';
+import { ibmPlexMono, newsreader, publicSans } from '@/app/fonts';
 import Analytics from '@/components/organisms/Analytics';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import Layout from '@/components/templates/Layout';
@@ -27,8 +27,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5, // WCAG 2.2 AA - Allow 500% zoom
   userScalable: true,
-  themeColor: '#1f2937', // Dark mode - matches msapplication-TileColor
-  colorScheme: 'dark',
+  themeColor: '#f8f5ed',
+  colorScheme: 'light dark',
   viewportFit: 'cover', // For notched devices
   interactiveWidget: 'resizes-visual', // Better keyboard handling on iOS PWAs
 };
@@ -39,8 +39,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang='en-GB'
-      className='dark'
-      data-theme='dark'
+      data-theme='light'
       data-scroll-behavior='smooth'
       data-view-transition='enabled'
     >
@@ -59,14 +58,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta name='apple-mobile-web-app-status-bar-style' content='black-translucent' />
         <meta name='apple-mobile-web-app-title' content='PayeTax' />
         <meta name='mobile-web-app-capable' content='yes' />
-        <meta name='msapplication-TileColor' content='#1f2937' />
+        <meta name='msapplication-TileColor' content='#f8f5ed' />
         <meta name='msapplication-tap-highlight' content='no' />
         <meta name='format-detection' content='telephone=no' />
       </head>
       <body
         className={cn(
-          inter.variable,
-          spaceGrotesk.variable,
+          publicSans.variable,
+          newsreader.variable,
+          ibmPlexMono.variable,
           'font-sans antialiased',
           'min-h-screen bg-background text-foreground',
         )}

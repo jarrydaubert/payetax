@@ -23,7 +23,7 @@ const Input = forwardRef<ElementRef<'input'>, InputProps>(({ className, ...props
     ref={ref}
     className={cn(
       // Base layout
-      'flex h-9 w-full rounded-md px-3 py-1 shadow-sm',
+      'flex h-9 w-full rounded-sm px-3 py-1 shadow-none',
       // Border - neutral by default, ring for focus
       'border border-border',
       // Background - slight surface for visibility on dark backgrounds

@@ -38,7 +38,8 @@ describe('ResultCard Component', () => {
       render(<ResultCard label='Label' value='£50,000' />);
 
       const value = screen.getByText('£50,000');
-      expect(value).toHaveClass('font-bold');
+      expect(value).toHaveClass('font-mono');
+      expect(value).toHaveClass('font-semibold');
       expect(value).toHaveClass('text-2xl');
     });
   });
