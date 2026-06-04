@@ -106,6 +106,8 @@ const TAX_YEAR_INPUT_SCHEMA = z
 const PAY_PERIOD_VALUES = Object.values(PERIODS) as [PayPeriod, ...PayPeriod[]];
 const STUDENT_LOAN_PLAN_VALUES = ['plan1', 'plan2', 'plan4', 'plan5', 'postgrad'] as const;
 const TAX_REGION_VALUES = ['England', 'Scotland', 'Wales', 'Northern Ireland'] as const;
+const TAX_CODE_EDIT_PATTERN =
+  /^(?:[SC]?|[SC]?(?:K\d*|BR?|D[01]?|NT?|0T?|\d+[LMNPTX]?)(?:W1?|M1?|X)?)$/;
 
 const SALARY_INPUT_SCHEMA = z
   .number()
@@ -119,27 +121,9 @@ const TAX_CODE_INPUT_SCHEMA = z
   .string()
   .min(1)
   .transform((val) => val.trim().replace(/\s+/g, '').toUpperCase())
-  .refine(
-    (code) => {
-      // Remove emergency suffix (W1, M1, X) before validation
-      const codeWithoutEmergency = code.replace(/(W1|M1|X)$/, '');
-
-      // Support Scottish (S) and Welsh (C) prefixes.
-      // Note: prefix does not change allowance logic; it affects which tax rates apply.
-      const codeWithoutPrefix = codeWithoutEmergency.replace(/^[SC]/, '');
-
-      // Special codes (also valid with prefixes, e.g. SBR, CBR, SD0, SNT, S0T).
-      const specialCodes = ['BR', 'D0', 'D1', 'NT', '0T'];
-      if (specialCodes.includes(codeWithoutPrefix)) return true;
-
-      // Standard format or K codes.
-      const standardPattern = /^[0-9]+[LMNPTX]?$/;
-      const kCodePattern = /^K[0-9]+$/;
-
-      return standardPattern.test(codeWithoutPrefix) || kCodePattern.test(codeWithoutPrefix);
-    },
-    { message: 'Invalid tax code format (e.g., 1257L, BR, S1257L, K100)' },
-  );
+  .refine((code) => TAX_CODE_EDIT_PATTERN.test(code), {
+    message: 'Invalid tax code format (e.g., 1257L, BR, S1257L, K100)',
+  });
 
 const REGION_INPUT_SCHEMA = z.enum(TAX_REGION_VALUES);
 
