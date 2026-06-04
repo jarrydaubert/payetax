@@ -257,6 +257,9 @@ describe('CalculatorContainer Component', () => {
       render(<CalculatorContainer />);
 
       expect(
+        screen.getByRole('button', { name: /Email tax calculation results/i }),
+      ).toBeInTheDocument();
+      expect(
         screen.getByRole('button', { name: /Print tax calculation results/i }),
       ).toBeInTheDocument();
       expect(
@@ -269,6 +272,9 @@ describe('CalculatorContainer Component', () => {
 
       const resultsColumn = screen.getByTestId('tax-results');
       expect(resultsColumn).toContainElement(
+        screen.getByRole('button', { name: /Email tax calculation results/i }),
+      );
+      expect(resultsColumn).toContainElement(
         screen.getByRole('button', { name: /Print tax calculation results/i }),
       );
       expect(resultsColumn).toContainElement(
@@ -276,10 +282,23 @@ describe('CalculatorContainer Component', () => {
       );
     });
 
+    it('should not show the email input until the email action is opened', () => {
+      render(<CalculatorContainer />);
+
+      expect(screen.queryByLabelText(/Email address for results/i)).not.toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole('button', { name: /Email tax calculation results/i }));
+
+      expect(screen.getByLabelText(/Email address for results/i)).toBeInTheDocument();
+    });
+
     it('should not show export buttons when no results', () => {
       (useCalculatorResults as jest.Mock).mockReturnValue(null);
       render(<CalculatorContainer />);
 
+      expect(
+        screen.queryByRole('button', { name: /Email tax calculation results/i }),
+      ).not.toBeInTheDocument();
       expect(
         screen.queryByRole('button', { name: /Print tax calculation results/i }),
       ).not.toBeInTheDocument();
