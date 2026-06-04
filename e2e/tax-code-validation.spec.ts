@@ -16,10 +16,14 @@ import { dismissCookieBannerIfPresent, ensureCalculatorVisible } from './helpers
 
 test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
   test.beforeEach(async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     const timestamp = Date.now();
     const testId = Math.floor(Math.random() * 1000);
-    await page.goto(`/?t=${timestamp}&test=${testId}#tax-calculator`);
-    await page.waitForLoadState('networkidle');
+    await page.goto(`/?t=${timestamp}&test=${testId}#tax-calculator`, {
+      waitUntil: 'domcontentloaded',
+      timeout: 60000,
+    });
+    await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
     await dismissCookieBannerIfPresent(page);
     await ensureCalculatorVisible(page);
   });

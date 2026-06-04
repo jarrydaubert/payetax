@@ -335,15 +335,15 @@ describe('analytics', () => {
     });
 
     it('tracks form interaction without field name', () => {
-      trackFormInteraction('feedback_form', 'open');
+      trackFormInteraction('email_results_form', 'open');
 
       expect(mockGtag).toHaveBeenCalledWith(
         'event',
         'form_interaction',
         expect.objectContaining({
           category: 'seo_actions',
-          label: 'feedback_form',
-          source: 'feedback_form',
+          label: 'email_results_form',
+          source: 'email_results_form',
           action_type: 'open',
           target: undefined,
           page_path: '/',

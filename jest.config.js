@@ -76,6 +76,7 @@ const config = {
     '!src/app/globals.css',
     '!src/app/manifest.ts', // PWA manifest
     '!src/types/navigation.ts', // Type definitions only
+    '!src/components/ui/textarea.ts', // Barrel re-export; implementation covered in atoms/ui
     // Focus on business logic: components, lib, store, hooks, utils
   ],
   testMatch: [

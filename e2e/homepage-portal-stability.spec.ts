@@ -17,13 +17,15 @@ test.describe('Homepage portal stability', () => {
     await page.getByTestId('calculate-button').click();
     await expect(page.getByTestId('tax-results')).toBeVisible();
 
-    // Exercise the fixed mobile-menu -> feedback-dialog handoff.
+    // Exercise the current mobile-menu handoff without relying on retired features.
     await page.getByTestId('mobile-menu-button').click();
     await expect(page.getByRole('dialog', { name: /mobile navigation menu/i })).toBeVisible();
-    await page.getByTestId('mobile-feedback-button').click();
-    await expect(page.getByRole('dialog', { name: /share your feedback/i })).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(page.getByRole('dialog', { name: /share your feedback/i })).toBeHidden();
+    await page
+      .getByRole('dialog', { name: /mobile navigation menu/i })
+      .getByRole('link', { name: 'Calculator' })
+      .click();
+    await expect(page.getByRole('dialog', { name: /mobile navigation menu/i })).toBeHidden();
+    await expect(page).toHaveURL(/#tax-calculator$/);
 
     // Exercise homepage body portals after results mount on mobile.
     await page.evaluate(() =>
