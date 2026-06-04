@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { PeriodCheckbox } from '@/components/atoms/PeriodCheckbox';
 import { Card } from '@/components/ui/card';
 import { ANIMATION_TRANSITIONS } from '@/constants/animationTokens';
-import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { SPACING } from '@/constants/designTokens';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { cn } from '@/lib/utils';
 
@@ -23,8 +23,7 @@ interface PeriodSelectorCardProps {
  * Features smooth layout animations when checkboxes are toggled using Framer Motion.
  * Respects user motion preferences for accessibility.
  *
- * IMPORTANT: Uses TEXT_LG for heading to match other section headings like "Enter Income Tax Details"
- * Base gap is GAP_2, with responsive overrides (sm:gap-3 md:gap-4) for larger screens
+ * The selector compacts into a single toolbar row on desktop so the results table stays dominant.
  */
 export function PeriodSelectorCard({
   periods,
@@ -35,25 +34,28 @@ export function PeriodSelectorCard({
 
   return (
     <Card className={cn('w-full', SPACING.P_2, 'sm:p-3 md:p-4')}>
-      <p
-        className={cn('font-semibold text-foreground', SPACING.MB_2, 'sm:mb-3', TYPOGRAPHY.TEXT_LG)}
-      >
-        Display Periods
-      </p>
-      <div className={cn('flex flex-wrap sm:gap-3 md:gap-4', SPACING.GAP_2)}>
-        {periods.map((period) => (
-          <motion.div
-            key={period}
-            layout={!shouldReduceMotion}
-            transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.spring}
-          >
-            <PeriodCheckbox
-              period={period}
-              checked={visiblePeriods.includes(period)}
-              onCheckedChange={() => onPeriodToggle(period)}
-            />
-          </motion.div>
-        ))}
+      <div className='flex flex-col gap-2 lg:flex-row lg:items-center'>
+        <p className='shrink-0 font-semibold text-foreground text-sm'>Display Periods</p>
+        <div
+          className={cn(
+            'flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-2 lg:flex-nowrap lg:justify-end xl:gap-x-4',
+            SPACING.GAP_2,
+          )}
+        >
+          {periods.map((period) => (
+            <motion.div
+              key={period}
+              layout={!shouldReduceMotion}
+              transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.spring}
+            >
+              <PeriodCheckbox
+                period={period}
+                checked={visiblePeriods.includes(period)}
+                onCheckedChange={() => onPeriodToggle(period)}
+              />
+            </motion.div>
+          ))}
+        </div>
       </div>
     </Card>
   );

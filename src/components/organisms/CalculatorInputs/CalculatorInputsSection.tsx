@@ -1,28 +1,24 @@
 // src/components/organisms/CalculatorInputs/CalculatorInputsSection.tsx
 'use client';
 
-import { Calculator, ChevronDown, RotateCcw } from 'lucide-react';
+import { Calculator, RotateCcw } from 'lucide-react';
 import * as React from 'react';
 import { Spinner } from '@/components/atoms/Spinner';
 import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { ICON_SIZES, SPACING } from '@/constants/designTokens';
 import { convertPeriodToAnnual } from '@/lib/periodCalculator';
 import { cn } from '@/lib/utils';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
 import { BasicInputs } from './BasicInputs';
-import { WhatIfInputs } from './WhatIfInputs';
 
 interface CalculatorInputsSectionProps {
   onCalculate: () => void;
-  onWhatIfCalculate?: () => void;
   resultAction?: React.ReactNode;
 }
 
 export function CalculatorInputsSection({
   onCalculate,
-  onWhatIfCalculate,
   resultAction,
 }: CalculatorInputsSectionProps) {
   const { reset } = useCalculatorActions();
@@ -30,20 +26,10 @@ export function CalculatorInputsSection({
   const payPeriod = useCalculatorStore((state) => state.input.payPeriod);
   const hoursPerWeek = useCalculatorStore((state) => state.input.hoursPerWeek);
   const [isCalculating, setIsCalculating] = React.useState(false);
-  const [whatIfOpen, setWhatIfOpen] = React.useState(false);
   const [formMessage, setFormMessage] = React.useState<{
     tone: 'error' | 'warning';
     text: string;
   } | null>(null);
-
-  // Clear What If results when collapsible closes
-  const handleWhatIfToggle = (open: boolean) => {
-    setWhatIfOpen(open);
-    if (!open) {
-      // Clear What If results when closing
-      useCalculatorStore.setState({ whatIfResults: null });
-    }
-  };
 
   const handleCalculate = () => {
     // Validate salary is entered and reasonable
@@ -82,8 +68,6 @@ export function CalculatorInputsSection({
 
   const handleReset = () => {
     reset();
-    // Close What If section when resetting
-    setWhatIfOpen(false);
     setFormMessage(null);
   };
 
@@ -133,33 +117,6 @@ export function CalculatorInputsSection({
             {formMessage.text}
           </p>
         )}
-
-        {/* What If Collapsible Section */}
-        <Collapsible open={whatIfOpen} onOpenChange={handleWhatIfToggle}>
-          <CollapsibleTrigger asChild>
-            <Button
-              variant='outline'
-              size='lg'
-              className='w-full border-primary/40 bg-card text-primary hover:bg-primary/10 hover:text-primary'
-              data-testid='what-if-collapsible-trigger'
-            >
-              <div className={cn('flex w-full items-center justify-center', SPACING.GAP_2)}>
-                <span>Compare Scenarios</span>
-                <ChevronDown
-                  className={cn(
-                    ICON_SIZES.SIZE_5,
-                    `transition-transform duration-200 ${whatIfOpen ? 'rotate-180' : ''}`,
-                  )}
-                />
-              </div>
-            </Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <div className='pt-4'>
-              <WhatIfInputs onCompare={onWhatIfCalculate} />
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
       </div>
     </TooltipProvider>
   );

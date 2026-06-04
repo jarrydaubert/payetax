@@ -2,9 +2,8 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowUp, Mail, Sparkles } from 'lucide-react';
+import { Mail, Sparkles } from 'lucide-react';
 import * as React from 'react';
-import { createPortal } from 'react-dom';
 import { EmailResultsForm } from '@/components/molecules/EmailResultsForm';
 import { Card } from '@/components/ui/card';
 import {
@@ -17,7 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { ANIMATION_TRANSITIONS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
-import { BREAKPOINTS, SCROLL_THRESHOLDS, TIMERS } from '@/constants/ui';
+import { BREAKPOINTS, TIMERS } from '@/constants/ui';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { trackEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
@@ -36,7 +35,6 @@ export function CalculatorContainer() {
   // Use optimized selectors to prevent unnecessary re-renders
   const results = useCalculatorResults();
   const previousYearResults = useCalculatorStore((state) => state.previousYearResults);
-  const whatIfResults = useCalculatorStore((state) => state.whatIfResults);
   const input = useCalculatorStore(
     useShallow((state) => ({
       salary: state.input.salary,
@@ -68,8 +66,6 @@ export function CalculatorContainer() {
     'Daily',
     'Hourly',
   ]);
-  const [showScrollTop, setShowScrollTop] = React.useState(false);
-  const [portalMounted, setPortalMounted] = React.useState(false);
   const [actionMessage, setActionMessage] = React.useState<{
     tone: 'info' | 'error';
     text: string;
@@ -77,7 +73,6 @@ export function CalculatorContainer() {
   const resultsRef = React.useRef<HTMLDivElement>(null);
   const hasTrackedCalculatorStartRef = React.useRef(false);
   const calcScrollTimeoutRef = React.useRef<number | null>(null);
-  const whatIfScrollTimeoutRef = React.useRef<number | null>(null);
   const shouldReduceMotion = useMotionPreference();
 
   // SR-only live region message (event-driven, not region-driven)
@@ -107,38 +102,12 @@ export function CalculatorContainer() {
       : undefined,
   };
 
-  // Enable portal after mount (document not available during SSR)
-  React.useEffect(() => {
-    setPortalMounted(true);
-  }, []);
-
   // Cleanup timeouts on unmount to prevent memory leaks
   React.useEffect(() => {
     return () => {
       if (calcScrollTimeoutRef.current) clearTimeout(calcScrollTimeoutRef.current);
-      if (whatIfScrollTimeoutRef.current) clearTimeout(whatIfScrollTimeoutRef.current);
     };
   }, []);
-
-  // Lightweight scroll listener only for scroll-to-top button
-  React.useEffect(() => {
-    const handleScroll = () => {
-      const threshold =
-        window.innerWidth < BREAKPOINTS.LG
-          ? SCROLL_THRESHOLDS.TOP_BUTTON * 3
-          : SCROLL_THRESHOLDS.TOP_BUTTON;
-      setShowScrollTop(window.scrollY > threshold);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: shouldReduceMotion ? 'auto' : 'smooth' });
-  };
 
   const handleCalculate = () => {
     setActionMessage(null);
@@ -181,26 +150,6 @@ export function CalculatorContainer() {
         });
       }
     }, TIMERS.CALC_SCROLL);
-  };
-
-  /**
-   * Handle post-calculation UI for what-if scenarios
-   * Note: Actual calculation happens in CalculatorInputsSection
-   */
-  const handleWhatIfPostCalculateUI = () => {
-    // Announce for screen readers
-    setLiveMessage('Scenarios compared. Check the results table.');
-
-    // Clear any pending scroll timeout
-    if (whatIfScrollTimeoutRef.current) clearTimeout(whatIfScrollTimeoutRef.current);
-
-    // Scroll to results after the comparison updates
-    whatIfScrollTimeoutRef.current = window.setTimeout(() => {
-      resultsRef.current?.scrollIntoView({
-        behavior: shouldReduceMotion ? 'auto' : 'smooth',
-        block: 'start',
-      });
-    }, TIMERS.WHAT_IF_SCROLL);
   };
 
   const handleVisiblePeriodsChange = (periods: string[]) => {
@@ -339,7 +288,6 @@ export function CalculatorContainer() {
       >
         <CalculatorInputsSection
           onCalculate={handleCalculate}
-          onWhatIfCalculate={handleWhatIfPostCalculateUI}
           resultAction={showResults ? emailResultsAction : undefined}
         />
       </Card>
@@ -365,7 +313,6 @@ export function CalculatorContainer() {
               studentLoans={input.studentLoanPlans !== 'none' ? input.studentLoanPlans : []}
               allowancesDeductions={input.allowancesDeductions}
               previousYearResults={previousYearResults}
-              whatIfResults={whatIfResults}
               visiblePeriods={visiblePeriods}
               onVisiblePeriodsChange={handleVisiblePeriodsChange}
               taxYear={input.taxYear}
@@ -420,32 +367,6 @@ export function CalculatorContainer() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Scroll to Top Button - Portal to body to escape stacking contexts */}
-      {portalMounted &&
-        createPortal(
-          <AnimatePresence>
-            {showScrollTop && (
-              <motion.button
-                initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={shouldReduceMotion ? undefined : { opacity: 0, scale: 0.8 }}
-                transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2 }}
-                onClick={scrollToTop}
-                className={cn(
-                  'safe-bottom safe-right fixed z-[9999] flex items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-                  // Only add hover scale when motion is allowed
-                  !shouldReduceMotion && 'transition-transform hover:scale-110',
-                  ICON_SIZES.SIZE_12,
-                )}
-                aria-label='Scroll to top'
-              >
-                <ArrowUp className={ICON_SIZES.SIZE_6} />
-              </motion.button>
-            )}
-          </AnimatePresence>,
-          document.body,
-        )}
     </div>
   );
 }
