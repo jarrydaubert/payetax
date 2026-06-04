@@ -33,9 +33,17 @@ export function PeriodSelectorCard({
   const shouldReduceMotion = useMotionPreference();
 
   return (
-    <Card className={cn('w-full', SPACING.P_2, 'sm:p-3 md:p-4')}>
+    <Card
+      className={cn(
+        'w-full rounded-sm border-border bg-card shadow-none',
+        SPACING.P_2,
+        'sm:p-3 md:p-4',
+      )}
+    >
       <div className='flex flex-col gap-2 lg:flex-row lg:items-center'>
-        <p className='shrink-0 font-semibold text-foreground text-sm'>Display Periods</p>
+        <p className='shrink-0 font-semibold text-foreground text-sm uppercase tracking-[0.12em]'>
+          Display Periods
+        </p>
         <div
           className={cn(
             'flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-2 lg:flex-nowrap lg:justify-end xl:gap-x-4',

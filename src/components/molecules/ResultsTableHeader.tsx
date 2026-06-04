@@ -19,15 +19,15 @@ interface ResultsTableHeaderProps {
 export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: ResultsTableHeaderProps) {
   return (
     <TableHeader>
-      <TableRow className='bg-card hover:bg-card'>
+      <TableRow className='border-border bg-card hover:bg-card'>
         {/* IMPORTANT: Use TEXT_LG to match other section headings
             ("Enter Income Tax Details" and "Display Periods" both use TEXT_LG)
             This maintains consistent visual hierarchy across all main sections */}
         <TableHead
           className={cn(
-            'sticky left-0 z-20 w-48 whitespace-nowrap bg-card font-semibold text-foreground',
+            'sticky left-0 z-20 w-44 whitespace-nowrap border-border border-r bg-card font-display font-semibold text-foreground sm:w-52',
             SPACING.PX_2,
-            'py-2.5',
+            'py-3',
             TYPOGRAPHY.TEXT_LG,
           )}
         >
@@ -35,9 +35,9 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
         </TableHead>
         <TableHead
           className={cn(
-            'w-14 text-right font-semibold',
+            'w-14 border-border border-r text-right font-semibold text-muted-foreground',
             SPACING.PX_2,
-            'py-2.5',
+            'py-3',
             TYPOGRAPHY.TEXT_SM,
           )}
         >
@@ -49,9 +49,9 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
               <TableHead
                 key={period}
                 className={cn(
-                  'min-w-48 text-center font-semibold',
+                  'min-w-56 border-border border-r text-center font-semibold text-muted-foreground',
                   SPACING.PX_2,
-                  'py-2.5',
+                  'py-3',
                   TYPOGRAPHY.TEXT_SM,
                 )}
                 colSpan={2}
@@ -64,9 +64,9 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
               <TableHead
                 key={period}
                 className={cn(
-                  'min-w-24 whitespace-nowrap text-right font-semibold',
+                  'min-w-28 whitespace-nowrap text-right font-semibold text-muted-foreground',
                   SPACING.PX_2,
-                  'py-2.5',
+                  'py-3',
                   TYPOGRAPHY.TEXT_SM,
                 )}
               >
@@ -75,16 +75,20 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
             ))}
       </TableRow>
       {hasWhatIfResults && (
-        <TableRow className='bg-card hover:bg-card'>
+        <TableRow className='border-border bg-card hover:bg-card'>
           <TableHead
-            className={cn('sticky left-0 z-20 bg-card', SPACING.PX_2, 'py-1.5')}
+            className={cn(
+              'sticky left-0 z-20 border-border border-r bg-card',
+              SPACING.PX_2,
+              'py-1.5',
+            )}
             colSpan={2}
           />
           {visiblePeriods.map((period) => (
             <React.Fragment key={period}>
               <TableHead
                 className={cn(
-                  'min-w-24 whitespace-nowrap bg-primary/10 text-center font-medium',
+                  'min-w-28 whitespace-nowrap bg-primary/10 text-center font-medium text-muted-foreground',
                   SPACING.PX_2,
                   SPACING.PY_2,
                   TYPOGRAPHY.TEXT_SM,
@@ -95,7 +99,7 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
               </TableHead>
               <TableHead
                 className={cn(
-                  'min-w-24 whitespace-nowrap bg-accent/10 text-center font-medium',
+                  'min-w-28 whitespace-nowrap bg-accent/10 text-center font-medium text-muted-foreground',
                   SPACING.PX_2,
                   SPACING.PY_2,
                   TYPOGRAPHY.TEXT_SM,

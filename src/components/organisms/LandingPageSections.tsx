@@ -114,15 +114,15 @@ export function ProofStrip() {
   const ratesVerifiedDisplay = formatIsoDateForDisplay(RATES_LAST_VERIFIED);
 
   return (
-    <section className='border-border border-y bg-background py-6'>
-      <div className='container mx-auto max-w-5xl px-4'>
-        <div className='flex flex-wrap items-center justify-center gap-x-7 gap-y-3 text-muted-foreground text-sm'>
-          <span className='flex items-center gap-2'>
-            <CheckCircle aria-hidden='true' className='size-4 flex-shrink-0 text-brand-accent' />
+    <section className='border-border border-y bg-surface-brand py-5'>
+      <div className='container mx-auto max-w-6xl px-4'>
+        <div className='grid gap-3 text-muted-foreground text-sm sm:grid-cols-2 lg:grid-cols-4'>
+          <span className='flex items-center gap-2 border-border border-l pl-3'>
+            <CheckCircle aria-hidden='true' className='size-4 flex-shrink-0 text-primary' />
             HMRC rates verified {ratesVerifiedDisplay}
           </span>
-          <span className='flex items-center gap-2'>
-            <Shield aria-hidden='true' className='size-4 flex-shrink-0 text-brand-accent' />
+          <span className='flex items-center gap-2 border-border border-l pl-3'>
+            <Shield aria-hidden='true' className='size-4 flex-shrink-0 text-primary' />
             <Link
               href='/privacy'
               className='inline-flex min-h-6 items-center underline underline-offset-2 hover:text-foreground'
@@ -130,8 +130,8 @@ export function ProofStrip() {
               Privacy policy
             </Link>
           </span>
-          <span className='flex items-center gap-2'>
-            <CheckCircle aria-hidden='true' className='size-4 flex-shrink-0 text-brand-accent' />
+          <span className='flex items-center gap-2 border-border border-l pl-3'>
+            <CheckCircle aria-hidden='true' className='size-4 flex-shrink-0 text-primary' />
             <Link
               href='/compliance'
               className='inline-flex min-h-6 items-center underline underline-offset-2 hover:text-foreground'
@@ -139,8 +139,8 @@ export function ProofStrip() {
               Compliance
             </Link>
           </span>
-          <span className='flex items-center gap-2'>
-            <CheckCircle aria-hidden='true' className='size-4 flex-shrink-0 text-brand-accent' />
+          <span className='flex items-center gap-2 border-border border-l pl-3'>
+            <CheckCircle aria-hidden='true' className='size-4 flex-shrink-0 text-primary' />
             All UK regions, 5 student loan plans, pensions
           </span>
         </div>

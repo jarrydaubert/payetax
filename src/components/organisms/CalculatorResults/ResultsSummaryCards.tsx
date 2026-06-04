@@ -44,7 +44,10 @@ export function ResultsSummaryCards({
   return (
     <TooltipProvider delayDuration={200}>
       <motion.section
-        className={cn('grid md:grid-cols-2 lg:grid-cols-5', SPACING.GAP_4)}
+        className={cn(
+          'grid border-border border-y py-4 md:grid-cols-2 lg:grid-cols-5',
+          SPACING.GAP_4,
+        )}
         variants={shouldReduceMotion ? undefined : ANIMATION_CONTAINER_VARIANTS.staggerFast}
         initial='hidden'
         animate='show'

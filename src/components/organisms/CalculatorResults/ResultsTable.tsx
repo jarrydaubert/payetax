@@ -38,6 +38,7 @@ import {
 } from '@/lib/calculatorResultsPresenter';
 import { calculateOptimalPension } from '@/lib/pensionOptimizer';
 import type { TaxCalculationResults } from '@/lib/types/calculator';
+import { cn } from '@/lib/utils';
 
 interface ResultsTableProps {
   results: TaxCalculationResults;
@@ -218,7 +219,7 @@ export function ResultsTable({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.2 }}
-      className={`w-full ${SPACING.SPACE_Y_4}`}
+      className={cn('w-full', SPACING.SPACE_Y_4)}
     >
       {/* Landscape Prompt - Shows on mobile portrait to encourage rotation for better table viewing */}
       <LandscapePrompt />
@@ -231,12 +232,19 @@ export function ResultsTable({
       />
 
       {/* Results Table with Scroll Indicators */}
-      <div className='relative -mx-2 w-full sm:mx-0'>
+      <div className='relative -mx-4 w-[calc(100%+2rem)] sm:mx-0 sm:w-full'>
         {/* Scroll Indicators - must be positioned absolutely to overlay the card */}
         <ScrollIndicator direction='left' visible={showLeftIndicator} />
         <ScrollIndicator direction='right' visible={showRightIndicator} />
 
-        <Card className='relative w-full overflow-hidden'>
+        <Card className='relative w-full overflow-hidden rounded-sm border-border bg-card shadow-none'>
+          <div className='flex items-center justify-between border-border border-b px-3 py-2.5 text-muted-foreground text-xs uppercase tracking-[0.14em]'>
+            <span>PAYE breakdown</span>
+            <span>
+              {visiblePeriods.length} {visiblePeriods.length === 1 ? 'period' : 'periods'}
+            </span>
+          </div>
+
           {/* Screen reader hint for scrollable region */}
           <div id={scrollHintId} className='sr-only'>
             Use horizontal scroll, swipe, or click and drag to view all pay periods. Navigate
@@ -258,7 +266,10 @@ export function ResultsTable({
           >
             <table
               data-testid='results-table'
-              className={`w-full min-w-full table-auto caption-bottom ${TYPOGRAPHY.TEXT_SM}`}
+              className={cn(
+                'w-full min-w-[44rem] table-auto caption-bottom sm:min-w-full',
+                TYPOGRAPHY.TEXT_SM,
+              )}
             >
               <caption className='sr-only'>
                 Tax calculation breakdown showing gross pay, deductions, and take-home pay across

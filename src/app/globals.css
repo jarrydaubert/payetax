@@ -167,11 +167,11 @@
 
 /* Section Base Styles */
 .section-header {
-  max-width: 720px;
+  max-width: 960px;
   margin-right: auto;
   margin-left: auto;
-  text-align: center;
-  margin-bottom: 2.5rem;
+  text-align: left;
+  margin-bottom: 2rem;
 }
 
 .section-label {
@@ -195,29 +195,29 @@
 /* FAQ Section */
 .faq-section {
   padding: clamp(4rem, 8vw, 6rem) 1rem;
-  background: var(--secondary);
-  border-top: 1px solid var(--border);
+  background: var(--surface-brand);
+  border-block: 1px solid var(--border);
   position: relative;
   z-index: 1;
 }
 
 .faq-list {
   display: grid;
-  gap: 1rem;
+  gap: 0;
   max-width: 960px;
   margin: 0 auto;
+  border-top: 1px solid var(--border);
 }
 
 .faq-item {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.25rem;
+  background: transparent;
+  border-bottom: 1px solid var(--border);
+  padding: 1.25rem 0;
   transition: border-color 0.2s ease;
 }
 
 .faq-item:hover {
-  border-color: var(--primary);
+  border-color: var(--foreground);
 }
 
 .faq-question {
@@ -237,6 +237,7 @@
 @media (min-width: 900px) {
   .faq-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 2rem;
   }
 }
 
