@@ -16,11 +16,18 @@ jest.mock('@/store/calculatorStore', () => ({
 }));
 
 jest.mock('../CalculatorInputs/CalculatorInputsSection', () => ({
-  CalculatorInputsSection: ({ onCalculate }: { onCalculate: () => void }) => (
+  CalculatorInputsSection: ({
+    onCalculate,
+    resultAction,
+  }: {
+    onCalculate: () => void;
+    resultAction?: ReactNode;
+  }) => (
     <div data-testid='inputs-section-mock'>
       <button type='button' onClick={onCalculate}>
         Calculate
       </button>
+      <div data-testid='input-action-slot'>{resultAction}</div>
     </div>
   ),
 }));
@@ -31,15 +38,12 @@ jest.mock('../CalculatorResults/ResultsSummaryCards', () => ({
 
 jest.mock('../CalculatorResults/ResultsTable', () => ({
   ResultsTable: ({
-    resultAction,
     onApplyPensionOptimization,
   }: {
-    resultAction?: ReactNode;
     onApplyPensionOptimization?: (amount: number) => void;
   }) => (
     <div data-testid='results-table-mock'>
       Results Table
-      <div data-testid='results-action-slot'>{resultAction}</div>
       {onApplyPensionOptimization && (
         <button type='button' onClick={() => onApplyPensionOptimization(5000)}>
           Apply pension optimization
@@ -281,19 +285,10 @@ describe('CalculatorContainer Component', () => {
       ).not.toBeInTheDocument();
     });
 
-    it('should keep the email action inside the results column when results exist', () => {
+    it('should keep the email action in the input action row when results exist', () => {
       render(<CalculatorContainer />);
 
-      const resultsColumn = screen.getByTestId('tax-results');
-      expect(resultsColumn).toContainElement(
-        screen.getByRole('button', { name: /Email tax calculation results/i }),
-      );
-    });
-
-    it('should pass the email action into the results controls', () => {
-      render(<CalculatorContainer />);
-
-      expect(screen.getByTestId('results-action-slot')).toContainElement(
+      expect(screen.getByTestId('input-action-slot')).toContainElement(
         screen.getByRole('button', { name: /Email tax calculation results/i }),
       );
     });
