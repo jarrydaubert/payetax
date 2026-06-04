@@ -23,7 +23,7 @@ export default function ServerHero({ className }: ServerHeroProps) {
     <section
       data-testid='homepage-hero'
       className={cn(
-        'relative z-[1] flex min-h-[calc(100vh-4rem-var(--pwa-safe-area-top,0px))] flex-col items-center justify-start bg-surface-brand px-4 pt-10 pb-16 text-center sm:min-h-screen sm:justify-center sm:px-8 sm:py-32',
+        'relative z-[1] flex min-h-[calc(78svh-4rem-var(--pwa-safe-area-top,0px))] flex-col items-center justify-center bg-surface-brand px-4 py-14 text-center sm:min-h-[680px] sm:px-8 sm:py-20 lg:min-h-[720px]',
         className,
       )}
     >
@@ -32,20 +32,20 @@ export default function ServerHero({ className }: ServerHeroProps) {
       </p>
 
       {/* Heading */}
-      <h1 className='mx-auto mb-6 max-w-4xl font-display font-semibold text-5xl text-on-brand leading-[0.98] tracking-tight sm:text-6xl lg:text-7xl'>
-        See Your Take-Home Pay
+      <h1 className='mx-auto mb-5 max-w-4xl font-display font-semibold text-5xl text-on-brand leading-[0.98] tracking-tight sm:text-6xl lg:text-[4.75rem]'>
+        UK PAYE tax calculator
         <br />
-        <span className='text-gradient-brand'>Free UK PAYE Tax Calculator</span>
+        <span className='text-gradient-brand'>See your take-home pay</span>
       </h1>
 
       {/* Tagline */}
-      <p className='mx-auto mb-10 max-w-xl text-lg text-on-brand-muted leading-relaxed'>
-        Free UK tax calculator with official HMRC rates. Estimate your take-home in seconds. Built
-        on HMRC rates; results can vary with payslip timing and deductions.
+      <p className='mx-auto mb-8 max-w-2xl text-lg text-on-brand-muted leading-relaxed'>
+        Estimate your take-home pay with official HMRC rates for income tax, National Insurance,
+        student loans, and pensions.
       </p>
 
       {/* CTA Buttons */}
-      <div className='mb-16 flex flex-col gap-4 sm:flex-row'>
+      <div className='mb-12 flex flex-col gap-4 sm:flex-row'>
         <HeroCTA
           href='#tax-calculator'
           trackingLabel='hero_start_calculating'
@@ -70,7 +70,7 @@ export default function ServerHero({ className }: ServerHeroProps) {
       </div>
 
       {/* Trust Strip */}
-      <div className='flex max-w-4xl flex-wrap justify-center gap-6 border-chrome-brand border-t py-8 sm:gap-8'>
+      <div className='flex max-w-4xl flex-wrap justify-center gap-5 border-chrome-brand border-t py-6 sm:gap-8'>
         {[
           { icon: CheckCircle, text: 'Official HMRC rates' },
           { icon: CheckCircle, text: 'Fast in-browser results' },

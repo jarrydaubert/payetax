@@ -94,13 +94,13 @@
 /* Background Elements - Geometric patterns */
 .bg-grid {
   background-image:
-    linear-gradient(color-mix(in oklch, var(--ledger-blue) 10%, transparent) 1px, transparent 1px),
+    linear-gradient(color-mix(in oklch, var(--ledger-blue) 6%, transparent) 1px, transparent 1px),
     linear-gradient(
       90deg,
-      color-mix(in oklch, var(--ledger-blue) 10%, transparent) 1px,
+      color-mix(in oklch, var(--ledger-blue) 6%, transparent) 1px,
       transparent 1px
     );
-  background-size: 60px 60px;
+  background-size: 72px 72px;
 }
 
 .bg-circle {

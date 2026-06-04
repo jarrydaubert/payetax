@@ -2,25 +2,25 @@
  * @jest-environment jsdom
  */
 // src/components/molecules/__tests__/ServerHero.test.tsx
-// ServerHero with payetax-web design: badge, headline, dual CTAs, trust strip
+// ServerHero with Ledger design: badge, headline, dual CTAs, trust strip
 
 import { render, screen } from '@testing-library/react';
 import ServerHero from '../ServerHero';
 
 describe('ServerHero Component', () => {
-  it('should render the main heading with hybrid outcome+keyword text', () => {
+  it('should render the main heading with product and outcome text', () => {
     render(<ServerHero />);
 
     expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument();
-    expect(screen.getByText('See Your Take-Home Pay')).toBeInTheDocument();
-    expect(screen.getByText('Free UK PAYE Tax Calculator')).toBeInTheDocument();
+    expect(screen.getByText('UK PAYE tax calculator')).toBeInTheDocument();
+    expect(screen.getByText('See your take-home pay')).toBeInTheDocument();
   });
 
   it('should render the tagline with HMRC mention', () => {
     render(<ServerHero />);
 
     expect(
-      screen.getByText(/Free UK tax calculator with official HMRC rates/i),
+      screen.getByText(/Estimate your take-home pay with official HMRC rates/i),
     ).toBeInTheDocument();
   });
 
@@ -49,12 +49,12 @@ describe('ServerHero Component', () => {
     expect(screen.getByText('No signup needed')).toBeInTheDocument();
   });
 
-  it('should have text-gradient-brand class on keyword line', () => {
+  it('should have text-gradient-brand class on outcome line', () => {
     const { container } = render(<ServerHero />);
 
     const gradientText = container.querySelector('.text-gradient-brand');
     expect(gradientText).toBeInTheDocument();
-    expect(gradientText?.textContent).toBe('Free UK PAYE Tax Calculator');
+    expect(gradientText?.textContent).toBe('See your take-home pay');
   });
 
   it('should accept and apply custom className', () => {
