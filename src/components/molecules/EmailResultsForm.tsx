@@ -153,7 +153,7 @@ export function EmailResultsForm({ input, className }: EmailResultsFormProps) {
 
   return (
     <div className={cn('space-y-2', className)}>
-      <form onSubmit={handleSubmit} className='flex gap-2'>
+      <form onSubmit={handleSubmit} className='flex flex-col gap-2 sm:flex-row'>
         <div className='relative flex-1'>
           <Mail
             className={cn(
@@ -182,7 +182,12 @@ export function EmailResultsForm({ input, className }: EmailResultsFormProps) {
             aria-describedby={submitError ? `${formId}-email-error` : undefined}
           />
         </div>
-        <Button type='submit' disabled={isLoading || !email.trim()} variant='outline'>
+        <Button
+          type='submit'
+          disabled={isLoading || !email.trim()}
+          variant='outline'
+          className='sm:shrink-0'
+        >
           {isLoading ? (
             <span className='animate-pulse'>Sending...</span>
           ) : (

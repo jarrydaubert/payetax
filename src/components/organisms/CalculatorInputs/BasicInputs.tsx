@@ -211,7 +211,7 @@ export function BasicInputs() {
         </div>
         <div
           className={cn(
-            'grid w-full grid-cols-[minmax(0,1fr)_8rem] sm:flex sm:flex-1',
+            'grid w-full grid-cols-[minmax(0,1fr)_7.5rem] sm:flex sm:flex-1',
             SPACING.GAP_2,
           )}
         >
@@ -228,13 +228,13 @@ export function BasicInputs() {
             min={0}
             max={10000000}
             wrapperClassName='min-w-0 flex-1'
-            className={fullWidthInputClass}
+            className={cn(fullWidthInputClass, 'text-right tabular-nums')}
             data-testid='salary-input'
           />
           <Select value={input.payPeriod} onValueChange={setPayPeriod}>
             <SelectTrigger
               id={payPeriodId}
-              className='w-full sm:w-36'
+              className='w-full sm:w-[7.5rem]'
               aria-labelledby={payPeriodLabelId}
             >
               <SelectValue placeholder='Annually' />
