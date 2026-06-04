@@ -415,7 +415,7 @@ describe('CalculatorContent Component', () => {
       expect(screen.getByText('Enter Your Salary')).toBeInTheDocument();
       expect(screen.getByText('Select Tax Year & Region')).toBeInTheDocument();
       expect(screen.getByText('Add Deductions (Optional)')).toBeInTheDocument();
-      expect(screen.getByText('View & Export Results')).toBeInTheDocument();
+      expect(screen.getByText('View & Email Results')).toBeInTheDocument();
     });
 
     it('should show step numbers visually', () => {

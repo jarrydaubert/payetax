@@ -14,11 +14,6 @@ jest.mock('@/store/calculatorStore', () => ({
   useCalculatorStore: jest.fn(),
 }));
 
-jest.mock('@/lib/exportUtils', () => ({
-  exportToCSV: jest.fn(),
-  printResults: jest.fn(),
-}));
-
 jest.mock('../CalculatorInputs/CalculatorInputsSection', () => ({
   CalculatorInputsSection: ({ onCalculate }: { onCalculate: () => void }) => (
     <div data-testid='inputs-section-mock'>
@@ -253,32 +248,26 @@ describe('CalculatorContainer Component', () => {
       expect(screen.getByTestId('results-table-mock')).toBeInTheDocument();
     });
 
-    it('should show export buttons when results exist', () => {
+    it('should show the email results action when results exist', () => {
       render(<CalculatorContainer />);
 
       expect(
         screen.getByRole('button', { name: /Email tax calculation results/i }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole('button', { name: /Print tax calculation results/i }),
-      ).toBeInTheDocument();
+        screen.queryByRole('button', { name: /Print tax calculation results/i }),
+      ).not.toBeInTheDocument();
       expect(
-        screen.getByRole('button', { name: /Download results as CSV file/i }),
-      ).toBeInTheDocument();
+        screen.queryByRole('button', { name: /Download results as CSV file/i }),
+      ).not.toBeInTheDocument();
     });
 
-    it('should keep export actions inside the results column when results exist', () => {
+    it('should keep the email action inside the results column when results exist', () => {
       render(<CalculatorContainer />);
 
       const resultsColumn = screen.getByTestId('tax-results');
       expect(resultsColumn).toContainElement(
         screen.getByRole('button', { name: /Email tax calculation results/i }),
-      );
-      expect(resultsColumn).toContainElement(
-        screen.getByRole('button', { name: /Print tax calculation results/i }),
-      );
-      expect(resultsColumn).toContainElement(
-        screen.getByRole('button', { name: /Download results as CSV file/i }),
       );
     });
 
@@ -292,7 +281,7 @@ describe('CalculatorContainer Component', () => {
       expect(screen.getByLabelText(/Email address for results/i)).toBeInTheDocument();
     });
 
-    it('should not show export buttons when no results', () => {
+    it('should not show result actions when no results exist', () => {
       (useCalculatorResults as jest.Mock).mockReturnValue(null);
       render(<CalculatorContainer />);
 
@@ -304,110 +293,6 @@ describe('CalculatorContainer Component', () => {
       ).not.toBeInTheDocument();
       expect(
         screen.queryByRole('button', { name: /Download results as CSV file/i }),
-      ).not.toBeInTheDocument();
-    });
-  });
-
-  describe('Export Functionality', () => {
-    beforeEach(() => {
-      (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
-    });
-
-    it('should call exportToCSV when Export button is clicked', async () => {
-      const { exportToCSV } = await import('@/lib/exportUtils');
-
-      render(<CalculatorContainer />);
-
-      const button = screen.getByRole('button', { name: /Download results as CSV file/i });
-      fireEvent.click(button);
-
-      expect(exportToCSV).toHaveBeenCalledWith(mockResults);
-    });
-
-    it('should not show extra success copy after successful export', async () => {
-      const { exportToCSV } = await import('@/lib/exportUtils');
-      (exportToCSV as jest.Mock).mockImplementation(() => {});
-
-      render(<CalculatorContainer />);
-
-      const button = screen.getByRole('button', { name: /Download results as CSV file/i });
-      fireEvent.click(button);
-
-      expect(screen.queryByText(/Failed to export CSV/i)).not.toBeInTheDocument();
-    });
-
-    it('should show an inline error if export fails', async () => {
-      const { exportToCSV } = await import('@/lib/exportUtils');
-      (exportToCSV as jest.Mock).mockImplementation(() => {
-        throw new Error('Export failed');
-      });
-
-      render(<CalculatorContainer />);
-
-      const button = screen.getByRole('button', { name: /Download results as CSV file/i });
-      fireEvent.click(button);
-
-      expect(screen.getByText('Failed to export CSV. Please try again.')).toBeInTheDocument();
-    });
-
-    it('should not export if no results', () => {
-      (useCalculatorResults as jest.Mock).mockReturnValue(null);
-      render(<CalculatorContainer />);
-
-      // Export button shouldn't be visible
-      expect(
-        screen.queryByRole('button', { name: /Download results as CSV file/i }),
-      ).not.toBeInTheDocument();
-    });
-  });
-
-  describe('Print Functionality', () => {
-    beforeEach(() => {
-      (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
-    });
-
-    it('should call printResults when Print button is clicked', async () => {
-      const { printResults } = await import('@/lib/exportUtils');
-
-      render(<CalculatorContainer />);
-
-      const button = screen.getByRole('button', { name: /Print tax calculation results/i });
-      fireEvent.click(button);
-
-      expect(printResults).toHaveBeenCalledWith({
-        results: mockResults,
-        visiblePeriods: expect.any(Array),
-        whatIfResults: undefined,
-        studentLoans: [],
-        allowancesDeductions: 0,
-        previousYearResults: null,
-        taxYear: undefined,
-      });
-    });
-
-    it('should show an inline error if print fails', async () => {
-      const { printResults } = await import('@/lib/exportUtils');
-      (printResults as jest.Mock).mockImplementation(() => {
-        throw new Error('Print failed');
-      });
-
-      render(<CalculatorContainer />);
-
-      const button = screen.getByRole('button', { name: /Print tax calculation results/i });
-      fireEvent.click(button);
-
-      expect(
-        screen.getByText('Failed to open the print dialog. Please try again.'),
-      ).toBeInTheDocument();
-    });
-
-    it('should not print if no results', () => {
-      (useCalculatorResults as jest.Mock).mockReturnValue(null);
-      render(<CalculatorContainer />);
-
-      // Print button shouldn't be visible
-      expect(
-        screen.queryByRole('button', { name: /Print tax calculation results/i }),
       ).not.toBeInTheDocument();
     });
   });
@@ -475,11 +360,14 @@ describe('CalculatorContainer Component', () => {
       render(<CalculatorContainer />);
 
       expect(
-        screen.getByRole('button', { name: /Print tax calculation results/i }),
+        screen.getByRole('button', { name: /Email tax calculation results/i }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole('button', { name: /Download results as CSV file/i }),
-      ).toBeInTheDocument();
+        screen.queryByRole('button', { name: /Print tax calculation results/i }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /Download results as CSV file/i }),
+      ).not.toBeInTheDocument();
     });
   });
 

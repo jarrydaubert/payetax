@@ -20,7 +20,7 @@ import { isAnalyticsConsented } from '@/lib/cookieUtils';
 export type { AnalyticsAction, SEOActionType } from '@/lib/analyticsEvents';
 
 /** High-signal events that warrant Sentry breadcrumbs */
-const HIGH_SIGNAL_ACTIONS: ReadonlySet<string> = new Set(['calculator_error', 'export_failed']);
+const HIGH_SIGNAL_ACTIONS: ReadonlySet<string> = new Set(['calculator_error']);
 
 const shouldLogWarnings = process.env.NODE_ENV !== 'production';
 
