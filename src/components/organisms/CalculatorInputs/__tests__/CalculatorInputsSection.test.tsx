@@ -68,6 +68,31 @@ describe('CalculatorInputsSection Component', () => {
       const icon = resetButton.querySelector('svg');
       expect(icon).toBeInTheDocument();
     });
+
+    it('should render an optional result action after Reset', () => {
+      render(
+        <CalculatorInputsSection
+          onCalculate={mockOnCalculate}
+          resultAction={
+            <button type='button' aria-label='Email tax calculation results'>
+              Email
+            </button>
+          }
+        />,
+      );
+
+      const buttons = screen.getAllByRole('button');
+      const labels = buttons.map(
+        (button) => button.textContent || button.getAttribute('aria-label'),
+      );
+      const resetIndex = buttons.indexOf(screen.getByRole('button', { name: /Reset/i }));
+      const emailIndex = buttons.indexOf(
+        screen.getByRole('button', { name: /Email tax calculation results/i }),
+      );
+
+      expect(labels).toEqual(expect.arrayContaining(['Calculate', 'Reset', 'Email']));
+      expect(emailIndex).toBeGreaterThan(resetIndex);
+    });
   });
 
   describe('Calculate Button Interaction', () => {
@@ -223,7 +248,7 @@ describe('CalculatorInputsSection Component', () => {
       expect(button).toBeInTheDocument();
     });
 
-    it('should render buttons with large size', () => {
+    it('should render compact action buttons', () => {
       render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
 
       const calculateButton = screen.getByTestId('calculate-button');

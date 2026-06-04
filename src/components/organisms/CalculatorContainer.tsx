@@ -247,11 +247,12 @@ export function CalculatorContainer() {
       <DialogTrigger asChild>
         <button
           type='button'
-          className='inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 text-muted-foreground text-sm transition-colors hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:w-auto'
+          className='inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
           aria-label='Email tax calculation results'
+          title='Email Results'
         >
-          <Mail className='h-3.5 w-3.5' />
-          Email Results
+          <Mail className='h-4 w-4' />
+          <span className='sr-only'>Email Results</span>
         </button>
       </DialogTrigger>
       <DialogContent className='border-border/60 bg-card text-card-foreground sm:max-w-md'>
@@ -339,6 +340,7 @@ export function CalculatorContainer() {
         <CalculatorInputsSection
           onCalculate={handleCalculate}
           onWhatIfCalculate={handleWhatIfPostCalculateUI}
+          resultAction={showResults ? emailResultsAction : undefined}
         />
       </Card>
 
@@ -368,7 +370,6 @@ export function CalculatorContainer() {
               onVisiblePeriodsChange={handleVisiblePeriodsChange}
               taxYear={input.taxYear}
               onApplyPensionOptimization={handleApplyPensionOptimization}
-              resultAction={emailResultsAction}
               marriageAllowance={{
                 isMarried: input.isMarried,
                 partnerGrossWage: input.partnerGrossWage,
