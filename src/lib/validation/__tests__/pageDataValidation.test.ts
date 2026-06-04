@@ -442,8 +442,8 @@ describe('pageDataValidation', () => {
 
     it('should validate link type', () => {
       const link = {
-        text: 'Feedback',
-        href: '/feedback',
+        text: 'Privacy',
+        href: '/privacy',
         type: 'link' as const,
       };
 
@@ -535,7 +535,7 @@ describe('pageDataValidation', () => {
     it('should validate an array of contact links', () => {
       const links = [
         { text: 'Email', href: 'mailto:test@example.com', type: 'email' as const },
-        { text: 'Feedback', href: '/feedback', type: 'link' as const },
+        { text: 'Privacy', href: '/privacy', type: 'link' as const },
       ];
 
       const result = validateContactLinks(links);

@@ -32,6 +32,22 @@ Removed:
 - Competitor-style SEO pages
 - Extra analytics vendors beyond GA4
 
+## Testing And Quality
+
+The testing posture is deliberately evidence-led:
+
+> AI-assisted code is allowed. Unverified AI-assisted code is not.
+
+PayeTax tests the project at several layers:
+
+- independent unit oracles for PAYE, NI, student loans, tax codes, thresholds, rounding, and Director calculations
+- component and store tests for UI state, validation, analytics events, and rendering contracts
+- route/config tests for sitemap, robots, `llms.txt`, metadata, env sync, version sync, and deployment config
+- Playwright E2E for calculator flows, golden-master scenarios, accessibility, blog/navigation, mobile paths, and Director Intelligence
+- CI hard gates for repo checks, dependency audit, production build, and CodeQL JavaScript/TypeScript scanning
+
+The full testing approach is documented in [docs/guides/TESTING.md](docs/guides/TESTING.md), including what is tested, why each layer exists, current coverage gaps, and the difference between CI gates and local full-suite evidence.
+
 ## Common Commands
 
 ```bash
@@ -39,6 +55,7 @@ bun install --frozen-lockfile
 bun run dev
 bun run check:repo
 bun run test:no-coverage
+bun run test:full
 bun run build
 bun audit
 ```

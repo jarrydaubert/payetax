@@ -7,6 +7,7 @@ bun install --frozen-lockfile
 bun run dev
 bun run check:repo
 bun run test:no-coverage
+bun run test:full
 bun run build
 bun audit
 ```
@@ -17,6 +18,7 @@ bun audit
 - Director Intelligence: `src/lib/tax/`, `src/components/organisms/DirectorGuide/`
 - Email delivery: `src/lib/email/`
 - Observability: `src/lib/sentry.ts`, `sentry.server.config.ts`, `sentry.client.config.ts`
+- Test strategy: `docs/guides/TESTING.md`, `docs/guides/BUG_CATALOG.md`, `e2e/`, `jest.config.js`, `playwright.config.ts`
 - Documentation: `README.md`, `AGENTS.md`, `docs/`
 
 ## Agent Guidance

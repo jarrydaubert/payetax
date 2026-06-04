@@ -1,212 +1,468 @@
 # Testing Guide
 
-## Test Philosophy
+PayeTax is a deterministic UK tax-calculator R&D project. The test strategy is built around one question:
 
-> **"What bug will this test find?"**
+> What bug will this test find?
 
-Tests should catch real regressions in calculation, UX, or security behavior.
+The aim is not to look busy. The aim is to prove that the calculator, surrounding tools, public pages, and deployment controls keep working after AI-assisted or human changes.
 
-## Good Test Standard
+## Current Audit Snapshot
 
-A good test in PayeTax should be:
+Last audited: 2026-06-04.
 
-- bug-oriented: it targets a concrete regression or failure mode
-- layer-appropriate: unit, integration, or E2E is chosen on purpose
-- based on an explicit oracle: pass/fail is tied to a meaningful business or user-visible outcome
-- actionable when it fails: the failure tells you what broke
-- deterministic: no silent skips, optional success paths, or vague "app still renders" assertions
+Current automated evidence from a full local run:
 
-Reject low-signal tests:
+- `bun run check:repo`: passed.
+- Jest coverage suite: 202 suites, 3216 tests passed.
+- Playwright full suite: 338 tests passed across Chromium, WebKit, Mobile Chrome, and Mobile Safari.
+- Global coverage: 91.66% statements, 81.07% branches, 80.53% functions, 91.66% lines.
+- Golden master E2E: 20 HMRC-sourced scenarios passed within the stated tolerances.
+- `bun run build`: passed, 61 static pages generated.
+- `bun audit`: no vulnerabilities found.
 
-- broad click-through coverage with no named bug target
-- inventory/presence tests as the sole oracle for important behavior
-- tests that stay green even when the real user outcome is broken
-- test-count or coverage vanity without regression-detection value
-- mocks that assert the mocked behavior instead of the production contract
+Known automated-coverage gaps from the same audit:
 
-If a test cannot explain what bug it is trying to catch and why this is the right layer, it should be rewritten or deleted.
+- `src/app/api/ops/rate-limit-health/route.ts` is not unit-covered.
+- `src/lib/email/emailDelivery.ts` is not unit-covered.
+- `src/lib/email/outboundResultsDelivery.ts` is not unit-covered.
 
-See also:
-- `docs/guides/BUG_CATALOG.md`
-- `docs/guides/POST_RELEASE_VALIDATION.md`
+These gaps are tracked as useful next work because email delivery and operational health are production boundaries. They should be tested with mocked provider/network behaviour, not real email sends.
 
----
+## Philosophy
 
-## Definition Of Done (Tests)
+Good tests in this repo are:
 
-A test task is only done when all criteria below are met:
+- Bug-oriented: the title or surrounding context explains the failure mode.
+- Layer-appropriate: unit, component, route, or E2E is chosen deliberately.
+- Oracle-backed: expected results come from an explicit source, invariant, or user-visible outcome.
+- Deterministic: no silent skips, optional assertions, or vague "renders" checks for important behaviour.
+- Actionable: a failure should tell the maintainer what broke and where to look.
 
-- Bug-linked intent: every new/updated test clearly answers "What bug will this test find?" in title or nearby context.
-- Explicit oracle + layer fit: assertions prove a meaningful business or user-visible outcome, and the chosen layer is deliberate rather than convenience-driven.
-- Executable coverage: no placeholder assertions; tests are runnable and assertions are active.
-- Deterministic status: no new `skip`/`todo`; any retained debt is tagged (`PAYTAX-###` or `P#-#`) and allowlisted with rationale.
-- Monetary assertions: use `toBeCloseTo(expected, 2)` for currency/tax amounts; avoid integer precision (`..., 0`/`..., 1`) in tax-critical suites.
-- Relevant gates pass:
-  - Unit-focused changes: `bun run test:no-coverage`
-  - Critical user-path/UI changes: `bun run test:e2e:critical`
-  - Full confidence gate before closure: `bun run test:ci` and `bun run test:e2e` (CI or equivalent environment)
-- Debt/accounting updated: `scripts/test-debt-allowlist.ts`, `docs/BACKLOG.md`, and related docs reflect the new truth.
+Low-signal tests should be rewritten or deleted:
 
-For backlog closure, automated tests are the default proof path. Add or update the narrowest test that would have failed before the fix:
+- Click-through tests with no named regression target.
+- Presence-only checks for behaviour that needs a stronger oracle.
+- Tests that would pass while a real user outcome is broken.
+- Coverage added only to raise a number.
+- Mocks that only prove the mock works.
 
-- pure calculation or parser bug: unit test
-- component state or rendering bug: component/integration test
-- routing, browser API, critical journey, or cross-page behavior: E2E or scripted browser test
-- SEO metadata, sitemap, redirects, or canonical behavior: route/config/sitemap test plus live validation when relevant
+## What We Test
 
-Use manual validation only when automation is the wrong layer, and keep the validation steps in the PR or linked issue rather than creating standalone evidence docs.
+### Calculation Correctness
 
-Target state for "no issues found" audits:
-- `bun run check:test-skips` passes with no unexpected debt.
-- `bun run test:metrics` reports `Playwright last run: status=passed` and `failedTests=0`.
-- No unresolved P0/P1 test-quality backlog items remain open.
+This is the highest-value testing surface. PayeTax handles deterministic tax logic where there is a right answer, so tests must protect the calculation engine first.
 
----
+Covered areas include:
 
-## Running Tests
+- PAYE income tax.
+- Employee National Insurance.
+- Scottish tax bands.
+- Student loan plans and postgraduate loans.
+- BR, D0, D1, NT, K-codes, and emergency tax codes.
+- Personal allowance taper.
+- Marriage allowance boundaries.
+- Pension and salary sacrifice paths.
+- Additional income handling.
+- Period reconciliation and payroll rounding.
+- Director salary/dividend strategy calculations.
 
-```bash
-bun run test:no-coverage    # Unit tests (fast)
-bun run test:ci             # Full unit suite with coverage (CI-safe)
-bun run test:e2e:critical   # Critical-path E2E suite (smoke + golden)
-bun run test:e2e            # Full multi-browser E2E
-bun run test:quick          # Fast local gate: unit fast + critical E2E
-bun run test:full           # Full gate: coverage unit + full E2E
-bun run check:repo          # Read-only repo verification gate
-bun run harness:local       # Repo gate + quick tests + build
-bun run harness:release     # Release-oriented harness gate
-bun run check:test-skips    # Guardrail: block new skip/todo debt
-bun run test:metrics        # Print skip/todo + last-run confidence metrics
-bun run fix-all             # Lint + typecheck + format
-bun run clean:test          # Clear old test artifacts
-```
+Primary files:
+
+- `src/lib/__tests__/taxCalculator.hmrcVerification.test.ts`
+- `src/lib/__tests__/taxCalculator.*.test.ts`
+- `src/lib/tax/__tests__/`
+- `src/constants/__tests__/taxRates.test.ts`
+- `e2e/golden-master-PERFECT.spec.ts`
+- `e2e/payslip-regression.spec.ts`
+
+### Browser And User Flow Behaviour
+
+The browser suite proves that the engine, UI, routing, forms, and rendered results work together.
+
+Covered areas include:
+
+- Homepage calculator flow.
+- Calculate button and result rendering.
+- What-if comparison scenarios.
+- Period selector behaviour.
+- Salary comparison tables.
+- Tax-code input handling.
+- Blog navigation back to the calculator.
+- Director Intelligence critical flows.
+- Mobile menu handoff.
+- PWA/offline route coverage.
+
+Primary files:
+
+- `e2e/smoke.spec.ts`
+- `e2e/calculator-critical.spec.ts`
+- `e2e/what-if-comparison.spec.ts`
+- `e2e/display-periods.spec.ts`
+- `e2e/tax-code-validation.spec.ts`
+- `e2e/director-guide-critical.spec.ts`
+- `e2e/director-guide-recruiter-regression.spec.ts`
+- `e2e/homepage-portal-stability.spec.ts`
+
+### Accessibility
+
+Accessibility is tested at both component and browser levels.
+
+Covered areas include:
+
+- WCAG 2.2 AA axe scans across core pages.
+- Desktop and mobile viewports.
+- Supported dark theme.
+- Calculator tooltips and form controls.
+- Mobile navigation.
+- Keyboard focus and focus indicators.
+- Touch target minimums.
+- Blog article and filtered blog states.
+
+Primary files:
+
+- `e2e/accessibility-wcag22.spec.ts`
+- `src/components/atoms/__tests__/atoms.axe.test.tsx`
+- UI component tests under `src/components/atoms/ui/__tests__/`
 
 Notes:
-- `bun run test` is still available when you want local coverage + HTML report auto-open.
-- `bun run test:ci` is intended for full-suite runs; partial-file runs can fail coverage thresholds by design.
-- `bun run fix-all` now includes `check:test-skips`, so new unapproved skip/todo debt fails locally and in CI.
-- `bun run check:repo` is the read-only equivalent of the repo verification part of `fix-all`.
-- GitHub `CI` runs `bun run audit:deps` as a separate dependency-advisory gate after repo checks.
-- `bun run harness:local` is the recommended pre-refactor confidence gate.
-- `bun run harness:release` keeps the dependency advisory check in the stricter release-oriented validation path.
-- Visual review is handled manually in the developer/agent loop for UI changes. Do not maintain checked-in visual-regression baselines by default.
 
----
+- Axe can report "incomplete" checks that require manual review. These are not violations, but they are called out in the test output.
+- Visual review still belongs in the developer/agent loop for UI changes. This repo does not maintain checked-in visual-regression baselines by default.
 
-## Skip/Todo Policy
+### Public Content, SEO, And Routing
 
-- No new `test.skip` / `it.skip` / `it.todo` without explicit approval and debt tracking.
-- E2E skips must include a reason (`test.skip(condition, 'reason')`), never bare `test.skip()`.
-- Skip/todo entries must include an issue tag in title/reason: `PAYTAX-###` or backlog ID format `P#-#`.
-- No commented-out assertions in test files (e.g. `// expect(...)`); convert to real assertions or `it.todo`.
-- Baseline debt allowlist lives in:
-  - `scripts/test-debt-allowlist.ts`
-- Enforcement lives in:
-  - `scripts/check-test-skips.ts`
+The public repo still needs route and metadata confidence, even though the marketing-heavy page families have been removed.
 
----
+Covered areas include:
 
-## Cleaning Test Artifacts
+- Sitemap generation.
+- Robots output.
+- `llms.txt` output.
+- Open Graph route.
+- Blog page and post rendering.
+- Structured data smoke checks.
+- Canonical navigation back to the calculator.
+- Removed feature regressions, such as no feedback CTA on the About page.
 
-Use these when stale reports/traces or auth state pollute local runs.
+Primary files:
 
-```bash
-bun run clean:reports   # Clears coverage + Playwright reports/test-results/blob-report
-bun run test:e2e:clear  # Clears Playwright artifacts + storageState
-bun run clean:test      # One-shot cleanup for unit + E2E test artifacts
-```
+- `src/app/__tests__/sitemap.test.ts`
+- `src/app/__tests__/robots.test.ts`
+- `src/app/llms.txt/__tests__/route.test.ts`
+- `src/app/api/og/route.tsx` coverage through route tests.
+- `e2e/seo-blog.spec.ts`
+- `e2e/blog.spec.ts`
 
----
+### API, Security, And Environment Contracts
+
+These tests and checks protect production boundaries rather than tax maths.
+
+Covered areas include:
+
+- Origin checks.
+- Bot guard logic.
+- Rate-limit support code.
+- Email input validation.
+- Env schema and production env contract sync.
+- Analytics event naming contract.
+- Version sync between `package.json` and PWA/service-worker cache versions.
+- Secret hygiene in CI through the tracked env guard.
+- Dependency advisory checks.
+- CodeQL JavaScript/TypeScript scanning.
+
+Primary files and scripts:
+
+- `src/lib/security/__tests__/`
+- `src/lib/validation/__tests__/emailValidation.test.ts`
+- `src/lib/__tests__/rateLimit.test.ts`
+- `scripts/check-analytics-env-sync.ts`
+- `scripts/check-analytics-events.ts`
+- `scripts/check-version.ts`
+- `scripts/audit-deps.ts`
+- `.github/workflows/ci.yml`
+- `.github/workflows/codeql.yml`
+
+## Test Layers And Oracles
+
+### Layer 1: Independent Calculation Oracles
+
+Use this layer when the question is "is the tax answer correct?"
+
+Examples:
+
+- `src/lib/__tests__/taxCalculator.hmrcVerification.test.ts`
+- `src/lib/__tests__/taxCalculator.hmrcPayrollFixtures.test.ts`
+- `src/lib/tax/__tests__/incomeTax.test.ts`
+- `src/lib/tax/__tests__/employeeNI.test.ts`
+- `src/lib/tax/__tests__/directorCalculator.*.test.ts`
+
+These tests should use hand-anchored expected values, HMRC examples, payslip-derived expectations, or explicit legal/rate-table assumptions. They should not derive the expected answer from the same production constants or implementation path they are trying to test.
+
+### Layer 2: Component And Store Tests
+
+Use this layer when the question is "does this component or state transition behave correctly?"
+
+Examples:
+
+- Calculator input and result components.
+- What-if comparison components.
+- Director Guide dashboard and input panels.
+- Zustand calculator and Director Guide stores.
+- Analytics event calls from UI actions.
+- Blog/search/filter components.
+
+These tests are fast and good for state, rendering, validation, and contract assertions.
+
+### Layer 3: Route, Config, And Contract Tests
+
+Use this layer when the question is "does the app expose the right public or production-facing contract?"
+
+Examples:
+
+- Sitemap, robots, and `llms.txt`.
+- Vercel config.
+- Next config.
+- Metadata builders.
+- Env contract sync.
+- Analytics event registry.
+- Version sync.
+- Skip/todo guardrails.
+
+These tests catch drift that would otherwise hide until deployment.
+
+### Layer 4: Browser E2E
+
+Use this layer when the question is "does the user journey work in a real browser?"
+
+The full E2E suite runs:
+
+- Chromium.
+- WebKit.
+- Mobile Chrome.
+- Mobile Safari.
+
+Desktop projects run the broader suite. Mobile projects focus on critical paths to keep runtime reasonable while still covering the main user risk.
+
+### Layer 5: Manual Release Evidence
+
+Manual validation is allowed only when automation is the wrong layer.
+
+Examples:
+
+- Final production visual inspection.
+- Lighthouse runs on the live deployment.
+- Email deliverability checks against the configured provider.
+- Sentry and Vercel environment confirmation.
+
+Manual checks belong in the PR, release notes, or post-release checklist. They should not become permanent heavyweight CI workflows unless the risk justifies the maintenance.
 
 ## HMRC Verification
 
-Calculation correctness is guarded by distinct oracle layers. They are NOT
-interchangeable — know which one actually proves correctness:
+Calculation correctness is guarded by distinct oracle layers. They are not interchangeable.
 
-1. **Independent correctness oracle — `src/lib/__tests__/taxCalculator.hmrcVerification.test.ts`**
-   (and sibling `taxCalculator.*` / `tax/*` unit suites).
-   - Hand-anchored expected values typed from HMRC examples; imports only `calculateTax`,
-     never `TAX_RATES`.
-   - This is the ONLY layer that can catch an engine bug or a rate/threshold typo in
-     `taxRates.ts`, because its expected numbers do not derive from the production constants.
-   - Keep HMRC values anchored to source documents and code references.
+### Independent Correctness Oracle
 
-2. **Drift / UI-regression oracle — `e2e/golden-master-PERFECT.spec.ts`** (fixtures in `e2e/fixtures/`).
-   - ⚠️ The fixture is AUTO-GENERATED from `taxRates.ts` + `calculateTax()` via
-     `e2e/scripts/generate-golden-master.ts`. It therefore CANNOT catch an engine that is
-     wrong-but-self-consistent — break the engine and the regenerated fixture moves with it.
-   - Its job is form/rendering/extraction/browser-regression drift between engine and UI,
-     not calculation correctness.
+`src/lib/__tests__/taxCalculator.hmrcVerification.test.ts` and sibling `taxCalculator.*` / `tax/*` unit suites are the source of truth for engine correctness.
 
-3. **E2E helper — `e2e/helpers/tax-test-helpers.ts`** reimplements band/NI/loan *logic*
-   independently, but imports `TAX_RATES` from the production constants. It is
-   logic-independent but constant-dependent: a rate or threshold error passes both the
-   engine and the helper. Do not treat it as the correctness oracle.
+- Expected values are hand-anchored.
+- The tests import `calculateTax`, not `TAX_RATES` as the answer generator.
+- This layer can catch engine bugs and rate/threshold typos when the expected value is independent.
 
-Rule of thumb: every calculation fix needs a failing-then-passing assertion in layer (1).
-Layers (2) and (3) are supporting nets, not the source of truth.
+Every calculation fix should add or update a failing-then-passing assertion in this layer.
 
-### Threshold Sensitivity (non-obvious)
+### Drift And UI Regression Oracle
 
-The engine applies annual band thresholds via `Math.ceil(annualThreshold / 12)` (whole-pound
-monthly PAYE, matching HMRC payroll behaviour). Consequence: a sub-£5 drift in a
-`bands[].threshold` yields IDENTICAL income-tax output and is invisible to magnitude
-assertions — adding another `toBeCloseTo` income-tax case will NOT catch a £1 threshold typo.
+`e2e/golden-master-PERFECT.spec.ts` proves that the rendered browser flow and extraction path stay aligned with the current engine.
 
-Annual thresholds are guarded instead by paths that read them directly:
-- Marriage-allowance eligibility — the two-sided `£50,270 (granted) / £50,271 (denied)` pair
-  in `taxCalculator.hmrcVerification.test.ts` pins the higher-rate threshold in both directions.
-- HICBC taper boundaries pin the `£60,000` / `£80,000` thresholds.
+- Fixture: `e2e/fixtures/golden-tax-cases-2025-26-COMPLETE.json`
+- Generator: `e2e/scripts/generate-golden-master.ts`
 
-When changing or adding a band threshold, update/extend these eligibility-boundary tests —
-not just value assertions.
+Important limitation: the fixture is generated from `taxRates.ts` and `calculateTax()`. It cannot catch an engine that is wrong but self-consistent. Its job is to catch UI, form, rendering, browser, extraction, and regression drift.
 
-### HMRC Rounding Divergence Policy
+### E2E Helper Limitation
 
-- Core rule: engine outputs are monthly-first then annualized; assertions must follow engine behavior, not pure annual arithmetic.
-- Tax/NI/net assertions: use `toBeCloseTo(expected, 2)` with expected values derived from the current engine rounding model.
-- Published annual examples: if HMRC annual formula differs by a few pence from monthly-annualized output, assert the engine value and document the reason in the test comment.
-- Golden master (`e2e/golden-master-PERFECT.spec.ts`) is the canonical regression baseline for these rounding-sensitive scenarios.
+`e2e/helpers/tax-test-helpers.ts` reimplements band, NI, and loan logic, but imports production constants.
 
----
+That makes it logic-independent but constant-dependent. A rate or threshold typo can pass both the engine and helper. Treat it as a support net, not the correctness oracle.
 
-## Quality Gates (Recommended)
+## Rounding And Threshold Policy
+
+The engine applies annual band thresholds through monthly payroll behaviour. That means some annual threshold changes are invisible to ordinary magnitude assertions.
+
+Rules:
+
+- Use `toBeCloseTo(expected, 2)` for currency/tax amounts.
+- Avoid integer precision assertions for tax-critical values.
+- Assert engine behaviour when published annual examples differ by a few pence from monthly-annualised output, and explain the rounding reason in the test.
+- When changing thresholds, add or update direct boundary tests such as marriage allowance and HICBC threshold pairs.
+
+The golden master is the browser regression baseline for rounding-sensitive scenarios, not the legal source of truth.
+
+## Commands
+
+### Install
+
+```bash
+bun install --frozen-lockfile
+```
+
+### Fast Local Checks
+
+```bash
+bun run check:repo          # Lint, typecheck, version sync, env contract, analytics contract, skip guard
+bun run test:no-coverage    # Jest without coverage thresholds
+bun run test:e2e:critical   # Chromium smoke + critical + golden paths
+bun run test:quick          # Unit fast + critical E2E
+```
+
+### Full Confidence Checks
+
+```bash
+bun run test:ci             # Jest with coverage thresholds
+bun run test:e2e            # Full multi-browser Playwright suite
+bun run test:full           # Coverage Jest + full Playwright
+bun run build               # Production build
+bun audit                   # Bun advisory check
+```
+
+### Release-Oriented Checks
+
+```bash
+bun run harness:local       # Repo gate + quick tests + build
+bun run harness:release     # Repo gate + dependency audit + unit tests + build + release status
+bun run release:verify      # Alias for release harness
+bun run bundle:monitor      # Build + bundle threshold analysis
+```
+
+### Test Hygiene
+
+```bash
+bun run check:test-skips    # Block unapproved skip/todo debt
+bun run test:metrics        # Print test inventory, skip/todo counts, last E2E status, coverage summary
+bun run clean:test          # Clear unit and E2E artifacts
+bun run test:e2e:clear      # Clear Playwright artifacts and storage state
+```
+
+## CI And Repo Quality
+
+This repo follows a lean AI-assisted quality standard:
+
+> AI-assisted code is allowed. Unverified AI-assisted code is not.
+
+Current GitHub hard gates:
+
+- `CI`
+- `CodeQL`
+
+`CI` does:
+
+- checkout
+- Bun setup
+- disallowed-lockfile guard
+- tracked-env guard
+- frozen-lockfile install
+- `bun run check:repo`
+- `bun run audit:deps`
+- `bun run build`
+
+`CodeQL` does:
+
+- JavaScript/TypeScript CodeQL analysis on push, pull request, and weekly schedule.
+
+Why the full Playwright suite is not a default PR blocker:
+
+- It is valuable but slower.
+- It can produce browser timing flakes if run as a noisy permanent gate.
+- The repo standard is small hard gates plus clear evidence, not CI sprawl.
+
+Expected PR evidence for meaningful code changes:
 
 - `bun run check:repo`
-- `bun run test:no-coverage`
+- the smallest relevant unit or E2E check while developing
 - `bun run build`
-- `bun run test:e2e:critical`
-- `bun run release:report:init` (before manual post-release checks)
-- `RATE_LIMIT_VERIFY_BASE_URL="https://payetax.co.uk" RATE_LIMIT_HEALTH_SECRET="..." bun run check:production-env-contract` (against the intended Vercel Production project before release completion)
-- `bun run release:report:check` (after checklist completion)
-- Post-release production validation checklist (manual/high-confidence checks)
+- `bun run test:full` for broad calculation, browser, route, or refactor changes
 
----
+## Coverage Policy
 
-## Bundle Size Verification (Repeatable)
+Coverage is a signal, not the goal.
 
-Run this flow on release branches and before tagging:
+Current global thresholds:
 
-```bash
-bun run build           # Produces .next build artifacts
-bun run bundle:analyze  # Enforces bundle thresholds and updates bundle-history.json
-```
+- statements: 65%
+- branches: 55%
+- functions: 65%
+- lines: 65%
 
-Pass criteria:
-- `bun run bundle:analyze` exits with code `0`
-- `bundle-history.json` gets a new measurement entry
+Business-logic files carry stricter thresholds where it matters, especially:
 
-Fast single-command variant:
+- `src/lib/taxCalculator.ts`
+- `src/lib/periodCalculator.ts`
 
-```bash
-bun run bundle:monitor  # Runs build + bundle analysis in one step
-```
+UI components have more lenient thresholds because behaviour and accessibility often need component tests plus browser checks rather than pure line coverage.
 
----
+Do not add low-value tests only to raise coverage. Add tests that catch a named bug class.
 
-## Lighthouse Repro (Clean Browser)
+## Skip And Todo Policy
 
-Use a clean Chrome context to avoid extension noise in `TBT` and other metrics.
+- No new `test.skip`, `it.skip`, `describe.skip`, or `it.todo` without explicit approval.
+- E2E skips must include a reason.
+- Skip/todo debt must include an issue tag such as `PAYTAX-###` or `P#-#`.
+- Commented-out assertions are not allowed in executable test files.
+
+Guardrail files:
+
+- `scripts/check-test-skips.ts`
+- `scripts/test-debt-allowlist.ts`
+
+The current expected state is zero skip/todo debt.
+
+## Choosing The Right Test
+
+Use this rule of thumb:
+
+- Pure tax or calculation bug: unit test with independent expected values.
+- Parser or validation bug: unit test around the parser/validator.
+- Component rendering or state bug: component/store test.
+- Cross-page flow, browser API, focus, mobile menu, or production rendering bug: Playwright.
+- Sitemap, robots, metadata, env, analytics, or config drift: route/config/contract test.
+- Provider delivery behaviour: unit/integration test with mocked provider responses, plus manual production confirmation when needed.
+
+## Current Gaps And Next Tests To Add
+
+These are the most useful next automated tests:
+
+1. Email delivery boundary.
+   - Files: `src/lib/email/emailDelivery.ts`, `src/lib/email/outboundResultsDelivery.ts`.
+   - Why: production email depends on Brevo API configuration and provider responses.
+   - Test with: mocked `fetch`, configured/unconfigured env, success, provider failure, timeout/error path, and sanitised logging.
+
+2. Rate-limit health route.
+   - File: `src/app/api/ops/rate-limit-health/route.ts`.
+   - Why: this is an operational API boundary.
+   - Test with: missing secret, wrong secret, correct secret, Upstash unavailable, and healthy Upstash response.
+
+3. Production email smoke.
+   - Why: mocks prove code paths, but not deliverability.
+   - Test with: manual post-release send to a controlled address, then document result in release evidence.
+
+4. Live monitoring confirmation.
+   - Why: Sentry and Vercel env wiring are production configuration, not fully provable in local unit tests.
+   - Test with: post-release Sentry event confirmation and production env review.
+
+## Manual Visual And Lighthouse Checks
+
+Visual and Lighthouse checks are useful, but they are not default CI blockers.
+
+For frontend changes:
+
+- Run the app locally when practical.
+- Inspect the affected route or component.
+- Check desktop and mobile states when relevant.
+- Check the browser console.
+- Check the main interaction path.
+- Add or update behavioural tests when the behaviour should stay protected.
+
+For Lighthouse, use a clean browser context to avoid extension noise:
 
 ```bash
 bunx lighthouse https://payetax.co.uk \
@@ -222,7 +478,13 @@ bunx lighthouse https://payetax.co.uk \
   --output=json --output-path=./lighthouse-mobile.json
 ```
 
-Validation checklist:
-- Run at least 2 passes per strategy and compare medians.
-- Keep network/throttling preset unchanged between runs.
-- Treat extension-influenced runs as non-comparable.
+Run at least two passes per strategy and compare medians. Treat extension-influenced runs as non-comparable.
+
+## Related Docs
+
+- `docs/guides/BUG_CATALOG.md`
+- `docs/guides/POST_RELEASE_VALIDATION.md`
+- `docs/guides/PRODUCTION_ENV_CONTRACT.md`
+- `docs/guides/API_ROUTE_HARDENING.md`
+- `docs/guides/RATE_LIMIT_VERIFICATION.md`
+- `docs/business/PRODUCT_DIRECTION.md`

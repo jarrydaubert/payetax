@@ -13,8 +13,8 @@ describe('ContactFooter', () => {
       type: 'email',
     },
     {
-      text: 'Feedback Form',
-      href: '/feedback',
+      text: 'Privacy',
+      href: '/privacy',
       type: 'link',
     },
   ];
@@ -62,7 +62,7 @@ describe('ContactFooter', () => {
       render(<ContactFooter links={mockLinks} />);
 
       expect(screen.getByRole('link', { name: 'support@example.com' })).toBeInTheDocument();
-      expect(screen.getByRole('link', { name: 'Feedback Form' })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Privacy' })).toBeInTheDocument();
     });
 
     it('should render correct href for email link', () => {
@@ -75,8 +75,8 @@ describe('ContactFooter', () => {
     it('should render correct href for regular link', () => {
       render(<ContactFooter links={mockLinks} />);
 
-      const regularLink = screen.getByRole('link', { name: 'Feedback Form' });
-      expect(regularLink).toHaveAttribute('href', '/feedback');
+      const regularLink = screen.getByRole('link', { name: 'Privacy' });
+      expect(regularLink).toHaveAttribute('href', '/privacy');
     });
 
     it('should apply monospace font to email links', () => {
@@ -89,7 +89,7 @@ describe('ContactFooter', () => {
     it('should not apply monospace font to regular links', () => {
       render(<ContactFooter links={mockLinks} />);
 
-      const regularLink = screen.getByRole('link', { name: 'Feedback Form' });
+      const regularLink = screen.getByRole('link', { name: 'Privacy' });
       expect(regularLink).not.toHaveClass('font-mono');
     });
 
@@ -217,7 +217,7 @@ describe('ContactFooter', () => {
     it('should use correct typography for links', () => {
       render(<ContactFooter links={mockLinks} />);
 
-      const link = screen.getByRole('link', { name: 'Feedback Form' });
+      const link = screen.getByRole('link', { name: 'Privacy' });
       expect(link).toHaveClass('text-base');
     });
   });
@@ -314,7 +314,7 @@ describe('ContactFooter', () => {
 
       // Links
       expect(screen.getByRole('link', { name: 'support@example.com' })).toBeInTheDocument();
-      expect(screen.getByRole('link', { name: 'Feedback Form' })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Privacy' })).toBeInTheDocument();
 
       // Custom class
       const section = screen.getByRole('heading').closest('section');

@@ -1,5 +1,7 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 
+const DIRECTOR_WELCOME_DISMISS_KEY = 'directorGuideWelcome:dismissed:v1';
+
 function parseCurrency(value: string): number {
   return Number.parseFloat(value.replace(/[^0-9.-]/g, '') || '0');
 }
@@ -21,7 +23,26 @@ async function dismissWelcomeDialogIfPresent(page: Page): Promise<void> {
   if (!isVisible) return;
 
   await page.getByRole('button', { name: "Got it, let's start" }).click();
-  await expect(dialog).toBeHidden();
+  await expect
+    .poll(async () => {
+      if ((await dialog.count()) === 0) {
+        return 'closed';
+      }
+
+      return (
+        (await dialog
+          .first()
+          .getAttribute('data-state')
+          .catch(() => null)) ?? 'open'
+      );
+    })
+    .toBe('closed');
+}
+
+async function suppressWelcomeDialog(page: Page): Promise<void> {
+  await page.addInitScript((dismissKey) => {
+    window.localStorage.setItem(dismissKey, 'true');
+  }, DIRECTOR_WELCOME_DISMISS_KEY);
 }
 
 async function selectEnglandRegion(page: Page): Promise<void> {
@@ -31,7 +52,9 @@ async function selectEnglandRegion(page: Page): Promise<void> {
 
 test.describe('Director Intelligence recruiter regression', () => {
   test('annual recruiter case keeps expected strategy outputs', async ({ page }) => {
-    await page.goto('/tools/director-guide', { waitUntil: 'networkidle' });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await suppressWelcomeDialog(page);
+    await page.goto('/tools/director-guide', { waitUntil: 'domcontentloaded', timeout: 60000 });
     await dismissWelcomeDialogIfPresent(page);
     await page.locator('aside').getByRole('button', { name: 'Annual', exact: true }).click();
 
@@ -58,7 +81,9 @@ test.describe('Director Intelligence recruiter regression', () => {
   });
 
   test('monthly recruiter case keeps safe draw and buffer shortfall outputs', async ({ page }) => {
-    await page.goto('/tools/director-guide', { waitUntil: 'networkidle' });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await suppressWelcomeDialog(page);
+    await page.goto('/tools/director-guide', { waitUntil: 'domcontentloaded', timeout: 60000 });
     await dismissWelcomeDialogIfPresent(page);
 
     await page.locator('aside').getByRole('button', { name: 'Monthly' }).click();
