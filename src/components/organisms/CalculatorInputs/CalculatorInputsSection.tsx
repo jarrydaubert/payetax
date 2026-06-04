@@ -17,11 +17,13 @@ import { WhatIfInputs } from './WhatIfInputs';
 interface CalculatorInputsSectionProps {
   onCalculate: () => void;
   onWhatIfCalculate?: () => void;
+  resultAction?: React.ReactNode;
 }
 
 export function CalculatorInputsSection({
   onCalculate,
   onWhatIfCalculate,
+  resultAction,
 }: CalculatorInputsSectionProps) {
   const { reset } = useCalculatorActions();
   const salary = useCalculatorStore((state) => state.input.salary);
@@ -95,8 +97,8 @@ export function CalculatorInputsSection({
           <Button
             onClick={handleCalculate}
             disabled={isCalculating}
-            size='lg'
-            className='flex-1'
+            size='default'
+            className='min-w-0 flex-1 px-3'
             data-testid='calculate-button'
           >
             {isCalculating ? (
@@ -112,10 +114,11 @@ export function CalculatorInputsSection({
             )}
           </Button>
 
-          <Button onClick={handleReset} variant='outline' size='lg'>
-            <RotateCcw className={cn('mr-2', ICON_SIZES.SIZE_5)} />
+          <Button onClick={handleReset} variant='outline' size='default' className='shrink-0 px-3'>
+            <RotateCcw className={cn('mr-1.5', ICON_SIZES.SIZE_5)} />
             Reset
           </Button>
+          {resultAction}
         </div>
         {formMessage && (
           <p

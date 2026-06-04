@@ -7,21 +7,18 @@
  * Features:
  * - Only shows on mobile devices (< md breakpoint)
  * - Only shows in portrait orientation
- * - Centered on screen (not blocking scroll-to-top button)
+ * - Inline with the results section so it never blocks calculator controls
  * - Animated phone rotation icon
  * - Dismissible (persists via localStorage)
  * - Theme-aware (dark mode support)
  * - Accessible with ARIA labels
- * - Click-through overlay (only card is interactive)
- *
- * Updated: Centered positioning to avoid UI conflicts with fixed buttons
+ * - Dismissible without interrupting input actions
  */
 
 'use client';
 
 import { Smartphone, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { BREAKPOINTS } from '@/constants/ui';
 import { safeGetItem, safeSetItem } from '@/lib/safeStorage';
@@ -54,11 +51,6 @@ interface LandscapePromptProps {
  */
 export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) {
   const [isVisible, setIsVisible] = useState(false);
-  const [portalMounted, setPortalMounted] = useState(false);
-
-  useEffect(() => {
-    setPortalMounted(true);
-  }, []);
 
   useEffect(() => {
     // Check if user has dismissed before (localStorage)
@@ -107,39 +99,29 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
     onDismiss?.();
   };
 
-  if (!(isVisible && portalMounted)) {
+  if (!isVisible) {
     return null;
   }
 
-  const prompt = (
+  return (
     <output
       aria-live='polite'
       aria-atomic='true'
-      className={cn(
-        'fixed inset-0 z-[9998] flex items-center justify-center md:hidden',
-        'fade-in animate-in duration-500',
-        'pointer-events-none', // Allow clicks through to content
-        className,
-      )}
+      className={cn('block md:hidden', 'fade-in animate-in duration-500', className)}
     >
       <div
         className={cn(
-          'glass-card relative mx-4 flex max-w-sm items-center gap-3 p-4',
-          'pointer-events-auto', // Enable clicks on the card itself
+          'glass-card flex items-center gap-3 p-3',
           'border-primary/20 bg-primary/5 backdrop-blur-lg',
-          'shadow-lg dark:bg-primary/10',
+          'dark:bg-primary/10',
         )}
       >
-        {/* Animated Phone Icon - uses animate-wiggle from Tailwind config */}
-        <div className='flex-shrink-0'>
-          <Smartphone
-            className={cn(ICON_SIZES.SIZE_8, 'text-primary', 'animate-wiggle')}
-            aria-hidden='true'
-          />
-        </div>
+        <Smartphone
+          className={cn(ICON_SIZES.SIZE_8, 'shrink-0 text-primary', 'animate-wiggle')}
+          aria-hidden='true'
+        />
 
-        {/* Message */}
-        <div className='flex-1'>
+        <div className='min-w-0 flex-1'>
           <p className={cn('font-medium text-foreground', TYPOGRAPHY.TEXT_SM)}>
             Rotate for Better View
           </p>
@@ -148,12 +130,11 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
           </p>
         </div>
 
-        {/* Dismiss Button */}
         <button
           type='button'
           onClick={handleDismiss}
           className={cn(
-            'flex-shrink-0 rounded-md p-1',
+            'shrink-0 rounded-md p-1',
             'text-muted-foreground hover:text-foreground',
             'transition-colors duration-200',
             'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background',
@@ -165,6 +146,4 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
       </div>
     </output>
   );
-
-  return createPortal(prompt, document.body);
 }
