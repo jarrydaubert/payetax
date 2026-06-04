@@ -166,13 +166,17 @@ export function BasicInputs() {
   };
 
   const fieldRowClass = cn(
-    'flex flex-col items-stretch sm:flex-row sm:items-center',
+    'grid grid-cols-1 items-center min-[360px]:grid-cols-[auto_minmax(0,1fr)]',
     SPACING.GAP_2,
     'sm:gap-3',
   );
-  const fieldLabelClass = cn('flex items-center', SPACING.GAP_1_5);
+  const fieldLabelClass = cn('flex min-w-0 items-center', SPACING.GAP_1_5);
+  const fieldControlClass = 'min-w-0 justify-self-start';
+  const selectControlClass = cn(fieldControlClass, 'w-44 max-w-full');
+  const longSelectControlClass = cn(fieldControlClass, 'w-full max-w-64');
+  const numericControlClass = cn(fieldControlClass, 'w-36 max-w-full');
   const fullWidthInputClass = 'w-full';
-  const flexInputWrapperClass = 'w-full min-w-0 sm:flex-1';
+  const flexInputWrapperClass = numericControlClass;
 
   /**
    * Normalize tax code input:
@@ -211,7 +215,8 @@ export function BasicInputs() {
         </div>
         <div
           className={cn(
-            'grid w-full grid-cols-[minmax(0,1fr)_7.5rem] sm:flex sm:flex-1',
+            fieldControlClass,
+            'grid w-full max-w-full grid-cols-[minmax(0,1fr)_7.5rem] sm:w-[17rem]',
             SPACING.GAP_2,
           )}
         >
@@ -232,11 +237,7 @@ export function BasicInputs() {
             data-testid='salary-input'
           />
           <Select value={input.payPeriod} onValueChange={setPayPeriod}>
-            <SelectTrigger
-              id={payPeriodId}
-              className='w-full sm:w-[7.5rem]'
-              aria-labelledby={payPeriodLabelId}
-            >
+            <SelectTrigger id={payPeriodId} className='w-full' aria-labelledby={payPeriodLabelId}>
               <SelectValue placeholder='Annually' />
             </SelectTrigger>
             <SelectContent>
@@ -267,7 +268,7 @@ export function BasicInputs() {
           value={input.taxYear}
           onChange={setTaxYear}
           label=''
-          className='w-full sm:w-44'
+          className={selectControlClass}
           data-testid='tax-year-select'
         />
       </div>
@@ -287,7 +288,7 @@ export function BasicInputs() {
           onChange={handleTaxCodeChange}
           onFocus={() => trackCalculatorFieldFocus('tax_code')}
           placeholder={input.region === 'Scotland' ? 'S1257L' : '1257L'}
-          className='w-full uppercase sm:w-24'
+          className={cn(fieldControlClass, 'w-28 max-w-full uppercase')}
           maxLength={10}
           data-testid='tax-code-input'
         />
@@ -308,7 +309,7 @@ export function BasicInputs() {
         <Select value={input.region} onValueChange={setRegion}>
           <SelectTrigger
             id={regionId}
-            className='w-full sm:w-44'
+            className={selectControlClass}
             aria-labelledby={regionLabelId}
             data-testid='region-select'
           >
@@ -420,7 +421,7 @@ export function BasicInputs() {
         >
           <SelectTrigger
             id={ageId}
-            className='w-full sm:w-56'
+            className={longSelectControlClass}
             data-testid='age-select'
             aria-labelledby={ageLabelId}
           >
@@ -449,7 +450,7 @@ export function BasicInputs() {
           <Select value={undergraduateLoan} onValueChange={handleUndergraduateLoanChange}>
             <SelectTrigger
               id={studentLoanId}
-              className='w-full sm:w-52'
+              className={longSelectControlClass}
               aria-labelledby={studentLoanLabelId}
               data-testid='student-loan-select'
             >
@@ -516,7 +517,8 @@ export function BasicInputs() {
         </div>
         <div
           className={cn(
-            'grid w-full grid-cols-[5rem_minmax(0,1fr)] sm:flex sm:flex-1',
+            fieldControlClass,
+            'grid w-full max-w-[15rem] grid-cols-[4.75rem_minmax(0,1fr)] sm:grid-cols-[5rem_minmax(0,1fr)]',
             SPACING.GAP_1_5,
           )}
         >
@@ -531,7 +533,7 @@ export function BasicInputs() {
           >
             <SelectTrigger
               id={pensionTypeId}
-              className='w-full shrink-0 sm:w-20'
+              className='w-full shrink-0'
               aria-labelledby={pensionTypeLabelId}
               data-testid='pension-type-select'
             >
