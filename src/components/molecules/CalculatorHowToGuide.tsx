@@ -58,8 +58,8 @@ export function CalculatorHowToGuide() {
 
           <HowToStepCard
             step={4}
-            title='View & Export Results'
-            description='See your breakdown by income tax, National Insurance, and take-home pay across multiple periods. Export to CSV or print for your records.'
+            title='View & Email Results'
+            description='See your breakdown by income tax, National Insurance, and take-home pay across multiple periods. Email the results to keep a copy.'
           />
         </div>
       </div>

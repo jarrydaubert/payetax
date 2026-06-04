@@ -2,17 +2,24 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowUp, FileDown, Printer, Sparkles } from 'lucide-react';
+import { ArrowUp, Mail, Sparkles } from 'lucide-react';
 import * as React from 'react';
 import { createPortal } from 'react-dom';
 import { EmailResultsForm } from '@/components/molecules/EmailResultsForm';
 import { Card } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { ANIMATION_TRANSITIONS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
 import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { BREAKPOINTS, SCROLL_THRESHOLDS, TIMERS } from '@/constants/ui';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { trackEvent } from '@/lib/analytics';
-import { exportToCSV, printResults } from '@/lib/exportUtils';
 import { cn } from '@/lib/utils';
 import type { PayeEmailInput } from '@/lib/validation/emailValidation';
 import { useShallow } from '@/lib/zustandShallow';
@@ -197,58 +204,6 @@ export function CalculatorContainer() {
     setVisiblePeriods(periods);
   };
 
-  const handleExport = () => {
-    if (!results) return;
-    setActionMessage(null);
-    try {
-      exportToCSV(results);
-      trackEvent({
-        action: 'result_shared',
-        category: 'engagement',
-        label: 'csv_export',
-        custom_data: {
-          tax_year: input.taxYear,
-          region: input.region,
-        },
-      });
-    } catch {
-      setActionMessage({
-        tone: 'error',
-        text: 'Failed to export CSV. Please try again.',
-      });
-    }
-  };
-
-  const handlePrint = () => {
-    if (!results) return;
-    setActionMessage(null);
-    try {
-      printResults({
-        results,
-        visiblePeriods,
-        whatIfResults,
-        studentLoans: input.studentLoanPlans !== 'none' ? input.studentLoanPlans : [],
-        allowancesDeductions: input.allowancesDeductions,
-        previousYearResults,
-        taxYear: input.taxYear,
-      });
-      trackEvent({
-        action: 'result_shared',
-        category: 'engagement',
-        label: 'print',
-        custom_data: {
-          tax_year: input.taxYear,
-          region: input.region,
-        },
-      });
-    } catch {
-      setActionMessage({
-        tone: 'error',
-        text: 'Failed to open the print dialog. Please try again.',
-      });
-    }
-  };
-
   const handleApplyPensionOptimization = (pensionAmount: number) => {
     setActionMessage(null);
     try {
@@ -397,39 +352,36 @@ export function CalculatorContainer() {
                 isScottish: input.region === 'Scotland',
               }}
             />
-            {/* Email Results Form */}
+            {/* Results utility action */}
             <motion.div
               initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={shouldReduceMotion ? undefined : { opacity: 0, y: 20 }}
               transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.3 }}
-              className={cn(
-                'mt-2 flex flex-col items-stretch rounded-xl border border-border/70 bg-card/60 p-4 shadow-sm',
-                SPACING.GAP_3,
-              )}
+              className={cn('mt-3 flex flex-col items-stretch', SPACING.GAP_2, 'sm:items-end')}
             >
-              <EmailResultsForm input={emailInput} className='w-full' />
-
-              {/* Secondary actions - demoted to link-style for cleaner hierarchy */}
-              <div className='flex flex-wrap items-center gap-2 text-muted-foreground text-sm'>
-                <button
-                  type='button'
-                  onClick={handlePrint}
-                  className='inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 transition-colors hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:flex-none'
-                  aria-label='Print tax calculation results'
-                >
-                  <Printer className='h-3.5 w-3.5' />
-                  Print
-                </button>
-                <button
-                  type='button'
-                  onClick={handleExport}
-                  className='inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 transition-colors hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:flex-none'
-                  aria-label='Download results as CSV file'
-                >
-                  <FileDown className='h-3.5 w-3.5' />
-                  Download CSV
-                </button>
+              <div className='flex flex-wrap items-center gap-2 text-muted-foreground text-sm sm:justify-end'>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <button
+                      type='button'
+                      className='inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 transition-colors hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:flex-none'
+                      aria-label='Email tax calculation results'
+                    >
+                      <Mail className='h-3.5 w-3.5' />
+                      Email Results
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent className='border-border/60 bg-card text-card-foreground sm:max-w-md'>
+                    <DialogHeader>
+                      <DialogTitle>Email Results</DialogTitle>
+                      <DialogDescription>
+                        Send a copy of this calculation to your inbox.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <EmailResultsForm input={emailInput} className='w-full' />
+                  </DialogContent>
+                </Dialog>
               </div>
               {actionMessage && (
                 <p
