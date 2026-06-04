@@ -330,7 +330,7 @@ export function BasicInputs() {
         <div className='flex flex-wrap items-center gap-x-4 gap-y-3 sm:flex-nowrap'>
           <div className={fieldLabelClass}>
             <LabelTooltip fieldName='marriageAllowance' />
-            <Label htmlFor={marriedId} className={TYPOGRAPHY.TEXT_SM}>
+            <Label htmlFor={marriedId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
               Married
             </Label>
             <Checkbox
@@ -343,7 +343,7 @@ export function BasicInputs() {
 
           <div className={fieldLabelClass}>
             <LabelTooltip fieldName='blindAllowance' />
-            <Label htmlFor={blindId} className={TYPOGRAPHY.TEXT_SM}>
+            <Label htmlFor={blindId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
               Blind
             </Label>
             <Checkbox
@@ -355,8 +355,8 @@ export function BasicInputs() {
 
           <div className={fieldLabelClass}>
             <LabelTooltip fieldName='payNoNI' />
-            <Label htmlFor={payNoNIId} className={TYPOGRAPHY.TEXT_SM}>
-              I pay no NI
+            <Label htmlFor={payNoNIId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
+              No NI
             </Label>
             <Checkbox
               id={payNoNIId}

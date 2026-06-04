@@ -110,7 +110,7 @@ describe('BasicInputs Component', () => {
       render(<BasicInputs />);
       expect(screen.getByText('Married')).toBeInTheDocument();
       expect(screen.getByText('Blind')).toBeInTheDocument();
-      expect(screen.getByText('I pay no NI')).toBeInTheDocument();
+      expect(screen.getByText('No NI')).toBeInTheDocument();
     });
 
     it('should render age dropdown', () => {
@@ -176,6 +176,15 @@ describe('BasicInputs Component', () => {
       fireEvent.change(taxCodeInput, { target: { value: 'br' } });
 
       expect(mockSetTaxCode).toHaveBeenCalledWith('BR');
+    });
+
+    it('should pass partial alphanumeric tax code entry to the store', () => {
+      render(<BasicInputs />);
+
+      const taxCodeInput = screen.getByDisplayValue('1257L');
+      fireEvent.change(taxCodeInput, { target: { value: 'b' } });
+
+      expect(mockSetTaxCode).toHaveBeenCalledWith('B');
     });
 
     it('should call setIsMarried when married checkbox is toggled', () => {

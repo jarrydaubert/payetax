@@ -198,6 +198,17 @@ describe('Calculator Store Validation', () => {
       expect(useCalculatorStore.getState().input.taxCode).toBe('S1257L');
     });
 
+    it('should allow character-by-character entry of valid alphanumeric tax codes', () => {
+      const { setTaxCode } = useCalculatorStore.getState();
+
+      const typedStates = ['B', 'BR', 'K', 'K1', 'K10', 'K100', 'S', 'S1', 'S12', 'S1257L'];
+
+      for (const code of typedStates) {
+        setTaxCode(code);
+        expect(useCalculatorStore.getState().input.taxCode).toBe(code);
+      }
+    });
+
     it('should trim whitespace', () => {
       const { setTaxCode } = useCalculatorStore.getState();
 
