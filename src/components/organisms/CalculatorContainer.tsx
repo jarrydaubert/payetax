@@ -281,7 +281,7 @@ export function CalculatorContainer() {
       {/* Inputs Section - order-2 on mobile, left column on desktop (sticky) */}
       <Card
         className={cn(
-          'order-2 lg:sticky lg:top-4 lg:order-3 lg:self-start',
+          'order-2 mx-auto w-full max-w-xl lg:sticky lg:top-4 lg:order-3 lg:mx-0 lg:max-w-none lg:self-start',
           SPACING.P_3,
           'sm:p-4 md:p-6',
         )}

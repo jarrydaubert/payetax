@@ -166,7 +166,7 @@ export function BasicInputs() {
   };
 
   const fieldRowClass = cn(
-    'grid grid-cols-1 items-center min-[360px]:grid-cols-[auto_minmax(0,1fr)]',
+    'flex flex-col items-start sm:grid sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center',
     SPACING.GAP_2,
     'sm:gap-3',
   );
