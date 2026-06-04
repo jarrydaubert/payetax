@@ -123,7 +123,11 @@ export function CalculatorContainer() {
   // Lightweight scroll listener only for scroll-to-top button
   React.useEffect(() => {
     const handleScroll = () => {
-      setShowScrollTop(window.scrollY > SCROLL_THRESHOLDS.TOP_BUTTON);
+      const threshold =
+        window.innerWidth < BREAKPOINTS.LG
+          ? SCROLL_THRESHOLDS.TOP_BUTTON * 3
+          : SCROLL_THRESHOLDS.TOP_BUTTON;
+      setShowScrollTop(window.scrollY > threshold);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -279,30 +283,26 @@ export function CalculatorContainer() {
       {/* Header - CSS animation for better mobile LCP (no JS blocking) */}
       <div
         className={cn(
-          'order-1 py-6 text-center lg:col-span-2 lg:py-8',
+          'order-1 grid gap-4 border-border border-y py-5 text-left lg:col-span-2 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] lg:items-end lg:py-6',
           'fade-in slide-in-from-top-4 animate-in duration-500',
         )}
       >
-        <h2
-          className={cn(
-            'mb-3 bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text font-bold text-transparent',
-            TYPOGRAPHY.TEXT_4XL,
-            // Use literal string for responsive - dynamic template strings break Tailwind extraction
-            'md:text-5xl',
-          )}
-        >
-          UK Tax Calculator
-        </h2>
-        <p className={cn('mx-auto max-w-2xl text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
-          Estimate your take-home pay with official HMRC rates. Fast and free.
-        </p>
-        <div className='mx-auto mt-4 max-w-2xl rounded-lg border border-warning/30 bg-warning/10 p-3 text-left text-warning text-xs'>
-          <p>
-            <strong>Disclaimer:</strong> For illustrative purposes only. Not financial or tax
-            advice. Consult a qualified accountant for advice specific to your situation. Based on
-            HMRC rates for {input.taxYear} which may change.
+        <div>
+          <p className='mb-2 font-semibold text-primary text-xs uppercase tracking-[0.18em]'>
+            Calculator
+          </p>
+          <h2 className='font-display font-semibold text-3xl text-foreground leading-tight md:text-4xl'>
+            Calculate your take-home pay
+          </h2>
+          <p className='mt-2 max-w-2xl text-muted-foreground text-sm md:text-base'>
+            Enter a salary, choose the tax year and region, then check the period-by-period
+            breakdown against official HMRC rates.
           </p>
         </div>
+        <p className='border-border border-t pt-3 text-muted-foreground text-xs leading-relaxed lg:border-t-0 lg:border-l lg:pl-5'>
+          <strong className='font-semibold text-foreground'>Illustrative only.</strong> Not
+          financial or tax advice. Based on HMRC rates for {input.taxYear}, which may change.
+        </p>
       </div>
 
       {/* Summary Cards - Between inputs and table on mobile (order-4), top on desktop (order-2) */}
@@ -402,7 +402,7 @@ export function CalculatorContainer() {
             exit={shouldReduceMotion ? undefined : { opacity: 0 }}
             transition={shouldReduceMotion ? { duration: 0 } : undefined}
             className={cn(
-              'order-6 flex h-full items-center justify-center rounded-lg border border-dashed text-center lg:order-3',
+              'order-6 flex min-h-[28rem] items-center justify-center rounded-sm border border-dashed bg-card/70 text-center lg:order-3',
               'p-12',
             )}
           >

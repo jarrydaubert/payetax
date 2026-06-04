@@ -114,9 +114,9 @@ export function ProofStrip() {
   const ratesVerifiedDisplay = formatIsoDateForDisplay(RATES_LAST_VERIFIED);
 
   return (
-    <section className='py-8'>
-      <div className='container mx-auto max-w-4xl px-4'>
-        <div className='flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-muted-foreground text-sm'>
+    <section className='border-border border-y bg-background py-6'>
+      <div className='container mx-auto max-w-5xl px-4'>
+        <div className='flex flex-wrap items-center justify-center gap-x-7 gap-y-3 text-muted-foreground text-sm'>
           <span className='flex items-center gap-2'>
             <CheckCircle aria-hidden='true' className='size-4 flex-shrink-0 text-brand-accent' />
             HMRC rates verified {ratesVerifiedDisplay}
