@@ -4,6 +4,7 @@ import { checkRateLimitWithPolicy, createRateLimitHeaders } from '@/lib/rateLimi
 import { detectLikelyBotRequest } from '@/lib/security/botGuard';
 import { getClientIdentifier } from '@/lib/security/clientIdentifier';
 import { isValidRequestOrigin } from '@/lib/security/origin';
+import { captureOperationalFailure } from '@/lib/sentry';
 import { SendResultsRequestSchema } from '@/lib/validation/emailValidation';
 
 const MAX_BODY_SIZE = 50 * 1024; // 50KB
@@ -21,6 +22,13 @@ export async function POST(request: NextRequest) {
     'require_distributed_in_production',
   );
   if (rateLimit.reason === 'distributed_unavailable') {
+    captureOperationalFailure({
+      operation: 'send-results',
+      route: '/api/send-results',
+      reason: 'rate_limit_distributed_unavailable',
+      statusCode: 503,
+    });
+
     return NextResponse.json(
       { error: 'Email service temporarily unavailable. Please try again later.' },
       { status: 503 },
@@ -68,8 +76,23 @@ export async function POST(request: NextRequest) {
   const delivery = await sendPayeResultsEmail(validation.data);
   if (!delivery.ok) {
     if (delivery.reason === 'not_configured') {
+      captureOperationalFailure({
+        operation: 'send-results',
+        route: '/api/send-results',
+        reason: 'email_not_configured',
+        statusCode: 503,
+      });
+
       return NextResponse.json({ error: 'Email service not configured' }, { status: 503 });
     }
+
+    captureOperationalFailure({
+      operation: 'send-results',
+      route: '/api/send-results',
+      reason:
+        delivery.reason === 'unexpected_error' ? 'email_unexpected_error' : 'email_delivery_failed',
+      statusCode: 500,
+    });
 
     return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
   }

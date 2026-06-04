@@ -409,7 +409,7 @@ describe('CalculatorContainer Component', () => {
       render(<CalculatorContainer />);
 
       const section = screen.getByTestId('calculator-section');
-      expect(section).toHaveClass('px-2');
+      expect(section).toHaveClass('px-4');
       expect(section).toHaveClass('sm:px-4');
       expect(section).toHaveClass('xl:px-8');
     });

@@ -96,6 +96,21 @@ export interface APIErrorContext {
   requestParams?: Record<string, unknown>;
 }
 
+export interface OperationalFailureContext {
+  /** High-level operation that failed */
+  operation: 'send-results' | 'send-director-results';
+  /** Public API route where the failure happened */
+  route: '/api/send-results' | '/api/send-director-results';
+  /** Safe operational reason, without user payload details */
+  reason:
+    | 'rate_limit_distributed_unavailable'
+    | 'email_not_configured'
+    | 'email_delivery_failed'
+    | 'email_unexpected_error';
+  /** HTTP response code returned to the caller */
+  statusCode: 500 | 503;
+}
+
 export interface PerformanceContext {
   /** Operation being measured */
   operation: string;
@@ -105,6 +120,38 @@ export interface PerformanceContext {
   dataSize?: number;
   /** Whether operation completed successfully */
   success?: boolean;
+}
+
+/**
+ * Capture handled operational failures that still affect users.
+ *
+ * Use this for server-side failures where the route intentionally returns a JSON
+ * response instead of throwing. Do not include request payloads, email addresses,
+ * salaries, tax codes, or other user-entered data in this context.
+ */
+export function captureOperationalFailure(
+  context: OperationalFailureContext,
+  severity: ErrorSeverity = 'error',
+): string | undefined {
+  return Sentry.captureMessage(`Operational failure: ${context.reason}`, {
+    level: severity,
+    tags: {
+      error_type: 'operational_failure',
+      operation: context.operation,
+      route: context.route,
+      reason: context.reason,
+      status_code: String(context.statusCode),
+    },
+    contexts: {
+      operationalFailure: {
+        operation: context.operation,
+        route: context.route,
+        reason: context.reason,
+        statusCode: context.statusCode,
+      },
+    },
+    fingerprint: ['operational-failure', context.operation, context.reason],
+  });
 }
 
 /**

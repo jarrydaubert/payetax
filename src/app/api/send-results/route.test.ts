@@ -29,6 +29,12 @@ jest.mock('@/lib/email/outboundResultsDelivery', () => ({
   sendPayeResultsEmail: (...args: unknown[]) => sendResultsEmailMock(...args),
 }));
 
+const mockCaptureOperationalFailure = jest.fn();
+
+jest.mock('@/lib/sentry', () => ({
+  captureOperationalFailure: (...args: unknown[]) => mockCaptureOperationalFailure(...args),
+}));
+
 const ORIGINAL_ENV = process.env;
 function buildRequest(
   body: unknown,
@@ -88,6 +94,7 @@ describe('/api/send-results POST', () => {
   beforeEach(() => {
     sendResultsEmailMock.mockReset();
     sendResultsEmailMock.mockResolvedValue({ ok: true });
+    mockCaptureOperationalFailure.mockReset();
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
@@ -122,6 +129,7 @@ describe('/api/send-results POST', () => {
     expect(response.status).toBe(429);
     expect(json).toEqual({ error: 'Too many requests. Please try again later.' });
     expect(response.headers.get('Retry-After')).toBe('60');
+    expect(mockCaptureOperationalFailure).not.toHaveBeenCalled();
     expect(checkRateLimitWithPolicy).toHaveBeenCalledWith(
       'send-results:1.2.3.4',
       { max: 5, window: 60000 },
@@ -145,6 +153,12 @@ describe('/api/send-results POST', () => {
     expect(json).toEqual({
       error: 'Email service temporarily unavailable. Please try again later.',
     });
+    expect(mockCaptureOperationalFailure).toHaveBeenCalledWith({
+      operation: 'send-results',
+      route: '/api/send-results',
+      reason: 'rate_limit_distributed_unavailable',
+      statusCode: 503,
+    });
   });
 
   it('returns 503 when outbound email is not configured', async () => {
@@ -156,6 +170,12 @@ describe('/api/send-results POST', () => {
 
     expect(response.status).toBe(503);
     expect(json).toEqual({ error: 'Email service not configured' });
+    expect(mockCaptureOperationalFailure).toHaveBeenCalledWith({
+      operation: 'send-results',
+      route: '/api/send-results',
+      reason: 'email_not_configured',
+      statusCode: 503,
+    });
   });
 
   it('rejects invalid JSON payloads', async () => {
@@ -177,6 +197,7 @@ describe('/api/send-results POST', () => {
     expect(response.status).toBe(400);
     expect(json.error).toBe('Invalid request');
     expect(json.details).toBeDefined();
+    expect(mockCaptureOperationalFailure).not.toHaveBeenCalled();
   });
 
   it('rejects likely bot requests using honeypot fields', async () => {
@@ -190,6 +211,7 @@ describe('/api/send-results POST', () => {
 
     expect(response.status).toBe(400);
     expect(json).toEqual({ error: 'Invalid request' });
+    expect(mockCaptureOperationalFailure).not.toHaveBeenCalled();
   });
 
   it('sends the email when inputs are valid', async () => {
@@ -202,6 +224,7 @@ describe('/api/send-results POST', () => {
     expect(response.status).toBe(200);
     expect(json).toEqual({ success: true });
     expect(sendResultsEmailMock).toHaveBeenCalledTimes(1);
+    expect(mockCaptureOperationalFailure).not.toHaveBeenCalled();
   });
 
   it('returns 500 when outbound email delivery fails', async () => {
@@ -213,5 +236,11 @@ describe('/api/send-results POST', () => {
 
     expect(response.status).toBe(500);
     expect(json).toEqual({ error: 'Failed to send email' });
+    expect(mockCaptureOperationalFailure).toHaveBeenCalledWith({
+      operation: 'send-results',
+      route: '/api/send-results',
+      reason: 'email_delivery_failed',
+      statusCode: 500,
+    });
   });
 });

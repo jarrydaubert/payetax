@@ -29,6 +29,12 @@ jest.mock('@/lib/email/outboundResultsDelivery', () => ({
   sendDirectorResultsEmail: (...args: unknown[]) => sendResultsEmailMock(...args),
 }));
 
+const mockCaptureOperationalFailure = jest.fn();
+
+jest.mock('@/lib/sentry', () => ({
+  captureOperationalFailure: (...args: unknown[]) => mockCaptureOperationalFailure(...args),
+}));
+
 const ORIGINAL_ENV = process.env;
 function buildRequest(
   body: unknown,
@@ -89,6 +95,7 @@ describe('/api/send-director-results POST', () => {
   beforeEach(() => {
     sendResultsEmailMock.mockReset();
     sendResultsEmailMock.mockResolvedValue({ ok: true });
+    mockCaptureOperationalFailure.mockReset();
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
@@ -123,6 +130,7 @@ describe('/api/send-director-results POST', () => {
     expect(response.status).toBe(429);
     expect(json).toEqual({ error: 'Too many requests. Please try again later.' });
     expect(response.headers.get('Retry-After')).toBe('60');
+    expect(mockCaptureOperationalFailure).not.toHaveBeenCalled();
     expect(checkRateLimitWithPolicy).toHaveBeenCalledWith(
       'send-director-results:1.2.3.4',
       { max: 5, window: 60000 },
@@ -146,6 +154,12 @@ describe('/api/send-director-results POST', () => {
     expect(json).toEqual({
       error: 'Email service temporarily unavailable. Please try again later.',
     });
+    expect(mockCaptureOperationalFailure).toHaveBeenCalledWith({
+      operation: 'send-director-results',
+      route: '/api/send-director-results',
+      reason: 'rate_limit_distributed_unavailable',
+      statusCode: 503,
+    });
   });
 
   it('returns 503 when outbound email is not configured', async () => {
@@ -157,6 +171,12 @@ describe('/api/send-director-results POST', () => {
 
     expect(response.status).toBe(503);
     expect(json).toEqual({ error: 'Email service not configured' });
+    expect(mockCaptureOperationalFailure).toHaveBeenCalledWith({
+      operation: 'send-director-results',
+      route: '/api/send-director-results',
+      reason: 'email_not_configured',
+      statusCode: 503,
+    });
   });
 
   it('rejects invalid JSON payloads', async () => {
@@ -178,6 +198,7 @@ describe('/api/send-director-results POST', () => {
     expect(response.status).toBe(400);
     expect(json.error).toBe('Invalid request data');
     expect(json.details).toBeDefined();
+    expect(mockCaptureOperationalFailure).not.toHaveBeenCalled();
   });
 
   it('sends the email when inputs are valid', async () => {
@@ -190,6 +211,7 @@ describe('/api/send-director-results POST', () => {
     expect(response.status).toBe(200);
     expect(json).toEqual({ success: true });
     expect(sendResultsEmailMock).toHaveBeenCalledTimes(1);
+    expect(mockCaptureOperationalFailure).not.toHaveBeenCalled();
   });
 
   it('returns 500 when outbound email delivery fails', async () => {
@@ -201,5 +223,11 @@ describe('/api/send-director-results POST', () => {
 
     expect(response.status).toBe(500);
     expect(json).toEqual({ error: 'Failed to send email' });
+    expect(mockCaptureOperationalFailure).toHaveBeenCalledWith({
+      operation: 'send-director-results',
+      route: '/api/send-director-results',
+      reason: 'email_delivery_failed',
+      statusCode: 500,
+    });
   });
 });
