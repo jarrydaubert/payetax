@@ -59,8 +59,7 @@ export function CalculatorContainer() {
       region: state.input.region,
     })),
   );
-  const { calculate, calculatePreviousYear, setPensionContribution, setPensionContributionType } =
-    useCalculatorActions();
+  const { calculate, calculatePreviousYear, setInput } = useCalculatorActions();
   const [, startTransition] = React.useTransition();
   const [visiblePeriods, setVisiblePeriods] = React.useState<string[]>([
     'Yearly',
@@ -217,9 +216,11 @@ export function CalculatorContainer() {
         return;
       }
 
-      // Update pension contribution
-      setPensionContribution(pensionAmount);
-      setPensionContributionType('amount');
+      // Update both fields in one store write so the immediate recalculation reads the new value.
+      setInput({
+        pensionContribution: pensionAmount,
+        pensionContributionType: 'amount',
+      });
 
       // Recalculate
       calculate();
@@ -240,6 +241,28 @@ export function CalculatorContainer() {
       });
     }
   };
+
+  const emailResultsAction = (
+    <Dialog>
+      <DialogTrigger asChild>
+        <button
+          type='button'
+          className='inline-flex h-9 w-full items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 text-muted-foreground text-sm transition-colors hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:w-auto'
+          aria-label='Email tax calculation results'
+        >
+          <Mail className='h-3.5 w-3.5' />
+          Email Results
+        </button>
+      </DialogTrigger>
+      <DialogContent className='border-border/60 bg-card text-card-foreground sm:max-w-md'>
+        <DialogHeader>
+          <DialogTitle>Email Results</DialogTitle>
+          <DialogDescription>Send a copy of this calculation to your inbox.</DialogDescription>
+        </DialogHeader>
+        <EmailResultsForm input={emailInput} className='w-full' />
+      </DialogContent>
+    </Dialog>
+  );
 
   return (
     <div
@@ -345,6 +368,7 @@ export function CalculatorContainer() {
               onVisiblePeriodsChange={handleVisiblePeriodsChange}
               taxYear={input.taxYear}
               onApplyPensionOptimization={handleApplyPensionOptimization}
+              resultAction={emailResultsAction}
               marriageAllowance={{
                 isMarried: input.isMarried,
                 partnerGrossWage: input.partnerGrossWage,
@@ -352,51 +376,23 @@ export function CalculatorContainer() {
                 isScottish: input.region === 'Scotland',
               }}
             />
-            {/* Results utility action */}
-            <motion.div
-              initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={shouldReduceMotion ? undefined : { opacity: 0, y: 20 }}
-              transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.3 }}
-              className={cn('mt-3 flex flex-col items-stretch', SPACING.GAP_2, 'sm:items-end')}
-            >
-              <div className='flex flex-wrap items-center gap-2 text-muted-foreground text-sm sm:justify-end'>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <button
-                      type='button'
-                      className='inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 transition-colors hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:flex-none'
-                      aria-label='Email tax calculation results'
-                    >
-                      <Mail className='h-3.5 w-3.5' />
-                      Email Results
-                    </button>
-                  </DialogTrigger>
-                  <DialogContent className='border-border/60 bg-card text-card-foreground sm:max-w-md'>
-                    <DialogHeader>
-                      <DialogTitle>Email Results</DialogTitle>
-                      <DialogDescription>
-                        Send a copy of this calculation to your inbox.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <EmailResultsForm input={emailInput} className='w-full' />
-                  </DialogContent>
-                </Dialog>
-              </div>
-              {actionMessage && (
-                <p
-                  className={cn(
-                    'w-full rounded-md border px-3 py-2 text-sm',
-                    actionMessage.tone === 'error'
-                      ? 'border-destructive/30 bg-destructive/10 text-destructive'
-                      : 'border-primary/30 bg-primary/10 text-primary',
-                  )}
-                  role={actionMessage.tone === 'error' ? 'alert' : 'status'}
-                >
-                  {actionMessage.text}
-                </p>
-              )}
-            </motion.div>
+            {actionMessage && (
+              <motion.p
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={shouldReduceMotion ? undefined : { opacity: 0, y: 12 }}
+                transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2 }}
+                className={cn(
+                  'rounded-md border px-3 py-2 text-sm',
+                  actionMessage.tone === 'error'
+                    ? 'border-destructive/30 bg-destructive/10 text-destructive'
+                    : 'border-primary/30 bg-primary/10 text-primary',
+                )}
+                role={actionMessage.tone === 'error' ? 'alert' : 'status'}
+              >
+                {actionMessage.text}
+              </motion.p>
+            )}
           </motion.div>
         ) : (
           <motion.div

@@ -49,6 +49,7 @@ interface ResultsTableProps {
   onVisiblePeriodsChange?: (periods: string[]) => void;
   taxYear?: string;
   onApplyPensionOptimization?: (amount: number) => void;
+  resultAction?: React.ReactNode;
   // Marriage allowance detection
   marriageAllowance?: {
     isMarried?: boolean;
@@ -108,6 +109,7 @@ export function ResultsTable({
   onVisiblePeriodsChange,
   taxYear,
   onApplyPensionOptimization,
+  resultAction,
   marriageAllowance,
 }: ResultsTableProps) {
   const {
@@ -228,6 +230,7 @@ export function ResultsTable({
         periods={Object.keys(periodOptions)}
         visiblePeriods={visiblePeriods}
         onPeriodToggle={handlePeriodToggle}
+        action={resultAction}
       />
 
       {/* Results Table with Scroll Indicators */}
