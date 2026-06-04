@@ -41,6 +41,8 @@ interface NumberInputProps
   clearOnFocus?: boolean;
   /** Whether to show increment/decrement controls */
   showControls?: boolean;
+  /** Optional class for the outer wrapper when the input needs to size as a flex/grid item */
+  wrapperClassName?: string;
   /** Minimum allowed value (default: 0) */
   min?: number;
   /** Maximum allowed value */
@@ -61,6 +63,7 @@ const NumberInput = memo(
       onValueChange,
       decimals = 0,
       className,
+      wrapperClassName,
       prefix,
       suffix,
       clearOnFocus = true,
@@ -295,7 +298,7 @@ const NumberInput = memo(
         };
 
     return (
-      <div className={cn('relative flex items-center', disabled && 'opacity-60')}>
+      <div className={cn('relative flex items-center', disabled && 'opacity-60', wrapperClassName)}>
         {prefix && (
           <span
             className='pointer-events-none absolute left-3 z-10 text-foreground/70'
