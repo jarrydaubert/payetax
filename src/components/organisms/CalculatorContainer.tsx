@@ -403,26 +403,28 @@ export function CalculatorContainer() {
               animate={{ opacity: 1, y: 0 }}
               exit={shouldReduceMotion ? undefined : { opacity: 0, y: 20 }}
               transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.3 }}
-              className={cn('flex flex-col items-center', SPACING.GAP_4, 'lg:items-start')}
+              className={cn(
+                'mt-2 flex flex-col items-stretch rounded-xl border border-border/70 bg-card/60 p-4 shadow-sm',
+                SPACING.GAP_3,
+              )}
             >
-              <EmailResultsForm input={emailInput} className='w-full max-w-md' />
+              <EmailResultsForm input={emailInput} className='w-full' />
 
               {/* Secondary actions - demoted to link-style for cleaner hierarchy */}
-              <div className='flex items-center justify-center gap-4 text-muted-foreground text-sm lg:justify-start'>
+              <div className='flex flex-wrap items-center gap-2 text-muted-foreground text-sm'>
                 <button
                   type='button'
                   onClick={handlePrint}
-                  className='inline-flex items-center gap-1.5 hover:text-foreground hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                  className='inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 transition-colors hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:flex-none'
                   aria-label='Print tax calculation results'
                 >
                   <Printer className='h-3.5 w-3.5' />
                   Print
                 </button>
-                <span className='text-border'>|</span>
                 <button
                   type='button'
                   onClick={handleExport}
-                  className='inline-flex items-center gap-1.5 hover:text-foreground hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                  className='inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-md border border-border bg-background px-3 transition-colors hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:flex-none'
                   aria-label='Download results as CSV file'
                 >
                   <FileDown className='h-3.5 w-3.5' />
