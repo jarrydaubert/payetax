@@ -106,6 +106,18 @@ describe('ResultsTable Component', () => {
       expect(screen.getAllByText('Yearly').length).toBeGreaterThan(0);
     });
 
+    it('should render a supplied result action in the period controls', () => {
+      render(
+        <ResultsTable
+          results={mockResults}
+          resultAction={<button type='button'>Email Results</button>}
+        />,
+      );
+
+      expect(screen.getByText('Display Periods')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Email Results/i })).toBeInTheDocument();
+    });
+
     it('should render gross pay row', () => {
       render(<ResultsTable results={mockResults} />);
 

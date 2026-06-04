@@ -1,5 +1,6 @@
 // src/components/organisms/__tests__/CalculatorContainer.test.tsx
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import {
   useCalculatorActions,
@@ -29,7 +30,23 @@ jest.mock('../CalculatorResults/ResultsSummaryCards', () => ({
 }));
 
 jest.mock('../CalculatorResults/ResultsTable', () => ({
-  ResultsTable: () => <div data-testid='results-table-mock'>Results Table</div>,
+  ResultsTable: ({
+    resultAction,
+    onApplyPensionOptimization,
+  }: {
+    resultAction?: ReactNode;
+    onApplyPensionOptimization?: (amount: number) => void;
+  }) => (
+    <div data-testid='results-table-mock'>
+      Results Table
+      <div data-testid='results-action-slot'>{resultAction}</div>
+      {onApplyPensionOptimization && (
+        <button type='button' onClick={() => onApplyPensionOptimization(5000)}>
+          Apply pension optimization
+        </button>
+      )}
+    </div>
+  ),
 }));
 
 // Mock next/dynamic to bypass lazy loading in tests
@@ -101,12 +118,14 @@ describe('CalculatorContainer Component', () => {
 
   const mockCalculate = jest.fn();
   const mockCalculatePreviousYear = jest.fn();
+  const mockSetInput = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
     (useCalculatorActions as jest.Mock).mockReturnValue({
       calculate: mockCalculate,
       calculatePreviousYear: mockCalculatePreviousYear,
+      setInput: mockSetInput,
     });
     (useCalculatorResults as jest.Mock).mockReturnValue(null);
     (useCalculatorStore as jest.Mock).mockImplementation((selector) =>
@@ -271,6 +290,14 @@ describe('CalculatorContainer Component', () => {
       );
     });
 
+    it('should pass the email action into the results controls', () => {
+      render(<CalculatorContainer />);
+
+      expect(screen.getByTestId('results-action-slot')).toContainElement(
+        screen.getByRole('button', { name: /Email tax calculation results/i }),
+      );
+    });
+
     it('should not show the email input until the email action is opened', () => {
       render(<CalculatorContainer />);
 
@@ -294,6 +321,22 @@ describe('CalculatorContainer Component', () => {
       expect(
         screen.queryByRole('button', { name: /Download results as CSV file/i }),
       ).not.toBeInTheDocument();
+    });
+
+    it('should apply pension optimization before recalculating', () => {
+      render(<CalculatorContainer />);
+
+      fireEvent.click(screen.getByRole('button', { name: /Apply pension optimization/i }));
+
+      expect(mockSetInput).toHaveBeenCalledWith({
+        pensionContribution: 5000,
+        pensionContributionType: 'amount',
+      });
+      expect(mockCalculate).toHaveBeenCalledTimes(1);
+      expect(mockCalculatePreviousYear).toHaveBeenCalledTimes(1);
+      expect(mockSetInput.mock.invocationCallOrder[0]).toBeLessThan(
+        mockCalculate.mock.invocationCallOrder[0],
+      );
     });
   });
 
