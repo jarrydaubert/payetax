@@ -111,8 +111,7 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
     >
       <div
         className={cn(
-          'glass-card flex items-center gap-3 p-3',
-          'border-primary/20 bg-primary/5 backdrop-blur-lg',
+          'flex items-center gap-3 rounded-sm border border-primary/30 bg-primary/5 p-3',
           'dark:bg-primary/10',
         )}
       >

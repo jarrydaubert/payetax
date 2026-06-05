@@ -17,7 +17,6 @@ import {
   type TooltipContent as TooltipData,
   type TooltipFieldName,
 } from '@/config/inputTooltips';
-import { COMPONENT_GUIDELINES } from '@/constants/designTokens';
 import { formatTooltipText } from '@/lib/tooltipUtils';
 
 interface LabelTooltipProps {
@@ -66,7 +65,7 @@ export const LabelTooltip = memo(function LabelTooltip({
           aria-describedby={tooltipId}
           data-testid={`tooltip-trigger-${fieldName}`}
         >
-          <HelpCircle className={COMPONENT_GUIDELINES.TOOLTIPS.iconCompact} aria-hidden='true' />
+          <HelpCircle className='size-3.5' aria-hidden='true' />
         </button>
       </TooltipTrigger>
 

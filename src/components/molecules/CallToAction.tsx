@@ -57,7 +57,14 @@ export default function CallToAction({
   const SecondaryIcon = config.secondaryAction.icon;
 
   return (
-    <div className={cn('glass-card my-16 text-center', SPACING.P_8, 'md:p-12', className)}>
+    <div
+      className={cn(
+        'my-16 rounded-sm border border-border bg-card text-center',
+        SPACING.P_8,
+        'md:p-12',
+        className,
+      )}
+    >
       <IconComponent
         className={cn('mx-auto text-primary', SPACING.MB_6, ICON_SIZES.SIZE_12)}
         aria-hidden='true'
@@ -75,7 +82,7 @@ export default function CallToAction({
       </p>
 
       <div className='flex flex-col justify-center gap-4 sm:flex-row'>
-        <Button asChild variant='brandOutline' size='lg'>
+        <Button asChild variant='outline' size='lg'>
           {config.primaryAction.href.startsWith('mailto:') ? (
             <a href={config.primaryAction.href}>
               <PrimaryIcon className={`mr-2 ${ICON_SIZES.SIZE_4}`} aria-hidden='true' />

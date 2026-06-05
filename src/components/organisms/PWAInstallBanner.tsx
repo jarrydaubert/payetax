@@ -89,7 +89,7 @@ export default function PWAInstallBanner() {
 
   return (
     <div className='fixed top-24 right-4 left-4 z-40 sm:left-auto'>
-      <Card className='w-full max-w-sm border-border/50 bg-card/95 shadow-2xl backdrop-blur-xl'>
+      <Card className='w-full max-w-sm border-border bg-card'>
         <CardContent className='p-4'>
           <h2 className='font-semibold text-foreground text-sm'>Install PayeTax</h2>
           <p className='mt-1 text-muted-foreground text-sm'>
@@ -106,7 +106,7 @@ export default function PWAInstallBanner() {
           <Button type='button' variant='outline' size='sm' onClick={dismissBanner}>
             Not now
           </Button>
-          <Button type='button' size='sm' onClick={handleInstallClick} variant='brandOutline'>
+          <Button type='button' size='sm' onClick={handleInstallClick} variant='outline'>
             Install app
           </Button>
         </CardFooter>

@@ -489,82 +489,6 @@
     padding-right: 0 !important;
   }
 
-  /* Text gradient utility using brand colors */
-  .text-gradient {
-    color: var(--primary);
-    background: none;
-    -webkit-text-fill-color: currentColor;
-    filter: none;
-  }
-
-  /**
-   * Brand text gradient utilities - PAYTAX-96
-   * Common patterns for gradient text (used 12+ times across components)
-   */
-  .text-gradient-brand {
-    color: var(--primary);
-    background: none;
-    -webkit-text-fill-color: currentColor;
-    filter: none;
-  }
-
-  .text-gradient-brand-emphasis {
-    color: var(--primary);
-    background: none;
-    -webkit-text-fill-color: currentColor;
-    filter: none;
-    transition: color 0.2s ease;
-  }
-
-  /* Hover enhancement for text gradients (2025 addition) */
-  .text-gradient-brand:hover,
-  .text-gradient-brand-emphasis:hover {
-    color: color-mix(in oklch, var(--primary) 82%, var(--foreground));
-    filter: none;
-  }
-
-  /**
-   * Shared gradient-border button surface.
-   * Keeps interior dark while preserving a clearly visible brand border.
-   */
-  .btn-brand-outline {
-    background: transparent;
-    border-color: var(--primary);
-    transition: background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  }
-
-  .btn-brand-outline:hover {
-    background: var(--accent);
-    box-shadow: none;
-  }
-
-  /**
-   * Glass morphism effects
-   * Used for cards and overlays with backdrop blur
-   * Enhanced with OKLCH alpha support for better color consistency (2025)
-   */
-  .glass {
-    @apply border border-border bg-card shadow-none;
-  }
-
-  .glass-card {
-    @apply border border-border bg-card shadow-none;
-  }
-
-  .glass-card-inner {
-    @apply border border-border bg-background shadow-none;
-  }
-
-  /* Glass overlay with OKLCH alpha for overlays */
-  .glass-overlay {
-    background: color-mix(in oklch, var(--background) 92%, transparent);
-    backdrop-filter: none;
-  }
-
-  .dark .glass-overlay {
-    background: color-mix(in oklch, var(--background) 92%, transparent);
-  }
-
   /* Safe area utilities for fixed/sticky elements */
   .safe-bottom {
     bottom: calc(1.5rem + env(safe-area-inset-bottom));
@@ -951,12 +875,6 @@
 
   .grid > * {
     margin-bottom: 12pt;
-  }
-
-  /* Hide gradient backgrounds */
-  [class*="gradient"],
-  [class*="bg-gradient"] {
-    background: white !important;
   }
 
   /* Links */

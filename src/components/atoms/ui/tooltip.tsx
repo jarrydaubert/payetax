@@ -1,7 +1,6 @@
 import * as TooltipPrimitive from '@radix-ui/react-tooltip';
 import { type ComponentPropsWithoutRef, type ElementRef, forwardRef } from 'react';
 
-import { TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 /**
@@ -72,7 +71,7 @@ const TooltipContent = forwardRef<ElementRef<typeof TooltipPrimitive.Content>, T
           // Colors - neutral popover styling for readability
           'border border-border bg-popover text-popover-foreground shadow-md',
           // Typography
-          TYPOGRAPHY.TEXT_XS,
+          'text-xs',
           // Transform origin for animations
           'origin-[--radix-tooltip-content-transform-origin]',
           // Animations - respects reduced motion preference

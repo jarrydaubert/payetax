@@ -129,19 +129,6 @@ export const INPUT_TOOLTIPS = {
     note: "Only include items your employer marks as non-taxable (e.g., reimbursed expenses or 'Home Base'). This adds to take-home but does not reduce taxable income.",
   },
 
-  // What If Inputs
-  whatIfType: {
-    title: 'What If Scenario Type',
-    description: 'How you want to model a salary change',
-    note: 'Percentage: E.g., +10% raise\nAmount: E.g., +£5,000 bonus\nTotal: E.g., new job at £50,000',
-  },
-
-  whatIfValue: {
-    title: 'What If Value',
-    description: 'The amount of change to model',
-    note: 'Positive for increase, negative for decrease',
-  },
-
   // Director Intelligence Inputs
   directorRevenue: {
     title: 'Annual Revenue',

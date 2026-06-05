@@ -96,7 +96,7 @@ export function BlogSearch({ posts, className }: BlogSearchProps) {
 
       {/* Results dropdown */}
       {isOpen && query.trim() && (
-        <div className='absolute top-full right-0 left-0 z-50 mt-2 max-h-96 overflow-y-auto rounded-lg border border-border bg-card shadow-2xl'>
+        <div className='absolute top-full right-0 left-0 z-50 mt-2 max-h-96 overflow-y-auto rounded-sm border border-border bg-card'>
           {results.length > 0 ? (
             <ul className='divide-y divide-border'>
               {results.map(({ item: post }) => (

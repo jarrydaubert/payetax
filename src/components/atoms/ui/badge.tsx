@@ -1,13 +1,10 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 import type * as React from 'react';
-import { SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 const badgeVariants = cva(
   cn(
-    'inline-flex items-center border px-2.5 py-0.5 font-semibold transition-colors',
-    SURFACES.SHAPE_CIRCLE,
-    TYPOGRAPHY.TEXT_XS,
+    'inline-flex items-center rounded-full border px-2.5 py-0.5 font-semibold text-xs transition-colors',
   ),
   {
     variants: {

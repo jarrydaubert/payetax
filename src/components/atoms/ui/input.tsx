@@ -1,6 +1,5 @@
 import { type ComponentPropsWithoutRef, type ElementRef, forwardRef } from 'react';
 
-import { TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 export type InputProps = ComponentPropsWithoutRef<'input'>;
@@ -29,7 +28,7 @@ const Input = forwardRef<ElementRef<'input'>, InputProps>(({ className, ...props
       // Background - slight surface for visibility on dark backgrounds
       'bg-background',
       // Typography
-      TYPOGRAPHY.TEXT_SM,
+      'text-sm',
       // Placeholder
       'placeholder:text-muted-foreground',
       // Focus - ring with offset for visibility

@@ -53,7 +53,7 @@ export default function ToolsError({
             type='button'
             onClick={() => reset()}
             size='touch'
-            variant='brandOutline'
+            variant='outline'
             className='rounded-full px-6'
           >
             <RotateCcw className='size-4' aria-hidden='true' />

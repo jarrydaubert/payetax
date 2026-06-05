@@ -5,7 +5,7 @@ import { AlertTriangle, Copy, Home, RefreshCw, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ICON_SIZES, SHADOWS, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
+import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 /** Known benign errors that shouldn't be reported to Sentry */
@@ -130,19 +130,6 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
     };
   }, []);
 
-  // Generate stable particle data to avoid infinite re-renders
-  const particles = React.useMemo(
-    () =>
-      [...Array(15)].map((_, i) => ({
-        id: i,
-        left: Math.random() * 100,
-        top: Math.random() * 100,
-        delay: Math.random() * 3,
-        duration: 2 + Math.random() * 4,
-      })),
-    [],
-  );
-
   const handleCopyEventId = () => {
     if (eventId) {
       navigator.clipboard.writeText(eventId).then(() => {
@@ -158,38 +145,17 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
   };
 
   return (
-    <div className='relative flex min-h-screen items-center justify-center overflow-hidden'>
-      {/* Animated background */}
-      <div className='absolute inset-0 bg-gradient-to-br from-background via-destructive/20 to-background'>
-        {/* Floating error particles - hidden for reduced motion */}
-        <div className='absolute inset-0 motion-reduce:hidden'>
-          {particles.map((particle) => (
-            <div
-              key={`error-particle-${particle.id}`}
-              className='absolute size-2 animate-pulse rounded-full bg-destructive opacity-20 motion-reduce:animate-none'
-              style={{
-                left: `${particle.left}%`,
-                top: `${particle.top}%`,
-                animationDelay: `${particle.delay}s`,
-                animationDuration: `${particle.duration}s`,
-              }}
-            />
-          ))}
-        </div>
-      </div>
-
+    <div className='relative flex min-h-screen items-center justify-center overflow-hidden bg-background'>
       {/* Main content - responsive padding */}
       <div className={cn('relative z-10 w-full max-w-4xl', SPACING.PX_4)}>
         <div
           className={cn(
-            'glass-card text-center',
-            'border border-destructive/20',
+            'rounded-sm border border-destructive/30 bg-card text-center',
             SPACING.P_6,
             'md:p-12',
-            SHADOWS.XXL,
           )}
         >
-          {/* Error icon with animation - respects reduced motion */}
+          {/* Error icon */}
           <div className={cn('relative inline-block', SPACING.MB_8)}>
             <div
               className={cn(
@@ -201,16 +167,10 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
               )}
             >
               <AlertTriangle
-                className={cn(
-                  'text-destructive',
-                  'animate-pulse motion-reduce:animate-none',
-                  ICON_SIZES.SIZE_8,
-                  'md:size-10',
-                )}
+                className={cn('text-destructive', ICON_SIZES.SIZE_8, 'md:size-10')}
                 aria-hidden='true'
               />
             </div>
-            <div className='absolute inset-0 animate-ping rounded-full border-2 border-destructive/20 motion-reduce:animate-none' />
           </div>
 
           {/* Heading - responsive typography, focusable for a11y */}
@@ -246,8 +206,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
           {/* What happened section */}
           <div
             className={cn(
-              'glass-card',
-              'border border-warning/20 bg-warning/5',
+              'rounded-sm border border-warning/30 bg-warning/5',
               SPACING.P_6,
               SPACING.MB_8,
             )}
@@ -354,9 +313,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
               >
                 🔧 Developer Debug Info (Dev Mode Only)
               </summary>
-              <div
-                className={cn('glass-card', 'border border-warning/30 bg-warning/5', SPACING.P_4)}
-              >
+              <div className={cn('rounded-sm border border-warning/30 bg-warning/5', SPACING.P_4)}>
                 <h4 className={cn('font-semibold text-warning', SPACING.MB_2)}>Error Message:</h4>
                 <p className={cn('font-mono text-destructive', TYPOGRAPHY.TEXT_SM, SPACING.MB_4)}>
                   {error.message}

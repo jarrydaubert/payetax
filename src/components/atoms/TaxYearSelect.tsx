@@ -9,7 +9,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 import { cn } from '@/lib/utils';
 
@@ -101,7 +100,7 @@ export default function TaxYearSelect({
           htmlFor={selectId}
           className={cn(
             'mb-1 block font-medium text-foreground',
-            TYPOGRAPHY.TEXT_SM,
+            'text-sm',
             hideLabel && 'sr-only',
           )}
         >
@@ -117,8 +116,8 @@ export default function TaxYearSelect({
           className='w-full'
           data-testid={dataTestId}
         >
-          <div className={cn('flex items-center', SPACING.GAP_2)}>
-            <Calendar className={cn('text-foreground/70', ICON_SIZES.SIZE_4)} aria-hidden='true' />
+          <div className='flex items-center gap-2'>
+            <Calendar className='size-4 text-foreground/70' aria-hidden='true' />
             <SelectValue placeholder='Select tax year' />
           </div>
         </SelectTrigger>

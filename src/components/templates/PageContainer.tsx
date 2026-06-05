@@ -36,8 +36,8 @@ interface PageContainerProps {
   className?: string;
   /** Maximum width variant for the container */
   maxWidth?: MaxWidthVariant;
-  /** Whether to use glass styling (default: true) */
-  glass?: boolean;
+  /** Whether to wrap content in the standard bordered surface (default: true) */
+  surface?: boolean;
   /** ID for targeting with CSS or accessibility */
   id?: string;
   /**
@@ -56,7 +56,7 @@ const PageContainer: React.FC<PageContainerProps> = ({
   children,
   className,
   maxWidth = '5xl',
-  glass = true,
+  surface = true,
   id,
   includeNavbarSpacing = false,
 }) => {
@@ -72,9 +72,9 @@ const PageContainer: React.FC<PageContainerProps> = ({
         className,
       )}
     >
-      {glass ? (
-        <section className='glass-card relative overflow-hidden'>
-          <div className='glass-card-inner'>{children}</div>
+      {surface ? (
+        <section className='relative overflow-hidden rounded-sm border border-border bg-card'>
+          <div className='p-6 md:p-8'>{children}</div>
         </section>
       ) : (
         children

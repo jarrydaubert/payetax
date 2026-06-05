@@ -1,7 +1,6 @@
 import { cva, type VariantProps } from 'class-variance-authority';
 import type { ComponentPropsWithoutRef } from 'react';
 
-import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 export type EmptyProps = ComponentPropsWithoutRef<'div'>;
@@ -46,7 +45,7 @@ function EmptyHeader({ className, ...props }: EmptyHeaderProps) {
   return (
     <div
       data-slot='empty-header'
-      className={cn('flex max-w-sm flex-col items-center text-center', SPACING.GAP_2, className)}
+      className={cn('flex max-w-sm flex-col items-center gap-2 text-center', className)}
       {...props}
     />
   );
@@ -98,7 +97,7 @@ function EmptyTitle({ className, ...props }: EmptyTitleProps) {
   return (
     <h3
       data-slot='empty-title'
-      className={cn('font-medium tracking-tight', TYPOGRAPHY.TEXT_LG, className)}
+      className={cn('font-medium text-lg tracking-tight', className)}
       {...props}
     />
   );
@@ -116,7 +115,7 @@ function EmptyDescription({ className, ...props }: EmptyDescriptionProps) {
       className={cn(
         'text-muted-foreground',
         '[&>a:hover]:text-primary [&>a]:underline [&>a]:underline-offset-4',
-        TYPOGRAPHY.TEXT_SM,
+        'text-sm',
         className,
       )}
       {...props}

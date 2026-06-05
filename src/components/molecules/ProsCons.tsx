@@ -63,12 +63,7 @@ export function ProsCons({
   return (
     <div className={cn(isSideBySide ? 'grid gap-6 md:grid-cols-2' : SPACING.SPACE_Y_6, className)}>
       {/* Pros */}
-      <Card
-        className={cn(
-          'border-success/20 bg-gradient-to-br from-success/5 to-success/10',
-          SPACING.P_6,
-        )}
-      >
+      <Card className={cn('border-success/30 bg-success/5', SPACING.P_6)}>
         <h3
           className={cn(
             'flex items-center font-bold text-success',
@@ -94,12 +89,7 @@ export function ProsCons({
       </Card>
 
       {/* Cons */}
-      <Card
-        className={cn(
-          'border-warning/20 bg-gradient-to-br from-warning/5 to-warning/10',
-          SPACING.P_6,
-        )}
-      >
+      <Card className={cn('border-warning/30 bg-warning/5', SPACING.P_6)}>
         <h3
           className={cn(
             'flex items-center font-bold text-warning',
@@ -145,13 +135,7 @@ export function AdvantagesList({
   className,
 }: AdvantagesListProps) {
   return (
-    <Card
-      className={cn(
-        'border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5',
-        SPACING.P_6,
-        className,
-      )}
-    >
+    <Card className={cn('border-primary/30 bg-primary/5', SPACING.P_6, className)}>
       <h3 className={cn('font-bold text-primary', TYPOGRAPHY.TEXT_LG, SPACING.MB_4)}>{title}</h3>
       <ul className={SPACING.SPACE_Y_3}>
         {items.map((item) => (

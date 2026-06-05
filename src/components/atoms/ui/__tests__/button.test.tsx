@@ -44,20 +44,6 @@ describe('Button Component', () => {
       expect(button).toHaveClass('bg-background');
     });
 
-    it('should apply accentOutline variant styling', () => {
-      render(<Button variant='accentOutline'>Accent Outline</Button>);
-      const button = screen.getByRole('button');
-      expect(button).toHaveClass('border-primary/60');
-      expect(button).toHaveClass('bg-background');
-    });
-
-    it('should apply brandOutline variant styling', () => {
-      render(<Button variant='brandOutline'>Brand Outline</Button>);
-      const button = screen.getByRole('button');
-      expect(button).toHaveClass('btn-brand-outline');
-      expect(button).toHaveClass('border-primary');
-    });
-
     it('should apply secondary variant styling', () => {
       render(<Button variant='secondary'>Secondary</Button>);
       const button = screen.getByRole('button');

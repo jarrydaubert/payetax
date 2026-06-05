@@ -120,7 +120,7 @@ const CookieBanner: React.FC = () => {
           data-testid='cookie-banner'
           className='safe-bottom fixed right-4 bottom-4 left-4 z-40 sm:right-auto sm:w-[24rem]'
         >
-          <Card className='motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 border-border/70 bg-card/95 shadow-2xl backdrop-blur-xl motion-safe:animate-in'>
+          <Card className='border-border bg-card'>
             <CardContent className='p-4'>
               <div className='mb-3 flex items-start gap-3'>
                 <div className='mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/12'>
@@ -231,7 +231,7 @@ const CookieBanner: React.FC = () => {
             </Button>
             <Button
               type='button'
-              variant='accentOutline'
+              variant='outline'
               size='touch'
               onClick={handleSavePreferences}
               data-testid='cookie-modal-save'

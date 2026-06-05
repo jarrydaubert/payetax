@@ -86,10 +86,7 @@ export function MarriageAllowanceAlert({
   const monthlySaving = annualSaving / 12;
 
   return (
-    <Alert
-      variant='default'
-      className='border-2 border-primary/30 bg-gradient-to-r from-primary/10 to-accent/10'
-    >
+    <Alert variant='default' className='border-primary/30 bg-primary/5'>
       <Heart className={cn(ICON_SIZES.SIZE_5, 'self-start text-primary')} aria-hidden='true' />
       <div
         className={cn(
@@ -121,7 +118,7 @@ export function MarriageAllowanceAlert({
           asChild
           size='sm'
           className={cn(
-            'w-full whitespace-nowrap border border-primary/40 bg-card text-primary shadow-sm hover:bg-primary/10 hover:text-primary sm:w-auto',
+            'w-full whitespace-nowrap border border-primary/40 bg-card text-primary hover:bg-primary/10 hover:text-primary sm:w-auto',
             SPACING.GAP_2,
           )}
         >

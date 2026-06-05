@@ -135,25 +135,25 @@ describe('PageContainer Component', () => {
     });
   });
 
-  describe('Glass Styling', () => {
-    it('should render with glass styling by default', () => {
+  describe('Surface Styling', () => {
+    it('should render with the standard bordered surface by default', () => {
       const { container } = render(
         <PageContainer>
-          <div>Glass content</div>
+          <div>Surface content</div>
         </PageContainer>,
       );
-      expect(container.querySelector('.glass-card')).toBeInTheDocument();
-      expect(container.querySelector('.glass-card-inner')).toBeInTheDocument();
+      expect(container.querySelector('section')).toHaveClass('rounded-sm', 'border', 'bg-card');
+      expect(container.querySelector('.glass-card')).not.toBeInTheDocument();
     });
 
-    it('should render without glass styling when glass=false', () => {
+    it('should render without the wrapper surface when surface=false', () => {
       const { container } = render(
-        <PageContainer glass={false}>
-          <div>Non-glass content</div>
+        <PageContainer surface={false}>
+          <div>Plain content</div>
         </PageContainer>,
       );
-      expect(container.querySelector('.glass-card')).not.toBeInTheDocument();
-      expect(screen.getByText('Non-glass content')).toBeInTheDocument();
+      expect(container.querySelector('section')).not.toBeInTheDocument();
+      expect(screen.getByText('Plain content')).toBeInTheDocument();
     });
   });
 

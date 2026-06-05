@@ -3,8 +3,6 @@
 import { useId } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
-import { cn } from '@/lib/utils';
 
 interface PeriodCheckboxProps {
   /**
@@ -43,7 +41,7 @@ export function PeriodCheckbox({ period, checked, onCheckedChange }: PeriodCheck
   const checkboxId = `${id}-period-${period.toLowerCase()}`;
 
   return (
-    <div className={cn('flex items-center', SPACING.GAP_2)}>
+    <div className='flex items-center gap-2'>
       <Checkbox
         id={checkboxId}
         checked={checked}
@@ -54,7 +52,7 @@ export function PeriodCheckbox({ period, checked, onCheckedChange }: PeriodCheck
           }
         }}
       />
-      <Label htmlFor={checkboxId} className={cn('cursor-pointer font-normal', TYPOGRAPHY.TEXT_SM)}>
+      <Label htmlFor={checkboxId} className='cursor-pointer font-normal text-sm'>
         {period}
       </Label>
     </div>

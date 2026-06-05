@@ -41,11 +41,12 @@ describe('ScrollIndicator Component', () => {
       expect(indicator.className).toContain('justify-start');
     });
 
-    it('should have correct gradient for left', () => {
+    it('should use a flat edge surface for left', () => {
       const { container } = render(<ScrollIndicator direction='left' visible={true} />);
 
       const indicator = container.firstChild as HTMLElement;
-      expect(indicator.className).toContain('bg-gradient-to-r');
+      expect(indicator.className).toContain('bg-background/95');
+      expect(indicator.className).not.toContain('bg-gradient-to-r');
     });
 
     it('should render ChevronLeft icon', () => {
@@ -65,11 +66,12 @@ describe('ScrollIndicator Component', () => {
       expect(indicator.className).toContain('justify-end');
     });
 
-    it('should have correct gradient for right', () => {
+    it('should use a flat edge surface for right', () => {
       const { container } = render(<ScrollIndicator direction='right' visible={true} />);
 
       const indicator = container.firstChild as HTMLElement;
-      expect(indicator.className).toContain('bg-gradient-to-l');
+      expect(indicator.className).toContain('bg-background/95');
+      expect(indicator.className).not.toContain('bg-gradient-to-l');
     });
 
     it('should render ChevronRight icon', () => {
@@ -138,20 +140,20 @@ describe('ScrollIndicator Component', () => {
       expect(indicator.className).toContain('items-center');
     });
 
-    it('should have gradient background classes', () => {
+    it('should not use gradient background classes', () => {
       const { container } = render(<ScrollIndicator direction='left' visible={true} />);
 
       const indicator = container.firstChild as HTMLElement;
-      expect(indicator.className).toContain('from-background');
-      expect(indicator.className).toContain('to-transparent');
+      expect(indicator.className).not.toContain('from-background');
+      expect(indicator.className).not.toContain('to-transparent');
     });
 
     it('should have width classes', () => {
       const { container } = render(<ScrollIndicator direction='left' visible={true} />);
 
       const indicator = container.firstChild as HTMLElement;
-      expect(indicator.className).toContain('w-16');
-      expect(indicator.className).toContain('md:w-20');
+      expect(indicator.className).toContain('w-12');
+      expect(indicator.className).toContain('md:w-14');
     });
   });
 
@@ -163,11 +165,11 @@ describe('ScrollIndicator Component', () => {
       expect(icon).toHaveClass('text-primary');
     });
 
-    it('should have drop shadow on icon', () => {
+    it('should not have drop shadow on icon', () => {
       const { container } = render(<ScrollIndicator direction='left' visible={true} />);
 
       const icon = container.querySelector('svg');
-      expect(icon).toHaveClass('drop-shadow-lg');
+      expect(icon).not.toHaveClass('drop-shadow-lg');
     });
 
     it('should have responsive size classes on icon', () => {
@@ -180,8 +182,8 @@ describe('ScrollIndicator Component', () => {
     });
   });
 
-  describe('Animation Props', () => {
-    it('should render with Framer Motion component', () => {
+  describe('Visibility Props', () => {
+    it('should render the static component', () => {
       const { container } = render(<ScrollIndicator direction='left' visible={true} />);
 
       const indicator = container.firstChild;

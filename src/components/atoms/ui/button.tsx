@@ -2,7 +2,6 @@ import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { type ComponentPropsWithoutRef, type ElementRef, forwardRef } from 'react';
 
-import { TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
@@ -13,7 +12,7 @@ const buttonVariants = cva(
     // aria-disabled support for asChild (links don't support disabled attribute)
     'aria-disabled:pointer-events-none aria-disabled:opacity-50',
     '[&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
-    TYPOGRAPHY.TEXT_SM,
+    'text-sm',
   ),
   {
     variants: {
@@ -21,17 +20,13 @@ const buttonVariants = cva(
         default: 'bg-primary text-primary-foreground hover:bg-primary/90',
         destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
-        accentOutline:
-          'border border-primary/60 bg-background text-foreground hover:border-primary hover:bg-accent',
-        brandOutline:
-          'btn-brand-outline border border-primary bg-background text-foreground hover:bg-accent',
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {
         default: 'h-9 px-4 py-2',
-        sm: cn('h-8 rounded-sm px-3', TYPOGRAPHY.TEXT_XS),
+        sm: 'h-8 rounded-sm px-3 text-xs',
         lg: 'h-10 rounded-sm px-8',
         icon: 'size-9',
         // 44px min for WCAG 2.2 touch targets

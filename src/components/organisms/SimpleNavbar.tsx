@@ -125,7 +125,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
 
         {/* Desktop Utilities */}
         <div className={cn('hidden items-center justify-end md:flex', SPACING.GAP_2)}>
-          <Button asChild size='touch' variant='brandOutline' className='px-5 py-2.5 text-sm'>
+          <Button asChild size='touch' variant='outline' className='px-5 py-2.5 text-sm'>
             <Link href={`/${CALCULATOR_HASH}`} onClick={handleCalculatorClick}>
               Open Calculator
             </Link>
