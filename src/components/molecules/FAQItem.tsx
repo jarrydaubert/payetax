@@ -16,13 +16,13 @@ export function FAQItem({ question, children }: FAQItemProps) {
   return (
     <details
       className={cn(
-        'group overflow-hidden rounded-xl border-2 border-border/20 bg-card transition-all duration-300 hover:border-primary/40 hover:shadow-lg',
+        'group overflow-hidden rounded-sm border border-border bg-card transition-colors hover:border-primary/45',
         SPACING.P_6,
       )}
     >
       <summary
         className={cn(
-          'cursor-pointer font-bold text-foreground transition-colors hover:text-primary',
+          'cursor-pointer font-display font-semibold text-foreground transition-colors hover:text-primary',
           TYPOGRAPHY.TEXT_LG,
         )}
       >

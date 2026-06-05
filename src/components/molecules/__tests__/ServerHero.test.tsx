@@ -49,12 +49,12 @@ describe('ServerHero Component', () => {
     expect(screen.getByText('No signup needed')).toBeInTheDocument();
   });
 
-  it('should have text-gradient-brand class on outcome line', () => {
+  it('should style the outcome line with the Ledger accent', () => {
     const { container } = render(<ServerHero />);
 
-    const gradientText = container.querySelector('.text-gradient-brand');
-    expect(gradientText).toBeInTheDocument();
-    expect(gradientText?.textContent).toBe('See your take-home pay');
+    const accentText = screen.getByText('See your take-home pay');
+    expect(accentText).toHaveClass('text-primary');
+    expect(container.querySelector('.text-gradient-brand')).not.toBeInTheDocument();
   });
 
   it('should accept and apply custom className', () => {

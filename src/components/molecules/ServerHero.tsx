@@ -27,7 +27,7 @@ export default function ServerHero({ className }: ServerHeroProps) {
         className,
       )}
     >
-      <p className='mb-4 rounded-full border border-brand/20 bg-brand/5 px-4 py-1.5 font-medium text-brand text-sm'>
+      <p className='mb-4 rounded-sm border border-primary/25 bg-background px-4 py-1.5 font-medium text-primary text-sm uppercase tracking-[0.2em]'>
         Updated for {taxYearLabel}
       </p>
 
@@ -35,7 +35,7 @@ export default function ServerHero({ className }: ServerHeroProps) {
       <h1 className='mx-auto mb-5 max-w-4xl font-display font-semibold text-5xl text-on-brand leading-[0.98] tracking-tight sm:text-6xl lg:text-[4.75rem]'>
         UK PAYE tax calculator
         <br />
-        <span className='text-gradient-brand'>See your take-home pay</span>
+        <span className='text-primary'>See your take-home pay</span>
       </h1>
 
       {/* Tagline */}
@@ -49,10 +49,7 @@ export default function ServerHero({ className }: ServerHeroProps) {
         <HeroCTA
           href='#tax-calculator'
           trackingLabel='hero_start_calculating'
-          className={cn(
-            buttonVariants({ variant: 'brandOutline', size: 'touch' }),
-            'group px-8 text-on-brand',
-          )}
+          className={cn(buttonVariants({ size: 'touch' }), 'group px-8')}
         >
           See My Take Home Pay
         </HeroCTA>
@@ -60,7 +57,7 @@ export default function ServerHero({ className }: ServerHeroProps) {
           asChild
           variant='outline'
           size='touch'
-          className='border-border bg-transparent px-8 text-on-brand hover:border-primary/30 hover:bg-accent hover:text-on-brand'
+          className='border-border bg-card px-8 text-foreground hover:border-primary/45 hover:bg-card hover:text-foreground'
         >
           <Link href='/tools'>
             Explore Tax Tools
@@ -70,7 +67,7 @@ export default function ServerHero({ className }: ServerHeroProps) {
       </div>
 
       {/* Trust Strip */}
-      <div className='flex max-w-4xl flex-wrap justify-center gap-5 border-chrome-brand border-t py-6 sm:gap-8'>
+      <div className='flex max-w-4xl flex-wrap justify-center gap-5 border-border border-t py-6 sm:gap-8'>
         {[
           { icon: CheckCircle, text: 'Official HMRC rates' },
           { icon: CheckCircle, text: 'Fast in-browser results' },

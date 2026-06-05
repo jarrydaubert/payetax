@@ -69,13 +69,13 @@ export function SalaryComparisonTable() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-100px' }}
       transition={{ duration: 0.5 }}
-      className={cn('bg-gradient-to-br from-accent/5 to-primary/5', 'py-16')}
+      className='border-border/70 border-b bg-background py-16'
     >
       <div className={cn('mx-auto max-w-6xl', SPACING.PX_4)}>
         <div className={cn('text-center', SPACING.MB_10)}>
           <h2
             className={cn(
-              'bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-transparent',
+              'font-display font-semibold text-foreground leading-tight',
               SPACING.MB_3,
               TYPOGRAPHY.TEXT_4XL,
             )}
@@ -91,14 +91,14 @@ export function SalaryComparisonTable() {
           <ScrollIndicator direction='left' visible={showLeftIndicator} />
           <ScrollIndicator direction='right' visible={showRightIndicator} />
 
-          <Card className='overflow-hidden'>
+          <Card className='overflow-hidden rounded-sm border-border bg-card'>
             <section
               ref={comparisonTableRef}
               className='scroll-area-thin overflow-x-auto scroll-smooth'
               aria-label='Salary comparison table - scrollable'
             >
               <table className='w-full min-w-160 border-collapse'>
-                <thead className='bg-gradient-to-r from-primary/10 to-accent/10'>
+                <thead className='border-border border-b bg-background'>
                   <tr className='border-border/20 border-b'>
                     <th className={cn('text-left font-bold text-foreground', SPACING.P_4)}>
                       Gross Salary

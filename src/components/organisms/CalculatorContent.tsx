@@ -57,13 +57,13 @@ export function CalculatorContent() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-100px' }}
         transition={{ duration: 0.5 }}
-        className='bg-gradient-to-br from-accent/5 to-primary/5 py-16'
+        className='border-border/70 border-y bg-ledger-grid py-16'
       >
         <div className={cn('mx-auto max-w-4xl', SPACING.PX_4)}>
           <div className='mb-10 text-center'>
             <h2
               className={cn(
-                'bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-transparent',
+                'font-display font-semibold text-foreground leading-tight',
                 SPACING.MB_3,
                 TYPOGRAPHY.TEXT_4XL,
               )}

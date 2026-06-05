@@ -19,13 +19,13 @@ export function CalculatorHowToGuide() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-100px' }}
       transition={{ duration: 0.5 }}
-      className='bg-gradient-to-br from-primary/10 via-accent/5 to-transparent py-16'
+      className='border-border/70 border-b bg-background py-16'
     >
       <div className={cn('mx-auto max-w-5xl', SPACING.PX_4)}>
         <div className={cn('text-center', SPACING.MB_10)}>
           <h2
             className={cn(
-              'bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-transparent',
+              'font-display font-semibold text-foreground leading-tight',
               SPACING.MB_3,
               TYPOGRAPHY.TEXT_4XL,
             )}

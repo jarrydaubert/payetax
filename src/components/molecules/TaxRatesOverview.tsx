@@ -67,13 +67,13 @@ export function TaxRatesOverview() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
-      className='bg-gradient-to-br from-primary/5 to-accent/5 py-16'
+      className='border-border/70 border-y bg-ledger-grid py-16'
     >
       <div className={cn('mx-auto max-w-7xl', SPACING.PX_4)}>
         <div className='mb-10 text-center'>
           <h2
             className={cn(
-              'bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-transparent',
+              'font-display font-semibold text-foreground leading-tight',
               SPACING.MB_3,
               TYPOGRAPHY.TEXT_4XL,
             )}

@@ -421,8 +421,8 @@ describe('CalculatorContent Component', () => {
     it('should show step numbers visually', () => {
       const { container } = render(<CalculatorContent />);
 
-      // Check for numbered badges
-      const badges = container.querySelectorAll('.font-bold.text-2xl.text-white');
+      // Check for Ledger numbered badges.
+      const badges = container.querySelectorAll('.font-mono.font-semibold.text-primary');
       expect(badges.length).toBe(4);
     });
 
@@ -509,11 +509,13 @@ describe('CalculatorContent Component', () => {
   });
 
   describe('Styling and Animation', () => {
-    it('should have gradient backgrounds on sections', () => {
+    it('should use Ledger section backgrounds instead of gradients', () => {
       const { container } = render(<CalculatorContent />);
 
       const gradients = container.querySelectorAll('[class*="bg-gradient"]');
-      expect(gradients.length).toBeGreaterThan(0);
+      const ledgerSections = container.querySelectorAll('.bg-ledger-grid');
+      expect(gradients.length).toBe(0);
+      expect(ledgerSections.length).toBeGreaterThan(0);
     });
 
     it('should use Framer Motion for animations', () => {
