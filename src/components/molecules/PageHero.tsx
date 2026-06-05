@@ -1,7 +1,7 @@
 /**
  * PageHero Molecule
  *
- * Reusable page hero section with badge, title, and subtitle.
+ * Reusable Ledger page hero section with badge, title, and subtitle.
  * Used across all major pages (about, privacy, compliance, blog).
  *
  * Part of PAYTAX-109: Proper Page Architecture Refactor
@@ -33,7 +33,7 @@ export interface PageHeroBadge {
 export interface PageHeroProps {
   /** Optional badge above title */
   badge?: PageHeroBadge;
-  /** Main heading - supports React nodes for GradientText */
+  /** Main heading */
   title: React.ReactNode;
   /** Subtitle text - can be string or array of strings for multiple paragraphs */
   subtitle?: string | string[];
@@ -48,7 +48,7 @@ export interface PageHeroProps {
 /**
  * PageHero Component
  *
- * Displays a hero section with optional badge, title, and subtitle.
+ * Displays a Ledger hero section with optional badge, title, and subtitle.
  * Supports multiple subtitle paragraphs and customizable alignment.
  *
  * @example
@@ -57,8 +57,7 @@ export interface PageHeroProps {
  *   badge={{ icon: Sparkles, text: 'About PayeTax' }}
  *   title={
  *     <>
- *       <GradientText variant='brand-full'>Tax Calculations</GradientText>
- *       {' '}Built for Privacy
+ *       Tax Calculations Built for Privacy
  *     </>
  *   }
  *   subtitle="The UK tax calculator that respects your privacy..."
@@ -88,11 +87,7 @@ export function PageHero({
   const alignClass = align === 'center' ? 'text-center' : 'text-left';
 
   const backgroundClass =
-    variant === 'gradient'
-      ? 'bg-gradient-to-br from-primary/5 via-accent/5 to-transparent'
-      : variant === 'simple'
-        ? ''
-        : 'bg-gradient-to-br from-primary/5 via-accent/5 to-transparent';
+    variant === 'simple' ? '' : 'border-border/70 border-b bg-background bg-ledger-grid';
 
   const subtitles = Array.isArray(subtitle) ? subtitle : subtitle ? [subtitle] : [];
 
@@ -111,7 +106,7 @@ export function PageHero({
             <Badge
               variant={badge.variant || 'outline'}
               className={cn(
-                'mb-6 gap-2 border-primary/30 bg-primary/10 px-6 py-2.5 backdrop-blur-sm',
+                'mb-6 rounded-sm border-primary/35 bg-background px-5 py-2.5 text-primary uppercase tracking-[0.24em]',
                 SPACING.GAP_2,
               )}
             >
@@ -121,7 +116,13 @@ export function PageHero({
           )}
 
           {/* Title */}
-          <h1 className={cn('font-bold leading-tight', SPACING.MB_6, TYPOGRAPHY.TEXT_6XL)}>
+          <h1
+            className={cn(
+              'font-display font-semibold text-foreground leading-[0.98]',
+              SPACING.MB_6,
+              TYPOGRAPHY.TEXT_6XL,
+            )}
+          >
             {title}
           </h1>
 

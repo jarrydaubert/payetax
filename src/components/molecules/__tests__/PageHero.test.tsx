@@ -6,7 +6,6 @@
 
 import { render, screen } from '@testing-library/react';
 import { Sparkles } from 'lucide-react';
-import { GradientText } from '@/components/atoms/GradientText';
 import { PageHero } from '../PageHero';
 
 describe('PageHero', () => {
@@ -71,37 +70,39 @@ describe('PageHero', () => {
   });
 
   describe('Variants', () => {
-    it('applies gradient background by default', () => {
+    it('applies the Ledger grid background by default', () => {
       const { container } = render(<PageHero title='Title' />);
       const section = container.querySelector('section');
-      expect(section).toHaveClass('bg-gradient-to-br');
+      expect(section).toHaveClass('bg-ledger-grid');
+      expect(section).not.toHaveClass('bg-gradient-to-br');
     });
 
-    it('applies gradient background when variant="gradient"', () => {
+    it('keeps variant="gradient" on the Ledger background for migration compatibility', () => {
       const { container } = render(<PageHero title='Title' variant='gradient' />);
       const section = container.querySelector('section');
-      expect(section).toHaveClass('bg-gradient-to-br');
+      expect(section).toHaveClass('bg-ledger-grid');
+      expect(section).not.toHaveClass('bg-gradient-to-br');
     });
 
-    it('does not apply gradient when variant="simple"', () => {
+    it('does not apply the Ledger grid when variant="simple"', () => {
       const { container } = render(<PageHero title='Title' variant='simple' />);
       const section = container.querySelector('section');
-      expect(section).not.toHaveClass('bg-gradient-to-br');
+      expect(section).not.toHaveClass('bg-ledger-grid');
     });
   });
 
   describe('React Nodes', () => {
-    it('supports React nodes as title (e.g., GradientText)', () => {
+    it('supports React nodes as title', () => {
       render(
         <PageHero
           title={
             <>
-              <GradientText variant='brand-full'>Gradient</GradientText> Regular Text
+              <span>Styled</span> Regular Text
             </>
           }
         />,
       );
-      expect(screen.getByText(/Gradient/)).toBeInTheDocument();
+      expect(screen.getByText(/Styled/)).toBeInTheDocument();
       expect(screen.getByText(/Regular Text/)).toBeInTheDocument();
     });
   });

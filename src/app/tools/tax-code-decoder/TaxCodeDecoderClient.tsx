@@ -38,7 +38,7 @@ export function TaxCodeDecoderClient() {
       <div className='mb-12 text-center'>
         <h1
           className={cn(
-            'mb-4 bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text font-bold text-transparent',
+            'mb-4 font-display font-semibold text-foreground leading-tight',
             TYPOGRAPHY.TEXT_4XL,
           )}
         >
@@ -250,7 +250,7 @@ export function TaxCodeDecoderClient() {
           Know your tax code? Calculate your take-home pay.
         </p>
         <Link href='/'>
-          <Button size='lg' variant='brandOutline'>
+          <Button size='lg' variant='outline'>
             Open Tax Calculator
             <ArrowRight className={cn('ml-2', ICON_SIZES.SIZE_4)} />
           </Button>

@@ -102,13 +102,13 @@ export function MarriageAllowanceClient() {
     <div className={cn('mx-auto max-w-4xl', SPACING.PX_4, SPACING.PY_12)}>
       {/* Header */}
       <div className='mb-12 text-center'>
-        <div className='mb-4 inline-flex items-center gap-2 rounded-full bg-primary/15 px-4 py-2 text-primary'>
+        <div className='mb-4 inline-flex items-center gap-2 rounded-sm border border-primary/35 bg-background px-4 py-2 text-primary'>
           <Heart className={ICON_SIZES.SIZE_4} />
-          <span className='font-medium text-sm'>Marriage Allowance</span>
+          <span className='font-medium text-sm uppercase tracking-[0.2em]'>Marriage Allowance</span>
         </div>
         <h1
           className={cn(
-            'mb-4 bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text font-bold text-transparent',
+            'mb-4 font-display font-semibold text-foreground leading-tight',
             TYPOGRAPHY.TEXT_4XL,
           )}
         >
@@ -122,7 +122,7 @@ export function MarriageAllowanceClient() {
       </div>
 
       {/* Quick Summary Card */}
-      <Card className='mb-8 border-2 border-primary/20'>
+      <Card className='mb-8 border-primary/30'>
         <CardContent className='pt-6'>
           <div className='grid gap-6 text-center md:grid-cols-3'>
             <div>
@@ -355,7 +355,7 @@ export function MarriageAllowanceClient() {
           See your full household tax breakdown with Marriage Allowance applied.
         </p>
         <Link href='/?marriageAllowance=receiving'>
-          <Button size='lg' variant='brandOutline'>
+          <Button size='lg' variant='outline'>
             Calculate with Marriage Allowance
             <ArrowRight className={cn('ml-2', ICON_SIZES.SIZE_4)} />
           </Button>

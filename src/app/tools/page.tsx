@@ -1,7 +1,6 @@
 // src/app/tools/page.tsx
 import { ArrowRight, Wrench } from 'lucide-react';
 import Link from 'next/link';
-import { GradientText } from '@/components/atoms/GradientText';
 import { PageHero } from '@/components/molecules/PageHero';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { Card } from '@/components/ui/card';
@@ -71,14 +70,7 @@ export default function ToolsPage() {
       <div className={LAYOUT.PAGE_WRAPPER}>
         <PageHero
           badge={{ icon: Wrench, text: 'Free Tax Tools' }}
-          title={
-            <>
-              Free UK Tax{' '}
-              <GradientText variant='brand-full' as='span'>
-                Tools
-              </GradientText>
-            </>
-          }
+          title='Free UK Tax Tools'
           subtitle='Quick calculators and explainers built on current HMRC rates. No signup.'
         />
 
@@ -94,14 +86,14 @@ export default function ToolsPage() {
                 >
                   <Card
                     className={cn(
-                      'flex h-full flex-col justify-between rounded-2xl border-border/60 bg-card/70 p-5 backdrop-blur-sm transition-all duration-200',
-                      'hover:-translate-y-0.5 hover:border-primary/40 hover:bg-card/80',
+                      'flex h-full flex-col justify-between rounded-sm border-border bg-card p-5 transition-colors',
+                      'hover:border-primary/55',
                     )}
                   >
                     <div>
                       <h2
                         className={cn(
-                          'font-semibold text-foreground transition-colors group-hover:text-primary',
+                          'font-display font-semibold text-foreground transition-colors group-hover:text-primary',
                           TYPOGRAPHY.TEXT_XL,
                         )}
                       >
@@ -125,7 +117,7 @@ export default function ToolsPage() {
                       )}
                     >
                       Use Tool
-                      <ArrowRight className='size-4 transition-transform duration-200 group-hover:translate-x-0.5' />
+                      <ArrowRight className='size-4' />
                     </span>
                   </Card>
                 </Link>

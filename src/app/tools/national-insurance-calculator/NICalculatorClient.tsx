@@ -106,13 +106,13 @@ export function NICalculatorClient() {
     <div className={cn('mx-auto max-w-4xl', SPACING.PX_4, SPACING.PY_12)}>
       {/* Header */}
       <div className='mb-12 text-center'>
-        <div className='mb-4 inline-flex items-center gap-2 rounded-full bg-success/15 px-4 py-2 text-success'>
+        <div className='mb-4 inline-flex items-center gap-2 rounded-sm border border-primary/35 bg-background px-4 py-2 text-primary'>
           <Shield className={ICON_SIZES.SIZE_4} />
-          <span className='font-medium text-sm'>National Insurance</span>
+          <span className='font-medium text-sm uppercase tracking-[0.2em]'>National Insurance</span>
         </div>
         <h1
           className={cn(
-            'mb-4 bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text font-bold text-transparent',
+            'mb-4 font-display font-semibold text-foreground leading-tight',
             TYPOGRAPHY.TEXT_4XL,
           )}
         >
@@ -428,7 +428,7 @@ export function NICalculatorClient() {
           See your full take-home pay with tax, NI, pension, and student loans.
         </p>
         <Link href='/'>
-          <Button size='lg' variant='brandOutline'>
+          <Button size='lg' variant='outline'>
             Open Full Tax Calculator
             <ArrowRight className={cn('ml-2', ICON_SIZES.SIZE_4)} />
           </Button>

@@ -18,16 +18,18 @@ export const metadata: Metadata = {
 
 export default function OfflinePage() {
   return (
-    <div className='flex min-h-dvh items-center justify-center pt-20'>
+    <div className='flex min-h-dvh items-center justify-center bg-ledger-grid pt-20'>
       <div className='container mx-auto max-w-2xl px-4 text-center'>
-        <div className='glass-card p-8 md:p-16'>
+        <div className='border border-border bg-card p-8 md:p-16'>
           {/* Offline Icon */}
-          <div className='mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-warning/30 bg-warning/20'>
+          <div className='mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-sm border border-warning/40 bg-background'>
             <Wifi className={`${ICON_SIZES.SIZE_10} text-warning`} aria-hidden='true' />
           </div>
 
           {/* Title */}
-          <h1 className={cn('mb-4 font-bold text-foreground', TYPOGRAPHY.TEXT_4XL)}>
+          <h1
+            className={cn('mb-4 font-display font-semibold text-foreground', TYPOGRAPHY.TEXT_4XL)}
+          >
             You're Offline
           </h1>
 
@@ -38,8 +40,10 @@ export default function OfflinePage() {
           </p>
 
           {/* Features Available Offline */}
-          <div className='mb-8 rounded-lg border border-border bg-secondary/50 p-6'>
-            <h2 className={cn('mb-4 font-semibold text-foreground', TYPOGRAPHY.TEXT_XL)}>
+          <div className='mb-8 border border-border bg-background p-6'>
+            <h2
+              className={cn('mb-4 font-display font-semibold text-foreground', TYPOGRAPHY.TEXT_XL)}
+            >
               Available Offline:
             </h2>
             <div className='grid grid-cols-1 gap-4 text-left md:grid-cols-2'>
@@ -89,9 +93,9 @@ export default function OfflinePage() {
           </div>
 
           {/* Connection Status */}
-          <div className='mt-8 rounded-lg border border-primary/30 bg-primary/10 p-4'>
+          <div className='mt-8 border border-primary/30 bg-background p-4'>
             <p className={cn('text-primary', TYPOGRAPHY.TEXT_SM)}>
-              💡 <strong>Tip:</strong> When you're back online, PayeTax will automatically sync and
+              <strong>Tip:</strong> When you're back online, PayeTax will automatically sync and
               show the latest tax rates.
             </p>
           </div>
