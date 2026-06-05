@@ -46,24 +46,21 @@ export function SurvivalModePanel({ className }: { className?: string }) {
   return (
     <section
       data-testid='director-survival-mode'
-      className={cn(
-        'rounded-2xl border border-warning/20 bg-gradient-to-r from-warning/10 to-destructive/10 p-6',
-        className,
-      )}
+      className={cn('rounded-sm border border-warning/35 border-l-4 bg-card p-6', className)}
     >
       <div className='mb-4 flex items-start gap-3'>
-        <div className='mt-0.5 flex size-9 items-center justify-center rounded-xl bg-warning/15'>
+        <div className='mt-0.5 flex size-9 items-center justify-center rounded-sm border border-warning/35 bg-background'>
           <AlertTriangle className='size-5 text-warning' aria-hidden='true' />
         </div>
         <div>
-          <h2 className='font-semibold text-foreground text-xl'>Survival Mode</h2>
+          <h2 className='font-display font-semibold text-foreground text-xl'>Survival Mode</h2>
           <p className='mt-1 text-muted-foreground text-sm'>
             Your company has no distributable profit this year. Dividends aren&apos;t possible.
           </p>
         </div>
       </div>
 
-      <div className='rounded-xl border border-border/50 bg-background/70 p-4'>
+      <div className='rounded-sm border border-border/70 bg-background p-4'>
         <div className='mb-2 font-medium text-foreground'>NI credits threshold (illustrative)</div>
         <div className='text-muted-foreground text-sm'>
           NI credits typically require earnings around{' '}
@@ -75,19 +72,19 @@ export function SurvivalModePanel({ className }: { className?: string }) {
         </div>
 
         <div className='mt-4 grid gap-3 md:grid-cols-3'>
-          <div className='rounded-lg border border-border/50 bg-background/60 p-3'>
+          <div className='rounded-sm border border-border/70 bg-background p-3'>
             <div className='text-muted-foreground text-xs'>Company loss (estimate)</div>
             <div className='font-mono font-semibold text-warning'>
               {formatCurrency(Math.round(companyLossIfPaySalary), 0)}
             </div>
           </div>
-          <div className='rounded-lg border border-border/50 bg-background/60 p-3'>
+          <div className='rounded-sm border border-border/70 bg-background p-3'>
             <div className='text-muted-foreground text-xs'>Take-home (approx)</div>
             <div className='font-mono font-semibold text-success'>
               {formatCurrency(Math.round(niCreditsSalary), 0)}
             </div>
           </div>
-          <div className='rounded-lg border border-border/50 bg-background/60 p-3'>
+          <div className='rounded-sm border border-border/70 bg-background p-3'>
             <div className='text-muted-foreground text-xs'>NI credits</div>
             <div className='font-mono font-semibold text-foreground'>Yes (qualifying year)</div>
           </div>

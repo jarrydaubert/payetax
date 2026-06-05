@@ -6,7 +6,6 @@
  */
 'use client';
 
-import { GradientText } from '@/components/atoms/GradientText';
 import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario';
 import { cn, formatCurrency } from '@/lib/utils';
 import { useDirectorFormValue, useMonthlyModeOutput } from '@/store/directorGuideStore';
@@ -102,8 +101,8 @@ function SummaryCard({
   return (
     <article
       className={cn(
-        'rounded-xl border border-border bg-card p-5 transition-all hover:-translate-y-0.5 hover:border-border/80',
-        highlight && !isEmpty && 'border-primary/30 bg-gradient-to-br from-primary/10 to-success/5',
+        'rounded-sm border border-border bg-card p-5 transition-colors hover:border-primary/35',
+        highlight && !isEmpty && 'border-primary/35 bg-card',
       )}
       aria-label={ariaDescription}
     >
@@ -112,18 +111,13 @@ function SummaryCard({
       </div>
       <div
         className={cn(
-          'mb-1 font-semibold text-3xl tracking-tight',
+          'mb-1 font-mono font-semibold text-3xl tracking-tight',
           !highlight && 'text-foreground',
+          highlight && !isEmpty && 'text-primary',
           isEmpty && 'text-muted-foreground/60',
         )}
       >
-        {highlight && !isEmpty ? (
-          <GradientText variant='custom' className='bg-gradient-to-r from-primary to-success'>
-            {value}
-          </GradientText>
-        ) : (
-          value
-        )}
+        {value}
       </div>
       <div className={cn('text-muted-foreground text-xs', isEmpty && 'text-muted-foreground/60')}>
         {subtext}

@@ -18,6 +18,8 @@ describe('DirectorGuideWelcomeDialog', () => {
     const dialog = screen.getByRole('dialog');
     expect(dialog).toHaveClass('max-h-[calc(100dvh-env(safe-area-inset-top,0px)-1rem)]');
     expect(dialog).not.toHaveClass('top-2');
+    expect(dialog).toHaveClass('shadow-none');
+    expect(dialog).not.toHaveClass('shadow-2xl', 'backdrop-blur-xl');
 
     const closeButton = screen.getByRole('button', { name: /close/i });
     expect(closeButton).toHaveClass('h-11', 'w-11');

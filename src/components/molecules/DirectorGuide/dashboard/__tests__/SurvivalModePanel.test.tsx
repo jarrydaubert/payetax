@@ -21,10 +21,11 @@ describe('DirectorGuide SurvivalModePanel', () => {
   test('renders recommendation when profit is zero', () => {
     useDirectorGuideStore.setState({ strategyComparison: { grossProfit: 0 } as never } as never);
 
-    render(<SurvivalModePanel />);
+    const { container } = render(<SurvivalModePanel />);
 
     expect(screen.getByTestId('director-survival-mode')).toBeInTheDocument();
     expect(screen.getByText('Survival Mode')).toBeInTheDocument();
+    expect(container.querySelector('[class*="bg-gradient"]')).not.toBeInTheDocument();
 
     // 2026-27 LEL is £6,708.
     expect(screen.getAllByText(/£6,708/).length).toBeGreaterThan(0);

@@ -126,7 +126,7 @@ function MobileDrawer({
         {children}
       </div>
       {showResultsHint && (
-        <div className='border-border/40 border-t bg-background/95 px-4 pt-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)] backdrop-blur-sm'>
+        <div className='border-border/40 border-t bg-background px-4 pt-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)]'>
           <p className='text-center text-muted-foreground text-xs'>
             {inputsReady
               ? 'Results are ready. Close this view to see your dashboard.'
@@ -215,11 +215,11 @@ export function DashboardLayout({
           className='relative min-w-0 flex-1 overflow-y-auto bg-background'
         >
           {/* Mobile header with logo */}
-          <div className='sticky top-0 z-30 flex items-center justify-between border-border/40 border-b bg-background/95 px-4 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)] pb-3 backdrop-blur-sm lg:hidden'>
+          <div className='sticky top-0 z-30 flex items-center justify-between border-border/40 border-b bg-background px-4 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)] pb-3 lg:hidden'>
             <Link href='/' className='group' aria-label='PayeTax Home'>
               <span className='brand-wordmark text-foreground text-xl'>
                 paye
-                <span className='text-gradient-brand'>tax</span>
+                <span className='text-primary'>tax</span>
               </span>
             </Link>
             <span className='text-muted-foreground text-sm'>Director Intelligence</span>
@@ -284,10 +284,10 @@ export function DashboardLayout({
         <button
           type='button'
           onClick={handleToggleMobileInputs}
-          className='fixed right-6 bottom-6 z-40 rounded-full border border-primary/40 bg-card p-4 shadow-lg transition-transform hover:scale-105 hover:bg-primary/10 lg:hidden'
+          className='fixed right-6 bottom-6 z-40 rounded-sm border border-primary/40 bg-background p-4 transition-colors hover:border-primary/70 hover:bg-card lg:hidden'
           aria-label='Open calculator inputs'
         >
-          <Calculator className='size-6 text-foreground' />
+          <Calculator className='size-6 text-primary' />
         </button>
       )}
 
@@ -307,7 +307,7 @@ export function DashboardLayout({
         <button
           type='button'
           onClick={handleToggleMobileEducation}
-          className='fixed bottom-6 left-6 z-40 rounded-full border border-border/50 bg-card p-3 shadow-lg transition-transform hover:scale-105 lg:hidden'
+          className='fixed bottom-6 left-6 z-40 rounded-sm border border-border/70 bg-background p-3 transition-colors hover:border-primary/45 hover:bg-card lg:hidden'
           aria-label='Show learn panel'
         >
           <BookOpen className='size-5 text-primary' />

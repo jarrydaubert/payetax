@@ -266,14 +266,14 @@ export function SidebarNav({
       <Link
         href='/'
         className={cn(
-          'mb-4 flex items-center rounded-xl border border-border/50 bg-card text-foreground transition-colors hover:bg-accent/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+          'mb-4 flex items-center rounded-sm border border-border/70 bg-card text-foreground transition-colors hover:border-primary/45 hover:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background',
           collapsed
             ? 'size-10 justify-center p-0'
             : 'mb-3 min-h-11 w-full gap-2.5 px-2.5 py-2 xl:mb-4 xl:min-h-12 xl:gap-3 xl:px-3 xl:py-2.5',
         )}
         aria-label='PayeTax Home'
       >
-        <span className='flex size-9 items-center justify-center rounded-lg bg-gradient-to-br from-brand-gradient-start to-brand-gradient-end font-bold text-surface-brand'>
+        <span className='flex size-9 items-center justify-center rounded-sm border border-primary/25 bg-background font-bold text-primary'>
           P
         </span>
         <span
@@ -283,7 +283,7 @@ export function SidebarNav({
           )}
         >
           paye
-          <span className='text-gradient-brand'>tax</span>
+          <span className='text-primary'>tax</span>
         </span>
       </Link>
 

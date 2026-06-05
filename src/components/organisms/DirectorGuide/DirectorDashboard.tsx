@@ -34,7 +34,6 @@ import { EmailResultsDialog } from '@/components/molecules/DirectorGuide/EmailRe
 import { DirectorGuideWelcomeDialog } from '@/components/molecules/DirectorGuide/WelcomeDialog';
 import { Button } from '@/components/ui/button';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { SPACING } from '@/constants/designTokens';
 import {
   trackCalculationRun,
   trackGuideStarted,
@@ -257,8 +256,8 @@ export function DirectorDashboard() {
           <main className='p-6' data-testid='director-dashboard-main'>
             {/* Header */}
             <div className={inputsCollapsed ? 'mb-6 pl-12' : 'mb-6'}>
-              <h1 className='font-semibold text-2xl text-foreground'>
-                Director Pay <span className='text-gradient-brand'>Dashboard</span>
+              <h1 className='font-display font-semibold text-3xl text-foreground leading-tight'>
+                Director Pay <span className='text-primary'>Dashboard</span>
               </h1>
               <nav
                 aria-label='Director Intelligence navigation links'
@@ -293,7 +292,7 @@ export function DirectorDashboard() {
                 ) : (
                   <>
                     {isMonthlyMode && monthlyModeOutput && (
-                      <section className='rounded-xl border border-success/20 bg-success/10 p-4'>
+                      <section className='rounded-sm border border-success/30 bg-card p-4'>
                         <h3 className='font-semibold text-sm text-success uppercase tracking-wider'>
                           Safe Monthly Draw
                         </h3>
@@ -372,19 +371,8 @@ export function DirectorDashboard() {
                 )}
 
                 {/* Email CTA Banner */}
-                <div
-                  className={cn(
-                    'rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/10 to-success/10',
-                    SPACING.MT_8,
-                    SPACING.P_6,
-                  )}
-                >
-                  <div
-                    className={cn(
-                      'flex flex-col items-center justify-between sm:flex-row',
-                      SPACING.GAP_4,
-                    )}
-                  >
+                <div className='mt-8 rounded-sm border border-primary/25 bg-card p-6'>
+                  <div className='flex flex-col items-center justify-between gap-4 sm:flex-row'>
                     <div className='text-center sm:text-left'>
                       <h3 className='mb-1 font-semibold text-foreground text-lg'>
                         Save this breakdown for your records
@@ -396,7 +384,7 @@ export function DirectorDashboard() {
                     </div>
                     <Button
                       onClick={() => setEmailDialogOpen(true)}
-                      variant='brandOutline'
+                      variant='outline'
                       className='flex shrink-0 items-center gap-2 px-6 py-3 font-semibold'
                     >
                       <Mail className='size-4' aria-hidden='true' />
@@ -407,15 +395,15 @@ export function DirectorDashboard() {
               </div>
             ) : (
               /* Empty State */
-              <div className='flex min-h-[calc(100dvh-11rem)] flex-col items-center justify-center rounded-[1.75rem] border border-border/50 border-dashed bg-background/60 px-5 py-8 sm:min-h-[calc(100dvh-9rem)] sm:px-8 lg:min-h-screen'>
+              <div className='flex min-h-[calc(100dvh-11rem)] flex-col items-center justify-center rounded-sm border border-border/70 border-dashed bg-background px-5 py-8 sm:min-h-[calc(100dvh-9rem)] sm:px-8 lg:min-h-screen'>
                 <div className='mx-auto max-w-xl text-center'>
                   <p className='mb-3 font-semibold text-primary/90 text-xs uppercase tracking-[0.28em]'>
                     Start Here
                   </p>
-                  <div className='mx-auto mb-5 flex size-20 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-success/20'>
+                  <div className='mx-auto mb-5 flex size-20 items-center justify-center rounded-sm border border-primary/25 bg-card'>
                     <Calculator className='size-10 text-primary' />
                   </div>
-                  <h2 className='mb-3 font-semibold text-[1.7rem] text-foreground leading-tight sm:text-[2rem]'>
+                  <h2 className='mb-3 font-display font-semibold text-[1.7rem] text-foreground leading-tight sm:text-[2rem]'>
                     Enter your numbers to compare director pay options
                   </h2>
                   <p className='mx-auto max-w-2xl text-muted-foreground text-sm leading-7 sm:text-base'>
@@ -438,10 +426,7 @@ export function DirectorDashboard() {
                         copy: 'See take-home, tax pots, and common salary/dividend mixes.',
                       },
                     ].map((item) => (
-                      <div
-                        key={item.title}
-                        className='rounded-2xl border border-border/60 bg-card/70 p-4'
-                      >
+                      <div key={item.title} className='rounded-sm border border-border bg-card p-4'>
                         <h3 className='mb-1 font-medium text-foreground text-sm'>{item.title}</h3>
                         <p className='text-muted-foreground text-sm leading-6'>{item.copy}</p>
                       </div>
@@ -457,21 +442,16 @@ export function DirectorDashboard() {
                     <Button
                       type='button'
                       onClick={() => setMobileInputsOpen(true)}
-                      variant='brandOutline'
+                      variant='outline'
                       className='inline-flex min-h-11 items-center gap-2 px-5 py-3 font-semibold lg:hidden'
                     >
                       <Calculator className='size-4' aria-hidden='true' />
                       Open Calculator
                     </Button>
 
-                    <div
-                      className={cn(
-                        'flex items-center justify-center text-muted-foreground text-sm',
-                        SPACING.GAP_2,
-                      )}
-                    >
+                    <div className='flex items-center justify-center gap-2 text-muted-foreground text-sm'>
                       <span
-                        className='size-2 rounded-full bg-primary motion-safe:animate-pulse'
+                        className='size-2 rounded-full border border-primary/50 bg-primary'
                         aria-hidden='true'
                       />
                       On mobile, tap the calculator button to enter your figures.
