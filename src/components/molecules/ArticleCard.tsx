@@ -92,7 +92,18 @@ function formatPublishedDateShort(isoDate: string): string {
 
 /** Common focus styles for card links */
 const focusStyles =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-xl';
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded-sm';
+
+const cardSurface = cn(
+  'group relative overflow-hidden rounded-sm border border-border bg-card transition-colors',
+  'hover:border-primary/55',
+);
+
+const categoryBadge =
+  'absolute top-3 left-3 border border-primary/35 bg-background/90 px-2.5 py-1 font-semibold text-[11px] text-primary uppercase tracking-[0.22em] sm:top-4 sm:left-4 sm:px-3 sm:text-xs sm:tracking-wider';
+
+const cardTitle =
+  'font-display font-semibold text-foreground leading-tight transition-colors group-hover:text-primary';
 
 /**
  * Large Article Card
@@ -102,14 +113,7 @@ export function ArticleCardLarge({ post, className, priority = false }: ArticleC
   const { categoryConfig, imageSrc, blurDataUrl, href, alt, formattedDate } = deriveCardModel(post);
 
   return (
-    <article
-      className={cn(
-        'group relative overflow-hidden rounded-[1.15rem] bg-card/60 transition-all duration-200',
-        'border border-border/60 hover:border-primary/50',
-        'motion-safe:hover:-translate-y-0.5',
-        className,
-      )}
-    >
+    <article className={cn(cardSurface, className)}>
       <Link href={href} className={cn('block', focusStyles)}>
         {/* Image container - 16:10 aspect ratio */}
         <div className='relative aspect-[16/10] overflow-hidden'>
@@ -117,7 +121,7 @@ export function ArticleCardLarge({ post, className, priority = false }: ArticleC
             src={imageSrc}
             alt={alt}
             fill
-            className='object-cover transition-transform duration-300 group-hover:scale-105'
+            className='object-cover'
             sizes='(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 60vw'
             placeholder='blur'
             blurDataURL={blurDataUrl}
@@ -125,14 +129,12 @@ export function ArticleCardLarge({ post, className, priority = false }: ArticleC
           />
 
           {/* Category badge */}
-          <span className='absolute top-3 left-3 rounded-full bg-primary px-2.5 py-1 font-semibold text-[11px] text-primary-foreground uppercase tracking-[0.22em] sm:top-4 sm:left-4 sm:px-3 sm:text-xs sm:tracking-wider'>
-            {categoryConfig.label}
-          </span>
+          <span className={categoryBadge}>{categoryConfig.label}</span>
         </div>
 
         {/* Content */}
         <div className='p-4 sm:p-5'>
-          <h3 className='mb-2 line-clamp-2 font-display font-semibold text-[1.35rem] text-foreground leading-tight transition-colors group-hover:text-primary sm:text-lg md:text-xl'>
+          <h3 className={cn('mb-2 line-clamp-2 text-[1.35rem] sm:text-lg md:text-xl', cardTitle)}>
             {post.title}
           </h3>
 
@@ -161,36 +163,29 @@ export function ArticleCardSmall({ post, className }: ArticleCardProps) {
     deriveCardModel(post);
 
   return (
-    <article
-      className={cn(
-        'group relative overflow-hidden rounded-lg bg-card/60 transition-all duration-200',
-        'border border-border/60 hover:border-primary/50',
-        'motion-safe:hover:-translate-y-0.5',
-        className,
-      )}
-    >
+    <article className={cn(cardSurface, className)}>
       <Link href={href} className={cn('flex gap-3 p-3 sm:gap-4', focusStyles)}>
         {/* Thumbnail - square */}
-        <div className='relative size-[4.5rem] shrink-0 overflow-hidden rounded-xl sm:size-20 sm:rounded-md'>
+        <div className='relative size-[4.5rem] shrink-0 overflow-hidden border border-border sm:size-20'>
           <Image
             src={imageSrc}
             alt={alt}
             fill
-            className='object-cover transition-transform duration-300 group-hover:scale-105'
+            className='object-cover'
             sizes='80px'
             placeholder='blur'
             blurDataURL={blurDataUrl}
           />
 
           {/* Category badge overlay */}
-          <span className='absolute bottom-1 left-1 rounded bg-primary px-1.5 py-0.5 font-semibold text-[10px] text-primary-foreground uppercase sm:text-xs'>
+          <span className='absolute bottom-1 left-1 border border-primary/35 bg-background/90 px-1.5 py-0.5 font-semibold text-[10px] text-primary uppercase sm:text-xs'>
             {categoryConfig.label.split(' ')[0]}
           </span>
         </div>
 
         {/* Content */}
         <div className='flex flex-1 flex-col justify-center py-1'>
-          <h3 className='mb-1 line-clamp-2 font-display font-semibold text-[0.95rem] text-foreground leading-5 transition-colors group-hover:text-primary sm:text-sm'>
+          <h3 className={cn('mb-1 line-clamp-2 text-[0.95rem] leading-5 sm:text-sm', cardTitle)}>
             {post.title}
           </h3>
 
@@ -215,14 +210,7 @@ export function ArticleCardDeepDive({ post, className }: ArticleCardProps) {
     deriveCardModel(post);
 
   return (
-    <article
-      className={cn(
-        'group relative overflow-hidden rounded-xl bg-card/60 transition-all duration-200',
-        'border border-border/60 hover:border-primary/50',
-        'motion-safe:hover:-translate-y-0.5',
-        className,
-      )}
-    >
+    <article className={cn(cardSurface, className)}>
       <Link href={href} className={cn('block', focusStyles)}>
         {/* Image container - 16:10 aspect ratio */}
         <div className='relative aspect-[16/10] overflow-hidden'>
@@ -230,23 +218,19 @@ export function ArticleCardDeepDive({ post, className }: ArticleCardProps) {
             src={imageSrc}
             alt={alt}
             fill
-            className='object-cover transition-transform duration-300 group-hover:scale-105'
+            className='object-cover'
             sizes='(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw'
             placeholder='blur'
             blurDataURL={blurDataUrl}
           />
 
           {/* Category badge */}
-          <span className='absolute top-3 left-3 rounded-full bg-primary px-2.5 py-0.5 font-semibold text-primary-foreground text-xs uppercase tracking-wider'>
-            {categoryConfig.label}
-          </span>
+          <span className={categoryBadge}>{categoryConfig.label}</span>
         </div>
 
         {/* Content */}
         <div className='p-4'>
-          <h3 className='mb-2 line-clamp-2 font-display font-semibold text-base text-foreground transition-colors group-hover:text-primary'>
-            {post.title}
-          </h3>
+          <h3 className={cn('mb-2 line-clamp-2 text-base', cardTitle)}>{post.title}</h3>
 
           <p className='mb-3 line-clamp-2 text-muted-foreground text-sm'>{post.excerpt}</p>
 

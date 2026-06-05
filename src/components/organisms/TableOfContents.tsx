@@ -86,11 +86,11 @@ export function TableOfContents({ content, className }: TableOfContentsProps) {
   return (
     <nav className={cn('hidden xl:block', className)} aria-label='Table of contents'>
       <div className='sticky top-24'>
-        <div className='mb-3 flex items-center gap-2 font-semibold text-foreground'>
+        <div className='mb-3 flex items-center gap-2 font-semibold text-primary text-xs uppercase tracking-[0.24em]'>
           <List className={ICON_SIZES.SIZE_4} aria-hidden='true' />
-          <span className={TYPOGRAPHY.TEXT_SM}>On this page</span>
+          <span>On this page</span>
         </div>
-        <ul className='space-y-2 border-foreground/10 border-l'>
+        <ul className='space-y-2 border-border border-l'>
           {headings.map((heading) => {
             const isActive = activeId === heading.id;
             return (

@@ -285,7 +285,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       <BlogArticleAnalytics slug={post.slug} category={post.categoryData?.name || post.category} />
 
       <ReadingProgress />
-      <div className='min-h-screen pt-20 md:pt-24'>
+      <div className='min-h-screen bg-ledger-grid pt-20 md:pt-24'>
         <div className='container mx-auto max-w-4xl px-4 pb-12 md:px-6 lg:max-w-5xl lg:px-8 xl:max-w-6xl 2xl:max-w-7xl'>
           <nav aria-label='Breadcrumb' className={cn('mb-8', TYPOGRAPHY.TEXT_SM)}>
             <ol className='flex flex-wrap items-center gap-1 text-muted-foreground'>
@@ -316,7 +316,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <div className='mb-4 flex flex-wrap items-center gap-2'>
                 <span
                   className={cn(
-                    'rounded-full bg-primary/10 px-3 py-1 font-medium text-primary',
+                    'border border-primary/35 bg-background px-3 py-1 font-medium text-primary uppercase tracking-[0.2em]',
                     TYPOGRAPHY.TEXT_XS,
                   )}
                 >
@@ -326,7 +326,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   <span
                     key={tag}
                     className={cn(
-                      'rounded-full bg-foreground/5 px-2.5 py-1 text-foreground/70',
+                      'border border-border bg-card px-2.5 py-1 text-foreground/70',
                       TYPOGRAPHY.TEXT_XS,
                     )}
                   >
@@ -337,7 +337,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
               <h1
                 className={cn(
-                  'mb-4 font-bold text-foreground leading-tight md:mb-6',
+                  'mb-4 max-w-4xl font-display font-semibold text-foreground leading-[0.98] md:mb-6',
                   TYPOGRAPHY.TEXT_4XL,
                   'md:text-5xl',
                 )}
@@ -393,7 +393,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </div>
             </header>
             {post.image && (
-              <div className='relative -mx-4 mb-8 aspect-video overflow-hidden md:-mx-6 md:mb-12 md:rounded-xl lg:-mx-8'>
+              <div className='relative mb-8 aspect-video overflow-hidden border border-border md:mb-12'>
                 <Image
                   src={post.image}
                   alt={post.imageAlt || post.title}
@@ -412,7 +412,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <div
                 className={cn(
                   'prose prose-lg dark:prose-invert min-w-0 max-w-none flex-1',
-                  'prose-headings:font-bold prose-headings:text-foreground',
+                  'prose-headings:font-display prose-headings:font-semibold prose-headings:text-foreground',
                   'prose-p:text-foreground/90 prose-p:leading-relaxed',
                   'prose-strong:font-semibold prose-strong:text-foreground',
                   'prose-ol:text-foreground/90 prose-ul:text-foreground/90',
@@ -429,8 +429,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </div>
             </div>
             <BlogDisclaimer className='mt-12 md:mt-16' />
-            <section className='mt-8 rounded-xl border border-primary/20 bg-primary/5 p-6 md:p-8'>
-              <h3 className='mb-2 font-semibold text-foreground'>Useful tools for this topic</h3>
+            <section className='mt-8 border border-border bg-card p-6 md:p-8'>
+              <h3 className='mb-2 font-display font-semibold text-2xl text-foreground'>
+                Useful tools for this topic
+              </h3>
               <p className={cn('mb-4 text-foreground/70', TYPOGRAPHY.TEXT_SM)}>
                 Jump straight into calculators and guides relevant to what you just read.
               </p>
@@ -439,7 +441,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   <Link
                     key={link.id}
                     href={link.href}
-                    className='rounded-lg border border-primary/20 bg-background/80 p-3 transition-colors hover:border-primary/35 hover:bg-primary/5'
+                    className='border border-border bg-background p-3 transition-colors hover:border-primary/55'
                   >
                     <p className='font-medium text-foreground'>{link.title}</p>
                     <p className={cn('text-foreground/70', TYPOGRAPHY.TEXT_XS)}>
@@ -449,10 +451,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 ))}
               </div>
             </section>
-            <div className='mt-8 rounded-xl border border-primary/20 bg-primary/5 p-6 md:p-8'>
+            <div className='mt-8 border border-border bg-card p-6 md:p-8'>
               <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
                 <div>
-                  <h3 className='mb-2 font-semibold text-foreground'>Found this helpful?</h3>
+                  <h3 className='mb-2 font-display font-semibold text-2xl text-foreground'>
+                    Found this helpful?
+                  </h3>
                   <p className={cn('text-foreground/70', TYPOGRAPHY.TEXT_SM)}>
                     Try our free UK tax calculator to see how much you&apos;ll take home.
                   </p>
@@ -472,7 +476,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
           {relatedPosts.length > 0 && (
             <section className='mt-12 border-foreground/10 border-t pt-12 md:mt-16 md:pt-16'>
-              <h2 className={cn('mb-6 font-bold text-foreground md:mb-8', TYPOGRAPHY.TEXT_2XL)}>
+              <h2
+                className={cn(
+                  'mb-6 font-display font-semibold text-foreground md:mb-8',
+                  TYPOGRAPHY.TEXT_2XL,
+                )}
+              >
                 Related Articles
               </h2>
               <div className='grid gap-6 md:grid-cols-3'>
@@ -483,7 +492,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     source='blog_related_articles'
                     target={relatedPost.slug}
                     destination={relatedPost.category}
-                    className='group rounded-lg border border-foreground/10 p-5 transition-all hover:border-primary/30 hover:bg-primary/5'
+                    className='group border border-border bg-card p-5 transition-colors hover:border-primary/55'
                   >
                     <div className={cn('mb-2 text-primary', TYPOGRAPHY.TEXT_SM)}>
                       {relatedPost.category}

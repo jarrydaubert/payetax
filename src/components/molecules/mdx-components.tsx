@@ -51,7 +51,7 @@ const ANCHOR_LINK_CLASSES = cn(
   'text-primary opacity-0 transition-opacity',
   'hover:text-primary/80 group-hover:opacity-100',
   'focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2',
-  'focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+  'focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
   'rounded-sm', // For focus ring
 );
 
@@ -62,7 +62,7 @@ export const mdxComponents = {
     return (
       <h1
         className={cn(
-          'group flex scroll-mt-20 flex-wrap items-center font-bold text-foreground',
+          'group flex scroll-mt-20 flex-wrap items-center font-display font-semibold text-foreground',
           SPACING.MT_8,
           SPACING.MB_4,
           SPACING.GAP_3,
@@ -86,7 +86,7 @@ export const mdxComponents = {
     return (
       <h2
         className={cn(
-          'group flex scroll-mt-20 flex-wrap items-center font-bold text-foreground',
+          'group flex scroll-mt-20 flex-wrap items-center font-display font-semibold text-foreground',
           SPACING.MT_6,
           SPACING.MB_3,
           SPACING.GAP_3,
@@ -110,7 +110,7 @@ export const mdxComponents = {
     return (
       <h3
         className={cn(
-          'group flex scroll-mt-20 flex-wrap items-center font-bold text-foreground',
+          'group flex scroll-mt-20 flex-wrap items-center font-display font-semibold text-foreground',
           'mt-5',
           SPACING.MB_2,
           SPACING.GAP_2,
@@ -132,7 +132,7 @@ export const mdxComponents = {
   h4: ({ children, ...props }: React.ComponentPropsWithoutRef<'h4'>) => (
     <h4
       className={cn(
-        'font-semibold text-foreground',
+        'font-display font-semibold text-foreground',
         SPACING.MT_4,
         SPACING.MB_2,
         TYPOGRAPHY.TEXT_XL,
@@ -145,7 +145,11 @@ export const mdxComponents = {
   ),
   h5: ({ children, ...props }: React.ComponentPropsWithoutRef<'h5'>) => (
     <h5
-      className={cn('mt-5 font-semibold text-foreground', SPACING.MB_2, TYPOGRAPHY.TEXT_LG)}
+      className={cn(
+        'mt-5 font-display font-semibold text-foreground',
+        SPACING.MB_2,
+        TYPOGRAPHY.TEXT_LG,
+      )}
       {...props}
     >
       {children}
@@ -154,7 +158,7 @@ export const mdxComponents = {
   h6: ({ children, ...props }: React.ComponentPropsWithoutRef<'h6'>) => (
     <h6
       className={cn(
-        'font-semibold text-foreground',
+        'font-display font-semibold text-foreground',
         SPACING.MT_4,
         SPACING.MB_2,
         TYPOGRAPHY.TEXT_BASE,
@@ -207,7 +211,7 @@ export const mdxComponents = {
       <a
         href={href}
         className={cn(
-          'inline-flex items-center font-medium text-primary underline underline-offset-2 transition-colors hover:text-primary/80',
+          'inline-flex items-center font-medium text-primary underline decoration-primary/45 underline-offset-4 transition-colors hover:text-primary/80',
           SPACING.GAP_1,
         )}
         target={isExternal ? '_blank' : undefined}
@@ -252,14 +256,12 @@ export const mdxComponents = {
   // Enhanced blockquotes
   blockquote: ({ children, ...props }: React.ComponentPropsWithoutRef<'blockquote'>) => (
     <blockquote
-      className={cn(
-        'rounded-lg border-primary/50 border-l-4 bg-card/80 backdrop-blur-sm',
-        'my-8 px-6 [&_p:last-child]:mb-0',
-        SPACING.PY_4,
-      )}
+      className={cn('my-8 border-primary/50 border-l px-5 py-1 [&_p:last-child]:mb-0')}
       {...props}
     >
-      <div className={cn('text-foreground/90 italic', TYPOGRAPHY.TEXT_LG)}>{children}</div>
+      <div className={cn('font-display text-foreground/90 italic', TYPOGRAPHY.TEXT_LG)}>
+        {children}
+      </div>
     </blockquote>
   ),
 
@@ -295,10 +297,10 @@ export const mdxComponents = {
 
   // Enhanced tables
   table: ({ children, ...props }: React.ComponentPropsWithoutRef<'table'>) => (
-    <div className='not-prose my-8 overflow-x-auto rounded-lg border border-foreground/20 bg-card/40'>
+    <div className='not-prose my-8 overflow-x-auto border border-border bg-card'>
       <table
         className={cn(
-          'w-full min-w-2xl bg-card/80 backdrop-blur-sm',
+          'w-full min-w-2xl bg-card',
           '[&_td:last-child]:text-right [&_th:last-child]:text-right',
           '[&_td:last-child]:whitespace-nowrap [&_td:last-child]:tabular-nums',
         )}
@@ -309,27 +311,24 @@ export const mdxComponents = {
     </div>
   ),
   thead: ({ children, ...props }: React.ComponentPropsWithoutRef<'thead'>) => (
-    <thead className='bg-foreground/10' {...props}>
+    <thead className='border-border border-b bg-muted/45' {...props}>
       {children}
     </thead>
   ),
   tbody: ({ children, ...props }: React.ComponentPropsWithoutRef<'tbody'>) => (
-    <tbody
-      className='divide-y divide-foreground/10 [&_tr:nth-child(even)]:bg-foreground/5'
-      {...props}
-    >
+    <tbody className='divide-y divide-border [&_tr:nth-child(even)]:bg-muted/25' {...props}>
       {children}
     </tbody>
   ),
   tr: ({ children, ...props }: React.ComponentPropsWithoutRef<'tr'>) => (
-    <tr className='transition-colors hover:bg-foreground/5' {...props}>
+    <tr className='transition-colors hover:bg-muted/35' {...props}>
       {children}
     </tr>
   ),
   th: ({ children, ...props }: React.ComponentPropsWithoutRef<'th'>) => (
     <th
       className={cn(
-        'text-left font-semibold text-foreground uppercase tracking-wider',
+        'text-left font-semibold text-muted-foreground uppercase tracking-[0.2em]',
         SPACING.PX_6,
         'py-3',
         TYPOGRAPHY.TEXT_SM,
@@ -355,10 +354,7 @@ export const mdxComponents = {
 
   // Enhanced horizontal rule
   hr: ({ ...props }: React.ComponentPropsWithoutRef<'hr'>) => (
-    <hr
-      className='my-12 h-px border-0 bg-gradient-to-r from-transparent via-foreground/30 to-transparent'
-      {...props}
-    />
+    <hr className='my-12 border-0 border-border border-t' {...props} />
   ),
 
   // Enhanced images with figure/figcaption semantics
@@ -374,7 +370,7 @@ export const mdxComponents = {
           width={1200}
           height={630}
           sizes='(max-width: 768px) 100vw, 768px'
-          className='h-auto w-full rounded-lg border border-foreground/20 shadow-lg'
+          className='h-auto w-full border border-border'
         />
         {alt && (
           <figcaption

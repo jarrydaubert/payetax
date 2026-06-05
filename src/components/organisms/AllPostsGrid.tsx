@@ -53,11 +53,7 @@ export function AllPostsGrid({ posts, currentPage, totalPages, totalPosts }: All
           {/* biome-ignore lint/correctness/useUniqueElementIds: Server component rendered once per page */}
           <h2
             id='all-posts-heading'
-            className={cn(
-              'font-display font-semibold text-white',
-              TYPOGRAPHY.TEXT_XL,
-              'md:text-2xl',
-            )}
+            className='font-semibold text-primary text-xs uppercase tracking-[0.28em] sm:text-sm sm:tracking-widest'
           >
             All Articles
           </h2>
@@ -118,9 +114,8 @@ function PostCard({ post, priority = false }: PostCardProps) {
   return (
     <article
       className={cn(
-        'group relative overflow-hidden rounded-xl bg-card/70 transition-all duration-200',
-        'border border-border/60 hover:border-primary/50',
-        'motion-safe:hover:-translate-y-0.5',
+        'group relative overflow-hidden rounded-sm bg-card transition-colors',
+        'border border-border hover:border-primary/55',
       )}
     >
       <Link href={`/blog/${post.slug}`} className='block'>
@@ -130,7 +125,7 @@ function PostCard({ post, priority = false }: PostCardProps) {
             src={imageSrc}
             alt={post.imageAlt ?? post.title}
             fill
-            className='object-cover transition-transform duration-300 group-hover:scale-105'
+            className='object-cover'
             sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
             priority={priority}
             placeholder={blurDataUrl ? 'blur' : 'empty'}
@@ -138,7 +133,7 @@ function PostCard({ post, priority = false }: PostCardProps) {
           />
 
           {/* Category badge */}
-          <span className='absolute top-3 left-3 rounded-full bg-primary px-2.5 py-0.5 font-semibold text-primary-foreground text-xs uppercase tracking-wider'>
+          <span className='absolute top-3 left-3 border border-primary/35 bg-background/90 px-2.5 py-0.5 font-semibold text-primary text-xs uppercase tracking-wider'>
             {categoryConfig.label}
           </span>
         </div>

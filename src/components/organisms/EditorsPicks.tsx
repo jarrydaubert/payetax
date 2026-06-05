@@ -35,10 +35,10 @@ export function EditorsPicks({ posts, className }: EditorsPicksProps) {
       {/* Mobile: Native accordion using details/summary (zero CLS) */}
       <details className='group md:hidden'>
         <summary
-          className='flex cursor-pointer items-center justify-between rounded-2xl border border-border/60 bg-card/70 px-4 py-3.5 text-foreground hover:bg-card/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background'
+          className='flex cursor-pointer items-center justify-between rounded-sm border border-border bg-card px-4 py-3.5 text-foreground hover:border-primary/55 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background'
           aria-label="Toggle Editor's Picks section"
         >
-          <span className='font-display font-semibold text-primary/90 text-sm uppercase tracking-[0.2em]'>
+          <span className='font-semibold text-primary text-sm uppercase tracking-[0.24em]'>
             Editor&apos;s Picks
           </span>
           <span className='text-muted-foreground transition-transform group-open:rotate-180'>
@@ -75,33 +75,33 @@ interface EditorsPicksListProps {
 
 function EditorsPicksList({ posts, showHeading = true }: EditorsPicksListProps) {
   return (
-    <div className='rounded-2xl border border-border/60 bg-card/70 p-4 sm:p-5'>
+    <div className='rounded-sm border border-border bg-card p-4 sm:p-5'>
       {showHeading && (
-        <h2 className='mb-5 font-display font-semibold text-primary text-xs uppercase tracking-[0.28em] sm:mb-6 sm:text-sm sm:tracking-widest'>
+        <h2 className='mb-5 font-semibold text-primary text-xs uppercase tracking-[0.28em] sm:mb-6 sm:text-sm sm:tracking-widest'>
           Editor&apos;s Picks
         </h2>
       )}
 
-      <ol className='space-y-3 sm:space-y-4'>
+      <ol className='divide-y divide-border'>
         {posts.map((post, index) => (
           <li key={post.slug}>
             <Link
               href={`/blog/${post.slug}`}
-              className='group flex items-start gap-3'
+              className='group flex items-start gap-3 py-3 first:pt-0 last:pb-0'
               prefetch={false}
             >
               {/* Number */}
-              <span className='flex-shrink-0 font-bold font-display text-[1.6rem] text-primary/80 transition-colors group-hover:text-primary sm:text-2xl'>
+              <span className='flex-shrink-0 font-mono text-primary text-xs tabular-nums tracking-[0.2em] transition-colors group-hover:text-primary/80'>
                 {String(index + 1).padStart(2, '0')}
               </span>
 
               {/* Content */}
-              <div className='pt-1'>
-                <h3 className='line-clamp-2 font-medium text-[0.95rem] text-foreground leading-5 transition-colors group-hover:text-primary sm:text-sm'>
+              <div>
+                <h3 className='line-clamp-2 font-display font-semibold text-[0.98rem] text-foreground leading-5 transition-colors group-hover:text-primary'>
                   {post.title}
                 </h3>
                 {post.readTime && (
-                  <span className='mt-1 text-muted-foreground text-xs'>{post.readTime}</span>
+                  <span className='mt-1 block text-muted-foreground text-xs'>{post.readTime}</span>
                 )}
               </div>
             </Link>
