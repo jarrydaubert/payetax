@@ -2,7 +2,6 @@
 // Server Component - all presentational, no hooks/handlers
 
 import { AlertTriangle, Award, CheckCircle, ExternalLink, Shield } from 'lucide-react';
-import { GradientText } from '@/components/atoms/GradientText';
 import { ContactFooter } from '@/components/molecules/ContactFooter';
 import { PageHero } from '@/components/molecules/PageHero';
 import { SectionHeading } from '@/components/molecules/SectionHeading';
@@ -55,9 +54,7 @@ export function CompliancePageContent() {
         badge={{ icon: Shield, text: 'Compliance' }}
         title={
           <>
-            <GradientText variant='brand-full' as='span'>
-              Official HMRC
-            </GradientText>
+            Official HMRC
             <br />
             <span className='text-foreground'>Tax Rates & Compliance</span>
           </>
@@ -111,19 +108,19 @@ export function CompliancePageContent() {
               return (
                 <Card
                   key={feature.title}
-                  className={cn(
-                    'bg-gradient-to-br',
-                    feature.color,
-                    SPACING.P_8,
-                    'backdrop-blur-sm',
-                  )}
+                  className={cn('rounded-sm border-border bg-card', SPACING.P_8)}
                 >
                   <div className='mb-6 flex items-start gap-4'>
-                    <div className='flex size-12 items-center justify-center rounded-xl bg-primary/10'>
+                    <div className='flex size-12 items-center justify-center rounded-sm border border-primary/25 bg-background text-primary'>
                       <Icon className={ICON_SIZES.SIZE_6} aria-hidden='true' />
                     </div>
                     <div>
-                      <h3 className={cn('mb-2 font-bold text-foreground', TYPOGRAPHY.TEXT_XL)}>
+                      <h3
+                        className={cn(
+                          'mb-2 font-display font-semibold text-foreground',
+                          TYPOGRAPHY.TEXT_XL,
+                        )}
+                      >
                         {feature.title}
                       </h3>
                       <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>

@@ -8,7 +8,6 @@ import {
   Workflow,
 } from 'lucide-react';
 import Link from 'next/link';
-import { GradientText } from '@/components/atoms/GradientText';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -45,19 +44,19 @@ export default function AboutPage() {
         ]}
       />
 
-      <section className='border-border/40 border-b py-24 md:py-28'>
+      <section className='border-border/70 border-b bg-ledger-grid py-24 md:py-28'>
         <div className={LAYOUT.CONTAINER_MD}>
           <div className='mx-auto max-w-4xl text-center'>
-            <Badge className='mb-4 border-primary/30 bg-primary/10 text-primary hover:bg-primary/20'>
+            <Badge
+              variant='outline'
+              className='mb-4 rounded-sm border-primary/35 bg-background px-5 py-2 text-primary uppercase tracking-[0.24em]'
+            >
               <Sparkles className='mr-1.5 size-3.5' />
               About PayeTax
             </Badge>
 
-            <h1 className='font-bold text-4xl text-foreground tracking-tight md:text-6xl'>
-              Built to help you{' '}
-              <GradientText variant='brand-full' as='span'>
-                trust your numbers
-              </GradientText>
+            <h1 className='font-display font-semibold text-4xl text-foreground leading-[0.98] md:text-6xl'>
+              Built to help you trust your numbers
               <br />
               without trading your privacy
             </h1>
@@ -71,8 +70,7 @@ export default function AboutPage() {
               <Button
                 asChild
                 size='touch'
-                variant='brandOutline'
-                className='w-full rounded-xl px-5 sm:w-auto sm:min-w-[12rem]'
+                className='w-full rounded-sm px-5 sm:w-auto sm:min-w-[12rem]'
               >
                 <Link href='/'>
                   Open Calculator
@@ -82,8 +80,8 @@ export default function AboutPage() {
               <Button
                 asChild
                 size='touch'
-                variant='brandOutline'
-                className='w-full rounded-xl px-5 sm:w-auto sm:min-w-[12rem]'
+                variant='outline'
+                className='w-full rounded-sm bg-card px-5 sm:w-auto sm:min-w-[12rem]'
               >
                 <Link href='/compliance'>
                   Compliance & Sources
@@ -93,8 +91,8 @@ export default function AboutPage() {
               <Button
                 asChild
                 size='touch'
-                variant='brandOutline'
-                className='w-full rounded-xl px-5 sm:w-auto sm:min-w-[12rem]'
+                variant='outline'
+                className='w-full rounded-sm bg-card px-5 sm:w-auto sm:min-w-[12rem]'
               >
                 <Link href='/install'>
                   Install App
@@ -110,16 +108,11 @@ export default function AboutPage() {
               return (
                 <Card
                   key={stat.label}
-                  className='border-border/50 bg-card/70 p-4 backdrop-blur-sm transition-colors hover:border-primary/30'
+                  className='rounded-sm border-border bg-card p-4 transition-colors hover:border-primary/45'
                 >
                   <div className='mb-3 flex items-center gap-3'>
-                    <div
-                      className={cn(
-                        'flex size-10 items-center justify-center rounded-lg bg-gradient-to-br',
-                        stat.color,
-                      )}
-                    >
-                      <Icon className='size-5 text-white' />
+                    <div className='flex size-10 items-center justify-center rounded-sm border border-primary/25 bg-background'>
+                      <Icon className='size-5 text-primary' />
                     </div>
                     <div className='font-semibold text-foreground text-xl'>{stat.value}</div>
                   </div>
@@ -143,7 +136,7 @@ export default function AboutPage() {
               <Badge variant='outline' className='mb-4 border-success/40 text-success'>
                 Why We Exist
               </Badge>
-              <h2 className='font-bold text-3xl text-foreground tracking-tight md:text-4xl'>
+              <h2 className='font-display font-semibold text-3xl text-foreground leading-tight md:text-4xl'>
                 A tax calculator should reduce stress,
                 <br className='hidden md:block' />
                 not create more of it
@@ -164,8 +157,10 @@ export default function AboutPage() {
               </div>
             </div>
 
-            <Card className='border-success/25 bg-success/10 p-6'>
-              <h3 className='font-semibold text-foreground text-lg'>Non-negotiables</h3>
+            <Card className='rounded-sm border-success/30 bg-card p-6'>
+              <h3 className='font-display font-semibold text-foreground text-lg'>
+                Non-negotiables
+              </h3>
               <ul className='mt-4 space-y-4'>
                 {ABOUT_OPERATING_RULES.map((rule) => {
                   const Icon = rule.icon;
@@ -195,7 +190,7 @@ export default function AboutPage() {
             <Badge variant='outline' className='mb-4 border-primary/35 text-primary'>
               Trust, Explained
             </Badge>
-            <h2 className='font-bold text-3xl text-foreground tracking-tight md:text-4xl'>
+            <h2 className='font-display font-semibold text-3xl text-foreground leading-tight md:text-4xl'>
               Proof, not just positioning
             </h2>
             <p className='mx-auto mt-3 max-w-3xl text-muted-foreground'>
@@ -210,19 +205,17 @@ export default function AboutPage() {
               return (
                 <Card
                   key={pillar.title}
-                  className={cn(
-                    'h-full rounded-2xl border p-5 transition-transform duration-200 hover:-translate-y-0.5',
-                    pillar.gradient?.border,
-                    pillar.gradient?.bg,
-                  )}
+                  className='h-full rounded-sm border border-border bg-card p-5 transition-colors hover:border-primary/45'
                 >
                   <div className='mb-4 flex items-center justify-between'>
-                    <span className='rounded-md border border-border/60 bg-card/80 px-2 py-1 font-medium text-foreground text-xs'>
+                    <span className='rounded-sm border border-border bg-background px-2 py-1 font-medium text-foreground text-xs'>
                       {pillar.metric}
                     </span>
-                    <Icon className={cn('size-5', pillar.gradient?.icon || 'text-foreground')} />
+                    <Icon className='size-5 text-primary' />
                   </div>
-                  <h3 className='font-semibold text-foreground text-lg'>{pillar.title}</h3>
+                  <h3 className='font-display font-semibold text-foreground text-lg'>
+                    {pillar.title}
+                  </h3>
                   <p className='mt-2 text-muted-foreground text-sm leading-relaxed'>
                     {pillar.description}
                   </p>
@@ -233,21 +226,21 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className='border-border/40 border-y bg-gradient-to-br from-primary/5 via-transparent to-accent/5 py-14 md:py-20'>
+      <section className='border-border/70 border-y bg-ledger-grid py-14 md:py-20'>
         <div className={LAYOUT.CONTAINER_MD}>
           <div className='mb-6 flex flex-wrap items-center justify-between gap-3'>
             <div>
               <Badge variant='outline' className='border-primary/35 text-primary'>
                 Comparison
               </Badge>
-              <h2 className='mt-3 font-bold text-3xl text-foreground tracking-tight'>
+              <h2 className='mt-3 font-display font-semibold text-3xl text-foreground leading-tight'>
                 How PayeTax differs in practice
               </h2>
             </div>
           </div>
 
           <section
-            className='overflow-x-auto rounded-2xl border border-border/60 bg-card/80 shadow-xl backdrop-blur-sm'
+            className='overflow-x-auto rounded-sm border border-border bg-card'
             aria-label='PayeTax comparison table'
           >
             <Link
@@ -291,7 +284,7 @@ export default function AboutPage() {
       <section className={LAYOUT.SECTION}>
         <div className={LAYOUT.CONTAINER_MD}>
           <div className='grid gap-8 lg:grid-cols-[1fr_1.1fr]'>
-            <Card className='border-border/60 bg-card/85 p-6'>
+            <Card className='rounded-sm border-border bg-card p-6'>
               <Badge variant='outline' className='mb-4 border-success/35 text-success'>
                 Build Standards
               </Badge>
@@ -305,11 +298,14 @@ export default function AboutPage() {
               </ul>
             </Card>
 
-            <Card className='rounded-2xl border-primary/25 bg-gradient-to-br from-primary/15 to-success/10 p-6'>
-              <Badge className='mb-4 border-primary/35 bg-primary/15 text-primary hover:bg-primary/20'>
+            <Card className='rounded-sm border-primary/25 bg-card p-6'>
+              <Badge
+                variant='outline'
+                className='mb-4 rounded-sm border-primary/35 bg-background text-primary'
+              >
                 From Jarryd
               </Badge>
-              <h3 className='font-semibold text-2xl text-foreground tracking-tight'>
+              <h3 className='font-display font-semibold text-2xl text-foreground tracking-tight'>
                 I built the tool I wished existed
               </h3>
               <p className='mt-4 text-muted-foreground leading-relaxed'>
@@ -329,7 +325,7 @@ export default function AboutPage() {
                 <li>Uses automated unit and E2E checks before production releases.</li>
               </ul>
               <div className='mt-6 flex flex-wrap gap-3'>
-                <Button asChild variant='brandOutline' className='rounded-lg'>
+                <Button asChild variant='outline' className='rounded-sm bg-card'>
                   <Link href='/install'>
                     <Workflow className='size-4' />
                     Install PayeTax
@@ -343,14 +339,19 @@ export default function AboutPage() {
 
       <section className='pb-24'>
         <div className={cn(LAYOUT.CONTAINER_XS, LAYOUT.TEXT_CENTER)}>
-          <h2 className={cn('font-bold text-foreground tracking-tight', TYPOGRAPHY.TEXT_3XL)}>
+          <h2
+            className={cn(
+              'font-display font-semibold text-foreground tracking-tight',
+              TYPOGRAPHY.TEXT_3XL,
+            )}
+          >
             Ready to pressure-test your next pay decision?
           </h2>
           <p className={cn(SPACING.MT_3, 'text-muted-foreground')}>
             Use the calculator, compare outcomes, and keep control of your data.
           </p>
           <div className='mt-6 flex flex-col justify-center gap-3 sm:flex-row'>
-            <Button asChild size='touch' variant='brandOutline' className='rounded-xl px-6'>
+            <Button asChild size='touch' className='rounded-sm px-6'>
               <Link href='/'>
                 Start Calculating
                 <ArrowRight className='size-4' />
@@ -360,7 +361,7 @@ export default function AboutPage() {
               asChild
               size='touch'
               variant='outline'
-              className='rounded-xl border-border/70 bg-card/70 px-6 hover:bg-card'
+              className='rounded-sm border-border bg-card px-6 hover:border-primary/45'
             >
               <Link href='/privacy'>
                 Privacy Details

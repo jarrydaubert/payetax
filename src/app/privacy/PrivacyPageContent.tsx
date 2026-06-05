@@ -4,9 +4,8 @@
 import { Calendar, CheckCircle, Cookie, Eye, Lock, Shield, X } from 'lucide-react';
 
 // Last updated date - update when privacy policy changes
-const PRIVACY_LAST_UPDATED = 'February 19, 2026';
+const PRIVACY_LAST_UPDATED = 'June 5, 2026';
 
-import { GradientText } from '@/components/atoms/GradientText';
 import { ComparisonCards } from '@/components/molecules/ComparisonCards';
 import { DataFlowCards } from '@/components/molecules/DataFlowCards';
 import { FeatureGrid } from '@/components/molecules/FeatureGrid';
@@ -29,9 +28,7 @@ export function PrivacyPageContent() {
         badge={{ icon: Shield, text: 'Privacy Policy' }}
         title={
           <>
-            <GradientText variant='brand-full' as='span'>
-              Your Data Stays
-            </GradientText>
+            Your Data Stays
             <br />
             <span className='text-foreground'>In Your Browser</span>
           </>
@@ -57,7 +54,7 @@ export function PrivacyPageContent() {
         <div className={LAYOUT.CONTAINER_MD}>
           <SectionHeading
             badge={{ icon: CheckCircle, text: 'Quick Summary' }}
-            title={<GradientText variant='brand'>The 30-Second Version</GradientText>}
+            title='The 30-Second Version'
             subtitle='Everything you need to know at a glance'
             align='center'
           />
@@ -100,7 +97,7 @@ export function PrivacyPageContent() {
         <div className={LAYOUT.CONTAINER_MD}>
           <SectionHeading
             badge={{ icon: Lock, text: 'Data Flow' }}
-            title={<GradientText variant='brand'>Where Your Tax Data Goes</GradientText>}
+            title='Where Your Tax Data Goes'
             subtitle="Spoiler: Nowhere. Here's the technical breakdown."
             align='center'
           />
@@ -124,19 +121,19 @@ export function PrivacyPageContent() {
                 icon: Cookie,
                 title: 'Analytics Tools',
                 description:
-                  'We use Google Analytics 4 (with Consent Mode), Vercel Analytics for Web Vitals, and Sentry for error monitoring. GA4 only tracks after you accept cookies. Vercel Analytics is cookieless and collects no PII.',
+                  'We use Google Analytics 4 with Consent Mode and Sentry for error monitoring. GA4 only tracks after you accept analytics cookies.',
               },
               {
                 icon: Eye,
                 title: 'What We Track',
                 description:
-                  'Page views, anonymized salary ranges (not exact values), calculator usage patterns, and performance metrics. Sentry may capture session replays (1% sample) for debugging - no financial data is recorded.',
+                  'Page views, anonymized salary ranges (not exact values), calculator usage patterns, performance metrics, and error context needed to diagnose failures. No financial data is intentionally recorded.',
               },
               {
                 icon: Shield,
                 title: 'Your Control',
                 description:
-                  'Decline analytics via our cookie banner to block GA4 tracking entirely. Vercel Analytics runs regardless but collects no personal data. The calculator works identically either way.',
+                  'Decline analytics via our cookie banner to block GA4 tracking entirely. The calculator works identically either way.',
               },
             ]}
             columns={3}

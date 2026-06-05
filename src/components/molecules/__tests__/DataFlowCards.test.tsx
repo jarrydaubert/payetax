@@ -74,15 +74,15 @@ describe('DataFlowCards', () => {
     });
   });
 
-  describe('Icon Colors', () => {
-    it('should apply custom icon colors', () => {
+  describe('Icon Styling', () => {
+    it('should use Ledger icon containers', () => {
       const { container } = render(<DataFlowCards cards={mockCards} />);
 
-      const primaryIcon = container.querySelector('.bg-primary');
+      const primaryIcon = container.querySelector('.border-primary\\/25.bg-background');
       expect(primaryIcon).toBeInTheDocument();
     });
 
-    it('should use default bg-primary when no color specified', () => {
+    it('should use the same Ledger icon container when no color specified', () => {
       const cardsWithoutColor: DataFlowCard[] = [
         {
           icon: Database,
@@ -93,7 +93,7 @@ describe('DataFlowCards', () => {
 
       const { container } = render(<DataFlowCards cards={cardsWithoutColor} />);
 
-      const icon = container.querySelector('.bg-primary');
+      const icon = container.querySelector('.border-primary\\/25.bg-background');
       expect(icon).toBeInTheDocument();
     });
   });
@@ -136,7 +136,7 @@ describe('DataFlowCards', () => {
 
       const titles = screen.getAllByRole('heading', { level: 3 });
       for (const title of titles) {
-        expect(title).toHaveClass('text-xl', 'font-bold');
+        expect(title).toHaveClass('text-xl', 'font-display', 'font-semibold');
       }
     });
 

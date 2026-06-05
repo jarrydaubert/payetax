@@ -55,14 +55,14 @@ describe('ComparisonCards', () => {
     it('should apply negative variant styling', () => {
       const { container } = render(<ComparisonCards left={mockLeft} right={mockRight} />);
 
-      const negativeCard = container.querySelector('.from-destructive\\/5');
+      const negativeCard = container.querySelector('.border-destructive\\/30');
       expect(negativeCard).toBeInTheDocument();
     });
 
     it('should apply positive variant styling', () => {
       const { container } = render(<ComparisonCards left={mockLeft} right={mockRight} />);
 
-      const positiveCard = container.querySelector('.from-primary\\/5');
+      const positiveCard = container.querySelector('.border-primary\\/30');
       expect(positiveCard).toBeInTheDocument();
     });
   });
@@ -100,7 +100,7 @@ describe('ComparisonCards', () => {
 
       const titles = screen.getAllByRole('heading', { level: 3 });
       for (const title of titles) {
-        expect(title).toHaveClass('text-2xl', 'font-bold');
+        expect(title).toHaveClass('text-2xl', 'font-display', 'font-semibold');
       }
     });
   });

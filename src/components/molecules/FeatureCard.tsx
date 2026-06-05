@@ -52,19 +52,14 @@ export interface FeatureCardProps {
  * />
  * ```
  *
- * @example With metric and gradient
+ * @example With metric
  * ```tsx
  * <FeatureCard
  *   feature={{
  *     icon: Zap,
  *     title: 'Performance',
  *     description: 'Lightning fast calculations',
- *     metric: '<1.5s',
- *     gradient: {
- *       bg: 'from-warning/10 to-destructive/10',
- *       icon: 'text-warning',
- *       border: 'border-warning/20'
- *     }
+ *     metric: '<1.5s'
  *   }}
  *   variant="showcase"
  * />
@@ -74,21 +69,17 @@ export function FeatureCard({ feature, variant = 'default', className }: Feature
   const { icon: Icon, title, description, metric, link, gradient } = feature;
 
   const cardClasses = cn(
-    'h-full transition-all duration-300',
+    'h-full rounded-sm border-border bg-card transition-colors',
     {
-      'hover:border-primary/50 hover:shadow-lg': variant === 'showcase',
-      'bg-card/50 backdrop-blur-sm': variant === 'default',
+      'hover:border-primary/45': variant === 'showcase',
       'border-0': variant === 'simple',
     },
-    gradient?.bg,
-    gradient?.border,
     className,
   );
 
   const iconContainerClasses = cn(
-    'mb-4 flex h-12 w-12 items-center justify-center rounded-lg',
+    'mb-4 flex h-12 w-12 items-center justify-center rounded-sm border border-primary/25 bg-background',
     gradient?.icon || 'text-primary',
-    variant === 'showcase' && !gradient?.bg && 'bg-primary/10',
   );
 
   return (
@@ -101,7 +92,9 @@ export function FeatureCard({ feature, variant = 'default', className }: Feature
 
         {/* Title with optional metric */}
         <div className={cn('flex items-start justify-between', SPACING.GAP_4)}>
-          <h3 className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>{title}</h3>
+          <h3 className={cn('font-display font-semibold text-foreground', TYPOGRAPHY.TEXT_2XL)}>
+            {title}
+          </h3>
           {metric && (
             <Badge variant='secondary' className='shrink-0 font-mono font-semibold'>
               {metric}

@@ -119,7 +119,7 @@ describe('FeatureCard', () => {
 
     it('should apply showcase variant classes', () => {
       const { container } = render(<FeatureCard feature={mockFeature} variant='showcase' />);
-      const card = container.querySelector('[class*="hover:shadow-lg"]');
+      const card = container.querySelector('[class*="hover:border-primary"]');
       expect(card).toBeInTheDocument();
     });
 
@@ -130,8 +130,8 @@ describe('FeatureCard', () => {
     });
   });
 
-  describe('Gradient', () => {
-    it('should apply gradient background', () => {
+  describe('Ledger Styling', () => {
+    it('should ignore legacy gradient background classes on cards', () => {
       const featureWithGradient: Feature = {
         ...mockFeature,
         gradient: {
@@ -142,10 +142,11 @@ describe('FeatureCard', () => {
       };
       const { container } = render(<FeatureCard feature={featureWithGradient} />);
       const card = container.firstChild as HTMLElement;
-      expect(card).toHaveClass('from-cyan-500/10', 'to-emerald-500/10');
+      expect(card).toHaveClass('bg-card', 'rounded-sm');
+      expect(card).not.toHaveClass('from-cyan-500/10', 'to-emerald-500/10');
     });
 
-    it('should apply gradient icon color', () => {
+    it('should still apply configured icon color', () => {
       const featureWithGradient: Feature = {
         ...mockFeature,
         gradient: {
@@ -159,7 +160,7 @@ describe('FeatureCard', () => {
       expect(iconContainer).toHaveClass('text-yellow-500');
     });
 
-    it('should apply gradient border', () => {
+    it('should ignore legacy gradient border classes on cards', () => {
       const featureWithGradient: Feature = {
         ...mockFeature,
         gradient: {
@@ -170,7 +171,8 @@ describe('FeatureCard', () => {
       };
       const { container } = render(<FeatureCard feature={featureWithGradient} />);
       const card = container.firstChild as HTMLElement;
-      expect(card).toHaveClass('border-green-500/20');
+      expect(card).toHaveClass('border-border');
+      expect(card).not.toHaveClass('border-green-500/20');
     });
 
     it('should use default icon color when no gradient', () => {
@@ -190,7 +192,7 @@ describe('FeatureCard', () => {
     it('should preserve default classes with custom className', () => {
       const { container } = render(<FeatureCard feature={mockFeature} className='custom-class' />);
       const card = container.firstChild as HTMLElement;
-      expect(card).toHaveClass('custom-class', 'h-full', 'transition-all');
+      expect(card).toHaveClass('custom-class', 'h-full', 'transition-colors');
     });
   });
 
@@ -198,7 +200,7 @@ describe('FeatureCard', () => {
     it('should use correct typography for title', () => {
       render(<FeatureCard feature={mockFeature} />);
       const title = screen.getByRole('heading');
-      expect(title).toHaveClass('text-2xl', 'font-bold');
+      expect(title).toHaveClass('text-2xl', 'font-display', 'font-semibold');
     });
 
     it('should use correct typography for description', () => {

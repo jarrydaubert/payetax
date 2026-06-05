@@ -82,7 +82,11 @@ export function FeatureGrid({
       {/* Features Grid */}
       <div className={gridClasses}>
         {features.map((feature) => (
-          <FeatureCard key={feature.title} feature={feature} variant={variant} />
+          <FeatureCard
+            key={`${feature.title}-${feature.description}`}
+            feature={feature}
+            variant={variant}
+          />
         ))}
       </div>
     </section>

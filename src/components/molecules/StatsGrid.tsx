@@ -41,7 +41,7 @@ export interface StatsGridProps {
  * Features:
  * - Responsive grid layout (1-4 columns)
  * - Design token usage for consistency
- * - Icon support with gradients
+ * - Icon support
  * - Multiple visual variants
  * - Accessible markup
  *
@@ -73,7 +73,7 @@ export function StatsGrid({ stats, columns = 3, variant = 'default', className }
   return (
     <ul className={gridClasses} aria-label='Statistics'>
       {stats.map((stat) => (
-        <li key={stat.label} className='list-none'>
+        <li key={`${stat.label}-${stat.value}`} className='list-none'>
           <StatCard stat={stat} variant={variant} />
         </li>
       ))}
@@ -90,32 +90,29 @@ interface StatCardProps {
 }
 
 function StatCard({ stat, variant }: StatCardProps) {
-  const { icon: Icon, value, label, description, color } = stat;
+  const { icon: Icon, value, label, description } = stat;
 
-  const cardClasses = cn('h-full transition-all duration-300', {
-    'hover:shadow-lg': variant === 'elevated',
+  const cardClasses = cn('h-full rounded-sm border-border bg-card transition-colors', {
+    'hover:border-primary/45': variant === 'elevated',
     'border-2': variant === 'bordered',
-    'bg-card/50 backdrop-blur-sm': variant === 'default',
   });
 
-  const iconClasses = cn(
-    'mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-gradient-to-br',
-    color || 'from-primary to-accent',
-  );
+  const iconClasses =
+    'mb-4 flex h-12 w-12 items-center justify-center rounded-sm border border-primary/25 bg-background text-primary';
 
   return (
     <Card className={cardClasses}>
       <CardContent className={cn('flex flex-col items-center text-center', SPACING.P_6)}>
         {/* Icon */}
         <div className={iconClasses} aria-hidden='true'>
-          <Icon className='h-6 w-6 text-white' />
+          <Icon className='h-6 w-6' />
         </div>
 
         {/* Value */}
         <div
           className={cn(
             TYPOGRAPHY.TEXT_3XL,
-            'mb-2 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text font-bold text-transparent',
+            'mb-2 font-mono font-semibold text-foreground tracking-tight',
           )}
         >
           {value}

@@ -80,7 +80,7 @@ export function DataFlowCards({ cards, columns = 3, className }: DataFlowCardsPr
   return (
     <div className={gridClasses}>
       {cards.map((card) => (
-        <DataFlowCardItem key={card.title} card={card} />
+        <DataFlowCardItem key={`${card.title}-${card.description}`} card={card} />
       ))}
     </div>
   );
@@ -94,27 +94,30 @@ interface DataFlowCardItemProps {
 }
 
 function DataFlowCardItem({ card }: DataFlowCardItemProps) {
-  const { icon: Icon, iconColor = 'bg-primary', title, description } = card;
+  const { icon: Icon, title, description } = card;
 
   return (
     <Card
       className={cn(
-        'h-full border-primary/20 text-center transition-all duration-300 active:scale-[1.02] md:hover:border-primary/40 md:hover:shadow-xl',
+        'h-full rounded-sm border-primary/20 bg-card text-center transition-colors md:hover:border-primary/45',
         SPACING.P_8,
       )}
     >
       {/* Icon */}
-      <div
-        className={cn(
-          `mx-auto mb-6 flex ${'size-20'} items-center justify-center rounded-2xl shadow-lg`,
-          iconColor,
-        )}
-      >
-        <Icon className={cn(ICON_SIZES.SIZE_10, 'text-primary-foreground')} aria-hidden='true' />
+      <div className='mx-auto mb-6 flex size-20 items-center justify-center rounded-sm border border-primary/25 bg-background text-primary'>
+        <Icon className={ICON_SIZES.SIZE_10} aria-hidden='true' />
       </div>
 
       {/* Title */}
-      <h3 className={cn('font-bold text-foreground', SPACING.MB_4, TYPOGRAPHY.TEXT_XL)}>{title}</h3>
+      <h3
+        className={cn(
+          'font-display font-semibold text-foreground',
+          SPACING.MB_4,
+          TYPOGRAPHY.TEXT_XL,
+        )}
+      >
+        {title}
+      </h3>
 
       {/* Description */}
       <p className='text-muted-foreground leading-relaxed'>{description}</p>

@@ -97,13 +97,13 @@ describe('StatsGrid', () => {
     it('should apply default variant classes', () => {
       const { container } = render(<StatsGrid stats={mockStats} variant='default' />);
       const cards = container.querySelectorAll('[class*="bg-card"]');
-      expect(cards[0]).toHaveClass('bg-card/50', 'backdrop-blur-sm');
+      expect(cards[0]).toHaveClass('bg-card', 'rounded-sm', 'border-border');
     });
 
     it('should apply elevated variant classes', () => {
       const { container } = render(<StatsGrid stats={mockStats} variant='elevated' />);
-      const cards = container.querySelectorAll('[class*="hover:shadow-lg"]');
-      expect(cards[0]).toHaveClass('hover:shadow-lg');
+      const cards = container.querySelectorAll('[class*="hover:border-primary"]');
+      expect(cards[0]).toHaveClass('hover:border-primary/45');
     });
 
     it('should apply bordered variant classes', () => {
@@ -179,19 +179,19 @@ describe('StatsGrid', () => {
     });
   });
 
-  describe('Icon Colors', () => {
-    it('should apply custom gradient color', () => {
+  describe('Icon Styling', () => {
+    it('should use Ledger icon containers', () => {
       const { container } = render(<StatsGrid stats={mockStats} />);
 
-      const iconContainer = container.querySelector('.from-primary.to-accent');
+      const iconContainer = container.querySelector('.border-primary\\/25.bg-background');
       expect(iconContainer).toBeInTheDocument();
     });
 
-    it('should use default gradient when no color specified', () => {
+    it('should use the same Ledger icon container when no color specified', () => {
       const statsWithoutColor: Stat[] = [{ icon: Calculator, value: '100%', label: 'Test' }];
 
       const { container } = render(<StatsGrid stats={statsWithoutColor} />);
-      const iconContainer = container.querySelector('.from-primary.to-accent');
+      const iconContainer = container.querySelector('.border-primary\\/25.bg-background');
       expect(iconContainer).toBeInTheDocument();
     });
   });

@@ -91,7 +91,7 @@ export function SectionHeading({
   const HeadingTag = level;
 
   const titleClasses = cn(
-    'mb-4 font-bold text-foreground',
+    'mb-4 font-display font-semibold text-foreground leading-tight',
     level === 'h2' ? TYPOGRAPHY.TEXT_4XL : TYPOGRAPHY.TEXT_3XL,
     alignClass,
   );
@@ -109,7 +109,11 @@ export function SectionHeading({
         <div className={cn(SPACING.MB_4, align === 'center' ? 'flex justify-center' : '')}>
           <Badge
             variant={badge.variant || 'outline'}
-            className={cn('px-4 py-1.5', SPACING.GAP_2, badge.icon && 'gap-2')}
+            className={cn(
+              'rounded-sm px-4 py-1.5 uppercase tracking-[0.18em]',
+              SPACING.GAP_2,
+              badge.icon && 'gap-2',
+            )}
           >
             {badge.icon && <badge.icon className={ICON_SIZES.SIZE_4} aria-hidden='true' />}
             <span>{badge.text}</span>

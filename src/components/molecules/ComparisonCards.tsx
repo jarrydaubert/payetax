@@ -87,20 +87,13 @@ function ComparisonCard({ item }: ComparisonCardProps) {
   const ListIcon = isNegative ? UserX : CheckCircle;
 
   const cardClasses = cn(
-    'h-full overflow-hidden p-8',
-    isNegative
-      ? 'border-destructive/30 bg-gradient-to-br from-destructive/5 to-destructive/10'
-      : 'border-primary/30 bg-gradient-to-br from-primary/5 to-primary/10',
+    'h-full overflow-hidden rounded-sm bg-card p-8',
+    isNegative ? 'border-destructive/30' : 'border-primary/30',
   );
 
   const iconContainerClasses = cn(
-    `flex ${ICON_SIZES.SIZE_12} items-center justify-center rounded-xl shadow-lg`,
-    isNegative ? 'bg-destructive' : 'bg-primary',
-  );
-
-  const iconClasses = cn(
-    ICON_SIZES.SIZE_6,
-    isNegative ? 'text-destructive-foreground' : 'text-primary-foreground',
+    `flex ${ICON_SIZES.SIZE_12} items-center justify-center rounded-sm border bg-background`,
+    isNegative ? 'border-destructive/25 text-destructive' : 'border-primary/25 text-primary',
   );
 
   const listIconClasses = cn(
@@ -113,9 +106,11 @@ function ComparisonCard({ item }: ComparisonCardProps) {
       {/* Header */}
       <div className={cn('flex items-center', SPACING.MB_6, SPACING.GAP_3)}>
         <div className={iconContainerClasses}>
-          <Icon className={iconClasses} aria-hidden='true' />
+          <Icon className={ICON_SIZES.SIZE_6} aria-hidden='true' />
         </div>
-        <h3 className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>{title}</h3>
+        <h3 className={cn('font-display font-semibold text-foreground', TYPOGRAPHY.TEXT_2XL)}>
+          {title}
+        </h3>
       </div>
 
       {/* List */}
