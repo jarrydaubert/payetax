@@ -484,6 +484,11 @@
     position: relative;
   }
 
+  body[data-scroll-locked] {
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+  }
+
   /* Text gradient utility using brand colors */
   .text-gradient {
     color: var(--primary);

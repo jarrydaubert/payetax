@@ -238,13 +238,6 @@ export function ResultsTable({
         <ScrollIndicator direction='right' visible={showRightIndicator} />
 
         <Card className='relative w-full overflow-hidden rounded-sm border-border bg-card shadow-none'>
-          <div className='flex items-center justify-between border-border border-b px-3 py-2.5 text-muted-foreground text-xs uppercase tracking-[0.14em]'>
-            <span>PAYE breakdown</span>
-            <span>
-              {visiblePeriods.length} {visiblePeriods.length === 1 ? 'period' : 'periods'}
-            </span>
-          </div>
-
           {/* Screen reader hint for scrollable region */}
           <div id={scrollHintId} className='sr-only'>
             Use horizontal scroll, swipe, or click and drag to view all pay periods. Navigate

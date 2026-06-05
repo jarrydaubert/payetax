@@ -25,10 +25,11 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
             This maintains consistent visual hierarchy across all main sections */}
         <TableHead
           className={cn(
-            'sticky left-0 z-20 w-44 whitespace-nowrap border-border border-r bg-card font-display font-semibold text-foreground sm:w-52',
+            'sticky left-0 z-20 w-44 whitespace-nowrap border-border border-r bg-card font-semibold text-foreground sm:w-52',
             SPACING.PX_2,
             'py-3',
-            TYPOGRAPHY.TEXT_LG,
+            TYPOGRAPHY.TEXT_BASE,
+            'sm:text-lg',
           )}
         >
           Breakdown

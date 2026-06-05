@@ -41,7 +41,7 @@ export function PeriodSelectorCard({
       )}
     >
       <div className='flex flex-col gap-2 lg:flex-row lg:items-center'>
-        <p className='shrink-0 font-semibold text-foreground text-sm uppercase tracking-[0.12em]'>
+        <p className='shrink-0 font-semibold text-base text-foreground sm:text-lg'>
           Display Periods
         </p>
         <div
