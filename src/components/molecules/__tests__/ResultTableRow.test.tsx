@@ -94,9 +94,9 @@ describe('ResultTableRow Component', () => {
       });
 
       const row = container.querySelector('tr');
-      expect(row).toHaveClass('border-t');
-      expect(row).toHaveClass('border-t-border');
-      expect(row).toHaveClass('bg-primary/5');
+      expect(row).toHaveClass('border-y');
+      expect(row).toHaveClass('border-primary/40');
+      expect(row).toHaveClass('bg-primary/10');
     });
 
     it('should not apply highlight styles when isHighlight is false', () => {
@@ -122,10 +122,10 @@ describe('ResultTableRow Component', () => {
         wrapper: TableWrapper,
       });
 
-      // Updated to match responsive padding classes (pl-4 sm:pl-6)
-      const categoryCell = container.querySelector('.pl-4');
+      // Updated to match responsive padding classes (pl-3 sm:pl-4)
+      const categoryCell = container.querySelector('.pl-3');
       expect(categoryCell).toBeInTheDocument();
-      expect(categoryCell).toHaveClass('sm:pl-6');
+      expect(categoryCell).toHaveClass('sm:pl-4');
     });
 
     it('should not apply sub-row indentation when isSubRow is false', () => {
@@ -133,10 +133,10 @@ describe('ResultTableRow Component', () => {
         wrapper: TableWrapper,
       });
 
-      // When isSubRow is false, the pl-4 class should NOT be applied to the div
-      const iconContainer = container.querySelector('.flex.items-center.gap-1\\.5');
-      expect(iconContainer).not.toHaveClass('pl-4');
-      expect(iconContainer).not.toHaveClass('sm:pl-6');
+      // When isSubRow is false, the indentation classes should NOT be applied to the div
+      const iconContainer = container.querySelector('.flex.items-start.gap-1\\.5');
+      expect(iconContainer).not.toHaveClass('pl-3');
+      expect(iconContainer).not.toHaveClass('sm:pl-4');
     });
 
     it('should have hover styles', () => {
@@ -145,7 +145,7 @@ describe('ResultTableRow Component', () => {
       });
 
       const row = container.querySelector('tr');
-      expect(row).toHaveClass('hover:bg-muted/50');
+      expect(row).toHaveClass('hover:bg-secondary/60');
     });
   });
 

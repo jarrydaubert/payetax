@@ -27,7 +27,6 @@ describe('pageDataValidation', () => {
         value: '100%',
         label: 'Free Forever',
         description: 'Always free, no hidden costs',
-        color: 'from-primary to-accent',
       };
 
       const result = StatSchema.safeParse(stat);
@@ -168,9 +167,7 @@ describe('pageDataValidation', () => {
           href: 'https://example.com',
         },
         gradient: {
-          bg: 'from-primary to-accent',
           icon: 'text-primary',
-          border: 'border-primary',
         },
       };
 

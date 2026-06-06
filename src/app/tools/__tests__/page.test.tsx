@@ -5,7 +5,7 @@ describe('ToolsPage', () => {
   it('renders the tools list with key links', () => {
     render(<ToolsPage />);
 
-    expect(screen.getByText('Free UK Tax')).toBeInTheDocument();
+    expect(screen.getByText('Free UK Tax Tools')).toBeInTheDocument();
     expect(screen.getByTestId('tools-link-director-guide')).toBeInTheDocument();
     expect(screen.getByTestId('tools-link-tax-code-decoder')).toBeInTheDocument();
     expect(screen.getByTestId('tools-link-national-insurance-calculator')).toBeInTheDocument();

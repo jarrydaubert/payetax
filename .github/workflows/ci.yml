@@ -50,6 +50,9 @@ jobs:
       - name: Repo checks
         run: bun run check:repo
 
+      - name: Tests
+        run: bun run test:ci
+
       - name: Dependency audit
         run: bun run audit:deps
 

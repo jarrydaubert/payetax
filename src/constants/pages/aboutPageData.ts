@@ -23,28 +23,24 @@ export const ABOUT_HERO_STATS = [
     value: '0',
     label: 'Salary fields sold',
     description: 'Core calculator interactions stay in-browser',
-    color: 'from-primary to-success',
   },
   {
     icon: Scale,
     value: 'HMRC',
     label: 'Rates source',
     description: 'Thresholds are mapped from official UK guidance',
-    color: 'from-success to-primary',
   },
   {
     icon: Clock3,
     value: '< 1s',
     label: 'Typical calculation speed',
     description: 'Designed for instant what-if iteration',
-    color: 'from-primary to-accent',
   },
   {
     icon: RefreshCw,
     value: 'Fast',
     label: 'Tax-year updates',
     description: 'Single source in `taxRates.ts` for controlled rollouts',
-    color: 'from-primary to-accent',
   },
 ] satisfies z.infer<typeof StatSchema>[];
 
@@ -83,9 +79,7 @@ export const ABOUT_TRUST_PILLARS = [
       'The calculator is designed to process inputs client-side so day-to-day salary exploration does not require account creation.',
     metric: 'Client-side',
     gradient: {
-      bg: 'from-primary/10 to-success/10',
       icon: 'text-primary',
-      border: 'border-primary/30',
     },
   },
   {
@@ -95,9 +89,7 @@ export const ABOUT_TRUST_PILLARS = [
       'Instrumentation focuses on product quality signals while avoiding raw personal salary telemetry in analytics events.',
     metric: 'Signal > noise',
     gradient: {
-      bg: 'from-success/10 to-primary/10',
       icon: 'text-success',
-      border: 'border-success/30',
     },
   },
   {
@@ -107,9 +99,7 @@ export const ABOUT_TRUST_PILLARS = [
       'When constraints exist, we call them out. We would rather show caveats than silently over-claim accuracy.',
     metric: 'No hidden assumptions',
     gradient: {
-      bg: 'from-accent/10 to-primary/10',
       icon: 'text-primary',
-      border: 'border-primary/30',
     },
   },
 ] satisfies z.infer<typeof FeatureSchema>[];

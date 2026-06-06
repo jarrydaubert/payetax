@@ -41,9 +41,7 @@ export const PRIVACY_PRINCIPLES = [
     description:
       'All tax calculations run in your browser using JavaScript. Your salary, tax code, and personal details never leave your device.',
     gradient: {
-      bg: 'from-primary/20 to-accent/20',
       icon: 'text-primary',
-      border: 'border-primary/20',
     },
   },
   {
@@ -52,9 +50,7 @@ export const PRIVACY_PRINCIPLES = [
     description:
       "We don't store your tax data on our servers. Calculations happen locally, results display instantly, nothing gets saved remotely.",
     gradient: {
-      bg: 'from-accent/20 to-primary/20',
       icon: 'text-accent',
-      border: 'border-accent/20',
     },
   },
   {
@@ -63,9 +59,7 @@ export const PRIVACY_PRINCIPLES = [
     description:
       'Anonymous usage data (page views, device type) only with your consent. You can decline entirely - the calculator works exactly the same.',
     gradient: {
-      bg: 'from-primary/10 to-accent/10',
       icon: 'text-primary',
-      border: 'border-primary/10',
     },
   },
   {
@@ -74,9 +68,7 @@ export const PRIVACY_PRINCIPLES = [
     description:
       "Your privacy isn't a feature we added - it's built into the architecture. We literally cannot see your tax calculations.",
     gradient: {
-      bg: 'from-accent/10 to-primary/10',
       icon: 'text-accent',
-      border: 'border-accent/10',
     },
   },
 ] satisfies z.infer<typeof FeatureSchema>[];

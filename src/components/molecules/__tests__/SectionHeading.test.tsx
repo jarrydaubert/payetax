@@ -164,10 +164,10 @@ describe('SectionHeading', () => {
       expect(heading).toHaveClass('text-3xl');
     });
 
-    it('should apply font-bold to title', () => {
+    it('should apply font-semibold to title', () => {
       render(<SectionHeading title='Title' />);
       const heading = screen.getByRole('heading');
-      expect(heading).toHaveClass('font-bold');
+      expect(heading).toHaveClass('font-semibold');
     });
 
     it('should apply muted color to subtitle', () => {
