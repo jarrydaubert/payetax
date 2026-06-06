@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
+import { isSentryMonitoredPath } from '@/lib/sentryScope';
 
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
@@ -9,7 +10,7 @@ export async function register() {
     await import('./sentry.edge.config');
   }
 
-  // Client-side Sentry configuration (replaces sentry.client.config.ts)
+  // Client-side Sentry configuration
   if (process.env.NEXT_RUNTIME === 'browser') {
     await import('./instrumentation-client');
   }
@@ -24,6 +25,10 @@ export async function onRequestError(
     routerKind: 'Pages Router' | 'App Router';
   },
 ) {
+  if (!isSentryMonitoredPath(request.path)) {
+    return;
+  }
+
   Sentry.captureException(err, {
     tags: {
       router_kind: context.routerKind,

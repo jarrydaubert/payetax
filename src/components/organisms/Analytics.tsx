@@ -34,7 +34,8 @@ declare global {
 export function Analytics() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [hasConsent, setHasConsent] = useState(false);
+  const [isScriptReady, setIsScriptReady] = useState(false);
   const sentPageViews = useRef(new Set<string>());
 
   const getCurrentPagePath = useCallback(() => {
@@ -44,7 +45,7 @@ export function Analytics() {
 
   const markAnalyticsReady = useCallback(() => {
     if (typeof window !== 'undefined' && window.gtag) {
-      setIsLoaded(true);
+      setIsScriptReady(true);
     }
   }, []);
 
@@ -90,23 +91,19 @@ export function Analytics() {
     [getCurrentPagePath],
   );
 
-  const applyAnalyticsConsent = useCallback(
+  const setAnalyticsConsentState = useCallback(
     (hasConsent: boolean) => {
-      if (window.consentMode) {
-        window.consentMode.isConsentGiven = hasConsent;
-      }
+      window.consentMode = {
+        isConsentGiven: hasConsent,
+      };
 
-      updateConsent(hasConsent);
+      setHasConsent(hasConsent);
 
-      if (hasConsent) {
-        if (!vitalsInitialized.current) {
-          vitalsInitialized.current = true;
-          initCoreWebVitals();
-        }
-        sendCurrentPageView(hasConsent);
+      if (isScriptReady) {
+        updateConsent(hasConsent);
       }
     },
-    [sendCurrentPageView, updateConsent],
+    [isScriptReady, updateConsent],
   );
 
   /**
@@ -178,47 +175,32 @@ export function Analytics() {
   // Track whether we've initialized Core Web Vitals (only do once)
   const vitalsInitialized = useRef(false);
 
-  // Initialize analytics when component mounts
-  // Note: consent 'default' is already set in the inline Script (runs earlier)
-  // This effect only needs to check stored consent and update if granted
+  // Initialize consent state on mount. GA4 scripts are only loaded after consent;
+  // Vercel Web Analytics handles cookieless traffic visibility outside this component.
   useEffect(() => {
-    if (!(isLoaded && window?.gtag)) return;
+    setAnalyticsConsentState(isAnalyticsConsented());
+  }, [setAnalyticsConsentState]);
 
-    // Check if user previously gave consent (respects 12-month expiry)
-    const hasConsent = isAnalyticsConsented();
+  // Track page views when pathname/search params change and consented GA4 is ready.
+  useEffect(() => {
+    if (!(hasConsent && isScriptReady && GA_MEASUREMENT_ID && window?.gtag)) return;
 
-    // Store in window for other components to access
-    window.consentMode = {
-      isConsentGiven: hasConsent,
-    };
+    updateConsent(true);
 
-    // Update consent if previously given
-    if (hasConsent) {
-      updateConsent(true);
-
-      // Initialize Core Web Vitals tracking (only once per session)
-      if (!vitalsInitialized.current) {
-        vitalsInitialized.current = true;
-        initCoreWebVitals();
-      }
+    if (!vitalsInitialized.current) {
+      vitalsInitialized.current = true;
+      initCoreWebVitals();
     }
-  }, [isLoaded, updateConsent]);
 
-  // Track page views when pathname or search params change
-  useEffect(() => {
-    if (!(isLoaded && GA_MEASUREMENT_ID)) return;
-
-    if (!sendCurrentPageView()) return;
+    if (!sendCurrentPageView(true)) return;
 
     // Track additional SEO metrics and return cleanup
     const cleanup = trackSEOMetrics();
     return cleanup;
-  }, [isLoaded, sendCurrentPageView, trackSEOMetrics]);
+  }, [hasConsent, isScriptReady, sendCurrentPageView, trackSEOMetrics, updateConsent]);
 
   // Handle storage events for consent changes from other tabs
   useEffect(() => {
-    if (!isLoaded) return;
-
     const parseAnalyticsConsentValue = (value: string | null): boolean => {
       if (value === 'accepted') return true;
       if (value === 'declined') return false;
@@ -239,14 +221,14 @@ export function Analytics() {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'cookie-consent') {
         const newConsent = parseAnalyticsConsentValue(e.newValue);
-        applyAnalyticsConsent(newConsent);
+        setAnalyticsConsentState(newConsent);
       }
     };
 
     const handleConsentUpdate = (event: Event) => {
       const detail: unknown = (event as CustomEvent<unknown>).detail;
       const newConsent = isConsentPreferences(detail) ? detail.analytics : isAnalyticsConsented();
-      applyAnalyticsConsent(newConsent);
+      setAnalyticsConsentState(newConsent);
     };
 
     window.addEventListener('storage', handleStorageChange);
@@ -256,10 +238,10 @@ export function Analytics() {
       window.removeEventListener('storage', handleStorageChange);
       document.removeEventListener('cookieConsentUpdated', handleConsentUpdate);
     };
-  }, [applyAnalyticsConsent, isLoaded]);
+  }, [setAnalyticsConsentState]);
 
-  // Don't render when analytics are disabled or GA ID is missing.
-  if (!(ANALYTICS_ENABLED && GA_MEASUREMENT_ID)) {
+  // Don't render GA4 unless it is enabled, configured, and consented.
+  if (!(ANALYTICS_ENABLED && GA_MEASUREMENT_ID && hasConsent)) {
     return null;
   }
 
@@ -282,9 +264,10 @@ export function Analytics() {
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
           
-          // Initialize with consent mode v2 (all denied by default)
+          // GA4 is only loaded after consent, so initialize consent mode as granted
+          // for analytics while keeping ad and personalization storage denied.
           gtag('consent', 'default', {
-            'analytics_storage': 'denied',
+            'analytics_storage': 'granted',
             'ad_storage': 'denied',
             'ad_user_data': 'denied',
             'ad_personalization': 'denied',

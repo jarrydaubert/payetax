@@ -250,7 +250,7 @@ Examples:
 - Final production visual inspection.
 - Lighthouse runs on the live deployment.
 - Email deliverability checks against the configured provider.
-- Sentry and Vercel environment confirmation.
+- Calculator-focused Sentry and Vercel environment confirmation.
 
 Manual checks belong in the PR, release notes, or post-release checklist. They should not become permanent heavyweight CI workflows unless the risk justifies the maintenance.
 
@@ -276,12 +276,6 @@ Every calculation fix should add or update a failing-then-passing assertion in t
 - Generator: `e2e/scripts/generate-golden-master.ts`
 
 Important limitation: the fixture is generated from `taxRates.ts` and `calculateTax()`. It cannot catch an engine that is wrong but self-consistent. Its job is to catch UI, form, rendering, browser, extraction, and regression drift.
-
-### E2E Helper Limitation
-
-`e2e/helpers/tax-test-helpers.ts` reimplements band, NI, and loan logic, but imports production constants.
-
-That makes it logic-independent but constant-dependent. A rate or threshold typo can pass both the engine and helper. Treat it as a support net, not the correctness oracle.
 
 ## Rounding And Threshold Policy
 
@@ -444,8 +438,8 @@ These are the most useful next automated tests:
    - Test with: manual post-release send to a controlled address, then document result in release evidence.
 
 4. Live monitoring confirmation.
-   - Why: Sentry and Vercel env wiring are production configuration, not fully provable in local unit tests.
-   - Test with: post-release Sentry event confirmation and production env review.
+   - Why: calculator-focused Sentry and Vercel env wiring are production configuration, not fully provable in local unit tests.
+   - Test with: post-release Sentry event confirmation on PAYE or Director calculator flows and production env review.
 
 ## Manual Visual And Lighthouse Checks
 

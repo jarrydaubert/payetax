@@ -9,6 +9,7 @@ After a production deploy:
 - [ ] Blog index and a blog post load.
 - [ ] PAYE results email sends through the Brevo API.
 - [ ] Director results email sends through the Brevo API.
-- [ ] Sentry reports no new release-blocking errors.
-- [ ] GA4 receives a page view if analytics changed.
+- [ ] Sentry reports no new release-blocking PAYE or Director calculator errors.
+- [ ] Vercel Web Analytics receives traffic if analytics changed.
+- [ ] GA4 receives a page view after accepting analytics cookies if GA4 changed.
 - [ ] Rate-limit health check passes when using the configured secret.

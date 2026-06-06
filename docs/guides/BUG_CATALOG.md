@@ -104,12 +104,12 @@ Primary detectors:
 ### OBSERVABILITY-CONTRACT (Monitoring or operational health drift)
 
 Symptoms:
-- Sentry, env validation, or rate-limit health checks stop matching production expectations.
+- Calculator-focused Sentry, env validation, or rate-limit health checks stop matching production expectations.
 - Required env names drift between code, docs, and `.env.template`.
 - Operational health route returns the wrong status for missing/invalid secrets.
 
 Primary detectors:
-- Jest: Sentry/env/rate-limit tests under `src/lib/__tests__/` and `src/lib/security/__tests__/`
+- Jest: Sentry scope, env, and rate-limit tests under `src/lib/__tests__/` and `src/lib/security/__tests__/`
 - Scripts: `bun run check:env-contract`, `bun run check-version`
 - Next tests to add: `src/app/api/ops/rate-limit-health/route.ts`
 

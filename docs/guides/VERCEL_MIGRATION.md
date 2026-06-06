@@ -132,7 +132,7 @@ bun run check:production-env-contract
 ```
 
 3. Check Vercel logs for production runtime errors.
-4. Confirm analytics and Sentry are receiving expected events without leaking sensitive data.
+4. Confirm analytics and calculator-focused Sentry are receiving expected events without leaking sensitive data.
 5. Confirm any previous or incorrect Vercel project is no longer receiving production traffic.
 
 ## Rollback

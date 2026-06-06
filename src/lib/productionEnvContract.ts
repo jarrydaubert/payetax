@@ -48,11 +48,14 @@ export const PRODUCTION_ENV_FEATURE_CONTRACT: readonly ProductionEnvFeatureContr
   },
   {
     id: 'analytics',
-    label: 'Basic GA4 analytics',
+    label: 'Vercel Web Analytics and consent-based GA4 analytics',
     enabled: isAnalyticsEnabled,
     requiredEnv: ['NEXT_PUBLIC_GA_ID'],
     verificationMode: 'env',
-    notes: ['Analytics defaults to enabled unless NEXT_PUBLIC_ENABLE_ANALYTICS=false is set.'],
+    notes: [
+      'Analytics defaults to enabled unless NEXT_PUBLIC_ENABLE_ANALYTICS=false is set.',
+      'Vercel Web Analytics requires the project dashboard feature to be enabled, not an env variable.',
+    ],
   },
   {
     id: 'results-email',

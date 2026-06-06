@@ -1,8 +1,6 @@
 import * as Sentry from '@sentry/nextjs';
 import { shouldDropClientSentryEvent } from '@/lib/sentryClientFilters';
-
-// Export router transition hook for navigation instrumentation
-export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
+import { isSentryMonitoredPath, shouldDropSentryEventForUnmonitoredPath } from '@/lib/sentryScope';
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
@@ -11,76 +9,14 @@ Sentry.init({
   environment: process.env.NODE_ENV,
   release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || 'development',
 
-  // Enable structured logs (5GB/month free tier)
-  enableLogs: true,
+  enableLogs: false,
+  tracesSampleRate: 0,
 
-  // Performance monitoring - optimized for free tier (10k transactions/month)
-  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0, // 10% in prod, 100% in dev
-
-  // Advanced traces sampling based on operation
-  tracesSampler: (samplingContext) => {
-    // Always sample errors
-    if (samplingContext.parentSampled === true) {
-      return 1.0;
-    }
-
-    // Sample critical transactions - keep low for free tier
-    const transactionName = samplingContext.transactionContext?.name;
-    if (transactionName?.includes('/api/')) {
-      return 0.1; // 10% for API routes
-    }
-
-    // Sample calculator pages (core functionality)
-    if (
-      transactionName?.includes('/calculator') ||
-      transactionName?.includes('/salary') ||
-      transactionName?.includes('/income')
-    ) {
-      return 0.15; // 15% for calculator pages
-    }
-
-    // Default sampling for other pages
-    return 0.05;
-  },
-
-  // Session Replay - optimized for free tier (50 replays/month)
-  replaysOnErrorSampleRate: process.env.NODE_ENV === 'production' ? 1.0 : 0, // Capture 100% of errors
-  replaysSessionSampleRate: process.env.NODE_ENV === 'production' ? 0.01 : 0, // Sample 1% of sessions
-
-  // Integrations with enhanced configuration
+  // Error-focused client monitoring. Session Replay and Browser Tracing are
+  // intentionally disabled to keep Sentry scoped to calculator failures.
   integrations:
     process.env.NODE_ENV === 'production'
       ? [
-          // Console logging integration - capture console.warn and console.error
-          Sentry.consoleLoggingIntegration({
-            levels: ['warn', 'error'], // Only capture warnings and errors (not log/debug)
-          }),
-
-          // Session Replay with privacy controls
-          Sentry.replayIntegration({
-            maskAllText: true,
-            blockAllMedia: true,
-            // Privacy-sensitive selectors to block
-            block: [
-              '.sentry-block',
-              '[data-sentry-block]',
-              '[data-private]',
-              'input[type="email"]',
-              'input[type="tel"]',
-            ],
-            // Network request/response body recording
-            networkDetailAllowUrls: [window.location.origin],
-            networkRequestHeaders: ['User-Agent'],
-            networkResponseHeaders: ['Content-Type'],
-          }),
-          // Browser tracing for performance monitoring
-          Sentry.browserTracingIntegration({
-            // Enhanced instrumentation
-            enableLongTask: true,
-            enableInp: true, // Track Interaction to Next Paint (Core Web Vital)
-          }),
-
-          // Breadcrumbs for better error context
           Sentry.breadcrumbsIntegration({
             console: false, // Don't track console.log
             dom: true, // Track DOM events
@@ -173,10 +109,18 @@ Sentry.init({
       if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.local')) {
         return null;
       }
+
+      if (!isSentryMonitoredPath(window.location.pathname)) {
+        return null;
+      }
     }
 
     // Don't send errors from development environment
     if (process.env.NODE_ENV === 'development') {
+      return null;
+    }
+
+    if (shouldDropSentryEventForUnmonitoredPath(event)) {
       return null;
     }
 
@@ -312,61 +256,5 @@ Sentry.init({
     }
 
     return breadcrumb;
-  },
-
-  // Filter logs before sending to Sentry
-  beforeSendLog(log) {
-    // Don't send logs from development or localhost
-    if (process.env.NODE_ENV === 'development') {
-      return null;
-    }
-    if (typeof window !== 'undefined') {
-      const hostname = window.location.hostname;
-      if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.endsWith('.local')) {
-        return null;
-      }
-    }
-
-    // Filter out info/debug logs to conserve quota (only warn/error/fatal)
-    if (log.level === 'info' || log.level === 'debug' || log.level === 'trace') {
-      return null;
-    }
-
-    // Filter out PWA/ServiceWorker logs, deprecation warnings, and Sentry Replay errors
-    const msg = typeof log.message === 'string' ? log.message : '';
-    if (
-      msg.includes('[PWA]') ||
-      msg.includes('[SW]') ||
-      msg.includes('DeprecationWarning') ||
-      msg.includes('[DEP0') ||
-      msg.includes('cross-origin stylesheet') ||
-      msg.includes('Failed to load chunk')
-    ) {
-      return null;
-    }
-
-    // Scrub potential PII from log attributes
-    if (log.attributes) {
-      const sanitized = { ...log.attributes };
-      const sensitiveFields = [
-        'email',
-        'name',
-        'phone',
-        'address',
-        'postcode',
-        'nationalInsuranceNumber',
-        'taxCode',
-        'salary',
-        'pensionContribution',
-      ];
-      for (const field of sensitiveFields) {
-        if (field in sanitized) {
-          sanitized[field] = '[Filtered]';
-        }
-      }
-      log.attributes = sanitized;
-    }
-
-    return log;
   },
 });

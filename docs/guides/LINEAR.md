@@ -10,7 +10,7 @@ For board operating rules, see `docs/guides/KANBAN.md`.
 
 - `docs/BACKLOG.md` is the source of truth for planned work.
 - GitHub issues and pull requests are sufficient for current repo work.
-- Sentry is used for monitoring, but it does not automatically create Linear issues.
+- Sentry is used for calculator error monitoring, but it does not automatically create Linear issues.
 - Any old Linear API keys, team keys, project names, and webhook secrets should be treated as stale.
 
 ## Future Reconnection

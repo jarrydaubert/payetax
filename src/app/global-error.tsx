@@ -6,6 +6,7 @@ import { ChevronDown, Home, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { isSentryMonitoredPath } from '@/lib/sentryScope';
 
 export default function GlobalError({
   error,
@@ -26,6 +27,7 @@ export default function GlobalError({
     const errorKey = `${error.digest ?? ''}:${error.message}`;
     if (capturedRef.current === errorKey) return;
     capturedRef.current = errorKey;
+    if (!isSentryMonitoredPath(window.location.pathname)) return;
 
     const eventId = Sentry.captureException(error, {
       tags: { error_boundary: 'global' },

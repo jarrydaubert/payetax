@@ -1,4 +1,6 @@
 // src/app/layout.tsx
+
+import { Analytics as VercelAnalytics } from '@vercel/analytics/next';
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
@@ -8,7 +10,7 @@ import './globals.css';
 import Script from 'next/script';
 import { Suspense } from 'react';
 import { ibmPlexMono, newsreader, publicSans } from '@/app/fonts';
-import Analytics from '@/components/organisms/Analytics';
+import GoogleAnalytics from '@/components/organisms/Analytics';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import Layout from '@/components/templates/Layout';
 import { ThemeProvider } from '@/lib/theme';
@@ -35,6 +37,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const analyticsEnabled = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS !== 'false';
+  const vercelAnalyticsEnabled = analyticsEnabled && Boolean(process.env.VERCEL_URL);
 
   return (
     <html
@@ -74,7 +77,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <StructuredData type='organization' />
 
         <ThemeProvider>
-          <Suspense fallback={null}>{analyticsEnabled ? <Analytics /> : null}</Suspense>
+          {vercelAnalyticsEnabled ? <VercelAnalytics /> : null}
+          <Suspense fallback={null}>{analyticsEnabled ? <GoogleAnalytics /> : null}</Suspense>
           <Layout>{children}</Layout>
         </ThemeProvider>
 

@@ -67,17 +67,34 @@ describe('Analytics Component', () => {
   });
 
   describe('Initialization', () => {
-    it('should render Analytics scripts', () => {
+    it('should render Analytics scripts after consent', () => {
+      (window.localStorage.getItem as jest.Mock).mockReturnValue('accepted');
+
       const { container } = render(<Analytics />);
 
       // Check that component renders without errors
       expect(container).toBeInTheDocument();
     });
 
-    it('should include consent-default snippet in ga-init script', () => {
+    it('should not render GA4 scripts before consent', () => {
       const { container } = render(<Analytics />);
       const initScript = container.querySelector('#ga-init');
-      expect(initScript?.textContent).toMatch(/gtag\('consent',\s*'default'/i);
+      const gaScript = container.querySelector('#ga-script');
+
+      expect(initScript).not.toBeInTheDocument();
+      expect(gaScript).not.toBeInTheDocument();
+    });
+
+    it('should include consent-granted snippet in ga-init script after consent', async () => {
+      (window.localStorage.getItem as jest.Mock).mockReturnValue('accepted');
+
+      const { container } = render(<Analytics />);
+
+      await waitFor(() => {
+        const initScript = container.querySelector('#ga-init');
+        expect(initScript?.textContent).toMatch(/gtag\('consent',\s*'default'/i);
+        expect(initScript?.textContent).toMatch(/'analytics_storage': 'granted'/i);
+      });
     });
 
     it('should create consentMode object on window', async () => {
@@ -175,7 +192,7 @@ describe('Analytics Component', () => {
 
       await waitFor(() => {
         const configCalls = mockGtag.mock.calls.filter((call) => call[0] === 'config');
-        expect(configCalls.length).toBeLessThanOrEqual(1); // Only initial config
+        expect(configCalls).toHaveLength(0);
       });
     });
 

@@ -108,8 +108,8 @@ export function PrivacyPageContent() {
           <FeatureGrid
             heading={{
               badge: { icon: Eye, text: 'Analytics' },
-              title: 'What We Track (With Your Permission)',
-              subtitle: 'Anonymous analytics that respect your privacy',
+              title: 'What We Track',
+              subtitle: 'Privacy-conscious analytics and monitoring',
               align: 'center',
             }}
             features={[
@@ -117,19 +117,19 @@ export function PrivacyPageContent() {
                 icon: Cookie,
                 title: 'Analytics Tools',
                 description:
-                  'We use Google Analytics 4 with Consent Mode and Sentry for error monitoring. GA4 only tracks after you accept analytics cookies.',
+                  'We use Vercel Web Analytics for cookieless traffic counts, Google Analytics 4 with Consent Mode, and Sentry for calculator error monitoring. GA4 only tracks after you accept analytics cookies.',
               },
               {
                 icon: Eye,
                 title: 'What We Track',
                 description:
-                  'Page views, anonymized salary ranges (not exact values), calculator usage patterns, performance metrics, and error context needed to diagnose failures. No financial data is intentionally recorded.',
+                  'Page views, anonymized salary ranges (not exact values), calculator usage patterns, and calculator error context needed to diagnose failures. No financial data is intentionally recorded.',
               },
               {
                 icon: Shield,
                 title: 'Your Control',
                 description:
-                  'Decline analytics via our cookie banner to block GA4 tracking entirely. The calculator works identically either way.',
+                  'Decline analytics via our cookie banner to block GA4 tracking entirely. Cookieless Vercel Web Analytics still helps us understand basic traffic. The calculator works identically either way.',
               },
             ]}
             columns={3}

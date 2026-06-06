@@ -2,10 +2,6 @@ import { fireEvent, render, screen } from '@/test/testing-library';
 
 import BlogPostError from '../error';
 
-jest.mock('@sentry/nextjs', () => ({
-  captureException: jest.fn(),
-}));
-
 describe('BlogPostError', () => {
   it('renders error UI and allows retry', () => {
     const reset = jest.fn();

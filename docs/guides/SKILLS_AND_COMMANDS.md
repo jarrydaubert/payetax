@@ -17,7 +17,7 @@ bun audit
 - Calculator correctness: `src/lib/taxCalculator.ts`, `src/constants/taxRates.ts`
 - Director Intelligence: `src/lib/tax/`, `src/components/organisms/DirectorGuide/`
 - Email delivery: `src/lib/email/`
-- Observability: `src/lib/sentry.ts`, `sentry.server.config.ts`, `sentry.client.config.ts`
+- Observability: `src/lib/sentry.ts`, `instrumentation-client.ts`, `sentry.server.config.ts`
 - Test strategy: `docs/guides/TESTING.md`, `docs/guides/BUG_CATALOG.md`, `e2e/`, `jest.config.js`, `playwright.config.ts`
 - Documentation: `README.md`, `AGENTS.md`, `docs/`
 

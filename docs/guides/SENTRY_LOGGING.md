@@ -1,56 +1,52 @@
-# Sentry Structured Logging Guide
+# Sentry Calculator Monitoring
 
-## Overview
+## Scope
 
-Sentry structured logging is enabled across client, server, and edge runtimes.
+Sentry is configured as a calculator failure net, not as sitewide analytics.
+
+Reportable surfaces:
+
+- `/` for the main PAYE calculator.
+- `/calculator` for old calculator entry points and redirects.
+- `/tools/director-guide` for Director Intelligence.
+- `/api/send-results` and `/api/send-director-results` for email-results failures.
+
+Blog, privacy, static content, and non-core tool pages still render their local error UI, but their browser errors are filtered before they reach Sentry.
 
 ## What Is Captured
 
-- `console.error()` and `console.warn()`
-- Structured logs via `Sentry.logger`
+- Unhandled client errors on the monitored calculator routes.
+- Handled operational failures for PAYE and Director email-results API routes.
+- Calculator anomaly exceptions.
+- Source maps for production releases when `SENTRY_AUTH_TOKEN` is configured.
 
-Low‑value logs (debug/info/trace) and PII are filtered out.
+## What Is Not Captured
 
-## How to Log
-
-Use `Sentry.logger` for structured logs with searchable attributes:
-
-```typescript
-import * as Sentry from '@sentry/nextjs';
-
-Sentry.logger.error('Payment processing failed');
-Sentry.logger.warn('Rate limit approaching');
-
-Sentry.logger.error('Failed to process payment', {
-  orderId: 'order_id',
-  amount: amount,
-  userId: user.id,
-  errorCode: 'PAYMENT_DECLINED',
-});
-
-Sentry.logger.error(
-  Sentry.logger.fmt`Payment failed for user ${userId} with order ${orderId}`
-);
-```
-
-Console logging is also captured automatically for warnings and errors.
+- Session Replay.
+- Browser performance tracing.
+- Structured Sentry logs.
+- Sitewide content-page errors.
+- Raw user-entered salary, tax code, email, or pension values.
 
 ## Files
 
-- Client: `instrumentation-client.ts`
-- Server: `sentry.server.config.ts`
-- Edge: `sentry.edge.config.ts`
+- Scope helper: `src/lib/sentryScope.ts`.
+- Client configuration: `instrumentation-client.ts`.
+- Server configuration: `sentry.server.config.ts`.
+- Edge configuration: `sentry.edge.config.ts`.
+- Calculator utility wrappers: `src/lib/sentry.ts`.
 
 ## Calculation Anomaly Alerts
 
-PayeTax emits explicit anomaly alerts when calculator output contains impossible values
-(for example non-finite numbers, negative tax components, or invalid effective-rate bounds).
+PayeTax emits explicit anomaly alerts when calculator output contains impossible values, such as non-finite numbers, negative tax components, or invalid effective-rate bounds.
 
 Primary signal:
-- Sentry exception message containing `Calculation anomaly detected`
-- Analytics event `calculator_error` with `error_type=calculation_anomaly`
+
+- Sentry exception message containing `Calculation anomaly detected`.
+- Analytics event `calculator_error` with `error_type=calculation_anomaly`.
 
 Minimum triage steps:
-1. Capture the Sentry event ID and inspect `tax_year`, `region`, and `salary` context.
+
+1. Capture the Sentry event ID and inspect non-PII tags such as tax year and region.
 2. Reproduce with equivalent non-PII input in non-production.
 3. If reproducible, create a blocker issue before marking release health as complete.
