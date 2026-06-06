@@ -13,7 +13,7 @@ It is not a commercial growth site. Keep the product useful, accurate, and simpl
 - Keep the main calculator, tools, Director Intelligence, blog, email-results, PWA, GA4, Sentry, Brevo API email, and Upstash-backed rate limiting.
 - Do not reintroduce growth page families, competitor-style SEO pages, partner lead capture, or mailing-list plumbing unless explicitly requested.
 - Do not add extra analytics vendors beyond GA4 unless there is a specific implementation task.
-- Do not reintroduce the feedback feature or active Linear integration unless explicitly requested.
+- Do not reintroduce the feedback feature or external issue-tracker integrations unless explicitly requested.
 - Do not invent tax behaviour, provider support, production status, usage metrics, or security controls.
 - Do not commit secrets.
 
