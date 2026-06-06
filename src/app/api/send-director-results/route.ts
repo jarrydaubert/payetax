@@ -4,7 +4,7 @@ import { checkRateLimitWithPolicy, createRateLimitHeaders } from '@/lib/rateLimi
 import { detectLikelyBotRequest } from '@/lib/security/botGuard';
 import { getClientIdentifier } from '@/lib/security/clientIdentifier';
 import { isValidRequestOrigin } from '@/lib/security/origin';
-import { captureOperationalFailure } from '@/lib/sentry';
+import { captureOperationalFailureAndFlush } from '@/lib/sentry';
 import { SendDirectorResultsRequestSchema } from '@/lib/validation/emailValidation';
 
 const MAX_BODY_SIZE = 50 * 1024; // 50KB
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     'require_distributed_in_production',
   );
   if (rateLimit.reason === 'distributed_unavailable') {
-    captureOperationalFailure({
+    await captureOperationalFailureAndFlush({
       operation: 'send-director-results',
       route: '/api/send-director-results',
       reason: 'rate_limit_distributed_unavailable',
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
   const delivery = await sendDirectorResultsEmail(validationResult.data);
   if (!delivery.ok) {
     if (delivery.reason === 'not_configured') {
-      captureOperationalFailure({
+      await captureOperationalFailureAndFlush({
         operation: 'send-director-results',
         route: '/api/send-director-results',
         reason: 'email_not_configured',
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Email service not configured' }, { status: 503 });
     }
 
-    captureOperationalFailure({
+    await captureOperationalFailureAndFlush({
       operation: 'send-director-results',
       route: '/api/send-director-results',
       reason:

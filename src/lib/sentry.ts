@@ -160,6 +160,16 @@ export function captureOperationalFailure(
   });
 }
 
+export async function captureOperationalFailureAndFlush(
+  context: OperationalFailureContext,
+  severity: ErrorSeverity = 'error',
+  timeout = 2000,
+): Promise<string | undefined> {
+  const eventId = captureOperationalFailure(context, severity);
+  await flushSentryEvents(timeout);
+  return eventId;
+}
+
 /**
  * Capture an error with calculator-specific context
  * Use this for errors during tax calculations

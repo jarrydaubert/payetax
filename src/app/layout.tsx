@@ -37,7 +37,6 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const analyticsEnabled = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS !== 'false';
-  const vercelAnalyticsEnabled = analyticsEnabled && Boolean(process.env.VERCEL_URL);
 
   return (
     <html
@@ -77,7 +76,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <StructuredData type='organization' />
 
         <ThemeProvider>
-          {vercelAnalyticsEnabled ? <VercelAnalytics /> : null}
+          {analyticsEnabled ? <VercelAnalytics /> : null}
           <Suspense fallback={null}>{analyticsEnabled ? <GoogleAnalytics /> : null}</Suspense>
           <Layout>{children}</Layout>
         </ThemeProvider>
