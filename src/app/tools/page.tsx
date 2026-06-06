@@ -1,9 +1,11 @@
 // src/app/tools/page.tsx
 import { ArrowRight, Wrench } from 'lucide-react';
+import type { Route } from 'next';
 import Link from 'next/link';
 import { PageHero } from '@/components/molecules/PageHero';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { Card } from '@/components/ui/card';
+import { TOOLS } from '@/constants/pages/toolsData';
 import { generateMetadata as generateBaseMetadata, SITE_URL } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
 
@@ -15,33 +17,7 @@ export const metadata = generateBaseMetadata({
 });
 
 export default function ToolsPage() {
-  const tools = [
-    {
-      href: '/tools/director-guide',
-      title: 'Director Intelligence',
-      description: 'Salary vs dividends optimizer for UK limited company directors.',
-    },
-    {
-      href: '/tools/tax-code-decoder',
-      title: 'Tax Code Decoder',
-      description: 'Decode HMRC tax codes (1257L, BR, D0, K codes, etc.).',
-    },
-    {
-      href: '/tools/scottish-tax-calculator',
-      title: 'Scottish Tax Calculator',
-      description: 'Calculate take-home using Scotland’s income tax bands.',
-    },
-    {
-      href: '/tools/national-insurance-calculator',
-      title: 'National Insurance Calculator',
-      description: 'Employee and employer NI breakdown by tax year.',
-    },
-    {
-      href: '/tools/marriage-allowance-calculator',
-      title: 'Marriage Allowance Calculator',
-      description: 'Check eligibility and estimate the savings.',
-    },
-  ] as const;
+  const tools = TOOLS;
 
   return (
     <>
@@ -79,7 +55,7 @@ export default function ToolsPage() {
               {tools.map((tool) => (
                 <Link
                   key={tool.href}
-                  href={tool.href}
+                  href={tool.href as Route}
                   data-testid={`tools-link-${tool.href.split('/').pop()}`}
                   className='group block h-full'
                 >
