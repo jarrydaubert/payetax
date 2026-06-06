@@ -238,7 +238,10 @@ export function SidebarNav({
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
         const firstVisible = visible[0];
         if (firstVisible) {
-          setActiveSectionId(firstVisible.target.id);
+          const sectionId = firstVisible.target.getAttribute('data-director-section');
+          if (sectionId) {
+            setActiveSectionId(sectionId);
+          }
         }
       },
       {

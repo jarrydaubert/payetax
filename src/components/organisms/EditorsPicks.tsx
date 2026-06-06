@@ -69,21 +69,17 @@ interface EditorsPicksPanelProps extends EditorsPicksListProps {
 
 function EditorsPicksPanel({ posts, countLabel }: EditorsPicksPanelProps) {
   return (
-    <aside
-      aria-label="Editor's picks"
-      className='overflow-hidden rounded-sm border border-border bg-card'
-    >
-      <div className='border-border border-b px-4 py-4 sm:px-5'>
-        <p className='font-semibold text-[0.68rem] text-primary uppercase tracking-[0.24em]'>
-          Curated reads
-        </p>
-        <h2 className='mt-1 font-display font-semibold text-foreground text-xl leading-tight'>
+    <aside aria-label="Editor's picks">
+      <div className='mb-4 flex items-baseline justify-between gap-3 sm:mb-6'>
+        <h2 className='font-semibold text-primary text-xs uppercase tracking-[0.28em] sm:text-sm sm:tracking-widest'>
           Editor&apos;s Picks
         </h2>
-        <p className='mt-2 text-muted-foreground text-xs'>{countLabel}</p>
+        <p className='whitespace-nowrap text-muted-foreground text-xs'>{countLabel}</p>
       </div>
 
-      <EditorsPicksList posts={posts} />
+      <div className='overflow-hidden rounded-sm border border-border bg-card'>
+        <EditorsPicksList posts={posts} />
+      </div>
     </aside>
   );
 }
@@ -98,18 +94,18 @@ function EditorsPicksList({ posts }: EditorsPicksListProps) {
           <li key={post.slug}>
             <Link
               href={`/blog/${post.slug}`}
-              className='group grid grid-cols-[2rem_1fr] gap-3 px-4 py-4 transition-colors hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:grid-cols-[2.25rem_1fr] sm:px-5'
+              className='group grid grid-cols-[1.75rem_1fr] gap-3 px-3.5 py-3 transition-colors hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-4'
               prefetch={false}
             >
-              <span className='flex size-8 items-center justify-center rounded-sm border border-border bg-background font-mono font-semibold text-[0.72rem] text-primary tabular-nums transition-colors group-hover:border-primary/45'>
+              <span className='flex size-7 items-center justify-center rounded-sm border border-border bg-background font-mono font-semibold text-[0.68rem] text-primary tabular-nums transition-colors group-hover:border-primary/45'>
                 {String(index + 1).padStart(2, '0')}
               </span>
 
               <span className='min-w-0'>
-                <span className='line-clamp-2 font-semibold text-[0.95rem] text-foreground leading-5 transition-colors group-hover:text-primary'>
+                <span className='line-clamp-2 font-semibold text-foreground text-sm leading-5 transition-colors group-hover:text-primary'>
                   {post.title}
                 </span>
-                <span className='mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-muted-foreground text-xs'>
+                <span className='mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-muted-foreground text-xs'>
                   <span className='capitalize'>{categoryLabel}</span>
                   {post.readTime && (
                     <>
