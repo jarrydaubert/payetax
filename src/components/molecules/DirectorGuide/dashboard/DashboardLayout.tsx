@@ -230,7 +230,7 @@ export function DashboardLayout({
                 <button
                   type='button'
                   onClick={handleToggleMobileInputs}
-                  className='inline-flex min-h-10 items-center gap-2 rounded-sm border border-primary/35 bg-background px-3 font-medium text-primary text-sm transition-colors hover:border-primary/60 hover:bg-primary/5 focus:outline-none focus:ring-2 focus:ring-primary/60'
+                  className='inline-flex min-h-10 items-center gap-2 rounded-sm border border-primary/35 bg-background px-3 font-medium text-primary text-sm transition-colors hover:border-primary/60 hover:bg-primary/5 focus:outline-none focus:ring-2 focus:ring-primary/60 lg:hidden'
                   aria-label='Open calculator inputs'
                 >
                   <Calculator className='size-4' aria-hidden='true' />
@@ -241,7 +241,7 @@ export function DashboardLayout({
                 <button
                   type='button'
                   onClick={handleToggleMobileEducation}
-                  className='inline-flex min-h-10 items-center justify-center rounded-sm border border-border/60 bg-background px-3 text-muted-foreground transition-colors hover:border-primary/45 hover:bg-primary/5 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/60'
+                  className='inline-flex min-h-10 items-center justify-center rounded-sm border border-border/60 bg-background px-3 text-muted-foreground transition-colors hover:border-primary/45 hover:bg-primary/5 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/60 lg:hidden'
                   aria-label='Show learn panel'
                 >
                   <BookOpen className='size-4' aria-hidden='true' />
