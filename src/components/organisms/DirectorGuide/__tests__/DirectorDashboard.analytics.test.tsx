@@ -66,10 +66,6 @@ jest.mock('@/components/molecules/DirectorGuide/EmailResultsDialog', () => ({
   EmailResultsDialog: () => null,
 }));
 
-jest.mock('@/components/molecules/DirectorGuide/WelcomeDialog', () => ({
-  DirectorGuideWelcomeDialog: () => null,
-}));
-
 describe('DirectorDashboard analytics', () => {
   const mockFormSlice = (overrides: Record<string, unknown>) => {
     const defaults = {
