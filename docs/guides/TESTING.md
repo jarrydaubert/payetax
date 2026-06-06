@@ -8,19 +8,19 @@ The aim is not to look busy. The aim is to prove that the calculator, surroundin
 
 ## Current Audit Snapshot
 
-Last audited: 2026-06-04.
+Last audited: 2026-06-06.
 
-Current automated evidence from a full local run:
+Use this section as the current testing map, not as a frozen release certificate. Exact suite counts, coverage percentages, and generated route counts move as the app changes. Capture those run-specific numbers in PRs or release evidence instead of letting this guide go stale.
 
-- `bun run check:repo`: passed.
-- Jest coverage suite: 202 suites, 3216 tests passed.
-- Playwright full suite: 338 tests passed across Chromium, WebKit, Mobile Chrome, and Mobile Safari.
-- Global coverage: 91.66% statements, 81.07% branches, 80.53% functions, 91.66% lines.
-- Golden master E2E: 20 HMRC-sourced scenarios passed within the stated tolerances.
-- `bun run build`: passed, 61 static pages generated.
-- `bun audit`: no vulnerabilities found.
+Current automated evidence expected before broad changes merge:
 
-Known automated-coverage gaps from the same audit:
+- `bun run check:repo`
+- the smallest relevant Jest or Playwright check while developing
+- `bun run build`
+- `bun run test:full` for broad calculation, browser, route, or refactor changes
+- `bun audit` or `bun run audit:deps` when dependencies change
+
+Known automated-coverage gaps:
 
 - `src/app/api/ops/rate-limit-health/route.ts` is not unit-covered.
 - `src/lib/email/emailDelivery.ts` is not unit-covered.
@@ -250,7 +250,7 @@ Examples:
 - Final production visual inspection.
 - Lighthouse runs on the live deployment.
 - Email deliverability checks against the configured provider.
-- Sentry and Vercel environment confirmation.
+- Calculator-focused Sentry and Vercel environment confirmation.
 
 Manual checks belong in the PR, release notes, or post-release checklist. They should not become permanent heavyweight CI workflows unless the risk justifies the maintenance.
 
@@ -276,12 +276,6 @@ Every calculation fix should add or update a failing-then-passing assertion in t
 - Generator: `e2e/scripts/generate-golden-master.ts`
 
 Important limitation: the fixture is generated from `taxRates.ts` and `calculateTax()`. It cannot catch an engine that is wrong but self-consistent. Its job is to catch UI, form, rendering, browser, extraction, and regression drift.
-
-### E2E Helper Limitation
-
-`e2e/helpers/tax-test-helpers.ts` reimplements band, NI, and loan logic, but imports production constants.
-
-That makes it logic-independent but constant-dependent. A rate or threshold typo can pass both the engine and helper. Treat it as a support net, not the correctness oracle.
 
 ## Rounding And Threshold Policy
 
@@ -444,8 +438,8 @@ These are the most useful next automated tests:
    - Test with: manual post-release send to a controlled address, then document result in release evidence.
 
 4. Live monitoring confirmation.
-   - Why: Sentry and Vercel env wiring are production configuration, not fully provable in local unit tests.
-   - Test with: post-release Sentry event confirmation and production env review.
+   - Why: calculator-focused Sentry and Vercel env wiring are production configuration, not fully provable in local unit tests.
+   - Test with: post-release Sentry event confirmation on PAYE or Director calculator flows and production env review.
 
 ## Manual Visual And Lighthouse Checks
 

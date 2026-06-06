@@ -420,11 +420,7 @@ const reportCalculationAnomalies = (
 
   const anomalyPreview = anomalies
     .slice(0, MAX_REPORTED_ANOMALIES)
-    .map((anomaly) =>
-      typeof anomaly.value === 'number'
-        ? `${anomaly.code}:${anomaly.detail}=${anomaly.value}`
-        : `${anomaly.code}:${anomaly.detail}`,
-    );
+    .map((anomaly) => `${anomaly.code}:${anomaly.detail}`);
 
   addBreadcrumb('calculator', {
     message: 'Calculation anomaly detected',
@@ -576,7 +572,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           addBreadcrumb('calculator-input', {
             message: 'Salary updated',
             level: 'info',
-            data: { salary: validated.data },
+            data: { salaryRange: getSalaryRange(validated.data) ?? 'none' },
           });
 
           set((state) => ({ input: { ...state.input, salary: validated.data } }));
@@ -975,12 +971,12 @@ export const useCalculatorStore = create<CalculatorState>()(
 
             // Set context for error tracking
             setContext('calculator_input', {
-              salary: input.salary,
               taxYear: input.taxYear,
               region: input.region,
-              taxCode: input.taxCode || 'default',
+              salaryRange: getSalaryRange(input.salary) ?? 'none',
+              taxCodeProvided: Boolean(input.taxCode),
               studentLoanPlans: input.studentLoanPlans,
-              pensionContribution: input.pensionContribution,
+              hasPension: input.pensionContribution > 0,
             });
 
             // Add breadcrumb
@@ -988,7 +984,7 @@ export const useCalculatorStore = create<CalculatorState>()(
               message: 'Starting tax calculation',
               level: 'info',
               data: {
-                salary: input.salary,
+                salaryRange: getSalaryRange(input.salary) ?? 'none',
                 taxYear: input.taxYear,
                 region: input.region,
               },
@@ -1016,8 +1012,8 @@ export const useCalculatorStore = create<CalculatorState>()(
               message: 'Tax calculation completed',
               level: 'info',
               data: {
-                netPay: results.netPay.annually,
-                incomeTax: results.incomeTax.annually,
+                resultShape: 'annual-periods',
+                hasTaxDue: results.incomeTax.annually > 0,
               },
             });
 

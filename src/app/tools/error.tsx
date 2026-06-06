@@ -5,6 +5,7 @@ import { ChevronDown, Home, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useId, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { isSentryMonitoredPath } from '@/lib/sentryScope';
 
 export default function ToolsError({
   error,
@@ -21,6 +22,7 @@ export default function ToolsError({
     // Prevent duplicate captures on Fast Refresh / rerenders
     if (capturedRef.current) return;
     capturedRef.current = true;
+    if (!isSentryMonitoredPath(window.location.pathname)) return;
 
     Sentry.captureException(error, {
       tags: { error_boundary: 'tools', error_id: errorId },

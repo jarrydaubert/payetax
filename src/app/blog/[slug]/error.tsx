@@ -1,9 +1,8 @@
 'use client';
 
-import * as Sentry from '@sentry/nextjs';
 import { ChevronDown, Home, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useId, useRef, useState } from 'react';
+import { useId, useState } from 'react';
 import { Button } from '@/components/ui/button';
 
 export default function BlogPostError({
@@ -16,26 +15,9 @@ export default function BlogPostError({
   const fallbackId = useId().replace(/:/g, '');
   const debugPanelId = useId();
   const [showDebug, setShowDebug] = useState(false);
-  const capturedRef = useRef<string | null>(null);
-  const sentryEventIdRef = useRef<string | null>(null);
 
-  useEffect(() => {
-    // Guard against duplicate captures (dev/Strict Mode can remount)
-    const key = error.digest ?? `${error.name}:${error.message}`;
-    if (capturedRef.current === key) return;
-    capturedRef.current = key;
-
-    const eventId = Sentry.captureException(error, {
-      tags: { error_boundary: 'blog-post' },
-      contexts: { error_details: { digest: error.digest } },
-    });
-
-    // Store Sentry event ID for display
-    sentryEventIdRef.current = typeof eventId === 'string' ? eventId : null;
-  }, [error]);
-
-  // Prefer error.digest (Next.js correlation), then Sentry eventId, then fallback
-  const displayId = error.digest ?? sentryEventIdRef.current ?? fallbackId;
+  // Prefer error.digest (Next.js correlation), then a local fallback.
+  const displayId = error.digest ?? fallbackId;
 
   return (
     <div className='flex min-h-screen flex-col items-center justify-center p-6'>
@@ -74,7 +56,7 @@ export default function BlogPostError({
           </Link>
         </div>
 
-        {/* Error reference - shows digest (Next.js), Sentry eventId, or fallback */}
+        {/* Error reference - shows digest (Next.js) or fallback */}
         <p className='mt-8 font-mono text-muted-foreground/60 text-xs'>
           Error ID: {displayId.slice(-8)}
         </p>

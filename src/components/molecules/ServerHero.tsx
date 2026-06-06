@@ -2,9 +2,8 @@
 // Server-rendered hero for instant LCP - no 'use client' directive
 // Uses the canonical brand-surface theme tokens for headline, CTAs, and trust strip
 
-import { CheckCircle, ChevronDown, Shield } from 'lucide-react';
+import { ArrowRight, CheckCircle, ChevronDown, Shield } from 'lucide-react';
 import Link from 'next/link';
-import { HeroCTA } from '@/components/molecules/HeroCTA';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { CURRENT_TAX_YEAR, formatTaxYearDisplay } from '@/constants/taxRates';
 import { cn } from '@/lib/utils';
@@ -46,13 +45,16 @@ export default function ServerHero({ className }: ServerHeroProps) {
 
       {/* CTA Buttons */}
       <div className='mb-12 flex flex-col gap-4 sm:flex-row'>
-        <HeroCTA
+        <Link
           href='#tax-calculator'
-          trackingLabel='hero_start_calculating'
           className={cn(buttonVariants({ size: 'touch' }), 'group px-8')}
         >
           See My Take Home Pay
-        </HeroCTA>
+          <ArrowRight
+            className='size-[18px] transition-transform group-hover:translate-x-1'
+            aria-hidden='true'
+          />
+        </Link>
         <Button
           asChild
           variant='outline'

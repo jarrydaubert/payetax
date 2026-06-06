@@ -205,6 +205,7 @@ const configWithSentry = withSentryConfig(withBundleAnalyzer(nextConfig), {
   org: 'jgf-projects',
   project: 'payetax',
   silent: !process.env.CI,
+  suppressOnRouterTransitionStartWarning: true,
   widenClientFileUpload: true,
   bundleSizeOptimizations: {
     excludeDebugStatements: true,

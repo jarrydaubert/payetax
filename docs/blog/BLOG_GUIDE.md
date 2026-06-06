@@ -7,7 +7,7 @@ Purpose: create accurate, helpful content that drives users to the calculator an
 - Accuracy first. Use `src/constants/taxRates.ts` as the single source of truth.
 - Explain the *why* behind the numbers, not just the results.
 - Avoid fear-mongering or aggressive sales language.
-- Keep posts useful even if the reader never converts.
+- Keep posts useful even if the reader only wants an answer.
 - Use UK English throughout. Avoid American spellings and terms in headings, body copy, metadata, CTAs, and image alt text.
 
 ## Content Types
@@ -44,11 +44,11 @@ Purpose: create accurate, helpful content that drives users to the calculator an
 - Keep all work items in `docs/BACKLOG.md`.
 - Use `docs/blog/IMAGE_WORKFLOW.md` for featured-image prompts and import steps.
 
-## Conversion Checklist (Default)
+## Reader Journey Checklist
 
 Apply this on every new post before publish:
 
-- Primary CTA present: link to `/#tax-calculator` (or salary calculator page where appropriate).
-- Secondary CTA present: link to `/tools/director-guide` when relevant.
+- Primary calculator path present: link to `/#tax-calculator` where appropriate.
+- Secondary calculator path present: link to `/tools/director-guide` when relevant.
 - Trust/compliance path present: link to `/compliance`.
 - At least one contextual internal tool link beyond the three default links when relevant to the topic.

@@ -105,8 +105,8 @@ ${blogSections}
 
 - Framework: Next.js, React, TypeScript
 - Hosting: Vercel
-- Analytics: basic consent-gated GA4
-- Error monitoring: Sentry
+- Analytics: Vercel Web Analytics for cookieless traffic visibility; GA4 after consent
+- Error monitoring: calculator-focused Sentry
 - Privacy: interactive calculations run in-browser; salary inputs are not stored
 - PWA: installable progressive web app
 

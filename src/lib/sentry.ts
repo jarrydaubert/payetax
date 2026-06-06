@@ -1,18 +1,14 @@
 /**
- * Sentry Error Tracking & Performance Monitoring Utilities
+ * Calculator-focused Sentry error monitoring utilities
  *
- * Centralized Sentry utilities for consistent error tracking, performance monitoring,
- * and debugging across the PayeTax application.
+ * Centralized Sentry utilities for calculator and email-results failures.
  *
  * Features:
  * - Type-safe error tracking with custom contexts
- * - Performance monitoring with transactions and spans
  * - Breadcrumb management for debugging
  * - User context management
  * - Custom fingerprinting for better error grouping
  * - Calculator-specific error tracking
- *
- * PAYTAX-76: Sentry 10.22.0 Maximization
  */
 
 import type { SeverityLevel, User } from '@sentry/nextjs';
@@ -40,6 +36,16 @@ function isZodIssueLike(value: unknown): value is ZodIssueLike {
 
 function isZodErrorLike(error: unknown): error is ZodErrorLike {
   return isRecord(error) && Array.isArray(error.issues) && error.issues.every(isZodIssueLike);
+}
+
+function describeSentryValue(value: unknown): string {
+  if (value === null) return 'null';
+  if (value === undefined) return 'undefined';
+  if (Array.isArray(value)) return `array:${value.length}`;
+  if (typeof value === 'object') return `object:${Object.keys(value).length}`;
+  if (typeof value === 'string') return value.length > 0 ? 'string:present' : 'string:empty';
+  if (typeof value === 'number') return Number.isFinite(value) ? 'number:finite' : 'number:invalid';
+  return typeof value;
 }
 
 /**
@@ -191,10 +197,13 @@ export function captureCalculatorError(
     },
     contexts: {
       calculator: {
-        salary: context.salary,
-        taxCode: context.taxCode || 'default',
+        taxYear: context.taxYear,
+        region: context.region,
+        salaryProvided: Number.isFinite(context.salary),
+        taxCodeProvided: Boolean(context.taxCode),
         studentLoanPlans: context.studentLoanPlans || 'none',
-        pensionContribution: context.pensionContribution || 0,
+        pensionContributionProvided: Boolean(context.pensionContribution),
+        isMarried: Boolean(context.isMarried),
       },
     },
     fingerprint: ['calculator-error', context.taxYear, context.region],
@@ -237,10 +246,7 @@ export function captureValidationError(
     data: {
       field: context.field,
       location: context.location,
-      attemptedValue:
-        typeof context.attemptedValue === 'object'
-          ? JSON.stringify(context.attemptedValue)
-          : String(context.attemptedValue),
+      attemptedValueShape: describeSentryValue(context.attemptedValue),
       expectedFormat: context.expectedFormat,
       errorCount: zodDetails.issueCount,
       errorCodes: zodDetails.errorCodes,
@@ -347,11 +353,8 @@ export function captureAPIError(
         endpoint: context.endpoint,
         method: context.method,
         statusCode: context.statusCode,
-        responseBody:
-          typeof context.responseBody === 'object'
-            ? JSON.stringify(context.responseBody)
-            : context.responseBody,
-        requestParams: context.requestParams,
+        responseBodyShape: describeSentryValue(context.responseBody),
+        requestParamKeys: context.requestParams ? Object.keys(context.requestParams) : [],
       },
     },
     fingerprint: ['api-error', context.endpoint, context.method],
@@ -585,7 +588,7 @@ export function withErrorTracking<T extends (...args: unknown[]) => Promise<unkn
 ): (...args: Parameters<T>) => Promise<Awaited<ReturnType<T>>> {
   return (async (...args: Parameters<T>) => {
     const transaction = startPerformanceTransaction(operationName, {
-      args: args.map((arg) => (typeof arg === 'object' ? JSON.stringify(arg) : arg)),
+      argShapes: args.map(describeSentryValue),
     });
 
     if (tags) {
@@ -630,7 +633,7 @@ export function withErrorTrackingSync<T extends (...args: unknown[]) => unknown>
 ): (...args: Parameters<T>) => ReturnType<T> {
   return ((...args: Parameters<T>) => {
     const transaction = startPerformanceTransaction(operationName, {
-      args: args.map((arg) => (typeof arg === 'object' ? JSON.stringify(arg) : arg)),
+      argShapes: args.map(describeSentryValue),
     });
 
     if (tags) {

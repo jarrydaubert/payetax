@@ -9,8 +9,9 @@ The repo is public. Real secrets must live in Vercel or local ignored env files 
 - Next.js, React, TypeScript
 - Bun package manager
 - Jest and Playwright
-- GA4 for basic analytics
-- Sentry for error monitoring
+- Vercel Web Analytics for cookieless traffic visibility
+- GA4 for consent-based event analytics
+- Sentry for calculator-focused error monitoring
 - Brevo API for transactional results email
 
 ## Current Scope
@@ -30,7 +31,7 @@ Removed:
 - Mailing-list setup
 - Partner lead capture
 - Competitor-style SEO pages
-- Extra analytics vendors beyond GA4
+- Extra analytics vendors beyond Vercel Web Analytics and GA4
 
 ## Testing And Quality
 
@@ -74,7 +75,7 @@ Required for production email flows:
 Other production controls:
 
 - `NEXT_PUBLIC_GA_ID`
-- `NEXT_PUBLIC_SENTRY_DSN`
+- `NEXT_PUBLIC_SENTRY_DSN` for PAYE and Director calculator error capture
 - `SENTRY_AUTH_TOKEN`
 - `UPSTASH_REDIS_REST_URL`
 - `UPSTASH_REDIS_REST_TOKEN`
@@ -85,4 +86,5 @@ Other production controls:
 - Product direction: [docs/business/PRODUCT_DIRECTION.md](docs/business/PRODUCT_DIRECTION.md)
 - Testing: [docs/guides/TESTING.md](docs/guides/TESTING.md)
 - Ops: [docs/guides/OPS_RUNBOOK.md](docs/guides/OPS_RUNBOOK.md)
+- Vercel project: [docs/guides/VERCEL_PROJECT.md](docs/guides/VERCEL_PROJECT.md)
 - Env contract: [docs/guides/PRODUCTION_ENV_CONTRACT.md](docs/guides/PRODUCTION_ENV_CONTRACT.md)

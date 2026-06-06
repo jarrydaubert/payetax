@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
+import { shouldDropSentryEventForUnmonitoredPath } from '@/lib/sentryScope';
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
@@ -7,53 +8,11 @@ Sentry.init({
   environment: process.env.NODE_ENV,
   release: process.env.VERCEL_GIT_COMMIT_SHA || 'development',
 
-  // Enable structured logs (5GB/month free tier)
-  enableLogs: true,
-
-  // Performance monitoring - optimized for free tier (10k transactions/month)
-  tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0, // 10% in prod, 100% in dev
-
-  // Advanced traces sampling for server-side operations
-  tracesSampler: (samplingContext) => {
-    // Always sample errors
-    if (samplingContext.parentSampled === true) {
-      return 1.0;
-    }
-
-    const transactionName = samplingContext.transactionContext?.name;
-
-    // Sample API routes - keep low for free tier
-    if (transactionName?.includes('/api/')) {
-      // Critical API routes - 20% sampling
-      if (
-        transactionName?.includes('/api/calculate') ||
-        transactionName?.includes('/api/tax') ||
-        transactionName?.includes('/api/salary')
-      ) {
-        return 0.2;
-      }
-      // Other API routes - 10% sampling
-      return 0.1;
-    }
-
-    // Sample server actions and route handlers
-    if (transactionName?.includes('action') || transactionName?.includes('route')) {
-      return 0.1;
-    }
-
-    // Default sampling for server-side rendering
-    return 0.05;
-  },
+  enableLogs: false,
+  tracesSampleRate: 0,
 
   // Server-specific integrations
   integrations: [
-    // Console logging integration - capture console.warn and console.error
-    Sentry.consoleLoggingIntegration({
-      levels: ['warn', 'error'], // Only capture warnings and errors (not log/debug)
-    }),
-    // HTTP instrumentation for request tracking
-    Sentry.httpIntegration(),
-    // Performance context for server-side metrics
     Sentry.extraErrorDataIntegration({
       depth: 10, // Capture nested objects up to 10 levels
     }),
@@ -80,6 +39,10 @@ Sentry.init({
   beforeSend(event, _hint) {
     // Don't send errors from development or local builds
     if (process.env.NODE_ENV === 'development' || !process.env.VERCEL) {
+      return null;
+    }
+
+    if (shouldDropSentryEventForUnmonitoredPath(event)) {
       return null;
     }
 
@@ -251,59 +214,5 @@ Sentry.init({
     }
 
     return breadcrumb;
-  },
-
-  // Filter logs before sending to Sentry
-  beforeSendLog(log) {
-    // Don't send logs from development or local builds
-    if (process.env.NODE_ENV === 'development' || !process.env.VERCEL) {
-      return null;
-    }
-
-    // Filter out info/debug logs to conserve quota (only warn/error/fatal)
-    if (log.level === 'info' || log.level === 'debug' || log.level === 'trace') {
-      return null;
-    }
-
-    // Filter out noisy logs (deprecation warnings, SW errors, chunk failures)
-    const msg = typeof log.message === 'string' ? log.message : '';
-    if (
-      msg.includes('DeprecationWarning') ||
-      msg.includes('[DEP0') ||
-      msg.includes('[PWA]') ||
-      msg.includes('[SW]') ||
-      msg.includes('Failed to load chunk')
-    ) {
-      return null;
-    }
-
-    // Scrub potential PII from log attributes
-    if (log.attributes) {
-      const sanitized = { ...log.attributes };
-      const sensitiveFields = [
-        'email',
-        'name',
-        'phone',
-        'address',
-        'postcode',
-        'password',
-        'token',
-        'secret',
-        'apiKey',
-        'authorization',
-        'nationalInsuranceNumber',
-        'taxCode',
-        'salary',
-        'pensionContribution',
-      ];
-      for (const field of sensitiveFields) {
-        if (field in sanitized) {
-          sanitized[field] = '[Filtered]';
-        }
-      }
-      log.attributes = sanitized;
-    }
-
-    return log;
   },
 });

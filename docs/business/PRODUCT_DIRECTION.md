@@ -134,7 +134,7 @@ When AI is used, the calculation remains deterministic and the explanation remai
 
 Before adding a backlog item, running a skill audit, or planning a feature, ask:
 
-1. Does this improve accuracy, trust, clarity, acquisition, activation, retention, or maintainability?
+1. Does this improve accuracy, trust, clarity, usefulness, resilience, or maintainability?
 2. Does it make PayeTax better at explaining UK PAYE reality?
 3. Is the target user and pain clear?
 4. Can it be tested or verified without hand-waving?
@@ -178,4 +178,3 @@ More is not automatically better. A smaller product that users trust beats a lar
 When in doubt, build toward this sentence:
 
 PayeTax is the UK take-home pay calculator that explains payroll reality.
-

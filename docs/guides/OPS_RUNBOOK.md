@@ -24,8 +24,9 @@ If Vercel CLI reports that it cannot retrieve project settings, the local `.verc
 
 ```bash
 vercel login
-mv .vercel .vercel.old-deleted-account
+mv .vercel .vercel.stale
 vercel link --project payetax
+vercel project ls
 ```
 
 Choose the current Vercel account used for Jarryd's public projects.
@@ -41,6 +42,7 @@ Email:
 
 Analytics and monitoring:
 
+- Vercel Web Analytics must be enabled in the Vercel `payetax` project dashboard.
 - `NEXT_PUBLIC_GA_ID`
 - `NEXT_PUBLIC_SENTRY_DSN`
 - `SENTRY_AUTH_TOKEN`
@@ -64,6 +66,7 @@ After deploy:
 - Open the homepage and main tools.
 - Send PAYE results email.
 - Send Director Intelligence results email.
-- Check Sentry for new errors.
-- Check GA4 realtime if analytics changed.
+- Check Sentry for new PAYE or Director calculator errors.
+- Check Vercel Web Analytics for live traffic if analytics changed.
+- Check GA4 realtime after accepting analytics cookies.
 - Check `/api/ops/rate-limit-health` with the configured secret when rate limiting changed.

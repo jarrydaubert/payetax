@@ -90,7 +90,7 @@ export const PRIVACY_DONT_DO = [
  */
 export const PRIVACY_DO_DO = [
   'Calculate everything in your browser',
-  'Use consent-based analytics (GA4) and Sentry error monitoring',
+  'Use cookieless traffic analytics, consent-based GA4, and calculator-focused Sentry monitoring',
   'Respect Do Not Track settings',
   'Provide complete transparency',
   'Keep the site forever free',
@@ -119,8 +119,8 @@ export const PRIVACY_DATA_FLOW: DataFlowCard[] = [
   {
     icon: FileText,
     iconColor: 'bg-primary/60',
-    title: 'Analytics (Optional)',
+    title: 'Analytics and Monitoring',
     description:
-      'Google Analytics 4 only runs after consent. Sentry records error context needed to diagnose failures. No cross-site tracking.',
+      'Vercel Web Analytics gives cookieless traffic counts. Google Analytics 4 only runs after consent. Sentry records calculator error context needed to diagnose failures. No cross-site tracking.',
   },
 ];
