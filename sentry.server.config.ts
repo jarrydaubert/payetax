@@ -37,8 +37,10 @@ Sentry.init({
   ],
 
   beforeSend(event, _hint) {
-    // Don't send errors from development or local builds
-    if (process.env.NODE_ENV === 'development' || !process.env.VERCEL) {
+    // Don't send errors from development. Do not depend on Vercel system
+    // environment variables here; they may be unavailable when system env
+    // exposure is disabled, but production server events should still land.
+    if (process.env.NODE_ENV === 'development') {
       return null;
     }
 
