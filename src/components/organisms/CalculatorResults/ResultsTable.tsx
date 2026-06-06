@@ -259,10 +259,25 @@ export function ResultsTable({
             <table
               data-testid='results-table'
               className={cn(
-                'w-full min-w-[44rem] table-auto caption-bottom sm:min-w-full',
-                'text-sm',
+                'w-full min-w-[42rem] table-fixed caption-bottom sm:min-w-full',
+                whatIfResults && 'min-w-[64rem]',
+                'text-[0.8125rem] xl:text-sm',
               )}
             >
+              <colgroup>
+                <col className='w-[10.5rem] xl:w-[11.5rem]' />
+                <col className='w-12 xl:w-14' />
+                {visiblePeriods.map((period) =>
+                  whatIfResults ? (
+                    <React.Fragment key={period}>
+                      <col />
+                      <col />
+                    </React.Fragment>
+                  ) : (
+                    <col key={period} />
+                  ),
+                )}
+              </colgroup>
               <caption className='sr-only'>
                 Tax calculation breakdown showing gross pay, deductions, and take-home pay across
                 different time periods

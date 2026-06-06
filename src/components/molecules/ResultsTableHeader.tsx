@@ -24,9 +24,9 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
             This maintains consistent visual hierarchy across all main sections */}
         <TableHead
           className={cn(
-            'sticky left-0 z-20 w-44 whitespace-nowrap border-border border-r bg-card font-semibold text-foreground sm:w-52',
+            'sticky left-0 z-20 whitespace-nowrap border-border border-r bg-card font-semibold text-foreground',
             'px-2',
-            'py-3',
+            'py-2.5',
             'text-base',
             'sm:text-lg',
           )}
@@ -35,10 +35,10 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
         </TableHead>
         <TableHead
           className={cn(
-            'w-14 border-border border-r text-right font-semibold text-muted-foreground',
+            'border-border border-r text-right font-semibold text-muted-foreground',
             'px-2',
-            'py-3',
-            'text-sm',
+            'py-2.5',
+            'text-xs xl:text-sm',
           )}
         >
           %
@@ -51,8 +51,8 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
                 className={cn(
                   'min-w-56 border-border border-r text-center font-semibold text-muted-foreground',
                   'px-2',
-                  'py-3',
-                  'text-sm',
+                  'py-2.5',
+                  'text-xs xl:text-sm',
                 )}
                 colSpan={2}
               >
@@ -64,10 +64,10 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
               <TableHead
                 key={period}
                 className={cn(
-                  'min-w-28 whitespace-nowrap text-right font-semibold text-muted-foreground',
-                  'px-2',
-                  'py-3',
-                  'text-sm',
+                  'whitespace-nowrap text-right font-semibold text-muted-foreground',
+                  'px-1.5 xl:px-2',
+                  'py-2.5',
+                  'text-xs xl:text-sm',
                 )}
               >
                 {period}

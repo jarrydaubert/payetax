@@ -70,19 +70,20 @@ export function ResultTableRow({
         className={cn(
           color,
           isHighlight && 'font-bold',
-          'sticky left-0 z-10 border-border/80 border-r bg-card px-2.5 py-3 text-left font-normal',
-          'w-[195px]',
+          'sticky left-0 z-10 border-border/80 border-r bg-card px-2 py-2.5 text-left font-normal',
         )}
       >
-        <div className={cn('flex items-center', 'gap-1.5', isSubRow && 'pl-4 sm:pl-6')}>
+        <div className={cn('flex items-start', 'gap-1.5', isSubRow && 'pl-3 sm:pl-4')}>
           <Icon className={cn('size-3.5', 'flex-shrink-0')} aria-hidden='true' />
-          <span className={cn('whitespace-nowrap', 'text-sm')}>{category}</span>
+          <span className={cn('min-w-0 leading-tight', 'text-[0.8125rem] xl:text-sm')}>
+            {category}
+          </span>
         </div>
       </th>
       <TableCell
         className={cn(
-          'w-14 border-border/60 border-r px-2.5 py-3 text-right font-mono tabular-nums',
-          'text-sm',
+          'border-border/60 border-r px-2 py-2.5 text-right font-mono tabular-nums',
+          'text-[0.8125rem] xl:text-sm',
           color,
           isHighlight && 'font-bold',
         )}
@@ -104,8 +105,8 @@ export function ResultTableRow({
             <React.Fragment key={period}>
               <TableCell
                 className={cn(
-                  'min-w-28 whitespace-nowrap bg-primary/10 px-2.5 py-3 text-right font-mono tabular-nums',
-                  'text-sm',
+                  'min-w-28 whitespace-nowrap bg-primary/10 px-2 py-2.5 text-right font-mono tabular-nums',
+                  'text-[0.8125rem] xl:text-sm',
                   color,
                   isHighlight && 'font-bold',
                 )}
@@ -114,8 +115,8 @@ export function ResultTableRow({
               </TableCell>
               <TableCell
                 className={cn(
-                  'min-w-28 whitespace-nowrap bg-success/10 px-2.5 py-3 text-right font-mono tabular-nums',
-                  'text-sm',
+                  'min-w-28 whitespace-nowrap bg-success/10 px-2 py-2.5 text-right font-mono tabular-nums',
+                  'text-[0.8125rem] xl:text-sm',
                   color,
                   isHighlight && 'font-bold',
                 )}
@@ -131,8 +132,8 @@ export function ResultTableRow({
           <TableCell
             key={period}
             className={cn(
-              'min-w-28 whitespace-nowrap px-2.5 py-3 text-right font-mono tabular-nums',
-              'text-sm',
+              'whitespace-nowrap px-1.5 py-2.5 text-right font-mono tabular-nums xl:px-2',
+              'text-[0.8125rem] xl:text-sm',
               color,
               isHighlight && 'font-bold',
             )}
