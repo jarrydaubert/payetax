@@ -405,7 +405,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 />
               </div>
             )}
-            <div className='relative xl:flex xl:gap-8'>
+            <div className='relative lg:flex lg:gap-8'>
               <TableOfContents content={post.content} className='w-56 shrink-0' />
 
               <div

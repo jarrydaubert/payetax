@@ -11,10 +11,6 @@ jest.mock('@/lib/directorGuideAnalytics', () => ({
   trackBufferShortfallShown: jest.fn(),
 }));
 
-jest.mock('@/components/molecules/DirectorGuide/WelcomeDialog', () => ({
-  DirectorGuideWelcomeDialog: () => null,
-}));
-
 function createEmptyComparison(grossProfit: number) {
   const emptyStrategy = {
     name: '—',

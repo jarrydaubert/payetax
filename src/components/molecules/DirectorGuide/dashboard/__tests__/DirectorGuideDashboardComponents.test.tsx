@@ -112,8 +112,10 @@ describe('Director Intelligence dashboard components', () => {
       setStoreState({ strategyComparison: createComparison() as never });
 
       const { container } = render(<SummaryCards />);
+      const summary = screen.getByLabelText('Financial summary');
       expect(screen.getByText('Safe Monthly Draw')).toBeInTheDocument();
       expect(screen.getByText('Annual Dividends')).toBeInTheDocument();
+      expect(summary.className).toContain('auto-fit');
       expect(container.querySelector('.text-gradient-brand')).not.toBeInTheDocument();
       expect(container.querySelector('[class*="bg-gradient"]')).not.toBeInTheDocument();
     });

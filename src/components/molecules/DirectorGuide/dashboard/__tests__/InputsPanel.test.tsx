@@ -136,6 +136,42 @@ describe('DirectorGuide InputsPanel', () => {
     expect(screen.getByText('Compare My Setup')).toBeInTheDocument();
   });
 
+  it('shows hidden detailed inputs when quick start would hide active values', () => {
+    const current = useDirectorGuideStore.getState();
+    setStoreState({
+      formData: {
+        ...current.formData,
+        otherIncome: 5000,
+        studentLoanPlans: ['plan1'],
+        pensionContribution: 2500,
+      },
+    });
+
+    render(<InputsPanel />);
+
+    expect(screen.getByText(/Saved detailed inputs are still active/)).toBeInTheDocument();
+    expect(screen.getByText(/other income/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Clear Details' }));
+
+    const state = useDirectorGuideStore.getState().formData;
+    expect(state.otherIncome).toBe(0);
+    expect(state.studentLoanPlans).toEqual([]);
+    expect(state.pensionContribution).toBe(0);
+  });
+
+  it('reveals a custom date field when company year-end is other', () => {
+    render(<InputsPanel />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Other' }));
+
+    const input = screen.getByLabelText('Custom Year-End Date');
+    expect(input).toBeInTheDocument();
+
+    fireEvent.change(input, { target: { value: '06-30' } });
+    expect(useDirectorGuideStore.getState().formData.yearEndCustom).toBe('06-30');
+  });
+
   it('updates monthly mode values, including contract month selection', () => {
     const store = useDirectorGuideStore.getState();
     store.setMode('monthly');

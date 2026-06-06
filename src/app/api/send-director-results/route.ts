@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { sendDirectorResultsEmail } from '@/lib/email/outboundResultsDelivery';
 import { checkRateLimitWithPolicy, createRateLimitHeaders } from '@/lib/rateLimit';
+import { detectLikelyBotRequest } from '@/lib/security/botGuard';
 import { getClientIdentifier } from '@/lib/security/clientIdentifier';
 import { isValidRequestOrigin } from '@/lib/security/origin';
 import { captureOperationalFailure } from '@/lib/sentry';
@@ -56,6 +57,12 @@ export async function POST(request: NextRequest) {
     body = JSON.parse(rawBody);
   } catch {
     return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
+  }
+
+  const botReason = detectLikelyBotRequest(request, body);
+  if (botReason) {
+    console.warn(`[send-director-results] blocked likely bot request (${botReason})`);
+    return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
   }
 
   const validationResult = SendDirectorResultsRequestSchema.safeParse(body);
