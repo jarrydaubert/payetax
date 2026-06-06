@@ -222,7 +222,32 @@ export function DashboardLayout({
                 <span className='text-primary'>tax</span>
               </span>
             </Link>
-            <span className='text-muted-foreground text-sm'>Director Intelligence</span>
+            <div className='flex items-center gap-2'>
+              <span className='hidden text-muted-foreground text-sm sm:inline'>
+                Director Intelligence
+              </span>
+              {onToggleMobileInputs && (
+                <button
+                  type='button'
+                  onClick={handleToggleMobileInputs}
+                  className='inline-flex min-h-10 items-center gap-2 rounded-sm border border-primary/35 bg-background px-3 font-medium text-primary text-sm transition-colors hover:border-primary/60 hover:bg-primary/5 focus:outline-none focus:ring-2 focus:ring-primary/60'
+                  aria-label='Open calculator inputs'
+                >
+                  <Calculator className='size-4' aria-hidden='true' />
+                  <span>Inputs</span>
+                </button>
+              )}
+              {education && onToggleMobileEducation && (
+                <button
+                  type='button'
+                  onClick={handleToggleMobileEducation}
+                  className='inline-flex min-h-10 items-center justify-center rounded-sm border border-border/60 bg-background px-3 text-muted-foreground transition-colors hover:border-primary/45 hover:bg-primary/5 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/60'
+                  aria-label='Show learn panel'
+                >
+                  <BookOpen className='size-4' aria-hidden='true' />
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Toggle buttons when panels are collapsed */}
@@ -279,18 +304,6 @@ export function DashboardLayout({
         )}
       </div>
 
-      {/* Mobile: FAB to open inputs */}
-      {onToggleMobileInputs && !mobileInputsOpen && !mobileEducationOpen && (
-        <button
-          type='button'
-          onClick={handleToggleMobileInputs}
-          className='fixed right-6 bottom-6 z-40 rounded-sm border border-primary/40 bg-background p-4 transition-colors hover:border-primary/70 hover:bg-card lg:hidden'
-          aria-label='Open calculator inputs'
-        >
-          <Calculator className='size-6 text-primary' />
-        </button>
-      )}
-
       {/* Mobile: Full-screen inputs drawer */}
       <MobileDrawer
         isOpen={mobileInputsOpen}
@@ -301,18 +314,6 @@ export function DashboardLayout({
       >
         {inputs}
       </MobileDrawer>
-
-      {/* Mobile: FAB to show education */}
-      {education && onToggleMobileEducation && !mobileInputsOpen && !mobileEducationOpen && (
-        <button
-          type='button'
-          onClick={handleToggleMobileEducation}
-          className='fixed bottom-6 left-6 z-40 rounded-sm border border-border/70 bg-background p-3 transition-colors hover:border-primary/45 hover:bg-card lg:hidden'
-          aria-label='Show learn panel'
-        >
-          <BookOpen className='size-5 text-primary' />
-        </button>
-      )}
 
       {/* Mobile: Education drawer */}
       {education && (
