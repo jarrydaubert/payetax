@@ -35,7 +35,7 @@ interface SidebarNavProps {
 
 // Shared styles for nav items
 const baseItemClass =
-  'group flex min-h-9 w-full items-center rounded-lg border border-transparent py-2 text-muted-foreground transition-[color,background-color,border-color] duration-150 hover:border-border/60 hover:bg-accent/30 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background 2xl:min-h-10 2xl:py-2.5';
+  'group flex min-h-9 w-full items-center rounded-sm border border-transparent py-2 text-muted-foreground transition-[color,background-color,border-color] duration-150 hover:border-border/60 hover:bg-accent/30 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background 2xl:min-h-10 2xl:py-2.5';
 
 const getItemClass = (collapsed: boolean, isActive = false) =>
   cn(
@@ -288,7 +288,7 @@ export function SidebarNav({
       </Link>
 
       {!collapsed && (
-        <div className='mb-3 rounded-xl border border-primary/25 bg-primary/10 p-2.5 2xl:mb-4 2xl:p-3'>
+        <div className='mb-3 rounded-sm border border-primary/25 bg-primary/10 p-2.5 2xl:mb-4 2xl:p-3'>
           <div className='font-semibold text-primary text-xs uppercase tracking-widest'>Guide</div>
           <p className='mt-1 text-muted-foreground text-xs leading-relaxed'>
             {dashboardVariant

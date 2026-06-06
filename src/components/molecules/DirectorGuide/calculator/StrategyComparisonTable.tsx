@@ -3,7 +3,7 @@
  * Strategy Comparison Cards - 3 selectable strategy cards
  *
  * All Salary | Baseline Mix (Comparison) | All Dividends
- * Selected card has cyan glow. Clicking a card updates the slider.
+ * Selected card uses a bordered Ledger treatment. Clicking a card updates the slider.
  * Dynamic message shows savings (green) or cost (red) vs optimal mix.
  */
 'use client';
@@ -102,12 +102,12 @@ export function StrategyComparisonTable() {
       {/* Header with dynamic message */}
       <div>
         <h3 className='font-semibold text-foreground'>Choose Your Strategy</h3>
-        <div className='mt-2 grid grid-cols-2 gap-2 rounded-lg border border-border/40 bg-background p-1'>
+        <div className='mt-2 grid grid-cols-2 gap-2 rounded-sm border border-border/40 bg-background p-1'>
           <button
             type='button'
             onClick={() => setObjective('maximizeTakeHome')}
             className={cn(
-              'rounded-md px-3 py-2 text-sm transition-colors',
+              'rounded-sm px-3 py-2 text-sm transition-colors',
               objective === 'maximizeTakeHome'
                 ? 'bg-primary/20 font-medium text-primary'
                 : 'text-muted-foreground hover:text-foreground',
@@ -120,7 +120,7 @@ export function StrategyComparisonTable() {
             type='button'
             onClick={() => setObjective('minimizeNI')}
             className={cn(
-              'rounded-md px-3 py-2 text-sm transition-colors',
+              'rounded-sm px-3 py-2 text-sm transition-colors',
               objective === 'minimizeNI'
                 ? 'bg-primary/20 font-medium text-primary'
                 : 'text-muted-foreground hover:text-foreground',
@@ -185,15 +185,15 @@ export function StrategyComparisonTable() {
               key={key}
               onClick={() => handleSelectStrategy(key)}
               className={cn(
-                'relative rounded-xl border p-5 text-left transition-all',
+                'relative rounded-sm border p-5 text-left transition-colors',
                 isSelected
-                  ? 'border-primary bg-primary/10 shadow-cyan-glow'
+                  ? 'border-primary bg-primary/5'
                   : 'border-border/40 bg-card hover:border-border/70 hover:bg-accent/20',
               )}
             >
               {/* Objective badge */}
               {isRecommended && (
-                <span className='absolute -top-2 right-3 rounded-full bg-success px-2 py-0.5 font-medium text-success-foreground text-xs'>
+                <span className='absolute -top-2 right-3 rounded-sm bg-success px-2 py-0.5 font-medium text-success-foreground text-xs'>
                   {objective === 'maximizeTakeHome' ? 'Highest Take-Home' : 'Lowest NI'}
                 </span>
               )}
@@ -202,7 +202,7 @@ export function StrategyComparisonTable() {
               <div className='mb-3 flex items-center gap-2'>
                 <div
                   className={cn(
-                    'flex size-8 items-center justify-center rounded-lg',
+                    'flex size-8 items-center justify-center rounded-sm',
                     isSelected ? 'bg-primary/20' : 'bg-muted/20',
                   )}
                 >
@@ -318,9 +318,9 @@ function YourSetupCard({
 }: YourSetupCardProps) {
   if (!yourSetup) {
     return (
-      <div className='relative mt-4 rounded-xl border border-warning/50 bg-warning/10 p-5'>
+      <div className='relative mt-4 rounded-sm border border-warning/50 bg-warning/10 p-5'>
         <div className='mb-3 flex items-center gap-2'>
-          <div className='flex size-8 items-center justify-center rounded-lg bg-warning/20'>
+          <div className='flex size-8 items-center justify-center rounded-sm bg-warning/20'>
             <User className='size-4 text-warning' />
           </div>
           <div>
@@ -328,7 +328,7 @@ function YourSetupCard({
             <p className='text-muted-foreground text-xs'>Your current arrangement</p>
           </div>
         </div>
-        <div className='rounded-lg bg-muted/20 p-3 text-foreground/80 text-sm'>
+        <div className='rounded-sm bg-muted/20 p-3 text-foreground/80 text-sm'>
           <span className='font-medium text-foreground'>Not set.</span> Add your salary and
           dividends in Full Inputs to compare your current setup against your selected objective.
         </div>
@@ -346,7 +346,7 @@ function YourSetupCard({
   return (
     <div
       className={cn(
-        'relative mt-4 rounded-xl border p-5',
+        'relative mt-4 rounded-sm border p-5',
         yourSetup.exceedsProfit
           ? 'border-destructive/50 bg-destructive/10'
           : 'border-warning/50 bg-warning/10',
@@ -354,7 +354,7 @@ function YourSetupCard({
     >
       {/* DLA Warning Badge */}
       {yourSetup.exceedsProfit && (
-        <span className='absolute -top-2 right-3 flex items-center gap-1 rounded-full bg-destructive px-2 py-0.5 font-medium text-destructive-foreground text-xs'>
+        <span className='absolute -top-2 right-3 flex items-center gap-1 rounded-sm bg-destructive px-2 py-0.5 font-medium text-destructive-foreground text-xs'>
           <AlertTriangle className='size-3' />
           Exceeds Profit
         </span>
@@ -362,7 +362,7 @@ function YourSetupCard({
 
       {/* Icon & Title */}
       <div className='mb-3 flex items-center gap-2'>
-        <div className='flex size-8 items-center justify-center rounded-lg bg-warning/20'>
+        <div className='flex size-8 items-center justify-center rounded-sm bg-warning/20'>
           <User className='size-4 text-warning' />
         </div>
         <div>
@@ -402,7 +402,7 @@ function YourSetupCard({
       </div>
 
       {/* Delta vs Optimal */}
-      <div className='mt-3 rounded-lg bg-muted/20 p-2 text-center text-sm'>
+      <div className='mt-3 rounded-sm bg-muted/20 p-2 text-center text-sm'>
         {objective === 'maximizeTakeHome' && isNearObjective && (
           <span className='text-success'>Within £10 of max take-home reference</span>
         )}
@@ -433,7 +433,7 @@ function YourSetupCard({
 
       {/* DLA Warning */}
       {yourSetup.exceedsProfit && (
-        <div className='mt-3 flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/10 p-3'>
+        <div className='mt-3 flex items-start gap-2 rounded-sm border border-destructive/40 bg-destructive/10 p-3'>
           <AlertTriangle className='mt-0.5 size-4 shrink-0 text-destructive' />
           <p className='text-destructive/90 text-xs'>
             Your salary + dividends exceeds available profit. This may create or increase a

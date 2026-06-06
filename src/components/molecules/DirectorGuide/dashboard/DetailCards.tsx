@@ -191,7 +191,7 @@ interface DetailCardProps {
 
 function DetailCard({ title, badge, rows, total }: DetailCardProps) {
   return (
-    <div className='rounded-xl border border-border/60 bg-card/80 p-5'>
+    <div className='rounded-sm border border-border/60 bg-card p-5'>
       <div className='mb-4 flex items-center justify-between'>
         <span className='font-semibold text-foreground'>{title}</span>
         {badge && (

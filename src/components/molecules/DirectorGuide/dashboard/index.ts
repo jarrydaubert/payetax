@@ -2,8 +2,7 @@
 /**
  * Dashboard molecules for Director Intelligence
  *
- * 4-panel layout matching the original mockup design.
- * Dark theme with cyan/emerald gradients.
+ * 4-panel layout using the Ledger visual system.
  */
 
 export { DashboardLayout } from './DashboardLayout';

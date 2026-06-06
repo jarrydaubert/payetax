@@ -140,7 +140,7 @@ export function EmailResultsDialog({
 
         {sentEmail ? (
           <div className='mt-4 space-y-4'>
-            <div className='rounded-lg border border-success/30 bg-success/10 p-4 text-sm text-success'>
+            <div className='rounded-sm border border-success/30 bg-success/10 p-4 text-sm text-success'>
               Results sent to {sentEmail}. You can close this dialog or send the report to a
               different address.
             </div>

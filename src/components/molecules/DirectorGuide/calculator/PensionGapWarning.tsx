@@ -47,7 +47,7 @@ export function PensionGapWarning() {
   // Qualifies for pension - green success state
   if (qualifiesForPension) {
     return (
-      <div className='rounded-xl border border-success/30 bg-success/5 p-4'>
+      <div className='rounded-sm border border-success/30 bg-success/5 p-4'>
         <div className='flex items-start gap-3'>
           <CheckCircle2 className='mt-0.5 size-5 shrink-0 text-success' />
           <div className='space-y-1 text-sm'>
@@ -66,7 +66,7 @@ export function PensionGapWarning() {
   // In the gap zone - amber warning state
   if (inGapZone) {
     return (
-      <div className='rounded-xl border border-warning/30 bg-warning/5 p-4'>
+      <div className='rounded-sm border border-warning/30 bg-warning/5 p-4'>
         <div className='flex items-start gap-3'>
           <AlertTriangle className='mt-0.5 size-5 shrink-0 text-warning' />
           <div className='space-y-2 text-sm'>
@@ -90,7 +90,7 @@ export function PensionGapWarning() {
 
   // Below threshold - neutral info state
   return (
-    <div className='rounded-xl border border-border/50 bg-card p-4'>
+    <div className='rounded-sm border border-border/50 bg-card p-4'>
       <div className='flex items-start gap-3'>
         <XCircle className='mt-0.5 size-5 shrink-0 text-muted-foreground' />
         <div className='space-y-1 text-sm'>

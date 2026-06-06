@@ -451,7 +451,7 @@ export function DirectorDashboard() {
 
                     <div className='flex items-center justify-center gap-2 text-muted-foreground text-sm'>
                       <span
-                        className='size-2 rounded-full border border-primary/50 bg-primary'
+                        className='size-2 rounded-sm border border-primary/50 bg-primary'
                         aria-hidden='true'
                       />
                       On mobile, tap the calculator button to enter your figures.

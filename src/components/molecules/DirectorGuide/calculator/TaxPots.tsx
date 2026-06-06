@@ -2,7 +2,7 @@
 /**
  * Tax Pots - Company and Personal tax pots to set aside
  *
- * Dark theme with cyan/emerald accents.
+ * Ledger-style tax set-aside summaries.
  */
 'use client';
 
@@ -26,7 +26,7 @@ export function TaxPots() {
     <div className='space-y-6'>
       <div className='grid gap-6 md:grid-cols-2'>
         {/* Company Tax Pot */}
-        <div className='rounded-xl border border-primary/30 bg-card p-5'>
+        <div className='rounded-sm border border-primary/30 bg-card p-5'>
           <div className='mb-4'>
             <h3 className='font-semibold text-primary text-sm'>Company Tax Pot</h3>
             <p className='text-muted-foreground text-xs'>Set aside in company account</p>
@@ -54,7 +54,7 @@ export function TaxPots() {
         </div>
 
         {/* Personal Tax Pot */}
-        <div className='rounded-xl border border-success/30 bg-card p-5'>
+        <div className='rounded-sm border border-success/30 bg-card p-5'>
           <div className='mb-4'>
             <h3 className='font-semibold text-sm text-success'>Personal Tax Pot</h3>
             <p className='text-muted-foreground text-xs'>Set aside for Self Assessment</p>

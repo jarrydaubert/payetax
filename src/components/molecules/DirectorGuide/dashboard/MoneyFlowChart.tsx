@@ -72,7 +72,7 @@ export function MoneyFlowChart() {
   ];
 
   return (
-    <div className='rounded-xl border border-border/50 bg-card p-4'>
+    <div className='rounded-sm border border-border/50 bg-card p-4'>
       <div className='mb-3 flex items-center gap-2 text-muted-foreground'>
         <BarChart3 className='size-4' aria-hidden='true' />
         <span className='font-medium text-sm'>Money Flow</span>

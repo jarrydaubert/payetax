@@ -230,7 +230,7 @@ export function DashboardLayout({
             <button
               type='button'
               onClick={onToggleInputs}
-              className='absolute top-6 left-4 z-20 rounded-lg border border-border/50 bg-card p-2 text-muted-foreground transition-colors hover:bg-accent/30 hover:text-foreground max-lg:hidden'
+              className='absolute top-6 left-4 z-20 rounded-sm border border-border/50 bg-card p-2 text-muted-foreground transition-colors hover:bg-accent/30 hover:text-foreground max-lg:hidden'
               aria-label='Show inputs panel'
             >
               <PanelLeftOpen className='size-4' />
@@ -240,7 +240,7 @@ export function DashboardLayout({
             <button
               type='button'
               onClick={onToggleEducation}
-              className='absolute top-6 right-4 z-20 rounded-lg border border-border/50 bg-card p-2 text-muted-foreground transition-colors hover:bg-accent/30 hover:text-foreground max-lg:hidden'
+              className='absolute top-6 right-4 z-20 rounded-sm border border-border/50 bg-card p-2 text-muted-foreground transition-colors hover:bg-accent/30 hover:text-foreground max-lg:hidden'
               aria-label='Show learn panel'
             >
               <PanelRightOpen className='size-4' />

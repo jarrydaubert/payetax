@@ -206,7 +206,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           <legend id={ids.mode} className='sr-only'>
             Input mode
           </legend>
-          <div className='grid grid-cols-2 gap-2 rounded-lg border border-border/40 bg-background p-1'>
+          <div className='grid grid-cols-2 gap-2 rounded-sm border border-border/40 bg-background p-1'>
             <button
               type='button'
               onClick={() => actions.setMode('annual')}
@@ -239,7 +239,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 
       <Section title='Input Path'>
         <fieldset aria-label='Input path'>
-          <div className='grid grid-cols-2 gap-2 rounded-lg border border-border/40 bg-background p-1'>
+          <div className='grid grid-cols-2 gap-2 rounded-sm border border-border/40 bg-background p-1'>
             <button
               type='button'
               onClick={() => setQuickStartMode(true)}
@@ -511,7 +511,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
       </Section>
 
       {quickStartMode ? (
-        <div className='mb-5 rounded-lg border border-primary/20 bg-primary/5 p-4'>
+        <div className='mb-5 rounded-sm border border-primary/20 bg-primary/5 p-4'>
           <p className='text-primary text-xs'>
             You can calculate with just company inputs + region. Add more detail any time for better
             accuracy.
@@ -625,7 +625,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               onClick={() => setAdvancedOpen(!advancedOpen)}
               aria-expanded={advancedOpen}
               aria-controls={ids.advancedPanel}
-              className='flex w-full items-center justify-between rounded-lg border border-border/40 bg-card px-4 py-3 text-left text-muted-foreground text-sm transition-all hover:border-border/40 hover:bg-accent/30'
+              className='flex w-full items-center justify-between rounded-sm border border-border/40 bg-card px-4 py-3 text-left text-muted-foreground text-sm transition-colors hover:border-border/40 hover:bg-accent/30'
             >
               <span className='font-medium'>Advanced Options</span>
               {advancedOpen ? <ChevronUp className='size-4' /> : <ChevronDown className='size-4' />}
@@ -634,7 +634,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             {advancedOpen && (
               <div
                 id={ids.advancedPanel}
-                className='mt-3 space-y-4 rounded-lg border border-border/40 bg-background p-4'
+                className='mt-3 space-y-4 rounded-sm border border-border/40 bg-background p-4'
               >
                 {/* Employment Allowance */}
                 <div className='flex items-center justify-between'>
@@ -904,7 +904,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
         <button
           type='button'
           onClick={handleReset}
-          className='flex w-full items-center gap-3 rounded-lg border border-border/40 bg-card px-3 py-2 text-left text-muted-foreground text-sm transition-all hover:border-border/40 hover:bg-accent/30 hover:text-foreground'
+          className='flex w-full items-center gap-3 rounded-sm border border-border/40 bg-card px-3 py-2 text-left text-muted-foreground text-sm transition-colors hover:border-border/40 hover:bg-accent/30 hover:text-foreground'
         >
           <RotateCcw className='size-4 text-primary' />
           <span className='flex-1'>Reset</span>
@@ -918,7 +918,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className='mb-6 rounded-xl border border-border/50 bg-card/50 p-4'>
+    <section className='mb-6 rounded-sm border border-border/50 bg-card p-4'>
       <h3 className={SECTION_HEADING_CLASS}>{title}</h3>
       <div className='space-y-4'>{children}</div>
     </section>
