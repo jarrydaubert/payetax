@@ -75,14 +75,14 @@ interface EditorsPicksListProps {
 
 function EditorsPicksList({ posts, showHeading = true }: EditorsPicksListProps) {
   return (
-    <div className='rounded-sm border border-border bg-card p-4 sm:p-5'>
+    <div>
       {showHeading && (
-        <h2 className='mb-5 font-semibold text-primary text-xs uppercase tracking-[0.28em] sm:mb-6 sm:text-sm sm:tracking-widest'>
+        <h2 className='mb-4 font-semibold text-primary text-xs uppercase tracking-[0.28em] sm:mb-6 sm:text-sm sm:tracking-widest'>
           Editor&apos;s Picks
         </h2>
       )}
 
-      <ol className='divide-y divide-border'>
+      <ol className='divide-y divide-border rounded-sm border border-border bg-card p-4 sm:p-5'>
         {posts.map((post, index) => (
           <li key={post.slug}>
             <Link
@@ -91,7 +91,7 @@ function EditorsPicksList({ posts, showHeading = true }: EditorsPicksListProps) 
               prefetch={false}
             >
               {/* Number */}
-              <span className='flex-shrink-0 font-mono text-primary text-xs tabular-nums tracking-[0.2em] transition-colors group-hover:text-primary/80'>
+              <span className='flex-shrink-0 font-mono text-primary text-xs tabular-nums transition-colors group-hover:text-primary/80'>
                 {String(index + 1).padStart(2, '0')}
               </span>
 
