@@ -5,7 +5,6 @@ import { Calculator, Mail, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import type React from 'react';
 import { Button } from '@/components/ui/button';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 interface CallToActionProps {
@@ -60,24 +59,14 @@ export default function CallToAction({
     <div
       className={cn(
         'my-16 rounded-sm border border-border bg-card text-center',
-        SPACING.P_8,
+        'p-8',
         'md:p-12',
         className,
       )}
     >
-      <IconComponent
-        className={cn('mx-auto text-primary', SPACING.MB_6, ICON_SIZES.SIZE_12)}
-        aria-hidden='true'
-      />
-      <h2 className={cn('font-bold text-foreground', SPACING.MB_6, TYPOGRAPHY.TEXT_3XL)}>
-        {config.title}
-      </h2>
-      <p
-        className={cn(
-          'mx-auto mb-8 max-w-2xl text-muted-foreground leading-relaxed',
-          TYPOGRAPHY.TEXT_XL,
-        )}
-      >
+      <IconComponent className={cn('mx-auto text-primary', 'mb-6', 'size-12')} aria-hidden='true' />
+      <h2 className={cn('font-bold text-foreground', 'mb-6', 'text-3xl')}>{config.title}</h2>
+      <p className={cn('mx-auto mb-8 max-w-2xl text-muted-foreground leading-relaxed', 'text-xl')}>
         {config.description}
       </p>
 
@@ -85,12 +74,12 @@ export default function CallToAction({
         <Button asChild variant='outline' size='lg'>
           {config.primaryAction.href.startsWith('mailto:') ? (
             <a href={config.primaryAction.href}>
-              <PrimaryIcon className={`mr-2 ${ICON_SIZES.SIZE_4}`} aria-hidden='true' />
+              <PrimaryIcon className={`mr-2 size-4`} aria-hidden='true' />
               {config.primaryAction.text}
             </a>
           ) : (
             <Link href={config.primaryAction.href}>
-              <PrimaryIcon className={`mr-2 ${ICON_SIZES.SIZE_4}`} aria-hidden='true' />
+              <PrimaryIcon className={`mr-2 size-4`} aria-hidden='true' />
               {config.primaryAction.text}
             </Link>
           )}
@@ -98,7 +87,7 @@ export default function CallToAction({
 
         <Button asChild variant='outline' size='lg'>
           <Link href={config.secondaryAction.href}>
-            <SecondaryIcon className={`mr-2 ${ICON_SIZES.SIZE_4}`} aria-hidden='true' />
+            <SecondaryIcon className={`mr-2 size-4`} aria-hidden='true' />
             {config.secondaryAction.text}
           </Link>
         </Button>

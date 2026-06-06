@@ -22,7 +22,6 @@ import { AlertTriangle, ArrowRight, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { ICON_SIZES, SPACING } from '@/constants/designTokens';
 import { CURRENT_TAX_YEAR, TAX_RATES, type TaxYear } from '@/constants/taxRates';
 import { cn, formatCurrency } from '@/lib/utils';
 
@@ -101,7 +100,7 @@ export function TaxTrapInlineAlert({
 
   return (
     <Alert variant='warning' className='relative border-2'>
-      <AlertTriangle className={ICON_SIZES.SIZE_5} aria-hidden='true' />
+      <AlertTriangle className={'size-5'} aria-hidden='true' />
 
       {/* Close button */}
       <button
@@ -109,18 +108,15 @@ export function TaxTrapInlineAlert({
         onClick={handleDismiss}
         className={cn(
           'absolute top-3 right-3 rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
-          SPACING.P_2,
+          'p-2',
         )}
         aria-label='Dismiss tax trap alert'
       >
-        <X className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+        <X className={'size-4'} aria-hidden='true' />
       </button>
 
       <div
-        className={cn(
-          'flex flex-col pr-8 sm:flex-row sm:items-center sm:justify-between',
-          SPACING.GAP_3,
-        )}
+        className={cn('flex flex-col pr-8 sm:flex-row sm:items-center sm:justify-between', 'gap-3')}
       >
         <div className='flex-1'>
           <AlertTitle>Tax Trap Alert</AlertTitle>
@@ -129,7 +125,7 @@ export function TaxTrapInlineAlert({
             <span className='font-bold text-destructive'>{formatCurrency(allowanceLost, 0)}</span>{' '}
             in personal allowance due to the 60% tax trap (£100k-£125k zone).
             {onApplyPension && (
-              <span className={cn('block', SPACING.MT_1)}>
+              <span className={cn('block', 'mt-1')}>
                 Add {formatCurrency(suggestedPension, 0)} to your pension to avoid this trap?
               </span>
             )}
@@ -143,11 +139,11 @@ export function TaxTrapInlineAlert({
             size='sm'
             className={cn(
               'w-full whitespace-nowrap border border-warning/40 bg-card text-warning shadow-none hover:bg-warning/10 hover:text-warning sm:w-auto',
-              SPACING.GAP_2,
+              'gap-2',
             )}
           >
             Add {formatCurrency(suggestedPension, 0)} to Pension
-            <ArrowRight className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+            <ArrowRight className={'size-4'} aria-hidden='true' />
           </Button>
         )}
       </div>

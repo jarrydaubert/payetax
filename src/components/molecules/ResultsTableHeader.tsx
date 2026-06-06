@@ -3,7 +3,6 @@
 
 import * as React from 'react';
 import { TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 interface ResultsTableHeaderProps {
@@ -26,9 +25,9 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
         <TableHead
           className={cn(
             'sticky left-0 z-20 w-44 whitespace-nowrap border-border border-r bg-card font-semibold text-foreground sm:w-52',
-            SPACING.PX_2,
+            'px-2',
             'py-3',
-            TYPOGRAPHY.TEXT_BASE,
+            'text-base',
             'sm:text-lg',
           )}
         >
@@ -37,9 +36,9 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
         <TableHead
           className={cn(
             'w-14 border-border border-r text-right font-semibold text-muted-foreground',
-            SPACING.PX_2,
+            'px-2',
             'py-3',
-            TYPOGRAPHY.TEXT_SM,
+            'text-sm',
           )}
         >
           %
@@ -51,9 +50,9 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
                 key={period}
                 className={cn(
                   'min-w-56 border-border border-r text-center font-semibold text-muted-foreground',
-                  SPACING.PX_2,
+                  'px-2',
                   'py-3',
-                  TYPOGRAPHY.TEXT_SM,
+                  'text-sm',
                 )}
                 colSpan={2}
               >
@@ -66,9 +65,9 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
                 key={period}
                 className={cn(
                   'min-w-28 whitespace-nowrap text-right font-semibold text-muted-foreground',
-                  SPACING.PX_2,
+                  'px-2',
                   'py-3',
-                  TYPOGRAPHY.TEXT_SM,
+                  'text-sm',
                 )}
               >
                 {period}
@@ -78,11 +77,7 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
       {hasWhatIfResults && (
         <TableRow className='border-border bg-card hover:bg-card'>
           <TableHead
-            className={cn(
-              'sticky left-0 z-20 border-border border-r bg-card',
-              SPACING.PX_2,
-              'py-1.5',
-            )}
+            className={cn('sticky left-0 z-20 border-border border-r bg-card', 'px-2', 'py-1.5')}
             colSpan={2}
           />
           {visiblePeriods.map((period) => (
@@ -90,9 +85,9 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
               <TableHead
                 className={cn(
                   'min-w-28 whitespace-nowrap bg-primary/10 text-center font-medium text-muted-foreground',
-                  SPACING.PX_2,
-                  SPACING.PY_2,
-                  TYPOGRAPHY.TEXT_SM,
+                  'px-2',
+                  'py-2',
+                  'text-sm',
                 )}
               >
                 Current
@@ -101,9 +96,9 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
               <TableHead
                 className={cn(
                   'min-w-28 whitespace-nowrap bg-accent/10 text-center font-medium text-muted-foreground',
-                  SPACING.PX_2,
-                  SPACING.PY_2,
-                  TYPOGRAPHY.TEXT_SM,
+                  'px-2',
+                  'py-2',
+                  'text-sm',
                 )}
               >
                 What If

@@ -9,7 +9,6 @@
 
 import { Check, X } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 export interface ProsConsProps {
@@ -61,54 +60,34 @@ export function ProsCons({
   const isSideBySide = variant === 'side-by-side';
 
   return (
-    <div className={cn(isSideBySide ? 'grid gap-6 md:grid-cols-2' : SPACING.SPACE_Y_6, className)}>
+    <div className={cn(isSideBySide ? 'grid gap-6 md:grid-cols-2' : 'space-y-6', className)}>
       {/* Pros */}
-      <Card className={cn('border-success/30 bg-success/5', SPACING.P_6)}>
-        <h3
-          className={cn(
-            'flex items-center font-bold text-success',
-            TYPOGRAPHY.TEXT_LG,
-            SPACING.MB_4,
-            SPACING.GAP_2,
-          )}
-        >
-          <Check className={ICON_SIZES.SIZE_5} aria-hidden='true' />
+      <Card className={cn('border-success/30 bg-success/5', 'p-6')}>
+        <h3 className={cn('flex items-center font-bold text-success', 'text-lg', 'mb-4', 'gap-2')}>
+          <Check className={'size-5'} aria-hidden='true' />
           {prosTitle}
         </h3>
-        <ul className={SPACING.SPACE_Y_3}>
+        <ul className={'space-y-3'}>
           {pros.map((pro) => (
-            <li key={pro} className={cn('flex items-start text-foreground', SPACING.GAP_3)}>
-              <Check
-                className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 shrink-0 text-success')}
-                aria-hidden='true'
-              />
-              <span className={TYPOGRAPHY.TEXT_SM}>{pro}</span>
+            <li key={pro} className={cn('flex items-start text-foreground', 'gap-3')}>
+              <Check className={cn('size-4', 'mt-0.5 shrink-0 text-success')} aria-hidden='true' />
+              <span className={'text-sm'}>{pro}</span>
             </li>
           ))}
         </ul>
       </Card>
 
       {/* Cons */}
-      <Card className={cn('border-warning/30 bg-warning/5', SPACING.P_6)}>
-        <h3
-          className={cn(
-            'flex items-center font-bold text-warning',
-            TYPOGRAPHY.TEXT_LG,
-            SPACING.MB_4,
-            SPACING.GAP_2,
-          )}
-        >
-          <X className={ICON_SIZES.SIZE_5} aria-hidden='true' />
+      <Card className={cn('border-warning/30 bg-warning/5', 'p-6')}>
+        <h3 className={cn('flex items-center font-bold text-warning', 'text-lg', 'mb-4', 'gap-2')}>
+          <X className={'size-5'} aria-hidden='true' />
           {consTitle}
         </h3>
-        <ul className={SPACING.SPACE_Y_3}>
+        <ul className={'space-y-3'}>
           {cons.map((con) => (
-            <li key={con} className={cn('flex items-start text-foreground', SPACING.GAP_3)}>
-              <X
-                className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 shrink-0 text-warning')}
-                aria-hidden='true'
-              />
-              <span className={TYPOGRAPHY.TEXT_SM}>{con}</span>
+            <li key={con} className={cn('flex items-start text-foreground', 'gap-3')}>
+              <X className={cn('size-4', 'mt-0.5 shrink-0 text-warning')} aria-hidden='true' />
+              <span className={'text-sm'}>{con}</span>
             </li>
           ))}
         </ul>
@@ -135,16 +114,13 @@ export function AdvantagesList({
   className,
 }: AdvantagesListProps) {
   return (
-    <Card className={cn('border-primary/30 bg-primary/5', SPACING.P_6, className)}>
-      <h3 className={cn('font-bold text-primary', TYPOGRAPHY.TEXT_LG, SPACING.MB_4)}>{title}</h3>
-      <ul className={SPACING.SPACE_Y_3}>
+    <Card className={cn('border-primary/30 bg-primary/5', 'p-6', className)}>
+      <h3 className={cn('font-bold text-primary', 'text-lg', 'mb-4')}>{title}</h3>
+      <ul className={'space-y-3'}>
         {items.map((item) => (
-          <li key={item} className={cn('flex items-start text-foreground', SPACING.GAP_3)}>
-            <Check
-              className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 shrink-0 text-primary')}
-              aria-hidden='true'
-            />
-            <span className={TYPOGRAPHY.TEXT_SM}>{item}</span>
+          <li key={item} className={cn('flex items-start text-foreground', 'gap-3')}>
+            <Check className={cn('size-4', 'mt-0.5 shrink-0 text-primary')} aria-hidden='true' />
+            <span className={'text-sm'}>{item}</span>
           </li>
         ))}
       </ul>

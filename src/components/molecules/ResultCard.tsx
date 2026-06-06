@@ -11,7 +11,6 @@ import {
   ANIMATION_TRANSITIONS,
   ANIMATION_VARIANTS,
 } from '@/constants/animationTokens';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { cn } from '@/lib/utils';
 
@@ -88,27 +87,17 @@ export const ResultCard = memo(function ResultCard({
 
   // Card visual content
   const cardVisual = (
-    <Card className={cn(SPACING.P_4, 'rounded-sm border-border bg-card shadow-none', styles.card)}>
-      <div className={cn(SPACING.SPACE_Y_2, 'border-foreground/15 border-t pt-3')}>
+    <Card className={cn('p-4', 'rounded-sm border-border bg-card shadow-none', styles.card)}>
+      <div className={cn('space-y-2', 'border-foreground/15 border-t pt-3')}>
         <div className='flex items-center justify-between'>
           <p
-            className={cn(
-              'font-medium text-foreground/80 uppercase tracking-[0.12em]',
-              TYPOGRAPHY.TEXT_SM,
-            )}
+            className={cn('font-medium text-foreground/80 uppercase tracking-[0.12em]', 'text-sm')}
           >
             {label}
           </p>
-          {Icon && (
-            <Icon className={cn(ICON_SIZES.SIZE_4, styles.icon, 'opacity-80')} aria-hidden='true' />
-          )}
+          {Icon && <Icon className={cn('size-4', styles.icon, 'opacity-80')} aria-hidden='true' />}
         </div>
-        <p
-          className={cn(
-            'font-mono font-semibold text-foreground tabular-nums',
-            TYPOGRAPHY.TEXT_2XL,
-          )}
-        >
+        <p className={cn('font-mono font-semibold text-foreground tabular-nums', 'text-2xl')}>
           {value}
         </p>
       </div>

@@ -9,7 +9,6 @@
 
 import type { LucideIcon } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
-import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 import type { StatData } from '@/lib/validation/pageDataValidation';
 
@@ -102,7 +101,7 @@ function StatCard({ stat, variant }: StatCardProps) {
 
   return (
     <Card className={cardClasses}>
-      <CardContent className={cn('flex flex-col items-center text-center', SPACING.P_6)}>
+      <CardContent className={cn('flex flex-col items-center text-center', 'p-6')}>
         {/* Icon */}
         <div className={iconClasses} aria-hidden='true'>
           <Icon className='h-6 w-6' />
@@ -110,23 +109,16 @@ function StatCard({ stat, variant }: StatCardProps) {
 
         {/* Value */}
         <div
-          className={cn(
-            TYPOGRAPHY.TEXT_3XL,
-            'mb-2 font-mono font-semibold text-foreground tracking-tight',
-          )}
+          className={cn('text-3xl', 'mb-2 font-mono font-semibold text-foreground tracking-tight')}
         >
           {value}
         </div>
 
         {/* Label */}
-        <div className={cn(TYPOGRAPHY.TEXT_LG, 'font-semibold text-foreground', SPACING.MB_2)}>
-          {label}
-        </div>
+        <div className={cn('text-lg', 'font-semibold text-foreground', 'mb-2')}>{label}</div>
 
         {/* Optional Description */}
-        {description && (
-          <p className={cn(TYPOGRAPHY.TEXT_SM, 'text-muted-foreground')}>{description}</p>
-        )}
+        {description && <p className={cn('text-sm', 'text-muted-foreground')}>{description}</p>}
       </CardContent>
     </Card>
   );

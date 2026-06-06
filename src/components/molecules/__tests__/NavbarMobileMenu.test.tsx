@@ -67,32 +67,32 @@ describe('NavbarMobileMenu', () => {
       render(<NavbarMobileMenu {...defaultProps} pathname='/' />);
       const calculatorLink = screen.getByRole('link', { name: 'Calculator' });
       // Active state uses Tailwind class
-      expect(calculatorLink).toHaveClass('text-brand');
+      expect(calculatorLink).toHaveClass('text-primary');
     });
 
     it('should mark Blog as active when pathname starts with /blog', () => {
       render(<NavbarMobileMenu {...defaultProps} pathname='/blog' />);
       const blogLink = screen.getByRole('link', { name: 'Blog' });
-      expect(blogLink).toHaveClass('text-brand');
+      expect(blogLink).toHaveClass('text-primary');
     });
 
     it('should mark Blog as active for blog sub-pages', () => {
       render(<NavbarMobileMenu {...defaultProps} pathname='/blog/some-article' />);
       const blogLink = screen.getByRole('link', { name: 'Blog' });
-      expect(blogLink).toHaveClass('text-brand');
+      expect(blogLink).toHaveClass('text-primary');
     });
 
     it('should mark link as active when pathname matches exactly', () => {
       render(<NavbarMobileMenu {...defaultProps} pathname='/about' />);
       const aboutLink = screen.getByRole('link', { name: 'About' });
-      expect(aboutLink).toHaveClass('text-brand');
+      expect(aboutLink).toHaveClass('text-primary');
     });
 
     it('should not mark non-matching links as active', () => {
       render(<NavbarMobileMenu {...defaultProps} pathname='/about' />);
       const calculatorLink = screen.getByRole('link', { name: 'Calculator' });
       // Inactive state uses secondary text class
-      expect(calculatorLink).toHaveClass('text-on-brand-muted');
+      expect(calculatorLink).toHaveClass('text-muted-foreground');
     });
   });
 
@@ -164,13 +164,13 @@ describe('NavbarMobileMenu', () => {
       render(<NavbarMobileMenu {...defaultProps} pathname='/' />);
       const calculatorLink = screen.getByRole('link', { name: 'Calculator' });
       // New design uses Tailwind classes for active state
-      expect(calculatorLink).toHaveClass('bg-brand/10', 'text-brand');
+      expect(calculatorLink).toHaveClass('bg-primary/10', 'text-primary');
     });
 
     it('should apply inactive styling to inactive links', () => {
       render(<NavbarMobileMenu {...defaultProps} pathname='/' />);
       const aboutLink = screen.getByRole('link', { name: 'About' });
-      expect(aboutLink).toHaveClass('text-on-brand-muted');
+      expect(aboutLink).toHaveClass('text-muted-foreground');
     });
   });
 

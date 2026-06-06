@@ -10,7 +10,6 @@ import type { PayPeriod } from '@/constants/taxRates';
 const MotionTableRow = motion.create(TableRow);
 
 import { ANIMATION_TRANSITIONS } from '@/constants/animationTokens';
-import { ARBITRARY, ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { PERIOD_LABEL_TO_PAY_PERIOD } from '@/lib/calculatorResultsPresenter';
 import { cn, formatCurrency } from '@/lib/utils';
@@ -72,18 +71,18 @@ export function ResultTableRow({
           color,
           isHighlight && 'font-bold',
           'sticky left-0 z-10 border-border/80 border-r bg-card px-2.5 py-3 text-left font-normal',
-          ARBITRARY.TABLE_LABEL_WIDTH,
+          'w-[195px]',
         )}
       >
-        <div className={cn('flex items-center', SPACING.GAP_1_5, isSubRow && 'pl-4 sm:pl-6')}>
-          <Icon className={cn(ICON_SIZES.SIZE_3_5, 'flex-shrink-0')} aria-hidden='true' />
-          <span className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>{category}</span>
+        <div className={cn('flex items-center', 'gap-1.5', isSubRow && 'pl-4 sm:pl-6')}>
+          <Icon className={cn('size-3.5', 'flex-shrink-0')} aria-hidden='true' />
+          <span className={cn('whitespace-nowrap', 'text-sm')}>{category}</span>
         </div>
       </th>
       <TableCell
         className={cn(
           'w-14 border-border/60 border-r px-2.5 py-3 text-right font-mono tabular-nums',
-          TYPOGRAPHY.TEXT_SM,
+          'text-sm',
           color,
           isHighlight && 'font-bold',
         )}
@@ -106,7 +105,7 @@ export function ResultTableRow({
               <TableCell
                 className={cn(
                   'min-w-28 whitespace-nowrap bg-primary/10 px-2.5 py-3 text-right font-mono tabular-nums',
-                  TYPOGRAPHY.TEXT_SM,
+                  'text-sm',
                   color,
                   isHighlight && 'font-bold',
                 )}
@@ -116,7 +115,7 @@ export function ResultTableRow({
               <TableCell
                 className={cn(
                   'min-w-28 whitespace-nowrap bg-success/10 px-2.5 py-3 text-right font-mono tabular-nums',
-                  TYPOGRAPHY.TEXT_SM,
+                  'text-sm',
                   color,
                   isHighlight && 'font-bold',
                 )}
@@ -133,7 +132,7 @@ export function ResultTableRow({
             key={period}
             className={cn(
               'min-w-28 whitespace-nowrap px-2.5 py-3 text-right font-mono tabular-nums',
-              TYPOGRAPHY.TEXT_SM,
+              'text-sm',
               color,
               isHighlight && 'font-bold',
             )}

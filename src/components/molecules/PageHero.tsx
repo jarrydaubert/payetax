@@ -12,7 +12,6 @@
 import type { LucideIcon } from 'lucide-react';
 import type React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 /**
@@ -99,7 +98,7 @@ export function PageHero({
         className,
       )}
     >
-      <div className={cn('container mx-auto max-w-7xl', SPACING.PX_4)}>
+      <div className={cn('container mx-auto max-w-7xl', 'px-4')}>
         <div className={alignClass}>
           {/* Badge */}
           {badge && (
@@ -107,10 +106,10 @@ export function PageHero({
               variant={badge.variant || 'outline'}
               className={cn(
                 'mb-6 rounded-sm border-primary/35 bg-background px-5 py-2.5 text-primary uppercase tracking-[0.24em]',
-                SPACING.GAP_2,
+                'gap-2',
               )}
             >
-              {badge.icon && <badge.icon className={ICON_SIZES.SIZE_5} aria-hidden='true' />}
+              {badge.icon && <badge.icon className={'size-5'} aria-hidden='true' />}
               <span>{badge.text}</span>
             </Badge>
           )}
@@ -119,8 +118,8 @@ export function PageHero({
           <h1
             className={cn(
               'font-display font-semibold text-foreground leading-[0.98]',
-              SPACING.MB_6,
-              TYPOGRAPHY.TEXT_6XL,
+              'mb-6',
+              'text-6xl',
             )}
           >
             {title}
@@ -128,12 +127,9 @@ export function PageHero({
 
           {/* Subtitle(s) */}
           {subtitles.length > 0 && (
-            <div className={cn('mx-auto max-w-3xl', SPACING.SPACE_Y_4)}>
+            <div className={cn('mx-auto max-w-3xl', 'space-y-4')}>
               {subtitles.map((text) => (
-                <p
-                  key={text}
-                  className={cn('text-muted-foreground leading-relaxed', TYPOGRAPHY.TEXT_LG)}
-                >
+                <p key={text} className={cn('text-muted-foreground leading-relaxed', 'text-lg')}>
                   {text}
                 </p>
               ))}

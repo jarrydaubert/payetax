@@ -6,7 +6,6 @@ import * as React from 'react';
 import { Spinner } from '@/components/atoms/Spinner';
 import { Button } from '@/components/ui/button';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { ICON_SIZES, SPACING } from '@/constants/designTokens';
 import { convertPeriodToAnnual } from '@/lib/periodCalculator';
 import { cn } from '@/lib/utils';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
@@ -73,11 +72,11 @@ export function CalculatorInputsSection({
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className={SPACING.SPACE_Y_4}>
+      <div className={'space-y-4'}>
         <BasicInputs />
 
         {/* Calculate and Reset buttons */}
-        <div className={cn('flex', SPACING.GAP_2)}>
+        <div className={cn('flex', 'gap-2')}>
           <Button
             onClick={handleCalculate}
             disabled={isCalculating}
@@ -87,19 +86,19 @@ export function CalculatorInputsSection({
           >
             {isCalculating ? (
               <>
-                <Spinner className={cn('mr-2', ICON_SIZES.SIZE_5)} />
+                <Spinner className={cn('mr-2', 'size-5')} />
                 Calculating...
               </>
             ) : (
               <>
-                <Calculator className={cn('mr-2', ICON_SIZES.SIZE_5)} />
+                <Calculator className={cn('mr-2', 'size-5')} />
                 Calculate
               </>
             )}
           </Button>
 
           <Button onClick={handleReset} variant='outline' size='default' className='shrink-0 px-3'>
-            <RotateCcw className={cn('mr-1.5', ICON_SIZES.SIZE_5)} />
+            <RotateCcw className={cn('mr-1.5', 'size-5')} />
             Reset
           </Button>
           {resultAction}

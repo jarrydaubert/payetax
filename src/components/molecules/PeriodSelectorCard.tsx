@@ -5,7 +5,6 @@ import { motion } from 'framer-motion';
 import { PeriodCheckbox } from '@/components/atoms/PeriodCheckbox';
 import { Card } from '@/components/ui/card';
 import { ANIMATION_TRANSITIONS } from '@/constants/animationTokens';
-import { SPACING } from '@/constants/designTokens';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { cn } from '@/lib/utils';
 
@@ -34,11 +33,7 @@ export function PeriodSelectorCard({
 
   return (
     <Card
-      className={cn(
-        'w-full rounded-sm border-border bg-card shadow-none',
-        SPACING.P_2,
-        'sm:p-3 md:p-4',
-      )}
+      className={cn('w-full rounded-sm border-border bg-card shadow-none', 'p-2', 'sm:p-3 md:p-4')}
     >
       <div className='flex flex-col gap-2 lg:flex-row lg:items-center'>
         <p className='shrink-0 font-semibold text-base text-foreground sm:text-lg'>
@@ -47,7 +42,7 @@ export function PeriodSelectorCard({
         <div
           className={cn(
             'flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-2 lg:flex-nowrap lg:justify-end xl:gap-x-4',
-            SPACING.GAP_2,
+            'gap-2',
           )}
         >
           {periods.map((period) => (

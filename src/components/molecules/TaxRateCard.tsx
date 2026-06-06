@@ -2,7 +2,6 @@
 
 import type { LucideIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 export interface TaxRateItem {
@@ -25,23 +24,21 @@ export interface TaxRateCardProps {
  */
 export function TaxRateCard({ icon: Icon, title, items, footerNote }: TaxRateCardProps) {
   return (
-    <Card className={cn('overflow-hidden rounded-sm border-border bg-card', SPACING.P_6)}>
-      <div className={cn('mb-4 flex items-center', SPACING.GAP_3)}>
+    <Card className={cn('overflow-hidden rounded-sm border-border bg-card', 'p-6')}>
+      <div className={cn('mb-4 flex items-center', 'gap-3')}>
         <div className='flex size-10 items-center justify-center rounded-sm border border-primary/25 bg-background text-primary'>
-          <Icon className={ICON_SIZES.SIZE_5} />
+          <Icon className={'size-5'} />
         </div>
-        <h3 className={cn('font-display font-semibold text-foreground', TYPOGRAPHY.TEXT_LG)}>
-          {title}
-        </h3>
+        <h3 className={cn('font-display font-semibold text-foreground', 'text-lg')}>{title}</h3>
       </div>
-      <ul className={SPACING.SPACE_Y_3}>
+      <ul className={'space-y-3'}>
         {items.map((item) => (
           <li
             key={item.label}
             className={cn(
               'flex justify-between rounded-sm border border-border bg-background',
-              SPACING.P_2,
-              TYPOGRAPHY.TEXT_SM,
+              'p-2',
+              'text-sm',
             )}
           >
             <span className='text-muted-foreground'>{item.label}</span>
@@ -49,9 +46,7 @@ export function TaxRateCard({ icon: Icon, title, items, footerNote }: TaxRateCar
           </li>
         ))}
         {footerNote && (
-          <li className={cn('pt-1 text-center text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>
-            {footerNote}
-          </li>
+          <li className={cn('pt-1 text-center text-muted-foreground', 'text-xs')}>{footerNote}</li>
         )}
       </ul>
     </Card>

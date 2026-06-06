@@ -6,7 +6,6 @@ import { Calculator, TrendingUp, Wallet } from 'lucide-react';
 import Link from 'next/link';
 import { TaxRateCard } from '@/components/molecules/TaxRateCard';
 import { ANIMATION_CONTAINER_VARIANTS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
-import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { CURRENT_TAX_YEAR, formatTaxYearDisplay, TAX_RATES } from '@/constants/taxRates';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { calculateTax } from '@/lib/taxCalculator';
@@ -69,13 +68,13 @@ export function TaxRatesOverview() {
       transition={{ duration: 0.5, delay: 0.2 }}
       className='border-border/70 border-y bg-ledger-grid py-16'
     >
-      <div className={cn('mx-auto max-w-7xl', SPACING.PX_4)}>
+      <div className={cn('mx-auto max-w-7xl', 'px-4')}>
         <div className='mb-10 text-center'>
           <h2
             className={cn(
               'font-display font-semibold text-foreground leading-tight',
-              SPACING.MB_3,
-              TYPOGRAPHY.TEXT_4XL,
+              'mb-3',
+              'text-4xl',
             )}
           >
             UK Tax Rates {currentTaxYearDisplay}
@@ -86,7 +85,7 @@ export function TaxRatesOverview() {
         </div>
 
         <motion.div
-          className={`grid ${SPACING.GAP_6} md:grid-cols-3`}
+          className={`grid gap-6 md:grid-cols-3`}
           variants={shouldReduceMotion ? undefined : ANIMATION_CONTAINER_VARIANTS.staggerNormal}
           initial='hidden'
           animate='show'
@@ -147,10 +146,10 @@ export function TaxRatesOverview() {
           </motion.div>
         </motion.div>
 
-        <div className={cn('text-center', SPACING.MT_8)}>
+        <div className={cn('text-center', 'mt-8')}>
           <Link
             href='/blog/scottish-vs-english-tax-rates-2026-comparison'
-            className={cn('inline-flex items-center text-primary hover:underline', SPACING.GAP_2)}
+            className={cn('inline-flex items-center text-primary hover:underline', 'gap-2')}
           >
             Scottish taxpayers: See rate differences →
           </Link>

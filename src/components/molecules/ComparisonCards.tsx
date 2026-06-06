@@ -12,7 +12,6 @@
 import type { LucideIcon } from 'lucide-react';
 import { CheckCircle, UserX } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 /**
@@ -66,7 +65,7 @@ export interface ComparisonCardsProps {
  */
 export function ComparisonCards({ left, right, className }: ComparisonCardsProps) {
   return (
-    <div className={cn('grid md:grid-cols-2', SPACING.GAP_4, 'md:gap-8', className)}>
+    <div className={cn('grid md:grid-cols-2', 'gap-4', 'md:gap-8', className)}>
       <ComparisonCard item={left} />
       <ComparisonCard item={right} />
     </div>
@@ -92,31 +91,29 @@ function ComparisonCard({ item }: ComparisonCardProps) {
   );
 
   const iconContainerClasses = cn(
-    `flex ${ICON_SIZES.SIZE_12} items-center justify-center rounded-sm border bg-background`,
+    `flex size-12 items-center justify-center rounded-sm border bg-background`,
     isNegative ? 'border-destructive/25 text-destructive' : 'border-primary/25 text-primary',
   );
 
   const listIconClasses = cn(
-    `mt-0.5 ${ICON_SIZES.SIZE_5} flex-shrink-0`,
+    `mt-0.5 size-5 flex-shrink-0`,
     isNegative ? 'text-destructive' : 'text-primary',
   );
 
   return (
     <Card className={cardClasses}>
       {/* Header */}
-      <div className={cn('flex items-center', SPACING.MB_6, SPACING.GAP_3)}>
+      <div className={cn('flex items-center', 'mb-6', 'gap-3')}>
         <div className={iconContainerClasses}>
-          <Icon className={ICON_SIZES.SIZE_6} aria-hidden='true' />
+          <Icon className={'size-6'} aria-hidden='true' />
         </div>
-        <h3 className={cn('font-display font-semibold text-foreground', TYPOGRAPHY.TEXT_2XL)}>
-          {title}
-        </h3>
+        <h3 className={cn('font-display font-semibold text-foreground', 'text-2xl')}>{title}</h3>
       </div>
 
       {/* List */}
-      <ul className={SPACING.SPACE_Y_3}>
+      <ul className={'space-y-3'}>
         {items.map((text) => (
-          <li key={text} className={cn('flex items-start text-muted-foreground', SPACING.GAP_3)}>
+          <li key={text} className={cn('flex items-start text-muted-foreground', 'gap-3')}>
             <ListIcon className={listIconClasses} aria-hidden='true' />
             <span>{text}</span>
           </li>

@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { ComparisonValueSchema } from '@/lib/calculatorValidation';
 import type { ComparisonInput, ComparisonMode } from '@/lib/salaryComparison';
 import { cn, formatCurrency } from '@/lib/utils';
@@ -80,24 +79,24 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle className={cn('flex items-center', SPACING.GAP_2)}>
-          <Calculator className={ICON_SIZES.SIZE_5} />
+        <CardTitle className={cn('flex items-center', 'gap-2')}>
+          <Calculator className={'size-5'} />
           Compare Salary Scenarios
         </CardTitle>
-        <CardDescription className={TYPOGRAPHY.TEXT_SM}>
+        <CardDescription className={'text-sm'}>
           See how a raise affects your take-home pay. Current salary:{' '}
           {formatCurrency(currentSalary, 0)}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className={SPACING.SPACE_Y_4}>
+        <form onSubmit={handleSubmit} className={'space-y-4'}>
           {/* Mode Selection - proper fieldset/legend for a11y */}
-          <fieldset className={SPACING.SPACE_Y_3}>
-            <legend id={radioGroupId} className={cn('font-medium', TYPOGRAPHY.TEXT_SM)}>
+          <fieldset className={'space-y-3'}>
+            <legend id={radioGroupId} className={cn('font-medium', 'text-sm')}>
               Comparison Type
             </legend>
             <div
-              className={cn('grid sm:grid-cols-3', SPACING.GAP_2)}
+              className={cn('grid sm:grid-cols-3', 'gap-2')}
               role='radiogroup'
               aria-labelledby={radioGroupId}
             >
@@ -107,7 +106,7 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
                   className={cn(
                     'cursor-pointer rounded-lg border-2 p-3 transition-colors',
                     'focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2',
-                    TYPOGRAPHY.TEXT_SM,
+                    'text-sm',
                     mode === m
                       ? 'border-primary bg-primary/5 font-medium'
                       : 'border-border hover:border-primary/50',
@@ -124,7 +123,7 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
                   {m === 'percentage' && 'Percentage'}
                   {m === 'amount' && '£ Amount'}
                   {m === 'total' && 'New Total'}
-                  <span className={cn('block text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>
+                  <span className={cn('block text-muted-foreground', 'text-xs')}>
                     {m === 'percentage' && 'e.g., 10%'}
                     {m === 'amount' && 'e.g., +£5k'}
                     {m === 'total' && 'e.g., £45k'}
@@ -135,8 +134,8 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
           </fieldset>
 
           {/* Value Input */}
-          <div className={SPACING.SPACE_Y_2}>
-            <Label htmlFor={inputId} className={TYPOGRAPHY.TEXT_SM}>
+          <div className={'space-y-2'}>
+            <Label htmlFor={inputId} className={'text-sm'}>
               {MODE_LABELS[mode]}
             </Label>
             <div className='relative'>
@@ -168,11 +167,7 @@ export function ComparisonInputs({ currentSalary, onCompare, className }: Compar
               />
             </div>
             {error && (
-              <p
-                id={`${inputId}-error`}
-                className={cn('text-destructive', TYPOGRAPHY.TEXT_SM)}
-                role='alert'
-              >
+              <p id={`${inputId}-error`} className={cn('text-destructive', 'text-sm')} role='alert'>
                 {error}
               </p>
             )}

@@ -13,7 +13,6 @@ import Link from 'next/link';
 
 import { BlogPagination } from '@/components/molecules/BlogPagination';
 import { BLOG_CATEGORIES, type CategoryKey } from '@/constants/blogCategories';
-import { LAYOUT, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { getCategoryBlurDataUrl, getCategoryFallbackSvg } from '@/lib/blog/imageFallback';
 import { cn } from '@/lib/utils';
 import type { BlogPost } from '@/types/blog';
@@ -39,17 +38,17 @@ interface AllPostsGridProps {
 export function AllPostsGrid({ posts, currentPage, totalPages, totalPosts }: AllPostsGridProps) {
   if (posts.length === 0) {
     return (
-      <div className={cn('text-center', SPACING.PY_16)}>
-        <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>No articles found.</p>
+      <div className={cn('text-center', 'py-16')}>
+        <p className={cn('text-muted-foreground', 'text-lg')}>No articles found.</p>
       </div>
     );
   }
 
   return (
-    <section aria-labelledby='all-posts-heading' className={SPACING.PY_12}>
-      <div className={LAYOUT.CONTAINER}>
+    <section aria-labelledby='all-posts-heading' className={'py-12'}>
+      <div className={'container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'}>
         {/* Section Header */}
-        <div className={cn('flex items-center justify-between', SPACING.MB_8)}>
+        <div className={cn('flex items-center justify-between', 'mb-8')}>
           {/* biome-ignore lint/correctness/useUniqueElementIds: Server component rendered once per page */}
           <h2
             id='all-posts-heading'
@@ -57,19 +56,13 @@ export function AllPostsGrid({ posts, currentPage, totalPages, totalPosts }: All
           >
             All Articles
           </h2>
-          <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+          <p className={cn('text-muted-foreground', 'text-sm')}>
             {totalPosts.toLocaleString('en-GB')} article{totalPosts !== 1 ? 's' : ''}
           </p>
         </div>
 
         {/* Posts Grid */}
-        <ul
-          className={cn(
-            'grid list-none p-0 sm:grid-cols-2 lg:grid-cols-3',
-            SPACING.GAP_6,
-            SPACING.MB_12,
-          )}
-        >
+        <ul className={cn('grid list-none p-0 sm:grid-cols-2 lg:grid-cols-3', 'gap-6', 'mb-12')}>
           {posts.map((post, idx) => (
             <li key={post.slug} className='h-full'>
               <PostCard post={post} priority={idx < PRIORITY_IMAGE_COUNT} />
@@ -139,29 +132,23 @@ function PostCard({ post, priority = false }: PostCardProps) {
         </div>
 
         {/* Content */}
-        <div className={SPACING.P_4}>
+        <div className={'p-4'}>
           <h3
             className={cn(
               'line-clamp-2 font-display font-semibold text-foreground transition-colors group-hover:text-primary',
-              SPACING.MB_2,
-              TYPOGRAPHY.TEXT_BASE,
+              'mb-2',
+              'text-base',
             )}
           >
             {post.title}
           </h3>
 
-          <p className={cn('line-clamp-2 text-muted-foreground', SPACING.MB_3, TYPOGRAPHY.TEXT_SM)}>
+          <p className={cn('line-clamp-2 text-muted-foreground', 'mb-3', 'text-sm')}>
             {post.excerpt}
           </p>
 
           {/* Meta */}
-          <div
-            className={cn(
-              'flex items-center text-muted-foreground',
-              SPACING.GAP_2,
-              TYPOGRAPHY.TEXT_XS,
-            )}
-          >
+          <div className={cn('flex items-center text-muted-foreground', 'gap-2', 'text-xs')}>
             <span>{post.readTime}</span>
             <span aria-hidden='true'>•</span>
             <time dateTime={post.publishedAt}>{formattedDate}</time>

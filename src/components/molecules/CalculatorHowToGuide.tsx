@@ -3,7 +3,6 @@
 
 import { motion } from 'framer-motion';
 import { HowToStepCard } from '@/components/molecules/HowToStepCard';
-import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
 import { cn } from '@/lib/utils';
 
@@ -21,23 +20,23 @@ export function CalculatorHowToGuide() {
       transition={{ duration: 0.5 }}
       className='border-border/70 border-b bg-background py-16'
     >
-      <div className={cn('mx-auto max-w-5xl', SPACING.PX_4)}>
-        <div className={cn('text-center', SPACING.MB_10)}>
+      <div className={cn('mx-auto max-w-5xl', 'px-4')}>
+        <div className={cn('text-center', 'mb-10')}>
           <h2
             className={cn(
               'font-display font-semibold text-foreground leading-tight',
-              SPACING.MB_3,
-              TYPOGRAPHY.TEXT_4XL,
+              'mb-3',
+              'text-4xl',
             )}
           >
             How to Use the Calculator
           </h2>
-          <p className={`${TYPOGRAPHY.TEXT_LG} text-muted-foreground`}>
+          <p className={`text-lg text-muted-foreground`}>
             Calculate your take-home pay in 4 simple steps
           </p>
         </div>
 
-        <div className={`grid ${SPACING.GAP_6} md:grid-cols-2`}>
+        <div className={`grid gap-6 md:grid-cols-2`}>
           <HowToStepCard
             step={1}
             title='Enter Your Salary'

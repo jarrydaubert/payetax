@@ -132,7 +132,7 @@ export function EmailResultsDialog({
           <DialogDescription className='text-muted-foreground'>
             We&apos;ll send your director pay breakdown to your inbox. Results are sent directly via
             email and not stored on our servers.{' '}
-            <Link href='/privacy' className='text-brand underline hover:text-brand-accent'>
+            <Link href='/privacy' className='text-primary underline hover:text-primary/80'>
               Privacy policy
             </Link>
           </DialogDescription>

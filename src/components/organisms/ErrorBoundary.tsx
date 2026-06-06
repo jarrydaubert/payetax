@@ -5,7 +5,6 @@ import { AlertTriangle, Copy, Home, RefreshCw, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 /** Known benign errors that shouldn't be reported to Sentry */
@@ -147,27 +146,27 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
   return (
     <div className='relative flex min-h-screen items-center justify-center overflow-hidden bg-background'>
       {/* Main content - responsive padding */}
-      <div className={cn('relative z-10 w-full max-w-4xl', SPACING.PX_4)}>
+      <div className={cn('relative z-10 w-full max-w-4xl', 'px-4')}>
         <div
           className={cn(
             'rounded-sm border border-destructive/30 bg-card text-center',
-            SPACING.P_6,
+            'p-6',
             'md:p-12',
           )}
         >
           {/* Error icon */}
-          <div className={cn('relative inline-block', SPACING.MB_8)}>
+          <div className={cn('relative inline-block', 'mb-8')}>
             <div
               className={cn(
                 'inline-flex items-center justify-center rounded-full',
                 'border border-destructive/30 bg-destructive/20',
-                SPACING.MB_4,
-                ICON_SIZES.SIZE_12,
+                'mb-4',
+                'size-12',
                 'md:size-20',
               )}
             >
               <AlertTriangle
-                className={cn('text-destructive', ICON_SIZES.SIZE_8, 'md:size-10')}
+                className={cn('text-destructive', 'size-8', 'md:size-10')}
                 aria-hidden='true'
               />
             </div>
@@ -179,10 +178,10 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
             tabIndex={-1}
             className={cn(
               'font-bold text-foreground outline-none',
-              TYPOGRAPHY.TEXT_3XL,
+              'text-3xl',
               // Use literal string - dynamic template breaks Tailwind extraction
               'md:text-4xl',
-              SPACING.MB_6,
+              'mb-6',
             )}
           >
             Oops! Something Went Wrong
@@ -193,10 +192,10 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
             className={cn(
               'mx-auto max-w-2xl leading-relaxed',
               'text-muted-foreground',
-              TYPOGRAPHY.TEXT_LG,
+              'text-lg',
               // Use literal string - dynamic template breaks Tailwind extraction
               'md:text-xl',
-              SPACING.MB_8,
+              'mb-8',
             )}
           >
             Don't worry - even the best tax calculators have their off days! We've automatically
@@ -204,22 +203,16 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
           </p>
 
           {/* What happened section */}
-          <div
-            className={cn(
-              'rounded-sm border border-warning/30 bg-warning/5',
-              SPACING.P_6,
-              SPACING.MB_8,
-            )}
-          >
-            <h3 className={cn('font-semibold text-warning', TYPOGRAPHY.TEXT_LG, SPACING.MB_3)}>
+          <div className={cn('rounded-sm border border-warning/30 bg-warning/5', 'p-6', 'mb-8')}>
+            <h3 className={cn('font-semibold text-warning', 'text-lg', 'mb-3')}>
               What can you do?
             </h3>
             <ul
               className={cn(
                 'mx-auto max-w-md text-left',
                 'text-muted-foreground',
-                TYPOGRAPHY.TEXT_SM,
-                SPACING.SPACE_Y_2,
+                'text-sm',
+                'space-y-2',
               )}
             >
               <li>• Try refreshing the page or clicking "Try Again"</li>
@@ -236,12 +229,12 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
                 'mx-auto max-w-md rounded-lg',
                 'border border-border/60 bg-card/80',
                 'text-muted-foreground',
-                TYPOGRAPHY.TEXT_SM,
-                SPACING.P_4,
-                SPACING.MB_8,
+                'text-sm',
+                'p-4',
+                'mb-8',
               )}
             >
-              <div className={cn('flex items-center justify-between', SPACING.MB_2)}>
+              <div className={cn('flex items-center justify-between', 'mb-2')}>
                 <strong className='text-foreground'>Error Reference:</strong>
                 <Button
                   variant='ghost'
@@ -250,14 +243,14 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
                   className='h-7 gap-1 text-muted-foreground hover:text-foreground'
                   aria-label='Copy error reference to clipboard'
                 >
-                  <Copy className={ICON_SIZES.SIZE_4} />
+                  <Copy className={'size-4'} />
                   <span>{copied ? 'Copied' : 'Copy'}</span>
                 </Button>
               </div>
-              <code className={cn('block break-all font-mono', 'text-primary', TYPOGRAPHY.TEXT_XS)}>
+              <code className={cn('block break-all font-mono', 'text-primary', 'text-xs')}>
                 {eventId}
               </code>
-              <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS, SPACING.MT_2)}>
+              <p className={cn('text-muted-foreground', 'text-xs', 'mt-2')}>
                 Share this ID when reporting the issue
               </p>
             </div>
@@ -265,11 +258,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
 
           {/* Action buttons - responsive layout */}
           <div
-            className={cn(
-              'flex flex-col justify-center sm:flex-row sm:flex-wrap',
-              SPACING.GAP_4,
-              SPACING.MB_8,
-            )}
+            className={cn('flex flex-col justify-center sm:flex-row sm:flex-wrap', 'gap-4', 'mb-8')}
           >
             <Button
               type='button'
@@ -277,25 +266,25 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
               size='lg'
               className='bg-primary text-primary-foreground hover:bg-primary/90'
             >
-              <RefreshCw className={cn('mr-2', ICON_SIZES.SIZE_5)} aria-hidden='true' />
+              <RefreshCw className={cn('mr-2', 'size-5')} aria-hidden='true' />
               Try Again
             </Button>
 
             <Button type='button' onClick={handleHardRefresh} variant='outline' size='lg'>
-              <RotateCcw className={cn('mr-2', ICON_SIZES.SIZE_5)} aria-hidden='true' />
+              <RotateCcw className={cn('mr-2', 'size-5')} aria-hidden='true' />
               Refresh Page
             </Button>
 
             <Button asChild variant='outline' size='lg'>
               <Link href='/'>
-                <Home className={cn('mr-2', ICON_SIZES.SIZE_5)} aria-hidden='true' />
+                <Home className={cn('mr-2', 'size-5')} aria-hidden='true' />
                 Go Home
               </Link>
             </Button>
           </div>
 
           {/* Help text */}
-          <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM, SPACING.MB_6)}>
+          <p className={cn('text-muted-foreground', 'text-sm', 'mb-6')}>
             This error has been automatically logged with reference{' '}
             {eventId ? `#${eventId.slice(-8)}` : 'N/A'}
           </p>
@@ -307,26 +296,26 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
                 className={cn(
                   'cursor-pointer font-semibold',
                   'text-warning transition-colors hover:text-warning/90',
-                  TYPOGRAPHY.TEXT_LG,
-                  SPACING.MB_4,
+                  'text-lg',
+                  'mb-4',
                 )}
               >
                 🔧 Developer Debug Info (Dev Mode Only)
               </summary>
-              <div className={cn('rounded-sm border border-warning/30 bg-warning/5', SPACING.P_4)}>
-                <h4 className={cn('font-semibold text-warning', SPACING.MB_2)}>Error Message:</h4>
-                <p className={cn('font-mono text-destructive', TYPOGRAPHY.TEXT_SM, SPACING.MB_4)}>
+              <div className={cn('rounded-sm border border-warning/30 bg-warning/5', 'p-4')}>
+                <h4 className={cn('font-semibold text-warning', 'mb-2')}>Error Message:</h4>
+                <p className={cn('font-mono text-destructive', 'text-sm', 'mb-4')}>
                   {error.message}
                 </p>
 
-                <h4 className={cn('font-semibold text-warning', SPACING.MB_2)}>Stack Trace:</h4>
+                <h4 className={cn('font-semibold text-warning', 'mb-2')}>Stack Trace:</h4>
                 <pre
                   className={cn(
                     'max-h-64 overflow-auto whitespace-pre-wrap rounded',
                     'border border-destructive/20 bg-card/90',
                     'font-mono text-destructive',
-                    TYPOGRAPHY.TEXT_XS,
-                    SPACING.P_4,
+                    'text-xs',
+                    'p-4',
                   )}
                 >
                   {error.stack}

@@ -18,7 +18,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { PERIODS, type StudentLoanPlan } from '@/constants/taxRates';
 import { trackFormInteraction } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
@@ -167,10 +166,10 @@ export function BasicInputs() {
 
   const fieldRowClass = cn(
     'flex flex-col items-start sm:grid sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center',
-    SPACING.GAP_2,
+    'gap-2',
     'sm:gap-3',
   );
-  const fieldLabelClass = cn('flex min-w-0 items-center', SPACING.GAP_1_5);
+  const fieldLabelClass = cn('flex min-w-0 items-center', 'gap-1.5');
   const fieldControlClass = 'min-w-0 justify-self-start';
   const selectControlClass = cn(fieldControlClass, 'w-44 max-w-full');
   const longSelectControlClass = cn(fieldControlClass, 'w-full max-w-64');
@@ -198,10 +197,10 @@ export function BasicInputs() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={SPACING.SPACE_Y_3}
+      className={'space-y-3'}
     >
       {/* Heading */}
-      <h3 className={cn('font-semibold text-foreground', TYPOGRAPHY.TEXT_BASE, 'sm:text-lg')}>
+      <h3 className={cn('font-semibold text-foreground', 'text-base', 'sm:text-lg')}>
         Enter Income Tax Details
       </h3>
 
@@ -209,7 +208,7 @@ export function BasicInputs() {
       <div className={fieldRowClass}>
         <div className={fieldLabelClass}>
           <LabelTooltip fieldName='salary' />
-          <Label htmlFor={salaryId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
+          <Label htmlFor={salaryId} className={cn('whitespace-nowrap', 'text-sm')}>
             Salary
           </Label>
         </div>
@@ -217,7 +216,7 @@ export function BasicInputs() {
           className={cn(
             fieldControlClass,
             'grid w-full max-w-full grid-cols-[minmax(0,1fr)_7.5rem] sm:w-[17rem]',
-            SPACING.GAP_2,
+            'gap-2',
           )}
         >
           <NumberInput
@@ -259,7 +258,7 @@ export function BasicInputs() {
       <div className={fieldRowClass}>
         <div className={cn(fieldLabelClass, 'sm:whitespace-nowrap')}>
           <LabelTooltip fieldName='taxYear' />
-          <Label htmlFor={taxYearId} className={TYPOGRAPHY.TEXT_SM}>
+          <Label htmlFor={taxYearId} className={'text-sm'}>
             Tax Year
           </Label>
         </div>
@@ -277,7 +276,7 @@ export function BasicInputs() {
       <div className={fieldRowClass}>
         <div className={fieldLabelClass}>
           <LabelTooltip fieldName='taxCode' />
-          <Label htmlFor={taxCodeId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
+          <Label htmlFor={taxCodeId} className={cn('whitespace-nowrap', 'text-sm')}>
             Tax Code
           </Label>
         </div>
@@ -301,7 +300,7 @@ export function BasicInputs() {
           <Label
             id={regionLabelId}
             htmlFor={regionId}
-            className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}
+            className={cn('whitespace-nowrap', 'text-sm')}
           >
             Region
           </Label>
@@ -331,7 +330,7 @@ export function BasicInputs() {
         <div className='flex flex-wrap items-center gap-x-4 gap-y-3 sm:flex-nowrap'>
           <div className={fieldLabelClass}>
             <LabelTooltip fieldName='marriageAllowance' />
-            <Label htmlFor={marriedId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
+            <Label htmlFor={marriedId} className={cn('whitespace-nowrap', 'text-sm')}>
               Married
             </Label>
             <Checkbox
@@ -344,7 +343,7 @@ export function BasicInputs() {
 
           <div className={fieldLabelClass}>
             <LabelTooltip fieldName='blindAllowance' />
-            <Label htmlFor={blindId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
+            <Label htmlFor={blindId} className={cn('whitespace-nowrap', 'text-sm')}>
               Blind
             </Label>
             <Checkbox
@@ -356,7 +355,7 @@ export function BasicInputs() {
 
           <div className={fieldLabelClass}>
             <LabelTooltip fieldName='payNoNI' />
-            <Label htmlFor={payNoNIId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
+            <Label htmlFor={payNoNIId} className={cn('whitespace-nowrap', 'text-sm')}>
               No NI
             </Label>
             <Checkbox
@@ -372,10 +371,7 @@ export function BasicInputs() {
         <div className={fieldRowClass}>
           <div className={fieldLabelClass}>
             <LabelTooltip fieldName='partnerGrossWage' />
-            <Label
-              htmlFor={partnerWageId}
-              className={cn('sm:whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}
-            >
+            <Label htmlFor={partnerWageId} className={cn('sm:whitespace-nowrap', 'text-sm')}>
               Partner's Gross Wage
             </Label>
           </div>
@@ -395,14 +391,10 @@ export function BasicInputs() {
       )}
 
       {/* Age - Dropdown for State Pension Age (affects NI) */}
-      <div className={cn(fieldRowClass, SPACING.MT_4)}>
+      <div className={cn(fieldRowClass, 'mt-4')}>
         <div className={cn(fieldLabelClass, 'sm:whitespace-nowrap')}>
           <LabelTooltip fieldName='age' />
-          <Label
-            id={ageLabelId}
-            htmlFor={ageId}
-            className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}
-          >
+          <Label id={ageLabelId} htmlFor={ageId} className={cn('whitespace-nowrap', 'text-sm')}>
             Age
           </Label>
         </div>
@@ -435,14 +427,14 @@ export function BasicInputs() {
       </div>
 
       {/* Student Loan - Select + Conditional */}
-      <div className={cn('flex flex-col', SPACING.GAP_2)}>
+      <div className={cn('flex flex-col', 'gap-2')}>
         <div className={fieldRowClass}>
           <div className={fieldLabelClass}>
             <LabelTooltip fieldName='studentLoanPlan' />
             <Label
               id={studentLoanLabelId}
               htmlFor={studentLoanId}
-              className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}
+              className={cn('whitespace-nowrap', 'text-sm')}
             >
               Student Loan
             </Label>
@@ -468,17 +460,14 @@ export function BasicInputs() {
 
         {/* Conditional: Show postgraduate add-on if undergraduate loan selected */}
         {undergraduateLoan !== 'none' && undergraduateLoan !== 'postgrad' && (
-          <div className={cn('flex items-center', SPACING.GAP_2, 'sm:pl-6')}>
+          <div className={cn('flex items-center', 'gap-2', 'sm:pl-6')}>
             <Checkbox
               id={postgraduateAddonId}
               checked={hasPostgraduateAddOn}
               onCheckedChange={handlePostgraduateToggle}
               data-testid='postgraduate-addon-checkbox'
             />
-            <Label
-              htmlFor={postgraduateAddonId}
-              className={cn('cursor-pointer', TYPOGRAPHY.TEXT_SM)}
-            >
+            <Label htmlFor={postgraduateAddonId} className={cn('cursor-pointer', 'text-sm')}>
               I also have a Postgraduate Loan
             </Label>
           </div>
@@ -489,7 +478,7 @@ export function BasicInputs() {
       <div className={fieldRowClass}>
         <div className={fieldLabelClass}>
           <LabelTooltip fieldName='allowancesDeductions' />
-          <Label htmlFor={allowancesId} className={cn('sm:whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
+          <Label htmlFor={allowancesId} className={cn('sm:whitespace-nowrap', 'text-sm')}>
             Non-taxable allowance(s)
           </Label>
         </div>
@@ -511,7 +500,7 @@ export function BasicInputs() {
       <div className={fieldRowClass}>
         <div className={fieldLabelClass}>
           <LabelTooltip fieldName='pensionContribution' />
-          <Label htmlFor={pensionId} className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>
+          <Label htmlFor={pensionId} className={cn('whitespace-nowrap', 'text-sm')}>
             Pension
           </Label>
         </div>
@@ -519,7 +508,7 @@ export function BasicInputs() {
           className={cn(
             fieldControlClass,
             'grid w-full max-w-[15rem] grid-cols-[4.75rem_minmax(0,1fr)] sm:grid-cols-[5rem_minmax(0,1fr)]',
-            SPACING.GAP_1_5,
+            'gap-1.5',
           )}
         >
           {/* Type selector with icons */}

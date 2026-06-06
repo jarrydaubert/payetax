@@ -11,7 +11,6 @@
 
 import type { LucideIcon } from 'lucide-react';
 import { Card } from '@/components/ui/card';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 /**
@@ -100,22 +99,16 @@ function DataFlowCardItem({ card }: DataFlowCardItemProps) {
     <Card
       className={cn(
         'h-full rounded-sm border-primary/20 bg-card text-center transition-colors md:hover:border-primary/45',
-        SPACING.P_8,
+        'p-8',
       )}
     >
       {/* Icon */}
       <div className='mx-auto mb-6 flex size-20 items-center justify-center rounded-sm border border-primary/25 bg-background text-primary'>
-        <Icon className={ICON_SIZES.SIZE_10} aria-hidden='true' />
+        <Icon className={'size-10'} aria-hidden='true' />
       </div>
 
       {/* Title */}
-      <h3
-        className={cn(
-          'font-display font-semibold text-foreground',
-          SPACING.MB_4,
-          TYPOGRAPHY.TEXT_XL,
-        )}
-      >
+      <h3 className={cn('font-display font-semibold text-foreground', 'mb-4', 'text-xl')}>
         {title}
       </h3>
 

@@ -1,6 +1,5 @@
 import { AlertTriangle } from 'lucide-react';
 import { useId } from 'react';
-import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 /** Official HMRC organization page - stable GOV.UK URL */
@@ -23,7 +22,7 @@ export function BlogDisclaimer({ className }: BlogDisclaimerProps) {
     <aside
       className={cn(
         'rounded-lg border border-warning/30 bg-warning/10 p-4',
-        TYPOGRAPHY.TEXT_BASE,
+        'text-base',
         'md:text-lg',
         className,
       )}
@@ -31,10 +30,7 @@ export function BlogDisclaimer({ className }: BlogDisclaimerProps) {
       aria-labelledby={headingId}
     >
       <div className='flex gap-3'>
-        <AlertTriangle
-          className={cn(ICON_SIZES.SIZE_5, 'shrink-0 text-warning')}
-          aria-hidden='true'
-        />
+        <AlertTriangle className={cn('size-5', 'shrink-0 text-warning')} aria-hidden='true' />
         <div className='space-y-2'>
           <p id={headingId} className='font-medium text-foreground'>
             Important: This is for informational purposes only

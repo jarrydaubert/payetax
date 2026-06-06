@@ -8,7 +8,6 @@ import X from 'lucide-react/dist/esm/icons/x.mjs';
 import Link from 'next/link';
 import { useCallback, useDeferredValue, useMemo, useState } from 'react';
 import { Input } from '@/components/ui/input';
-import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 import type { BlogPost } from '@/types/blog';
 
@@ -56,7 +55,7 @@ export function BlogSearch({ posts, className }: BlogSearchProps) {
         <Search
           className={cn(
             'pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground',
-            ICON_SIZES.SIZE_4,
+            'size-4',
           )}
           aria-hidden='true'
         />
@@ -79,7 +78,7 @@ export function BlogSearch({ posts, className }: BlogSearchProps) {
             className='absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground'
             aria-label='Clear search'
           >
-            <X className={ICON_SIZES.SIZE_4} />
+            <X className={'size-4'} />
           </button>
         )}
       </div>
@@ -108,29 +107,21 @@ export function BlogSearch({ posts, className }: BlogSearchProps) {
                   >
                     <div className='mb-1 flex items-center gap-2'>
                       <span
-                        className={cn(
-                          'rounded bg-primary/10 px-2 py-0.5 text-primary',
-                          TYPOGRAPHY.TEXT_XS,
-                        )}
+                        className={cn('rounded bg-primary/10 px-2 py-0.5 text-primary', 'text-xs')}
                       >
                         {post.category}
                       </span>
                       {post.readTime && (
                         <span
-                          className={cn(
-                            'flex items-center gap-1 text-muted-foreground',
-                            TYPOGRAPHY.TEXT_XS,
-                          )}
+                          className={cn('flex items-center gap-1 text-muted-foreground', 'text-xs')}
                         >
-                          <Clock className={ICON_SIZES.SIZE_3_5} aria-hidden='true' />
+                          <Clock className={'size-3.5'} aria-hidden='true' />
                           {post.readTime}
                         </span>
                       )}
                     </div>
-                    <h4 className={cn('font-medium text-foreground', TYPOGRAPHY.TEXT_SM)}>
-                      {post.title}
-                    </h4>
-                    <p className={cn('line-clamp-1 text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>
+                    <h4 className={cn('font-medium text-foreground', 'text-sm')}>{post.title}</h4>
+                    <p className={cn('line-clamp-1 text-muted-foreground', 'text-xs')}>
                       {post.excerpt}
                     </p>
                   </Link>
@@ -139,7 +130,7 @@ export function BlogSearch({ posts, className }: BlogSearchProps) {
             </ul>
           ) : (
             <div className='p-4 text-center text-muted-foreground'>
-              <p className={TYPOGRAPHY.TEXT_SM}>No results found for "{query}"</p>
+              <p className={'text-sm'}>No results found for "{query}"</p>
             </div>
           )}
         </div>

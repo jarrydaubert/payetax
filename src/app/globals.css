@@ -18,16 +18,6 @@
   --font-size-base: clamp(0.95rem, 0.925rem + 0.125vw, 1.0625rem);
   --radius: 0.25rem;
 
-  /* Blog-Specific Fluid Typography (distinct from Tailwind classes) */
-  /* Use these CSS vars only in blog content for optimal readability */
-  --blog-font-size-sm: clamp(0.875rem, 0.85rem + 0.125vw, 0.9375rem);
-  --blog-font-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-  --blog-font-size-lg: clamp(1.125rem, 1.05rem + 0.375vw, 1.25rem);
-  --blog-font-size-xl: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
-  --blog-font-size-2xl: clamp(1.5rem, 1.35rem + 0.75vw, 1.875rem);
-  --blog-font-size-3xl: clamp(1.875rem, 1.65rem + 1.125vw, 2.25rem);
-  --blog-font-size-4xl: clamp(2.25rem, 1.95rem + 1.5vw, 3rem);
-
   /* Ledger primitives */
   --ledger-paper: oklch(0.982 0.012 82);
   --ledger-paper-raised: oklch(0.997 0.006 82);
@@ -38,12 +28,6 @@
   --ledger-blue-quiet: oklch(0.93 0.035 255);
   --ledger-focus: oklch(0.84 0.18 92);
 
-  /* Brand aliases retained while components migrate off gradient-era names */
-  --brand-primary: var(--ledger-blue);
-  --brand-accent: var(--ledger-blue);
-  --brand-gradient-start: var(--ledger-blue);
-  --brand-gradient-end: var(--ledger-blue);
-
   /* Chart Colors - restrained ledger palette */
   --chart-1: 214 46% 32%;
   --chart-2: 212 22% 46%;
@@ -51,8 +35,6 @@
   --chart-4: 39 62% 45%;
   --chart-5: 25 52% 45%;
   --chart-6: 151 42% 36%;
-  --chart-7: 203 38% 40%;
-  --chart-8: 256 30% 42%;
 
   /* Light-first Ledger theme */
   --background: var(--ledger-paper);
@@ -80,17 +62,6 @@
   --ring: var(--ledger-focus);
 }
 
-/* Brand surface tokens now map to the light Ledger shell */
-:root {
-  --surface-brand: var(--background);
-  --surface-brand-alt: var(--secondary);
-  --on-brand: var(--foreground);
-  --on-brand-muted: var(--muted-foreground);
-  --on-brand-dim: var(--muted-foreground);
-  --chrome-brand: color-mix(in oklch, var(--border) 82%, transparent);
-  --chrome-brand-strong: var(--foreground);
-}
-
 /* Background Elements - Geometric patterns */
 .bg-grid {
   background-image:
@@ -103,45 +74,12 @@
   background-size: 72px 72px;
 }
 
-.bg-circle {
-  display: none;
-}
-
-.bg-circle-1 {
-  width: 600px;
-  height: 600px;
-  top: -200px;
-  right: -200px;
-  animation: none;
-}
-
-.bg-circle-2 {
-  width: 800px;
-  height: 800px;
-  bottom: -300px;
-  left: -300px;
-  border-color: transparent;
-  animation: none;
-}
-
-@keyframes bg-rotate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
 /* Shared PayeTax wordmark typography */
 .brand-wordmark {
   font-family: var(--font-display);
   font-weight: 600;
   letter-spacing: -0.015em;
   line-height: 1;
-}
-
-/* Mobile menu blur - with webkit support */
-.mobile-menu-blur {
-  background: var(--card);
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
 }
 
 /* Shared horizontal scroll styling for comparison tables */
@@ -165,192 +103,6 @@
   }
 }
 
-/* Section Base Styles */
-.section-header {
-  max-width: 960px;
-  margin-right: auto;
-  margin-left: auto;
-  text-align: left;
-  margin-bottom: 2rem;
-}
-
-.section-label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--primary);
-  margin-bottom: 0.75rem;
-}
-
-.section-title {
-  font-family: var(--font-display);
-  font-size: clamp(2.25rem, 5vw, 4rem);
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  line-height: 0.98;
-  color: var(--foreground);
-}
-
-/* FAQ Section */
-.faq-section {
-  padding: clamp(4rem, 8vw, 6rem) 1rem;
-  background: var(--surface-brand);
-  border-block: 1px solid var(--border);
-  position: relative;
-  z-index: 1;
-}
-
-.faq-list {
-  display: grid;
-  gap: 0;
-  max-width: 960px;
-  margin: 0 auto;
-  border-top: 1px solid var(--border);
-}
-
-.faq-item {
-  background: transparent;
-  border-bottom: 1px solid var(--border);
-  padding: 1.25rem 0;
-  transition: border-color 0.2s ease;
-}
-
-.faq-item:hover {
-  border-color: var(--foreground);
-}
-
-.faq-question {
-  font-family: var(--font-sans);
-  font-size: 1rem;
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-  color: var(--foreground);
-}
-
-.faq-answer {
-  font-size: 0.9rem;
-  color: var(--muted-foreground);
-  line-height: 1.65;
-}
-
-@media (min-width: 900px) {
-  .faq-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 2rem;
-  }
-}
-
-
-/* New Footer Styles */
-.footer-new {
-  padding: 3rem 2rem;
-  border-top: 1px solid var(--chrome-brand);
-  position: relative;
-  z-index: 1;
-}
-
-.footer-content-new {
-  max-width: 1100px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 1rem 1.5rem;
-}
-
-.footer-brand {
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--on-brand);
-}
-
-.footer-brand span {
-  color: var(--primary);
-}
-
-.footer-links-new {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.5rem 1.25rem;
-  min-width: 0;
-}
-
-.footer-links-new a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 24px;
-  color: var(--on-brand-dim);
-  font-size: 0.85rem;
-  line-height: 1.5;
-  text-decoration: none;
-  transition: color 0.3s;
-  white-space: nowrap;
-}
-
-.footer-link-button {
-  display: inline-flex;
-  align-items: center;
-  min-height: 24px;
-  color: var(--on-brand-dim);
-  font-size: 0.85rem;
-  line-height: 1.5;
-  text-decoration: none;
-  transition: color 0.3s;
-  white-space: nowrap;
-  background: transparent;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-}
-
-.footer-links-new a:hover {
-  color: var(--primary);
-}
-
-.footer-link-button:hover {
-  color: var(--primary);
-}
-
-.footer-copy {
-  color: var(--on-brand-dim);
-  font-size: 0.8rem;
-  justify-self: end;
-  white-space: nowrap;
-}
-
-
-@media (max-width: 1200px) {
-  .footer-content-new {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    text-align: center;
-  }
-  .footer-brand,
-  .footer-links-new,
-  .footer-copy {
-    justify-self: center;
-  }
-}
-
-@media (max-width: 640px) {
-  .footer-content-new {
-    gap: 1.25rem;
-  }
-  .footer-links-new {
-    gap: 0.5rem 0.9rem;
-  }
-}
-
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-  .bg-circle-1, .bg-circle-2 {
-    animation: none;
-  }
-}
-
 /* Dark Mode Theme */
 .dark {
   --ledger-paper: oklch(0.18 0.026 255);
@@ -362,18 +114,6 @@
   --ledger-blue-quiet: oklch(0.28 0.045 250);
   --ledger-focus: oklch(0.86 0.18 92);
 
-  --brand-primary: var(--ledger-blue);
-  --brand-accent: var(--ledger-blue);
-  --brand-gradient-start: var(--ledger-blue);
-  --brand-gradient-end: var(--ledger-blue);
-  --surface-brand: var(--background);
-  --surface-brand-alt: var(--secondary);
-  --on-brand: var(--foreground);
-  --on-brand-muted: var(--muted-foreground);
-  --on-brand-dim: var(--muted-foreground);
-  --chrome-brand: color-mix(in oklch, var(--border) 82%, transparent);
-  --chrome-brand-strong: var(--foreground);
-
   /* Chart Colors - Brighter for dark mode visibility */
   --chart-1: 212 62% 72%;
   --chart-2: 212 24% 70%;
@@ -381,8 +121,6 @@
   --chart-4: 39 68% 68%;
   --chart-5: 25 58% 68%;
   --chart-6: 151 48% 64%;
-  --chart-7: 203 46% 68%;
-  --chart-8: 256 36% 70%;
 
   --background: var(--ledger-paper);
   --foreground: var(--ledger-ink);
@@ -411,12 +149,6 @@
 
 /* Tailwind v4 Theme Directive */
 @theme inline {
-  /* Brand colors */
-  --color-brand: var(--brand-primary);
-  --color-brand-accent: var(--brand-accent);
-  --color-brand-gradient-start: var(--brand-gradient-start);
-  --color-brand-gradient-end: var(--brand-gradient-end);
-
   /* Semantic colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -493,14 +225,6 @@
   .safe-bottom {
     bottom: calc(1.5rem + env(safe-area-inset-bottom));
   }
-
-  .safe-left {
-    left: calc(1rem + env(safe-area-inset-left));
-  }
-
-  .safe-right {
-    right: calc(1.5rem + env(safe-area-inset-right));
-  }
 }
 
 @layer utilities {
@@ -572,58 +296,6 @@
   to { opacity: 1; }
 }
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Tailwind 4: @starting-style for smoother DOM insertion animations */
-/* These provide better entry animations than keyframes for dynamically inserted content */
-.fade-enter {
-  opacity: 1;
-  transition: opacity 0.3s ease-out;
-  @starting-style {
-    opacity: 0;
-  }
-}
-
-.slide-up-enter {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
-  @starting-style {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-}
-
-.scale-enter {
-  opacity: 1;
-  transform: scale(1);
-  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
-  @starting-style {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-}
-
-/* Dialog/Modal entry animation using @starting-style */
-[data-state="open"].dialog-content {
-  opacity: 1;
-  transform: translate(-50%, -50%) scale(1);
-  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
-  @starting-style {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.95);
-  }
-}
-
 /* View Transitions API - Smooth page navigation (Chrome 111+) */
 @view-transition {
   navigation: auto; /* Enable for all navigations */
@@ -684,59 +356,9 @@
     transition-duration: 0.01ms !important;
   }
 
-  /* Reduce animation complexity for Framer Motion */
-  [data-framer-motion] {
-    animation: none !important;
-    transition: none !important;
-  }
-
   /* Skip loading web fonts, use system fonts */
   @font-face {
     font-display: optional;
-  }
-}
-
-/* Container Queries - Component-level responsiveness (cutting-edge!) */
-/* More responsive than media queries for reusable components */
-.results-container {
-  container-type: inline-size;
-  container-name: results;
-}
-
-.summary-cards-container {
-  container-type: inline-size;
-  container-name: summary;
-}
-
-/* Results table adapts to its container width, not viewport */
-@container results (min-width: 600px) {
-  .results-table-responsive {
-    font-size: 0.9375rem; /* Slightly larger on wider containers */
-  }
-}
-
-@container results (min-width: 900px) {
-  .results-table-responsive {
-    font-size: 1rem; /* Full size on large containers */
-  }
-}
-
-/* Summary cards adapt to their container */
-@container summary (min-width: 500px) {
-  .summary-card-grid {
-    grid-template-columns: repeat(2, 1fr); /* 2 columns in medium containers */
-  }
-}
-
-@container summary (min-width: 800px) {
-  .summary-card-grid {
-    grid-template-columns: repeat(3, 1fr); /* 3 columns in large containers */
-  }
-}
-
-@container summary (min-width: 1100px) {
-  .summary-card-grid {
-    grid-template-columns: repeat(4, 1fr); /* 4 columns in xl containers */
   }
 }
 
@@ -782,8 +404,6 @@
   }
 
   /* Hide non-printable elements */
-  [class*="print\:hidden"],
-  [data-print-hide],
   nav,
   button,
   .fixed,
@@ -798,15 +418,6 @@
     color: black !important;
     font-size: 12pt;
     line-height: 1.4;
-  }
-
-  /* Director Intelligence specific print styles */
-  .director-dashboard-print {
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
   }
 
   /* Make sure main content fills the page */
@@ -894,51 +505,12 @@
     content: "";
   }
 
-  /* Print header */
-  .print-header {
-    display: block !important;
-    text-align: center;
-    margin-bottom: 20pt;
-    padding-bottom: 10pt;
-    border-bottom: 2px solid #06b6d4;
-  }
-
-  .print-header h1 {
-    font-size: 18pt;
-    margin: 0;
-  }
-
-  .print-header p {
-    font-size: 10pt;
-    color: #6b7280 !important;
-    margin: 4pt 0 0;
-  }
-
-  /* Print footer */
-  .print-footer {
-    display: block !important;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    text-align: center;
-    font-size: 8pt;
-    color: #9ca3af !important;
-    padding-top: 8pt;
-    border-top: 1px solid #e5e7eb;
-  }
-
   /* Charts - hide complex visualizations */
   svg,
   canvas,
   [class*="chart"],
   [class*="Chart"] {
     display: none !important;
-  }
-
-  /* Show print-only elements */
-  [class*="print\:block"] {
-    display: block !important;
   }
 
   /* Mobile elements hidden */

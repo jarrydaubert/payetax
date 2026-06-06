@@ -7,7 +7,6 @@ import { useId, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { decodeTaxCode, formatAllowance, type TaxCodeDecoded } from '@/lib/taxCodeDecoder';
 import { cn } from '@/lib/utils';
 
@@ -33,18 +32,18 @@ export function TaxCodeDecoderClient() {
   };
 
   return (
-    <div className={cn('mx-auto max-w-4xl', SPACING.PX_4, SPACING.PY_12)}>
+    <div className={cn('mx-auto max-w-4xl', 'px-4', 'py-12')}>
       {/* Header */}
       <div className='mb-12 text-center'>
         <h1
           className={cn(
             'mb-4 font-display font-semibold text-foreground leading-tight',
-            TYPOGRAPHY.TEXT_4XL,
+            'text-4xl',
           )}
         >
           UK Tax Code Decoder
         </h1>
-        <p className={cn('mx-auto max-w-2xl text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
+        <p className={cn('mx-auto max-w-2xl text-muted-foreground', 'text-lg')}>
           Enter your tax code to understand what it means, your personal allowance, and how it
           affects your take-home pay.
         </p>
@@ -54,7 +53,7 @@ export function TaxCodeDecoderClient() {
       <Card className='mb-8'>
         <CardHeader>
           <CardTitle className='flex items-center gap-2'>
-            <Search className={ICON_SIZES.SIZE_5} />
+            <Search className={'size-5'} />
             Enter Your Tax Code
           </CardTitle>
           <CardDescription>
@@ -85,7 +84,7 @@ export function TaxCodeDecoderClient() {
 
           {/* Example Codes */}
           <div className='mt-4'>
-            <p className={cn('mb-2 text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>Try an example:</p>
+            <p className={cn('mb-2 text-muted-foreground', 'text-sm')}>Try an example:</p>
             <div className='flex flex-wrap gap-2'>
               {EXAMPLE_CODES.map((exampleCode) => (
                 <button
@@ -116,9 +115,9 @@ export function TaxCodeDecoderClient() {
               <div>
                 <CardTitle className='flex items-center gap-2'>
                   {result.isValid ? (
-                    <CheckCircle className={cn(ICON_SIZES.SIZE_5, 'text-success')} />
+                    <CheckCircle className={cn('size-5', 'text-success')} />
                   ) : (
-                    <AlertCircle className={cn(ICON_SIZES.SIZE_5, 'text-destructive')} />
+                    <AlertCircle className={cn('size-5', 'text-destructive')} />
                   )}
                   <span className='font-mono text-2xl'>{result.code}</span>
                 </CardTitle>
@@ -126,13 +125,11 @@ export function TaxCodeDecoderClient() {
               </div>
               {result.allowance !== null && (
                 <div className='text-right'>
-                  <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
-                    Personal Allowance
-                  </p>
+                  <p className={cn('text-muted-foreground', 'text-sm')}>Personal Allowance</p>
                   <p
                     className={cn(
                       'font-bold',
-                      TYPOGRAPHY.TEXT_2XL,
+                      'text-2xl',
                       result.allowance < 0 ? 'text-destructive' : 'text-success',
                     )}
                   >
@@ -172,7 +169,7 @@ export function TaxCodeDecoderClient() {
                     key={`detail-${detail}`}
                     className='flex items-start gap-2 text-muted-foreground'
                   >
-                    <Info className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 flex-shrink-0 text-primary')} />
+                    <Info className={cn('size-4', 'mt-0.5 flex-shrink-0 text-primary')} />
                     <span>{detail}</span>
                   </div>
                 ))}
@@ -184,7 +181,7 @@ export function TaxCodeDecoderClient() {
               <div className='space-y-2 rounded-lg border border-warning/30 bg-warning/10 p-4'>
                 {result.warnings.map((warning) => (
                   <div key={`warning-${warning}`} className='flex items-start gap-2 text-warning'>
-                    <AlertCircle className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 flex-shrink-0')} />
+                    <AlertCircle className={cn('size-4', 'mt-0.5 flex-shrink-0')} />
                     <span>{warning}</span>
                   </div>
                 ))}
@@ -199,7 +196,7 @@ export function TaxCodeDecoderClient() {
                   className='inline-flex items-center gap-2 text-primary hover:underline'
                 >
                   Use this tax code in the calculator
-                  <ArrowRight className={ICON_SIZES.SIZE_4} />
+                  <ArrowRight className={'size-4'} />
                 </Link>
               </div>
             )}
@@ -211,7 +208,7 @@ export function TaxCodeDecoderClient() {
       <Card>
         <CardHeader>
           <CardTitle className='flex items-center gap-2'>
-            <HelpCircle className={ICON_SIZES.SIZE_5} />
+            <HelpCircle className={'size-5'} />
             Common Tax Code Letters
           </CardTitle>
         </CardHeader>
@@ -246,13 +243,13 @@ export function TaxCodeDecoderClient() {
       </Card>
       {/* Calculator CTA */}
       <div className='mt-12 text-center'>
-        <p className={cn('mb-4 text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
+        <p className={cn('mb-4 text-muted-foreground', 'text-lg')}>
           Know your tax code? Calculate your take-home pay.
         </p>
         <Link href='/'>
           <Button size='lg' variant='outline'>
             Open Tax Calculator
-            <ArrowRight className={cn('ml-2', ICON_SIZES.SIZE_4)} />
+            <ArrowRight className={cn('ml-2', 'size-4')} />
           </Button>
         </Link>
       </div>

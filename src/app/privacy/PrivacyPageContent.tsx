@@ -11,7 +11,6 @@ import { DataFlowCards } from '@/components/molecules/DataFlowCards';
 import { FeatureGrid } from '@/components/molecules/FeatureGrid';
 import { PageHero } from '@/components/molecules/PageHero';
 import { SectionHeading } from '@/components/molecules/SectionHeading';
-import { ICON_SIZES, LAYOUT, TYPOGRAPHY } from '@/constants/designTokens';
 import {
   PRIVACY_DATA_FLOW,
   PRIVACY_DO_DO,
@@ -22,7 +21,7 @@ import { cn } from '@/lib/utils';
 
 export function PrivacyPageContent() {
   return (
-    <div className={LAYOUT.PAGE_WRAPPER}>
+    <div className={'min-h-screen'}>
       {/* Hero Section */}
       <PageHero
         badge={{ icon: Shield, text: 'Privacy Policy' }}
@@ -37,21 +36,18 @@ export function PrivacyPageContent() {
       />
 
       {/* Last Updated */}
-      <section className={LAYOUT.SECTION}>
+      <section className={'py-12 md:py-20'}>
         <div
-          className={cn(
-            'flex items-center justify-center gap-2 text-muted-foreground',
-            TYPOGRAPHY.TEXT_SM,
-          )}
+          className={cn('flex items-center justify-center gap-2 text-muted-foreground', 'text-sm')}
         >
-          <Calendar className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+          <Calendar className={'size-4'} aria-hidden='true' />
           <span>Last updated: {PRIVACY_LAST_UPDATED}</span>
         </div>
       </section>
 
       {/* Quick Summary */}
-      <section className={LAYOUT.SECTION}>
-        <div className={LAYOUT.CONTAINER_MD}>
+      <section className={'py-12 md:py-20'}>
+        <div className={'container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8'}>
           <SectionHeading
             badge={{ icon: CheckCircle, text: 'Quick Summary' }}
             title='The 30-Second Version'
@@ -77,8 +73,8 @@ export function PrivacyPageContent() {
       </section>
 
       {/* Privacy Principles */}
-      <section className={LAYOUT.SECTION_TINTED_PRIMARY}>
-        <div className={LAYOUT.CONTAINER}>
+      <section className={'border-border/60 border-y bg-primary/5 py-12 md:py-20'}>
+        <div className={'container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'}>
           <FeatureGrid
             heading={{
               title: 'How We Protect Your Privacy',
@@ -93,8 +89,8 @@ export function PrivacyPageContent() {
       </section>
 
       {/* Data Flow */}
-      <section className={LAYOUT.SECTION}>
-        <div className={LAYOUT.CONTAINER_MD}>
+      <section className={'py-12 md:py-20'}>
+        <div className={'container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8'}>
           <SectionHeading
             badge={{ icon: Lock, text: 'Data Flow' }}
             title='Where Your Tax Data Goes'
@@ -107,8 +103,8 @@ export function PrivacyPageContent() {
       </section>
 
       {/* Analytics Section */}
-      <section className={LAYOUT.SECTION_TINTED_ACCENT}>
-        <div className={LAYOUT.CONTAINER_MD}>
+      <section className={'border-border/60 border-y bg-card py-12 md:py-20'}>
+        <div className={'container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8'}>
           <FeatureGrid
             heading={{
               badge: { icon: Eye, text: 'Analytics' },

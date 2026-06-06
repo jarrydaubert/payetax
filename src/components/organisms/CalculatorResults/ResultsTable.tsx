@@ -26,7 +26,6 @@ import { ResultTableRow } from '@/components/molecules/ResultTableRow';
 import { TaxTrapInlineAlert } from '@/components/molecules/TaxTrapInlineAlert';
 import { Card } from '@/components/ui/card';
 import { TableBody } from '@/components/ui/table';
-import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { CURRENT_TAX_YEAR, TAX_RATES, type TaxYear } from '@/constants/taxRates';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
 import { useMouseDragScroll } from '@/hooks/useMouseDragScroll';
@@ -219,7 +218,7 @@ export function ResultsTable({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.2 }}
-      className={cn('w-full', SPACING.SPACE_Y_4)}
+      className={cn('w-full', 'space-y-4')}
     >
       {/* Landscape Prompt - Shows on mobile portrait to encourage rotation for better table viewing */}
       <LandscapePrompt />
@@ -261,7 +260,7 @@ export function ResultsTable({
               data-testid='results-table'
               className={cn(
                 'w-full min-w-[44rem] table-auto caption-bottom sm:min-w-full',
-                TYPOGRAPHY.TEXT_SM,
+                'text-sm',
               )}
             >
               <caption className='sr-only'>
@@ -302,7 +301,7 @@ export function ResultsTable({
 
       {/* Tax Trap Inline Alert */}
       {taxTrapOptimization && onApplyPensionOptimization && (
-        <div className={SPACING.MT_4}>
+        <div className={'mt-4'}>
           <TaxTrapInlineAlert
             salary={results.grossSalary.annually}
             suggestedPension={taxTrapOptimization.suggested}
@@ -314,7 +313,7 @@ export function ResultsTable({
 
       {/* Marriage Allowance Alert */}
       {marriageAllowanceEligible && (
-        <div className={SPACING.MT_4}>
+        <div className={'mt-4'}>
           <MarriageAllowanceAlert
             userSalary={results.grossSalary.annually}
             partnerSalary={partnerGrossWage}

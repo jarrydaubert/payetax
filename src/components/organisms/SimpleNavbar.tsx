@@ -7,7 +7,6 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 import { NavbarMobileMenu } from '@/components/molecules/NavbarMobileMenu';
 import { Button } from '@/components/ui/button';
-import { ICON_SIZES, SPACING } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 const CALCULATOR_ID = 'tax-calculator';
@@ -103,7 +102,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
             }
           }}
         >
-          <span className='brand-wordmark text-2xl text-on-brand'>
+          <span className='brand-wordmark text-2xl text-foreground'>
             paye
             <span className='text-primary'>tax</span>
           </span>
@@ -124,7 +123,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
         </div>
 
         {/* Desktop Utilities */}
-        <div className={cn('hidden items-center justify-end md:flex', SPACING.GAP_2)}>
+        <div className={cn('hidden items-center justify-end md:flex', 'gap-2')}>
           <Button asChild size='touch' variant='outline' className='px-5 py-2.5 text-sm'>
             <Link href={`/${CALCULATOR_HASH}`} onClick={handleCalculatorClick}>
               Open Calculator
@@ -143,11 +142,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
           data-testid='mobile-menu-button'
         >
-          {isMobileMenuOpen ? (
-            <X className={ICON_SIZES.SIZE_5} />
-          ) : (
-            <Menu className={ICON_SIZES.SIZE_5} />
-          )}
+          {isMobileMenuOpen ? <X className={'size-5'} /> : <Menu className={'size-5'} />}
         </Button>
       </nav>
 

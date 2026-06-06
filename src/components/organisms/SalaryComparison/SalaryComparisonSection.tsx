@@ -5,7 +5,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowLeftRight, ChevronDown } from 'lucide-react';
 import { useCallback, useId, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ICON_SIZES, SPACING } from '@/constants/designTokens';
 import {
   type ComparisonInput,
   type ComparisonResults,
@@ -64,7 +63,7 @@ export function SalaryComparisonSection({
   }, []);
 
   return (
-    <div className={cn(SPACING.SPACE_Y_4, className)}>
+    <div className={cn('space-y-4', className)}>
       {/* Toggle Button */}
       <Button
         id={buttonId}
@@ -74,16 +73,12 @@ export function SalaryComparisonSection({
         aria-expanded={isOpen}
         aria-controls={contentId}
       >
-        <span className={cn('flex items-center', SPACING.GAP_2)}>
-          <ArrowLeftRight className={ICON_SIZES.SIZE_4} />
+        <span className={cn('flex items-center', 'gap-2')}>
+          <ArrowLeftRight className={'size-4'} />
           Compare Salary Scenarios
         </span>
         <ChevronDown
-          className={cn(
-            ICON_SIZES.SIZE_4,
-            'transition-transform duration-200',
-            isOpen && 'rotate-180',
-          )}
+          className={cn('size-4', 'transition-transform duration-200', isOpen && 'rotate-180')}
         />
       </Button>
 
@@ -98,7 +93,7 @@ export function SalaryComparisonSection({
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className={cn('overflow-hidden', SPACING.SPACE_Y_4)}
+            className={cn('overflow-hidden', 'space-y-4')}
           >
             {/* Comparison Inputs */}
             <ComparisonInputs
@@ -117,7 +112,7 @@ export function SalaryComparisonSection({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.1 }}
-                className={SPACING.SPACE_Y_4}
+                className={'space-y-4'}
               >
                 <MarginalRateInsight
                   increase={comparisonResults.increase}

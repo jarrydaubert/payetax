@@ -13,7 +13,6 @@ import type { Route } from 'next';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 import type { FeatureData } from '@/lib/validation/pageDataValidation';
 
@@ -87,14 +86,12 @@ export function FeatureCard({ feature, variant = 'default', className }: Feature
       <CardHeader>
         {/* Icon */}
         <div className={iconContainerClasses} aria-hidden='true'>
-          <Icon className={cn(ICON_SIZES.SIZE_6)} />
+          <Icon className={cn('size-6')} />
         </div>
 
         {/* Title with optional metric */}
-        <div className={cn('flex items-start justify-between', SPACING.GAP_4)}>
-          <h3 className={cn('font-display font-semibold text-foreground', TYPOGRAPHY.TEXT_2XL)}>
-            {title}
-          </h3>
+        <div className={cn('flex items-start justify-between', 'gap-4')}>
+          <h3 className={cn('font-display font-semibold text-foreground', 'text-2xl')}>{title}</h3>
           {metric && (
             <Badge variant='secondary' className='shrink-0 font-mono font-semibold'>
               {metric}
@@ -105,13 +102,7 @@ export function FeatureCard({ feature, variant = 'default', className }: Feature
 
       <CardContent>
         {/* Description */}
-        <p
-          className={cn(
-            'text-muted-foreground leading-relaxed',
-            SPACING.MB_4,
-            TYPOGRAPHY.TEXT_BASE,
-          )}
-        >
+        <p className={cn('text-muted-foreground leading-relaxed', 'mb-4', 'text-base')}>
           {description}
         </p>
 
@@ -121,12 +112,12 @@ export function FeatureCard({ feature, variant = 'default', className }: Feature
             href={link.href as Route}
             className={cn(
               'group inline-flex items-center gap-2 font-semibold text-primary transition-colors hover:text-primary/80',
-              TYPOGRAPHY.TEXT_SM,
+              'text-sm',
             )}
           >
             {link.text}
             <ArrowRight
-              className={cn(ICON_SIZES.SIZE_4, 'transition-transform group-hover:translate-x-1')}
+              className={cn('size-4', 'transition-transform group-hover:translate-x-1')}
             />
           </Link>
         )}

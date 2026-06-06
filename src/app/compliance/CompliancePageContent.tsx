@@ -8,7 +8,6 @@ import { SectionHeading } from '@/components/molecules/SectionHeading';
 import { StatsGrid } from '@/components/molecules/StatsGrid';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ICON_SIZES, LAYOUT, SPACING, SURFACES, TYPOGRAPHY } from '@/constants/designTokens';
 import {
   CURRENT_TAX_YEAR_DISPLAY_SHORT,
   formatIsoDateForDisplay,
@@ -48,7 +47,7 @@ export function CompliancePageContent() {
   ] as const;
 
   return (
-    <div className={LAYOUT.PAGE_WRAPPER}>
+    <div className={'min-h-screen'}>
       {/* Hero */}
       <PageHero
         badge={{ icon: Shield, text: 'Compliance' }}
@@ -63,15 +62,15 @@ export function CompliancePageContent() {
       />
 
       {/* Stats */}
-      <section className={LAYOUT.SECTION}>
-        <div className={LAYOUT.CONTAINER}>
+      <section className={'py-12 md:py-20'}>
+        <div className={'container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'}>
           <StatsGrid stats={complianceStats} columns={3} variant='elevated' />
         </div>
       </section>
 
       {/* Integrity Snapshot */}
-      <section className={LAYOUT.SECTION_TINTED_ACCENT}>
-        <div className={LAYOUT.CONTAINER}>
+      <section className={'border-border/60 border-y bg-card py-12 md:py-20'}>
+        <div className={'container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'}>
           <SectionHeading
             badge={{ icon: Shield, text: 'Integrity Snapshot' }}
             title='Calculation Integrity Snapshot'
@@ -81,7 +80,7 @@ export function CompliancePageContent() {
 
           <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
             {integritySnapshot.map((item) => (
-              <Card key={item.label} className={SURFACES.CARD_STANDARD}>
+              <Card key={item.label} className={'border-primary/20 p-6'}>
                 <p className='font-medium text-muted-foreground text-xs uppercase tracking-wide'>
                   {item.label}
                 </p>
@@ -94,8 +93,8 @@ export function CompliancePageContent() {
       </section>
 
       {/* Compliance Features */}
-      <section className={LAYOUT.SECTION_TINTED_PRIMARY}>
-        <div className={LAYOUT.CONTAINER}>
+      <section className={'border-border/60 border-y bg-primary/5 py-12 md:py-20'}>
+        <div className={'container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'}>
           <SectionHeading
             title='HMRC Compliance Standards'
             subtitle='How we ensure calculation accuracy'
@@ -106,24 +105,18 @@ export function CompliancePageContent() {
             {COMPLIANCE_FEATURES.map((feature) => {
               const Icon = feature.icon;
               return (
-                <Card
-                  key={feature.title}
-                  className={cn('rounded-sm border-border bg-card', SPACING.P_8)}
-                >
+                <Card key={feature.title} className={cn('rounded-sm border-border bg-card', 'p-8')}>
                   <div className='mb-6 flex items-start gap-4'>
                     <div className='flex size-12 items-center justify-center rounded-sm border border-primary/25 bg-background text-primary'>
-                      <Icon className={ICON_SIZES.SIZE_6} aria-hidden='true' />
+                      <Icon className={'size-6'} aria-hidden='true' />
                     </div>
                     <div>
                       <h3
-                        className={cn(
-                          'mb-2 font-display font-semibold text-foreground',
-                          TYPOGRAPHY.TEXT_XL,
-                        )}
+                        className={cn('mb-2 font-display font-semibold text-foreground', 'text-xl')}
                       >
                         {feature.title}
                       </h3>
-                      <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+                      <p className={cn('text-muted-foreground', 'text-sm')}>
                         {feature.description}
                       </p>
                     </div>
@@ -132,10 +125,7 @@ export function CompliancePageContent() {
                     {feature.details.map((detail) => (
                       <li
                         key={detail}
-                        className={cn(
-                          'flex items-start gap-2 text-muted-foreground',
-                          TYPOGRAPHY.TEXT_SM,
-                        )}
+                        className={cn('flex items-start gap-2 text-muted-foreground', 'text-sm')}
                       >
                         <CheckCircle
                           className='mt-0.5 size-4 flex-shrink-0 text-primary'
@@ -148,7 +138,7 @@ export function CompliancePageContent() {
                   <div
                     className={cn(
                       'mt-6 flex items-center justify-between border-primary/10 border-t pt-4 text-muted-foreground',
-                      TYPOGRAPHY.TEXT_XS,
+                      'text-xs',
                     )}
                   >
                     <span>Last updated: {feature.lastUpdated}</span>
@@ -162,8 +152,8 @@ export function CompliancePageContent() {
       </section>
 
       {/* Compliance Statements */}
-      <section className={LAYOUT.SECTION}>
-        <div className={LAYOUT.CONTAINER}>
+      <section className={'py-12 md:py-20'}>
+        <div className={'container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'}>
           <SectionHeading
             badge={{ icon: AlertTriangle, text: 'Legal Compliance' }}
             title='Official Compliance Statements'
@@ -171,17 +161,15 @@ export function CompliancePageContent() {
             align='center'
           />
 
-          <div className={LAYOUT.GRID_2}>
+          <div className={'grid gap-6 md:grid-cols-2'}>
             {COMPLIANCE_STATEMENTS.map((statement) => (
-              <Card key={statement.category} className={SURFACES.CARD_STANDARD}>
+              <Card key={statement.category} className={'border-primary/20 p-6'}>
                 <h3 className='mb-3 font-semibold text-foreground'>{statement.category}</h3>
-                <p className={cn('mb-4 text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
-                  {statement.statement}
-                </p>
+                <p className={cn('mb-4 text-muted-foreground', 'text-sm')}>{statement.statement}</p>
                 <div
                   className={cn(
                     'space-y-2 border-primary/10 border-t pt-4 text-muted-foreground',
-                    TYPOGRAPHY.TEXT_XS,
+                    'text-xs',
                   )}
                 >
                   <p className='font-medium'>{statement.verification}</p>
@@ -194,8 +182,8 @@ export function CompliancePageContent() {
       </section>
 
       {/* Data Sources */}
-      <section className={LAYOUT.SECTION_TINTED_ACCENT}>
-        <div className={LAYOUT.CONTAINER}>
+      <section className={'border-border/60 border-y bg-card py-12 md:py-20'}>
+        <div className={'container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'}>
           <SectionHeading
             badge={{ icon: Award, text: 'Data Sources' }}
             title='Official Government Sources'
@@ -203,15 +191,13 @@ export function CompliancePageContent() {
             align='center'
           />
 
-          <div className={LAYOUT.GRID_2}>
+          <div className={'grid gap-6 md:grid-cols-2'}>
             {DATA_SOURCES.map((source) => (
-              <Card key={source.source} className={SURFACES.CARD_STANDARD}>
+              <Card key={source.source} className={'border-primary/20 p-6'}>
                 <div className='mb-4 flex items-start justify-between'>
                   <div>
                     <h3 className='mb-2 font-bold text-foreground'>{source.source}</h3>
-                    <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
-                      {source.description}
-                    </p>
+                    <p className={cn('text-muted-foreground', 'text-sm')}>{source.description}</p>
                   </div>
                 </div>
                 <div className='space-y-3'>
@@ -223,13 +209,13 @@ export function CompliancePageContent() {
                       className='flex items-center gap-2'
                     >
                       Visit Source
-                      <ExternalLink className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+                      <ExternalLink className={'size-4'} aria-hidden='true' />
                     </a>
                   </Button>
                   <div
                     className={cn(
                       'flex items-center justify-between text-muted-foreground',
-                      TYPOGRAPHY.TEXT_XS,
+                      'text-xs',
                     )}
                   >
                     <span className='font-medium text-primary'>{source.reliability}</span>

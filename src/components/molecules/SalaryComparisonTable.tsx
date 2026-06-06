@@ -6,7 +6,6 @@ import Link from 'next/link';
 import * as React from 'react';
 import { ScrollIndicator } from '@/components/atoms/ScrollIndicator';
 import { Card } from '@/components/ui/card';
-import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
 import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
@@ -71,18 +70,18 @@ export function SalaryComparisonTable() {
       transition={{ duration: 0.5 }}
       className='border-border/70 border-b bg-background py-16'
     >
-      <div className={cn('mx-auto max-w-6xl', SPACING.PX_4)}>
-        <div className={cn('text-center', SPACING.MB_10)}>
+      <div className={cn('mx-auto max-w-6xl', 'px-4')}>
+        <div className={cn('text-center', 'mb-10')}>
           <h2
             className={cn(
               'font-display font-semibold text-foreground leading-tight',
-              SPACING.MB_3,
-              TYPOGRAPHY.TEXT_4XL,
+              'mb-3',
+              'text-4xl',
             )}
           >
             Salary Take-Home Comparison
           </h2>
-          <p className={`${TYPOGRAPHY.TEXT_LG} text-muted-foreground`}>
+          <p className={`text-lg text-muted-foreground`}>
             See how much you&apos;ll take home at different salary levels
           </p>
         </div>
@@ -100,30 +99,30 @@ export function SalaryComparisonTable() {
               <table className='w-full min-w-160 border-collapse'>
                 <thead className='border-border border-b bg-background'>
                   <tr className='border-border/20 border-b'>
-                    <th className={cn('text-left font-bold text-foreground', SPACING.P_4)}>
+                    <th className={cn('text-left font-bold text-foreground', 'p-4')}>
                       Gross Salary
                     </th>
-                    <th className={cn('text-right font-bold text-foreground', SPACING.P_4)}>
+                    <th className={cn('text-right font-bold text-foreground', 'p-4')}>
                       Income Tax
                     </th>
-                    <th className={cn('text-right font-bold text-foreground', SPACING.P_4)}>
+                    <th className={cn('text-right font-bold text-foreground', 'p-4')}>
                       National Insurance
                     </th>
-                    <th className={cn('text-right font-bold text-foreground', SPACING.P_4)}>
+                    <th className={cn('text-right font-bold text-foreground', 'p-4')}>
                       Annual Take-Home
                     </th>
-                    <th className={cn('text-right font-bold text-foreground', SPACING.P_4)}>
+                    <th className={cn('text-right font-bold text-foreground', 'p-4')}>
                       Monthly Take-Home
                     </th>
                   </tr>
                 </thead>
-                <tbody className={TYPOGRAPHY.TEXT_SM}>
+                <tbody className={'text-sm'}>
                   {salaryData.map((row, idx) => (
                     <tr
                       key={row.salary}
                       className={`border-border/10 border-b transition-colors hover:bg-primary/5 ${idx % 2 === 0 ? 'bg-muted/20' : ''}`}
                     >
-                      <td className={SPACING.P_4}>
+                      <td className={'p-4'}>
                         <Link
                           href='/'
                           className='font-semibold text-foreground hover:text-primary hover:underline'
@@ -131,16 +130,16 @@ export function SalaryComparisonTable() {
                           £{row.salary.toLocaleString()}
                         </Link>
                       </td>
-                      <td className={cn('text-right text-destructive', SPACING.P_4)}>
+                      <td className={cn('text-right text-destructive', 'p-4')}>
                         £{row.tax.toLocaleString()}
                       </td>
-                      <td className={cn('text-right text-warning', SPACING.P_4)}>
+                      <td className={cn('text-right text-warning', 'p-4')}>
                         £{row.ni.toLocaleString()}
                       </td>
-                      <td className={cn('text-right font-bold text-success', SPACING.P_4)}>
+                      <td className={cn('text-right font-bold text-success', 'p-4')}>
                         £{row.annual.toLocaleString()}
                       </td>
-                      <td className={cn('text-right text-muted-foreground', SPACING.P_4)}>
+                      <td className={cn('text-right text-muted-foreground', 'p-4')}>
                         £{row.monthly.toLocaleString()}
                       </td>
                     </tr>
@@ -151,8 +150,8 @@ export function SalaryComparisonTable() {
           </Card>
         </div>
 
-        <div className={cn('text-center', SPACING.MT_6)}>
-          <p className={`text-muted-foreground ${TYPOGRAPHY.TEXT_SM}`}>
+        <div className={cn('text-center', 'mt-6')}>
+          <p className={`text-muted-foreground text-sm`}>
             Based on England/Wales/NI rates for {CURRENT_TAX_YEAR_DISPLAY_SHORT}. Scottish rates
             differ.
           </p>

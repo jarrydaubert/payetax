@@ -7,7 +7,6 @@ import { useId, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
 import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
 import { calculateMarriageAllowanceNetSaving } from '@/lib/tax/marriageAllowance';
@@ -99,22 +98,22 @@ export function MarriageAllowanceClient() {
   const isFormValid = transferorIncome.trim() && recipientIncome.trim();
 
   return (
-    <div className={cn('mx-auto max-w-4xl', SPACING.PX_4, SPACING.PY_12)}>
+    <div className={cn('mx-auto max-w-4xl', 'px-4', 'py-12')}>
       {/* Header */}
       <div className='mb-12 text-center'>
         <div className='mb-4 inline-flex items-center gap-2 rounded-sm border border-primary/35 bg-background px-4 py-2 text-primary'>
-          <Heart className={ICON_SIZES.SIZE_4} />
+          <Heart className={'size-4'} />
           <span className='font-medium text-sm uppercase tracking-[0.2em]'>Marriage Allowance</span>
         </div>
         <h1
           className={cn(
             'mb-4 font-display font-semibold text-foreground leading-tight',
-            TYPOGRAPHY.TEXT_4XL,
+            'text-4xl',
           )}
         >
           Marriage Allowance Calculator {CURRENT_TAX_YEAR_DISPLAY_SHORT}
         </h1>
-        <p className={cn('mx-auto max-w-2xl text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
+        <p className={cn('mx-auto max-w-2xl text-muted-foreground', 'text-lg')}>
           Married? In a civil partnership? You could save up to{' '}
           <span className='font-semibold text-foreground'>{formatCurrency(TAX_SAVING, 0)}</span> per
           year by transferring unused Personal Allowance to your partner.
@@ -217,9 +216,9 @@ export function MarriageAllowanceClient() {
           <CardContent className='pt-6'>
             <div className='flex items-start gap-4'>
               {result.status === 'eligible' ? (
-                <CheckCircle className={cn(ICON_SIZES.SIZE_8, 'flex-shrink-0 text-success')} />
+                <CheckCircle className={cn('size-8', 'flex-shrink-0 text-success')} />
               ) : (
-                <XCircle className={cn(ICON_SIZES.SIZE_8, 'flex-shrink-0 text-destructive')} />
+                <XCircle className={cn('size-8', 'flex-shrink-0 text-destructive')} />
               )}
               <div>
                 <h3
@@ -288,7 +287,7 @@ export function MarriageAllowanceClient() {
 
           <div className='rounded-lg border border-primary/30 bg-primary/10 p-4'>
             <div className='flex items-start gap-2'>
-              <Info className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 flex-shrink-0 text-primary')} />
+              <Info className={cn('size-4', 'mt-0.5 flex-shrink-0 text-primary')} />
               <div className='text-primary text-sm'>
                 <p className='font-medium'>Important Notes:</p>
                 <ul className='mt-1 space-y-1'>
@@ -351,13 +350,13 @@ export function MarriageAllowanceClient() {
       </Card>
       {/* CTA */}
       <div className='mt-12 text-center'>
-        <p className={cn('mb-4 text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
+        <p className={cn('mb-4 text-muted-foreground', 'text-lg')}>
           See your full household tax breakdown with Marriage Allowance applied.
         </p>
         <Link href='/?marriageAllowance=receiving'>
           <Button size='lg' variant='outline'>
             Calculate with Marriage Allowance
-            <ArrowRight className={cn('ml-2', ICON_SIZES.SIZE_4)} />
+            <ArrowRight className={cn('ml-2', 'size-4')} />
           </Button>
         </Link>
       </div>

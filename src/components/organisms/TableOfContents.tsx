@@ -4,7 +4,6 @@
 import GithubSlugger from 'github-slugger';
 import { List } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 interface TocItem {
@@ -87,7 +86,7 @@ export function TableOfContents({ content, className }: TableOfContentsProps) {
     <nav className={cn('hidden xl:block', className)} aria-label='Table of contents'>
       <div className='sticky top-24'>
         <div className='mb-3 flex items-center gap-2 font-semibold text-primary text-xs uppercase tracking-[0.24em]'>
-          <List className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+          <List className={'size-4'} aria-hidden='true' />
           <span>On this page</span>
         </div>
         <ul className='space-y-2 border-border border-l'>
@@ -114,7 +113,7 @@ export function TableOfContents({ content, className }: TableOfContentsProps) {
                   }}
                   className={cn(
                     '-ml-px block border-l-2 py-1 pl-4 transition-colors',
-                    TYPOGRAPHY.TEXT_SM,
+                    'text-sm',
                     isActive
                       ? 'border-primary font-medium text-primary'
                       : 'border-transparent text-muted-foreground hover:border-foreground/30 hover:text-foreground',

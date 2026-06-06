@@ -7,7 +7,6 @@ import { useId, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
 import { CURRENT_TAX_YEAR, type NICategory, TAX_RATES } from '@/constants/taxRates';
 import { cn, formatCurrency } from '@/lib/utils';
@@ -103,22 +102,22 @@ export function NICalculatorClient() {
   };
 
   return (
-    <div className={cn('mx-auto max-w-4xl', SPACING.PX_4, SPACING.PY_12)}>
+    <div className={cn('mx-auto max-w-4xl', 'px-4', 'py-12')}>
       {/* Header */}
       <div className='mb-12 text-center'>
         <div className='mb-4 inline-flex items-center gap-2 rounded-sm border border-primary/35 bg-background px-4 py-2 text-primary'>
-          <Shield className={ICON_SIZES.SIZE_4} />
+          <Shield className={'size-4'} />
           <span className='font-medium text-sm uppercase tracking-[0.2em]'>National Insurance</span>
         </div>
         <h1
           className={cn(
             'mb-4 font-display font-semibold text-foreground leading-tight',
-            TYPOGRAPHY.TEXT_4XL,
+            'text-4xl',
           )}
         >
           National Insurance Calculator {CURRENT_TAX_YEAR_DISPLAY_SHORT}
         </h1>
-        <p className={cn('mx-auto max-w-2xl text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
+        <p className={cn('mx-auto max-w-2xl text-muted-foreground', 'text-lg')}>
           Calculate your employee and employer National Insurance contributions. NI is separate from
           income tax and funds state benefits including the NHS.
         </p>
@@ -128,7 +127,7 @@ export function NICalculatorClient() {
       <Card className='mb-8'>
         <CardHeader>
           <CardTitle className='flex items-center gap-2'>
-            <Calculator className={ICON_SIZES.SIZE_5} />
+            <Calculator className={'size-5'} />
             Calculate Your NI
           </CardTitle>
           <CardDescription>
@@ -234,9 +233,7 @@ export function NICalculatorClient() {
 
             {/* Quick Examples */}
             <div>
-              <p className={cn('mb-2 text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
-                Quick examples:
-              </p>
+              <p className={cn('mb-2 text-muted-foreground', 'text-sm')}>Quick examples:</p>
               <div className='flex flex-wrap gap-2'>
                 {EXAMPLE_SALARIES.map((exampleSalary) => (
                   <button
@@ -305,7 +302,7 @@ export function NICalculatorClient() {
       <Card className='mb-8'>
         <CardHeader>
           <CardTitle className='flex items-center gap-2'>
-            <HelpCircle className={ICON_SIZES.SIZE_5} />
+            <HelpCircle className={'size-5'} />
             NI Rates {CURRENT_TAX_YEAR_DISPLAY_SHORT}
           </CardTitle>
           <CardDescription>Current National Insurance thresholds and rates.</CardDescription>
@@ -352,7 +349,7 @@ export function NICalculatorClient() {
               </h3>
               <div className='rounded-lg border border-warning/30 bg-warning/10 p-4'>
                 <div className='flex items-start gap-2'>
-                  <Info className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 flex-shrink-0 text-warning')} />
+                  <Info className={cn('size-4', 'mt-0.5 flex-shrink-0 text-warning')} />
                   <div className='text-sm text-warning'>
                     <p className='font-medium'>Autumn Budget 2024 Changes:</p>
                     <ul className='mt-1 space-y-1'>
@@ -424,13 +421,13 @@ export function NICalculatorClient() {
 
       {/* CTA */}
       <div className='mt-12 text-center'>
-        <p className={cn('mb-4 text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
+        <p className={cn('mb-4 text-muted-foreground', 'text-lg')}>
           See your full take-home pay with tax, NI, pension, and student loans.
         </p>
         <Link href='/'>
           <Button size='lg' variant='outline'>
             Open Full Tax Calculator
-            <ArrowRight className={cn('ml-2', ICON_SIZES.SIZE_4)} />
+            <ArrowRight className={cn('ml-2', 'size-4')} />
           </Button>
         </Link>
       </div>

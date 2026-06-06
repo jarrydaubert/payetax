@@ -1,7 +1,5 @@
 // src/app/blog/category/[slug]/loading.tsx
 
-import { SURFACES } from '@/constants/designTokens';
-
 export default function Loading() {
   return (
     <output className='container mx-auto block px-4 py-12' aria-busy='true' aria-live='polite'>
@@ -24,7 +22,7 @@ export default function Loading() {
             {Array.from({ length: 4 }, (_, i) => `header-badge-${i}`).map((key) => (
               <div
                 key={key}
-                className={`h-8 w-24 animate-pulse bg-muted motion-reduce:animate-none ${SURFACES.SHAPE_CIRCLE}`}
+                className={`h-8 w-24 animate-pulse rounded-full bg-muted motion-reduce:animate-none`}
               />
             ))}
           </div>
@@ -39,7 +37,7 @@ export default function Loading() {
             {Array.from({ length: 6 }, (_, i) => `category-filter-${i}`).map((key) => (
               <div
                 key={key}
-                className={`h-10 w-32 animate-pulse bg-muted motion-reduce:animate-none ${SURFACES.SHAPE_CIRCLE}`}
+                className={`h-10 w-32 animate-pulse rounded-full bg-muted motion-reduce:animate-none`}
               />
             ))}
           </div>

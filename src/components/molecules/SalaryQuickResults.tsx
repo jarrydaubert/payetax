@@ -5,7 +5,6 @@ import { TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { cn } from '@/lib/utils';
 
@@ -24,51 +23,51 @@ export function SalaryQuickResults({ salary, results, comparisons }: SalaryQuick
 
   return (
     <div className='lg:sticky lg:top-24 lg:self-start'>
-      <Card className={cn(SPACING.P_6, 'sm:p-8')}>
-        <div className={SPACING.SPACE_Y_6}>
+      <Card className={cn('p-6', 'sm:p-8')}>
+        <div className={'space-y-6'}>
           {/* Main Take-Home */}
           <div className='text-center'>
-            <p className={cn('text-muted-foreground uppercase tracking-wide', TYPOGRAPHY.TEXT_SM)}>
+            <p className={cn('text-muted-foreground uppercase tracking-wide', 'text-sm')}>
               Monthly Take-Home Pay
             </p>
-            <p className={cn('font-bold text-primary', SPACING.MT_2, TYPOGRAPHY.TEXT_4XL)}>
+            <p className={cn('font-bold text-primary', 'mt-2', 'text-4xl')}>
               £{results.netPay.monthly.toLocaleString('en-GB')}
             </p>
-            <p className={cn('text-muted-foreground', SPACING.MT_2, TYPOGRAPHY.TEXT_SM)}>
+            <p className={cn('text-muted-foreground', 'mt-2', 'text-sm')}>
               After tax and National Insurance
             </p>
           </div>
 
           {/* Quick Breakdown */}
-          <div className={cn('grid grid-cols-2 border-t', SPACING.GAP_4, SPACING.PT_4)}>
+          <div className={cn('grid grid-cols-2 border-t', 'gap-4', 'pt-4')}>
             <div>
-              <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>Annual Take-Home</p>
-              <p className={cn('font-semibold', TYPOGRAPHY.TEXT_XL)}>
+              <p className={cn('text-muted-foreground', 'text-xs')}>Annual Take-Home</p>
+              <p className={cn('font-semibold', 'text-xl')}>
                 £{results.netPay.annually.toLocaleString('en-GB')}
               </p>
             </div>
             <div>
-              <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>Weekly Take-Home</p>
-              <p className={cn('font-semibold', TYPOGRAPHY.TEXT_XL)}>
+              <p className={cn('text-muted-foreground', 'text-xs')}>Weekly Take-Home</p>
+              <p className={cn('font-semibold', 'text-xl')}>
                 £{results.netPay.weekly.toLocaleString('en-GB')}
               </p>
             </div>
           </div>
 
           {/* Tax Breakdown */}
-          <div className={cn('border-t', SPACING.SPACE_Y_3, SPACING.PT_4)}>
+          <div className={cn('border-t', 'space-y-3', 'pt-4')}>
             <div className='flex justify-between'>
-              <span className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>Gross Salary</span>
+              <span className={cn('text-muted-foreground', 'text-sm')}>Gross Salary</span>
               <span className='font-medium'>£{formattedSalary}</span>
             </div>
             <div className='flex justify-between text-destructive'>
-              <span className={TYPOGRAPHY.TEXT_SM}>Income Tax</span>
+              <span className={'text-sm'}>Income Tax</span>
               <span className='font-medium'>
                 -£{results.incomeTax.annually.toLocaleString('en-GB')}
               </span>
             </div>
             <div className='flex justify-between text-destructive'>
-              <span className={TYPOGRAPHY.TEXT_SM}>National Insurance</span>
+              <span className={'text-sm'}>National Insurance</span>
               <span className='font-medium'>
                 -£{results.nationalInsurance.annually.toLocaleString('en-GB')}
               </span>
@@ -82,9 +81,9 @@ export function SalaryQuickResults({ salary, results, comparisons }: SalaryQuick
           </div>
 
           {/* Effective Tax Rate */}
-          <div className={cn('rounded-lg bg-muted/50', SPACING.P_4)}>
+          <div className={cn('rounded-lg bg-muted/50', 'p-4')}>
             <div className='flex items-center justify-between'>
-              <span className={TYPOGRAPHY.TEXT_SM}>Effective Tax Rate</span>
+              <span className={'text-sm'}>Effective Tax Rate</span>
               <Badge variant='secondary' className='font-mono'>
                 {(
                   ((results.incomeTax.annually + results.nationalInsurance.annually) / salary) *
@@ -98,24 +97,24 @@ export function SalaryQuickResults({ salary, results, comparisons }: SalaryQuick
       </Card>
 
       {/* Compare Salaries */}
-      <Card className={cn(SPACING.MT_4, SPACING.P_4)}>
-        <h2 className={cn('flex items-center font-semibold', SPACING.MB_3, SPACING.GAP_2)}>
-          <TrendingUp className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+      <Card className={cn('mt-4', 'p-4')}>
+        <h2 className={cn('flex items-center font-semibold', 'mb-3', 'gap-2')}>
+          <TrendingUp className={'size-4'} aria-hidden='true' />
           Popular Salaries Nearby
         </h2>
-        <div className={cn('grid grid-cols-2', SPACING.GAP_2)}>
+        <div className={cn('grid grid-cols-2', 'gap-2')}>
           {comparisons.map((comp) => (
             <Link
               key={comp.amount}
               href='/'
               className={cn(
                 'rounded-md px-3 py-2 text-center',
-                TYPOGRAPHY.TEXT_SM,
+                'text-sm',
                 'border border-border hover:border-primary',
                 'transition-colors hover:bg-primary/5',
               )}
             >
-              <span className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>{comp.label}</span>
+              <span className={cn('text-muted-foreground', 'text-xs')}>{comp.label}</span>
               <br />£{comp.amount.toLocaleString('en-GB')}
             </Link>
           ))}

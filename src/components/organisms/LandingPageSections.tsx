@@ -72,21 +72,31 @@ export function FAQSection() {
 
   return (
     // biome-ignore lint/correctness/useUniqueElementIds: Static ID required for anchor navigation
-    <section className='faq-section' id='faq'>
-      <div className='section-header'>
-        <div className='section-label'>FAQ</div>
-        <h2 className='section-title'>Common questions</h2>
+    <section
+      className='relative z-[1] border-border border-y bg-background px-4 py-16 md:py-24'
+      id='faq'
+    >
+      <div className='mx-auto mb-8 max-w-[960px] text-left'>
+        <div className='mb-3 font-semibold text-primary text-xs uppercase tracking-[0.18em]'>
+          FAQ
+        </div>
+        <h2 className='font-display font-semibold text-4xl text-foreground leading-[0.98] md:text-6xl'>
+          Common questions
+        </h2>
         <p className='mt-2 text-muted-foreground text-sm'>
           Using official HMRC rates for {CURRENT_TAX_YEAR_DISPLAY_SHORT} (verified{' '}
           {ratesVerifiedDisplay}).
         </p>
       </div>
 
-      <div className='faq-list'>
+      <div className='mx-auto grid max-w-[960px] border-border border-t md:grid-cols-2 md:gap-x-8'>
         {faqs.map((faq) => (
-          <div key={faq.question} className='faq-item'>
-            <h3 className='faq-question'>{faq.question}</h3>
-            <p className='faq-answer'>
+          <div
+            key={faq.question}
+            className='border-border border-b py-5 transition-colors hover:border-foreground'
+          >
+            <h3 className='mb-3 font-semibold text-base text-foreground'>{faq.question}</h3>
+            <p className='text-muted-foreground text-sm leading-relaxed'>
               {faq.answer}
               {faq.links?.map((link) => (
                 <span key={`${faq.question}-${link.href}`}>
@@ -114,7 +124,7 @@ export function ProofStrip() {
   const ratesVerifiedDisplay = formatIsoDateForDisplay(RATES_LAST_VERIFIED);
 
   return (
-    <section className='border-border border-y bg-surface-brand py-5'>
+    <section className='border-border border-y bg-background py-5'>
       <div className='container mx-auto max-w-6xl px-4'>
         <div className='grid gap-3 text-muted-foreground text-sm sm:grid-cols-2 lg:grid-cols-4'>
           <span className='flex items-center gap-2 border-border border-l pl-3'>

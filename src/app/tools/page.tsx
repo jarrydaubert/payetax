@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { PageHero } from '@/components/molecules/PageHero';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { Card } from '@/components/ui/card';
-import { LAYOUT, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { generateMetadata as generateBaseMetadata, SITE_URL } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
 
@@ -67,15 +66,15 @@ export default function ToolsPage() {
         }}
       />
 
-      <div className={LAYOUT.PAGE_WRAPPER}>
+      <div className={'min-h-screen'}>
         <PageHero
           badge={{ icon: Wrench, text: 'Free Tax Tools' }}
           title='Free UK Tax Tools'
           subtitle='Quick calculators and explainers built on current HMRC rates. No signup.'
         />
 
-        <section className={cn(LAYOUT.SECTION, 'pt-0 md:pt-0')}>
-          <div className={LAYOUT.CONTAINER_MD}>
+        <section className={cn('py-12 md:py-20', 'pt-0 md:pt-0')}>
+          <div className={'container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8'}>
             <div className='grid gap-4 md:grid-cols-2'>
               {tools.map((tool) => (
                 <Link
@@ -94,17 +93,12 @@ export default function ToolsPage() {
                       <h2
                         className={cn(
                           'font-display font-semibold text-foreground transition-colors group-hover:text-primary',
-                          TYPOGRAPHY.TEXT_XL,
+                          'text-xl',
                         )}
                       >
                         {tool.title}
                       </h2>
-                      <p
-                        className={cn(
-                          'mt-2 text-muted-foreground leading-relaxed',
-                          TYPOGRAPHY.TEXT_SM,
-                        )}
-                      >
+                      <p className={cn('mt-2 text-muted-foreground leading-relaxed', 'text-sm')}>
                         {tool.description}
                       </p>
                     </div>
@@ -112,8 +106,8 @@ export default function ToolsPage() {
                     <span
                       className={cn(
                         'mt-5 inline-flex items-center gap-1 whitespace-nowrap font-medium text-primary',
-                        TYPOGRAPHY.TEXT_SM,
-                        SPACING.GAP_1,
+                        'text-sm',
+                        'gap-1',
                       )}
                     >
                       Use Tool

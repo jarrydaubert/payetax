@@ -15,7 +15,6 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { ANIMATION_TRANSITIONS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { BREAKPOINTS, TIMERS } from '@/constants/ui';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { trackEvent } from '@/lib/analytics';
@@ -222,9 +221,9 @@ export function CalculatorContainer() {
     <div
       className={cn(
         'mx-auto flex w-full max-w-screen-2xl flex-col sm:px-4 md:py-8 lg:grid lg:grid-cols-[400px_minmax(0,1fr)] xl:grid-cols-[390px_minmax(0,1fr)] xl:px-8 2xl:grid-cols-[380px_minmax(0,1fr)]',
-        SPACING.GAP_3,
-        SPACING.PX_4,
-        SPACING.PY_4,
+        'gap-3',
+        'px-4',
+        'py-4',
         'md:gap-6 lg:gap-4 xl:gap-6',
       )}
       data-testid='calculator-section'
@@ -282,7 +281,7 @@ export function CalculatorContainer() {
       <Card
         className={cn(
           'order-2 mx-auto w-full max-w-xl lg:sticky lg:top-4 lg:order-3 lg:mx-0 lg:max-w-none lg:self-start',
-          SPACING.P_3,
+          'p-3',
           'sm:p-4 md:p-6',
         )}
       >
@@ -301,11 +300,7 @@ export function CalculatorContainer() {
             animate={shouldReduceMotion ? {} : 'animate'}
             exit={shouldReduceMotion ? {} : 'exit'}
             transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.default}
-            className={cn(
-              'order-6 flex flex-col',
-              SPACING.GAP_4,
-              'lg:order-3 lg:min-w-0 lg:self-start',
-            )}
+            className={cn('order-6 flex flex-col', 'gap-4', 'lg:order-3 lg:min-w-0 lg:self-start')}
             data-testid='tax-results'
           >
             <ResultsTable
@@ -354,13 +349,9 @@ export function CalculatorContainer() {
             )}
           >
             <div>
-              <Sparkles
-                className={cn('mx-auto text-muted-foreground', SPACING.MB_4, ICON_SIZES.SIZE_12)}
-              />
-              <h3 className={cn('font-semibold', SPACING.MB_2, TYPOGRAPHY.TEXT_LG)}>
-                Ready to Calculate
-              </h3>
-              <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+              <Sparkles className={cn('mx-auto text-muted-foreground', 'mb-4', 'size-12')} />
+              <h3 className={cn('font-semibold', 'mb-2', 'text-lg')}>Ready to Calculate</h3>
+              <p className={cn('text-muted-foreground', 'text-sm')}>
                 Enter your salary. See your take-home pay in seconds.
               </p>
             </div>

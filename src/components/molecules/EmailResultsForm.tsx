@@ -10,7 +10,6 @@ import { Mail, RotateCcw, Send } from 'lucide-react';
 import { type FormEvent, useEffect, useId, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { COLORS, ICON_SIZES } from '@/constants/designTokens';
 import { trackEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 import type { PayeEmailInput } from '@/lib/validation/emailValidation';
@@ -128,13 +127,13 @@ export function EmailResultsForm({ input, className }: EmailResultsFormProps) {
       <output
         className={cn(
           'flex items-center justify-between gap-2 rounded-lg border border-success/30 bg-success/10 px-4 py-3 text-sm',
-          COLORS.SUCCESS,
+          'text-success',
           className,
         )}
         aria-live='polite'
       >
         <div className='flex items-center gap-2'>
-          <Mail className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+          <Mail className={'size-4'} aria-hidden='true' />
           <span>Results sent to {maskEmail(sentEmail)}</span>
         </div>
         <Button
@@ -142,10 +141,10 @@ export function EmailResultsForm({ input, className }: EmailResultsFormProps) {
           variant='ghost'
           size='sm'
           onClick={handleReset}
-          className={cn('h-auto p-1 hover:bg-success/20', COLORS.SUCCESS)}
+          className={cn('h-auto p-1 hover:bg-success/20', 'text-success')}
           aria-label='Send to different email'
         >
-          <RotateCcw className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+          <RotateCcw className={'size-4'} aria-hidden='true' />
         </Button>
       </output>
     );
@@ -158,7 +157,7 @@ export function EmailResultsForm({ input, className }: EmailResultsFormProps) {
           <Mail
             className={cn(
               'absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground',
-              ICON_SIZES.SIZE_4,
+              'size-4',
             )}
             aria-hidden='true'
           />
@@ -192,7 +191,7 @@ export function EmailResultsForm({ input, className }: EmailResultsFormProps) {
             <span className='animate-pulse'>Sending...</span>
           ) : (
             <>
-              <Send className={cn('mr-2', ICON_SIZES.SIZE_4)} aria-hidden='true' />
+              <Send className={cn('mr-2', 'size-4')} aria-hidden='true' />
               Email Results
             </>
           )}

@@ -3,7 +3,6 @@
 
 import { useId } from 'react';
 import { Button } from '@/components/ui/button';
-import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 import type { BlogCategory } from '@/types/blog';
 
@@ -31,24 +30,24 @@ export function CategoryFilter({
     <nav className='mb-12' aria-labelledby={headingId}>
       <h2
         id={headingId}
-        className={cn('mb-6 text-center font-semibold text-foreground', TYPOGRAPHY.TEXT_XL)}
+        className={cn('mb-6 text-center font-semibold text-foreground', 'text-xl')}
       >
         Browse Topics
       </h2>
       <div className='mx-auto max-w-5xl'>
-        <div className={cn('flex flex-wrap items-center justify-center', SPACING.GAP_2)}>
+        <div className={cn('flex flex-wrap items-center justify-center', 'gap-2')}>
           {/* All Posts Button */}
           <Button
             variant={isActive() ? 'default' : 'outline'}
             size='sm'
             onClick={() => onCategoryClick()}
-            className={SPACING.GAP_2}
+            className={'gap-2'}
           >
             All Posts
             <span
               className={cn(
                 'rounded px-1.5 py-0.5 font-mono',
-                TYPOGRAPHY.TEXT_XS,
+                'text-xs',
                 isActive() ? 'bg-primary-foreground/20' : 'text-muted-foreground',
               )}
             >
@@ -65,13 +64,13 @@ export function CategoryFilter({
                 variant={isActive(category.slug) ? 'default' : 'outline'}
                 size='sm'
                 onClick={() => onCategoryClick(category.slug)}
-                className={SPACING.GAP_2}
+                className={'gap-2'}
               >
                 {category.name}
                 <span
                   className={cn(
                     'rounded px-1.5 py-0.5 font-mono',
-                    TYPOGRAPHY.TEXT_XS,
+                    'text-xs',
                     isActive(category.slug) ? 'bg-primary-foreground/20' : 'text-muted-foreground',
                   )}
                 >

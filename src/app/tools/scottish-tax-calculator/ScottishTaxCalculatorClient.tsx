@@ -7,7 +7,6 @@ import { useId, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
 import { CURRENT_TAX_YEAR, SCOTTISH_TAX_RATES, TAX_RATES } from '@/constants/taxRates';
 import { cn, formatCurrency } from '@/lib/utils';
@@ -96,11 +95,11 @@ export function ScottishTaxCalculatorClient() {
   };
 
   return (
-    <div className={cn('mx-auto max-w-4xl', SPACING.PX_4, SPACING.PY_12)}>
+    <div className={cn('mx-auto max-w-4xl', 'px-4', 'py-12')}>
       {/* Header */}
       <div className='mb-12 text-center'>
         <div className='mb-4 inline-flex items-center gap-2 rounded-sm border border-primary/35 bg-background px-4 py-2 text-primary'>
-          <MapPin className={ICON_SIZES.SIZE_4} />
+          <MapPin className={'size-4'} />
           <span className='font-medium text-sm uppercase tracking-[0.2em]'>
             Scottish Income Tax
           </span>
@@ -108,12 +107,12 @@ export function ScottishTaxCalculatorClient() {
         <h1
           className={cn(
             'mb-4 font-display font-semibold text-foreground leading-tight',
-            TYPOGRAPHY.TEXT_4XL,
+            'text-4xl',
           )}
         >
           Scottish Tax Calculator {CURRENT_TAX_YEAR_DISPLAY_SHORT}
         </h1>
-        <p className={cn('mx-auto max-w-2xl text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
+        <p className={cn('mx-auto max-w-2xl text-muted-foreground', 'text-lg')}>
           Scotland has 6 income tax bands with different rates to the rest of the UK. See how much
           how much tax you&apos;ll pay and compare with English rates.
         </p>
@@ -123,7 +122,7 @@ export function ScottishTaxCalculatorClient() {
       <Card className='mb-8'>
         <CardHeader>
           <CardTitle className='flex items-center gap-2'>
-            <Calculator className={ICON_SIZES.SIZE_5} />
+            <Calculator className={'size-5'} />
             Quick Comparison
           </CardTitle>
           <CardDescription>
@@ -157,7 +156,7 @@ export function ScottishTaxCalculatorClient() {
 
           {/* Quick Examples */}
           <div className='mt-4'>
-            <p className={cn('mb-2 text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>Quick examples:</p>
+            <p className={cn('mb-2 text-muted-foreground', 'text-sm')}>Quick examples:</p>
             <div className='flex flex-wrap gap-2'>
               {EXAMPLE_SALARIES.map((exampleSalary) => (
                 <button
@@ -228,7 +227,7 @@ export function ScottishTaxCalculatorClient() {
 
             <div className='mt-6 rounded-lg border border-primary/30 bg-primary/10 p-4'>
               <div className='flex items-start gap-2'>
-                <Info className={cn(ICON_SIZES.SIZE_4, 'mt-0.5 flex-shrink-0 text-primary')} />
+                <Info className={cn('size-4', 'mt-0.5 flex-shrink-0 text-primary')} />
                 <p className='text-primary text-sm'>
                   This comparison shows income tax only. National Insurance is the same across the
                   UK. Scottish taxpayers have an &quot;S&quot; prefix in their tax code (e.g.,
@@ -244,7 +243,7 @@ export function ScottishTaxCalculatorClient() {
       <Card className='mb-8'>
         <CardHeader>
           <CardTitle className='flex items-center gap-2'>
-            <TrendingUp className={ICON_SIZES.SIZE_5} />
+            <TrendingUp className={'size-5'} />
             Scottish Tax Bands {CURRENT_TAX_YEAR_DISPLAY_SHORT}
           </CardTitle>
           <CardDescription>
@@ -360,13 +359,13 @@ export function ScottishTaxCalculatorClient() {
       </Card>
       {/* CTA */}
       <div className='mt-12 text-center'>
-        <p className={cn('mb-4 text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
+        <p className={cn('mb-4 text-muted-foreground', 'text-lg')}>
           Get a full breakdown with NI, pension, and student loan calculations.
         </p>
         <Link href='/?scottish=true'>
           <Button size='lg' variant='outline'>
             Open Full Scottish Calculator
-            <ArrowRight className={cn('ml-2', ICON_SIZES.SIZE_4)} />
+            <ArrowRight className={cn('ml-2', 'size-4')} />
           </Button>
         </Link>
       </div>

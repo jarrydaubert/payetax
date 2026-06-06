@@ -23,7 +23,7 @@ export default function ServerHero({ className }: ServerHeroProps) {
     <section
       data-testid='homepage-hero'
       className={cn(
-        'relative z-[1] flex min-h-[calc(78svh-4rem-var(--pwa-safe-area-top,0px))] flex-col items-center justify-center bg-surface-brand px-4 py-14 text-center sm:min-h-[680px] sm:px-8 sm:py-20 lg:min-h-[720px]',
+        'relative z-[1] flex min-h-[calc(78svh-4rem-var(--pwa-safe-area-top,0px))] flex-col items-center justify-center bg-background px-4 py-14 text-center sm:min-h-[680px] sm:px-8 sm:py-20 lg:min-h-[720px]',
         className,
       )}
     >
@@ -32,14 +32,14 @@ export default function ServerHero({ className }: ServerHeroProps) {
       </p>
 
       {/* Heading */}
-      <h1 className='mx-auto mb-5 max-w-4xl font-display font-semibold text-5xl text-on-brand leading-[0.98] tracking-tight sm:text-6xl lg:text-[4.75rem]'>
+      <h1 className='mx-auto mb-5 max-w-4xl font-display font-semibold text-5xl text-foreground leading-[0.98] tracking-tight sm:text-6xl lg:text-[4.75rem]'>
         UK PAYE tax calculator
         <br />
         <span className='text-primary'>See your take-home pay</span>
       </h1>
 
       {/* Tagline */}
-      <p className='mx-auto mb-8 max-w-2xl text-lg text-on-brand-muted leading-relaxed'>
+      <p className='mx-auto mb-8 max-w-2xl text-lg text-muted-foreground leading-relaxed'>
         Estimate your take-home pay with official HMRC rates for income tax, National Insurance,
         student loans, and pensions.
       </p>
@@ -74,8 +74,8 @@ export default function ServerHero({ className }: ServerHeroProps) {
           { icon: Shield, text: 'Your data stays private' },
           { icon: Shield, text: 'No signup needed' },
         ].map(({ icon: Icon, text }) => (
-          <div key={text} className='flex items-center gap-2 text-on-brand-dim text-sm'>
-            <Icon aria-hidden='true' className='size-4 flex-shrink-0 text-brand-accent' />
+          <div key={text} className='flex items-center gap-2 text-muted-foreground text-sm'>
+            <Icon aria-hidden='true' className='size-4 flex-shrink-0 text-primary' />
             <span>{text}</span>
           </div>
         ))}

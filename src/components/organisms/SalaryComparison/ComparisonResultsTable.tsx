@@ -12,7 +12,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { SPACING } from '@/constants/designTokens';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
 import { useMouseDragScroll } from '@/hooks/useMouseDragScroll';
 import type { ComparisonResults } from '@/lib/salaryComparison';
@@ -61,7 +60,7 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
         <div
           className={cn(
             'flex items-center justify-end',
-            SPACING.GAP_1,
+            'gap-1',
             isGain ? 'text-success' : 'text-warning',
           )}
         >

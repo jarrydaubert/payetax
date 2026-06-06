@@ -12,7 +12,6 @@ import { StructuredData } from '@/components/organisms/StructuredData';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { LAYOUT, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import {
   ABOUT_BUILD_PROMISES,
   ABOUT_COMPARISON_ROWS,
@@ -45,7 +44,7 @@ export default function AboutPage() {
       />
 
       <section className='border-border/70 border-b bg-ledger-grid py-24 md:py-28'>
-        <div className={LAYOUT.CONTAINER_MD}>
+        <div className={'container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8'}>
           <div className='mx-auto max-w-4xl text-center'>
             <Badge
               variant='outline'
@@ -129,8 +128,8 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className={cn(LAYOUT.SECTION, 'border-border/40 border-b')}>
-        <div className={LAYOUT.CONTAINER_MD}>
+      <section className={cn('py-12 md:py-20', 'border-border/40 border-b')}>
+        <div className={'container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8'}>
           <div className='grid gap-8 lg:grid-cols-[1.2fr_1fr]'>
             <div>
               <Badge variant='outline' className='mb-4 border-success/40 text-success'>
@@ -184,8 +183,8 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className={LAYOUT.SECTION}>
-        <div className={LAYOUT.CONTAINER_MD}>
+      <section className={'py-12 md:py-20'}>
+        <div className={'container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8'}>
           <div className='text-center'>
             <Badge variant='outline' className='mb-4 border-primary/35 text-primary'>
               Trust, Explained
@@ -227,7 +226,7 @@ export default function AboutPage() {
       </section>
 
       <section className='border-border/70 border-y bg-ledger-grid py-14 md:py-20'>
-        <div className={LAYOUT.CONTAINER_MD}>
+        <div className={'container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8'}>
           <div className='mb-6 flex flex-wrap items-center justify-between gap-3'>
             <div>
               <Badge variant='outline' className='border-primary/35 text-primary'>
@@ -281,8 +280,8 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className={LAYOUT.SECTION}>
-        <div className={LAYOUT.CONTAINER_MD}>
+      <section className={'py-12 md:py-20'}>
+        <div className={'container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8'}>
           <div className='grid gap-8 lg:grid-cols-[1fr_1.1fr]'>
             <Card className='rounded-sm border-border bg-card p-6'>
               <Badge variant='outline' className='mb-4 border-success/35 text-success'>
@@ -338,16 +337,13 @@ export default function AboutPage() {
       </section>
 
       <section className='pb-24'>
-        <div className={cn(LAYOUT.CONTAINER_XS, LAYOUT.TEXT_CENTER)}>
+        <div className={cn('container mx-auto max-w-2xl px-4 sm:px-6 lg:px-8', 'text-center')}>
           <h2
-            className={cn(
-              'font-display font-semibold text-foreground tracking-tight',
-              TYPOGRAPHY.TEXT_3XL,
-            )}
+            className={cn('font-display font-semibold text-foreground tracking-tight', 'text-3xl')}
           >
             Ready to pressure-test your next pay decision?
           </h2>
-          <p className={cn(SPACING.MT_3, 'text-muted-foreground')}>
+          <p className={cn('mt-3', 'text-muted-foreground')}>
             Use the calculator, compare outcomes, and keep control of your data.
           </p>
           <div className='mt-6 flex flex-col justify-center gap-3 sm:flex-row'>
