@@ -18,7 +18,7 @@ import { z } from 'zod';
  * @example
  * ```typescript
  * const stats = [
- *   { icon: Calculator, value: '100%', label: 'Free Forever', color: 'from-primary to-accent' },
+ *   { icon: Calculator, value: '100%', label: 'Free Forever' },
  *   { icon: Lock, value: '0', label: 'Data Stored' },
  * ] satisfies z.infer<typeof StatSchema>[];
  * ```
@@ -37,8 +37,6 @@ export const StatSchema = z.object({
   label: z.string().min(1, 'Label is required').max(100, 'Label too long'),
   /** Optional longer description */
   description: z.string().max(500).optional(),
-  /** Optional gradient color classes (e.g., "from-primary to-accent") */
-  color: z.string().max(100).optional(),
 });
 
 /**
@@ -103,12 +101,10 @@ export const FeatureSchema = z.object({
       href: z.string().url('Invalid URL').or(z.string().startsWith('/', 'Must be URL or path')),
     })
     .optional(),
-  /** Optional gradient colors */
+  /** Optional icon color class (e.g., "text-primary") */
   gradient: z
     .object({
-      bg: z.string().max(100),
       icon: z.string().max(100),
-      border: z.string().max(100),
     })
     .optional(),
 });

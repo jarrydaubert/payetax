@@ -35,7 +35,6 @@ interface ComplianceFeature {
   icon: LucideIcon;
   lastUpdated: string;
   source: string;
-  color: string;
 }
 
 /**
@@ -79,7 +78,6 @@ const COMPLIANCE_FEATURES: ComplianceFeature[] = [
     icon: FileText,
     lastUpdated: COMPLIANCE_LAST_REVIEWED,
     source: 'HMRC Gov.UK Publications',
-    color: 'from-primary to-accent',
   },
   {
     title: 'Formula Verification',
@@ -93,7 +91,6 @@ const COMPLIANCE_FEATURES: ComplianceFeature[] = [
     icon: Shield,
     lastUpdated: COMPLIANCE_LAST_REVIEWED,
     source: 'HMRC Example Calculations',
-    color: 'from-accent to-primary',
   },
   {
     title: 'Regular Updates',
@@ -107,7 +104,6 @@ const COMPLIANCE_FEATURES: ComplianceFeature[] = [
     icon: Calendar,
     lastUpdated: COMPLIANCE_LAST_REVIEWED,
     source: 'HMRC Announcements',
-    color: 'from-primary/80 to-accent/80',
   },
   {
     title: 'Quality Assurance',
@@ -122,7 +118,6 @@ const COMPLIANCE_FEATURES: ComplianceFeature[] = [
     icon: Shield,
     lastUpdated: COMPLIANCE_LAST_REVIEWED,
     source: 'Internal QA Process',
-    color: 'from-accent/80 to-primary/80',
   },
 ];
 
@@ -206,21 +201,18 @@ const complianceStats = [
     value: '100%',
     label: 'HMRC Rates',
     description: 'All rates sourced from official publications',
-    color: 'from-primary to-accent',
   },
   {
     icon: Shield,
     value: '24hrs',
     label: 'Update Time',
     description: 'New rates applied within 24 hours of announcement',
-    color: 'from-accent to-primary',
   },
   {
     icon: Award,
     value: '4+',
     label: 'Years Data',
     description: 'Historical rates back to 2020/21 tax year',
-    color: 'from-primary to-accent',
   },
 ];
 
