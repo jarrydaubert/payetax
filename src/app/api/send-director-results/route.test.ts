@@ -91,16 +91,19 @@ async function loadRoute(
 
 describe('/api/send-director-results POST', () => {
   let consoleErrorSpy: jest.SpyInstance;
+  let consoleWarnSpy: jest.SpyInstance;
 
   beforeEach(() => {
     sendResultsEmailMock.mockReset();
     sendResultsEmailMock.mockResolvedValue({ ok: true });
     mockCaptureOperationalFailure.mockReset();
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   afterEach(() => {
     consoleErrorSpy?.mockRestore();
+    consoleWarnSpy?.mockRestore();
     process.env = ORIGINAL_ENV;
   });
 
@@ -198,6 +201,21 @@ describe('/api/send-director-results POST', () => {
     expect(response.status).toBe(400);
     expect(json.error).toBe('Invalid request data');
     expect(json.details).toBeDefined();
+    expect(mockCaptureOperationalFailure).not.toHaveBeenCalled();
+  });
+
+  it('rejects likely bot requests using honeypot fields', async () => {
+    const POST = await loadRoute({ BREVO_API_KEY: 'test' });
+    const request = buildRequest(
+      { ...validPayload, website: 'https://spam.example' },
+      { origin: 'https://payetax.co.uk' },
+    );
+    const response = await POST(request);
+    const json = await response.json();
+
+    expect(response.status).toBe(400);
+    expect(json).toEqual({ error: 'Invalid request' });
+    expect(sendResultsEmailMock).not.toHaveBeenCalled();
     expect(mockCaptureOperationalFailure).not.toHaveBeenCalled();
   });
 

@@ -51,21 +51,6 @@ interface InputsPanelProps {
   className?: string;
 }
 
-// Map country selection to region code
-type Country = 'england' | 'wales' | 'ni' | 'scotland';
-const countryToRegion: Record<Country, Region> = {
-  england: 'rUK',
-  wales: 'rUK',
-  ni: 'rUK',
-  scotland: 'scotland',
-};
-
-// Reverse mapping for initializing select from store
-const regionToCountry: Record<Region, Country> = {
-  rUK: 'england', // Default to England for rUK
-  scotland: 'scotland',
-};
-
 const STUDENT_LOAN_PLAN_SHORT_LABELS: Record<StudentLoanPlan, string> = {
   plan1: 'Plan 1',
   plan2: 'Plan 2',
@@ -93,6 +78,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
     otherIncome: formData.otherIncome,
     hasOtherPAYEEmployment: formData.hasOtherPAYEEmployment,
     yearEndMonth: formData.yearEndMonth,
+    yearEndCustom: formData.yearEndCustom,
     studentLoanPlans: formData.studentLoanPlans,
     pensionContribution: formData.pensionContribution,
     isPensionAlreadyDeducted: formData.isPensionAlreadyDeducted,
@@ -112,9 +98,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
   }));
   const actions = useDirectorGuideActions();
   const isMonthlyMode = formData.mode === 'monthly';
-
-  // Derive country selection from store region (single source of truth)
-  const selectedCountry = formData.region ? regionToCountry[formData.region] : '';
+  const selectedRegion = formData.region ?? '';
 
   const parseCurrency = (value: string): number => {
     const num = value.replace(/[^0-9]/g, '');
@@ -159,6 +143,48 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
     actions.setYourSetupDividends(undefined);
   };
 
+  const hiddenDetailLabels = [
+    formData.ytdSalary > 0 ? 'YTD salary' : null,
+    formData.ytdDividends > 0 ? 'YTD dividends' : null,
+    formData.ytdDrawings > 0 ? 'other drawings' : null,
+    formData.otherIncome > 0 ? 'other income' : null,
+    formData.hasOtherPAYEEmployment ? 'other PAYE employment' : null,
+    formData.studentLoanPlans.length > 0 ? 'student loans' : null,
+    formData.pensionContribution > 0 ? 'pension' : null,
+    formData.companyCarBIK > 0 ? 'company car BIK' : null,
+    formData.associatedCompaniesCount !== 1 ? 'associated companies' : null,
+    formData.hasEmploymentAllowance ? 'Employment Allowance' : null,
+    formData.lossesBroughtForward > 0 ? 'losses brought forward' : null,
+    formData.minimumSalaryRequirement !== undefined ? 'minimum salary' : null,
+    formData.yourSetupSalary !== undefined || formData.yourSetupDividends !== undefined
+      ? 'your setup comparison'
+      : null,
+  ].filter((label): label is string => Boolean(label));
+  const hasHiddenDetails = quickStartMode && hiddenDetailLabels.length > 0;
+  const hiddenDetailSummary = hiddenDetailLabels.slice(0, 3).join(', ');
+
+  const handleReviewHiddenDetails = () => {
+    setQuickStartMode(false);
+    setAdvancedOpen(true);
+  };
+
+  const handleClearHiddenDetails = () => {
+    actions.setYtdSalary(0);
+    actions.setYtdDividends(0);
+    actions.setYtdDrawings(0);
+    actions.setOtherIncome(0);
+    actions.setHasOtherPAYEEmployment(false);
+    actions.setStudentLoanPlans([]);
+    actions.setPensionContribution(0);
+    actions.setIsPensionAlreadyDeducted(false);
+    actions.setCompanyCarBIK(0);
+    actions.setAssociatedCompaniesCount(1);
+    actions.setHasEmploymentAllowance(false);
+    actions.setLossesBroughtForward(0);
+    actions.setMinimumSalaryRequirement(undefined);
+    handleClearYourSetup();
+  };
+
   const handleReset = () => {
     if (onReset) {
       onReset();
@@ -181,6 +207,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
     expenses: `${baseId}-expenses`,
     region: `${baseId}-region`,
     yearEnd: `${baseId}-year-end`,
+    yearEndCustom: `${baseId}-year-end-custom`,
     ytdSalary: `${baseId}-ytd-salary`,
     ytdDividends: `${baseId}-ytd-dividends`,
     ytdDrawings: `${baseId}-ytd-drawings`,
@@ -459,13 +486,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           id={ids.region}
           tooltipFieldName='region'
         >
-          <Select
-            value={selectedCountry}
-            onValueChange={(v) => {
-              const country = v as Country;
-              actions.setRegion(countryToRegion[country]);
-            }}
-          >
+          <Select value={selectedRegion} onValueChange={(v) => actions.setRegion(v as Region)}>
             <SelectTrigger
               id={ids.region}
               data-testid='director-region-select'
@@ -475,9 +496,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               <SelectValue placeholder='Select region' />
             </SelectTrigger>
             <SelectContent className='border-border bg-card'>
-              <SelectItem value='england'>England</SelectItem>
-              <SelectItem value='wales'>Wales</SelectItem>
-              <SelectItem value='ni'>Northern Ireland</SelectItem>
+              <SelectItem value='rUK'>England, Wales, or Northern Ireland</SelectItem>
               <SelectItem value='scotland'>Scotland</SelectItem>
             </SelectContent>
           </Select>
@@ -491,7 +510,13 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
         >
           <Select
             value={formData.yearEndMonth}
-            onValueChange={(v) => actions.setYearEndMonth(v as YearEndMonth)}
+            onValueChange={(v) => {
+              const yearEndMonth = v as YearEndMonth;
+              actions.setYearEndMonth(yearEndMonth);
+              if (yearEndMonth !== 'other') {
+                actions.setYearEndCustom('');
+              }
+            }}
           >
             <SelectTrigger
               id={ids.yearEnd}
@@ -508,6 +533,26 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             </SelectContent>
           </Select>
         </Field>
+
+        {formData.yearEndMonth === 'other' ? (
+          <Field
+            label='Custom Year-End Date'
+            hint='Use MM-DD, for example 06-30'
+            id={ids.yearEndCustom}
+            tooltipFieldName='directorYearEnd'
+          >
+            <Input
+              id={ids.yearEndCustom}
+              type='text'
+              inputMode='numeric'
+              value={formData.yearEndCustom}
+              onChange={(e) => actions.setYearEndCustom(e.target.value)}
+              placeholder='06-30'
+              className={INPUT_CLASS}
+              aria-describedby={getHintId(ids.yearEndCustom)}
+            />
+          </Field>
+        ) : null}
       </Section>
 
       {quickStartMode ? (
@@ -523,6 +568,34 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           >
             Add More Detail
           </button>
+          {hasHiddenDetails ? (
+            <div className='mt-4 border-primary/20 border-t pt-4'>
+              <p className='text-primary text-xs'>
+                Saved detailed inputs are still active while hidden:{' '}
+                <span className='font-medium'>
+                  {hiddenDetailSummary}
+                  {hiddenDetailLabels.length > 3 ? ` +${hiddenDetailLabels.length - 3} more` : ''}
+                </span>
+                .
+              </p>
+              <div className='mt-3 grid grid-cols-2 gap-2'>
+                <button
+                  type='button'
+                  onClick={handleReviewHiddenDetails}
+                  className='rounded-md border border-primary/40 bg-primary/10 px-3 py-2 text-primary text-xs transition-colors hover:bg-primary/20'
+                >
+                  Review Details
+                </button>
+                <button
+                  type='button'
+                  onClick={handleClearHiddenDetails}
+                  className='rounded-md border border-border/60 bg-background px-3 py-2 text-muted-foreground text-xs transition-colors hover:border-primary/40 hover:text-primary'
+                >
+                  Clear Details
+                </button>
+              </div>
+            </div>
+          ) : null}
         </div>
       ) : null}
 

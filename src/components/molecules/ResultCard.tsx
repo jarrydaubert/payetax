@@ -88,7 +88,7 @@ export const ResultCard = memo(function ResultCard({
   // Card visual content
   const cardVisual = (
     <Card className={cn('p-4', 'rounded-sm border-border bg-card shadow-none', styles.card)}>
-      <div className={cn('space-y-2', 'border-foreground/15 border-t pt-3')}>
+      <div className={cn('space-y-2')}>
         <div className='flex items-center justify-between'>
           <p
             className={cn('font-medium text-foreground/80 uppercase tracking-[0.12em]', 'text-sm')}

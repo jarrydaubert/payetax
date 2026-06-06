@@ -83,7 +83,7 @@ export function TableOfContents({ content, className }: TableOfContentsProps) {
   if (headings.length < 2) return null;
 
   return (
-    <nav className={cn('hidden xl:block', className)} aria-label='Table of contents'>
+    <nav className={cn('hidden lg:block', className)} aria-label='Table of contents'>
       <div className='sticky top-24'>
         <div className='mb-3 flex items-center gap-2 font-semibold text-primary text-xs uppercase tracking-[0.24em]'>
           <List className={'size-4'} aria-hidden='true' />

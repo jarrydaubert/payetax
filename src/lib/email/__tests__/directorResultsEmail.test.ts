@@ -1,4 +1,4 @@
-import { TAX_RATES } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
 import {
   escapeHtml,
   generateDirectorEmailHtml,
@@ -22,6 +22,14 @@ describe('directorResultsEmail', () => {
     expect(t.niPrimaryThreshold).toBe(rates.nationalInsurance.employee.A.primary.threshold);
     expect(t.employerNiThreshold).toBe(rates.nationalInsurance.employer.A.secondary.threshold);
     expect(t.dividendAllowance).toBe(rates.dividendAllowance);
+  });
+
+  test('thresholds default to the current tax year', () => {
+    const thresholds = getDirectorEmailThresholds();
+    const rates = TAX_RATES[CURRENT_TAX_YEAR];
+
+    expect(thresholds.taxYear).toBe(CURRENT_TAX_YEAR);
+    expect(thresholds.personalAllowance).toBe(rates.personalAllowance);
   });
 
   test('HTML template escapes strategy.name (prevents injection)', () => {
@@ -54,6 +62,9 @@ describe('directorResultsEmail', () => {
 
     expect(html).toContain('&lt;img src=x onerror=alert(1)&gt;');
     expect(html).not.toContain('<img src=x onerror=alert(1)>');
+    expect(html).not.toContain('linear-gradient');
+    expect(html).not.toContain('#06b6d4');
+    expect(html).not.toContain('#10b981');
 
     // Deadline should be derived from tax year (2025-26 => 31 Jan 2027).
     expect(html).toContain('31 January 2027');

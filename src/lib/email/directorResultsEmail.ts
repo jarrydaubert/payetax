@@ -8,7 +8,7 @@
  */
 
 import type { TaxYear } from '@/constants/taxRates';
-import { CT_RATES, TAX_RATES } from '@/constants/taxRates';
+import { CT_RATES, CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
 import { formatCurrency } from '@/lib/utils';
 import type { DirectorStrategy } from '@/lib/validation/emailValidation';
 
@@ -24,9 +24,9 @@ export function escapeHtml(str: string): string {
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://payetax.co.uk';
 
 function normalizeTaxYear(taxYear?: string): TaxYear {
-  if (!taxYear) return '2025-2026';
+  if (!taxYear) return CURRENT_TAX_YEAR;
 
-  // Accept "2025-26" and "2025-2026".
+  // Accept "2026-27" and "2026-2027".
   const short = /^(\d{4})-(\d{2})$/;
   const long = /^(\d{4})-(\d{4})$/;
 
@@ -37,22 +37,21 @@ function normalizeTaxYear(taxYear?: string): TaxYear {
     const century = Math.floor(start / 100) * 100;
     const end = century + end2;
     const normalized = `${start}-${end}` as TaxYear;
-    return TAX_RATES[normalized] ? normalized : '2025-2026';
+    return TAX_RATES[normalized] ? normalized : CURRENT_TAX_YEAR;
   }
 
   const mLong = taxYear.match(long);
   if (mLong) {
     const normalized = `${mLong[1]}-${mLong[2]}` as TaxYear;
-    return TAX_RATES[normalized] ? normalized : '2025-2026';
+    return TAX_RATES[normalized] ? normalized : CURRENT_TAX_YEAR;
   }
 
-  return '2025-2026';
+  return CURRENT_TAX_YEAR;
 }
 
 function getSelfAssessmentDeadlineLabel(taxYear?: string): string {
   const normalized = normalizeTaxYear(taxYear);
   const startYear = Number.parseInt(normalized.slice(0, 4), 10);
-  // For tax year 2025-26 (ending Apr 2026), the online filing/payment deadline is 31 Jan 2027.
   return `31 January ${startYear + 2}`;
 }
 
@@ -183,7 +182,7 @@ export function generateDirectorEmailHtml(args: {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Director Strategy Report - PayeTax</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8f5ec;">
   <div style="display: none; max-height: 0; overflow: hidden; opacity: 0; color: transparent; font-size: 1px; line-height: 1px;">
     Director strategy summary: ${safeStrategyName} with estimated take-home ${formatCurrency(strategy.takeHome)} per year.
     ${'&nbsp;'.repeat(40)}
@@ -193,31 +192,31 @@ export function generateDirectorEmailHtml(args: {
     <!-- Header -->
     <div style="text-align: center; margin-bottom: 32px;">
       <h1 style="margin: 0; font-size: 24px;">
-        <span style="color: #020617;">paye</span><span style="color: #0d9488;">tax</span>
+        <span style="color: #10151f;">paye</span><span style="color: #123a66;">tax</span>
       </h1>
-      <p style="margin: 8px 0 0; color: #64748b; font-size: 14px;">Director Strategy Report${safeTaxYear ? ` - ${safeTaxYear}` : ''}</p>
-      <p style="margin: 4px 0 0; color: #94a3b8; font-size: 12px;">Generated: ${escapeHtml(safeGeneratedDate)}</p>
+      <p style="margin: 8px 0 0; color: #536174; font-size: 14px;">Director Strategy Report${safeTaxYear ? ` - ${safeTaxYear}` : ''}</p>
+      <p style="margin: 4px 0 0; color: #7d8795; font-size: 12px;">Generated: ${escapeHtml(safeGeneratedDate)}</p>
     </div>
 
     <!-- Executive Summary -->
-    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; margin-bottom: 24px;">
-      <h2 style="margin: 0 0 8px; font-size: 20px; color: #020617;">Scenario Summary</h2>
-      <p style="margin: 0 0 24px; font-size: 28px; font-weight: 700; color: #10b981;">${safeStrategyName}</p>
+    <div style="background: #fffdf7; border: 1px solid #cec6b7; border-radius: 4px; padding: 32px; margin-bottom: 24px;">
+      <h2 style="margin: 0 0 8px; font-size: 20px; color: #10151f;">Scenario Summary</h2>
+      <p style="margin: 0 0 24px; font-size: 28px; font-weight: 700; color: #123a66;">${safeStrategyName}</p>
 
       <table role="presentation" style="width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed;">
         <tr>
           <td style="width: 50%; vertical-align: top; padding-right: 8px;">
-            <div style="height: 120px; box-sizing: border-box; padding: 16px; background: #f0fdf4; border-radius: 12px; border: 1px solid #bbf7d0;">
-              <p style="margin: 0 0 6px; color: #166534; font-size: 12px; text-transform: uppercase; font-weight: 600;">Monthly Take-Home</p>
-              <p style="margin: 0; font-size: 24px; font-weight: 700; color: #10b981; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(strategy.takeHome / 12)}<span style="font-size: 14px; font-weight: 400;">/mo</span></p>
-              <p style="margin: 10px 0 0; color: #166534; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Annual: ${formatCurrency(strategy.takeHome)}</p>
+            <div style="height: 120px; box-sizing: border-box; padding: 16px; background: #eef4ed; border-radius: 4px; border: 1px solid #bdd2c0;">
+              <p style="margin: 0 0 6px; color: #2f6f4e; font-size: 12px; text-transform: uppercase; font-weight: 600;">Monthly Take-Home</p>
+              <p style="margin: 0; font-size: 24px; font-weight: 700; color: #2f6f4e; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(strategy.takeHome / 12)}<span style="font-size: 14px; font-weight: 400;">/mo</span></p>
+              <p style="margin: 10px 0 0; color: #2f6f4e; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Annual: ${formatCurrency(strategy.takeHome)}</p>
             </div>
           </td>
           <td style="width: 50%; vertical-align: top; padding-left: 8px;">
-            <div style="height: 120px; box-sizing: border-box; padding: 16px; background: #fef3c7; border-radius: 12px; border: 1px solid #fde68a;">
-              <p style="margin: 0 0 6px; color: #92400e; font-size: 12px; text-transform: uppercase; font-weight: 600;">Savings vs All Salary</p>
-              <p style="margin: 0; font-size: 24px; font-weight: 700; color: #f59e0b; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(savingsVsAllSalary)}<span style="font-size: 14px; font-weight: 400;">/year</span></p>
-              <p style="margin: 10px 0 0; color: #92400e; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Tax saved annually</p>
+            <div style="height: 120px; box-sizing: border-box; padding: 16px; background: #f7efd9; border-radius: 4px; border: 1px solid #dac48f;">
+              <p style="margin: 0 0 6px; color: #8a641f; font-size: 12px; text-transform: uppercase; font-weight: 600;">Savings vs All Salary</p>
+              <p style="margin: 0; font-size: 24px; font-weight: 700; color: #8a641f; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(savingsVsAllSalary)}<span style="font-size: 14px; font-weight: 400;">/year</span></p>
+              <p style="margin: 10px 0 0; color: #8a641f; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Tax saved annually</p>
             </div>
           </td>
         </tr>
@@ -225,14 +224,14 @@ export function generateDirectorEmailHtml(args: {
     </div>
 
     <!-- Company Overview Card -->
-    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; margin-bottom: 24px;">
-      <h2 style="margin: 0 0 16px; font-size: 18px; color: #020617;">Company Overview</h2>
-      <p style="margin: 0; color: #64748b; font-size: 14px;">Gross profit available for extraction: <strong style="color: #020617;">${formatCurrency(grossProfit)}</strong></p>
+    <div style="background: #fffdf7; border: 1px solid #cec6b7; border-radius: 4px; padding: 32px; margin-bottom: 24px;">
+      <h2 style="margin: 0 0 16px; font-size: 18px; color: #10151f;">Company Overview</h2>
+      <p style="margin: 0; color: #536174; font-size: 14px;">Gross profit available for extraction: <strong style="color: #10151f;">${formatCurrency(grossProfit)}</strong></p>
     </div>
 
     <!-- Detailed Breakdown Card -->
-    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; margin-bottom: 24px;">
-      <h2 style="margin: 0 0 16px; font-size: 18px; color: #020617;">Detailed Breakdown - ${safeStrategyName}</h2>
+    <div style="background: #fffdf7; border: 1px solid #cec6b7; border-radius: 4px; padding: 32px; margin-bottom: 24px;">
+      <h2 style="margin: 0 0 16px; font-size: 18px; color: #10151f;">Detailed Breakdown - ${safeStrategyName}</h2>
       
       <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
         <tr style="border-bottom: 1px solid #f1f5f9;">
@@ -247,26 +246,26 @@ export function generateDirectorEmailHtml(args: {
           <td style="padding: 12px 0; color: #64748b;">Employer Pension</td>
           <td style="padding: 12px 0; text-align: right; font-weight: 600; color: #020617;">${formatCurrency(strategy.pension)}</td>
         </tr>
-        <tr style="border-bottom: 2px solid #e2e8f0;">
-          <td style="padding: 12px 0; color: #64748b;">Total Company Cost</td>
-          <td style="padding: 12px 0; text-align: right; font-weight: 700; color: #dc2626;">${formatCurrency(strategy.companyCost)}</td>
+        <tr style="border-bottom: 2px solid #cec6b7;">
+          <td style="padding: 12px 0; color: #536174;">Total Company Cost</td>
+          <td style="padding: 12px 0; text-align: right; font-weight: 700; color: #a6453c;">${formatCurrency(strategy.companyCost)}</td>
         </tr>
       </table>
 
       <table role="presentation" style="width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; margin-top: 24px;">
         <tr>
           <td style="width: 50%; vertical-align: top; padding-right: 8px;">
-            <div style="height: 120px; box-sizing: border-box; padding: 16px; background: #eff6ff; border-radius: 12px; border: 1px solid #bfdbfe;">
-              <p style="margin: 0 0 6px; color: #1e40af; font-size: 12px; text-transform: uppercase; font-weight: 600;">Company Tax Pot</p>
-              <p style="margin: 0; font-size: 24px; font-weight: 700; color: #2563eb; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency((strategy.corporationTax + strategy.employerNI) / 12)}<span style="font-size: 14px; font-weight: 400;">/mo</span></p>
-              <p style="margin: 10px 0 0; color: #1e40af; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Corporation Tax + Employer NI</p>
+            <div style="height: 120px; box-sizing: border-box; padding: 16px; background: #eef2f6; border-radius: 4px; border: 1px solid #c5d1dc;">
+              <p style="margin: 0 0 6px; color: #123a66; font-size: 12px; text-transform: uppercase; font-weight: 600;">Company Tax Pot</p>
+              <p style="margin: 0; font-size: 24px; font-weight: 700; color: #123a66; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency((strategy.corporationTax + strategy.employerNI) / 12)}<span style="font-size: 14px; font-weight: 400;">/mo</span></p>
+              <p style="margin: 10px 0 0; color: #123a66; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Corporation Tax + Employer NI</p>
             </div>
           </td>
           <td style="width: 50%; vertical-align: top; padding-left: 8px;">
-            <div style="height: 120px; box-sizing: border-box; padding: 16px; background: #faf5ff; border-radius: 12px; border: 1px solid #e9d5ff;">
-              <p style="margin: 0 0 6px; color: #6b21a8; font-size: 12px; text-transform: uppercase; font-weight: 600;">Personal Tax Pot</p>
-              <p style="margin: 0; font-size: 24px; font-weight: 700; color: #7c3aed; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(strategy.totalPersonalTax / 12)}<span style="font-size: 14px; font-weight: 400;">/mo</span></p>
-              <p style="margin: 10px 0 0; color: #6b21a8; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Self Assessment due ${escapeHtml(saDeadline)}</p>
+            <div style="height: 120px; box-sizing: border-box; padding: 16px; background: #f4efe5; border-radius: 4px; border: 1px solid #d5cab9;">
+              <p style="margin: 0 0 6px; color: #6d5741; font-size: 12px; text-transform: uppercase; font-weight: 600;">Personal Tax Pot</p>
+              <p style="margin: 0; font-size: 24px; font-weight: 700; color: #6d5741; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(strategy.totalPersonalTax / 12)}<span style="font-size: 14px; font-weight: 400;">/mo</span></p>
+              <p style="margin: 10px 0 0; color: #6d5741; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Self Assessment due ${escapeHtml(saDeadline)}</p>
             </div>
           </td>
         </tr>
@@ -274,13 +273,13 @@ export function generateDirectorEmailHtml(args: {
     </div>
 
     <!-- Key Dates Card -->
-    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; margin-bottom: 24px;">
-      <h2 style="margin: 0 0 16px; font-size: 18px; color: #020617;">Key Tax Dates</h2>
+    <div style="background: #fffdf7; border: 1px solid #cec6b7; border-radius: 4px; padding: 32px; margin-bottom: 24px;">
+      <h2 style="margin: 0 0 16px; font-size: 18px; color: #10151f;">Key Tax Dates</h2>
       
       <table style="width: 100%; border-collapse: collapse;">
         <tr style="border-bottom: 1px solid #f1f5f9;">
           <td style="padding: 12px 0; color: #020617; font-weight: 500;">Self Assessment Deadline</td>
-          <td style="padding: 12px 0; text-align: right; color: #dc2626; font-weight: 600;">${escapeHtml(saDeadline)}</td>
+          <td style="padding: 12px 0; text-align: right; color: #a6453c; font-weight: 600;">${escapeHtml(saDeadline)}</td>
         </tr>
         <tr style="border-bottom: 1px solid #f1f5f9;">
           <td style="padding: 12px 0; color: #020617; font-weight: 500;">Corporation Tax Due</td>
@@ -298,11 +297,11 @@ export function generateDirectorEmailHtml(args: {
     </div>
 
     <!-- Tax Thresholds Card -->
-    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 32px; margin-bottom: 24px;">
-      <h2 style="margin: 0 0 24px; font-size: 18px; color: #020617;">Tax Rates & Thresholds Used (${safeTaxYear || '2025-26'})</h2>
+    <div style="background: #fffdf7; border: 1px solid #cec6b7; border-radius: 4px; padding: 32px; margin-bottom: 24px;">
+      <h2 style="margin: 0 0 24px; font-size: 18px; color: #10151f;">Tax Rates & Thresholds Used (${safeTaxYear})</h2>
       
       <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-        <tr style="background: #f8fafc;">
+        <tr style="background: #f4efe5;">
           <td colspan="2" style="padding: 10px 12px; font-weight: 600; color: #475569; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">Income Tax</td>
         </tr>
         <tr style="border-bottom: 1px solid #f1f5f9;">
@@ -322,7 +321,7 @@ export function generateDirectorEmailHtml(args: {
           <td style="padding: 8px 12px; text-align: right; color: #020617;">above ${formatCurrency(thresholds.higherRateLimit)}</td>
         </tr>
         
-        <tr style="background: #f8fafc;">
+        <tr style="background: #f4efe5;">
           <td colspan="2" style="padding: 10px 12px; font-weight: 600; color: #475569; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">National Insurance</td>
         </tr>
         <tr style="border-bottom: 1px solid #f1f5f9;">
@@ -342,7 +341,7 @@ export function generateDirectorEmailHtml(args: {
           <td style="padding: 8px 12px; text-align: right; color: #020617;">${thresholds.employerNiRate}%</td>
         </tr>
         
-        <tr style="background: #f8fafc;">
+        <tr style="background: #f4efe5;">
           <td colspan="2" style="padding: 10px 12px; font-weight: 600; color: #475569; text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;">Dividends & Corporation Tax</td>
         </tr>
         <tr style="border-bottom: 1px solid #f1f5f9;">
@@ -366,22 +365,22 @@ export function generateDirectorEmailHtml(args: {
 
     <!-- CTA -->
     <div style="text-align: center; margin-top: 32px;">
-      <a href="${BASE_URL}/tools/director-guide?utm_source=director_results_email&utm_medium=email&utm_campaign=director_recalculate" style="display: inline-block; background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); color: #052e2b; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px;">
+      <a href="${BASE_URL}/tools/director-guide?utm_source=director_results_email&utm_medium=email&utm_campaign=director_recalculate" style="display: inline-block; background: #123a66; border: 1px solid #123a66; color: #fffdf7; padding: 14px 28px; border-radius: 4px; text-decoration: none; font-weight: 700; font-size: 14px;">
         Recalculate with Different Inputs
       </a>
     </div>
 
     <!-- Footer -->
-    <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
-      <p style="margin: 0; color: #94a3b8; font-size: 12px;">
+    <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid #cec6b7;">
+      <p style="margin: 0; color: #7d8795; font-size: 12px;">
         For illustrative purposes only. Not financial or tax advice.
         <br><strong>Consult a qualified accountant for advice specific to your situation.</strong>
         <br>Based on HMRC rates${safeTaxYear ? ` for ${safeTaxYear}` : ''} which may change.
       </p>
-      <p style="margin: 16px 0 0; color: #94a3b8; font-size: 12px;">
-        <a href="${BASE_URL}" style="color: #06b6d4; text-decoration: none;">payetax.co.uk</a>
+      <p style="margin: 16px 0 0; color: #7d8795; font-size: 12px;">
+        <a href="${BASE_URL}" style="color: #123a66; text-decoration: none;">payetax.co.uk</a>
         &nbsp;•&nbsp;
-        <a href="${BASE_URL}/privacy" style="color: #94a3b8; text-decoration: none;">Privacy</a>
+        <a href="${BASE_URL}/privacy" style="color: #7d8795; text-decoration: none;">Privacy</a>
       </p>
     </div>
   </div>
