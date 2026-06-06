@@ -32,7 +32,7 @@ jest.mock('@/lib/email/outboundResultsDelivery', () => ({
 const mockCaptureOperationalFailure = jest.fn();
 
 jest.mock('@/lib/sentry', () => ({
-  captureOperationalFailure: (...args: unknown[]) => mockCaptureOperationalFailure(...args),
+  captureOperationalFailureAndFlush: (...args: unknown[]) => mockCaptureOperationalFailure(...args),
 }));
 
 const ORIGINAL_ENV = process.env;
