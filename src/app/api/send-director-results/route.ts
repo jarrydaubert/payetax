@@ -1,4 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
+// Ensure handled 503s in this API route have an initialized server Sentry client.
+import '../../../../sentry.server.config';
 import { sendDirectorResultsEmail } from '@/lib/email/outboundResultsDelivery';
 import { checkRateLimitWithPolicy, createRateLimitHeaders } from '@/lib/rateLimit';
 import { detectLikelyBotRequest } from '@/lib/security/botGuard';
