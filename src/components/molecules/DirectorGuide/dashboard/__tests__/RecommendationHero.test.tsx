@@ -3,12 +3,9 @@ import { RecommendationHero } from '../RecommendationHero';
 
 const mockUseActiveDirectorScenario = jest.fn();
 
-jest.mock(
-  '@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario',
-  () => ({
-    useActiveDirectorScenario: () => mockUseActiveDirectorScenario(),
-  }),
-);
+jest.mock('@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario', () => ({
+  useActiveDirectorScenario: () => mockUseActiveDirectorScenario(),
+}));
 
 function strategy(overrides: Record<string, number> = {}) {
   return {
