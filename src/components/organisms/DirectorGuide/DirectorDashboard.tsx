@@ -26,12 +26,12 @@ import {
   EducationPanel,
   InputsPanel,
   MoneyFlowChart,
+  RecommendationHero,
   SidebarNav,
   SummaryCards,
   SurvivalModePanel,
 } from '@/components/molecules/DirectorGuide/dashboard';
 import { EmailResultsDialog } from '@/components/molecules/DirectorGuide/EmailResultsDialog';
-import { DirectorGuideWelcomeDialog } from '@/components/molecules/DirectorGuide/WelcomeDialog';
 import { Button } from '@/components/ui/button';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import {
@@ -328,6 +328,13 @@ export function DirectorDashboard() {
                       </section>
                     )}
 
+                    <section
+                      data-director-section='director-recommendation'
+                      aria-label='Recommended strategy'
+                    >
+                      <RecommendationHero />
+                    </section>
+
                     <section data-director-section='director-summary' aria-label='Summary cards'>
                       <SummaryCards />
                     </section>
@@ -481,7 +488,6 @@ export function DirectorDashboard() {
         comparison={comparison}
         emailInput={emailInput}
       />
-      <DirectorGuideWelcomeDialog />
     </TooltipProvider>
   );
 }

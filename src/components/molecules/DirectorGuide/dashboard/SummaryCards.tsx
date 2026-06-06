@@ -71,7 +71,10 @@ export function SummaryCards({ className }: SummaryCardsProps) {
 
   return (
     <section
-      className={cn('grid grid-cols-4 gap-4 max-sm:grid-cols-1 max-lg:grid-cols-2', className)}
+      className={cn(
+        'grid grid-cols-[repeat(auto-fit,minmax(min(100%,12rem),1fr))] gap-4',
+        className,
+      )}
       aria-label='Financial summary'
     >
       {cards.map((card) => (
@@ -101,7 +104,7 @@ function SummaryCard({
   return (
     <article
       className={cn(
-        'rounded-sm border border-border bg-card p-5 transition-colors hover:border-primary/35',
+        'min-w-0 rounded-sm border border-border bg-card p-5 transition-colors hover:border-primary/35',
         highlight && !isEmpty && 'border-primary/35 bg-card',
       )}
       aria-label={ariaDescription}
@@ -111,7 +114,7 @@ function SummaryCard({
       </div>
       <div
         className={cn(
-          'mb-1 font-mono font-semibold text-3xl tracking-tight',
+          'mb-1 break-words font-mono font-semibold text-2xl tracking-tight sm:text-3xl',
           !highlight && 'text-foreground',
           highlight && !isEmpty && 'text-primary',
           isEmpty && 'text-muted-foreground/60',

@@ -35,6 +35,18 @@ export function Analytics() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isLoaded, setIsLoaded] = useState(false);
+  const sentPageViews = useRef(new Set<string>());
+
+  const getCurrentPagePath = useCallback(() => {
+    const searchParamsString = searchParams?.toString();
+    return pathname + (searchParamsString ? `?${searchParamsString}` : '');
+  }, [pathname, searchParams]);
+
+  const markAnalyticsReady = useCallback(() => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      setIsLoaded(true);
+    }
+  }, []);
 
   /**
    * Update consent settings in Google Analytics
@@ -57,6 +69,45 @@ export function Analytics() {
       window.consentMode.isConsentGiven = hasConsent;
     }
   }, []);
+
+  const sendCurrentPageView = useCallback(
+    (hasConsent = isAnalyticsConsented()) => {
+      if (!(GA_MEASUREMENT_ID && window?.gtag && hasConsent)) return false;
+
+      const url = getCurrentPagePath();
+      if (sentPageViews.current.has(url)) return false;
+
+      sentPageViews.current.add(url);
+      window.gtag('config', GA_MEASUREMENT_ID, {
+        page_path: url,
+        send_page_view: true,
+        anonymize_ip: true,
+        transport_type: 'beacon',
+      });
+
+      return true;
+    },
+    [getCurrentPagePath],
+  );
+
+  const applyAnalyticsConsent = useCallback(
+    (hasConsent: boolean) => {
+      if (window.consentMode) {
+        window.consentMode.isConsentGiven = hasConsent;
+      }
+
+      updateConsent(hasConsent);
+
+      if (hasConsent) {
+        if (!vitalsInitialized.current) {
+          vitalsInitialized.current = true;
+          initCoreWebVitals();
+        }
+        sendCurrentPageView(hasConsent);
+      }
+    },
+    [sendCurrentPageView, updateConsent],
+  );
 
   /**
    * Track SEO-relevant metrics
@@ -157,26 +208,12 @@ export function Analytics() {
   useEffect(() => {
     if (!(isLoaded && GA_MEASUREMENT_ID)) return;
 
-    // Only track page views if consent is given (respects 12-month expiry)
-    const hasConsent = isAnalyticsConsented();
-    if (!(hasConsent && window.gtag)) return;
-
-    // Construct full URL for tracking
-    const searchParamsString = searchParams?.toString();
-    const url = pathname + (searchParamsString ? `?${searchParamsString}` : '');
-
-    // Track page view (removed cookie_flags - let GA use default first-party behavior)
-    window.gtag('config', GA_MEASUREMENT_ID, {
-      page_path: url,
-      send_page_view: true,
-      anonymize_ip: true,
-      transport_type: 'beacon',
-    });
+    if (!sendCurrentPageView()) return;
 
     // Track additional SEO metrics and return cleanup
     const cleanup = trackSEOMetrics();
     return cleanup;
-  }, [pathname, searchParams, isLoaded, trackSEOMetrics]);
+  }, [isLoaded, sendCurrentPageView, trackSEOMetrics]);
 
   // Handle storage events for consent changes from other tabs
   useEffect(() => {
@@ -202,16 +239,14 @@ export function Analytics() {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'cookie-consent') {
         const newConsent = parseAnalyticsConsentValue(e.newValue);
-        if (window.consentMode) {
-          window.consentMode.isConsentGiven = newConsent;
-        }
-        updateConsent(newConsent);
+        applyAnalyticsConsent(newConsent);
       }
     };
 
-    const handleConsentUpdate = () => {
-      const newConsent = isAnalyticsConsented();
-      updateConsent(newConsent);
+    const handleConsentUpdate = (event: Event) => {
+      const detail: unknown = (event as CustomEvent<unknown>).detail;
+      const newConsent = isConsentPreferences(detail) ? detail.analytics : isAnalyticsConsented();
+      applyAnalyticsConsent(newConsent);
     };
 
     window.addEventListener('storage', handleStorageChange);
@@ -221,7 +256,7 @@ export function Analytics() {
       window.removeEventListener('storage', handleStorageChange);
       document.removeEventListener('cookieConsentUpdated', handleConsentUpdate);
     };
-  }, [isLoaded, updateConsent]);
+  }, [applyAnalyticsConsent, isLoaded]);
 
   // Don't render when analytics are disabled or GA ID is missing.
   if (!(ANALYTICS_ENABLED && GA_MEASUREMENT_ID)) {
@@ -236,12 +271,12 @@ export function Analytics() {
         id='ga-script'
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
         strategy='lazyOnload'
-        onLoad={() => setIsLoaded(true)}
+        onLoad={markAnalyticsReady}
       />
 
       {/* Google Analytics Initialization - static id prevents duplicate execution */}
       {/* biome-ignore lint/correctness/useUniqueElementIds: Script id must be static to prevent duplicates */}
-      <Script id='ga-init' strategy='lazyOnload'>
+      <Script id='ga-init' strategy='lazyOnload' onReady={markAnalyticsReady}>
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
