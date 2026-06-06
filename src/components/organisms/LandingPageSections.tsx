@@ -2,13 +2,16 @@
 // Landing page sections: Proof Strip and FAQ
 // Server Component - no hooks/state/effects, maximizes SEO/LCP
 
-import { CheckCircle, Shield } from 'lucide-react';
+import { ArrowRight, CheckCircle, Shield } from 'lucide-react';
+import type { Route } from 'next';
 import Link from 'next/link';
+import { Card } from '@/components/ui/card';
 import {
   CURRENT_TAX_YEAR_DISPLAY_SHORT,
   formatIsoDateForDisplay,
   RATES_LAST_VERIFIED,
 } from '@/constants/freshness';
+import { TOOLS } from '@/constants/pages/toolsData';
 import { HMRC_INCOME_TAX_RATES_URL, REVENUE_SCOTLAND_INCOME_TAX_URL } from '@/constants/sources';
 
 export interface FAQ {
@@ -23,20 +26,15 @@ export interface FAQ {
 
 export const faqs: FAQ[] = [
   {
-    question: 'Is PayeTax free to use?',
-    answer:
-      'Yes, PayeTax is completely free with no signup required. All features are available at no cost.',
-  },
-  {
     question: 'How accurate is this compared to my payslip?',
     answer:
-      "PayeTax uses official HMRC tax tables - the same rates your employer's payroll system uses. Differences can come from pay period timing, benefits in kind, or employer-specific deductions.",
+      "PayeTax uses the official HMRC tax tables your employer's payroll runs on, so the annual figures line up. Small differences usually come from pay-period timing, benefits in kind, or employer-specific deductions we can't see.",
     links: [{ label: 'HMRC income tax rates', href: HMRC_INCOME_TAX_RATES_URL, external: true }],
   },
   {
-    question: 'Does PayeTax support Scottish tax rates?',
+    question: 'Does it support Scottish tax rates?',
     answer:
-      'Yes, PayeTax fully supports Scottish income tax rates. Scottish residents pay different rates set by the Scottish Parliament - select Scotland as your region.',
+      'Yes. Choose Scotland as your region and the calculator applies the Scottish income tax bands set by the Scottish Parliament, which differ from the rest of the UK.',
     links: [
       {
         label: 'Revenue Scotland tax rates',
@@ -46,24 +44,20 @@ export const faqs: FAQ[] = [
     ],
   },
   {
-    question: 'Does this work for self-employed or contractors?',
+    question: 'Does it work for self-employed or contractors?',
     answer:
-      "PayeTax is built for employees on PAYE. Self-employed? You pay differently via Self Assessment. Check our blog for guides, or use HMRC's Self Assessment tools.",
+      "No - PayeTax models PAYE for employees. Self-employed income is taxed through Self Assessment, which works differently. Our blog has guides, or use HMRC's Self Assessment tools directly.",
   },
   {
-    question: 'Is my salary data safe?',
+    question: 'What does the calculation include?',
     answer:
-      'Your salary is yours alone. All calculations happen locally in your browser - nothing is sent to our servers, stored, or shared.',
+      'Income tax by band, National Insurance, student loan repayments across all five plans, and pension contributions with tax relief - broken down across every pay period.',
   },
   {
-    question: 'What deductions are included?',
+    question: 'Can I use it offline?',
     answer:
-      'PayeTax calculates income tax by band, National Insurance contributions, student loan repayments, and pension contributions with tax relief.',
-  },
-  {
-    question: 'Can I use PayeTax offline?',
-    answer:
-      'Yes. You can install PayeTax as an app and continue using cached pages and tools when your connection drops. Visit /install for setup steps.',
+      'Yes. Install PayeTax as an app and it keeps working from cache when your connection drops.',
+    links: [{ label: 'Install guide', href: '/install', external: false }],
   },
 ];
 
@@ -159,10 +153,55 @@ export function ProofStrip() {
   );
 }
 
+export function ToolsDirectory() {
+  return (
+    // biome-ignore lint/correctness/useUniqueElementIds: Static ID required for anchor navigation
+    <section className='relative z-[1] bg-background px-4 py-16 md:py-24' id='tools'>
+      <div className='mx-auto mb-8 max-w-[960px] text-left'>
+        <div className='mb-3 font-semibold text-primary text-xs uppercase tracking-[0.18em]'>
+          More tools
+        </div>
+        <h2 className='font-display font-semibold text-4xl text-foreground leading-[0.98] md:text-6xl'>
+          Go deeper than take-home
+        </h2>
+        <p className='mt-2 text-muted-foreground text-sm'>
+          Specialised UK tax tools, built on the same official HMRC rates as the calculator above.
+        </p>
+      </div>
+
+      <div className='mx-auto grid max-w-[960px] gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+        {TOOLS.map((tool) => (
+          <Link
+            key={tool.href}
+            href={tool.href as Route}
+            data-testid={`home-tool-${tool.href.split('/').pop()}`}
+            className='group block h-full'
+          >
+            <Card className='flex h-full flex-col rounded-sm border-border bg-card p-5 transition-colors hover:border-primary/55'>
+              <div className='mb-2 flex items-center gap-2'>
+                <tool.icon aria-hidden='true' className='size-4 flex-shrink-0 text-primary' />
+                <h3 className='font-display font-semibold text-foreground text-lg group-hover:text-primary'>
+                  {tool.title}
+                </h3>
+              </div>
+              <p className='text-muted-foreground text-sm leading-relaxed'>{tool.description}</p>
+              <span className='mt-4 inline-flex items-center gap-1 font-medium text-primary text-sm'>
+                Open tool
+                <ArrowRight className='size-4' aria-hidden='true' />
+              </span>
+            </Card>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function LandingPageSections() {
   return (
     <>
       <ProofStrip />
+      <ToolsDirectory />
       <FAQSection />
     </>
   );

@@ -31,6 +31,20 @@ describe('LandingPageSections', () => {
 
   it('includes offline availability FAQ entry', () => {
     render(<LandingPageSections />);
-    expect(screen.getByText('Can I use PayeTax offline?')).toBeInTheDocument();
+    expect(screen.getByText('Can I use it offline?')).toBeInTheDocument();
+  });
+
+  it('renders the tools directory linking to every tool', () => {
+    render(<LandingPageSections />);
+
+    expect(screen.getByText('Go deeper than take-home')).toBeInTheDocument();
+    expect(screen.getByTestId('home-tool-director-guide')).toHaveAttribute(
+      'href',
+      '/tools/director-guide',
+    );
+    expect(screen.getByTestId('home-tool-tax-code-decoder')).toBeInTheDocument();
+    expect(screen.getByTestId('home-tool-scottish-tax-calculator')).toBeInTheDocument();
+    expect(screen.getByTestId('home-tool-national-insurance-calculator')).toBeInTheDocument();
+    expect(screen.getByTestId('home-tool-marriage-allowance-calculator')).toBeInTheDocument();
   });
 });
