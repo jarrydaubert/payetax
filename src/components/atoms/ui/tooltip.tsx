@@ -69,7 +69,7 @@ const TooltipContent = forwardRef<ElementRef<typeof TooltipPrimitive.Content>, T
           // Layout
           'z-50 rounded-md px-3 py-1.5',
           // Colors - neutral popover styling for readability
-          'border border-border bg-popover text-popover-foreground shadow-md',
+          'border border-border bg-popover text-popover-foreground shadow-none',
           // Typography
           'text-xs',
           // Transform origin for animations

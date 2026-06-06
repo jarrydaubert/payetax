@@ -39,8 +39,6 @@ const Switch = forwardRef<ElementRef<typeof SwitchPrimitive.Root>, SwitchProps>(
         'h-5 w-9',
         // Border - subtle outline for unchecked contrast
         'border-2 border-transparent data-[state=unchecked]:border-border',
-        // Shadow
-        'shadow-sm',
         // Transitions
         'transition-colors',
         // Focus ring

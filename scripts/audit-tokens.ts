@@ -22,7 +22,6 @@ import {
   COLORS,
   ICON_SIZES,
   LAYOUT,
-  SHADOWS,
   SPACING,
   SURFACES,
   TYPOGRAPHY,
@@ -66,7 +65,6 @@ const tokenSet = new Set<string>([
   ...Object.values(ICON_SIZES),
   ...Object.values(LAYOUT),
   ...Object.values(COLORS),
-  ...Object.values(SHADOWS),
   ...Object.values(SURFACES),
 ]);
 
@@ -122,12 +120,10 @@ const genericPatterns = [
 ];
 
 const rawPaletteAllowlistRules: Array<{ file: RegExp; className: RegExp }> = [
-  {
-    file: /src\/components\/molecules\/ServerHero\.tsx$/,
-    className:
-      /^(?:from-cyan-500|to-emerald-500|from-cyan-400|to-emerald-400|border-cyan-500|bg-cyan-500|text-cyan-500|text-emerald-500)$/,
-  },
+  // Keep empty by default. Add only narrowly scoped product-specific exceptions.
 ];
+
+const hardcodedClassAllowlist = new Set(['shadow-none']);
 
 const inlineStyleAllowlistRules: Array<{ file: RegExp; snippet?: RegExp }> = [
   {
@@ -301,6 +297,9 @@ function scanFile(filePath: string): Violation[] {
           continue;
         }
         if (individualClasses.has(hardcodedClass)) {
+          continue;
+        }
+        if (hardcodedClassAllowlist.has(hardcodedClass)) {
           continue;
         }
         if (

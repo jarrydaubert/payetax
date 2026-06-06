@@ -148,7 +148,7 @@ const CookieBanner: React.FC = () => {
                   onClick={handleRejectAll}
                   variant='outline'
                   size='touch'
-                  className='!border-slate-300 !bg-slate-100 !text-slate-950 hover:!border-white hover:!bg-white hover:!text-slate-950 w-full'
+                  className='w-full'
                   data-testid='cookie-reject-all'
                 >
                   Essential Only
@@ -157,7 +157,7 @@ const CookieBanner: React.FC = () => {
                   onClick={handleAcceptAll}
                   variant='default'
                   size='touch'
-                  className='!bg-cyan-300 !text-slate-950 hover:!bg-cyan-200 w-full'
+                  className='w-full'
                   data-testid='cookie-accept-all'
                 >
                   Accept All

@@ -4,14 +4,10 @@
  * Centralizes all styling constants for consistent design patterns across
  * the PayeTax application. All tokens follow Tailwind CSS utility patterns.
  *
- * ## Audit Snapshot (2026-03-18)
- * - **Files scanned**: 293
- * - **Total violations**: 10
- * - **Raw palette colors**: 0
- * - **Hardcoded classes**: 10
- * - **Inline styles**: 0
- * - **Typography tokens**: 33
- * - **Total design tokens**: 150+ shared utilities
+ * ## Current direction
+ * These constants remain as a migration aid while the app moves to CSS-first
+ * Ledger tokens. Keep this file focused on genuinely shared utility patterns,
+ * not one-off visual effects.
  *
  * ### What Was Added (2025 Expansion)
  * ✅ Font sizes: TEXT_9XL, TEXT_7XL (for 404/error pages)
@@ -23,10 +19,10 @@
  * ✅ Spacing: SPACE_X_2, SPACE_X_1, SPACE_X_0, P_16, P_12, P_5, GAP_0, GAP_7, M_4, M_2
  *
  * ### Intentional Non-Tokens (Documented Exceptions)
- * - **`border-*`** (212 uses): Framework utilities like `border-2`, `border-t` - NOT tokenized by design
+ * - **`border-*`**: Framework utilities like `border-2`, `border-t` - NOT tokenized by design
  * - **Chart/domain colors**: Keep genuinely component-specific visual mappings out of the shared token surface
  * - **Arbitrary values**: A small tail remains for layout/formula edge cases that do not warrant general-purpose tokens
- * - **Inline styles** (46): Email templates requiring inline CSS
+ * - **Inline styles**: Email templates requiring inline CSS
  *
  * @module constants/designTokens
  * @see {@link /scripts/audit-tokens.ts Token Audit Script}
@@ -343,10 +339,10 @@ export const LAYOUT = {
   PAGE_WRAPPER: 'min-h-screen',
   /** Standard section spacing (responsive) */
   SECTION: 'py-12 md:py-20',
-  /** Section with light primary background */
-  SECTION_TINTED_PRIMARY: 'bg-gradient-to-br from-primary/5 to-accent/5 py-12 md:py-20',
-  /** Section with light accent background */
-  SECTION_TINTED_ACCENT: 'bg-gradient-to-br from-accent/5 to-transparent py-12 md:py-20',
+  /** Flat bordered section with subtle primary tint */
+  SECTION_TINTED_PRIMARY: 'border-y border-border/60 bg-primary/5 py-12 md:py-20',
+  /** Flat bordered section with subtle card tint */
+  SECTION_TINTED_ACCENT: 'border-y border-border/60 bg-card py-12 md:py-20',
 
   /** Navbar height (64px / 4rem) */
   NAVBAR_HEIGHT: 'h-16',
@@ -408,19 +404,12 @@ export const SURFACES = {
   /** Border with top separator */
   BORDER_TOP_DIVIDER: 'border-t border-primary/10',
 
-  /** Light primary gradient background */
-  BG_GRADIENT_PRIMARY: 'bg-gradient-to-br from-primary/5 to-accent/5',
-  /** Light accent gradient background */
-  BG_GRADIENT_ACCENT: 'bg-gradient-to-br from-accent/5 to-transparent',
-
   /** Card with padding and border */
   CARD_STANDARD: 'border-primary/20 p-6',
   /** Large card with more padding */
   CARD_LARGE: 'border-primary/20 p-8',
   /** Card with rounded corners and standard padding */
   CARD_ROUNDED: 'border border-primary/20 p-6 rounded-lg',
-  /** Card with glassmorphism effect */
-  CARD_GLASS: 'bg-card/80 backdrop-blur-sm border border-border/50 p-6 rounded-lg',
 
   // Shape utilities for common patterns
   /** Fully rounded / circular shape */
@@ -472,41 +461,6 @@ export const COLORS = {
   DESTRUCTIVE_BG: 'bg-destructive/10',
   /** Info background with subtle opacity */
   INFO_BG: 'bg-primary/10',
-} as const;
-
-/**
- * Shadow utilities for elevation and focus effects
- * ADDED IN PAYTAX-58 (Nov 2025) to standardize shadow patterns
- */
-export const SHADOWS = {
-  /** Subtle elevation - input hover states, small cards */
-  SM: 'shadow-sm',
-  /** Standard elevation - cards, dropdowns, default interactive elements */
-  MD: 'shadow-md',
-  /** High elevation - modals, popovers, emphasized content */
-  LG: 'shadow-lg',
-  /** Maximum elevation - hero sections, marketing elements */
-  XL: 'shadow-xl',
-  /** Extra large elevation - special hero sections */
-  XXL: 'shadow-2xl',
-
-  // Glow effects for special UI elements
-  /** Primary brand glow - for featured CTAs */
-  GLOW_PRIMARY: 'shadow-lg shadow-primary/30',
-  /** Purple glow - for what-if comparisons and special features */
-  GLOW_PURPLE: 'shadow-lg shadow-purple-500/50',
-  /** Success glow - for positive actions */
-  GLOW_SUCCESS: 'shadow-lg shadow-green-500/40',
-  /** Brand cyan glow for prominent CTA hover states */
-  GLOW_BRAND: 'shadow-brand-glow',
-  /** Cyan glow for selected dashboard cards */
-  GLOW_CYAN: 'shadow-cyan-glow',
-  /** Subtle inset cyan ring for active nav surfaces */
-  INSET_CYAN: 'shadow-cyan-inset',
-  /** Custom category filter glow (Tailwind theme extension: shadow-accent-glow) */
-  GLOW_ACCENT: 'shadow-accent-glow',
-  /** Hover state for accent glow */
-  GLOW_ACCENT_HOVER: 'hover:shadow-accent-glow-hover',
 } as const;
 
 /**
@@ -565,8 +519,6 @@ export type IconSizeKey = keyof typeof ICON_SIZES;
 export type LayoutKey = keyof typeof LAYOUT;
 /** Type-safe color token keys */
 export type ColorKey = keyof typeof COLORS;
-/** Type-safe shadow token keys */
-export type ShadowKey = keyof typeof SHADOWS;
 
 // Token Values (for className usage - actual Tailwind class strings)
 /** Type-safe typography class strings */
@@ -579,17 +531,9 @@ export type IconSizeClass = (typeof ICON_SIZES)[IconSizeKey];
 export type LayoutClass = (typeof LAYOUT)[LayoutKey];
 /** Type-safe color class strings */
 export type ColorClass = (typeof COLORS)[ColorKey];
-/** Type-safe shadow class strings */
-export type ShadowClass = (typeof SHADOWS)[ShadowKey];
 
 /** Union of all token keys */
-export type DesignTokenKey =
-  | TypographyKey
-  | SpacingKey
-  | IconSizeKey
-  | LayoutKey
-  | ColorKey
-  | ShadowKey;
+export type DesignTokenKey = TypographyKey | SpacingKey | IconSizeKey | LayoutKey | ColorKey;
 
 /** Union of all token class strings */
 export type DesignTokenClass =
@@ -597,8 +541,7 @@ export type DesignTokenClass =
   | SpacingClass
   | IconSizeClass
   | LayoutClass
-  | ColorClass
-  | ShadowClass;
+  | ColorClass;
 
 /**
  * CSS Custom Properties for dynamic theming

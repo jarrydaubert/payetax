@@ -11,6 +11,7 @@ Purpose:
 2. Prefer semantic theme classes such as `bg-background`, `text-foreground`, `border-border`, `text-muted-foreground`, and `text-primary`.
 3. Use design tokens only for genuinely shared patterns such as typography, spacing, and layout.
 4. Use inline Tailwind only for narrow one-off styling that is not worth turning into a shared token or variant.
+5. Keep the current Ledger direction flat, light-first, semantic, and low-radius. Do not reintroduce gradient, glass, glow, or raw cyan/emerald styling.
 
 ## Hard Rules
 
@@ -27,12 +28,13 @@ Do not introduce new raw palette classes such as:
 - `bg-[#...]`
 
 Allowed exceptions:
-- explicit brand accents already allowlisted in the token audit
 - chart/data-viz colors
 - constrained marketing one-offs that do not have a sensible semantic token yet
 
 Enforcement:
-- `bun run audit:tokens`
+- `bun run audit:tokens -- --delta`
+
+Note: default `bun run audit:tokens` is intentionally stricter and currently reports legacy arbitrary layout classes. Use `--delta` as the no-growth gate unless the task is specifically to clear that remaining arbitrary-class debt.
 
 ### 2. New interactive UI should use the canonical UI import surface
 
@@ -61,14 +63,16 @@ Do not create tokens for:
 - component-specific visual effects
 
 Evidence path:
-- code review plus `bun run audit:tokens` for raw-palette drift
+- code review plus `bun run audit:tokens -- --delta` for raw-palette and inline-style drift
 
 ## Verification
 
 Use the smallest relevant checks for the change:
 
 ```bash
-bun run audit:tokens
+bun run audit:tokens -- --delta
+bun run check:repo
+bun run build
 bun run fix-all
 ```
 
@@ -79,7 +83,8 @@ Run the app locally or inspect the Vercel preview, check the affected route at d
 ## Known Exceptions
 
 - Remaining mixed UI import surface: older `@/components/atoms/ui/*` imports exist from earlier component passes.
-- Raw palette classes: existing allowlisted brand, chart, and one-off visual classes are tolerated by `bun run audit:tokens`.
-- Token hygiene: continue opportunistic cleanup when touching nearby UI, but do not create broad styling-only churn.
+- Raw palette classes: current audit delta should stay at zero. Do not add new raw palette classes without a narrow documented exception.
+- Arbitrary layout classes: some legacy width, height, and exact typography classes remain. Clean these opportunistically when touching nearby UI, but do not create broad styling-only churn.
+- Token hygiene: `src/constants/designTokens.ts` still exists as a migration aid. Keep pruning dead visual-effect entries when proven unused.
 
 If a styling rule is not backed by an existing script, test, or documented exception, it should not be treated as a hard constraint in this guide.
