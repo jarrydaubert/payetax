@@ -1,238 +1,46 @@
 {
   "styleGuide": {
-    "description": "PayeTax blog images - consistent isometric fintech style",
-    "aspectRatio": "16:10 (1600x1000px recommended)",
+    "description": "PayeTax blog images in the Ledger direction",
+    "aspectRatio": "16:10, 1600x1000px recommended",
+    "visualLanguage": "editorial, document-led, public-authority, tax-led",
     "background": {
-      "base": "#0f172a (dark slate)",
-      "style": "Subtle gradient from base to category accent color at 10-20% opacity"
+      "base": "warm paper or off-white",
+      "texture": "subtle paper grain, faint ledger grid, or ruled document lines"
     },
-    "illustrationStyle": "3D isometric, clean geometric shapes, soft glows and gradients",
-    "lighting": "Soft ambient with subtle rim lighting, tech/futuristic feel",
-    "mood": "Professional, trustworthy, modern fintech",
-    "noText": true,
-    "notes": "DO NOT include any text, titles, or labels - the website overlays these"
+    "illustrationStyle": "flat or lightly dimensional editorial still life, not glossy fintech illustration",
+    "lighting": "clean daylight, low contrast, no glow",
+    "palette": {
+      "paper": "#f8f3ea",
+      "ink": "#07111f",
+      "inkBlue": "#123a66",
+      "rule": "#d8cdbd",
+      "mutedGreen": "#2f6f4e",
+      "mutedRed": "#9f3d35",
+      "mutedGold": "#a36b1f"
+    },
+    "avoid": [
+      "dark-slate fintech backgrounds",
+      "cyan or emerald glow",
+      "purple gradients",
+      "glassmorphism",
+      "3D isometric app marketing scenes",
+      "floating UI dashboards",
+      "text, titles, labels, logos, or fake HMRC branding"
+    ],
+    "notes": "The website supplies article titles and metadata. Images should support the subject without making unverifiable claims."
   },
-  "categoryColors": {
-    "salary-guides": { "color": "#f59e0b", "name": "Amber", "accent": "warm orange glow" },
-    "tax-basics": { "color": "#10b981", "name": "Emerald", "accent": "green glow" },
-    "tax-planning": { "color": "#8b5cf6", "name": "Violet", "accent": "purple glow" },
-    "tax-tips": { "color": "#06b6d4", "name": "Cyan", "accent": "cyan glow" },
-    "tax-comparison": { "color": "#ec4899", "name": "Pink", "accent": "pink glow" },
-    "tax-tools": { "color": "#14b8a6", "name": "Teal", "accent": "teal glow" },
-    "student-loans": { "color": "#3b82f6", "name": "Blue", "accent": "blue glow" },
-    "tax-changes": { "color": "#ef4444", "name": "Red", "accent": "red glow" },
-    "tax-deadlines": { "color": "#f97316", "name": "Orange", "accent": "orange glow" }
+  "promptPatterns": {
+    "salaryGuides": "Editorial still life of a payslip, calculator tape, and neatly separated pound notes on warm paper. Faint ledger grid in the background. Ink-blue and muted-gold accents. No text.",
+    "taxBasics": "Clean tax explainer scene using forms, ruled paper, and a simple calculator. Public-authority tone, restrained ink-blue accents, flat document-led composition. No text.",
+    "taxPlanning": "Pension and tax-planning scene with annotated paper sheets, envelopes, and a calculator. Muted green and ink-blue accents. No text or labels.",
+    "directorGuides": "Limited-company director tax scene with ledger pages, dividend notes, company accounts, and a calculator. Broadsheet editorial tone, warm paper, ink-blue accents. No text.",
+    "studentLoans": "Student loan repayment scene with payslip, calculator, and stacked documents. Calm explanatory tone, paper background, ink-blue and muted-green accents. No text.",
+    "taxChanges": "Budget or tax-change scene with official-looking papers, a calendar, and a calculator. Muted red or gold accents for attention. No text or branding.",
+    "deadlines": "Tax deadline scene with calendar, forms, and envelope on a desk. Muted-gold attention accent, clean paper-led layout. No text."
   },
-  "posts": [
-    {
-      "slug": "100k-tax-trap-avoid-60-percent-tax-2025",
-      "category": "tax-planning",
-      "visualConcept": "Person standing confused in center of an isometric maze/labyrinth. A glowing percentage sign (60%) floats ominously above. Purple and cyan gradients. Trap door or pitfall visible in the maze.",
-      "keywords": ["maze", "trap", "confused person", "percentage", "pitfall"],
-      "outputFilename": "100k-tax-trap.jpg"
-    },
-    {
-      "slug": "100k-company-profit-director-take-home-2025-26",
-      "category": "salary-guides",
-      "visualConcept": "Isometric view of £100k represented as stacked coins/money splitting into three different pathways (funnels). One path leads to a person, one to a building (company), one dissolves (tax). Amber/gold tones.",
-      "keywords": ["money split", "three paths", "coins", "director figure", "company building"],
-      "outputFilename": "100k-company-profit-take-home.jpg"
-    },
-    {
-      "slug": "what-100k-salary-actually-looks-like-uk-2025",
-      "category": "salary-guides",
-      "visualConcept": "Isometric salary breakdown - large pile of coins gradually reducing through visible 'slices' being taken away. Final smaller pile reaches a person figure. Amber warm tones with subtle warning red hints.",
-      "keywords": ["salary breakdown", "coin stacks", "reduction", "person receiving"],
-      "outputFilename": "100k-salary-breakdown.jpg"
-    },
-    {
-      "slug": "what-80k-salary-actually-looks-like-uk-2025",
-      "category": "salary-guides",
-      "visualConcept": "Isometric paycheque or pay slip floating with coins flowing from it into organized stacks. Clean, professional feel. Amber/gold gradient accents.",
-      "keywords": ["payslip", "coins flowing", "organized stacks", "professional"],
-      "outputFilename": "80k-salary-breakdown.jpg"
-    },
-    {
-      "slug": "what-70k-salary-actually-looks-like-uk-2025",
-      "category": "salary-guides",
-      "visualConcept": "Isometric calculator or phone showing numbers, surrounded by floating pound coins arranged in neat groups. Warm amber lighting.",
-      "keywords": ["calculator", "pound coins", "grouped money", "phone"],
-      "outputFilename": "70k-salary-breakdown.jpg"
-    },
-    {
-      "slug": "what-60k-salary-actually-looks-like-uk-2025",
-      "category": "salary-guides",
-      "visualConcept": "Isometric piggy bank being filled with coins, some coins diverted to a tax box. Balanced composition showing savings vs tax. Amber tones.",
-      "keywords": ["piggy bank", "coins", "tax box", "savings"],
-      "outputFilename": "60k-salary-breakdown.jpg"
-    },
-    {
-      "slug": "what-50k-salary-actually-looks-like-uk-2025",
-      "category": "salary-guides",
-      "visualConcept": "Isometric wallet or purse open showing organized compartments of coins and notes. Clean midpoint salary visual. Amber/gold accents.",
-      "keywords": ["wallet", "organized money", "compartments", "notes and coins"],
-      "outputFilename": "50k-salary-breakdown.jpg"
-    },
-    {
-      "slug": "what-40k-salary-actually-looks-like-uk-2025",
-      "category": "salary-guides",
-      "visualConcept": "Isometric budget pie chart made of 3D segments - housing, bills, savings, spending - with small figure looking at it. Warm amber tones.",
-      "keywords": ["pie chart", "budget segments", "person planning", "3D chart"],
-      "outputFilename": "40k-salary-breakdown.jpg"
-    },
-    {
-      "slug": "how-much-tax-will-i-pay-uk-2025",
-      "category": "tax-basics",
-      "visualConcept": "Isometric ascending stairs/levels with pound signs at different heights representing tax bands. Person climbing the stairs. Green emerald glow.",
-      "keywords": ["stairs", "levels", "tax bands", "climbing", "progression"],
-      "outputFilename": "how-much-tax-uk.jpg"
-    },
-    {
-      "slug": "understanding-uk-tax-codes",
-      "category": "tax-basics",
-      "visualConcept": "Isometric decoder machine or cipher wheel with letters and numbers (like 1257L) floating around it. Magnifying glass examining the code. Green emerald accents.",
-      "keywords": ["decoder", "cipher", "magnifying glass", "letters numbers", "code"],
-      "outputFilename": "tax-codes-explained.jpg"
-    },
-    {
-      "slug": "understanding-the-uk-tax-system-2025",
-      "category": "tax-basics",
-      "visualConcept": "Isometric flowchart or system diagram showing money flowing through connected nodes (income → tax → services). Clean instructional feel. Emerald green paths.",
-      "keywords": ["flowchart", "system diagram", "connected nodes", "money flow"],
-      "outputFilename": "uk-tax-system.jpg"
-    },
-    {
-      "slug": "beginners-guide-to-uk-taxation",
-      "category": "tax-basics",
-      "visualConcept": "Isometric open book or guide with simple icons floating above it - pound sign, percentage, calendar. Welcoming, educational feel. Soft emerald green glow.",
-      "keywords": ["open book", "guide", "simple icons", "educational", "beginner friendly"],
-      "outputFilename": "beginners-guide-tax.jpg"
-    },
-    {
-      "slug": "how-national-insurance-works-uk-2025",
-      "category": "tax-basics",
-      "visualConcept": "Isometric shield or safety net with NI letters, coins dropping into it forming a safety cushion. Protection/insurance visual. Green emerald tones.",
-      "keywords": ["shield", "safety net", "protection", "NI", "coins cushion"],
-      "outputFilename": "national-insurance-explained.jpg"
-    },
-    {
-      "slug": "higher-rate-taxpayer-guide-uk-2025",
-      "category": "tax-planning",
-      "visualConcept": "Isometric premium/VIP door or gateway with 40% floating above. Professional figure approaching. Mix of warning and opportunity. Purple/violet gradients.",
-      "keywords": ["VIP door", "40%", "gateway", "professional figure", "premium"],
-      "outputFilename": "higher-rate-taxpayer.jpg"
-    },
-    {
-      "slug": "pension-tax-relief-uk-2025-guide",
-      "category": "tax-planning",
-      "visualConcept": "Isometric retirement/pension pot growing with coins being added, government adding matching coins from above. Multiplier effect visual. Purple accents.",
-      "keywords": ["pension pot", "growing", "matching coins", "government boost", "multiplier"],
-      "outputFilename": "pension-tax-relief.jpg"
-    },
-    {
-      "slug": "salary-sacrifice-explained-2025-26",
-      "category": "tax-planning",
-      "visualConcept": "Isometric balance scale - one side has salary (coins), other side has benefits (car, bike, pension). Exchange/trade visual. Purple violet tones.",
-      "keywords": ["balance scale", "salary vs benefits", "exchange", "trade-off"],
-      "outputFilename": "salary-sacrifice.jpg"
-    },
-    {
-      "slug": "year-end-tax-planning-2025-26-complete-checklist",
-      "category": "tax-planning",
-      "visualConcept": "Isometric checklist floating with tick marks, calendar showing April, clock ticking. Urgency but organized feel. Purple with hints of orange warning.",
-      "keywords": ["checklist", "ticks", "calendar", "clock", "deadline"],
-      "outputFilename": "year-end-tax-planning.jpg"
-    },
-    {
-      "slug": "marriage-allowance-uk-2025-guide",
-      "category": "tax-tips",
-      "visualConcept": "Isometric two figures holding hands with coins/savings flowing between them. Heart shape subtle in background. Warm cyan with pink hints.",
-      "keywords": ["couple", "holding hands", "shared savings", "heart", "transfer"],
-      "outputFilename": "marriage-allowance.jpg"
-    },
-    {
-      "slug": "frozen-tax-thresholds-stealth-tax-2026",
-      "category": "tax-tips",
-      "visualConcept": "Isometric ice block or frozen barrier with pound signs trapped inside. Person's money sliding toward it. Cold blue/cyan with warning elements.",
-      "keywords": ["ice block", "frozen", "trapped money", "barrier", "stealth"],
-      "outputFilename": "frozen-thresholds.jpg"
-    },
-    {
-      "slug": "scottish-vs-english-tax-rates-2026-comparison",
-      "category": "tax-comparison",
-      "visualConcept": "Isometric split scene - Scotland (thistle/tartan hints) on left, England (rose hints) on right. Different height tax stacks on each side. Pink/magenta dividing line.",
-      "keywords": ["split scene", "Scotland vs England", "comparison", "different stacks"],
-      "outputFilename": "scottish-vs-english-tax.jpg"
-    },
-    {
-      "slug": "director-salary-vs-dividends-comparison-2025-26",
-      "category": "tax-comparison",
-      "visualConcept": "Isometric fork in the road - one path labeled SALARY (regular coins), other DIVIDENDS (different colored coins). Director figure at decision point. Pink accents.",
-      "keywords": ["fork in road", "two paths", "decision", "director", "different coins"],
-      "outputFilename": "salary-vs-dividends.jpg"
-    },
-    {
-      "slug": "director-salary-dividends-guide-2025-26",
-      "category": "salary-guides",
-      "visualConcept": "Isometric mixing bowl or container combining two streams - salary stream and dividend stream - into optimal mix. Director figure overseeing. Amber/gold tones.",
-      "keywords": ["mixing", "two streams", "optimal blend", "director", "combination"],
-      "outputFilename": "director-salary-dividends-guide.jpg"
-    },
-    {
-      "slug": "director-tax-deadlines-2025-26",
-      "category": "tax-deadlines",
-      "visualConcept": "Isometric calendar with multiple dates circled/highlighted, alarm bells, urgent stamps. Director desk setup. Orange warning tones.",
-      "keywords": ["calendar", "circled dates", "alarm", "urgent", "desk"],
-      "outputFilename": "director-tax-deadlines.jpg"
-    },
-    {
-      "slug": "setting-up-limited-company-uk-2025-26",
-      "category": "tax-tips",
-      "visualConcept": "Isometric building blocks assembling into a small company/office building. Foundation being laid, 'LTD' subtle hint. Cyan construction glow.",
-      "keywords": ["building blocks", "construction", "company forming", "foundation", "assembly"],
-      "outputFilename": "setting-up-limited-company.jpg"
-    },
-    {
-      "slug": "student-loan-repayment-changes-2025-26",
-      "category": "student-loans",
-      "visualConcept": "Isometric graduation cap with price tag, loan document unfurling showing repayment steps. Student figure. Blue academic tones.",
-      "keywords": ["graduation cap", "loan document", "steps", "student", "repayment path"],
-      "outputFilename": "student-loan-changes.jpg"
-    },
-    {
-      "slug": "uk-tax-changes-2025-complete-guide",
-      "category": "tax-changes",
-      "visualConcept": "Isometric newspaper or bulletin board with 'NEW' stamps, arrows showing changes (up/down), refresh symbols. Red urgent accents.",
-      "keywords": ["bulletin", "new stamps", "change arrows", "updates", "refresh"],
-      "outputFilename": "uk-tax-changes-2025.jpg"
-    },
-    {
-      "slug": "autumn-budget-2025-uk-tax-changes-explained",
-      "category": "tax-changes",
-      "visualConcept": "Isometric red briefcase (Chancellor's box) opening with documents and pound signs floating out. Autumn leaves subtle. Red/orange government feel.",
-      "keywords": ["red briefcase", "budget box", "documents", "autumn leaves", "announcement"],
-      "outputFilename": "autumn-budget-2025.jpg"
-    },
-    {
-      "slug": "spring-statement-2026-uk-what-to-expect",
-      "category": "tax-changes",
-      "visualConcept": "Isometric crystal ball or forecast screen showing question marks and potential changes. Spring flowers subtle hints. Red with hopeful green accents.",
-      "keywords": ["crystal ball", "forecast", "question marks", "spring", "prediction"],
-      "outputFilename": "spring-statement-2026.jpg"
-    },
-    {
-      "slug": "self-assessment-deadline-january-2026-what-you-need-to-know",
-      "category": "tax-deadlines",
-      "visualConcept": "Isometric countdown clock approaching midnight, tax form/document, January calendar page. Urgent but manageable. Orange deadline glow.",
-      "keywords": ["countdown", "clock", "tax form", "January", "deadline"],
-      "outputFilename": "self-assessment-deadline.jpg"
-    },
-    {
-      "slug": "uk-tax-calculator-2025-complete-guide",
-      "category": "tax-tools",
-      "visualConcept": "Isometric sleek calculator or phone app with numbers displayed, input fields, result showing. Clean tech UI feel. Teal/cyan modern accents.",
-      "keywords": ["calculator app", "phone", "numbers", "modern UI", "input output"],
-      "outputFilename": "uk-tax-calculator-guide.jpg"
-    }
-  ]
+  "filenameRules": {
+    "format": "jpg",
+    "shape": "short descriptive kebab-case matching the post topic",
+    "examples": ["100k-tax-trap.jpg", "director-tax-deadlines.jpg", "student-loan-thresholds.jpg"]
+  }
 }

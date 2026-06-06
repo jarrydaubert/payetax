@@ -8,19 +8,19 @@ The aim is not to look busy. The aim is to prove that the calculator, surroundin
 
 ## Current Audit Snapshot
 
-Last audited: 2026-06-04.
+Last audited: 2026-06-06.
 
-Current automated evidence from a full local run:
+Use this section as the current testing map, not as a frozen release certificate. Exact suite counts, coverage percentages, and generated route counts move as the app changes. Capture those run-specific numbers in PRs or release evidence instead of letting this guide go stale.
 
-- `bun run check:repo`: passed.
-- Jest coverage suite: 202 suites, 3216 tests passed.
-- Playwright full suite: 338 tests passed across Chromium, WebKit, Mobile Chrome, and Mobile Safari.
-- Global coverage: 91.66% statements, 81.07% branches, 80.53% functions, 91.66% lines.
-- Golden master E2E: 20 HMRC-sourced scenarios passed within the stated tolerances.
-- `bun run build`: passed, 61 static pages generated.
-- `bun audit`: no vulnerabilities found.
+Current automated evidence expected before broad changes merge:
 
-Known automated-coverage gaps from the same audit:
+- `bun run check:repo`
+- the smallest relevant Jest or Playwright check while developing
+- `bun run build`
+- `bun run test:full` for broad calculation, browser, route, or refactor changes
+- `bun audit` or `bun run audit:deps` when dependencies change
+
+Known automated-coverage gaps:
 
 - `src/app/api/ops/rate-limit-health/route.ts` is not unit-covered.
 - `src/lib/email/emailDelivery.ts` is not unit-covered.

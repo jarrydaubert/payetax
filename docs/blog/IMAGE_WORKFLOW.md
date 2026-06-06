@@ -18,7 +18,7 @@ bun run blog:image:import -- ~/Desktop/source-image.png spring-statement-2026.jp
 
 ## Recommended Workflow
 
-1. Generate the image in your AI tool of choice using the prompt library as a starting point.
+1. Generate the image using the prompt library as a style guardrail.
 2. Save the source image anywhere convenient, for example `~/Desktop/`.
 3. Import it into the repo with:
 
@@ -49,8 +49,9 @@ image: "/images/blog/desired-output-name.jpg"
 
 Use `docs/blog/ai-image-prompts.json` for:
 
-- category colors
-- visual style guidance
-- existing post examples and filenames
+- Ledger-era visual style guidance
+- topic prompt patterns
+- filename conventions
+- details to avoid, especially old fintech glow and fake official branding
 
 It is a planning/reference file, not executable code.

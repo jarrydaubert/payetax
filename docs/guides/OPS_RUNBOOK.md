@@ -24,8 +24,9 @@ If Vercel CLI reports that it cannot retrieve project settings, the local `.verc
 
 ```bash
 vercel login
-mv .vercel .vercel.old-deleted-account
+mv .vercel .vercel.stale
 vercel link --project payetax
+vercel project ls
 ```
 
 Choose the current Vercel account used for Jarryd's public projects.

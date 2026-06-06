@@ -86,4 +86,5 @@ Other production controls:
 - Product direction: [docs/business/PRODUCT_DIRECTION.md](docs/business/PRODUCT_DIRECTION.md)
 - Testing: [docs/guides/TESTING.md](docs/guides/TESTING.md)
 - Ops: [docs/guides/OPS_RUNBOOK.md](docs/guides/OPS_RUNBOOK.md)
+- Vercel project: [docs/guides/VERCEL_PROJECT.md](docs/guides/VERCEL_PROJECT.md)
 - Env contract: [docs/guides/PRODUCTION_ENV_CONTRACT.md](docs/guides/PRODUCTION_ENV_CONTRACT.md)
