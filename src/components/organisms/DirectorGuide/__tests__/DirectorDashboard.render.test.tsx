@@ -59,6 +59,7 @@ jest.mock('@/components/molecules/DirectorGuide/dashboard', () => ({
     </button>
   ),
   MoneyFlowChart: () => <div>Money Flow</div>,
+  RecommendationHero: () => <div>Recommendation Hero</div>,
   SidebarNav: () => <div>Sidebar</div>,
   SummaryCards: () => <div>Summary Cards</div>,
   SurvivalModePanel: () => <div data-testid='director-survival-mode'>Survival Mode</div>,
@@ -66,10 +67,6 @@ jest.mock('@/components/molecules/DirectorGuide/dashboard', () => ({
 
 jest.mock('@/components/molecules/DirectorGuide/EmailResultsDialog', () => ({
   EmailResultsDialog: ({ open }: { open: boolean }) => (open ? <div>Results Dialog</div> : null),
-}));
-
-jest.mock('@/components/molecules/DirectorGuide/WelcomeDialog', () => ({
-  DirectorGuideWelcomeDialog: () => null,
 }));
 
 function createComparison(grossProfit: number) {
