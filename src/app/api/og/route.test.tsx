@@ -92,6 +92,7 @@ describe('/api/og GET', () => {
     const text = collectText(response.element).join(' ');
     expect(text).toContain('Gross Salary');
     expect(text).toContain('Take-Home Pay');
+    expect(text).toContain('Illustrative only.');
   });
 
   it('falls back to the default view when salary is out of bounds', async () => {

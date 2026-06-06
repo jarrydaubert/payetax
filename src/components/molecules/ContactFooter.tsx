@@ -9,7 +9,6 @@
 
 import type { Route } from 'next';
 import Link from 'next/link';
-import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 import type { ContactLinkData } from '@/lib/validation/pageDataValidation';
 
@@ -82,15 +81,11 @@ export function ContactFooter({
     <section className={containerClasses}>
       <div className={contentClasses}>
         {/* Title */}
-        <h3 className={cn('font-bold text-foreground', SPACING.MB_4, TYPOGRAPHY.TEXT_2XL)}>
-          {title}
-        </h3>
+        <h3 className={cn('font-bold text-foreground', 'mb-4', 'text-2xl')}>{title}</h3>
 
         {/* Description */}
         {description && (
-          <p className={cn('text-muted-foreground', SPACING.MB_6, TYPOGRAPHY.TEXT_BASE)}>
-            {description}
-          </p>
+          <p className={cn('text-muted-foreground', 'mb-6', 'text-base')}>{description}</p>
         )}
 
         {/* Contact Links */}
@@ -119,7 +114,7 @@ interface ContactLinkItemProps {
 function ContactLinkItem({ link, showSeparator }: ContactLinkItemProps) {
   const linkClasses = cn(
     'text-primary transition-colors hover:text-primary/80',
-    TYPOGRAPHY.TEXT_BASE,
+    'text-base',
     link.type === 'email' && 'font-mono',
   );
 

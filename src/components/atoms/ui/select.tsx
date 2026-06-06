@@ -1,7 +1,6 @@
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { Check, ChevronDown, ChevronUp } from 'lucide-react';
 import { type ComponentPropsWithoutRef, type ElementRef, forwardRef } from 'react';
-import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 const Select = SelectPrimitive.Root;
@@ -19,13 +18,13 @@ const SelectTrigger = forwardRef<ElementRef<typeof SelectPrimitive.Trigger>, Sel
       ref={ref}
       className={cn(
         // Layout
-        'flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md px-3 py-2 shadow-sm',
+        'flex h-9 w-full items-center justify-between whitespace-nowrap rounded-sm px-3 py-2 shadow-none',
         // Border - neutral by default
         'border border-border',
         // Background
         'bg-background',
         // Typography
-        TYPOGRAPHY.TEXT_SM,
+        'text-sm',
         // Focus
         'ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
         // Disabled
@@ -105,7 +104,7 @@ const SelectContent = forwardRef<ElementRef<typeof SelectPrimitive.Content>, Sel
         ref={ref}
         className={cn(
           // Base
-          'relative z-50 overflow-hidden rounded-md shadow-md',
+          'relative z-50 overflow-hidden rounded-sm shadow-none',
           // Border - neutral
           'border border-border',
           // Background
@@ -156,7 +155,7 @@ const SelectLabel = forwardRef<ElementRef<typeof SelectPrimitive.Label>, SelectL
   ({ className, ...props }, ref) => (
     <SelectPrimitive.Label
       ref={ref}
-      className={cn('py-1.5 font-semibold', SPACING.PX_2, TYPOGRAPHY.TEXT_SM, className)}
+      className={cn('px-2 py-1.5 font-semibold text-sm', className)}
       {...props}
     />
   ),
@@ -176,7 +175,7 @@ const SelectItem = forwardRef<ElementRef<typeof SelectPrimitive.Item>, SelectIte
         // Layout
         'relative flex w-full cursor-default select-none items-center rounded-sm py-2 pr-8 pl-3 outline-none',
         // Typography
-        TYPOGRAPHY.TEXT_SM,
+        'text-sm',
         // Highlighted state (Radix uses data-highlighted for keyboard navigation)
         'data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground',
         // Checked state styling

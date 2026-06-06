@@ -1,5 +1,5 @@
 // src/components/molecules/__tests__/Footer.test.tsx
-// Tests for new simplified footer design (payetax-web design system)
+// Tests for the simplified Ledger footer
 
 import { fireEvent, render, screen } from '@testing-library/react';
 import { Footer } from '../Footer';
@@ -13,13 +13,13 @@ describe('Footer Component', () => {
       // The parent template (Layout.tsx) wraps it in <footer>
       const footerDiv = container.firstChild;
       expect(footerDiv).toBeInTheDocument();
-      expect(footerDiv).toHaveClass('footer-new');
+      expect(footerDiv).toHaveClass('border-t');
     });
 
-    it('should render brand name with gradient', () => {
-      const { container } = render(<Footer />);
+    it('should render brand name', () => {
+      render(<Footer />);
 
-      const brand = container.querySelector('.footer-brand');
+      const brand = screen.getByRole('link', { name: /paye tax/i });
       expect(brand).toBeInTheDocument();
       expect(brand).toHaveTextContent('payetax');
     });
@@ -112,18 +112,19 @@ describe('Footer Component', () => {
       expect(footerDiv).toHaveClass('custom-class');
     });
 
-    it('should have footer-new class', () => {
+    it('should use Ledger shell classes', () => {
       const { container } = render(<Footer />);
 
       const footerDiv = container.firstChild as HTMLElement;
-      expect(footerDiv).toHaveClass('footer-new');
+      expect(footerDiv).toHaveClass('border-t', 'px-8', 'py-12');
     });
 
-    it('should have footer-content-new wrapper', () => {
+    it('should have a responsive content grid', () => {
       const { container } = render(<Footer />);
 
-      const content = container.querySelector('.footer-content-new');
+      const content = container.querySelector('.grid');
       expect(content).toBeInTheDocument();
+      expect(content).toHaveClass('max-w-[1100px]');
     });
   });
 
@@ -161,18 +162,18 @@ describe('Footer Component', () => {
       expect(screen.getByText(/2026/i)).toBeInTheDocument();
     });
 
-    it('should have footer-brand class on brand', () => {
+    it('should use the shared wordmark class on brand', () => {
       const { container } = render(<Footer />);
 
-      const brand = container.querySelector('.footer-brand');
+      const brand = container.querySelector('.brand-wordmark');
       expect(brand).toBeInTheDocument();
     });
 
-    it('should have footer-copy class on copyright', () => {
-      const { container } = render(<Footer />);
+    it('should keep copyright compact on desktop', () => {
+      render(<Footer />);
 
-      const copy = container.querySelector('.footer-copy');
-      expect(copy).toBeInTheDocument();
+      const copy = screen.getByText(/© 2026 PayeTax/i);
+      expect(copy).toHaveClass('whitespace-nowrap', 'md:justify-self-end');
     });
   });
 });

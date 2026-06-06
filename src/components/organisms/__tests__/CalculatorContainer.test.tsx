@@ -153,14 +153,16 @@ describe('CalculatorContainer Component', () => {
     it('should render header with title', () => {
       render(<CalculatorContainer />);
 
-      expect(screen.getByRole('heading', { name: /UK Tax Calculator/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { name: /Calculate your take-home pay/i }),
+      ).toBeInTheDocument();
     });
 
     it('should render header description', () => {
       render(<CalculatorContainer />);
 
       expect(
-        screen.getByText(/Estimate your take-home pay with official HMRC rates/i),
+        screen.getByText(/check the period-by-period breakdown against official HMRC rates/i),
       ).toBeInTheDocument();
     });
 
@@ -389,7 +391,7 @@ describe('CalculatorContainer Component', () => {
     it('should have proper heading hierarchy', () => {
       render(<CalculatorContainer />);
 
-      const heading = screen.getByRole('heading', { name: /UK Tax Calculator/i });
+      const heading = screen.getByRole('heading', { name: /Calculate your take-home pay/i });
       expect(heading).toBeInTheDocument();
     });
 

@@ -81,7 +81,7 @@ describe('mdx-components', () => {
       it('should have correct styling classes', () => {
         render(<H1>Styled Heading</H1>);
         const heading = screen.getByRole('heading', { level: 1 });
-        expect(heading).toHaveClass('font-bold', 'text-foreground', 'group');
+        expect(heading).toHaveClass('font-display', 'font-semibold', 'text-foreground', 'group');
       });
     });
 
@@ -270,12 +270,14 @@ describe('mdx-components', () => {
     it('should have left border styling', () => {
       render(<Blockquote>Styled quote</Blockquote>);
       const blockquote = screen.getByRole('blockquote');
-      expect(blockquote).toHaveClass('border-l-4', 'border-primary/50');
+      expect(blockquote).toHaveClass('border-l', 'border-primary/50');
     });
 
-    it('should have card styling', () => {
+    it('should use flat Ledger quote styling', () => {
       render(<Blockquote>Glass quote</Blockquote>);
-      expect(screen.getByRole('blockquote')).toHaveClass('bg-card/80', 'backdrop-blur-sm');
+      const blockquote = screen.getByRole('blockquote');
+      expect(blockquote).toHaveClass('my-8', 'border-l');
+      expect(blockquote).not.toHaveClass('bg-card/80', 'backdrop-blur-sm');
     });
   });
 
@@ -309,22 +311,25 @@ describe('mdx-components', () => {
       expect(screen.getAllByRole('cell')).toHaveLength(4);
     });
 
-    it('should have card styling on table', () => {
+    it('should have flat card styling on table', () => {
       renderTable();
-      expect(screen.getByRole('table')).toHaveClass('bg-card/80', 'backdrop-blur-sm');
+      const table = screen.getByRole('table');
+      expect(table).toHaveClass('bg-card');
+      expect(table).not.toHaveClass('bg-card/80', 'backdrop-blur-sm');
+      expect(table.parentElement).toHaveClass('border', 'border-border', 'bg-card');
     });
 
     it('should style table headers', () => {
       renderTable();
       const headers = screen.getAllByRole('columnheader');
-      expect(headers[0]).toHaveClass('font-semibold', 'uppercase', 'tracking-wider');
+      expect(headers[0]).toHaveClass('font-semibold', 'uppercase', 'tracking-[0.2em]');
     });
 
     it('should style table rows with hover', () => {
       renderTable();
       const rows = screen.getAllByRole('row');
       // Body rows should have hover styling
-      expect(rows[1]).toHaveClass('hover:bg-foreground/5');
+      expect(rows[1]).toHaveClass('hover:bg-muted/35');
     });
 
     it('should wrap table in scrollable container', () => {
@@ -341,10 +346,11 @@ describe('mdx-components', () => {
       expect(hr).toBeInTheDocument();
     });
 
-    it('should have gradient styling', () => {
+    it('should have flat rule styling', () => {
       const { container } = render(<HR />);
       const hr = container.querySelector('hr');
-      expect(hr).toHaveClass('bg-gradient-to-r');
+      expect(hr).toHaveClass('border-t', 'border-border');
+      expect(hr).not.toHaveClass('bg-gradient-to-r');
     });
   });
 
@@ -377,7 +383,8 @@ describe('mdx-components', () => {
     it('should have correct image styling', () => {
       render(<Img src='/styled.jpg' alt='Styled image' />);
       const img = screen.getByRole('img');
-      expect(img).toHaveClass('rounded-lg', 'shadow-lg');
+      expect(img).toHaveClass('border', 'border-border');
+      expect(img).not.toHaveClass('rounded-lg', 'shadow-lg');
     });
   });
 

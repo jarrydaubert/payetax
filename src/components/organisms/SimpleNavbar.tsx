@@ -7,20 +7,13 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 import { NavbarMobileMenu } from '@/components/molecules/NavbarMobileMenu';
 import { Button } from '@/components/ui/button';
-import { ICON_SIZES, SPACING } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 const CALCULATOR_ID = 'tax-calculator';
 const CALCULATOR_HASH = `#${CALCULATOR_ID}`;
 
 /**
- * Navigation bar using the canonical brand-surface theme
- *
- * Design specs from payetax-web:
- * - Fixed position with backdrop blur
- * - Logo: "paye<span>tax</span>" with gradient on "tax"
- * - Nav links: Simple hover color change (no underlines)
- * - CTA: Gradient pill button
+ * Navigation bar using the Ledger shell.
  */
 interface SimpleNavbarProps {
   className?: string;
@@ -92,7 +85,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           'nav-safe-top fixed right-0 left-0 z-50',
           'grid grid-cols-[1fr_auto_1fr] items-center',
           'px-4 pt-[calc(var(--pwa-safe-area-top,0px)+1rem)] pb-4 sm:px-8 sm:py-6',
-          'bg-surface-brand/80 backdrop-blur-xl',
+          'border-border border-b bg-background/95',
           className,
         )}
         aria-label='Main navigation'
@@ -109,9 +102,9 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
             }
           }}
         >
-          <span className='brand-wordmark text-2xl text-on-brand'>
+          <span className='brand-wordmark text-2xl text-foreground'>
             paye
-            <span className='text-gradient-brand'>tax</span>
+            <span className='text-primary'>tax</span>
           </span>
         </Link>
 
@@ -122,7 +115,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
               key={link.href}
               href={link.href}
               onClick={link.label === 'Calculator' ? handleCalculatorClick : undefined}
-              className='font-medium text-on-brand-muted text-sm transition-colors duration-300 hover:text-brand'
+              className='font-medium text-muted-foreground text-sm transition-colors duration-200 hover:text-primary'
             >
               {link.label}
             </Link>
@@ -130,13 +123,8 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
         </div>
 
         {/* Desktop Utilities */}
-        <div className={cn('hidden items-center justify-end md:flex', SPACING.GAP_2)}>
-          <Button
-            asChild
-            size='touch'
-            variant='brandOutline'
-            className='rounded-full px-5 py-2.5 text-on-brand text-sm hover:scale-105'
-          >
+        <div className={cn('hidden items-center justify-end md:flex', 'gap-2')}>
+          <Button asChild size='touch' variant='outline' className='px-5 py-2.5 text-sm'>
             <Link href={`/${CALCULATOR_HASH}`} onClick={handleCalculatorClick}>
               Open Calculator
             </Link>
@@ -147,18 +135,14 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
         <Button
           variant='ghost'
           size='icon'
-          className='col-start-3 justify-self-end text-on-brand md:hidden'
+          className='col-start-3 justify-self-end text-foreground md:hidden'
           onClick={() => {
             setIsMobileMenuOpen(!isMobileMenuOpen);
           }}
           aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
           data-testid='mobile-menu-button'
         >
-          {isMobileMenuOpen ? (
-            <X className={ICON_SIZES.SIZE_5} />
-          ) : (
-            <Menu className={ICON_SIZES.SIZE_5} />
-          )}
+          {isMobileMenuOpen ? <X className={'size-5'} /> : <Menu className={'size-5'} />}
         </Button>
       </nav>
 

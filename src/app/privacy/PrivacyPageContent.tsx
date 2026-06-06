@@ -4,15 +4,13 @@
 import { Calendar, CheckCircle, Cookie, Eye, Lock, Shield, X } from 'lucide-react';
 
 // Last updated date - update when privacy policy changes
-const PRIVACY_LAST_UPDATED = 'February 19, 2026';
+const PRIVACY_LAST_UPDATED = 'June 5, 2026';
 
-import { GradientText } from '@/components/atoms/GradientText';
 import { ComparisonCards } from '@/components/molecules/ComparisonCards';
 import { DataFlowCards } from '@/components/molecules/DataFlowCards';
 import { FeatureGrid } from '@/components/molecules/FeatureGrid';
 import { PageHero } from '@/components/molecules/PageHero';
 import { SectionHeading } from '@/components/molecules/SectionHeading';
-import { ICON_SIZES, LAYOUT, TYPOGRAPHY } from '@/constants/designTokens';
 import {
   PRIVACY_DATA_FLOW,
   PRIVACY_DO_DO,
@@ -23,15 +21,13 @@ import { cn } from '@/lib/utils';
 
 export function PrivacyPageContent() {
   return (
-    <div className={LAYOUT.PAGE_WRAPPER}>
+    <div className={'min-h-screen'}>
       {/* Hero Section */}
       <PageHero
         badge={{ icon: Shield, text: 'Privacy Policy' }}
         title={
           <>
-            <GradientText variant='brand-full' as='span'>
-              Your Data Stays
-            </GradientText>
+            Your Data Stays
             <br />
             <span className='text-foreground'>In Your Browser</span>
           </>
@@ -40,24 +36,21 @@ export function PrivacyPageContent() {
       />
 
       {/* Last Updated */}
-      <section className={LAYOUT.SECTION}>
+      <section className={'py-12 md:py-20'}>
         <div
-          className={cn(
-            'flex items-center justify-center gap-2 text-muted-foreground',
-            TYPOGRAPHY.TEXT_SM,
-          )}
+          className={cn('flex items-center justify-center gap-2 text-muted-foreground', 'text-sm')}
         >
-          <Calendar className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+          <Calendar className={'size-4'} aria-hidden='true' />
           <span>Last updated: {PRIVACY_LAST_UPDATED}</span>
         </div>
       </section>
 
       {/* Quick Summary */}
-      <section className={LAYOUT.SECTION}>
-        <div className={LAYOUT.CONTAINER_MD}>
+      <section className={'py-12 md:py-20'}>
+        <div className={'container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8'}>
           <SectionHeading
             badge={{ icon: CheckCircle, text: 'Quick Summary' }}
-            title={<GradientText variant='brand'>The 30-Second Version</GradientText>}
+            title='The 30-Second Version'
             subtitle='Everything you need to know at a glance'
             align='center'
           />
@@ -80,8 +73,8 @@ export function PrivacyPageContent() {
       </section>
 
       {/* Privacy Principles */}
-      <section className={LAYOUT.SECTION_TINTED_PRIMARY}>
-        <div className={LAYOUT.CONTAINER}>
+      <section className={'border-border/60 border-y bg-primary/5 py-12 md:py-20'}>
+        <div className={'container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'}>
           <FeatureGrid
             heading={{
               title: 'How We Protect Your Privacy',
@@ -96,11 +89,11 @@ export function PrivacyPageContent() {
       </section>
 
       {/* Data Flow */}
-      <section className={LAYOUT.SECTION}>
-        <div className={LAYOUT.CONTAINER_MD}>
+      <section className={'py-12 md:py-20'}>
+        <div className={'container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8'}>
           <SectionHeading
             badge={{ icon: Lock, text: 'Data Flow' }}
-            title={<GradientText variant='brand'>Where Your Tax Data Goes</GradientText>}
+            title='Where Your Tax Data Goes'
             subtitle="Spoiler: Nowhere. Here's the technical breakdown."
             align='center'
           />
@@ -110,8 +103,8 @@ export function PrivacyPageContent() {
       </section>
 
       {/* Analytics Section */}
-      <section className={LAYOUT.SECTION_TINTED_ACCENT}>
-        <div className={LAYOUT.CONTAINER_MD}>
+      <section className={'border-border/60 border-y bg-card py-12 md:py-20'}>
+        <div className={'container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8'}>
           <FeatureGrid
             heading={{
               badge: { icon: Eye, text: 'Analytics' },
@@ -124,19 +117,19 @@ export function PrivacyPageContent() {
                 icon: Cookie,
                 title: 'Analytics Tools',
                 description:
-                  'We use Google Analytics 4 (with Consent Mode), Vercel Analytics for Web Vitals, and Sentry for error monitoring. GA4 only tracks after you accept cookies. Vercel Analytics is cookieless and collects no PII.',
+                  'We use Google Analytics 4 with Consent Mode and Sentry for error monitoring. GA4 only tracks after you accept analytics cookies.',
               },
               {
                 icon: Eye,
                 title: 'What We Track',
                 description:
-                  'Page views, anonymized salary ranges (not exact values), calculator usage patterns, and performance metrics. Sentry may capture session replays (1% sample) for debugging - no financial data is recorded.',
+                  'Page views, anonymized salary ranges (not exact values), calculator usage patterns, performance metrics, and error context needed to diagnose failures. No financial data is intentionally recorded.',
               },
               {
                 icon: Shield,
                 title: 'Your Control',
                 description:
-                  'Decline analytics via our cookie banner to block GA4 tracking entirely. Vercel Analytics runs regardless but collects no personal data. The calculator works identically either way.',
+                  'Decline analytics via our cookie banner to block GA4 tracking entirely. The calculator works identically either way.',
               },
             ]}
             columns={3}

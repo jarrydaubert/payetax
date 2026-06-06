@@ -1,7 +1,7 @@
 /**
  * PageHero Molecule
  *
- * Reusable page hero section with badge, title, and subtitle.
+ * Reusable Ledger page hero section with badge, title, and subtitle.
  * Used across all major pages (about, privacy, compliance, blog).
  *
  * Part of PAYTAX-109: Proper Page Architecture Refactor
@@ -12,7 +12,6 @@
 import type { LucideIcon } from 'lucide-react';
 import type React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 /**
@@ -33,7 +32,7 @@ export interface PageHeroBadge {
 export interface PageHeroProps {
   /** Optional badge above title */
   badge?: PageHeroBadge;
-  /** Main heading - supports React nodes for GradientText */
+  /** Main heading */
   title: React.ReactNode;
   /** Subtitle text - can be string or array of strings for multiple paragraphs */
   subtitle?: string | string[];
@@ -48,7 +47,7 @@ export interface PageHeroProps {
 /**
  * PageHero Component
  *
- * Displays a hero section with optional badge, title, and subtitle.
+ * Displays a Ledger hero section with optional badge, title, and subtitle.
  * Supports multiple subtitle paragraphs and customizable alignment.
  *
  * @example
@@ -57,8 +56,7 @@ export interface PageHeroProps {
  *   badge={{ icon: Sparkles, text: 'About PayeTax' }}
  *   title={
  *     <>
- *       <GradientText variant='brand-full'>Tax Calculations</GradientText>
- *       {' '}Built for Privacy
+ *       Tax Calculations Built for Privacy
  *     </>
  *   }
  *   subtitle="The UK tax calculator that respects your privacy..."
@@ -88,11 +86,7 @@ export function PageHero({
   const alignClass = align === 'center' ? 'text-center' : 'text-left';
 
   const backgroundClass =
-    variant === 'gradient'
-      ? 'bg-gradient-to-br from-primary/5 via-accent/5 to-transparent'
-      : variant === 'simple'
-        ? ''
-        : 'bg-gradient-to-br from-primary/5 via-accent/5 to-transparent';
+    variant === 'simple' ? '' : 'border-border/70 border-b bg-background bg-ledger-grid';
 
   const subtitles = Array.isArray(subtitle) ? subtitle : subtitle ? [subtitle] : [];
 
@@ -104,35 +98,38 @@ export function PageHero({
         className,
       )}
     >
-      <div className={cn('container mx-auto max-w-7xl', SPACING.PX_4)}>
+      <div className={cn('container mx-auto max-w-7xl', 'px-4')}>
         <div className={alignClass}>
           {/* Badge */}
           {badge && (
             <Badge
               variant={badge.variant || 'outline'}
               className={cn(
-                'mb-6 gap-2 border-primary/30 bg-primary/10 px-6 py-2.5 backdrop-blur-sm',
-                SPACING.GAP_2,
+                'mb-6 rounded-sm border-primary/35 bg-background px-5 py-2.5 text-primary uppercase tracking-[0.24em]',
+                'gap-2',
               )}
             >
-              {badge.icon && <badge.icon className={ICON_SIZES.SIZE_5} aria-hidden='true' />}
+              {badge.icon && <badge.icon className={'size-5'} aria-hidden='true' />}
               <span>{badge.text}</span>
             </Badge>
           )}
 
           {/* Title */}
-          <h1 className={cn('font-bold leading-tight', SPACING.MB_6, TYPOGRAPHY.TEXT_6XL)}>
+          <h1
+            className={cn(
+              'font-display font-semibold text-foreground leading-[0.98]',
+              'mb-6',
+              'text-6xl',
+            )}
+          >
             {title}
           </h1>
 
           {/* Subtitle(s) */}
           {subtitles.length > 0 && (
-            <div className={cn('mx-auto max-w-3xl', SPACING.SPACE_Y_4)}>
+            <div className={cn('mx-auto max-w-3xl', 'space-y-4')}>
               {subtitles.map((text) => (
-                <p
-                  key={text}
-                  className={cn('text-muted-foreground leading-relaxed', TYPOGRAPHY.TEXT_LG)}
-                >
+                <p key={text} className={cn('text-muted-foreground leading-relaxed', 'text-lg')}>
                   {text}
                 </p>
               ))}

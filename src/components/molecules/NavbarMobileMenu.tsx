@@ -5,7 +5,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import type { Route } from 'next';
 import Link from 'next/link';
 import { type ReactNode, useCallback, useEffect, useRef } from 'react';
-import { LAYOUT } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 interface NavLink {
@@ -103,7 +102,7 @@ export function NavbarMobileMenu({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className='fixed inset-0 z-40 bg-surface-brand/60 md:hidden'
+            className='fixed inset-0 z-40 bg-background/60 md:hidden'
             onClick={onBackdropClick}
             aria-hidden='true'
           />
@@ -120,9 +119,9 @@ export function NavbarMobileMenu({
             transition={{ duration: 0.2, ease: 'easeOut' }}
             className={cn(
               'fixed right-0 left-0 z-50 md:hidden',
-              LAYOUT.BELOW_NAVBAR,
+              'top-16',
               'top-[calc(4rem+var(--pwa-safe-area-top,0px))]',
-              'mobile-menu-blur px-4 py-6',
+              'border-border/60 border-b bg-card px-4 py-6',
             )}
             aria-label='Mobile navigation menu'
           >
@@ -142,7 +141,7 @@ export function NavbarMobileMenu({
                     onClick={() => onLinkClick(link.label)}
                     className={cn(
                       'block min-h-11 rounded-lg px-4 py-3 font-medium text-sm transition-colors',
-                      isActive ? 'bg-brand/10 text-brand' : 'text-on-brand-muted',
+                      isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground',
                     )}
                   >
                     {link.label}

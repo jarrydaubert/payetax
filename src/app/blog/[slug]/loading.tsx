@@ -44,7 +44,7 @@ export default function Loading() {
         </div>
 
         {/* Article content skeleton */}
-        <div className='glass-card mb-6 rounded-xl p-8 md:mb-8'>
+        <div className='mb-6 rounded-sm border border-border bg-card p-8 md:mb-8'>
           <div className='space-y-4'>
             {Array.from({ length: 8 }, (_, i) => `skeleton-content-${i}`).map((key) => (
               <div key={key} className='space-y-2'>
@@ -57,7 +57,7 @@ export default function Loading() {
         </div>
 
         {/* CTA skeleton */}
-        <div className='glass-card mb-8 h-32 animate-pulse rounded-xl motion-reduce:animate-none' />
+        <div className='mb-8 h-32 animate-pulse rounded-sm border border-border bg-card motion-reduce:animate-none' />
       </div>
     </output>
   );

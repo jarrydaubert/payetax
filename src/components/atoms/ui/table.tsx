@@ -1,6 +1,5 @@
 import { type ComponentPropsWithoutRef, type ElementRef, forwardRef } from 'react';
 
-import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 /**
@@ -44,7 +43,7 @@ export type TableProps = ComponentPropsWithoutRef<'table'> & {
 const Table = forwardRef<HTMLDivElement, TableProps>(
   ({ className, containerRef, ...props }, ref) => (
     <div ref={ref ?? containerRef} className='relative w-full overflow-auto'>
-      <table className={cn('w-full caption-bottom', TYPOGRAPHY.TEXT_SM, className)} {...props} />
+      <table className={cn('w-full caption-bottom text-sm', className)} {...props} />
     </div>
   ),
 );
@@ -142,11 +141,7 @@ export type TableCaptionProps = ComponentPropsWithoutRef<'caption'>;
 
 const TableCaption = forwardRef<ElementRef<'caption'>, TableCaptionProps>(
   ({ className, ...props }, ref) => (
-    <caption
-      ref={ref}
-      className={cn('text-muted-foreground', SPACING.MT_4, TYPOGRAPHY.TEXT_SM, className)}
-      {...props}
-    />
+    <caption ref={ref} className={cn('mt-4 text-muted-foreground text-sm', className)} {...props} />
   ),
 );
 TableCaption.displayName = 'TableCaption';

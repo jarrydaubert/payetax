@@ -32,7 +32,6 @@ import {
   type TooltipContent as TooltipData,
   type TooltipFieldName,
 } from '@/config/inputTooltips';
-import { COMPONENT_GUIDELINES, SURFACES } from '@/constants/designTokens';
 import { formatTooltipText } from '@/lib/tooltipUtils';
 import { cn } from '@/lib/utils';
 
@@ -96,9 +95,7 @@ export const InputTooltip = memo(function InputTooltip({
 
   return (
     <Tooltip>
-      <div
-        className={cn('flex items-center', COMPONENT_GUIDELINES.TOOLTIPS.gapStandard, className)}
-      >
+      <div className={cn('flex items-center gap-2', className)}>
         {/* Input element with injected aria-describedby */}
         <div className='flex-1'>{wrappedChildren}</div>
 
@@ -108,13 +105,12 @@ export const InputTooltip = memo(function InputTooltip({
             type='button'
             className={cn(
               'flex min-h-6 min-w-6 flex-shrink-0 items-center justify-center p-1 text-muted-foreground transition-colors hover:text-foreground',
-              'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1',
-              SURFACES.SHAPE_CIRCLE,
+              'rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1',
             )}
             aria-label={`Help for ${tooltipContent.title}`}
             data-testid={`tooltip-trigger-${fieldName}`}
           >
-            <HelpCircle className={COMPONENT_GUIDELINES.TOOLTIPS.iconStandard} aria-hidden='true' />
+            <HelpCircle className='size-4' aria-hidden='true' />
           </button>
         </TooltipTrigger>
       </div>

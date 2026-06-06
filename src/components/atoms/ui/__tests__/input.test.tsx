@@ -183,7 +183,7 @@ describe('Input Component', () => {
       expect(input).toHaveClass('flex');
       expect(input).toHaveClass('h-9');
       expect(input).toHaveClass('w-full');
-      expect(input).toHaveClass('rounded-md');
+      expect(input).toHaveClass('rounded-sm');
       expect(input).toHaveClass('border');
     });
 

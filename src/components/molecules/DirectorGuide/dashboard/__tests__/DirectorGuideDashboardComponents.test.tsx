@@ -111,9 +111,11 @@ describe('Director Intelligence dashboard components', () => {
     it('renders values when comparison exists', () => {
       setStoreState({ strategyComparison: createComparison() as never });
 
-      render(<SummaryCards />);
+      const { container } = render(<SummaryCards />);
       expect(screen.getByText('Safe Monthly Draw')).toBeInTheDocument();
       expect(screen.getByText('Annual Dividends')).toBeInTheDocument();
+      expect(container.querySelector('.text-gradient-brand')).not.toBeInTheDocument();
+      expect(container.querySelector('[class*="bg-gradient"]')).not.toBeInTheDocument();
     });
 
     it('uses slider scenario when slider is active', () => {
@@ -237,6 +239,9 @@ describe('Director Intelligence dashboard components', () => {
       expect(mobileDrawer.querySelector('div.flex-1.overflow-y-auto')).toHaveClass(
         'pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)]',
       );
+      expect(
+        screen.getByText('Results are ready. Close this view to see your dashboard.').parentElement,
+      ).not.toHaveClass('backdrop-blur-sm');
       expect(
         screen.getByText('Results are ready. Close this view to see your dashboard.'),
       ).toBeInTheDocument();

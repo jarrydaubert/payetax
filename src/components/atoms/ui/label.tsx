@@ -1,7 +1,6 @@
 import * as LabelPrimitive from '@radix-ui/react-label';
 import { type ComponentPropsWithoutRef, type ElementRef, forwardRef } from 'react';
 
-import { TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 export type LabelProps = ComponentPropsWithoutRef<typeof LabelPrimitive.Root>;
@@ -38,7 +37,7 @@ const Label = forwardRef<ElementRef<typeof LabelPrimitive.Root>, LabelProps>(
         'flex items-center gap-2',
         // Typography
         'font-medium text-foreground leading-none',
-        TYPOGRAPHY.TEXT_SM,
+        'text-sm',
         // Disabled styling hooks
         // peer-disabled: works when label follows an input with .peer class
         'peer-disabled:cursor-not-allowed peer-disabled:opacity-50',

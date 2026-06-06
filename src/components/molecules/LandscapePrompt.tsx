@@ -19,7 +19,6 @@
 
 import { Smartphone, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { BREAKPOINTS } from '@/constants/ui';
 import { safeGetItem, safeSetItem } from '@/lib/safeStorage';
 import { cn } from '@/lib/utils';
@@ -111,21 +110,18 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
     >
       <div
         className={cn(
-          'glass-card flex items-center gap-3 p-3',
-          'border-primary/20 bg-primary/5 backdrop-blur-lg',
+          'flex items-center gap-3 rounded-sm border border-primary/30 bg-primary/5 p-3',
           'dark:bg-primary/10',
         )}
       >
         <Smartphone
-          className={cn(ICON_SIZES.SIZE_8, 'shrink-0 text-primary', 'animate-wiggle')}
+          className={cn('size-8', 'shrink-0 text-primary', 'animate-wiggle')}
           aria-hidden='true'
         />
 
         <div className='min-w-0 flex-1'>
-          <p className={cn('font-medium text-foreground', TYPOGRAPHY.TEXT_SM)}>
-            Rotate for Better View
-          </p>
-          <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS, SPACING.MT_1)}>
+          <p className={cn('font-medium text-foreground', 'text-sm')}>Rotate for Better View</p>
+          <p className={cn('text-muted-foreground', 'text-xs', 'mt-1')}>
             Turn your device sideways for easier viewing
           </p>
         </div>
@@ -141,7 +137,7 @@ export function LandscapePrompt({ className, onDismiss }: LandscapePromptProps) 
           )}
           aria-label='Dismiss landscape prompt'
         >
-          <X className={ICON_SIZES.SIZE_5} aria-hidden='true' />
+          <X className={'size-5'} aria-hidden='true' />
         </button>
       </div>
     </output>

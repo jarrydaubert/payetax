@@ -64,7 +64,7 @@ describe('HowToStepCard', () => {
     );
 
     const card = container.firstChild;
-    expect(card).toHaveClass('group', 'relative', 'overflow-hidden', 'border-2');
+    expect(card).toHaveClass('relative', 'overflow-hidden', 'rounded-sm', 'border');
   });
 
   it('renders with long description', () => {

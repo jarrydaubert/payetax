@@ -2,9 +2,8 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowUp, Mail, Sparkles } from 'lucide-react';
+import { Mail, Sparkles } from 'lucide-react';
 import * as React from 'react';
-import { createPortal } from 'react-dom';
 import { EmailResultsForm } from '@/components/molecules/EmailResultsForm';
 import { Card } from '@/components/ui/card';
 import {
@@ -16,8 +15,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { ANIMATION_TRANSITIONS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
-import { BREAKPOINTS, SCROLL_THRESHOLDS, TIMERS } from '@/constants/ui';
+import { BREAKPOINTS, TIMERS } from '@/constants/ui';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { trackEvent } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
@@ -36,7 +34,6 @@ export function CalculatorContainer() {
   // Use optimized selectors to prevent unnecessary re-renders
   const results = useCalculatorResults();
   const previousYearResults = useCalculatorStore((state) => state.previousYearResults);
-  const whatIfResults = useCalculatorStore((state) => state.whatIfResults);
   const input = useCalculatorStore(
     useShallow((state) => ({
       salary: state.input.salary,
@@ -68,8 +65,6 @@ export function CalculatorContainer() {
     'Daily',
     'Hourly',
   ]);
-  const [showScrollTop, setShowScrollTop] = React.useState(false);
-  const [portalMounted, setPortalMounted] = React.useState(false);
   const [actionMessage, setActionMessage] = React.useState<{
     tone: 'info' | 'error';
     text: string;
@@ -77,7 +72,6 @@ export function CalculatorContainer() {
   const resultsRef = React.useRef<HTMLDivElement>(null);
   const hasTrackedCalculatorStartRef = React.useRef(false);
   const calcScrollTimeoutRef = React.useRef<number | null>(null);
-  const whatIfScrollTimeoutRef = React.useRef<number | null>(null);
   const shouldReduceMotion = useMotionPreference();
 
   // SR-only live region message (event-driven, not region-driven)
@@ -107,34 +101,12 @@ export function CalculatorContainer() {
       : undefined,
   };
 
-  // Enable portal after mount (document not available during SSR)
-  React.useEffect(() => {
-    setPortalMounted(true);
-  }, []);
-
   // Cleanup timeouts on unmount to prevent memory leaks
   React.useEffect(() => {
     return () => {
       if (calcScrollTimeoutRef.current) clearTimeout(calcScrollTimeoutRef.current);
-      if (whatIfScrollTimeoutRef.current) clearTimeout(whatIfScrollTimeoutRef.current);
     };
   }, []);
-
-  // Lightweight scroll listener only for scroll-to-top button
-  React.useEffect(() => {
-    const handleScroll = () => {
-      setShowScrollTop(window.scrollY > SCROLL_THRESHOLDS.TOP_BUTTON);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: shouldReduceMotion ? 'auto' : 'smooth' });
-  };
 
   const handleCalculate = () => {
     setActionMessage(null);
@@ -177,26 +149,6 @@ export function CalculatorContainer() {
         });
       }
     }, TIMERS.CALC_SCROLL);
-  };
-
-  /**
-   * Handle post-calculation UI for what-if scenarios
-   * Note: Actual calculation happens in CalculatorInputsSection
-   */
-  const handleWhatIfPostCalculateUI = () => {
-    // Announce for screen readers
-    setLiveMessage('Scenarios compared. Check the results table.');
-
-    // Clear any pending scroll timeout
-    if (whatIfScrollTimeoutRef.current) clearTimeout(whatIfScrollTimeoutRef.current);
-
-    // Scroll to results after the comparison updates
-    whatIfScrollTimeoutRef.current = window.setTimeout(() => {
-      resultsRef.current?.scrollIntoView({
-        behavior: shouldReduceMotion ? 'auto' : 'smooth',
-        block: 'start',
-      });
-    }, TIMERS.WHAT_IF_SCROLL);
   };
 
   const handleVisiblePeriodsChange = (periods: string[]) => {
@@ -269,9 +221,9 @@ export function CalculatorContainer() {
     <div
       className={cn(
         'mx-auto flex w-full max-w-screen-2xl flex-col sm:px-4 md:py-8 lg:grid lg:grid-cols-[400px_minmax(0,1fr)] xl:grid-cols-[390px_minmax(0,1fr)] xl:px-8 2xl:grid-cols-[380px_minmax(0,1fr)]',
-        SPACING.GAP_3,
-        SPACING.PX_4,
-        SPACING.PY_4,
+        'gap-3',
+        'px-4',
+        'py-4',
         'md:gap-6 lg:gap-4 xl:gap-6',
       )}
       data-testid='calculator-section'
@@ -279,30 +231,26 @@ export function CalculatorContainer() {
       {/* Header - CSS animation for better mobile LCP (no JS blocking) */}
       <div
         className={cn(
-          'order-1 py-6 text-center lg:col-span-2 lg:py-8',
+          'order-1 grid gap-4 border-border border-y py-5 text-left lg:col-span-2 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] lg:items-end lg:py-6',
           'fade-in slide-in-from-top-4 animate-in duration-500',
         )}
       >
-        <h2
-          className={cn(
-            'mb-3 bg-gradient-to-r from-brand-gradient-start via-brand-accent to-brand-gradient-end bg-clip-text font-bold text-transparent',
-            TYPOGRAPHY.TEXT_4XL,
-            // Use literal string for responsive - dynamic template strings break Tailwind extraction
-            'md:text-5xl',
-          )}
-        >
-          UK Tax Calculator
-        </h2>
-        <p className={cn('mx-auto max-w-2xl text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>
-          Estimate your take-home pay with official HMRC rates. Fast and free.
-        </p>
-        <div className='mx-auto mt-4 max-w-2xl rounded-lg border border-warning/30 bg-warning/10 p-3 text-left text-warning text-xs'>
-          <p>
-            <strong>Disclaimer:</strong> For illustrative purposes only. Not financial or tax
-            advice. Consult a qualified accountant for advice specific to your situation. Based on
-            HMRC rates for {input.taxYear} which may change.
+        <div>
+          <p className='mb-2 font-semibold text-primary text-xs uppercase tracking-[0.18em]'>
+            Calculator
+          </p>
+          <h2 className='font-display font-semibold text-3xl text-foreground leading-tight md:text-4xl'>
+            Calculate your take-home pay
+          </h2>
+          <p className='mt-2 max-w-2xl text-muted-foreground text-sm md:text-base'>
+            Enter a salary, choose the tax year and region, then check the period-by-period
+            breakdown against official HMRC rates.
           </p>
         </div>
+        <p className='border-border border-t pt-3 text-muted-foreground text-xs leading-relaxed lg:border-t-0 lg:border-l lg:pl-5'>
+          <strong className='font-semibold text-foreground'>Illustrative only.</strong> Not
+          financial or tax advice. Based on HMRC rates for {input.taxYear}, which may change.
+        </p>
       </div>
 
       {/* Summary Cards - Between inputs and table on mobile (order-4), top on desktop (order-2) */}
@@ -332,14 +280,13 @@ export function CalculatorContainer() {
       {/* Inputs Section - order-2 on mobile, left column on desktop (sticky) */}
       <Card
         className={cn(
-          'order-2 lg:sticky lg:top-4 lg:order-3 lg:self-start',
-          SPACING.P_3,
+          'order-2 mx-auto w-full max-w-xl lg:sticky lg:top-4 lg:order-3 lg:mx-0 lg:max-w-none lg:self-start',
+          'p-3',
           'sm:p-4 md:p-6',
         )}
       >
         <CalculatorInputsSection
           onCalculate={handleCalculate}
-          onWhatIfCalculate={handleWhatIfPostCalculateUI}
           resultAction={showResults ? emailResultsAction : undefined}
         />
       </Card>
@@ -353,11 +300,7 @@ export function CalculatorContainer() {
             animate={shouldReduceMotion ? {} : 'animate'}
             exit={shouldReduceMotion ? {} : 'exit'}
             transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.default}
-            className={cn(
-              'order-6 flex flex-col',
-              SPACING.GAP_4,
-              'lg:order-3 lg:min-w-0 lg:self-start',
-            )}
+            className={cn('order-6 flex flex-col', 'gap-4', 'lg:order-3 lg:min-w-0 lg:self-start')}
             data-testid='tax-results'
           >
             <ResultsTable
@@ -365,7 +308,6 @@ export function CalculatorContainer() {
               studentLoans={input.studentLoanPlans !== 'none' ? input.studentLoanPlans : []}
               allowancesDeductions={input.allowancesDeductions}
               previousYearResults={previousYearResults}
-              whatIfResults={whatIfResults}
               visiblePeriods={visiblePeriods}
               onVisiblePeriodsChange={handleVisiblePeriodsChange}
               taxYear={input.taxYear}
@@ -402,50 +344,20 @@ export function CalculatorContainer() {
             exit={shouldReduceMotion ? undefined : { opacity: 0 }}
             transition={shouldReduceMotion ? { duration: 0 } : undefined}
             className={cn(
-              'order-6 flex h-full items-center justify-center rounded-lg border border-dashed text-center lg:order-3',
+              'order-6 flex min-h-[28rem] items-center justify-center rounded-sm border border-dashed bg-card/70 text-center lg:order-3',
               'p-12',
             )}
           >
             <div>
-              <Sparkles
-                className={cn('mx-auto text-muted-foreground', SPACING.MB_4, ICON_SIZES.SIZE_12)}
-              />
-              <h3 className={cn('font-semibold', SPACING.MB_2, TYPOGRAPHY.TEXT_LG)}>
-                Ready to Calculate
-              </h3>
-              <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+              <Sparkles className={cn('mx-auto text-muted-foreground', 'mb-4', 'size-12')} />
+              <h3 className={cn('font-semibold', 'mb-2', 'text-lg')}>Ready to Calculate</h3>
+              <p className={cn('text-muted-foreground', 'text-sm')}>
                 Enter your salary. See your take-home pay in seconds.
               </p>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Scroll to Top Button - Portal to body to escape stacking contexts */}
-      {portalMounted &&
-        createPortal(
-          <AnimatePresence>
-            {showScrollTop && (
-              <motion.button
-                initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={shouldReduceMotion ? undefined : { opacity: 0, scale: 0.8 }}
-                transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2 }}
-                onClick={scrollToTop}
-                className={cn(
-                  'safe-bottom safe-right fixed z-[9999] flex items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-                  // Only add hover scale when motion is allowed
-                  !shouldReduceMotion && 'transition-transform hover:scale-110',
-                  ICON_SIZES.SIZE_12,
-                )}
-                aria-label='Scroll to top'
-              >
-                <ArrowUp className={ICON_SIZES.SIZE_6} />
-              </motion.button>
-            )}
-          </AnimatePresence>,
-          document.body,
-        )}
     </div>
   );
 }

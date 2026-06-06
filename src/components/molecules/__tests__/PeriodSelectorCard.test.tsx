@@ -230,7 +230,13 @@ describe('PeriodSelectorCard', () => {
       );
 
       const title = screen.getByText('Display Periods');
-      expect(title).toHaveClass('mb-2', 'font-semibold', 'text-foreground', 'text-lg', 'sm:mb-3');
+      expect(title).toHaveClass(
+        'shrink-0',
+        'font-semibold',
+        'text-foreground',
+        'text-base',
+        'sm:text-lg',
+      );
     });
 
     it('uses flex-wrap for checkbox layout', () => {

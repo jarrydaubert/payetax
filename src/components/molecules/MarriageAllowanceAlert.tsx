@@ -21,7 +21,6 @@ import { ArrowRight, Heart } from 'lucide-react';
 import Link from 'next/link';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { CURRENT_TAX_YEAR, type TaxYear } from '@/constants/taxRates';
 import { calculateMarriageAllowanceNetSaving } from '@/lib/tax/marriageAllowance';
 import { cn, formatCurrency } from '@/lib/utils';
@@ -86,17 +85,9 @@ export function MarriageAllowanceAlert({
   const monthlySaving = annualSaving / 12;
 
   return (
-    <Alert
-      variant='default'
-      className='border-2 border-primary/30 bg-gradient-to-r from-primary/10 to-accent/10'
-    >
-      <Heart className={cn(ICON_SIZES.SIZE_5, 'self-start text-primary')} aria-hidden='true' />
-      <div
-        className={cn(
-          'flex flex-col sm:flex-row sm:items-center sm:justify-between',
-          SPACING.GAP_3,
-        )}
-      >
+    <Alert variant='default' className='border-primary/30 bg-primary/5'>
+      <Heart className={cn('size-5', 'self-start text-primary')} aria-hidden='true' />
+      <div className={cn('flex flex-col sm:flex-row sm:items-center sm:justify-between', 'gap-3')}>
         <div className='flex-1'>
           <AlertTitle className='text-foreground'>
             You May Qualify for Marriage Allowance
@@ -108,7 +99,7 @@ export function MarriageAllowanceAlert({
               {formatCurrency(annualSaving, 0)} per year
             </span>{' '}
             ({formatCurrency(monthlySaving, 0)}/month) in tax.
-            <span className={cn('block', SPACING.MT_2, TYPOGRAPHY.TEXT_SM)}>
+            <span className={cn('block', 'mt-2', 'text-sm')}>
               Your partner can transfer 10% of their Personal Allowance (
               {formatCurrency(transferAmount, 0)}) to you, which would update your tax code to
               include an 'M' suffix.
@@ -121,13 +112,13 @@ export function MarriageAllowanceAlert({
           asChild
           size='sm'
           className={cn(
-            'w-full whitespace-nowrap border border-primary/40 bg-card text-primary shadow-sm hover:bg-primary/10 hover:text-primary sm:w-auto',
-            SPACING.GAP_2,
+            'w-full whitespace-nowrap border border-primary/40 bg-card text-primary hover:bg-primary/10 hover:text-primary sm:w-auto',
+            'gap-2',
           )}
         >
           <Link href='/tools/marriage-allowance-calculator'>
             Open Marriage Allowance Calculator
-            <ArrowRight className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+            <ArrowRight className={'size-4'} aria-hidden='true' />
           </Link>
         </Button>
       </div>

@@ -37,13 +37,6 @@ export default function GlobalError({
   return (
     <html lang='en'>
       <body className='min-h-screen bg-background text-foreground'>
-        {/* Gradient background */}
-        <div className='fixed inset-0 -z-10'>
-          <div className='absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-success/5' />
-          <div className='absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-primary/10 blur-3xl' />
-          <div className='absolute right-1/4 bottom-1/4 h-96 w-96 rounded-full bg-success/10 blur-3xl' />
-        </div>
-
         <div className='flex min-h-screen flex-col items-center justify-center p-6'>
           <div className='w-full max-w-md text-center'>
             {/* Icon */}
@@ -65,18 +58,13 @@ export default function GlobalError({
                 type='button'
                 onClick={() => reset()}
                 size='touch'
-                variant='brandOutline'
+                variant='outline'
                 className='rounded-full px-6'
               >
                 <RotateCcw className='size-3.5' />
                 Try again
               </Button>
-              <Button
-                asChild
-                size='touch'
-                variant='outline'
-                className='rounded-full border-border/60 bg-card/50 px-6 text-foreground hover:border-border hover:bg-card/70 hover:text-foreground'
-              >
+              <Button asChild size='touch' variant='outline' className='rounded-full px-6'>
                 <Link href='/'>
                   <Home className='size-3.5' />
                   Go home

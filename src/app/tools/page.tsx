@@ -1,11 +1,9 @@
 // src/app/tools/page.tsx
 import { ArrowRight, Wrench } from 'lucide-react';
 import Link from 'next/link';
-import { GradientText } from '@/components/atoms/GradientText';
 import { PageHero } from '@/components/molecules/PageHero';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { Card } from '@/components/ui/card';
-import { LAYOUT, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { generateMetadata as generateBaseMetadata, SITE_URL } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
 
@@ -68,22 +66,15 @@ export default function ToolsPage() {
         }}
       />
 
-      <div className={LAYOUT.PAGE_WRAPPER}>
+      <div className={'min-h-screen'}>
         <PageHero
           badge={{ icon: Wrench, text: 'Free Tax Tools' }}
-          title={
-            <>
-              Free UK Tax{' '}
-              <GradientText variant='brand-full' as='span'>
-                Tools
-              </GradientText>
-            </>
-          }
+          title='Free UK Tax Tools'
           subtitle='Quick calculators and explainers built on current HMRC rates. No signup.'
         />
 
-        <section className={cn(LAYOUT.SECTION, 'pt-0 md:pt-0')}>
-          <div className={LAYOUT.CONTAINER_MD}>
+        <section className={cn('py-12 md:py-20', 'pt-0 md:pt-0')}>
+          <div className={'container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8'}>
             <div className='grid gap-4 md:grid-cols-2'>
               {tools.map((tool) => (
                 <Link
@@ -94,25 +85,20 @@ export default function ToolsPage() {
                 >
                   <Card
                     className={cn(
-                      'flex h-full flex-col justify-between rounded-2xl border-border/60 bg-card/70 p-5 backdrop-blur-sm transition-all duration-200',
-                      'hover:-translate-y-0.5 hover:border-primary/40 hover:bg-card/80',
+                      'flex h-full flex-col justify-between rounded-sm border-border bg-card p-5 transition-colors',
+                      'hover:border-primary/55',
                     )}
                   >
                     <div>
                       <h2
                         className={cn(
-                          'font-semibold text-foreground transition-colors group-hover:text-primary',
-                          TYPOGRAPHY.TEXT_XL,
+                          'font-display font-semibold text-foreground transition-colors group-hover:text-primary',
+                          'text-xl',
                         )}
                       >
                         {tool.title}
                       </h2>
-                      <p
-                        className={cn(
-                          'mt-2 text-muted-foreground leading-relaxed',
-                          TYPOGRAPHY.TEXT_SM,
-                        )}
-                      >
+                      <p className={cn('mt-2 text-muted-foreground leading-relaxed', 'text-sm')}>
                         {tool.description}
                       </p>
                     </div>
@@ -120,12 +106,12 @@ export default function ToolsPage() {
                     <span
                       className={cn(
                         'mt-5 inline-flex items-center gap-1 whitespace-nowrap font-medium text-primary',
-                        TYPOGRAPHY.TEXT_SM,
-                        SPACING.GAP_1,
+                        'text-sm',
+                        'gap-1',
                       )}
                     >
                       Use Tool
-                      <ArrowRight className='size-4 transition-transform duration-200 group-hover:translate-x-0.5' />
+                      <ArrowRight className='size-4' />
                     </span>
                   </Card>
                 </Link>

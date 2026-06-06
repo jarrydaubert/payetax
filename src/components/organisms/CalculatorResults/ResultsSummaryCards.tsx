@@ -7,7 +7,6 @@ import { useMemo } from 'react';
 import { ResultCard } from '@/components/molecules/ResultCard';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { ANIMATION_CONTAINER_VARIANTS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
-import { SPACING } from '@/constants/designTokens';
 import { TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { calculateMarginalTaxRate } from '@/lib/calculatorMarginalTax';
@@ -44,7 +43,7 @@ export function ResultsSummaryCards({
   return (
     <TooltipProvider delayDuration={200}>
       <motion.section
-        className={cn('grid md:grid-cols-2 lg:grid-cols-5', SPACING.GAP_4)}
+        className={cn('grid border-border border-b py-4 md:grid-cols-2 lg:grid-cols-5', 'gap-4')}
         variants={shouldReduceMotion ? undefined : ANIMATION_CONTAINER_VARIANTS.staggerFast}
         initial='hidden'
         animate='show'

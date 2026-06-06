@@ -13,7 +13,6 @@ import Link from 'next/link';
 
 import { BlogPagination } from '@/components/molecules/BlogPagination';
 import { BLOG_CATEGORIES, type CategoryKey } from '@/constants/blogCategories';
-import { LAYOUT, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { getCategoryBlurDataUrl, getCategoryFallbackSvg } from '@/lib/blog/imageFallback';
 import { cn } from '@/lib/utils';
 import type { BlogPost } from '@/types/blog';
@@ -39,41 +38,31 @@ interface AllPostsGridProps {
 export function AllPostsGrid({ posts, currentPage, totalPages, totalPosts }: AllPostsGridProps) {
   if (posts.length === 0) {
     return (
-      <div className={cn('text-center', SPACING.PY_16)}>
-        <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_LG)}>No articles found.</p>
+      <div className={cn('text-center', 'py-16')}>
+        <p className={cn('text-muted-foreground', 'text-lg')}>No articles found.</p>
       </div>
     );
   }
 
   return (
-    <section aria-labelledby='all-posts-heading' className={SPACING.PY_12}>
-      <div className={LAYOUT.CONTAINER}>
+    <section aria-labelledby='all-posts-heading' className={'py-12'}>
+      <div className={'container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'}>
         {/* Section Header */}
-        <div className={cn('flex items-center justify-between', SPACING.MB_8)}>
+        <div className={cn('flex items-center justify-between', 'mb-8')}>
           {/* biome-ignore lint/correctness/useUniqueElementIds: Server component rendered once per page */}
           <h2
             id='all-posts-heading'
-            className={cn(
-              'font-display font-semibold text-white',
-              TYPOGRAPHY.TEXT_XL,
-              'md:text-2xl',
-            )}
+            className='font-semibold text-primary text-xs uppercase tracking-[0.28em] sm:text-sm sm:tracking-widest'
           >
             All Articles
           </h2>
-          <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+          <p className={cn('text-muted-foreground', 'text-sm')}>
             {totalPosts.toLocaleString('en-GB')} article{totalPosts !== 1 ? 's' : ''}
           </p>
         </div>
 
         {/* Posts Grid */}
-        <ul
-          className={cn(
-            'grid list-none p-0 sm:grid-cols-2 lg:grid-cols-3',
-            SPACING.GAP_6,
-            SPACING.MB_12,
-          )}
-        >
+        <ul className={cn('grid list-none p-0 sm:grid-cols-2 lg:grid-cols-3', 'gap-6', 'mb-12')}>
           {posts.map((post, idx) => (
             <li key={post.slug} className='h-full'>
               <PostCard post={post} priority={idx < PRIORITY_IMAGE_COUNT} />
@@ -118,9 +107,8 @@ function PostCard({ post, priority = false }: PostCardProps) {
   return (
     <article
       className={cn(
-        'group relative overflow-hidden rounded-xl bg-card/70 transition-all duration-200',
-        'border border-border/60 hover:border-primary/50',
-        'motion-safe:hover:-translate-y-0.5',
+        'group relative overflow-hidden rounded-sm bg-card transition-colors',
+        'border border-border hover:border-primary/55',
       )}
     >
       <Link href={`/blog/${post.slug}`} className='block'>
@@ -130,7 +118,7 @@ function PostCard({ post, priority = false }: PostCardProps) {
             src={imageSrc}
             alt={post.imageAlt ?? post.title}
             fill
-            className='object-cover transition-transform duration-300 group-hover:scale-105'
+            className='object-cover'
             sizes='(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
             priority={priority}
             placeholder={blurDataUrl ? 'blur' : 'empty'}
@@ -138,35 +126,29 @@ function PostCard({ post, priority = false }: PostCardProps) {
           />
 
           {/* Category badge */}
-          <span className='absolute top-3 left-3 rounded-full bg-primary px-2.5 py-0.5 font-semibold text-primary-foreground text-xs uppercase tracking-wider'>
+          <span className='absolute top-3 left-3 border border-primary/35 bg-background/90 px-2.5 py-0.5 font-semibold text-primary text-xs uppercase tracking-wider'>
             {categoryConfig.label}
           </span>
         </div>
 
         {/* Content */}
-        <div className={SPACING.P_4}>
+        <div className={'p-4'}>
           <h3
             className={cn(
               'line-clamp-2 font-display font-semibold text-foreground transition-colors group-hover:text-primary',
-              SPACING.MB_2,
-              TYPOGRAPHY.TEXT_BASE,
+              'mb-2',
+              'text-base',
             )}
           >
             {post.title}
           </h3>
 
-          <p className={cn('line-clamp-2 text-muted-foreground', SPACING.MB_3, TYPOGRAPHY.TEXT_SM)}>
+          <p className={cn('line-clamp-2 text-muted-foreground', 'mb-3', 'text-sm')}>
             {post.excerpt}
           </p>
 
           {/* Meta */}
-          <div
-            className={cn(
-              'flex items-center text-muted-foreground',
-              SPACING.GAP_2,
-              TYPOGRAPHY.TEXT_XS,
-            )}
-          >
+          <div className={cn('flex items-center text-muted-foreground', 'gap-2', 'text-xs')}>
             <span>{post.readTime}</span>
             <span aria-hidden='true'>•</span>
             <time dateTime={post.publishedAt}>{formattedDate}</time>

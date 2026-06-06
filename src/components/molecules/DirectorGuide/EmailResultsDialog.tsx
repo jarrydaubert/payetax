@@ -20,11 +20,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { ICON_SIZES } from '@/constants/designTokens';
 import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
 import { trackEmailOpened, trackEmailSent } from '@/lib/directorGuideAnalytics';
 import type { StrategyComparison } from '@/lib/tax/strategyComparison';
-import { cn } from '@/lib/utils';
 import type { DirectorEmailInput } from '@/lib/validation/emailValidation';
 
 const TAX_YEAR = CURRENT_TAX_YEAR;
@@ -125,16 +123,16 @@ export function EmailResultsDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className='border-border/60 bg-card text-card-foreground sm:max-w-md'>
+      <DialogContent className='rounded-sm border-border/60 bg-card text-card-foreground shadow-none sm:max-w-md'>
         <DialogHeader>
           <DialogTitle className='flex items-center gap-2 text-card-foreground'>
-            <Mail className={ICON_SIZES.SIZE_5} aria-hidden='true' />
+            <Mail className='size-5' aria-hidden='true' />
             Email Your Results
           </DialogTitle>
           <DialogDescription className='text-muted-foreground'>
             We&apos;ll send your director pay breakdown to your inbox. Results are sent directly via
             email and not stored on our servers.{' '}
-            <Link href='/privacy' className='text-brand underline hover:text-brand-accent'>
+            <Link href='/privacy' className='text-primary underline hover:text-primary/80'>
               Privacy policy
             </Link>
           </DialogDescription>
@@ -142,7 +140,7 @@ export function EmailResultsDialog({
 
         {sentEmail ? (
           <div className='mt-4 space-y-4'>
-            <div className='rounded-lg border border-success/30 bg-success/10 p-4 text-sm text-success'>
+            <div className='rounded-sm border border-success/30 bg-success/10 p-4 text-sm text-success'>
               Results sent to {sentEmail}. You can close this dialog or send the report to a
               different address.
             </div>
@@ -159,7 +157,7 @@ export function EmailResultsDialog({
                 <RotateCcw className='mr-2 h-4 w-4' aria-hidden='true' />
                 Send Another
               </Button>
-              <Button type='button' variant='brandOutline' onClick={() => onOpenChange(false)}>
+              <Button type='button' variant='outline' onClick={() => onOpenChange(false)}>
                 Close
               </Button>
             </div>
@@ -172,10 +170,7 @@ export function EmailResultsDialog({
               </label>
               <div className='relative'>
                 <Mail
-                  className={cn(
-                    'absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground',
-                    ICON_SIZES.SIZE_4,
-                  )}
+                  className='absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground'
                   aria-hidden='true'
                 />
                 <Input
@@ -218,7 +213,7 @@ export function EmailResultsDialog({
               >
                 Cancel
               </Button>
-              <Button type='submit' variant='brandOutline' disabled={isLoading || !email.trim()}>
+              <Button type='submit' disabled={isLoading || !email.trim()}>
                 {isLoading ? 'Sending...' : 'Send Results'}
               </Button>
             </div>

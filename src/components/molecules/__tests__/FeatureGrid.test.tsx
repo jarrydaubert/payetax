@@ -138,8 +138,8 @@ describe('FeatureGrid', () => {
     it('should pass variant to feature cards', () => {
       const { container } = render(<FeatureGrid features={mockFeatures} variant='showcase' />);
 
-      // Showcase variant adds hover:shadow-lg class
-      const cards = container.querySelectorAll('[class*="hover:shadow-lg"]');
+      // Showcase variant adds Ledger hover border treatment.
+      const cards = container.querySelectorAll('[class*="hover:border-primary"]');
       expect(cards.length).toBeGreaterThan(0);
     });
 
@@ -200,7 +200,7 @@ describe('FeatureGrid', () => {
       expect(screen.getByRole('link', { name: /Learn More/ })).toBeInTheDocument();
     });
 
-    it('should render features with gradients', () => {
+    it('should render features with configured icon colours but no card gradients', () => {
       const featuresWithGradients: Feature[] = [
         {
           ...mockFeatures[0],
@@ -213,8 +213,11 @@ describe('FeatureGrid', () => {
       ];
 
       const { container } = render(<FeatureGrid features={featuresWithGradients} />);
-      const card = container.querySelector('.from-cyan-500\\/10');
+      const card = container.querySelector('[class*="bg-card"]');
+      const icon = container.querySelector('.text-cyan-500');
       expect(card).toBeInTheDocument();
+      expect(card).not.toHaveClass('from-cyan-500/10');
+      expect(icon).toBeInTheDocument();
     });
   });
 

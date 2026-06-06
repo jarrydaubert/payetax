@@ -26,7 +26,6 @@ import { ResultTableRow } from '@/components/molecules/ResultTableRow';
 import { TaxTrapInlineAlert } from '@/components/molecules/TaxTrapInlineAlert';
 import { Card } from '@/components/ui/card';
 import { TableBody } from '@/components/ui/table';
-import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { CURRENT_TAX_YEAR, TAX_RATES, type TaxYear } from '@/constants/taxRates';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
 import { useMouseDragScroll } from '@/hooks/useMouseDragScroll';
@@ -38,6 +37,7 @@ import {
 } from '@/lib/calculatorResultsPresenter';
 import { calculateOptimalPension } from '@/lib/pensionOptimizer';
 import type { TaxCalculationResults } from '@/lib/types/calculator';
+import { cn } from '@/lib/utils';
 
 interface ResultsTableProps {
   results: TaxCalculationResults;
@@ -218,7 +218,7 @@ export function ResultsTable({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, delay: 0.2 }}
-      className={`w-full ${SPACING.SPACE_Y_4}`}
+      className={cn('w-full', 'space-y-4')}
     >
       {/* Landscape Prompt - Shows on mobile portrait to encourage rotation for better table viewing */}
       <LandscapePrompt />
@@ -231,12 +231,12 @@ export function ResultsTable({
       />
 
       {/* Results Table with Scroll Indicators */}
-      <div className='relative -mx-2 w-full sm:mx-0'>
+      <div className='relative -mx-4 w-[calc(100%+2rem)] sm:mx-0 sm:w-full'>
         {/* Scroll Indicators - must be positioned absolutely to overlay the card */}
         <ScrollIndicator direction='left' visible={showLeftIndicator} />
         <ScrollIndicator direction='right' visible={showRightIndicator} />
 
-        <Card className='relative w-full overflow-hidden'>
+        <Card className='relative w-full overflow-hidden rounded-sm border-border bg-card shadow-none'>
           {/* Screen reader hint for scrollable region */}
           <div id={scrollHintId} className='sr-only'>
             Use horizontal scroll, swipe, or click and drag to view all pay periods. Navigate
@@ -258,8 +258,26 @@ export function ResultsTable({
           >
             <table
               data-testid='results-table'
-              className={`w-full min-w-full table-auto caption-bottom ${TYPOGRAPHY.TEXT_SM}`}
+              className={cn(
+                'w-full min-w-[42rem] table-fixed caption-bottom sm:min-w-full',
+                whatIfResults && 'min-w-[64rem]',
+                'text-[0.8125rem] xl:text-sm',
+              )}
             >
+              <colgroup>
+                <col className='w-[10.5rem] xl:w-[11.5rem]' />
+                <col className='w-12 xl:w-14' />
+                {visiblePeriods.map((period) =>
+                  whatIfResults ? (
+                    <React.Fragment key={period}>
+                      <col />
+                      <col />
+                    </React.Fragment>
+                  ) : (
+                    <col key={period} />
+                  ),
+                )}
+              </colgroup>
               <caption className='sr-only'>
                 Tax calculation breakdown showing gross pay, deductions, and take-home pay across
                 different time periods
@@ -298,7 +316,7 @@ export function ResultsTable({
 
       {/* Tax Trap Inline Alert */}
       {taxTrapOptimization && onApplyPensionOptimization && (
-        <div className={SPACING.MT_4}>
+        <div className={'mt-4'}>
           <TaxTrapInlineAlert
             salary={results.grossSalary.annually}
             suggestedPension={taxTrapOptimization.suggested}
@@ -310,7 +328,7 @@ export function ResultsTable({
 
       {/* Marriage Allowance Alert */}
       {marriageAllowanceEligible && (
-        <div className={SPACING.MT_4}>
+        <div className={'mt-4'}>
           <MarriageAllowanceAlert
             userSalary={results.grossSalary.annually}
             partnerSalary={partnerGrossWage}

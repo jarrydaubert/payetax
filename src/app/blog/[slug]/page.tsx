@@ -12,7 +12,6 @@ import { BlogArticleAnalytics } from '@/components/organisms/BlogArticleAnalytic
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { TableOfContents } from '@/components/organisms/TableOfContents';
 import { Button } from '@/components/ui/button';
-import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { BLUR_DATA_URL, IMAGE_SIZES } from '@/constants/images';
 import { getBlogPostBySlug, getBlogPosts, getRelatedPosts } from '@/lib/blog';
 import { compileMDXContent, extractFAQs, extractHowToSteps } from '@/lib/mdx';
@@ -285,9 +284,9 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       <BlogArticleAnalytics slug={post.slug} category={post.categoryData?.name || post.category} />
 
       <ReadingProgress />
-      <div className='min-h-screen pt-20 md:pt-24'>
+      <div className='min-h-screen bg-ledger-grid pt-20 md:pt-24'>
         <div className='container mx-auto max-w-4xl px-4 pb-12 md:px-6 lg:max-w-5xl lg:px-8 xl:max-w-6xl 2xl:max-w-7xl'>
-          <nav aria-label='Breadcrumb' className={cn('mb-8', TYPOGRAPHY.TEXT_SM)}>
+          <nav aria-label='Breadcrumb' className={cn('mb-8', 'text-sm')}>
             <ol className='flex flex-wrap items-center gap-1 text-muted-foreground'>
               <li>
                 <Link href='/' className='hover:text-primary'>
@@ -295,7 +294,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 </Link>
               </li>
               <li>
-                <ChevronRight className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+                <ChevronRight className={'size-4'} aria-hidden='true' />
               </li>
               <li>
                 <Link href='/blog' className='hover:text-primary'>
@@ -303,7 +302,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 </Link>
               </li>
               <li>
-                <ChevronRight className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+                <ChevronRight className={'size-4'} aria-hidden='true' />
               </li>
               <li className='truncate text-foreground' aria-current='page'>
                 {post.title.length > 50 ? `${post.title.substring(0, 50)}...` : post.title}
@@ -316,8 +315,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <div className='mb-4 flex flex-wrap items-center gap-2'>
                 <span
                   className={cn(
-                    'rounded-full bg-primary/10 px-3 py-1 font-medium text-primary',
-                    TYPOGRAPHY.TEXT_XS,
+                    'border border-primary/35 bg-background px-3 py-1 font-medium text-primary uppercase tracking-[0.2em]',
+                    'text-xs',
                   )}
                 >
                   {post.categoryData?.name || post.category}
@@ -326,8 +325,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   <span
                     key={tag}
                     className={cn(
-                      'rounded-full bg-foreground/5 px-2.5 py-1 text-foreground/70',
-                      TYPOGRAPHY.TEXT_XS,
+                      'border border-border bg-card px-2.5 py-1 text-foreground/70',
+                      'text-xs',
                     )}
                   >
                     {tag}
@@ -337,8 +336,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
               <h1
                 className={cn(
-                  'mb-4 font-bold text-foreground leading-tight md:mb-6',
-                  TYPOGRAPHY.TEXT_4XL,
+                  'mb-4 max-w-4xl font-display font-semibold text-foreground leading-[0.98] md:mb-6',
+                  'text-4xl',
                   'md:text-5xl',
                 )}
               >
@@ -348,7 +347,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <p
                 className={cn(
                   'mb-6 text-foreground/80 leading-relaxed md:mb-8',
-                  TYPOGRAPHY.TEXT_LG,
+                  'text-lg',
                   'md:text-xl',
                 )}
               >
@@ -358,16 +357,16 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <div
                 className={cn(
                   'flex flex-wrap items-center gap-4 text-foreground/60 md:gap-6',
-                  TYPOGRAPHY.TEXT_SM,
+                  'text-sm',
                 )}
               >
                 <div className='flex items-center gap-2'>
-                  <Calendar className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+                  <Calendar className={'size-4'} aria-hidden='true' />
                   <time>{formatDate(post.publishedAt)}</time>
                 </div>
                 {showUpdatedDate && post.updatedAt && (
                   <div className='flex items-center gap-2'>
-                    <RefreshCw className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+                    <RefreshCw className={'size-4'} aria-hidden='true' />
                     <span>
                       Updated <time>{formatDate(post.updatedAt)}</time>
                     </span>
@@ -375,12 +374,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 )}
                 {post.readTime && (
                   <div className='flex items-center gap-2'>
-                    <Clock className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+                    <Clock className={'size-4'} aria-hidden='true' />
                     <span>{post.readTime}</span>
                   </div>
                 )}
                 <div className='flex items-center gap-2'>
-                  <User className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+                  <User className={'size-4'} aria-hidden='true' />
                   <span className='flex flex-col'>
                     <span>{authorName}</span>
                     {authorName === 'PayeTax Editorial Team' && (
@@ -393,7 +392,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </div>
             </header>
             {post.image && (
-              <div className='relative -mx-4 mb-8 aspect-video overflow-hidden md:-mx-6 md:mb-12 md:rounded-xl lg:-mx-8'>
+              <div className='relative mb-8 aspect-video overflow-hidden border border-border md:mb-12'>
                 <Image
                   src={post.image}
                   alt={post.imageAlt || post.title}
@@ -412,7 +411,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <div
                 className={cn(
                   'prose prose-lg dark:prose-invert min-w-0 max-w-none flex-1',
-                  'prose-headings:font-bold prose-headings:text-foreground',
+                  'prose-headings:font-display prose-headings:font-semibold prose-headings:text-foreground',
                   'prose-p:text-foreground/90 prose-p:leading-relaxed',
                   'prose-strong:font-semibold prose-strong:text-foreground',
                   'prose-ol:text-foreground/90 prose-ul:text-foreground/90',
@@ -429,9 +428,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </div>
             </div>
             <BlogDisclaimer className='mt-12 md:mt-16' />
-            <section className='mt-8 rounded-xl border border-primary/20 bg-primary/5 p-6 md:p-8'>
-              <h3 className='mb-2 font-semibold text-foreground'>Useful tools for this topic</h3>
-              <p className={cn('mb-4 text-foreground/70', TYPOGRAPHY.TEXT_SM)}>
+            <section className='mt-8 border border-border bg-card p-6 md:p-8'>
+              <h3 className='mb-2 font-display font-semibold text-2xl text-foreground'>
+                Useful tools for this topic
+              </h3>
+              <p className={cn('mb-4 text-foreground/70', 'text-sm')}>
                 Jump straight into calculators and guides relevant to what you just read.
               </p>
               <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-3'>
@@ -439,31 +440,28 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   <Link
                     key={link.id}
                     href={link.href}
-                    className='rounded-lg border border-primary/20 bg-background/80 p-3 transition-colors hover:border-primary/35 hover:bg-primary/5'
+                    className='border border-border bg-background p-3 transition-colors hover:border-primary/55'
                   >
                     <p className='font-medium text-foreground'>{link.title}</p>
-                    <p className={cn('text-foreground/70', TYPOGRAPHY.TEXT_XS)}>
-                      {link.description}
-                    </p>
+                    <p className={cn('text-foreground/70', 'text-xs')}>{link.description}</p>
                   </Link>
                 ))}
               </div>
             </section>
-            <div className='mt-8 rounded-xl border border-primary/20 bg-primary/5 p-6 md:p-8'>
+            <div className='mt-8 border border-border bg-card p-6 md:p-8'>
               <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
                 <div>
-                  <h3 className='mb-2 font-semibold text-foreground'>Found this helpful?</h3>
-                  <p className={cn('text-foreground/70', TYPOGRAPHY.TEXT_SM)}>
+                  <h3 className='mb-2 font-display font-semibold text-2xl text-foreground'>
+                    Found this helpful?
+                  </h3>
+                  <p className={cn('text-foreground/70', 'text-sm')}>
                     Try our free UK tax calculator to see how much you&apos;ll take home.
                   </p>
                 </div>
                 <Button asChild className='shrink-0'>
                   <Link href='/'>
                     Calculate Your Tax
-                    <ArrowLeft
-                      className={cn('ml-2 rotate-180', ICON_SIZES.SIZE_4)}
-                      aria-hidden='true'
-                    />
+                    <ArrowLeft className={cn('ml-2 rotate-180', 'size-4')} aria-hidden='true' />
                   </Link>
                 </Button>
               </div>
@@ -472,7 +470,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
           {relatedPosts.length > 0 && (
             <section className='mt-12 border-foreground/10 border-t pt-12 md:mt-16 md:pt-16'>
-              <h2 className={cn('mb-6 font-bold text-foreground md:mb-8', TYPOGRAPHY.TEXT_2XL)}>
+              <h2
+                className={cn(
+                  'mb-6 font-display font-semibold text-foreground md:mb-8',
+                  'text-2xl',
+                )}
+              >
                 Related Articles
               </h2>
               <div className='grid gap-6 md:grid-cols-3'>
@@ -483,31 +486,24 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     source='blog_related_articles'
                     target={relatedPost.slug}
                     destination={relatedPost.category}
-                    className='group rounded-lg border border-foreground/10 p-5 transition-all hover:border-primary/30 hover:bg-primary/5'
+                    className='group border border-border bg-card p-5 transition-colors hover:border-primary/55'
                   >
-                    <div className={cn('mb-2 text-primary', TYPOGRAPHY.TEXT_SM)}>
-                      {relatedPost.category}
-                    </div>
+                    <div className={cn('mb-2 text-primary', 'text-sm')}>{relatedPost.category}</div>
                     <h3
                       className={cn(
                         'mb-2 font-semibold text-foreground transition-colors group-hover:text-primary',
-                        TYPOGRAPHY.TEXT_BASE,
+                        'text-base',
                       )}
                     >
                       {relatedPost.title}
                     </h3>
-                    <p className={cn('mb-3 line-clamp-2 text-foreground/60', TYPOGRAPHY.TEXT_SM)}>
+                    <p className={cn('mb-3 line-clamp-2 text-foreground/60', 'text-sm')}>
                       {relatedPost.excerpt}
                     </p>
-                    <div
-                      className={cn(
-                        'flex items-center gap-3 text-foreground/50',
-                        TYPOGRAPHY.TEXT_XS,
-                      )}
-                    >
+                    <div className={cn('flex items-center gap-3 text-foreground/50', 'text-xs')}>
                       {relatedPost.readTime && (
                         <div className='flex items-center gap-1'>
-                          <Clock className={ICON_SIZES.SIZE_3_5} aria-hidden='true' />
+                          <Clock className={'size-3.5'} aria-hidden='true' />
                           <span>{relatedPost.readTime}</span>
                         </div>
                       )}
@@ -524,7 +520,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               href='/blog'
               className='inline-flex items-center font-medium text-primary transition-colors hover:text-primary/80'
             >
-              <ArrowLeft className={cn('mr-2', ICON_SIZES.SIZE_4)} aria-hidden='true' />
+              <ArrowLeft className={cn('mr-2', 'size-4')} aria-hidden='true' />
               Back to All Posts
             </Link>
           </div>

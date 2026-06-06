@@ -1,5 +1,5 @@
 // src/components/molecules/Footer.tsx
-// Simplified footer matching payetax-web design system
+// Simplified footer matching the Ledger shell
 'use client';
 
 import Link from 'next/link';
@@ -7,12 +7,12 @@ import { useCallback } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
- * Footer molecule component - New design system
+ * Footer molecule component
  *
  * IMPORTANT: This is a MOLECULE - it does NOT own the <footer> semantic tag.
  * The parent TEMPLATE (Layout.tsx) must wrap this in <footer></footer>.
  *
- * Clean, minimal design with:
+ * Clean Ledger design with:
  * - Logo (paye<span>tax</span>)
  * - Essential links (Blog, Tools, About, Privacy, Compliance, Support)
  * - Copyright
@@ -27,32 +27,58 @@ export function Footer({ className }: FooterProps) {
   }, []);
 
   return (
-    <div className={cn('footer-new', className)}>
-      <div className='footer-content-new'>
+    <div className={cn('relative z-[1] border-border/60 border-t px-8 py-12', className)}>
+      <div className='mx-auto grid max-w-[1100px] grid-cols-1 items-center gap-x-6 gap-y-4 text-center md:grid-cols-[auto_minmax(0,1fr)_auto] md:text-left'>
         {/* Brand - links back to home */}
-        <Link href='/' className='footer-brand'>
-          paye<span>tax</span>
+        <Link href='/' className='brand-wordmark text-foreground text-xl'>
+          paye<span className='text-primary'>tax</span>
         </Link>
 
         {/* Links - no `as Route` casts; routes validated by typedRoutes in next.config */}
-        <nav className='footer-links-new' aria-label='Footer navigation'>
-          <Link href='/blog'>Blog</Link>
-          <Link href='/tools'>Tools</Link>
-          <Link href='/install'>Install App</Link>
-          <Link href='/about'>About</Link>
-          <Link href='/privacy'>Privacy</Link>
-          <button type='button' className='footer-link-button' onClick={openCookiePreferences}>
+        <nav
+          className='flex min-w-0 flex-wrap items-center justify-center gap-x-5 gap-y-2 text-muted-foreground text-sm'
+          aria-label='Footer navigation'
+        >
+          <Link className='inline-flex min-h-6 items-center hover:text-primary' href='/blog'>
+            Blog
+          </Link>
+          <Link className='inline-flex min-h-6 items-center hover:text-primary' href='/tools'>
+            Tools
+          </Link>
+          <Link className='inline-flex min-h-6 items-center hover:text-primary' href='/install'>
+            Install App
+          </Link>
+          <Link className='inline-flex min-h-6 items-center hover:text-primary' href='/about'>
+            About
+          </Link>
+          <Link className='inline-flex min-h-6 items-center hover:text-primary' href='/privacy'>
+            Privacy
+          </Link>
+          <button
+            type='button'
+            className='inline-flex min-h-6 cursor-pointer items-center border-0 bg-transparent p-0 text-muted-foreground hover:text-primary'
+            onClick={openCookiePreferences}
+          >
             Cookie Settings
           </button>
-          <Link href='/compliance'>Compliance</Link>
-          <a href='mailto:support@payetax.co.uk'>Support</a>
+          <Link className='inline-flex min-h-6 items-center hover:text-primary' href='/compliance'>
+            Compliance
+          </Link>
+          <a
+            className='inline-flex min-h-6 items-center hover:text-primary'
+            href='mailto:support@payetax.co.uk'
+          >
+            Support
+          </a>
         </nav>
 
         {/* Copyright & Version */}
-        <div className='footer-copy'>
+        <div className='whitespace-nowrap text-muted-foreground text-sm md:justify-self-end'>
           &copy; 2026 PayeTax
           {process.env.NEXT_PUBLIC_APP_VERSION && (
-            <span className='ml-2 text-white/50'>v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
+            <span className='ml-2 text-muted-foreground'>
+              v{process.env.NEXT_PUBLIC_APP_VERSION}
+            </span>
           )}
         </div>
       </div>

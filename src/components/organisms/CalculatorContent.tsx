@@ -7,7 +7,6 @@ import { CalculatorHowToGuide } from '@/components/molecules/CalculatorHowToGuid
 import { FAQItem } from '@/components/molecules/FAQItem';
 import { SalaryComparisonTable } from '@/components/molecules/SalaryComparisonTable';
 import { TaxRatesOverview } from '@/components/molecules/TaxRatesOverview';
-import { SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
 import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
 import { calculateTax } from '@/lib/taxCalculator';
@@ -44,7 +43,7 @@ export function CalculatorContent() {
   });
 
   return (
-    <div className={SPACING.SPACE_Y_16}>
+    <div className={'space-y-16'}>
       {/* Tax Rates Overview */}
       <TaxRatesOverview />
 
@@ -57,25 +56,25 @@ export function CalculatorContent() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-100px' }}
         transition={{ duration: 0.5 }}
-        className='bg-gradient-to-br from-accent/5 to-primary/5 py-16'
+        className='border-border/70 border-y bg-ledger-grid py-16'
       >
-        <div className={cn('mx-auto max-w-4xl', SPACING.PX_4)}>
+        <div className={cn('mx-auto max-w-4xl', 'px-4')}>
           <div className='mb-10 text-center'>
             <h2
               className={cn(
-                'bg-gradient-to-r from-brand-gradient-start to-brand-gradient-end bg-clip-text font-bold text-transparent',
-                SPACING.MB_3,
-                TYPOGRAPHY.TEXT_4XL,
+                'font-display font-semibold text-foreground leading-tight',
+                'mb-3',
+                'text-4xl',
               )}
             >
               Common Tax Questions
             </h2>
-            <p className={`${TYPOGRAPHY.TEXT_LG} text-muted-foreground`}>
+            <p className={`text-lg text-muted-foreground`}>
               Quick answers to the most frequently asked tax questions
             </p>
           </div>
 
-          <div className={SPACING.SPACE_Y_4}>
+          <div className={'space-y-4'}>
             <FAQItem
               question={`How much tax do I pay on £30,000 in the UK in ${CURRENT_TAX_YEAR_DISPLAY_SHORT}?`}
             >
@@ -83,7 +82,7 @@ export function CalculatorContent() {
                 <strong>Quick Answer:</strong> On a £30,000 salary in England/Wales/NI for{' '}
                 {CURRENT_TAX_YEAR_DISPLAY_SHORT}:
               </p>
-              <ul className={`ml-6 list-disc ${SPACING.SPACE_Y_1}`}>
+              <ul className={`ml-6 list-disc space-y-1`}>
                 <li>
                   <strong>Income Tax</strong>: £
                   {formatNumber(Math.round(salary30kResults.incomeTax.annually))} (20% on £
@@ -124,7 +123,7 @@ export function CalculatorContent() {
                 before paying income tax.
               </p>
               <p className='font-medium'>Important notes:</p>
-              <ul className={`ml-6 list-disc ${SPACING.SPACE_Y_1}`}>
+              <ul className={`ml-6 list-disc space-y-1`}>
                 <li>You pay 0% tax on the first £12,570 you earn</li>
                 <li>
                   The allowance reduces by £1 for every £2 earned over £100,000 (affecting higher
@@ -143,7 +142,7 @@ export function CalculatorContent() {
               <p>
                 PAYE (Pay As You Earn) is calculated monthly by your employer using this process:
               </p>
-              <ol className={`ml-6 list-decimal ${SPACING.SPACE_Y_2}`}>
+              <ol className={`ml-6 list-decimal space-y-2`}>
                 <li>
                   <strong>Calculate taxable income</strong>: Gross salary - Personal allowance
                   (£12,570)
@@ -173,7 +172,7 @@ export function CalculatorContent() {
                 allowance (£12,570).
               </p>
               <p className='font-medium'>Key differences for {CURRENT_TAX_YEAR_DISPLAY_SHORT}:</p>
-              <ul className={`ml-6 list-disc ${SPACING.SPACE_Y_1}`}>
+              <ul className={`ml-6 list-disc space-y-1`}>
                 <li>
                   <strong>Scotland</strong> has 6 tax bands (19%, 20%, 21%, 42%, 45%, 48%)
                 </li>
@@ -196,7 +195,7 @@ export function CalculatorContent() {
                 Student loan repayments are deducted automatically through PAYE if you earn above
                 the threshold for your plan type:
               </p>
-              <ul className={`ml-6 list-disc ${SPACING.SPACE_Y_1}`}>
+              <ul className={`ml-6 list-disc space-y-1`}>
                 <li>
                   <strong>Plan 1</strong>: 9% on earnings above £
                   {formatNumber(currentRates.studentLoan.plan1.threshold)}
@@ -241,7 +240,7 @@ export function CalculatorContent() {
               <p className='font-medium'>
                 Example on £50,000 salary with 5% pension (salary sacrifice):
               </p>
-              <ul className={`ml-6 list-disc ${SPACING.SPACE_Y_1}`}>
+              <ul className={`ml-6 list-disc space-y-1`}>
                 <li>Pension contribution: £2,500 (5% of £50,000)</li>
                 <li>Taxable income: £34,930 (£50,000 - £2,500 pension - £12,570 allowance)</li>
                 <li>Tax saved: £500 (20% of £2,500 at basic rate)</li>
@@ -255,7 +254,7 @@ export function CalculatorContent() {
                 The UK offers several tax reliefs that can reduce your tax bill. Here are the main
                 ones:
               </p>
-              <ul className={`ml-6 list-disc ${SPACING.SPACE_Y_1}`}>
+              <ul className={`ml-6 list-disc space-y-1`}>
                 <li>
                   <strong>Personal Allowance</strong>: £12,570 tax-free income (for most people)
                 </li>
@@ -282,8 +281,8 @@ export function CalculatorContent() {
             </FAQItem>
           </div>
 
-          <div className={cn('text-center', SPACING.MT_8)}>
-            <p className={`text-muted-foreground ${TYPOGRAPHY.TEXT_SM}`}>
+          <div className={cn('text-center', 'mt-8')}>
+            <p className={`text-muted-foreground text-sm`}>
               Can&apos;t find your question?{' '}
               <Link href='/blog' className='text-primary'>
                 Read our tax guides

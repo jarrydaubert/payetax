@@ -83,12 +83,11 @@ Covered areas include:
 
 - Homepage calculator flow.
 - Calculate button and result rendering.
-- What-if comparison scenarios.
 - Period selector behaviour.
 - Salary comparison tables.
 - Tax-code input handling.
 - Blog navigation back to the calculator.
-- Director Intelligence critical flows.
+- Director Intelligence scenario comparison and critical flows.
 - Mobile menu handoff.
 - PWA/offline route coverage.
 
@@ -96,7 +95,6 @@ Primary files:
 
 - `e2e/smoke.spec.ts`
 - `e2e/calculator-critical.spec.ts`
-- `e2e/what-if-comparison.spec.ts`
 - `e2e/display-periods.spec.ts`
 - `e2e/tax-code-validation.spec.ts`
 - `e2e/director-guide-critical.spec.ts`
@@ -205,7 +203,7 @@ Use this layer when the question is "does this component or state transition beh
 Examples:
 
 - Calculator input and result components.
-- What-if comparison components.
+- Results-table comparison paths retained below the removed homepage What If UI.
 - Director Guide dashboard and input panels.
 - Zustand calculator and Director Guide stores.
 - Analytics event calls from UI actions.

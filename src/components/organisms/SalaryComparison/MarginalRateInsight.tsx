@@ -4,7 +4,6 @@
 import { TrendingUp } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn, formatCurrency } from '@/lib/utils';
 
 interface MarginalRateInsightProps {
@@ -49,39 +48,33 @@ export function MarginalRateInsight({ increase, netDiff, className }: MarginalRa
     <Card className={className}>
       <CardContent className='pt-6'>
         <div
-          className={cn(
-            'flex flex-col sm:flex-row sm:items-center sm:justify-between',
-            SPACING.GAP_4,
-          )}
+          className={cn('flex flex-col sm:flex-row sm:items-center sm:justify-between', 'gap-4')}
         >
-          <div className={cn('flex items-center', SPACING.GAP_3)}>
+          <div className={cn('flex items-center', 'gap-3')}>
             <div
               className={cn(
                 'flex items-center justify-center rounded-full bg-primary/10',
-                ICON_SIZES.SIZE_12,
+                'size-12',
               )}
             >
-              <TrendingUp className={cn(ICON_SIZES.SIZE_6, 'text-primary')} />
+              <TrendingUp className={cn('size-6', 'text-primary')} />
             </div>
             <div>
-              <h3 className={cn('font-semibold', TYPOGRAPHY.TEXT_LG)}>Marginal Take-Home</h3>
-              <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+              <h3 className={cn('font-semibold', 'text-lg')}>Marginal Take-Home</h3>
+              <p className={cn('text-muted-foreground', 'text-sm')}>
                 On your {formatCurrency(safeIncrease, 0)} increase
               </p>
             </div>
           </div>
 
-          <Badge
-            variant='default'
-            className={cn('h-12 sm:ml-auto', SPACING.PX_6, TYPOGRAPHY.TEXT_XL)}
-          >
+          <Badge variant='default' className={cn('h-12 sm:ml-auto', 'px-6', 'text-xl')}>
             {keepRateDisplay}%
           </Badge>
         </div>
 
         {/* Visual Bar with accessibility */}
-        <div className={cn('mt-6', SPACING.SPACE_Y_2)}>
-          <div className={cn('flex justify-between', TYPOGRAPHY.TEXT_SM)}>
+        <div className={cn('mt-6', 'space-y-2')}>
+          <div className={cn('flex justify-between', 'text-sm')}>
             <span className='text-muted-foreground'>You keep</span>
             <span className='font-semibold text-success'>
               {formatCurrency(keepAmount, 0)} ({keepRateDisplay}%)
@@ -100,7 +93,7 @@ export function MarginalRateInsight({ increase, netDiff, className }: MarginalRa
               style={{ width: `${keepRateClamped}%` }}
             />
           </div>
-          <div className={cn('flex justify-between', TYPOGRAPHY.TEXT_SM)}>
+          <div className={cn('flex justify-between', 'text-sm')}>
             <span className='text-muted-foreground'>Lost to deductions</span>
             <span className='font-medium text-warning'>
               {formatCurrency(lostAmount, 0)} ({lostRateDisplay}%)
@@ -109,7 +102,7 @@ export function MarginalRateInsight({ increase, netDiff, className }: MarginalRa
         </div>
 
         {/* Explanation - use foreground color for emphasis */}
-        <p className={cn('text-center text-muted-foreground', SPACING.MT_4, TYPOGRAPHY.TEXT_XS)}>
+        <p className={cn('text-center text-muted-foreground', 'mt-4', 'text-xs')}>
           You keep <span className='font-semibold text-foreground'>{keepRateDisplay}%</span> of the{' '}
           {formatCurrency(safeIncrease, 0)} increase. The remaining{' '}
           <span className='font-semibold text-foreground'>{lostRateDisplay}%</span> goes to tax, NI,

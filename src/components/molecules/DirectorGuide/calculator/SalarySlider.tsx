@@ -67,8 +67,8 @@ export function SalarySlider() {
   if (!hasValidComparison) return null;
 
   return (
-    <div className='space-y-4 rounded-xl border border-border/50 bg-card p-5'>
-      <div className='rounded-lg border border-border/50 bg-background/80 p-3'>
+    <div className='space-y-4 rounded-sm border border-border/50 bg-card p-5'>
+      <div className='rounded-sm border border-border/50 bg-background p-3'>
         <div className='flex items-center justify-between gap-2'>
           <span className='font-medium text-foreground text-sm'>Active Scenario</span>
           <span

@@ -12,7 +12,6 @@
 import type { LucideIcon } from 'lucide-react';
 import type React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 import type { SectionBadgeData } from '@/lib/validation/pageDataValidation';
 
@@ -91,27 +90,27 @@ export function SectionHeading({
   const HeadingTag = level;
 
   const titleClasses = cn(
-    'mb-4 font-bold text-foreground',
-    level === 'h2' ? TYPOGRAPHY.TEXT_4XL : TYPOGRAPHY.TEXT_3XL,
+    'mb-4 font-display font-semibold text-foreground leading-tight',
+    level === 'h2' ? 'text-4xl' : 'text-3xl',
     alignClass,
   );
 
-  const subtitleClasses = cn(
-    'text-muted-foreground leading-relaxed',
-    TYPOGRAPHY.TEXT_LG,
-    alignClass,
-  );
+  const subtitleClasses = cn('text-muted-foreground leading-relaxed', 'text-lg', alignClass);
 
   return (
-    <div className={cn(SPACING.MB_8, className)} id={id}>
+    <div className={cn('mb-8', className)} id={id}>
       {/* Badge */}
       {badge && (
-        <div className={cn(SPACING.MB_4, align === 'center' ? 'flex justify-center' : '')}>
+        <div className={cn('mb-4', align === 'center' ? 'flex justify-center' : '')}>
           <Badge
             variant={badge.variant || 'outline'}
-            className={cn('px-4 py-1.5', SPACING.GAP_2, badge.icon && 'gap-2')}
+            className={cn(
+              'rounded-sm px-4 py-1.5 uppercase tracking-[0.18em]',
+              'gap-2',
+              badge.icon && 'gap-2',
+            )}
           >
-            {badge.icon && <badge.icon className={ICON_SIZES.SIZE_4} aria-hidden='true' />}
+            {badge.icon && <badge.icon className={'size-4'} aria-hidden='true' />}
             <span>{badge.text}</span>
           </Badge>
         </div>
@@ -122,14 +121,7 @@ export function SectionHeading({
 
       {/* Subtitle */}
       {subtitle && (
-        <p
-          className={cn(
-            'max-w-3xl',
-            SPACING.MT_4,
-            align === 'center' && 'mx-auto',
-            subtitleClasses,
-          )}
-        >
+        <p className={cn('max-w-3xl', 'mt-4', align === 'center' && 'mx-auto', subtitleClasses)}>
           {subtitle}
         </p>
       )}

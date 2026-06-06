@@ -214,8 +214,8 @@ export function generateMetadata({
 
     // Other metadata
     other: {
-      'msapplication-TileColor': '#1f2937',
-      'theme-color': '#1f2937',
+      'msapplication-TileColor': '#f8f5ed',
+      'theme-color': '#f8f5ed',
       // Schema.org JSON-LD markup is handled separately via the StructuredData component
     },
   };
@@ -234,12 +234,12 @@ export function generateMetadata({
  */
 export function generateViewport(): Viewport {
   return {
-    themeColor: '#1f2937', // Dark mode only
+    themeColor: '#f8f5ed',
     width: 'device-width',
     initialScale: 1,
     maximumScale: 5, // WCAG 2.2 AA - Allow 500% zoom
     userScalable: true,
-    colorScheme: 'dark',
+    colorScheme: 'light dark',
     viewportFit: 'cover', // For notched devices like iPhone X and newer
   };
 }

@@ -56,6 +56,51 @@ const CACHE_HEADERS = {
   'Cache-Control': 'public, immutable, s-maxage=31536000, stale-while-revalidate=86400',
 };
 
+const paper = '#f8f5ed';
+const paperMuted = '#f2eee4';
+const ink = '#07111f';
+const inkMuted = '#465468';
+const inkBlue = '#113f72';
+const rule = '#cfc7b8';
+const success = '#17623d';
+const destructive = '#9b2f2f';
+const sans = 'Arial, Helvetica, sans-serif';
+const display = 'Georgia, "Times New Roman", serif';
+const mono = 'Menlo, Consolas, monospace';
+
+function GridBackground() {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        inset: 0,
+        backgroundImage:
+          'linear-gradient(to right, rgba(17, 63, 114, 0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(17, 63, 114, 0.08) 1px, transparent 1px)',
+        backgroundSize: '64px 64px',
+      }}
+    />
+  );
+}
+
+function Wordmark() {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'baseline',
+        color: ink,
+        fontFamily: display,
+        fontSize: '40px',
+        fontWeight: 700,
+        letterSpacing: '-1px',
+      }}
+    >
+      <span>paye</span>
+      <span style={{ color: inkBlue }}>tax</span>
+    </div>
+  );
+}
+
 export async function GET(request: NextRequest) {
   const clientId = getClientIdentifier(request);
   if (!(await checkRateLimit(`og:${clientId}`, RATE_LIMIT))) {
@@ -90,132 +135,189 @@ export async function GET(request: NextRequest) {
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
-        backgroundColor: '#020617',
-        padding: '60px',
+        position: 'relative',
+        overflow: 'hidden',
+        backgroundColor: paper,
+        color: ink,
+        padding: '54px 64px',
+        fontFamily: sans,
       }}
     >
-      {/* Top gradient line */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '6px',
-          background: 'linear-gradient(90deg, #06b6d4, #10b981)',
-        }}
-      />
+      <GridBackground />
 
-      {/* Logo */}
       <div
         style={{
           display: 'flex',
+          position: 'relative',
+          zIndex: 1,
           alignItems: 'center',
-          marginBottom: hasResults ? '32px' : '48px',
+          justifyContent: 'space-between',
+          borderBottom: `2px solid ${rule}`,
+          paddingBottom: '26px',
         }}
       >
-        <span style={{ fontSize: '36px', fontWeight: 700, color: '#f8fafc' }}>paye</span>
+        <Wordmark />
         <span
           style={{
-            fontSize: '36px',
+            color: inkBlue,
+            fontFamily: mono,
+            fontSize: '16px',
             fontWeight: 700,
-            background: 'linear-gradient(135deg, #06b6d4 0%, #10b981 100%)',
-            backgroundClip: 'text',
-            color: 'transparent',
+            letterSpacing: '4px',
+            textTransform: 'uppercase',
           }}
         >
-          tax
+          UK PAYE Calculator
         </span>
       </div>
 
-      {/* Main Content */}
-      <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+      <div
+        style={{
+          display: 'flex',
+          position: 'relative',
+          zIndex: 1,
+          flex: 1,
+          flexDirection: 'column',
+          paddingTop: hasResults ? '42px' : '58px',
+        }}
+      >
         {hasResults ? (
-          // Results view
-          <>
-            <h1
+          <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+            <div
               style={{
-                fontSize: '42px',
+                display: 'flex',
+                height: '64px',
+                maxWidth: '960px',
+                color: ink,
+                fontFamily: display,
+                fontSize: '54px',
                 fontWeight: 700,
-                color: '#f8fafc',
-                marginBottom: '24px',
-                lineHeight: 1.2,
-                maxWidth: '100%',
+                letterSpacing: '-1.4px',
+                lineHeight: 1.05,
+                marginBottom: '32px',
                 overflow: 'hidden',
               }}
             >
               {title !== 'UK Tax Calculator' ? title : 'Your Tax Calculation'}
-            </h1>
+            </div>
 
             <div
               style={{
                 display: 'flex',
-                gap: '40px',
-                marginTop: '16px',
+                gap: '18px',
               }}
             >
-              {/* Salary */}
               <div
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  backgroundColor: 'rgba(255,255,255,0.05)',
-                  borderRadius: '16px',
-                  padding: '28px 36px',
+                  width: '340px',
+                  border: `2px solid ${rule}`,
+                  backgroundColor: 'rgba(255, 255, 255, 0.32)',
+                  padding: '24px 28px',
                 }}
               >
-                <span style={{ fontSize: '18px', color: '#94a3b8', marginBottom: '8px' }}>
+                <span
+                  style={{
+                    color: inkMuted,
+                    fontFamily: mono,
+                    fontSize: '16px',
+                    fontWeight: 700,
+                    letterSpacing: '2.5px',
+                    marginBottom: '12px',
+                    textTransform: 'uppercase',
+                  }}
+                >
                   Gross Salary
                 </span>
-                <span style={{ fontSize: '48px', fontWeight: 700, color: '#f8fafc' }}>
+                <span
+                  style={{
+                    color: ink,
+                    fontFamily: mono,
+                    fontSize: '42px',
+                    fontWeight: 700,
+                  }}
+                >
                   {formattedSalary}
                 </span>
               </div>
 
-              {/* Arrow */}
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '40px',
-                  color: '#64748b',
+                  width: '74px',
+                  color: inkBlue,
+                  fontFamily: display,
+                  fontSize: '46px',
                 }}
               >
                 →
               </div>
 
-              {/* Take Home */}
               <div
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  backgroundColor: 'rgba(16,185,129,0.1)',
-                  borderRadius: '16px',
-                  padding: '28px 36px',
-                  border: '2px solid rgba(16,185,129,0.3)',
+                  width: '380px',
+                  border: `2px solid ${inkBlue}`,
+                  backgroundColor: paperMuted,
+                  padding: '24px 28px',
                 }}
               >
-                <span style={{ fontSize: '18px', color: '#10b981', marginBottom: '8px' }}>
+                <span
+                  style={{
+                    color: inkBlue,
+                    fontFamily: mono,
+                    fontSize: '16px',
+                    fontWeight: 700,
+                    letterSpacing: '2.5px',
+                    marginBottom: '12px',
+                    textTransform: 'uppercase',
+                  }}
+                >
                   Take-Home Pay
                 </span>
-                <span style={{ fontSize: '48px', fontWeight: 700, color: '#10b981' }}>
+                <span
+                  style={{
+                    color: success,
+                    fontFamily: mono,
+                    fontSize: '42px',
+                    fontWeight: 700,
+                  }}
+                >
                   {formattedTakeHome}
                 </span>
               </div>
             </div>
-          </>
+          </div>
         ) : (
-          // Default view
-          <>
+          <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+            <span
+              style={{
+                color: inkBlue,
+                fontFamily: mono,
+                fontSize: '18px',
+                fontWeight: 700,
+                letterSpacing: '4px',
+                marginBottom: '20px',
+                textTransform: 'uppercase',
+              }}
+            >
+              HMRC rates
+            </span>
             <h1
               style={{
-                fontSize: '56px',
+                maxWidth: '920px',
+                color: ink,
+                fontFamily: display,
+                fontSize: '72px',
                 fontWeight: 700,
-                color: '#f8fafc',
-                marginBottom: '24px',
-                lineHeight: 1.2,
-                maxWidth: '100%',
+                letterSpacing: '-1.8px',
+                lineHeight: 1,
+                margin: 0,
+                marginBottom: '28px',
                 overflow: 'hidden',
               }}
             >
@@ -224,16 +326,17 @@ export async function GET(request: NextRequest) {
 
             <p
               style={{
+                maxWidth: '780px',
+                color: inkMuted,
                 fontSize: '28px',
-                color: '#94a3b8',
-                maxWidth: '80%',
-                lineHeight: 1.4,
+                lineHeight: 1.38,
+                margin: 0,
                 overflow: 'hidden',
               }}
             >
               {description}
             </p>
-          </>
+          </div>
         )}
       </div>
 
@@ -241,14 +344,35 @@ export async function GET(request: NextRequest) {
       <div
         style={{
           display: 'flex',
+          position: 'relative',
+          zIndex: 1,
           alignItems: 'center',
           justifyContent: 'space-between',
           marginTop: 'auto',
+          borderTop: `2px solid ${rule}`,
+          paddingTop: '24px',
         }}
       >
-        <span style={{ fontSize: '22px', color: '#64748b' }}>payetax.co.uk</span>
-        <span style={{ fontSize: '18px', color: '#475569' }}>
-          Official HMRC rates • Free • No signup
+        <span
+          style={{
+            color: inkBlue,
+            fontFamily: mono,
+            fontSize: '20px',
+            fontWeight: 700,
+          }}
+        >
+          payetax.co.uk
+        </span>
+        <span
+          style={{
+            display: 'flex',
+            gap: '5px',
+            color: inkMuted,
+            fontSize: '18px',
+          }}
+        >
+          <span style={{ color: destructive, fontWeight: 700 }}>Illustrative only.</span>
+          <span>Not financial or tax advice.</span>
         </span>
       </div>
     </div>,

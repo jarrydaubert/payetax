@@ -10,7 +10,6 @@ import type { PayPeriod } from '@/constants/taxRates';
 const MotionTableRow = motion.create(TableRow);
 
 import { ANIMATION_TRANSITIONS } from '@/constants/animationTokens';
-import { ARBITRARY, ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { PERIOD_LABEL_TO_PAY_PERIOD } from '@/lib/calculatorResultsPresenter';
 import { cn, formatCurrency } from '@/lib/utils';
@@ -59,9 +58,10 @@ export function ResultTableRow({
 
   return (
     <RowComponent
-      className={`border-b transition-colors hover:bg-muted/50 ${
-        isHighlight ? 'border-t border-t-border bg-primary/5' : ''
-      }`}
+      className={cn(
+        'border-border/80 border-b transition-colors hover:bg-secondary/60',
+        isHighlight && 'border-primary/40 border-y bg-primary/10 hover:bg-primary/10',
+      )}
       layout={!shouldReduceMotion}
       transition={!shouldReduceMotion ? ANIMATION_TRANSITIONS.layout : undefined}
     >
@@ -70,19 +70,20 @@ export function ResultTableRow({
         className={cn(
           color,
           isHighlight && 'font-bold',
-          'sticky left-0 z-10 bg-background px-2 py-2.5 text-left font-normal',
-          ARBITRARY.TABLE_LABEL_WIDTH,
+          'sticky left-0 z-10 border-border/80 border-r bg-card px-2 py-2.5 text-left font-normal',
         )}
       >
-        <div className={cn('flex items-center', SPACING.GAP_1_5, isSubRow && 'pl-4 sm:pl-6')}>
-          <Icon className={cn(ICON_SIZES.SIZE_3_5, 'flex-shrink-0')} aria-hidden='true' />
-          <span className={cn('whitespace-nowrap', TYPOGRAPHY.TEXT_SM)}>{category}</span>
+        <div className={cn('flex items-start', 'gap-1.5', isSubRow && 'pl-3 sm:pl-4')}>
+          <Icon className={cn('size-3.5', 'flex-shrink-0')} aria-hidden='true' />
+          <span className={cn('min-w-0 leading-tight', 'text-[0.8125rem] xl:text-sm')}>
+            {category}
+          </span>
         </div>
       </th>
       <TableCell
         className={cn(
-          'w-14 px-2 py-2.5 text-right font-mono',
-          TYPOGRAPHY.TEXT_SM,
+          'border-border/60 border-r px-2 py-2.5 text-right font-mono tabular-nums',
+          'text-[0.8125rem] xl:text-sm',
           color,
           isHighlight && 'font-bold',
         )}
@@ -104,8 +105,8 @@ export function ResultTableRow({
             <React.Fragment key={period}>
               <TableCell
                 className={cn(
-                  'min-w-24 whitespace-nowrap bg-primary/10 px-2 py-2.5 text-right font-mono',
-                  TYPOGRAPHY.TEXT_SM,
+                  'min-w-28 whitespace-nowrap bg-primary/10 px-2 py-2.5 text-right font-mono tabular-nums',
+                  'text-[0.8125rem] xl:text-sm',
                   color,
                   isHighlight && 'font-bold',
                 )}
@@ -114,8 +115,8 @@ export function ResultTableRow({
               </TableCell>
               <TableCell
                 className={cn(
-                  'min-w-24 whitespace-nowrap bg-success/10 px-2 py-2.5 text-right font-mono',
-                  TYPOGRAPHY.TEXT_SM,
+                  'min-w-28 whitespace-nowrap bg-success/10 px-2 py-2.5 text-right font-mono tabular-nums',
+                  'text-[0.8125rem] xl:text-sm',
                   color,
                   isHighlight && 'font-bold',
                 )}
@@ -131,8 +132,8 @@ export function ResultTableRow({
           <TableCell
             key={period}
             className={cn(
-              'min-w-24 whitespace-nowrap px-2 py-2.5 text-right font-mono',
-              TYPOGRAPHY.TEXT_SM,
+              'whitespace-nowrap px-1.5 py-2.5 text-right font-mono tabular-nums xl:px-2',
+              'text-[0.8125rem] xl:text-sm',
               color,
               isHighlight && 'font-bold',
             )}

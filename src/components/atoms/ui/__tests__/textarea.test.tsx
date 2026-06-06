@@ -109,7 +109,7 @@ describe('Textarea Component', () => {
       render(<Textarea />);
       const textarea = screen.getByRole('textbox');
       expect(textarea).toHaveClass('focus-visible:outline-none');
-      expect(textarea).toHaveClass('focus-visible:ring-1');
+      expect(textarea).toHaveClass('focus-visible:ring-2');
     });
   });
 
@@ -121,7 +121,7 @@ describe('Textarea Component', () => {
       expect(textarea).toHaveClass('flex');
       expect(textarea).toHaveClass('min-h-16');
       expect(textarea).toHaveClass('w-full');
-      expect(textarea).toHaveClass('rounded-md');
+      expect(textarea).toHaveClass('rounded-sm');
       expect(textarea).toHaveClass('border');
     });
 
@@ -129,7 +129,7 @@ describe('Textarea Component', () => {
       render(<Textarea />);
       const textarea = screen.getByRole('textbox');
 
-      expect(textarea).toHaveClass('bg-transparent');
+      expect(textarea).toHaveClass('bg-background');
       expect(textarea).toHaveClass('text-sm'); // Updated to match design tokens (PAYTAX-65)
     });
 

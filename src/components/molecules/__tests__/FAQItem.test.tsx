@@ -76,9 +76,15 @@ describe('FAQItem', () => {
     );
 
     const details = container.querySelector('details');
-    expect(details).toHaveClass('group', 'overflow-hidden', 'rounded-xl', 'border-2');
+    expect(details).toHaveClass('group', 'overflow-hidden', 'rounded-sm', 'border');
 
     const summary = container.querySelector('summary');
-    expect(summary).toHaveClass('cursor-pointer', 'font-bold', 'text-foreground', 'text-lg');
+    expect(summary).toHaveClass(
+      'cursor-pointer',
+      'font-display',
+      'font-semibold',
+      'text-foreground',
+      'text-lg',
+    );
   });
 });

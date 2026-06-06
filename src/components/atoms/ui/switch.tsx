@@ -39,8 +39,6 @@ const Switch = forwardRef<ElementRef<typeof SwitchPrimitive.Root>, SwitchProps>(
         'h-5 w-9',
         // Border - subtle outline for unchecked contrast
         'border-2 border-transparent data-[state=unchecked]:border-border',
-        // Shadow
-        'shadow-sm',
         // Transitions
         'transition-colors',
         // Focus ring
@@ -60,7 +58,7 @@ const Switch = forwardRef<ElementRef<typeof SwitchPrimitive.Root>, SwitchProps>(
           // Size - default (16×16px)
           'size-4',
           // Styling
-          'bg-background shadow-lg ring-0',
+          'bg-background ring-0',
           // Transitions
           'transition-transform',
           // Transform - tied to root w-9 / thumb w-4 / border-2

@@ -11,10 +11,8 @@
  * @module components/atoms/NumberInput
  */
 
-import { motion, useReducedMotion } from 'framer-motion';
 import type { ChangeEvent, FocusEvent, InputHTMLAttributes, KeyboardEvent } from 'react';
 import { forwardRef, memo, useCallback, useEffect, useId, useState } from 'react';
-import { TYPOGRAPHY } from '@/constants/designTokens';
 import { cn, formatNumber, parseFormattedValue } from '@/lib/utils';
 
 /**
@@ -88,9 +86,6 @@ const NumberInput = memo(
     const reactId = useId();
     const inputId = id ?? `number-input-${reactId}`;
     const controlsId = `${inputId}-controls`;
-
-    // Respect reduced motion preferences
-    const prefersReducedMotion = useReducedMotion();
 
     // Calculate default step based on decimals
     const effectiveStep = step ?? (decimals > 0 ? 10 ** -decimals : 1);
@@ -281,22 +276,6 @@ const NumberInput = memo(
       onChange(newValue);
     }, [disabled, displayValue, onChange, clampValue, effectiveStep, decimals]);
 
-    // Motion variants respecting reduced motion
-    const controlsAnimation = prefersReducedMotion
-      ? {}
-      : {
-          initial: { opacity: 0, x: 4 },
-          animate: { opacity: disabled ? 0.3 : 1, x: 0 },
-          transition: { duration: 0.2 },
-        };
-
-    const buttonAnimation = prefersReducedMotion
-      ? {}
-      : {
-          whileHover: { scale: disabled ? 1 : 1.05 },
-          whileTap: { scale: disabled ? 1 : 0.95 },
-        };
-
     return (
       <div className={cn('relative flex items-center', disabled && 'opacity-60', wrapperClassName)}>
         {prefix && (
@@ -329,13 +308,13 @@ const NumberInput = memo(
               : undefined
           }
           className={cn(
-            'flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 shadow-sm',
+            'flex h-9 w-full rounded-sm border border-input bg-background px-3 py-1 shadow-none',
             'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
             'disabled:cursor-not-allowed disabled:opacity-50',
             'placeholder:text-muted-foreground',
             'transition-all duration-200',
             'text-foreground',
-            TYPOGRAPHY.TEXT_SM,
+            'text-sm',
             prefix && 'pl-7',
             suffix && 'pr-7',
             showControls && 'pr-16',
@@ -355,24 +334,21 @@ const NumberInput = memo(
         )}
 
         {showControls && (
-          <motion.div
+          <fieldset
             id={controlsId}
-            role='group'
             aria-label='Value controls'
-            {...controlsAnimation}
             className={cn(
               'absolute inset-y-1 right-1 flex flex-col border-l',
               'border-input bg-background',
-              'overflow-hidden rounded-r-md',
-              'shadow-sm',
+              'overflow-hidden rounded-r-sm',
+              'shadow-none',
               disabled ? 'opacity-30' : 'opacity-70 hover:opacity-100',
             )}
           >
-            <motion.button
+            <button
               type='button'
               onClick={handleIncrement}
               disabled={disabled}
-              {...buttonAnimation}
               className={cn(
                 'flex flex-1 items-center justify-center px-2',
                 'text-foreground transition-colors hover:bg-accent',
@@ -395,12 +371,11 @@ const NumberInput = memo(
               >
                 <path d='M18 15l-6-6-6 6' />
               </svg>
-            </motion.button>
-            <motion.button
+            </button>
+            <button
               type='button'
               onClick={handleDecrement}
               disabled={disabled}
-              {...buttonAnimation}
               className={cn(
                 'flex flex-1 items-center justify-center px-2',
                 'text-foreground transition-colors hover:bg-accent',
@@ -423,8 +398,8 @@ const NumberInput = memo(
               >
                 <path d='M6 9l6 6 6-6' />
               </svg>
-            </motion.button>
-          </motion.div>
+            </button>
+          </fieldset>
         )}
       </div>
     );

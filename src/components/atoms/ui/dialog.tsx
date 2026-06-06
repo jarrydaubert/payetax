@@ -1,7 +1,6 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import { type ComponentPropsWithoutRef, type ElementRef, forwardRef } from 'react';
-import { ICON_SIZES, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 const Dialog = DialogPrimitive.Root;
@@ -59,7 +58,7 @@ const DialogContent = forwardRef<
         // Positioning
         'fixed top-[50%] left-[50%] z-50 translate-x-[-50%] translate-y-[-50%]',
         // Size and layout
-        'grid w-full max-w-lg gap-4 border bg-background p-6 shadow-lg sm:rounded-lg',
+        'grid w-full max-w-lg gap-4 rounded-sm border bg-background p-6 shadow-none',
         // Reduced motion: disable animations
         'motion-safe:duration-300',
         CONTENT_ANIMATION,
@@ -75,7 +74,7 @@ const DialogContent = forwardRef<
           'disabled:pointer-events-none',
         )}
       >
-        <X className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+        <X className='size-4' aria-hidden='true' />
         <span className='sr-only'>Close</span>
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
@@ -120,7 +119,7 @@ const DialogTitle = forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={cn('font-semibold leading-none tracking-tight', TYPOGRAPHY.TEXT_LG, className)}
+    className={cn('font-semibold text-lg leading-none tracking-tight', className)}
     {...props}
   />
 ));
@@ -135,7 +134,7 @@ const DialogDescription = forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM, className)}
+    className={cn('text-muted-foreground text-sm', className)}
     {...props}
   />
 ));

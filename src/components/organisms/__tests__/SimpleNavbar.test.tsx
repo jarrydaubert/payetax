@@ -72,12 +72,12 @@ describe('SimpleNavbar Component', () => {
       expect(logo).toHaveAttribute('href', '/');
     });
 
-    it('should have gradient styling on tax part', () => {
+    it('should render the tax mark in the primary ink colour', () => {
       render(<SimpleNavbar />);
 
-      // The logo should contain both "paye" and "tax" text
       const logo = screen.getByTestId('nav-logo');
       expect(logo).toHaveTextContent('payetax');
+      expect(screen.getByText('tax')).toHaveClass('text-primary');
     });
   });
 
@@ -223,8 +223,8 @@ describe('SimpleNavbar Component', () => {
       const { container } = render(<SimpleNavbar />);
 
       const nav = container.querySelector('nav');
-      expect(nav).toHaveClass('backdrop-blur-xl');
-      expect(nav).toHaveClass('bg-surface-brand/80');
+      expect(nav).toHaveClass('border-b');
+      expect(nav).toHaveClass('bg-background/95');
     });
 
     it('should apply consistent styling on all pages', () => {
@@ -233,9 +233,8 @@ describe('SimpleNavbar Component', () => {
       const { container } = render(<SimpleNavbar />);
 
       const nav = container.querySelector('nav');
-      // New design uses fixed positioning with backdrop blur (border removed)
-      expect(nav).toHaveClass('backdrop-blur-xl');
-      expect(nav).toHaveClass('bg-surface-brand/80');
+      expect(nav).toHaveClass('border-b');
+      expect(nav).toHaveClass('bg-background/95');
     });
 
     it('should include safe-area top padding on mobile nav', () => {

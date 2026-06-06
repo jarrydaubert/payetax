@@ -156,14 +156,14 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       />
 
       {/* Blog layout */}
-      <div className='min-h-screen bg-background'>
+      <div className='min-h-screen bg-background bg-ledger-grid'>
         {/* Header: H1 + Category Filters */}
-        <div className='container mx-auto max-w-7xl px-4 pt-8 sm:px-6 sm:pt-12 lg:px-8'>
+        <div className='container mx-auto max-w-7xl border-border/70 border-b px-4 pt-8 pb-8 sm:px-6 sm:pt-12 sm:pb-10 lg:px-8'>
           <div className='max-w-3xl'>
-            <p className='mb-3 font-semibold text-primary/90 text-xs uppercase tracking-[0.28em] sm:mb-4'>
+            <p className='mb-3 font-semibold text-primary text-xs uppercase tracking-[0.32em] sm:mb-4'>
               TaxInsights by PayeTax
             </p>
-            <h1 className='max-w-[14ch] font-bold font-display text-3xl text-foreground leading-tight sm:max-w-none sm:text-4xl'>
+            <h1 className='max-w-[14ch] font-display font-semibold text-4xl text-foreground leading-[0.98] sm:max-w-none sm:text-5xl lg:text-6xl'>
               UK Tax Guides &amp; PAYE Insights
             </h1>
             <p className='mt-3 max-w-2xl text-muted-foreground text-sm leading-6 sm:mt-4 sm:text-base'>
@@ -173,13 +173,13 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           </div>
 
           {/* Category Filters */}
-          <nav aria-label='Browse blog categories' className='mt-6 mb-8 sm:mt-8 sm:mb-10'>
+          <nav aria-label='Browse blog categories' className='mt-6 sm:mt-8'>
             <ul className='flex flex-wrap gap-2 sm:gap-3'>
               <li>
                 <Link
                   href='/blog'
                   aria-current='page'
-                  className='block rounded-full border border-primary/70 bg-primary/15 px-3.5 py-2 text-center font-medium text-primary text-sm shadow-[0_0_0_1px_rgba(96,165,250,0.12)] sm:px-4'
+                  className='block rounded-sm border border-primary bg-primary px-3.5 py-2 text-center font-medium text-primary-foreground text-sm sm:px-4'
                 >
                   All Articles
                 </Link>
@@ -190,7 +190,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                   <li key={category.slug}>
                     <Link
                       href={`/blog/category/${category.slug}`}
-                      className='block rounded-full border border-border/70 bg-card/80 px-3.5 py-2 text-center text-foreground text-sm transition hover:border-primary/50 hover:bg-card hover:text-foreground sm:px-4'
+                      className='block rounded-sm border border-border bg-card px-3.5 py-2 text-center text-foreground text-sm transition-colors hover:border-primary/55 hover:text-primary sm:px-4'
                     >
                       {category.name}
                     </Link>
@@ -201,7 +201,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         </div>
 
         {/* Latest Articles + Editor's Picks Sidebar */}
-        <div className='container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
+        <div className='container mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8'>
           <div className='grid gap-6 sm:gap-8 lg:grid-cols-[1fr_300px]'>
             <div>
               <LatestArticles posts={latestPosts} />
@@ -218,7 +218,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         </div>
 
         {/* All Posts — paginated grid */}
-        <div className='border-border/60 border-t'>
+        <div className='border-border/70 border-t'>
           <AllPostsGrid
             posts={paginatedPosts}
             currentPage={currentPage}

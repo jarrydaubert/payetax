@@ -196,10 +196,11 @@ describe('TaxRatesOverview', () => {
   });
 
   describe('Styling', () => {
-    it('should have gradient background', () => {
+    it('should use the Ledger grid background', () => {
       const { container } = render(<TaxRatesOverview />);
       const section = container.querySelector('section');
-      expect(section).toHaveClass('bg-gradient-to-br');
+      expect(section).toHaveClass('bg-ledger-grid');
+      expect(section).not.toHaveClass('bg-gradient-to-br');
     });
 
     it('should have padding', () => {

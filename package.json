@@ -30,8 +30,6 @@
     "check:production-env-contract": "bun scripts/check-production-env-contract.ts",
     "check:analytics-events": "bun scripts/check-analytics-events.ts",
     "check:test-skips": "bun scripts/check-test-skips.ts",
-    "audit:tokens": "bun scripts/audit-tokens.ts",
-    "audit:tokens:fix": "bun scripts/audit-tokens.ts --fix",
     "clean": "rm -rf .next coverage audit-outputs/coverage audit-outputs/playwright-report audit-outputs/test-results audit-outputs/blob-report *.tsbuildinfo || true",
     "clean:reports": "rm -rf audit-outputs/playwright-report audit-outputs/test-results audit-outputs/coverage audit-outputs/blob-report || true",
     "clean:test": "rm -rf audit-outputs/coverage audit-outputs/playwright-report audit-outputs/test-results audit-outputs/blob-report playwright/.auth/storageState.json || true",

@@ -4,7 +4,6 @@
 import { usePathname } from 'next/navigation';
 import type React from 'react';
 import { Suspense } from 'react';
-import BackgroundElements from '@/components/atoms/BackgroundElements';
 import Footer from '@/components/molecules/Footer';
 import CookieBanner from '@/components/organisms/CookieBanner';
 import PWAInstallBanner from '@/components/organisms/PWAInstallBanner';
@@ -37,9 +36,13 @@ export function Layout({ children }: LayoutProps): React.ReactElement {
   }
 
   return (
-    <div className='relative flex min-h-screen flex-col bg-surface-brand'>
-      {/* Background geometric elements */}
-      <BackgroundElements />
+    <div className='relative flex min-h-screen flex-col bg-background'>
+      <div
+        className='pointer-events-none fixed inset-0 z-0 overflow-hidden bg-elements'
+        aria-hidden='true'
+      >
+        <div className='absolute inset-0 bg-grid' />
+      </div>
 
       {/* Skip to main content for screen readers */}
       <a href='#main-content' className='skip-link'>

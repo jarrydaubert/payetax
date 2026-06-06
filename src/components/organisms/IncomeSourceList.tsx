@@ -16,7 +16,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { ANIMATION_TRANSITIONS } from '@/constants/animationTokens';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { PERIODS } from '@/constants/taxRates';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { cn } from '@/lib/utils';
@@ -71,15 +70,12 @@ export function IncomeSourceList() {
         <CollapsibleTrigger
           className={cn(
             'group flex min-h-6 items-center rounded-md py-1 font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-            SPACING.GAP_2,
-            TYPOGRAPHY.TEXT_SM,
+            'gap-2',
+            'text-sm',
           )}
         >
           <ChevronRight
-            className={cn(
-              ICON_SIZES.SIZE_4,
-              'transition-transform group-data-[state=open]:rotate-90',
-            )}
+            className={cn('size-4', 'transition-transform group-data-[state=open]:rotate-90')}
           />
           <span>Additional Income Sources</span>
           {incomeSources.length > 0 && (
@@ -89,19 +85,19 @@ export function IncomeSourceList() {
           )}
         </CollapsibleTrigger>
       </div>
-      <p className={cn('mt-1 text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>
+      <p className={cn('mt-1 text-muted-foreground', 'text-xs')}>
         Add other income here if you have anything besides your main salary.
       </p>
 
-      <CollapsibleContent className={cn('pt-3', SPACING.SPACE_Y_3)}>
+      <CollapsibleContent className={cn('pt-3', 'space-y-3')}>
         {incomeSources.length === 0 && (
-          <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_SM)}>
+          <p className={cn('text-muted-foreground', 'text-sm')}>
             Add pension income, rental income, or other sources
           </p>
         )}
         {incomeSources.length > 0 && (
           <Alert variant='warning'>
-            <AlertTriangle className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+            <AlertTriangle className={'size-4'} aria-hidden='true' />
             <AlertTitle>Additional income accuracy</AlertTitle>
             <AlertDescription>
               Multiple income sources can affect personal allowance, tax bands, and student loans.
@@ -120,15 +116,15 @@ export function IncomeSourceList() {
               animate={shouldReduceMotion ? {} : { opacity: 1, scale: 1 }}
               exit={shouldReduceMotion ? {} : { opacity: 0, scale: 0.95 }}
               transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.spring}
-              className={cn('flex flex-col rounded-lg border border-input p-2.5', SPACING.GAP_2)}
+              className={cn('flex flex-col rounded-lg border border-input p-2.5', 'gap-2')}
               data-testid={`income-source-${index}`}
             >
-              <div className={cn('flex items-center', SPACING.GAP_2)}>
+              <div className={cn('flex items-center', 'gap-2')}>
                 <Badge
                   variant='outline'
                   className={cn(
                     'flex h-6 w-6 shrink-0 items-center justify-center rounded-full p-0',
-                    TYPOGRAPHY.TEXT_XS,
+                    'text-xs',
                   )}
                 >
                   {index + 1}
@@ -144,7 +140,7 @@ export function IncomeSourceList() {
                     }}
                   >
                     <SelectTrigger
-                      className={cn('h-9 border-input', TYPOGRAPHY.TEXT_SM)}
+                      className={cn('h-9 border-input', 'text-sm')}
                       aria-label='Select income type'
                       data-testid={`income-source-${index}-type`}
                     >
@@ -168,12 +164,12 @@ export function IncomeSourceList() {
                   onClick={() => removeIncomeSource(source.id)}
                   aria-label={`Remove income source ${index + 1}`}
                 >
-                  <Trash2 className={ICON_SIZES.SIZE_4} />
+                  <Trash2 className={'size-4'} />
                 </Button>
               </div>
 
               {/* Amount and Period Row */}
-              <div className={cn('flex items-center', SPACING.GAP_2)}>
+              <div className={cn('flex items-center', 'gap-2')}>
                 <NumberInput
                   value={source.amount}
                   onChange={(amount) => updateIncomeSource(source.id, { amount })}
@@ -181,7 +177,7 @@ export function IncomeSourceList() {
                   decimals={0}
                   placeholder='0'
                   min={0}
-                  className={cn('h-9 flex-1', TYPOGRAPHY.TEXT_SM)}
+                  className={cn('h-9 flex-1', 'text-sm')}
                   data-testid={`income-source-${index}-amount`}
                 />
 
@@ -194,7 +190,7 @@ export function IncomeSourceList() {
                   }}
                 >
                   <SelectTrigger
-                    className={cn('h-9 w-28 border-input', TYPOGRAPHY.TEXT_SM)}
+                    className={cn('h-9 w-28 border-input', 'text-sm')}
                     aria-label='Select pay period'
                     data-testid={`income-source-${index}-period`}
                   >
@@ -221,12 +217,12 @@ export function IncomeSourceList() {
           disabled={incomeSources.length >= 10}
           data-testid='add-income-source'
         >
-          <Plus className={cn('mr-2', ICON_SIZES.SIZE_4)} />
+          <Plus className={cn('mr-2', 'size-4')} />
           Add Income Source
         </Button>
 
         {incomeSources.length >= 10 && (
-          <p className={cn('text-muted-foreground', TYPOGRAPHY.TEXT_XS)}>
+          <p className={cn('text-muted-foreground', 'text-xs')}>
             Maximum 10 income sources reached
           </p>
         )}

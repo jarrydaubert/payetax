@@ -201,7 +201,7 @@ describe('TaxYearSelect Component', () => {
       render(<TaxYearSelect value={defaultTaxYear} onChange={mockOnChange} />);
 
       const button = screen.getByRole('combobox');
-      expect(button).toHaveClass('rounded-md');
+      expect(button).toHaveClass('rounded-sm');
       expect(button).toHaveClass('border');
     });
 

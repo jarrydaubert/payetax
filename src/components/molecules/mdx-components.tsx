@@ -9,7 +9,6 @@ import { ExternalLink, Hash } from 'lucide-react';
 import Image from 'next/image';
 import type React from 'react';
 import { isValidElement, type ReactNode } from 'react';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 
 // Per-render slugger for unique IDs across a document
@@ -51,7 +50,7 @@ const ANCHOR_LINK_CLASSES = cn(
   'text-primary opacity-0 transition-opacity',
   'hover:text-primary/80 group-hover:opacity-100',
   'focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2',
-  'focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+  'focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
   'rounded-sm', // For focus ring
 );
 
@@ -62,11 +61,11 @@ export const mdxComponents = {
     return (
       <h1
         className={cn(
-          'group flex scroll-mt-20 flex-wrap items-center font-bold text-foreground',
-          SPACING.MT_8,
-          SPACING.MB_4,
-          SPACING.GAP_3,
-          TYPOGRAPHY.TEXT_4XL,
+          'group flex scroll-mt-20 flex-wrap items-center font-display font-semibold text-foreground',
+          'mt-8',
+          'mb-4',
+          'gap-3',
+          'text-4xl',
           'md:mt-12 md:mb-6',
         )}
         id={id}
@@ -75,7 +74,7 @@ export const mdxComponents = {
         <span>{children}</span>
         {id && (
           <a href={`#${id}`} className={ANCHOR_LINK_CLASSES} aria-label='Link to this heading'>
-            <Hash className={ICON_SIZES.SIZE_6} aria-hidden='true' />
+            <Hash className={'size-6'} aria-hidden='true' />
           </a>
         )}
       </h1>
@@ -86,11 +85,11 @@ export const mdxComponents = {
     return (
       <h2
         className={cn(
-          'group flex scroll-mt-20 flex-wrap items-center font-bold text-foreground',
-          SPACING.MT_6,
-          SPACING.MB_3,
-          SPACING.GAP_3,
-          TYPOGRAPHY.TEXT_3XL,
+          'group flex scroll-mt-20 flex-wrap items-center font-display font-semibold text-foreground',
+          'mt-6',
+          'mb-3',
+          'gap-3',
+          'text-3xl',
           'md:mt-10 md:mb-5',
         )}
         id={id}
@@ -99,7 +98,7 @@ export const mdxComponents = {
         <span>{children}</span>
         {id && (
           <a href={`#${id}`} className={ANCHOR_LINK_CLASSES} aria-label='Link to this heading'>
-            <Hash className={ICON_SIZES.SIZE_5} aria-hidden='true' />
+            <Hash className={'size-5'} aria-hidden='true' />
           </a>
         )}
       </h2>
@@ -110,11 +109,11 @@ export const mdxComponents = {
     return (
       <h3
         className={cn(
-          'group flex scroll-mt-20 flex-wrap items-center font-bold text-foreground',
+          'group flex scroll-mt-20 flex-wrap items-center font-display font-semibold text-foreground',
           'mt-5',
-          SPACING.MB_2,
-          SPACING.GAP_2,
-          TYPOGRAPHY.TEXT_2XL,
+          'mb-2',
+          'gap-2',
+          'text-2xl',
           'md:mt-8 md:mb-4',
         )}
         id={id}
@@ -123,7 +122,7 @@ export const mdxComponents = {
         <span>{children}</span>
         {id && (
           <a href={`#${id}`} className={ANCHOR_LINK_CLASSES} aria-label='Link to this heading'>
-            <Hash className={ICON_SIZES.SIZE_4} aria-hidden='true' />
+            <Hash className={'size-4'} aria-hidden='true' />
           </a>
         )}
       </h3>
@@ -132,10 +131,10 @@ export const mdxComponents = {
   h4: ({ children, ...props }: React.ComponentPropsWithoutRef<'h4'>) => (
     <h4
       className={cn(
-        'font-semibold text-foreground',
-        SPACING.MT_4,
-        SPACING.MB_2,
-        TYPOGRAPHY.TEXT_XL,
+        'font-display font-semibold text-foreground',
+        'mt-4',
+        'mb-2',
+        'text-xl',
         'md:mt-6 md:mb-3',
       )}
       {...props}
@@ -145,7 +144,7 @@ export const mdxComponents = {
   ),
   h5: ({ children, ...props }: React.ComponentPropsWithoutRef<'h5'>) => (
     <h5
-      className={cn('mt-5 font-semibold text-foreground', SPACING.MB_2, TYPOGRAPHY.TEXT_LG)}
+      className={cn('mt-5 font-display font-semibold text-foreground', 'mb-2', 'text-lg')}
       {...props}
     >
       {children}
@@ -153,12 +152,7 @@ export const mdxComponents = {
   ),
   h6: ({ children, ...props }: React.ComponentPropsWithoutRef<'h6'>) => (
     <h6
-      className={cn(
-        'font-semibold text-foreground',
-        SPACING.MT_4,
-        SPACING.MB_2,
-        TYPOGRAPHY.TEXT_BASE,
-      )}
+      className={cn('font-display font-semibold text-foreground', 'mt-4', 'mb-2', 'text-base')}
       {...props}
     >
       {children}
@@ -167,28 +161,19 @@ export const mdxComponents = {
 
   // Enhanced paragraphs
   p: ({ children, ...props }: React.ComponentPropsWithoutRef<'p'>) => (
-    <p
-      className={cn('text-foreground/90 leading-relaxed', SPACING.MB_6, TYPOGRAPHY.TEXT_BASE)}
-      {...props}
-    >
+    <p className={cn('text-foreground/90 leading-relaxed', 'mb-6', 'text-base')} {...props}>
       {children}
     </p>
   ),
 
   // Enhanced lists
   ul: ({ children, ...props }: React.ComponentPropsWithoutRef<'ul'>) => (
-    <ul
-      className={cn('list-disc pl-6 text-foreground/90', SPACING.MB_6, SPACING.SPACE_Y_2)}
-      {...props}
-    >
+    <ul className={cn('list-disc pl-6 text-foreground/90', 'mb-6', 'space-y-2')} {...props}>
       {children}
     </ul>
   ),
   ol: ({ children, ...props }: React.ComponentPropsWithoutRef<'ol'>) => (
-    <ol
-      className={cn('list-decimal pl-6 text-foreground/90', SPACING.MB_6, SPACING.SPACE_Y_2)}
-      {...props}
-    >
+    <ol className={cn('list-decimal pl-6 text-foreground/90', 'mb-6', 'space-y-2')} {...props}>
       {children}
     </ol>
   ),
@@ -207,8 +192,8 @@ export const mdxComponents = {
       <a
         href={href}
         className={cn(
-          'inline-flex items-center font-medium text-primary underline underline-offset-2 transition-colors hover:text-primary/80',
-          SPACING.GAP_1,
+          'inline-flex items-center font-medium text-primary underline decoration-primary/45 underline-offset-4 transition-colors hover:text-primary/80',
+          'gap-1',
         )}
         target={isExternal ? '_blank' : undefined}
         rel={isExternal ? 'noopener noreferrer' : undefined}
@@ -239,7 +224,7 @@ export const mdxComponents = {
       <code
         className={cn(
           'rounded border border-foreground/20 bg-foreground/10 px-1.5 py-0.5 font-mono text-foreground',
-          TYPOGRAPHY.TEXT_SM,
+          'text-sm',
           className,
         )}
         {...props}
@@ -252,14 +237,10 @@ export const mdxComponents = {
   // Enhanced blockquotes
   blockquote: ({ children, ...props }: React.ComponentPropsWithoutRef<'blockquote'>) => (
     <blockquote
-      className={cn(
-        'rounded-lg border-primary/50 border-l-4 bg-card/80 backdrop-blur-sm',
-        'my-8 px-6 [&_p:last-child]:mb-0',
-        SPACING.PY_4,
-      )}
+      className={cn('my-8 border-primary/50 border-l px-5 py-1 [&_p:last-child]:mb-0')}
       {...props}
     >
-      <div className={cn('text-foreground/90 italic', TYPOGRAPHY.TEXT_LG)}>{children}</div>
+      <div className={cn('font-display text-foreground/90 italic', 'text-lg')}>{children}</div>
     </blockquote>
   ),
 
@@ -295,10 +276,10 @@ export const mdxComponents = {
 
   // Enhanced tables
   table: ({ children, ...props }: React.ComponentPropsWithoutRef<'table'>) => (
-    <div className='not-prose my-8 overflow-x-auto rounded-lg border border-foreground/20 bg-card/40'>
+    <div className='not-prose my-8 overflow-x-auto border border-border bg-card'>
       <table
         className={cn(
-          'w-full min-w-2xl bg-card/80 backdrop-blur-sm',
+          'w-full min-w-2xl bg-card',
           '[&_td:last-child]:text-right [&_th:last-child]:text-right',
           '[&_td:last-child]:whitespace-nowrap [&_td:last-child]:tabular-nums',
         )}
@@ -309,30 +290,27 @@ export const mdxComponents = {
     </div>
   ),
   thead: ({ children, ...props }: React.ComponentPropsWithoutRef<'thead'>) => (
-    <thead className='bg-foreground/10' {...props}>
+    <thead className='border-border border-b bg-muted/45' {...props}>
       {children}
     </thead>
   ),
   tbody: ({ children, ...props }: React.ComponentPropsWithoutRef<'tbody'>) => (
-    <tbody
-      className='divide-y divide-foreground/10 [&_tr:nth-child(even)]:bg-foreground/5'
-      {...props}
-    >
+    <tbody className='divide-y divide-border [&_tr:nth-child(even)]:bg-muted/25' {...props}>
       {children}
     </tbody>
   ),
   tr: ({ children, ...props }: React.ComponentPropsWithoutRef<'tr'>) => (
-    <tr className='transition-colors hover:bg-foreground/5' {...props}>
+    <tr className='transition-colors hover:bg-muted/35' {...props}>
       {children}
     </tr>
   ),
   th: ({ children, ...props }: React.ComponentPropsWithoutRef<'th'>) => (
     <th
       className={cn(
-        'text-left font-semibold text-foreground uppercase tracking-wider',
-        SPACING.PX_6,
+        'text-left font-semibold text-muted-foreground uppercase tracking-[0.2em]',
+        'px-6',
         'py-3',
-        TYPOGRAPHY.TEXT_SM,
+        'text-sm',
       )}
       {...props}
     >
@@ -340,25 +318,14 @@ export const mdxComponents = {
     </th>
   ),
   td: ({ children, ...props }: React.ComponentPropsWithoutRef<'td'>) => (
-    <td
-      className={cn(
-        'text-foreground/90 tabular-nums',
-        SPACING.PX_6,
-        SPACING.PY_4,
-        TYPOGRAPHY.TEXT_SM,
-      )}
-      {...props}
-    >
+    <td className={cn('text-foreground/90 tabular-nums', 'px-6', 'py-4', 'text-sm')} {...props}>
       {children}
     </td>
   ),
 
   // Enhanced horizontal rule
   hr: ({ ...props }: React.ComponentPropsWithoutRef<'hr'>) => (
-    <hr
-      className='my-12 h-px border-0 bg-gradient-to-r from-transparent via-foreground/30 to-transparent'
-      {...props}
-    />
+    <hr className='my-12 border-0 border-border border-t' {...props} />
   ),
 
   // Enhanced images with figure/figcaption semantics
@@ -374,16 +341,10 @@ export const mdxComponents = {
           width={1200}
           height={630}
           sizes='(max-width: 768px) 100vw, 768px'
-          className='h-auto w-full rounded-lg border border-foreground/20 shadow-lg'
+          className='h-auto w-full border border-border'
         />
         {alt && (
-          <figcaption
-            className={cn(
-              'text-center text-muted-foreground italic',
-              SPACING.MT_2,
-              TYPOGRAPHY.TEXT_SM,
-            )}
-          >
+          <figcaption className={cn('text-center text-muted-foreground italic', 'mt-2', 'text-sm')}>
             {alt}
           </figcaption>
         )}
@@ -393,9 +354,6 @@ export const mdxComponents = {
 
   // Table caption for accessibility
   caption: (props: React.ComponentPropsWithoutRef<'caption'>) => (
-    <caption
-      className={cn('text-left text-muted-foreground', SPACING.P_3, TYPOGRAPHY.TEXT_SM)}
-      {...props}
-    />
+    <caption className={cn('text-left text-muted-foreground', 'p-3', 'text-sm')} {...props} />
   ),
 };

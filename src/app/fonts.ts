@@ -14,8 +14,10 @@ export type FontLike = {
 };
 
 // The CSS custom properties are defined in `src/app/globals.css` so Tailwind's
-// `font-sans` / `font-display` keep working even when we don't use next/font.
+// `font-sans` / `font-display` / `font-mono` keep working even when we don't
+// use next/font.
 const systemFont: FontLike = { className: '', variable: '' };
 
-export const spaceGrotesk: FontLike = systemFont;
-export const inter: FontLike = systemFont;
+export const newsreader: FontLike = systemFont;
+export const publicSans: FontLike = systemFont;
+export const ibmPlexMono: FontLike = systemFont;

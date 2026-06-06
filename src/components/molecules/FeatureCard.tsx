@@ -13,7 +13,6 @@ import type { Route } from 'next';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { ICON_SIZES, SPACING, TYPOGRAPHY } from '@/constants/designTokens';
 import { cn } from '@/lib/utils';
 import type { FeatureData } from '@/lib/validation/pageDataValidation';
 
@@ -52,19 +51,14 @@ export interface FeatureCardProps {
  * />
  * ```
  *
- * @example With metric and gradient
+ * @example With metric
  * ```tsx
  * <FeatureCard
  *   feature={{
  *     icon: Zap,
  *     title: 'Performance',
  *     description: 'Lightning fast calculations',
- *     metric: '<1.5s',
- *     gradient: {
- *       bg: 'from-warning/10 to-destructive/10',
- *       icon: 'text-warning',
- *       border: 'border-warning/20'
- *     }
+ *     metric: '<1.5s'
  *   }}
  *   variant="showcase"
  * />
@@ -74,21 +68,17 @@ export function FeatureCard({ feature, variant = 'default', className }: Feature
   const { icon: Icon, title, description, metric, link, gradient } = feature;
 
   const cardClasses = cn(
-    'h-full transition-all duration-300',
+    'h-full rounded-sm border-border bg-card transition-colors',
     {
-      'hover:border-primary/50 hover:shadow-lg': variant === 'showcase',
-      'bg-card/50 backdrop-blur-sm': variant === 'default',
+      'hover:border-primary/45': variant === 'showcase',
       'border-0': variant === 'simple',
     },
-    gradient?.bg,
-    gradient?.border,
     className,
   );
 
   const iconContainerClasses = cn(
-    'mb-4 flex h-12 w-12 items-center justify-center rounded-lg',
+    'mb-4 flex h-12 w-12 items-center justify-center rounded-sm border border-primary/25 bg-background',
     gradient?.icon || 'text-primary',
-    variant === 'showcase' && !gradient?.bg && 'bg-primary/10',
   );
 
   return (
@@ -96,12 +86,12 @@ export function FeatureCard({ feature, variant = 'default', className }: Feature
       <CardHeader>
         {/* Icon */}
         <div className={iconContainerClasses} aria-hidden='true'>
-          <Icon className={cn(ICON_SIZES.SIZE_6)} />
+          <Icon className={cn('size-6')} />
         </div>
 
         {/* Title with optional metric */}
-        <div className={cn('flex items-start justify-between', SPACING.GAP_4)}>
-          <h3 className={cn('font-bold text-foreground', TYPOGRAPHY.TEXT_2XL)}>{title}</h3>
+        <div className={cn('flex items-start justify-between', 'gap-4')}>
+          <h3 className={cn('font-display font-semibold text-foreground', 'text-2xl')}>{title}</h3>
           {metric && (
             <Badge variant='secondary' className='shrink-0 font-mono font-semibold'>
               {metric}
@@ -112,13 +102,7 @@ export function FeatureCard({ feature, variant = 'default', className }: Feature
 
       <CardContent>
         {/* Description */}
-        <p
-          className={cn(
-            'text-muted-foreground leading-relaxed',
-            SPACING.MB_4,
-            TYPOGRAPHY.TEXT_BASE,
-          )}
-        >
+        <p className={cn('text-muted-foreground leading-relaxed', 'mb-4', 'text-base')}>
           {description}
         </p>
 
@@ -128,12 +112,12 @@ export function FeatureCard({ feature, variant = 'default', className }: Feature
             href={link.href as Route}
             className={cn(
               'group inline-flex items-center gap-2 font-semibold text-primary transition-colors hover:text-primary/80',
-              TYPOGRAPHY.TEXT_SM,
+              'text-sm',
             )}
           >
             {link.text}
             <ArrowRight
-              className={cn(ICON_SIZES.SIZE_4, 'transition-transform group-hover:translate-x-1')}
+              className={cn('size-4', 'transition-transform group-hover:translate-x-1')}
             />
           </Link>
         )}
