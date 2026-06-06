@@ -126,12 +126,12 @@ export function ProofStrip() {
   return (
     <section className='border-border border-y bg-background py-5'>
       <div className='container mx-auto max-w-6xl px-4'>
-        <div className='grid gap-3 text-muted-foreground text-sm sm:grid-cols-2 lg:grid-cols-4'>
-          <span className='flex items-center gap-2 border-border border-l pl-3'>
+        <div className='flex flex-col items-center gap-x-8 gap-y-2.5 text-center text-muted-foreground text-sm sm:flex-row sm:flex-wrap sm:justify-center'>
+          <span className='flex items-center gap-2'>
             <CheckCircle aria-hidden='true' className='size-4 flex-shrink-0 text-primary' />
             HMRC rates verified {ratesVerifiedDisplay}
           </span>
-          <span className='flex items-center gap-2 border-border border-l pl-3'>
+          <span className='flex items-center gap-2'>
             <Shield aria-hidden='true' className='size-4 flex-shrink-0 text-primary' />
             <Link
               href='/privacy'
@@ -140,7 +140,7 @@ export function ProofStrip() {
               Privacy policy
             </Link>
           </span>
-          <span className='flex items-center gap-2 border-border border-l pl-3'>
+          <span className='flex items-center gap-2'>
             <CheckCircle aria-hidden='true' className='size-4 flex-shrink-0 text-primary' />
             <Link
               href='/compliance'
@@ -149,7 +149,7 @@ export function ProofStrip() {
               Compliance
             </Link>
           </span>
-          <span className='flex items-center gap-2 border-border border-l pl-3'>
+          <span className='flex items-center gap-2'>
             <CheckCircle aria-hidden='true' className='size-4 flex-shrink-0 text-primary' />
             All UK regions, 5 student loan plans, pensions
           </span>
