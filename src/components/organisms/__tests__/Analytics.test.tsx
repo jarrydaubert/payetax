@@ -17,12 +17,13 @@ jest.mock('next/navigation', () => ({
 // Mock next/script
 jest.mock('next/script', () => ({
   __esModule: true,
-  default: ({ children, onLoad, ...props }: any) => {
+  default: ({ children, onLoad, onReady, ...props }: any) => {
     const { useEffect } = require('react');
     // Simulate script loading after mount to avoid setState during render
     useEffect(() => {
       onLoad?.();
-    }, [onLoad]);
+      onReady?.();
+    }, [onLoad, onReady]);
     return children ? <script {...props}>{children}</script> : <script {...props} />;
   },
 }));
@@ -58,6 +59,7 @@ describe('Analytics Component', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    jest.restoreAllMocks();
     Object.defineProperty(window, 'localStorage', {
       value: originalLocalStorage,
       writable: true,
@@ -381,6 +383,28 @@ describe('Analytics Component', () => {
 
       await waitFor(() => {
         expect(mockGtag).toHaveBeenCalledWith('consent', 'update', expect.any(Object));
+      });
+    });
+
+    it('should track the current page view when consent is accepted after page load', async () => {
+      render(<Analytics />);
+
+      await waitFor(() => {
+        expect((window as any).consentMode?.isConsentGiven).toBe(false);
+      });
+
+      await waitFor(() => {
+        document.dispatchEvent(
+          new CustomEvent('cookieConsentUpdated', { detail: { analytics: true } }),
+        );
+        const pageViewCall = mockGtag.mock.calls.find(
+          (call) => call[0] === 'config' && call[2]?.page_path === '/',
+        );
+        expect(pageViewCall?.[2]).toMatchObject({
+          page_path: '/',
+          send_page_view: true,
+          anonymize_ip: true,
+        });
       });
     });
   });

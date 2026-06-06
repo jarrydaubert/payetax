@@ -25,8 +25,8 @@ import {
 const CONSENT_UPDATED_EVENT = 'cookieConsentUpdated';
 const OPEN_PREFERENCES_EVENT = 'openCookiePreferences';
 
-function notifyConsentUpdated(): void {
-  document.dispatchEvent(new Event(CONSENT_UPDATED_EVENT));
+function notifyConsentUpdated(preferences: ConsentPreferences): void {
+  document.dispatchEvent(new CustomEvent(CONSENT_UPDATED_EVENT, { detail: preferences }));
 }
 
 const CookieBanner: React.FC = () => {
@@ -84,7 +84,7 @@ const CookieBanner: React.FC = () => {
     setAnalyticsDraft(preferences.analytics);
     setModalOpen(false);
     setShowBanner(false);
-    notifyConsentUpdated();
+    notifyConsentUpdated(preferences);
   }, []);
 
   const handleAcceptAll = useCallback(() => {
