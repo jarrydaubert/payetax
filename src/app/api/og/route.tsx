@@ -1,13 +1,9 @@
 // src/app/api/og/route.tsx
 import { ImageResponse } from 'next/og';
 import type { NextRequest } from 'next/server';
+import { CURRENT_TAX_YEAR, formatTaxYearDisplay } from '@/constants/taxRates';
 import { checkRateLimit, createRateLimitHeaders } from '@/lib/rateLimit';
-import { formatCurrency } from '@/lib/utils';
 
-// Input constraints to prevent abuse and layout issues
-const MAX_TITLE_LENGTH = 70;
-const MAX_DESCRIPTION_LENGTH = 150;
-const MAX_SALARY = 10_000_000;
 const RATE_LIMIT = { max: 10, window: 60000 };
 
 /** Get client identifier - always returns a key */
@@ -28,45 +24,26 @@ function getClientIdentifier(request: NextRequest): string {
   return `ua:${Buffer.from(ua).toString('base64').slice(0, 16)}`;
 }
 
-/**
- * Clamp text to maximum length, adding ellipsis if truncated
- */
-function clampText(text: string, maxLength: number): string {
-  const trimmed = text.trim();
-  if (trimmed.length <= maxLength) return trimmed;
-  return `${trimmed.slice(0, maxLength - 1)}…`;
-}
-
-/**
- * Parse and validate a money value from query param
- * Returns null if invalid or out of bounds
- */
-function parseMoney(value: string | null): number | null {
-  if (!value) return null;
-  // Remove currency symbols, commas, spaces
-  const cleaned = value.replace(/[£,\s]/g, '');
-  const num = Number.parseFloat(cleaned);
-  if (!Number.isFinite(num)) return null;
-  if (num < 0 || num > MAX_SALARY) return null;
-  return num;
-}
-
 // Cache headers for CDN - OG images are expensive to generate
 const CACHE_HEADERS = {
   'Cache-Control': 'public, immutable, s-maxage=31536000, stale-while-revalidate=86400',
 };
 
 const paper = '#f8f5ed';
-const paperMuted = '#f2eee4';
 const ink = '#07111f';
 const inkMuted = '#465468';
 const inkBlue = '#113f72';
 const rule = '#cfc7b8';
-const success = '#17623d';
-const destructive = '#9b2f2f';
 const sans = 'Arial, Helvetica, sans-serif';
 const display = 'Georgia, "Times New Roman", serif';
 const mono = 'Menlo, Consolas, monospace';
+
+const TRUST_ITEMS = [
+  'Official HMRC rates',
+  'Fast in-browser results',
+  'Your data stays private',
+  'No signup needed',
+];
 
 function GridBackground() {
   return (
@@ -82,25 +59,6 @@ function GridBackground() {
   );
 }
 
-function Wordmark() {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'baseline',
-        color: ink,
-        fontFamily: display,
-        fontSize: '40px',
-        fontWeight: 700,
-        letterSpacing: '-1px',
-      }}
-    >
-      <span>paye</span>
-      <span style={{ color: inkBlue }}>tax</span>
-    </div>
-  );
-}
-
 export async function GET(request: NextRequest) {
   const clientId = getClientIdentifier(request);
   if (!(await checkRateLimit(`og:${clientId}`, RATE_LIMIT))) {
@@ -110,23 +68,10 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  const searchParams = request.nextUrl.searchParams;
-
-  // Get and validate parameters with constraints
-  const rawTitle = searchParams.get('title') || 'See Your Take-Home Pay';
-  const rawDescription =
-    searchParams.get('description') || 'Free UK PAYE calculator with official HMRC rates.';
-
-  const title = clampText(rawTitle, MAX_TITLE_LENGTH);
-  const description = clampText(rawDescription, MAX_DESCRIPTION_LENGTH);
-
-  // Parse salary values with validation
-  const salary = parseMoney(searchParams.get('salary'));
-  const takeHome = parseMoney(searchParams.get('takeHome'));
-
-  const formattedSalary = salary !== null ? formatCurrency(salary, 0) : null;
-  const formattedTakeHome = takeHome !== null ? formatCurrency(takeHome, 0) : null;
-  const hasResults = Boolean(formattedSalary && formattedTakeHome);
+  const taxYearLabel = formatTaxYearDisplay(CURRENT_TAX_YEAR, {
+    separator: '/',
+    shortEndYear: true,
+  });
 
   return new ImageResponse(
     <div
@@ -135,245 +80,134 @@ export async function GET(request: NextRequest) {
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
         position: 'relative',
         overflow: 'hidden',
         backgroundColor: paper,
         color: ink,
-        padding: '54px 64px',
+        padding: '64px',
         fontFamily: sans,
+        textAlign: 'center',
       }}
     >
       <GridBackground />
 
+      {/* Eyebrow */}
+      <div
+        style={{
+          display: 'flex',
+          position: 'relative',
+          zIndex: 1,
+          border: `2px solid rgba(17, 63, 114, 0.25)`,
+          borderRadius: '4px',
+          padding: '8px 20px',
+          marginBottom: '36px',
+          color: inkBlue,
+          fontFamily: mono,
+          fontSize: '20px',
+          fontWeight: 700,
+          letterSpacing: '5px',
+          textTransform: 'uppercase',
+        }}
+      >
+        Updated for {taxYearLabel}
+      </div>
+
+      {/* Headline */}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'relative',
+          zIndex: 1,
+          fontFamily: display,
+          fontSize: '76px',
+          fontWeight: 700,
+          letterSpacing: '-2px',
+          lineHeight: 1.02,
+          marginBottom: '28px',
+        }}
+      >
+        <span>UK PAYE tax calculator</span>
+        <span style={{ color: inkBlue }}>See your take-home pay</span>
+      </div>
+
+      {/* Tagline */}
+      <div
+        style={{
+          display: 'flex',
+          position: 'relative',
+          zIndex: 1,
+          maxWidth: '860px',
+          color: inkMuted,
+          fontSize: '28px',
+          lineHeight: 1.4,
+          marginBottom: '48px',
+        }}
+      >
+        Estimate your take-home pay with official HMRC rates for income tax, National Insurance,
+        student loans, and pensions.
+      </div>
+
+      {/* Trust strip */}
       <div
         style={{
           display: 'flex',
           position: 'relative',
           zIndex: 1,
           alignItems: 'center',
-          justifyContent: 'space-between',
-          borderBottom: `2px solid ${rule}`,
-          paddingBottom: '26px',
+          justifyContent: 'center',
+          gap: '40px',
+          borderTop: `2px solid ${rule}`,
+          paddingTop: '32px',
         }}
       >
-        <Wordmark />
-        <span
-          style={{
-            color: inkBlue,
-            fontFamily: mono,
-            fontSize: '16px',
-            fontWeight: 700,
-            letterSpacing: '4px',
-            textTransform: 'uppercase',
-          }}
-        >
-          UK PAYE Calculator
-        </span>
-      </div>
-
-      <div
-        style={{
-          display: 'flex',
-          position: 'relative',
-          zIndex: 1,
-          flex: 1,
-          flexDirection: 'column',
-          paddingTop: hasResults ? '42px' : '58px',
-        }}
-      >
-        {hasResults ? (
-          <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-            <div
-              style={{
-                display: 'flex',
-                height: '64px',
-                maxWidth: '960px',
-                color: ink,
-                fontFamily: display,
-                fontSize: '54px',
-                fontWeight: 700,
-                letterSpacing: '-1.4px',
-                lineHeight: 1.05,
-                marginBottom: '32px',
-                overflow: 'hidden',
-              }}
+        {TRUST_ITEMS.map((text) => (
+          <div
+            key={text}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              color: inkMuted,
+              fontSize: '22px',
+            }}
+          >
+            <svg
+              width='22'
+              height='22'
+              viewBox='0 0 24 24'
+              fill='none'
+              stroke={inkBlue}
+              strokeWidth={3}
+              strokeLinecap='round'
+              strokeLinejoin='round'
+              aria-hidden='true'
             >
-              {title !== 'UK Tax Calculator' ? title : 'Your Tax Calculation'}
-            </div>
-
-            <div
-              style={{
-                display: 'flex',
-                gap: '18px',
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  width: '340px',
-                  border: `2px solid ${rule}`,
-                  backgroundColor: 'rgba(255, 255, 255, 0.32)',
-                  padding: '24px 28px',
-                }}
-              >
-                <span
-                  style={{
-                    color: inkMuted,
-                    fontFamily: mono,
-                    fontSize: '16px',
-                    fontWeight: 700,
-                    letterSpacing: '2.5px',
-                    marginBottom: '12px',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  Gross Salary
-                </span>
-                <span
-                  style={{
-                    color: ink,
-                    fontFamily: mono,
-                    fontSize: '42px',
-                    fontWeight: 700,
-                  }}
-                >
-                  {formattedSalary}
-                </span>
-              </div>
-
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '74px',
-                  color: inkBlue,
-                  fontFamily: display,
-                  fontSize: '46px',
-                }}
-              >
-                →
-              </div>
-
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  width: '380px',
-                  border: `2px solid ${inkBlue}`,
-                  backgroundColor: paperMuted,
-                  padding: '24px 28px',
-                }}
-              >
-                <span
-                  style={{
-                    color: inkBlue,
-                    fontFamily: mono,
-                    fontSize: '16px',
-                    fontWeight: 700,
-                    letterSpacing: '2.5px',
-                    marginBottom: '12px',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  Take-Home Pay
-                </span>
-                <span
-                  style={{
-                    color: success,
-                    fontFamily: mono,
-                    fontSize: '42px',
-                    fontWeight: 700,
-                  }}
-                >
-                  {formattedTakeHome}
-                </span>
-              </div>
-            </div>
+              <path d='M20 6 9 17l-5-5' />
+            </svg>
+            <span>{text}</span>
           </div>
-        ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-            <span
-              style={{
-                color: inkBlue,
-                fontFamily: mono,
-                fontSize: '18px',
-                fontWeight: 700,
-                letterSpacing: '4px',
-                marginBottom: '20px',
-                textTransform: 'uppercase',
-              }}
-            >
-              HMRC rates
-            </span>
-            <h1
-              style={{
-                maxWidth: '920px',
-                color: ink,
-                fontFamily: display,
-                fontSize: '72px',
-                fontWeight: 700,
-                letterSpacing: '-1.8px',
-                lineHeight: 1,
-                margin: 0,
-                marginBottom: '28px',
-                overflow: 'hidden',
-              }}
-            >
-              {title}
-            </h1>
-
-            <p
-              style={{
-                maxWidth: '780px',
-                color: inkMuted,
-                fontSize: '28px',
-                lineHeight: 1.38,
-                margin: 0,
-                overflow: 'hidden',
-              }}
-            >
-              {description}
-            </p>
-          </div>
-        )}
+        ))}
       </div>
 
       {/* Footer */}
       <div
         style={{
           display: 'flex',
-          position: 'relative',
+          position: 'absolute',
+          bottom: '40px',
           zIndex: 1,
           alignItems: 'center',
-          justifyContent: 'space-between',
-          marginTop: 'auto',
-          borderTop: `2px solid ${rule}`,
-          paddingTop: '24px',
+          gap: '10px',
+          color: inkBlue,
+          fontFamily: mono,
+          fontSize: '20px',
+          fontWeight: 700,
         }}
       >
-        <span
-          style={{
-            color: inkBlue,
-            fontFamily: mono,
-            fontSize: '20px',
-            fontWeight: 700,
-          }}
-        >
-          payetax.co.uk
-        </span>
-        <span
-          style={{
-            display: 'flex',
-            gap: '5px',
-            color: inkMuted,
-            fontSize: '18px',
-          }}
-        >
-          <span style={{ color: destructive, fontWeight: 700 }}>Illustrative only.</span>
-          <span>Not financial or tax advice.</span>
-        </span>
+        payetax.co.uk
       </div>
     </div>,
     {

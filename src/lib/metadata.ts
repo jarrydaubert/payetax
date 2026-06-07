@@ -19,7 +19,7 @@ export const LOGO_URL = `${SITE_URL}/logo.png`;
 // Default metadata values
 const DEFAULT_TITLE = `Free UK PAYE Tax Calculator ${CURRENT_TAX_YEAR} | Salary & Take-Home Pay`;
 const DEFAULT_DESCRIPTION = `Free UK PAYE tax calculator with official HMRC rates ${CURRENT_TAX_YEAR}. Calculate income tax, National Insurance, student loans, and take-home pay from your salary instantly. No registration required.`;
-export const DEFAULT_OG_IMAGE_PATH = '/images/og/ledger-hero.png';
+export const DEFAULT_OG_IMAGE_PATH = '/api/og';
 
 /**
  * Options for generating SEO metadata
