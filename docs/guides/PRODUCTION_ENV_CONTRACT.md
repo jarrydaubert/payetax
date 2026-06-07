@@ -10,7 +10,7 @@ This document lists production environment variables for the public R&D version 
 | Consent-based GA4 analytics | `NEXT_PUBLIC_GA_ID` |
 | Vercel Web Analytics | No env variable. Enable Web Analytics on the current Vercel `payetax` project. |
 | PAYE and director results email | `BREVO_API_KEY`, `BREVO_FROM_EMAIL` |
-| Distributed API rate limiting | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` |
+| Distributed API rate limiting | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `RATE_LIMIT_HEALTH_SECRET` |
 | Sentry calculator error monitoring | `NEXT_PUBLIC_SENTRY_DSN` |
 | Sentry source maps | `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` |
 
