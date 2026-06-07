@@ -54,4 +54,24 @@ describe('calculatorResultsPresenter', () => {
 
     expect(calculateMarginalTaxRate({ results, input: payslipInput })).toBeGreaterThan(0);
   });
+
+  it('renders percentage values that round to 100 without a decimal place', () => {
+    const results = calculateTax({
+      ...payslipInput,
+      allowancesDeductions: 0,
+      pensionContribution: 0,
+    });
+    const rows = buildResultsTableRows({
+      results: {
+        ...results,
+        taxableIncome: results.grossSalary.annually,
+      },
+      allowancesDeductions: 0,
+      studentLoans: [],
+      previousYearLabel: '2025',
+    });
+
+    expect(rows.find((row) => row.kind === 'taxable')?.percentage).toBe('100%');
+    expect(rows.find((row) => row.kind === 'taxFree')?.percentage).toMatch(/\d+\.\d%/);
+  });
 });

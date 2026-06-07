@@ -1,33 +1,15 @@
 // src/app/privacy/page.tsx
 
-import type { Metadata } from 'next';
 import { StructuredData } from '@/components/organisms/StructuredData';
-import { SITE_URL } from '@/lib/metadata';
+import { generateMetadata, SITE_URL } from '@/lib/metadata';
 import { PrivacyPageContent } from './PrivacyPageContent';
 
-const OG_IMAGE = `${SITE_URL}/images/og/privacy.jpg`;
-
-export const metadata: Metadata = {
+export const metadata = generateMetadata({
   title: 'Privacy Policy | PayeTax - Privacy-First Tax Calculations',
   description:
     "PayeTax privacy policy: Interactive calculations run in your browser and tax inputs aren't stored. Learn how we protect your financial privacy.",
-  alternates: {
-    canonical: `${SITE_URL}/privacy`,
-  },
-  openGraph: {
-    title: 'Privacy Policy | PayeTax',
-    description: "Interactive calculations run in your browser and tax inputs aren't stored.",
-    url: `${SITE_URL}/privacy`,
-    type: 'website',
-    images: [OG_IMAGE],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Privacy Policy | PayeTax',
-    description: "Interactive calculations run in your browser and tax inputs aren't stored.",
-    images: [OG_IMAGE],
-  },
-};
+  pathname: '/privacy',
+});
 
 export default function PrivacyPage() {
   return (

@@ -65,6 +65,11 @@ describe('directorResultsEmail', () => {
     expect(html).not.toContain('linear-gradient');
     expect(html).not.toContain('#06b6d4');
     expect(html).not.toContain('#10b981');
+    expect(html).toContain('#f8f5ed');
+    expect(html).toContain('#123a66');
+    expect(html).toContain('@media only screen');
+    expect(html).toContain('font-variant-numeric: tabular-nums');
+    expect(html).toContain('Recalculate in Director Intelligence');
 
     // Deadline should be derived from tax year (2025-26 => 31 Jan 2027).
     expect(html).toContain('31 January 2027');

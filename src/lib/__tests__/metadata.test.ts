@@ -1,6 +1,6 @@
 // src/lib/__tests__/metadata.test.ts
 
-import { generateMetadata, generateViewport } from '../metadata';
+import { DEFAULT_OG_IMAGE_PATH, generateMetadata, generateViewport } from '../metadata';
 
 // Mock environment variables
 const originalEnv = process.env;
@@ -26,6 +26,15 @@ describe('Metadata Module', () => {
       expect(metadata.description).toContain('Free UK PAYE tax calculator');
       expect(metadata).not.toHaveProperty('keywords');
       expect(metadata.metadataBase).toBeInstanceOf(URL);
+      expect(metadata.openGraph?.images).toEqual([
+        {
+          url: `https://payetax.co.uk${DEFAULT_OG_IMAGE_PATH}`,
+          width: 1200,
+          height: 630,
+          alt: 'Free UK PAYE Tax Calculator 2026-2027 | Salary & Take-Home Pay',
+        },
+      ]);
+      expect(metadata.twitter?.images).toEqual([`https://payetax.co.uk${DEFAULT_OG_IMAGE_PATH}`]);
     });
 
     test('should use custom SITE_URL from environment', () => {
@@ -33,11 +42,17 @@ describe('Metadata Module', () => {
       delete require.cache[require.resolve('../metadata')];
       process.env.NEXT_PUBLIC_SITE_URL = 'https://custom-domain.com';
 
-      const { generateMetadata: newGenerateMetadata } = require('../metadata');
+      const {
+        DEFAULT_OG_IMAGE_PATH: newDefaultOgImagePath,
+        generateMetadata: newGenerateMetadata,
+      } = require('../metadata');
       const metadata = newGenerateMetadata({ pathname: '/test' });
 
       expect(metadata.alternates?.canonical).toBe('https://custom-domain.com/test');
       expect(metadata.openGraph?.url).toBe('https://custom-domain.com/test');
+      expect(metadata.twitter?.images).toEqual([
+        `https://custom-domain.com${newDefaultOgImagePath}`,
+      ]);
     });
 
     test('should format title correctly when site name not included', () => {

@@ -54,7 +54,6 @@ export async function generateMetadata({
     title,
     description,
     pathname: canonicalPath,
-    ogImage: '/images/og-image.png',
     noIndex: articleCount === 0,
   });
 
