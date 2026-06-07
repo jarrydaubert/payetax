@@ -4,6 +4,7 @@ type RateLimitDiagnostics = {
   configured: boolean;
   backend: 'distributed' | 'in-memory';
   upstashPing: 'ok' | 'failed' | 'not_configured';
+  upstashReadWriteDelete: 'ok' | 'failed' | 'not_configured';
   lastFallbackReason: 'missing_config' | 'upstash_error' | null;
   lastFallbackAt: string | null;
   upstashError?: string;
@@ -41,13 +42,15 @@ async function main(): Promise<void> {
   console.log(`   - configured: ${diagnostics.configured}`);
   console.log(`   - backend: ${diagnostics.backend}`);
   console.log(`   - upstashPing: ${diagnostics.upstashPing}`);
+  console.log(`   - upstashReadWriteDelete: ${diagnostics.upstashReadWriteDelete}`);
   console.log(`   - lastFallbackReason: ${diagnostics.lastFallbackReason ?? 'none'}`);
   console.log(`   - lastFallbackAt: ${diagnostics.lastFallbackAt ?? 'never'}`);
 
   if (
     !diagnostics.configured ||
     diagnostics.backend !== 'distributed' ||
-    diagnostics.upstashPing !== 'ok'
+    diagnostics.upstashPing !== 'ok' ||
+    diagnostics.upstashReadWriteDelete !== 'ok'
   ) {
     throw new Error('Distributed rate limiter is not healthy/configured');
   }

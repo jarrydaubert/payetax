@@ -40,6 +40,7 @@ export interface RateLimitDiagnostics {
   configured: boolean;
   backend: RateLimitBackend;
   upstashPing: 'ok' | 'failed' | 'not_configured';
+  upstashReadWriteDelete: 'ok' | 'failed' | 'not_configured';
   lastFallbackReason: RateLimitFallbackReason | null;
   lastFallbackAt: string | null;
   upstashError?: string;
@@ -136,6 +137,22 @@ async function runUpstashCommand(parts: string[]): Promise<UpstashResponse['resu
   }
 
   return payload.result;
+}
+
+async function runUpstashReadWriteDeleteProbe(): Promise<void> {
+  const suffix = `${Date.now()}:${Math.random().toString(36).slice(2)}`;
+  const diagnosticKey = `${DISTRIBUTED_KEY_PREFIX}:health:${suffix}`;
+  const diagnosticValue = `ok:${suffix}`;
+
+  try {
+    await runUpstashCommand(['SET', diagnosticKey, diagnosticValue, 'PX', '10000']);
+    const storedValue = await runUpstashCommand(['GET', diagnosticKey]);
+    if (storedValue !== diagnosticValue) {
+      throw new Error('Upstash read/write probe value mismatch');
+    }
+  } finally {
+    await runUpstashCommand(['DEL', diagnosticKey]);
+  }
 }
 
 async function incrementDistributedCounter(key: string, windowMs: number): Promise<number | null> {
@@ -259,6 +276,7 @@ export async function getRateLimitDiagnostics(): Promise<RateLimitDiagnostics> {
       configured: false,
       backend: 'in-memory',
       upstashPing: 'not_configured',
+      upstashReadWriteDelete: 'not_configured',
       lastFallbackReason,
       lastFallbackAt,
     };
@@ -266,10 +284,25 @@ export async function getRateLimitDiagnostics(): Promise<RateLimitDiagnostics> {
 
   try {
     await runUpstashCommand(['PING']);
+  } catch (error) {
+    return {
+      configured: true,
+      backend: 'in-memory',
+      upstashPing: 'failed',
+      upstashReadWriteDelete: 'failed',
+      lastFallbackReason,
+      lastFallbackAt,
+      upstashError: error instanceof Error ? error.message : 'unknown error',
+    };
+  }
+
+  try {
+    await runUpstashReadWriteDeleteProbe();
     return {
       configured: true,
       backend: 'distributed',
       upstashPing: 'ok',
+      upstashReadWriteDelete: 'ok',
       lastFallbackReason,
       lastFallbackAt,
     };
@@ -277,7 +310,8 @@ export async function getRateLimitDiagnostics(): Promise<RateLimitDiagnostics> {
     return {
       configured: true,
       backend: 'in-memory',
-      upstashPing: 'failed',
+      upstashPing: 'ok',
+      upstashReadWriteDelete: 'failed',
       lastFallbackReason,
       lastFallbackAt,
       upstashError: error instanceof Error ? error.message : 'unknown error',

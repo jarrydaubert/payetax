@@ -53,6 +53,8 @@ Rate limiting:
 - `UPSTASH_REDIS_REST_TOKEN`
 - `RATE_LIMIT_HEALTH_SECRET`
 
+PayeTax uses the Upstash REST URL/token pair, not the Redis TCP URL/password. A Redis CLI `PING` proves the database exists, but the deployed app still needs the REST env vars in Vercel.
+
 ## Secret Handling
 
 - Never commit real credentials.
@@ -69,4 +71,4 @@ After deploy:
 - Check Sentry for new PAYE or Director calculator errors.
 - Check Vercel Web Analytics for live traffic if analytics changed.
 - Check GA4 realtime after accepting analytics cookies.
-- Check `/api/ops/rate-limit-health` with the configured secret when rate limiting changed.
+- Check `/api/ops/rate-limit-health` with the configured secret when rate limiting changed. The check verifies Upstash REST `PING` plus a temporary write/read/delete probe.

@@ -4,6 +4,7 @@ import {
   checkRateLimitWithPolicy,
   clearAllRateLimits,
   createRateLimitHeaders,
+  getRateLimitDiagnostics,
   getRemainingRequests,
   getRetryAfterSeconds,
   resetRateLimit,
@@ -119,6 +120,7 @@ describe('Rate Limiting', () => {
   describe('checkRateLimitWithPolicy', () => {
     it('fails closed in production when distributed protection is required but unavailable', async () => {
       process.env.NODE_ENV = 'production';
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
       const result = await checkRateLimitWithPolicy(
         '192.168.9.1',
@@ -132,6 +134,7 @@ describe('Rate Limiting', () => {
         fallbackPolicy: 'require_distributed_in_production',
         reason: 'distributed_unavailable',
       });
+      consoleErrorSpy.mockRestore();
     });
 
     it('still uses in-memory fallback outside production when distributed protection is required', async () => {
@@ -149,6 +152,81 @@ describe('Rate Limiting', () => {
         fallbackPolicy: 'require_distributed_in_production',
         reason: 'allowed',
       });
+    });
+  });
+
+  describe('getRateLimitDiagnostics', () => {
+    const originalFetch = global.fetch;
+
+    afterEach(() => {
+      global.fetch = originalFetch;
+      process.env.UPSTASH_REDIS_REST_URL = undefined;
+      process.env.UPSTASH_REDIS_REST_TOKEN = undefined;
+      jest.resetModules();
+    });
+
+    it('reports distributed checks as not configured when REST env vars are missing', async () => {
+      const diagnostics = await getRateLimitDiagnostics();
+
+      expect(diagnostics).toMatchObject({
+        configured: false,
+        backend: 'in-memory',
+        upstashPing: 'not_configured',
+        upstashReadWriteDelete: 'not_configured',
+      });
+    });
+
+    it('runs a REST ping plus write/read/delete probe when configured', async () => {
+      jest.resetModules();
+      process.env.UPSTASH_REDIS_REST_URL = 'https://example.upstash.io';
+      process.env.UPSTASH_REDIS_REST_TOKEN = 'test-token';
+      let storedValue = '';
+
+      const fetchMock = jest.fn((input: RequestInfo | URL) => {
+        const url = String(input);
+
+        if (url.includes('/PING')) {
+          return Promise.resolve(new Response(JSON.stringify({ result: 'PONG' }), { status: 200 }));
+        }
+
+        if (url.includes('/SET/')) {
+          const parts = url.split('/');
+          storedValue = decodeURIComponent(parts.at(-3) ?? '');
+          return Promise.resolve(new Response(JSON.stringify({ result: 'OK' }), { status: 200 }));
+        }
+
+        if (url.includes('/GET/')) {
+          return Promise.resolve(
+            new Response(JSON.stringify({ result: storedValue }), { status: 200 }),
+          );
+        }
+
+        if (url.includes('/DEL/')) {
+          return Promise.resolve(new Response(JSON.stringify({ result: 1 }), { status: 200 }));
+        }
+
+        return Promise.resolve(
+          new Response(JSON.stringify({ error: 'unexpected command' }), { status: 400 }),
+        );
+      });
+      global.fetch = fetchMock as typeof fetch;
+
+      const { getRateLimitDiagnostics: getConfiguredDiagnostics } = await import('../rateLimit');
+      const diagnostics = await getConfiguredDiagnostics();
+
+      expect(diagnostics).toMatchObject({
+        configured: true,
+        backend: 'distributed',
+        upstashPing: 'ok',
+        upstashReadWriteDelete: 'ok',
+      });
+      expect(fetchMock).toHaveBeenCalledTimes(4);
+      expect(fetchMock.mock.calls.map(([input]) => String(input))).toEqual([
+        expect.stringContaining('/PING'),
+        expect.stringContaining('/SET/'),
+        expect.stringContaining('/GET/'),
+        expect.stringContaining('/DEL/'),
+      ]);
     });
   });
 
