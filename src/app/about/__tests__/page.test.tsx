@@ -7,7 +7,7 @@ describe('AboutPage', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: /Built to help you trust your numbers without trading your privacy/i,
+        name: /Trust your numbers without trading your privacy/i,
       }),
     ).toBeInTheDocument();
 

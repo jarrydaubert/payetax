@@ -5,8 +5,24 @@ describe('PrivacyPage', () => {
   it('renders hero copy and last updated date', () => {
     render(<PrivacyPage />);
 
-    expect(screen.getByText('Your Data Stays')).toBeInTheDocument();
-    expect(screen.getByText('In Your Browser')).toBeInTheDocument();
-    expect(screen.getByText('Last updated: June 5, 2026')).toBeInTheDocument();
+    expect(screen.getByText('Your Tax Data Stays')).toBeInTheDocument();
+    expect(screen.getByText('On Your Device')).toBeInTheDocument();
+    expect(screen.getByText('Last updated: 7 June 2026')).toBeInTheDocument();
+  });
+
+  it('renders the formal UK GDPR policy sections', () => {
+    render(<PrivacyPage />);
+
+    // Mandatory UK GDPR disclosures must be present.
+    expect(screen.getByRole('heading', { name: /Who we are/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Data we process/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Third parties we rely on/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Your rights/i })).toBeInTheDocument();
+
+    // Right to complain to the ICO.
+    expect(screen.getByRole('link', { name: /ico\.org\.uk/i })).toHaveAttribute(
+      'href',
+      'https://ico.org.uk',
+    );
   });
 });
