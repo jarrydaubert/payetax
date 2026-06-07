@@ -16,7 +16,7 @@ import {
   getLatestPosts,
 } from '@/lib/blog';
 import {
-  createHeroOgImagePath,
+  DEFAULT_OG_IMAGE_PATH,
   generateMetadata as generateMetadataHelper,
   LOGO_URL,
   SITE_URL,
@@ -132,7 +132,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       url: `${SITE_URL}/blog/${post.slug}`,
       image: post.image
         ? `${SITE_URL}${post.image.startsWith('/') ? post.image : `/${post.image}`}`
-        : `${SITE_URL}${createHeroOgImagePath(post.title, post.excerpt)}`,
+        : `${SITE_URL}${DEFAULT_OG_IMAGE_PATH}`,
       datePublished: post.publishedAt,
       dateModified: post.updatedAt || post.publishedAt,
       author: {
