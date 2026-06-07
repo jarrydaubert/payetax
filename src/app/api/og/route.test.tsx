@@ -3,8 +3,9 @@
  *
  * Bug class: SECURITY-ABUSE
  * What bug will this test find?
- * - Input constraint regressions (salary/title/description clamping)
  * - Cache header regressions for expensive OG generation
+ * - Rate-limit guard regressions for the OG renderer
+ * - Hero content regressions in the single shared OG card
  */
 
 import { NextRequest } from 'next/server';
@@ -63,11 +64,8 @@ function collectText(node: unknown, buffer: string[] = []): string[] {
   return buffer;
 }
 
-function buildRequest(search: Record<string, string>, headers?: Record<string, string>) {
+function buildRequest(headers?: Record<string, string>) {
   const url = new URL('https://payetax.co.uk/api/og');
-  for (const [key, value] of Object.entries(search)) {
-    url.searchParams.set(key, value);
-  }
   return new NextRequest(url, { headers: new Headers(headers) });
 }
 
@@ -78,38 +76,26 @@ describe('/api/og GET', () => {
 
   it('sets cache headers for OG responses', async () => {
     const { GET } = await import('./route');
-    const response = (await GET(buildRequest({}))) as MockImageResponse;
+    const response = (await GET(buildRequest())) as MockImageResponse;
 
     expect(response.headers.get('Cache-Control')).toContain('s-maxage');
   });
 
-  it('renders the results view when salary and takeHome are valid', async () => {
+  it('renders the shared hero card', async () => {
     const { GET } = await import('./route');
-    const response = (await GET(
-      buildRequest({ salary: '50000', takeHome: '40000' }),
-    )) as MockImageResponse;
+    const response = (await GET(buildRequest())) as MockImageResponse;
 
     const text = collectText(response.element).join(' ');
-    expect(text).toContain('Gross Salary');
-    expect(text).toContain('Take-Home Pay');
-    expect(text).toContain('Illustrative only.');
-  });
-
-  it('falls back to the default view when salary is out of bounds', async () => {
-    const { GET } = await import('./route');
-    const response = (await GET(
-      buildRequest({ salary: '999999999', takeHome: '40000' }),
-    )) as MockImageResponse;
-
-    const text = collectText(response.element).join(' ');
-    expect(text).toContain('See Your Take-Home Pay');
-    expect(text).not.toContain('Gross Salary');
+    expect(text).toContain('UK PAYE tax calculator');
+    expect(text).toContain('See your take-home pay');
+    expect(text).toContain('Official HMRC rates');
+    expect(text).toContain('payetax.co.uk');
   });
 
   it('returns 429 when rate limited', async () => {
     mockCheckRateLimit.mockReturnValue(false);
     const { GET } = await import('./route');
-    const response = await GET(buildRequest({}, { 'x-forwarded-for': '1.2.3.4' }));
+    const response = await GET(buildRequest({ 'x-forwarded-for': '1.2.3.4' }));
 
     expect(response.status).toBe(429);
     expect(response.headers.get('Retry-After')).toBe('60');
