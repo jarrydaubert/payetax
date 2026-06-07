@@ -8,9 +8,9 @@ describe('/install page', () => {
     expect(
       screen.getByRole('heading', { name: /Add PayeTax to your home screen/i }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/iPhone \/ iPad/i)).toBeInTheDocument();
-    expect(screen.getByText(/Android/i)).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /Desktop \(Chrome\/Edge\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /iPhone & iPad/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Android/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Desktop/i })).toBeInTheDocument();
   });
 
   it('renders calculator CTA', () => {

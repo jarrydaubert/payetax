@@ -58,7 +58,7 @@ export function CompliancePageContent() {
             <span className='text-foreground'>Tax Rates & Compliance</span>
           </>
         }
-        subtitle='All calculations use official HMRC tax rates and thresholds, updated within 24 hours of any changes.'
+        subtitle='All calculations use official HMRC and Revenue Scotland rates and thresholds, verified against published guidance. The last verification date is shown below.'
       />
 
       {/* Stats */}

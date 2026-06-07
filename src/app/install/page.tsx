@@ -1,7 +1,7 @@
-import Link from 'next/link';
 import { type SchemaType, StructuredData } from '@/components/organisms/StructuredData';
-import { Button } from '@/components/ui/button';
+import { INSTALL_PLATFORMS } from '@/constants/pages/installPageData';
 import { generateMetadata, SITE_URL } from '@/lib/metadata';
+import { InstallPageContent } from './InstallPageContent';
 
 export const metadata = generateMetadata({
   title: 'Install PayeTax App | Offline UK Tax Calculator',
@@ -15,6 +15,7 @@ export default function InstallPage() {
     { name: 'Home', url: SITE_URL },
     { name: 'Install', url: `${SITE_URL}/install` },
   ];
+
   const installHowToData: SchemaType = {
     '@context': 'https://schema.org',
     '@type': 'HowTo',
@@ -22,99 +23,18 @@ export default function InstallPage() {
     description:
       'Install PayeTax on iPhone, Android, and desktop for faster access and offline support.',
     totalTime: 'PT2M',
-    step: [
-      {
-        '@type': 'HowToStep',
-        name: 'Install on iPhone or iPad',
-        text: 'Open PayeTax in Safari, tap Share, then choose Add to Home Screen.',
-      },
-      {
-        '@type': 'HowToStep',
-        name: 'Install on Android',
-        text: 'Open PayeTax in Chrome, tap the menu, then choose Install app or Add to Home screen.',
-      },
-      {
-        '@type': 'HowToStep',
-        name: 'Install on desktop',
-        text: 'Open PayeTax in Chrome or Edge, click the install icon in the address bar, then confirm.',
-      },
-    ],
+    step: INSTALL_PLATFORMS.map((platform) => ({
+      '@type': 'HowToStep',
+      name: `Install on ${platform.platform} (${platform.browser})`,
+      text: platform.steps.join(' '),
+    })),
   };
 
   return (
     <>
       <StructuredData type='breadcrumb' breadcrumbs={breadcrumbItems} />
       <StructuredData type='howto' data={installHowToData} />
-
-      <section className='bg-ledger-grid'>
-        <div className='container mx-auto max-w-6xl px-4 py-24 md:py-28'>
-          <div className='mx-auto max-w-3xl text-center'>
-            <p className='mb-3 font-semibold text-primary text-xs uppercase tracking-[0.32em]'>
-              Install PayeTax
-            </p>
-            <h1 className='font-display font-semibold text-4xl text-foreground leading-[0.98] md:text-5xl'>
-              Add PayeTax to your home screen
-            </h1>
-            <p className='mt-4 text-lg text-muted-foreground'>
-              Use PayeTax like an app with faster launch, cleaner full-screen mode, and offline
-              support.
-            </p>
-          </div>
-
-          <div className='mt-12 grid gap-6 md:grid-cols-2'>
-            <article className='rounded-sm border border-border bg-card p-5'>
-              <h2 className='font-display font-semibold text-foreground text-xl'>
-                iPhone / iPad (Safari)
-              </h2>
-              <ol className='mt-3 list-decimal space-y-2 pl-5 text-muted-foreground'>
-                <li>Open PayeTax in Safari.</li>
-                <li>Tap the Share icon.</li>
-                <li>Select &quot;Add to Home Screen&quot; and confirm.</li>
-              </ol>
-            </article>
-
-            <article className='rounded-sm border border-border bg-card p-5'>
-              <h2 className='font-display font-semibold text-foreground text-xl'>
-                Android (Chrome)
-              </h2>
-              <ol className='mt-3 list-decimal space-y-2 pl-5 text-muted-foreground'>
-                <li>Open PayeTax in Chrome.</li>
-                <li>Tap the menu (three dots).</li>
-                <li>Select &quot;Install app&quot; or &quot;Add to Home screen&quot;.</li>
-              </ol>
-            </article>
-
-            <article className='rounded-sm border border-border bg-card p-5'>
-              <h2 className='font-display font-semibold text-foreground text-xl'>
-                Desktop (Chrome/Edge)
-              </h2>
-              <ol className='mt-3 list-decimal space-y-2 pl-5 text-muted-foreground'>
-                <li>Visit PayeTax in your browser.</li>
-                <li>Click the install icon in the address bar.</li>
-                <li>Confirm installation.</li>
-              </ol>
-            </article>
-
-            <article className='rounded-sm border border-success/30 bg-card p-5'>
-              <h2 className='font-display font-semibold text-success text-xl'>What you get</h2>
-              <ul className='mt-3 list-disc space-y-2 pl-5 text-foreground/90'>
-                <li>Faster launch from your home screen.</li>
-                <li>Standalone app-style experience.</li>
-                <li>Offline fallback when your connection drops.</li>
-              </ul>
-            </article>
-          </div>
-
-          <div className='mt-12 flex flex-col items-center gap-3 text-center'>
-            <Button asChild size='touch' className='rounded-sm px-6'>
-              <Link href='/'>Open Calculator</Link>
-            </Button>
-            <p className='text-muted-foreground text-sm'>
-              If install is unavailable, your browser or device might not support PWA installation.
-            </p>
-          </div>
-        </div>
-      </section>
+      <InstallPageContent />
     </>
   );
 }
