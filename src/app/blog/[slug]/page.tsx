@@ -140,7 +140,6 @@ export async function generateMetadata({
     return { title: 'Post Not Found | PayeTax Blog' };
   }
 
-  const imageUrl = getAbsoluteImageUrl(post.image);
   const title = post.seoTitle || post.title;
   const description = post.seoDescription || post.excerpt;
   const pathname = `/blog/${resolvedParams.slug}`;
@@ -154,7 +153,6 @@ export async function generateMetadata({
     authors: post.author ? [post.author] : undefined,
     section: post.categoryData?.name || post.category,
     tags: post.tags,
-    ...(imageUrl ? { ogImage: imageUrl } : {}),
   });
 
   return {

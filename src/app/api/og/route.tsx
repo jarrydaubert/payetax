@@ -113,9 +113,9 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
 
   // Get and validate parameters with constraints
-  const rawTitle = searchParams.get('title') || 'UK Tax Calculator';
+  const rawTitle = searchParams.get('title') || 'See Your Take-Home Pay';
   const rawDescription =
-    searchParams.get('description') || 'Calculate your take-home pay instantly';
+    searchParams.get('description') || 'Free UK PAYE calculator with official HMRC rates.';
 
   const title = clampText(rawTitle, MAX_TITLE_LENGTH);
   const description = clampText(rawDescription, MAX_DESCRIPTION_LENGTH);

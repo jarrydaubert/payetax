@@ -87,67 +87,91 @@ export function generatePayeEmailHtml(results: TaxCalculationResults, taxYear?: 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Your UK Tax Calculation - PayeTax</title>
+  <style>
+    @media only screen and (max-width: 640px) {
+      .email-shell { padding: 24px 12px !important; }
+      .email-card { padding: 24px 18px !important; }
+      .email-title { font-size: 34px !important; line-height: 1.02 !important; }
+      .money-xl { font-size: 34px !important; }
+      .mobile-hide { display: none !important; }
+      .mobile-block { display: block !important; width: 100% !important; }
+      .mobile-right { text-align: right !important; }
+      .cta { display: block !important; width: auto !important; }
+    }
+  </style>
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc;">
+<body style="margin: 0; padding: 0; background-color: #f8f5ed; color: #07111f; font-family: Arial, Helvetica, sans-serif;">
   <div style="display: none; max-height: 0; overflow: hidden; opacity: 0; color: transparent; font-size: 1px; line-height: 1px;">
     Your take-home pay: ${formatCurrency(results.netPay.annually)} per year (${effectiveRate}% effective tax rate).
     ${'&nbsp;'.repeat(40)}
   </div>
 
-  <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-    <div style="text-align: center; margin-bottom: 28px;">
-      <h1 style="margin: 0; font-size: 24px;">
-        <span style="color: #020617;">paye</span><span style="color: #0d9488;">tax</span>
-      </h1>
-      <p style="margin: 8px 0 0; color: #64748b; font-size: 14px;">UK Tax Calculator</p>
-    </div>
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width: 100%; border-collapse: collapse; background-color: #f8f5ed;">
+    <tr>
+      <td class="email-shell" align="center" style="padding: 40px 18px;">
+        <table role="presentation" width="640" cellspacing="0" cellpadding="0" style="width: 100%; max-width: 640px; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 0 0 24px; border-bottom: 1px solid #cec6b7;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="font-family: Georgia, 'Times New Roman', serif; font-size: 30px; font-weight: 700; line-height: 1;">
+                    <span style="color: #07111f;">paye</span><span style="color: #123a66;">tax</span>
+                  </td>
+                  <td align="right" style="color: #465468; font-size: 13px; line-height: 1.4;">
+                    UK PAYE Calculator
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 28px;">
-      <div style="margin-bottom: 18px;">
-        <span style="display: inline-block; background-color: rgba(13, 148, 136, 0.1); color: #0d9488; font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.4px;">Calculation Ready</span>
-        <span style="color: #94a3b8; font-size: 12px; margin-left: 10px;">Tax Year ${safeTaxYear}</span>
-      </div>
+          <tr>
+            <td class="email-card" style="padding: 32px; border: 1px solid #cec6b7; background-color: #fffdf7;">
+              <div style="margin-bottom: 18px;">
+                <span style="display: inline-block; border: 1px solid #123a66; background-color: #f2eee4; color: #123a66; font-family: Menlo, Consolas, monospace; font-size: 11px; font-weight: 700; letter-spacing: 2px; padding: 7px 10px; text-transform: uppercase;">Calculation Ready</span>
+                <span style="display: inline-block; margin-left: 10px; color: #536174; font-size: 13px;">Tax year ${safeTaxYear}</span>
+              </div>
 
-      <h2 style="margin: 0 0 8px; font-size: 26px; line-height: 1.25; color: #020617;">Your tax results are in</h2>
-      <p style="margin: 0 0 20px; color: #64748b; font-size: 15px; line-height: 1.6;">Below is your annual and monthly breakdown using HMRC rates${safeTaxYear ? ` for ${safeTaxYear}` : ''}.</p>
+              <h2 class="email-title" style="margin: 0 0 12px; color: #07111f; font-family: Georgia, 'Times New Roman', serif; font-size: 42px; font-weight: 700; line-height: 1.02;">Your tax results are in</h2>
+              <p style="margin: 0 0 24px; color: #465468; font-size: 16px; line-height: 1.55;">Below is your annual and monthly PAYE breakdown using HMRC rates${safeTaxYear ? ` for ${safeTaxYear}` : ''}.</p>
 
-      <div style="background: #f0fdfa; border: 1px solid #99f6e4; border-radius: 12px; padding: 18px; margin-bottom: 20px;">
-        <p style="margin: 0 0 6px; color: #0f766e; font-size: 12px; text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700;">Take-Home Pay</p>
-        <p style="margin: 0; font-size: 34px; font-weight: 700; color: #0f766e; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(results.netPay.annually)}</p>
-        <p style="margin: 8px 0 0; color: #115e59; font-size: 14px; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(results.netPay.monthly)}/month • ${effectiveRate}% effective tax rate</p>
-      </div>
+              <div style="border: 1px solid #123a66; border-left: 4px solid #123a66; background-color: #f2eee4; padding: 20px 22px; margin-bottom: 24px;">
+                <p style="margin: 0 0 8px; color: #123a66; font-family: Menlo, Consolas, monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700;">Take-home pay</p>
+                <p class="money-xl" style="margin: 0; color: #2f6f4e; font-family: Menlo, Consolas, monospace; font-size: 42px; font-weight: 700; line-height: 1.08; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(results.netPay.annually)}</p>
+                <p style="margin: 10px 0 0; color: #465468; font-size: 14px; line-height: 1.5; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(results.netPay.monthly)}/month. ${effectiveRate}% effective tax rate.</p>
+              </div>
 
-      <table style="width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">
+              <table style="width: 100%; border-collapse: collapse; color: #07111f; font-size: 14px; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">
         <thead>
-          <tr style="border-bottom: 2px solid #e2e8f0;">
-            <th style="text-align: left; padding: 10px 0; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Item</th>
-            <th style="text-align: right; padding: 10px 0; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Annual</th>
-            <th style="text-align: right; padding: 10px 0; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Monthly</th>
+          <tr style="border-bottom: 2px solid #cec6b7;">
+            <th style="text-align: left; padding: 10px 0; color: #536174; font-family: Menlo, Consolas, monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1.8px;">Item</th>
+            <th style="text-align: right; padding: 10px 0; color: #536174; font-family: Menlo, Consolas, monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1.8px;">Annual</th>
+            <th class="mobile-hide" style="text-align: right; padding: 10px 0; color: #536174; font-family: Menlo, Consolas, monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1.8px;">Monthly</th>
           </tr>
         </thead>
         <tbody>
-          <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 14px 0; color: #0f172a; font-weight: 600;">Gross Salary</td>
-            <td style="padding: 14px 0; text-align: right; color: #0f172a; font-weight: 600;">${formatCurrency(results.grossSalary.annually)}</td>
-            <td style="padding: 14px 0; text-align: right; color: #475569;">${formatCurrency(results.grossSalary.monthly)}</td>
+          <tr style="border-bottom: 1px solid #e1dbce;">
+            <td style="padding: 14px 0; color: #07111f; font-weight: 700;">Gross salary</td>
+            <td style="padding: 14px 0; text-align: right; color: #07111f; font-family: Menlo, Consolas, monospace; font-weight: 700;">${formatCurrency(results.grossSalary.annually)}</td>
+            <td class="mobile-hide" style="padding: 14px 0; text-align: right; color: #465468; font-family: Menlo, Consolas, monospace;">${formatCurrency(results.grossSalary.monthly)}</td>
           </tr>
-          <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 14px 0; color: #b91c1c;">Income Tax</td>
-            <td style="padding: 14px 0; text-align: right; color: #b91c1c;">-${formatCurrency(results.incomeTax.annually)}</td>
-            <td style="padding: 14px 0; text-align: right; color: #475569;">-${formatCurrency(results.incomeTax.monthly)}</td>
+          <tr style="border-bottom: 1px solid #e1dbce;">
+            <td style="padding: 14px 0; color: #a6453c;">Income tax</td>
+            <td style="padding: 14px 0; text-align: right; color: #a6453c; font-family: Menlo, Consolas, monospace;">-${formatCurrency(results.incomeTax.annually)}</td>
+            <td class="mobile-hide" style="padding: 14px 0; text-align: right; color: #465468; font-family: Menlo, Consolas, monospace;">-${formatCurrency(results.incomeTax.monthly)}</td>
           </tr>
-          <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 14px 0; color: #b91c1c;">National Insurance</td>
-            <td style="padding: 14px 0; text-align: right; color: #b91c1c;">-${formatCurrency(results.nationalInsurance.annually)}</td>
-            <td style="padding: 14px 0; text-align: right; color: #475569;">-${formatCurrency(results.nationalInsurance.monthly)}</td>
+          <tr style="border-bottom: 1px solid #e1dbce;">
+            <td style="padding: 14px 0; color: #a6453c;">National Insurance</td>
+            <td style="padding: 14px 0; text-align: right; color: #a6453c; font-family: Menlo, Consolas, monospace;">-${formatCurrency(results.nationalInsurance.annually)}</td>
+            <td class="mobile-hide" style="padding: 14px 0; text-align: right; color: #465468; font-family: Menlo, Consolas, monospace;">-${formatCurrency(results.nationalInsurance.monthly)}</td>
           </tr>
           ${
             results.pensionContribution.annually > 0
               ? `
-          <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 14px 0; color: #92400e;">Pension</td>
-            <td style="padding: 14px 0; text-align: right; color: #92400e;">-${formatCurrency(results.pensionContribution.annually)}</td>
-            <td style="padding: 14px 0; text-align: right; color: #475569;">-${formatCurrency(results.pensionContribution.monthly)}</td>
+          <tr style="border-bottom: 1px solid #e1dbce;">
+            <td style="padding: 14px 0; color: #8a641f;">Pension</td>
+            <td style="padding: 14px 0; text-align: right; color: #8a641f; font-family: Menlo, Consolas, monospace;">-${formatCurrency(results.pensionContribution.annually)}</td>
+            <td class="mobile-hide" style="padding: 14px 0; text-align: right; color: #465468; font-family: Menlo, Consolas, monospace;">-${formatCurrency(results.pensionContribution.monthly)}</td>
           </tr>
           `
               : ''
@@ -155,42 +179,50 @@ export function generatePayeEmailHtml(results: TaxCalculationResults, taxYear?: 
           ${
             results.studentLoan.annually > 0
               ? `
-          <tr style="border-bottom: 1px solid #f1f5f9;">
-            <td style="padding: 14px 0; color: #6d28d9;">Student Loan</td>
-            <td style="padding: 14px 0; text-align: right; color: #6d28d9;">-${formatCurrency(results.studentLoan.annually)}</td>
-            <td style="padding: 14px 0; text-align: right; color: #475569;">-${formatCurrency(results.studentLoan.monthly)}</td>
+          <tr style="border-bottom: 1px solid #e1dbce;">
+            <td style="padding: 14px 0; color: #123a66;">Student loan</td>
+            <td style="padding: 14px 0; text-align: right; color: #123a66; font-family: Menlo, Consolas, monospace;">-${formatCurrency(results.studentLoan.annually)}</td>
+            <td class="mobile-hide" style="padding: 14px 0; text-align: right; color: #465468; font-family: Menlo, Consolas, monospace;">-${formatCurrency(results.studentLoan.monthly)}</td>
           </tr>
           `
               : ''
           }
-          <tr style="background: #ecfeff;">
-            <td style="padding: 14px 0; color: #0f766e; font-weight: 700;">Take-Home Pay</td>
-            <td style="padding: 14px 0; text-align: right; color: #0f766e; font-weight: 700;">${formatCurrency(results.netPay.annually)}</td>
-            <td style="padding: 14px 0; text-align: right; color: #0f766e; font-weight: 700;">${formatCurrency(results.netPay.monthly)}</td>
+          <tr style="background: #eef4ed; border-top: 2px solid #cec6b7;">
+            <td style="padding: 14px 10px; color: #2f6f4e; font-weight: 700;">Take-home pay</td>
+            <td style="padding: 14px 10px; text-align: right; color: #2f6f4e; font-family: Menlo, Consolas, monospace; font-weight: 700;">${formatCurrency(results.netPay.annually)}</td>
+            <td class="mobile-hide" style="padding: 14px 10px; text-align: right; color: #2f6f4e; font-family: Menlo, Consolas, monospace; font-weight: 700;">${formatCurrency(results.netPay.monthly)}</td>
           </tr>
         </tbody>
       </table>
-    </div>
+            </td>
+          </tr>
 
-    <div style="text-align: center; margin-top: 24px;">
-      <a href="${BASE_URL}?utm_source=results_email&utm_medium=email&utm_campaign=results_followup" style="display: inline-block; background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%); color: #ffffff; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px; line-height: 1.2;">
-        Recalculate with New Inputs →
-      </a>
-    </div>
+          <tr>
+            <td align="center" style="padding: 28px 0 0;">
+              <a class="cta" href="${BASE_URL}?utm_source=results_email&utm_medium=email&utm_campaign=results_followup" style="display: inline-block; border: 1px solid #123a66; background-color: #123a66; color: #fffdf7; padding: 14px 24px; text-decoration: none; font-size: 14px; font-weight: 700; line-height: 1.2;">
+                Recalculate with new inputs
+              </a>
+            </td>
+          </tr>
 
-    <div style="text-align: center; margin-top: 28px; padding-top: 22px; border-top: 1px solid #e2e8f0;">
-      <p style="margin: 0; color: #94a3b8; font-size: 12px; line-height: 1.7;">
-        For illustrative purposes only. Not financial or tax advice.
-        <br>Consult a qualified accountant for advice specific to your situation.
-        <br>Based on HMRC rates${safeTaxYear ? ` for ${safeTaxYear}` : ''} which may change.
-      </p>
-      <p style="margin: 14px 0 0; color: #94a3b8; font-size: 12px;">
-        <a href="${BASE_URL}" style="color: #06b6d4; text-decoration: none;">payetax.co.uk</a>
-        &nbsp;•&nbsp;
-        <a href="${BASE_URL}/privacy" style="color: #94a3b8; text-decoration: none;">Privacy</a>
-      </p>
-    </div>
-  </div>
+          <tr>
+            <td style="padding: 28px 0 0; border-top: 1px solid #cec6b7; text-align: center;">
+              <p style="margin: 0; color: #536174; font-size: 12px; line-height: 1.7;">
+                For illustrative purposes only. Not financial or tax advice.
+                <br>Consult a qualified accountant for advice specific to your situation.
+                <br>Based on HMRC rates${safeTaxYear ? ` for ${safeTaxYear}` : ''} which may change.
+              </p>
+              <p style="margin: 14px 0 0; color: #7d8795; font-size: 12px;">
+                <a href="${BASE_URL}" style="color: #123a66; text-decoration: none;">payetax.co.uk</a>
+                &nbsp;&middot;&nbsp;
+                <a href="${BASE_URL}/privacy" style="color: #536174; text-decoration: none;">Privacy</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>
 `;

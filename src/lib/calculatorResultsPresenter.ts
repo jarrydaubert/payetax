@@ -52,7 +52,8 @@ export const PERIOD_LABEL_TO_PAY_PERIOD: Record<string, PayPeriod> = {
 function calculatePercentage(amount: number, total: number): string {
   if (total === 0) return '0.0%';
   const percentage = Math.abs((amount / total) * 100);
-  return `${Math.min(percentage, 999.9).toFixed(1)}%`;
+  const rounded = Number(Math.min(percentage, 999.9).toFixed(1));
+  return rounded === 100 ? '100%' : `${rounded.toFixed(1)}%`;
 }
 
 function getGrossAnnual(results: TaxCalculationResults): number {

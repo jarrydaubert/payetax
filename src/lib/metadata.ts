@@ -19,7 +19,8 @@ export const LOGO_URL = `${SITE_URL}/logo.png`;
 // Default metadata values
 const DEFAULT_TITLE = `Free UK PAYE Tax Calculator ${CURRENT_TAX_YEAR} | Salary & Take-Home Pay`;
 const DEFAULT_DESCRIPTION = `Free UK PAYE tax calculator with official HMRC rates ${CURRENT_TAX_YEAR}. Calculate income tax, National Insurance, student loans, and take-home pay from your salary instantly. No registration required.`;
-const DEFAULT_OG_IMAGE = '/images/og-image.png';
+const DEFAULT_OG_TITLE = 'See Your Take-Home Pay';
+const DEFAULT_OG_DESCRIPTION = `Free UK PAYE calculator with official HMRC rates ${CURRENT_TAX_YEAR}.`;
 
 /**
  * Options for generating SEO metadata
@@ -55,6 +56,14 @@ interface GenerateMetadataProps {
   tags?: string[];
 }
 
+export function createHeroOgImagePath(
+  title: string = DEFAULT_OG_TITLE,
+  description: string = DEFAULT_OG_DESCRIPTION,
+): string {
+  const params = new URLSearchParams({ title, description });
+  return `/api/og?${params.toString()}`;
+}
+
 /**
  * Generates comprehensive metadata for SEO
  *
@@ -75,7 +84,7 @@ interface GenerateMetadataProps {
 export function generateMetadata({
   title = DEFAULT_TITLE,
   description = DEFAULT_DESCRIPTION,
-  ogImage = DEFAULT_OG_IMAGE,
+  ogImage,
   noIndex = false,
   pathname = '',
   locale = 'en_GB',
@@ -89,7 +98,14 @@ export function generateMetadata({
   tags,
 }: GenerateMetadataProps): Metadata {
   // Make sure image URL is absolute
-  const imageUrl = ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage}`;
+  const fallbackOgImage = createHeroOgImagePath(
+    title === DEFAULT_TITLE ? DEFAULT_OG_TITLE : title,
+    title === DEFAULT_TITLE ? DEFAULT_OG_DESCRIPTION : description,
+  );
+  const resolvedOgImage = ogImage ?? fallbackOgImage;
+  const imageUrl = resolvedOgImage.startsWith('http')
+    ? resolvedOgImage
+    : `${SITE_URL}${resolvedOgImage}`;
 
   // Full URL for canonical and OG links
   const url = `${SITE_URL}${pathname}`;

@@ -102,7 +102,7 @@ describe('/api/og GET', () => {
     )) as MockImageResponse;
 
     const text = collectText(response.element).join(' ');
-    expect(text).toContain('UK Tax Calculator');
+    expect(text).toContain('See Your Take-Home Pay');
     expect(text).not.toContain('Gross Salary');
   });
 

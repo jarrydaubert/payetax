@@ -73,6 +73,19 @@ describe('payeResultsEmail', () => {
     expect(html).not.toContain('<img src=x onerror=alert(1)>');
   });
 
+  test('HTML template follows the Ledger email styling', () => {
+    const html = generatePayeEmailHtml(sampleResults, '2026-27');
+
+    expect(html).toContain('#f8f5ed');
+    expect(html).toContain('#123a66');
+    expect(html).toContain('@media only screen');
+    expect(html).toContain('font-variant-numeric: tabular-nums');
+    expect(html).not.toContain('linear-gradient');
+    expect(html).not.toContain('#06b6d4');
+    expect(html).not.toContain('#10b981');
+    expect(html).not.toContain('#0d9488');
+  });
+
   test('text template omits zero-value optional deductions', () => {
     const text = generatePayeEmailText(sampleResults, '2025-26');
 

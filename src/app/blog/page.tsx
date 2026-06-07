@@ -15,7 +15,12 @@ import {
   getEditorsPicks,
   getLatestPosts,
 } from '@/lib/blog';
-import { generateMetadata as generateMetadataHelper, LOGO_URL, SITE_URL } from '@/lib/metadata';
+import {
+  createHeroOgImagePath,
+  generateMetadata as generateMetadataHelper,
+  LOGO_URL,
+  SITE_URL,
+} from '@/lib/metadata';
 
 // ⚠️ CRITICAL: DO NOT CHANGE THIS CONFIGURATION WITHOUT TESTING
 // This config has been carefully tuned for Next.js 15/16 compatibility
@@ -58,7 +63,6 @@ export async function generateMetadata({ searchParams }: BlogPageProps): Promise
     description,
     pathname: canonicalPath,
     noIndex: isOutOfRange,
-    ogImage: '/images/blog/taxinsights-og.jpg',
   });
 
   return {
@@ -128,7 +132,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       url: `${SITE_URL}/blog/${post.slug}`,
       image: post.image
         ? `${SITE_URL}${post.image.startsWith('/') ? post.image : `/${post.image}`}`
-        : `${SITE_URL}/images/og-image.png`,
+        : `${SITE_URL}${createHeroOgImagePath(post.title, post.excerpt)}`,
       datePublished: post.publishedAt,
       dateModified: post.updatedAt || post.publishedAt,
       author: {
