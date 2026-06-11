@@ -160,7 +160,8 @@ function paginatePosts(posts: BlogPost[], page: number, pageSize: number) {
  * Get blog posts with optional filtering, sorting, and pagination
  * Can return either paginated response or simple array based on usage
  */
-export async function getBlogPosts(options?: BlogPaginationOptions): Promise<BlogPost[]>;
+// The `paginated: true` overload must come first: overloads resolve in order,
+// and the general signature would otherwise also match paginated calls.
 export async function getBlogPosts(options: BlogPaginationOptions & { paginated: true }): Promise<{
   posts: BlogPost[];
   pagination: {
@@ -170,6 +171,7 @@ export async function getBlogPosts(options: BlogPaginationOptions & { paginated:
     pageCount: number;
   };
 }>;
+export async function getBlogPosts(options?: BlogPaginationOptions): Promise<BlogPost[]>;
 export async function getBlogPosts(options: BlogPaginationOptions = {}): Promise<
   | BlogPost[]
   | {

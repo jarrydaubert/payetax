@@ -1,4 +1,5 @@
 // src/lib/__tests__/analytics.test.ts
+import { setNodeEnv } from '@/test/env';
 import {
   type AnalyticsEvent,
   type SEOActionType,
@@ -43,7 +44,7 @@ describe('analytics', () => {
     });
 
     // Set NODE_ENV to test
-    process.env.NODE_ENV = 'test';
+    setNodeEnv('test');
   });
 
   afterEach(() => {
@@ -77,7 +78,7 @@ describe('analytics', () => {
     });
 
     it('logs to console in development mode', () => {
-      process.env.NODE_ENV = 'development';
+      setNodeEnv('development');
       const action: SEOActionType = 'download';
       const data: SEOAnalyticsData = { source: 'calculator' };
 
@@ -89,7 +90,7 @@ describe('analytics', () => {
     });
 
     it('does not log to console in production mode', () => {
-      process.env.NODE_ENV = 'production';
+      setNodeEnv('production');
       const action: SEOActionType = 'share';
 
       trackSEOAction(action, {});
@@ -170,7 +171,7 @@ describe('analytics', () => {
     });
 
     it('logs to console in development mode', () => {
-      process.env.NODE_ENV = 'development';
+      setNodeEnv('development');
       const event: AnalyticsEvent = { action: 'result_shared' };
 
       trackEvent(event);

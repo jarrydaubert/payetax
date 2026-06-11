@@ -10,8 +10,11 @@ interface ClientIdentifierOptions {
  * Derive a stable per-client identifier for rate limiting.
  *
  * Header priority is consistent across the app:
- * 1) cf-connecting-ip
- * 2) x-forwarded-for (first IP)
+ * 1) cf-connecting-ip — ONLY when TRUST_CF_CONNECTING_IP=true (i.e. a
+ *    Cloudflare proxy we control sets it). On Vercel without Cloudflare
+ *    proxying this header is client-supplied and must be ignored, or it
+ *    becomes a per-request rate-limit-bucket bypass.
+ * 2) x-forwarded-for (first IP; platform-set on Vercel)
  * 3) x-real-ip
  * 4) user-agent (hashed fallback)
  */
@@ -25,8 +28,10 @@ export function getClientIdentifier(
     includeAcceptHeaderInFallback = false,
   } = options;
 
-  const cfIp = request.headers.get('cf-connecting-ip');
-  if (cfIp) return `${ipPrefix}${cfIp}`;
+  if (process.env.TRUST_CF_CONNECTING_IP === 'true') {
+    const cfIp = request.headers.get('cf-connecting-ip');
+    if (cfIp) return `${ipPrefix}${cfIp}`;
+  }
 
   const forwardedFor = request.headers.get('x-forwarded-for');
   if (forwardedFor) {

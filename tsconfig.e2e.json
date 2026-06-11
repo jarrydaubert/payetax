@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "incremental": false,
+    "types": ["node"],
+    "noUncheckedIndexedAccess": false,
+    "paths": {
+      "@/*": ["./src/*"],
+      // @axe-core/playwright types resolve the hoisted playwright-core copy;
+      // alias it to the one nested under playwright so Page types match.
+      "playwright-core": ["./node_modules/playwright/node_modules/playwright-core"]
+    }
+  },
+  "include": ["next-env.d.ts", "e2e/**/*", "playwright.config.ts"],
+  "exclude": ["node_modules"]
+}

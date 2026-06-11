@@ -292,10 +292,6 @@ describe('Case Study: Recruiter (Feast or Famine Director)', () => {
       // All salary wins on pure tax, but...
       expect(allSalaryTakeHome).toBeGreaterThan(lelDividendsTakeHome);
 
-      // LEL strategy leaves more in company for buffer
-      const _lelBuffer = grossProfit - 6500 - 225 - 206.53 - 880;
-      // This is ~0 because we took all dividends in the calc above
-
       // The real benefit of LEL is lower monthly commitment:
       const allSalaryMonthly = 7445 / 12; // £620/mo
       const lelSalaryMonthly = 6500 / 12; // £542/mo

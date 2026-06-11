@@ -243,7 +243,8 @@ generated.push({
     salary: dualLoanInput.salary,
     region: 'England',
     taxCode: dualLoanInput.taxCode,
-    studentLoan: dualLoanInput.studentLoanPlans,
+    studentLoan:
+      dualLoanInput.studentLoanPlans === 'none' ? [] : [...dualLoanInput.studentLoanPlans],
   },
   expected: {
     incomeTax: Math.round(dualLoanResults.incomeTax.annually * 100) / 100,

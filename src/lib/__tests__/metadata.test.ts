@@ -121,8 +121,9 @@ describe('Metadata Module', () => {
         category: 'Finance',
       });
 
-      expect(metadata.openGraph?.type).toBe('article');
-      expect(metadata.openGraph?.article).toEqual({
+      // Article fields are flat on openGraph per Next's Metadata API.
+      expect(metadata.openGraph).toMatchObject({
+        type: 'article',
         publishedTime,
         modifiedTime,
         authors: [{ name: 'John Doe' }, { name: 'Jane Smith' }],
@@ -140,7 +141,7 @@ describe('Metadata Module', () => {
         publishedTime,
       });
 
-      expect(metadata.openGraph?.article?.modifiedTime).toBe(publishedTime);
+      expect(metadata.openGraph).toMatchObject({ modifiedTime: publishedTime });
     });
 
     test('should use default authors when none provided for articles', () => {
@@ -149,7 +150,7 @@ describe('Metadata Module', () => {
         publishedTime: '2024-01-15T10:00:00Z',
       });
 
-      expect(metadata.openGraph?.article?.authors).toEqual([{ name: 'PayeTax' }]);
+      expect(metadata.openGraph).toMatchObject({ authors: [{ name: 'PayeTax' }] });
     });
 
     test('should handle noIndex parameter', () => {
@@ -186,7 +187,7 @@ describe('Metadata Module', () => {
         twitterCard: 'summary',
       });
 
-      expect(metadata.twitter?.card).toBe('summary');
+      expect(metadata.twitter).toMatchObject({ card: 'summary' });
     });
 
     test('should include verification codes', () => {

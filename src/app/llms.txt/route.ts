@@ -75,6 +75,10 @@ Last updated: ${lastUpdated}
 
 PayeTax is a deterministic UK tax calculation project focused on accuracy, privacy, and explaining payroll reality. It is not a broad finance app, a sales funnel, or a tax adviser.
 
+## Crawler Policy
+
+Search crawlers and AI crawlers are allowed. Public calculator, tool, blog, and policy pages may be indexed; operational and private paths such as /_vercel/ remain disallowed in robots.txt.
+
 ## Main Pages
 
 - [Calculator](${SITE_URL}): Main PAYE tax calculator with real-time calculations

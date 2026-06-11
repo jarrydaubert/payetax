@@ -177,7 +177,9 @@ export function generateMetadata({
       ],
       locale,
       type,
-      ...(type === 'article' && { article: articleMetadata }),
+      // Next's OpenGraph article fields live flat on the openGraph object;
+      // nesting them under an `article` key is silently ignored by Next.
+      ...(type === 'article' && articleMetadata),
     },
 
     // Twitter Card metadata

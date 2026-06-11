@@ -1,4 +1,5 @@
 // src/lib/__tests__/rateLimit.test.ts
+import { setNodeEnv } from '@/test/env';
 import {
   checkRateLimit,
   checkRateLimitWithPolicy,
@@ -25,7 +26,7 @@ describe('Rate Limiting', () => {
     if (originalUpstashUrl) process.env.UPSTASH_REDIS_REST_URL = originalUpstashUrl;
     if (originalUpstashToken) process.env.UPSTASH_REDIS_REST_TOKEN = originalUpstashToken;
     if (originalNodeEnv) {
-      process.env.NODE_ENV = originalNodeEnv;
+      setNodeEnv(originalNodeEnv);
     }
   });
 
@@ -119,7 +120,7 @@ describe('Rate Limiting', () => {
 
   describe('checkRateLimitWithPolicy', () => {
     it('fails closed in production when distributed protection is required but unavailable', async () => {
-      process.env.NODE_ENV = 'production';
+      setNodeEnv('production');
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
       const result = await checkRateLimitWithPolicy(
@@ -138,7 +139,7 @@ describe('Rate Limiting', () => {
     });
 
     it('still uses in-memory fallback outside production when distributed protection is required', async () => {
-      process.env.NODE_ENV = 'test';
+      setNodeEnv('test');
 
       const result = await checkRateLimitWithPolicy(
         '192.168.9.2',
@@ -227,6 +228,67 @@ describe('Rate Limiting', () => {
         expect.stringContaining('/GET/'),
         expect.stringContaining('/DEL/'),
       ]);
+    });
+  });
+
+  describe('distributed counter (pipelined)', () => {
+    const originalFetch = global.fetch;
+
+    afterEach(() => {
+      global.fetch = originalFetch;
+      process.env.UPSTASH_REDIS_REST_URL = undefined;
+      process.env.UPSTASH_REDIS_REST_TOKEN = undefined;
+      jest.resetModules();
+    });
+
+    it('increments and sets expiry in a single pipeline request', async () => {
+      jest.resetModules();
+      process.env.UPSTASH_REDIS_REST_URL = 'https://example.upstash.io';
+      process.env.UPSTASH_REDIS_REST_TOKEN = 'test-token';
+
+      let counter = 0;
+      const fetchMock = jest.fn((input: RequestInfo | URL, init?: RequestInit) => {
+        const url = String(input);
+        expect(url).toBe('https://example.upstash.io/pipeline');
+
+        const commands = JSON.parse(String(init?.body)) as string[][];
+        expect(commands).toHaveLength(2);
+        expect(commands[0]?.[0]).toBe('INCR');
+        expect(commands[1]?.[0]).toBe('PEXPIRE');
+        expect(commands[1]?.[3]).toBe('NX');
+
+        counter += 1;
+        return Promise.resolve(
+          new Response(JSON.stringify([{ result: counter }, { result: 1 }]), { status: 200 }),
+        );
+      });
+      global.fetch = fetchMock as typeof fetch;
+
+      const { checkRateLimitWithPolicy: check } = await import('../rateLimit');
+
+      const first = await check('pipeline-test', { max: 2, window: 60000 });
+      const second = await check('pipeline-test', { max: 2, window: 60000 });
+      const third = await check('pipeline-test', { max: 2, window: 60000 });
+
+      expect(first).toMatchObject({ allowed: true, backend: 'distributed' });
+      expect(second).toMatchObject({ allowed: true, backend: 'distributed' });
+      expect(third).toMatchObject({ allowed: false, reason: 'rate_limited' });
+      expect(fetchMock).toHaveBeenCalledTimes(3);
+    });
+
+    it('falls back to in-memory when the pipeline request fails', async () => {
+      jest.resetModules();
+      process.env.UPSTASH_REDIS_REST_URL = 'https://example.upstash.io';
+      process.env.UPSTASH_REDIS_REST_TOKEN = 'test-token';
+
+      global.fetch = jest.fn(() =>
+        Promise.resolve(new Response('upstream error', { status: 500 })),
+      ) as typeof fetch;
+
+      const { checkRateLimitWithPolicy: check } = await import('../rateLimit');
+      const result = await check('pipeline-failure-test', { max: 2, window: 60000 });
+
+      expect(result).toMatchObject({ allowed: true, backend: 'in-memory' });
     });
   });
 

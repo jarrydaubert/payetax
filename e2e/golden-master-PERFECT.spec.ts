@@ -44,7 +44,37 @@
 
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
-import goldenCases from './fixtures/golden-tax-cases-2025-26-COMPLETE.json';
+import goldenCasesJson from './fixtures/golden-tax-cases-2025-26-COMPLETE.json';
+
+/**
+ * Schema of generated golden cases. Keep in sync with
+ * e2e/scripts/generate-golden-master.ts output.
+ */
+interface GoldenCase {
+  id: string;
+  description: string;
+  input: {
+    salary: number;
+    region: string;
+    taxCode: string;
+    studentLoan?: string | string[];
+    pensionPercent?: number;
+    partnerGrossWage?: number;
+  };
+  expected: {
+    incomeTax: number;
+    employeeNI: number;
+    netPay: number;
+    studentLoanRepayment?: number;
+    pensionContribution?: number;
+  };
+  generatedAt: string;
+  taxYear: string;
+  /** When set, the scenario runs as test.fixme with this issue note. */
+  knownIssue?: string;
+}
+
+const goldenCases: { cases: GoldenCase[] } = goldenCasesJson;
 
 // ============================================================================
 // EXTRACTION HELPERS - Fail loud, not silent
@@ -318,36 +348,9 @@ test.describe('HMRC Golden Master 2025/26 – Regression Suite', () => {
         }
       }
 
-      // 7. Marriage Allowance (if specified)
-      if (input.isMarried) {
-        const marriedCheckbox = page.getByTestId('married-checkbox');
-        const exists = await marriedCheckbox.isVisible({ timeout: 2000 }).catch(() => false);
-        if (exists) {
-          await marriedCheckbox.check();
-          await waitForInputProcessed(page);
-
-          if (input.partnerSalary) {
-            const partnerInput = page.getByTestId('partner-salary-input');
-            const partnerExists = await partnerInput
-              .isVisible({ timeout: 2000 })
-              .catch(() => false);
-            if (partnerExists) {
-              await partnerInput.fill(input.partnerSalary.toString());
-              await waitForInputProcessed(page);
-            }
-          }
-        }
-      }
-
-      // 8. Children (for HICBC)
-      if (input.childrenUnder18) {
-        const childrenInput = page.getByTestId('children-input');
-        const exists = await childrenInput.isVisible({ timeout: 2000 }).catch(() => false);
-        if (exists) {
-          await childrenInput.fill(input.childrenUnder18.toString());
-          await waitForInputProcessed(page);
-        }
-      }
+      // Marriage allowance scenarios are driven via the tax code (e.g. 1257M),
+      // so no checkbox interaction is needed; partnerGrossWage documents the
+      // scenario in the fixture but the M/N code carries the calculation.
 
       // ====================================================================
       // CALCULATE

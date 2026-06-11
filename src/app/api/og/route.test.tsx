@@ -71,7 +71,7 @@ function buildRequest(headers?: Record<string, string>) {
 
 describe('/api/og GET', () => {
   beforeEach(() => {
-    mockCheckRateLimit.mockReturnValue(true);
+    mockCheckRateLimit.mockResolvedValue(true);
   });
 
   it('sets cache headers for OG responses', async () => {
@@ -93,7 +93,7 @@ describe('/api/og GET', () => {
   });
 
   it('returns 429 when rate limited', async () => {
-    mockCheckRateLimit.mockReturnValue(false);
+    mockCheckRateLimit.mockResolvedValue(false);
     const { GET } = await import('./route');
     const response = await GET(buildRequest({ 'x-forwarded-for': '1.2.3.4' }));
 

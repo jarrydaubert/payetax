@@ -114,9 +114,6 @@ describe('CalculatorContainer Component', () => {
       hourly: 12.56,
     },
     employerNI: 1872.48,
-    totalTaxBurden: 5514,
-    effectiveTaxRate: 18.38,
-    marginalTaxRate: 32,
     taxBands: [{ rate: 20, amount: 3486, name: 'Basic Rate' }],
   };
 
@@ -132,7 +129,7 @@ describe('CalculatorContainer Component', () => {
       setInput: mockSetInput,
     });
     (useCalculatorResults as jest.Mock).mockReturnValue(null);
-    (useCalculatorStore as jest.Mock).mockImplementation((selector) =>
+    (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({
         previousYearResults: null,
         input: {

@@ -35,7 +35,7 @@ export interface StrategyInput {
   lossesBroughtForward?: number; // Trading losses from previous years (reduces CT)
   otherIncome?: number;
   employmentAllowance?: boolean;
-  studentLoanPlans?: StudentLoanPlan[];
+  studentLoanPlans?: readonly StudentLoanPlan[];
   pensionContribution?: number; // Employer contribution (reduces CT profit)
   companyCarBIK?: number; // Taxable benefit added to income
   associatedCompaniesCount?: number; // Total associated companies for CT threshold splitting
@@ -59,7 +59,7 @@ interface StrategyCalcOptions {
   taxYear: TaxYear;
   otherIncome: number;
   hasEmploymentAllowance: boolean;
-  studentLoanPlans: StudentLoanPlan[];
+  studentLoanPlans: readonly StudentLoanPlan[];
   pension: number;
   companyCarBIK: number;
   associatedCompaniesCount: number;
@@ -113,7 +113,7 @@ export interface SalaryScenarioInput {
   taxYear: TaxYear;
   otherIncome: number;
   hasEmploymentAllowance: boolean;
-  studentLoanPlans?: StudentLoanPlan[];
+  studentLoanPlans?: readonly StudentLoanPlan[];
   pension?: number;
   companyCarBIK?: number;
   associatedCompaniesCount?: number;

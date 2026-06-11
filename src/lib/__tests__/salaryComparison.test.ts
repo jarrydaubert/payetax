@@ -12,7 +12,6 @@ describe('Salary Comparison', () => {
     payPeriod: 'annually',
     taxYear: '2025-2026',
     taxCode: '1257L',
-    region: 'England',
     isScottish: false,
     isMarried: false,
     partnerGrossWage: 0,

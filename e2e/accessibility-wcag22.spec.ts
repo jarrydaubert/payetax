@@ -99,7 +99,7 @@ async function gotoWithRetry(page: Page, url: string): Promise<void> {
  * Set theme state for scan.
  * App runtime currently enforces dark mode, so avoid brittle UI-toggle heuristics.
  */
-async function setTheme(page: Page, theme: 'dark'): Promise<void> {
+async function setTheme(page: Page, _theme: 'dark'): Promise<void> {
   if (!page.url().includes('localhost')) {
     await gotoWithRetry(page, '/');
   }
@@ -165,7 +165,7 @@ async function runAxeScan(
 
   const results = await new AxeBuilder({ page })
     .exclude('[data-testid="cookie-banner"]') // Exclude consent banner from page-level scans
-    .withTags(TEST_CONFIG.wcagTags)
+    .withTags([...TEST_CONFIG.wcagTags])
     .options({ resultTypes: ['violations', 'incomplete'] })
     .analyze();
   const hasH1 = (await page.locator('h1').count()) > 0;

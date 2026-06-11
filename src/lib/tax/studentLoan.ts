@@ -37,7 +37,7 @@ export interface StudentLoanResult {
  */
 export function getStudentLoanRepayment(
   totalIncome: number,
-  plans: StudentLoanPlan[],
+  plans: readonly StudentLoanPlan[],
   taxYear: TaxYear = CURRENT_TAX_YEAR,
 ): StudentLoanResult {
   const rates = TAX_RATES[taxYear].studentLoan;

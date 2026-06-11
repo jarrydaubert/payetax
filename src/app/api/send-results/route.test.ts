@@ -76,7 +76,10 @@ const validPayload = {
 
 async function loadRoute(
   envOverrides: Record<string, string | undefined> = {},
-  rateLimit = { allowed: true, reason: 'allowed' as const },
+  rateLimit: {
+    allowed: boolean;
+    reason: 'allowed' | 'rate_limited' | 'distributed_unavailable';
+  } = { allowed: true, reason: 'allowed' },
 ) {
   jest.resetModules();
   process.env = { ...ORIGINAL_ENV, ...envOverrides };

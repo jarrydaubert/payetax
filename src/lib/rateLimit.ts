@@ -139,6 +139,46 @@ async function runUpstashCommand(parts: string[]): Promise<UpstashResponse['resu
   return payload.result;
 }
 
+/**
+ * Run multiple commands in one Upstash REST request.
+ * Commands execute sequentially server-side, so the counter increment and its
+ * expiry can never be split across two requests that fail independently.
+ */
+async function runUpstashPipeline(commands: string[][]): Promise<UpstashResponse['result'][]> {
+  if (!(UPSTASH_REDIS_REST_URL && UPSTASH_REDIS_REST_TOKEN)) {
+    throw new Error('Distributed rate limiter not configured');
+  }
+
+  const response = await fetch(`${UPSTASH_REDIS_REST_URL}/pipeline`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${UPSTASH_REDIS_REST_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(commands),
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw new Error(`Upstash pipeline request failed: ${response.status}`);
+  }
+
+  const payload: unknown = await response.json();
+  if (!Array.isArray(payload) || payload.length !== commands.length) {
+    throw new Error('Upstash pipeline response shape mismatch');
+  }
+
+  return payload.map((entry) => {
+    if (!isUpstashResponse(entry)) {
+      throw new Error('Upstash pipeline response was not valid JSON');
+    }
+    if (entry.error) {
+      throw new Error(entry.error);
+    }
+    return entry.result;
+  });
+}
+
 async function runUpstashReadWriteDeleteProbe(): Promise<void> {
   const suffix = `${Date.now()}:${Math.random().toString(36).slice(2)}`;
   const diagnosticKey = `${DISTRIBUTED_KEY_PREFIX}:health:${suffix}`;
@@ -169,14 +209,16 @@ async function incrementDistributedCounter(key: string, windowMs: number): Promi
 
   try {
     const distributedKey = `${DISTRIBUTED_KEY_PREFIX}:${key}`;
-    const countValue = await runUpstashCommand(['INCR', distributedKey]);
+    // One pipelined round trip. PEXPIRE NX only sets a TTL when none exists,
+    // so a key can never survive without an expiry (the old two-request
+    // INCR-then-PEXPIRE could leave a permanent counter if the second call
+    // failed).
+    const [countValue] = await runUpstashPipeline([
+      ['INCR', distributedKey],
+      ['PEXPIRE', distributedKey, String(windowMs), 'NX'],
+    ]);
     const count = Number(countValue);
     if (!Number.isFinite(count)) throw new Error('Invalid distributed counter result');
-
-    // Set TTL only on first hit for this key/window.
-    if (count === 1) {
-      await runUpstashCommand(['PEXPIRE', distributedKey, String(windowMs)]);
-    }
 
     return count;
   } catch (error) {

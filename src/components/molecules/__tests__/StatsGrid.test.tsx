@@ -13,7 +13,6 @@ describe('StatsGrid', () => {
       value: '100%',
       label: 'Free Forever',
       description: 'Always free, no hidden costs',
-      color: 'from-primary to-accent',
     },
     {
       icon: Lock,

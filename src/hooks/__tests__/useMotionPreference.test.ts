@@ -56,7 +56,9 @@ describe('useMotionPreference', () => {
   });
 
   it('should update when media query changes', () => {
-    let eventListener: ((event: MediaQueryListEvent) => void) | null = null;
+    // Captured listeners go in an array so TS control-flow analysis doesn't
+    // narrow a closure-assigned variable back to null at the call site.
+    const capturedListeners: Array<(event: MediaQueryListEvent) => void> = [];
 
     // Mock matchMedia with event listener capture
     window.matchMedia = jest.fn().mockImplementation((query) => ({
@@ -66,7 +68,7 @@ describe('useMotionPreference', () => {
       addListener: jest.fn(),
       removeListener: jest.fn(),
       addEventListener: jest.fn((_, listener) => {
-        eventListener = listener as (event: MediaQueryListEvent) => void;
+        capturedListeners.push(listener as (event: MediaQueryListEvent) => void);
       }),
       removeEventListener: jest.fn(),
       dispatchEvent: jest.fn(),
@@ -76,9 +78,7 @@ describe('useMotionPreference', () => {
     expect(result.current).toBe(false);
 
     // Simulate media query change
-    if (eventListener) {
-      eventListener({ matches: true } as MediaQueryListEvent);
-    }
+    capturedListeners[0]?.({ matches: true } as MediaQueryListEvent);
 
     // Note: In real React Testing Library, we'd use act() and rerender
     // but for this simple test, we're just verifying the listener is attached

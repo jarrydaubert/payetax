@@ -24,8 +24,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "contentlayer/generated": ["./.contentlayer/generated"]
+      "@/*": ["./src/*"]
     }
   },
   "include": [
@@ -34,7 +33,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "next.config.ts",
-    ".contentlayer/generated",
     ".next/dev/types/**/*.ts",
     ".next/dev/dev/types/**/*.ts"
   ],

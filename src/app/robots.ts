@@ -7,8 +7,8 @@ import { SITE_URL } from '@/lib/metadata';
  * Generates robots.txt via Next.js App Router metadata route
  *
  * AEO (Answer Engine Optimization) strategy:
- * - ALLOW search crawlers: OAI-SearchBot, Claude-SearchBot, PerplexityBot
- * - BLOCK training crawlers: GPTBot, ClaudeBot, CCBot, Google-Extended
+ * - ALLOW search crawlers and AI crawlers
+ * - Keep operational/private paths out of crawler access
  *
  * Bot documentation:
  * - OpenAI: https://platform.openai.com/docs/bots
@@ -52,61 +52,30 @@ export default function robots(): MetadataRoute.Robots {
       },
 
       // OpenAI crawlers (per platform.openai.com/docs/bots)
-      // OAI-SearchBot = ChatGPT search indexing (ALLOW)
-      // GPTBot = model training (BLOCK)
+      // OAI-SearchBot = ChatGPT search indexing
       // ChatGPT-User = user-triggered fetch (robots.txt may not apply)
       {
         userAgent: 'OAI-SearchBot',
         allow: '/',
         disallow: DISALLOW_PATHS,
       },
-      {
-        userAgent: 'GPTBot',
-        disallow: '/',
-      },
 
       // Anthropic crawlers (per privacy.claude.com)
-      // Claude-SearchBot = search indexing (ALLOW)
-      // ClaudeBot = model training (BLOCK)
+      // Claude-SearchBot = search indexing
       // Claude-User = user-triggered fetch (robots.txt may not apply)
       {
         userAgent: 'Claude-SearchBot',
         allow: '/',
         disallow: DISALLOW_PATHS,
       },
-      {
-        userAgent: 'ClaudeBot',
-        disallow: '/',
-      },
 
       // Perplexity crawlers (per docs.perplexity.ai)
-      // PerplexityBot = search results (ALLOW)
+      // PerplexityBot = search results
       // Perplexity-User = user-triggered fetch (ignores robots.txt per their docs)
       {
         userAgent: 'PerplexityBot',
         allow: '/',
         disallow: DISALLOW_PATHS,
-      },
-
-      // Google AI usage control (per developers.google.com)
-      // Google-Extended = controls AI data usage, not search indexing
-      {
-        userAgent: 'Google-Extended',
-        disallow: '/',
-      },
-
-      // Apple crawlers (per support.apple.com/119829)
-      // Applebot = Apple Search (handled by default rules)
-      // Applebot-Extended = Apple Intelligence features (BLOCK training)
-      {
-        userAgent: 'Applebot-Extended',
-        disallow: '/',
-      },
-
-      // Training-only crawlers (BLOCK)
-      {
-        userAgent: 'CCBot',
-        disallow: '/',
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,

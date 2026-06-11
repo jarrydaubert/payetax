@@ -26,7 +26,7 @@ describe('CalculatorInputsSection Component', () => {
     (useCalculatorActions as jest.Mock).mockReturnValue({
       reset: mockReset,
     });
-    (useCalculatorStore as jest.Mock).mockImplementation((selector) =>
+    (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({ input: defaultInput }),
     );
   });
@@ -201,7 +201,7 @@ describe('CalculatorInputsSection Component', () => {
     });
 
     it('should clear inline messages on reset', () => {
-      (useCalculatorStore as jest.Mock).mockImplementation((selector) =>
+      (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
         selector({ input: { ...defaultInput, salary: 0 } }),
       );
       render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
@@ -220,7 +220,7 @@ describe('CalculatorInputsSection Component', () => {
     });
 
     it('does not show the low annual salary warning for a normal hourly rate', () => {
-      (useCalculatorStore as jest.Mock).mockImplementation((selector) =>
+      (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
         selector({ input: { ...defaultInput, salary: 12.5, payPeriod: 'hourly' } }),
       );
       render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);

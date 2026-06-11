@@ -5,6 +5,10 @@ describe('Tax Calculator - Basic Structure', () => {
     salary: 30000,
     payPeriod: 'annually',
     taxYear: '2024-2025',
+    isMarried: false,
+    partnerGrossWage: 0,
+    isBlind: false,
+    payNoNI: false,
     pensionContribution: 0,
     pensionContributionType: 'percentage',
     studentLoanPlans: [],
@@ -12,7 +16,7 @@ describe('Tax Calculator - Basic Structure', () => {
     isScottish: false,
     taxCode: '1257L',
     hoursPerWeek: 40,
-    additionalAllowances: [],
+    allowancesDeductions: 0,
   };
 
   it('should return a result object with expected structure', () => {

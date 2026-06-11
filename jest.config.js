@@ -34,23 +34,10 @@ const config = {
     '<rootDir>/node_modules/',
     '<rootDir>/e2e/',
     '<rootDir>/src/lib/__tests__/__mocks__/',
-    '<rootDir>/.contentlayer/',
   ],
-  transformIgnorePatterns: ['/node_modules/(?!(@?contentlayer2?|next-mdx-remote|github-slugger)/)'],
+  transformIgnorePatterns: ['/node_modules/(?!(next-mdx-remote|github-slugger)/)'],
   moduleNameMapper: {
     '^@testing-library/react$': '<rootDir>/src/test/testing-library.tsx',
-    // Mock Contentlayer generated files (must be first to catch before other patterns)
-    '^contentlayer/generated$': '<rootDir>/src/lib/__tests__/__mocks__/contentlayer.mock.ts',
-    '^\\./.contentlayer/generated(.*)$':
-      '<rootDir>/src/lib/__tests__/__mocks__/contentlayer.mock.ts',
-    '^\\.contentlayer/generated(.*)$': '<rootDir>/src/lib/__tests__/__mocks__/contentlayer.mock.ts',
-    '.contentlayer/generated': '<rootDir>/src/lib/__tests__/__mocks__/contentlayer.mock.ts',
-    '<rootDir>/.contentlayer/generated(.*)$':
-      '<rootDir>/src/lib/__tests__/__mocks__/contentlayer.mock.ts',
-    '^contentlayer2/client$': '<rootDir>/src/lib/__tests__/__mocks__/contentlayer-client.mock.ts',
-    '^@contentlayer2/client$': '<rootDir>/src/lib/__tests__/__mocks__/contentlayer-client.mock.ts',
-    '^contentlayer2/dist/client/index.js$':
-      '<rootDir>/src/lib/__tests__/__mocks__/contentlayer-client.mock.ts',
     // Mock next-mdx-remote to avoid ESM parsing issues
     '^next-mdx-remote/rsc$': '<rootDir>/src/lib/__tests__/__mocks__/next-mdx-remote.mock.tsx',
     // Mock github-slugger (ESM-only package)

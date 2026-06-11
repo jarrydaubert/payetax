@@ -35,8 +35,11 @@ describe('next.config crawler headers', () => {
   it('allows Sentry browser envelopes for US and EU ingest hosts', async () => {
     const { default: nextConfig } = await import('../../../next.config');
     const headers = await nextConfig.headers?.();
-    const globalHeaders = headers?.find((entry) => entry.source === '/(.*)')?.headers ?? [];
-    const csp = globalHeaders.find((header) => header.key === 'Content-Security-Policy')?.value;
+    const globalHeaders =
+      headers?.find((entry: { source: string }) => entry.source === '/(.*)')?.headers ?? [];
+    const csp = globalHeaders.find(
+      (header: { key: string; value: string }) => header.key === 'Content-Security-Policy',
+    )?.value;
 
     expect(csp).toContain('connect-src');
     expect(csp).toContain('https://*.ingest.sentry.io');
