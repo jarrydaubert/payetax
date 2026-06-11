@@ -85,7 +85,7 @@ describe('Atoms Components - Accessibility', () => {
   describe('PeriodCheckbox', () => {
     it('should have no accessibility violations', async () => {
       const { container } = render(
-        <PeriodCheckbox period='monthly' checked={false} onChange={() => {}} />,
+        <PeriodCheckbox period='monthly' checked={false} onCheckedChange={() => {}} />,
       );
 
       const results = await axe(container);
@@ -94,7 +94,7 @@ describe('Atoms Components - Accessibility', () => {
 
     it('should have no violations when checked', async () => {
       const { container } = render(
-        <PeriodCheckbox period='weekly' checked={true} onChange={() => {}} />,
+        <PeriodCheckbox period='weekly' checked={true} onCheckedChange={() => {}} />,
       );
 
       const results = await axe(container);
@@ -105,9 +105,9 @@ describe('Atoms Components - Accessibility', () => {
       const { container } = render(
         <fieldset>
           <legend>Select periods</legend>
-          <PeriodCheckbox period='yearly' checked={true} onChange={() => {}} />
-          <PeriodCheckbox period='monthly' checked={true} onChange={() => {}} />
-          <PeriodCheckbox period='weekly' checked={false} onChange={() => {}} />
+          <PeriodCheckbox period='yearly' checked={true} onCheckedChange={() => {}} />
+          <PeriodCheckbox period='monthly' checked={true} onCheckedChange={() => {}} />
+          <PeriodCheckbox period='weekly' checked={false} onCheckedChange={() => {}} />
         </fieldset>,
       );
 
@@ -174,8 +174,8 @@ describe('Atoms Components - Accessibility', () => {
 
           <fieldset>
             <legend>Display Periods</legend>
-            <PeriodCheckbox period='yearly' checked={true} onChange={() => {}} />
-            <PeriodCheckbox period='monthly' checked={true} onChange={() => {}} />
+            <PeriodCheckbox period='yearly' checked={true} onCheckedChange={() => {}} />
+            <PeriodCheckbox period='monthly' checked={true} onCheckedChange={() => {}} />
           </fieldset>
         </form>,
       );

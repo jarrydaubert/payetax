@@ -189,7 +189,7 @@ describe('pensionOptimizer', () => {
 
       expect(result).not.toBeNull();
       // £10k contribution × 60% effective rate = £6k savings
-      expect(result?.savingsFromOptimizing).toBe(result?.suggested * 0.6);
+      expect(result?.savingsFromOptimizing).toBe((result?.suggested ?? 0) * 0.6);
     });
 
     it('should maintain 60% effective rate throughout trap zone', () => {

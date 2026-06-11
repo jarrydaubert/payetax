@@ -3,26 +3,9 @@ import { ImageResponse } from 'next/og';
 import type { NextRequest } from 'next/server';
 import { CURRENT_TAX_YEAR, formatTaxYearDisplay } from '@/constants/taxRates';
 import { checkRateLimit, createRateLimitHeaders } from '@/lib/rateLimit';
+import { getClientIdentifier } from '@/lib/security/clientIdentifier';
 
 const RATE_LIMIT = { max: 10, window: 60000 };
-
-/** Get client identifier - always returns a key */
-function getClientIdentifier(request: NextRequest): string {
-  const cfIp = request.headers.get('cf-connecting-ip');
-  if (cfIp) return cfIp;
-
-  const forwardedFor = request.headers.get('x-forwarded-for');
-  if (forwardedFor) {
-    const firstIp = forwardedFor.split(',')[0];
-    if (firstIp) return firstIp.trim();
-  }
-
-  const realIp = request.headers.get('x-real-ip');
-  if (realIp) return realIp;
-
-  const ua = request.headers.get('user-agent') || 'unknown';
-  return `ua:${Buffer.from(ua).toString('base64').slice(0, 16)}`;
-}
 
 // Cache headers for CDN - OG images are expensive to generate
 const CACHE_HEADERS = {
@@ -60,7 +43,7 @@ function GridBackground() {
 }
 
 export async function GET(request: NextRequest) {
-  const clientId = getClientIdentifier(request);
+  const clientId = getClientIdentifier(request, { fallbackPrefix: 'ua:' });
   if (!(await checkRateLimit(`og:${clientId}`, RATE_LIMIT))) {
     return new Response('Too many requests', {
       status: 429,

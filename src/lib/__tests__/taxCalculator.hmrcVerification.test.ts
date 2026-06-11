@@ -575,14 +575,14 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       expect(basicBand).toBeDefined();
       // Band amount is the taxable income in that band: £37,700
       // Or it might store the tax amount: £7,540
-      if (basicBand?.amount > 10000) {
+      if ((basicBand?.amount ?? 0) > 10000) {
         expect(basicBand?.amount).toBeCloseTo(37704, 2); // Taxable income in band
       } else {
         expect(basicBand?.amount).toBeCloseTo(7540, 2); // Tax amount
       }
 
       expect(higherBand).toBeDefined();
-      if (higherBand?.amount > 5000) {
+      if ((higherBand?.amount ?? 0) > 5000) {
         expect(higherBand?.amount).toBeCloseTo(9720, 2); // Taxable income in band
       } else {
         expect(higherBand?.amount).toBeCloseTo(3892, 2); // Tax amount

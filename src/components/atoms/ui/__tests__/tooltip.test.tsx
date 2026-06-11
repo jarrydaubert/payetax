@@ -79,10 +79,12 @@ describe('Tooltip Component', () => {
 
       await user.unhover(trigger);
 
+      // Radix marks the content closed (or removes it) on unhover. The element
+      // with data-state is the TooltipContent wrapper, so walk up via closest().
       await waitFor(() => {
         const tooltips = screen.queryAllByText('Tooltip text');
         expect(
-          tooltips.every((el) => !el.isVisible || el.getAttribute('data-state') === 'closed'),
+          tooltips.every((el) => el.closest('[data-state]')?.getAttribute('data-state') !== 'open'),
         ).toBe(true);
       });
     });

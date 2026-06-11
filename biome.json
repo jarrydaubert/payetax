@@ -209,16 +209,6 @@
       }
     },
     {
-      "includes": ["contentlayer.config.ts"],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noExplicitAny": "off"
-          }
-        }
-      }
-    },
-    {
       "includes": [
         "**/scripts/**",
         "*.config.ts",

@@ -41,6 +41,10 @@ export const ServerEnvSchema = z.object({
     .string()
     .min(1, 'Rate-limit health secret must not be empty')
     .optional(),
+  TRUST_CF_CONNECTING_IP: z
+    .string()
+    .transform((val) => val === 'true')
+    .optional(),
   SENTRY_AUTH_TOKEN: z.string().optional(),
   SENTRY_ORG: z.string().optional(),
   SENTRY_PROJECT: z.string().optional(),
@@ -123,6 +127,7 @@ export function validateServerEnv(): ServerEnv {
     UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
     UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
     RATE_LIMIT_HEALTH_SECRET: process.env.RATE_LIMIT_HEALTH_SECRET,
+    TRUST_CF_CONNECTING_IP: process.env.TRUST_CF_CONNECTING_IP,
     SENTRY_AUTH_TOKEN: process.env.SENTRY_AUTH_TOKEN,
     SENTRY_ORG: process.env.SENTRY_ORG,
     SENTRY_PROJECT: process.env.SENTRY_PROJECT,

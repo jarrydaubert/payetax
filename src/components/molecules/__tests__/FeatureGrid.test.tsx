@@ -208,7 +208,7 @@ describe('FeatureGrid', () => {
             bg: 'from-cyan-500/10 to-emerald-500/10',
             icon: 'text-cyan-500',
             border: 'border-cyan-500/20',
-          },
+          } as Feature['gradient'],
         },
       ];
 

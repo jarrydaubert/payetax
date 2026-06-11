@@ -33,18 +33,6 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
   });
 
   describe('All Pay Periods', () => {
-    const _testSalaries = [
-      {
-        annually: 30000,
-        monthly: 2500,
-        weekly: 576.92,
-        fortnightly: 1153.85,
-        fourWeekly: 2307.69,
-        daily: 115.38,
-        hourly: 15.38,
-      },
-    ];
-
     it('handles ANNUAL salary input correctly', () => {
       const result = calculateTax(
         createInput({

@@ -17,22 +17,29 @@ jest.mock('framer-motion', () => ({
 }));
 
 const mockCurrentInput: TaxCalculationInput = {
-  grossSalary: 50000,
+  salary: 50000,
+  payPeriod: 'annually',
+  taxYear: '2025-2026',
   taxCode: '1257L',
-  region: 'england',
-  taxYear: '2025-26',
-  pensionContribution: 0,
-  pensionType: 'percentage',
-  studentLoanPlans: 'none',
-  allowancesDeductions: 0,
+  isScottish: false,
+  isMarried: false,
+  partnerGrossWage: 0,
   isBlind: false,
-  isOver65: false,
+  payNoNI: false,
+  pensionContribution: 0,
+  pensionContributionType: 'percentage',
+  studentLoanPlans: 'none',
+  niCategory: 'A',
+  hoursPerWeek: 40,
+  allowancesDeductions: 0,
 };
 
 const mockCurrentResults: TaxCalculationResults = {
   grossSalary: {
     annually: 50000,
     monthly: 4166.67,
+    fourWeekly: 0,
+    fortnightly: 0,
     weekly: 961.54,
     daily: 192.31,
     hourly: 25.64,
@@ -42,6 +49,8 @@ const mockCurrentResults: TaxCalculationResults = {
   incomeTax: {
     annually: 7486,
     monthly: 623.83,
+    fourWeekly: 0,
+    fortnightly: 0,
     weekly: 143.96,
     daily: 28.79,
     hourly: 3.84,
@@ -49,6 +58,8 @@ const mockCurrentResults: TaxCalculationResults = {
   nationalInsurance: {
     annually: 4212,
     monthly: 351,
+    fourWeekly: 0,
+    fortnightly: 0,
     weekly: 81,
     daily: 16.2,
     hourly: 2.16,
@@ -56,6 +67,8 @@ const mockCurrentResults: TaxCalculationResults = {
   pensionContribution: {
     annually: 0,
     monthly: 0,
+    fourWeekly: 0,
+    fortnightly: 0,
     weekly: 0,
     daily: 0,
     hourly: 0,
@@ -63,6 +76,8 @@ const mockCurrentResults: TaxCalculationResults = {
   studentLoan: {
     annually: 0,
     monthly: 0,
+    fourWeekly: 0,
+    fortnightly: 0,
     weekly: 0,
     daily: 0,
     hourly: 0,
@@ -70,6 +85,8 @@ const mockCurrentResults: TaxCalculationResults = {
   netPay: {
     annually: 38302,
     monthly: 3191.83,
+    fourWeekly: 0,
+    fortnightly: 0,
     weekly: 736.58,
     daily: 147.32,
     hourly: 19.64,
@@ -78,13 +95,10 @@ const mockCurrentResults: TaxCalculationResults = {
     {
       name: 'Basic Rate',
       rate: 20,
-      income: 37430,
       amount: 7486,
     },
   ],
   employerNI: 5584,
-  effectiveTaxRate: 23.4,
-  marginalTaxRate: 32,
 };
 
 describe('SalaryComparisonSection', () => {

@@ -10,6 +10,8 @@ const sampleResults: TaxCalculationResults = {
   grossSalary: {
     annually: 50000,
     monthly: 4166.67,
+    fourWeekly: 0,
+    fortnightly: 0,
     weekly: 961.54,
     daily: 192.31,
     hourly: 24.04,
@@ -19,6 +21,8 @@ const sampleResults: TaxCalculationResults = {
   incomeTax: {
     annually: 7486,
     monthly: 623.83,
+    fourWeekly: 0,
+    fortnightly: 0,
     weekly: 143.96,
     daily: 28.79,
     hourly: 3.6,
@@ -26,6 +30,8 @@ const sampleResults: TaxCalculationResults = {
   nationalInsurance: {
     annually: 3000,
     monthly: 250,
+    fourWeekly: 0,
+    fortnightly: 0,
     weekly: 57.69,
     daily: 11.54,
     hourly: 1.44,
@@ -33,6 +39,8 @@ const sampleResults: TaxCalculationResults = {
   studentLoan: {
     annually: 0,
     monthly: 0,
+    fourWeekly: 0,
+    fortnightly: 0,
     weekly: 0,
     daily: 0,
     hourly: 0,
@@ -40,6 +48,8 @@ const sampleResults: TaxCalculationResults = {
   pensionContribution: {
     annually: 0,
     monthly: 0,
+    fourWeekly: 0,
+    fortnightly: 0,
     weekly: 0,
     daily: 0,
     hourly: 0,
@@ -48,6 +58,8 @@ const sampleResults: TaxCalculationResults = {
   netPay: {
     annually: 39514,
     monthly: 3292.84,
+    fourWeekly: 0,
+    fortnightly: 0,
     weekly: 759.88,
     daily: 151.98,
     hourly: 19,

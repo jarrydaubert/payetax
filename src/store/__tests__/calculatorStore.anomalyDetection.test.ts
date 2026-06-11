@@ -6,7 +6,7 @@ import { collectCalculationAnomalies } from '../calculatorStore';
 const createPeriodValue = (value: number) => ({
   annually: value,
   monthly: value / 12,
-  four_weekly: value / 13,
+  fourWeekly: value / 13,
   fortnightly: value / 26,
   weekly: value / 52,
   daily: value / 260,

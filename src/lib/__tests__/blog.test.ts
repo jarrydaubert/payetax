@@ -182,10 +182,8 @@ describe('blog.ts', () => {
 
   describe('getBlogPostBySlug', () => {
     it('should return post when found', async () => {
-      const mockPost = createMockPost({
-        slug: 'test-slug',
-        content: 'Full post content',
-      });
+      // getPostBySlug returns the listing shape plus full content.
+      const mockPost = { ...createMockPost({ slug: 'test-slug' }), content: 'Full post content' };
       mockGetPostBySlug.mockReturnValue(mockPost);
 
       const post = await getBlogPostBySlug('test-slug');

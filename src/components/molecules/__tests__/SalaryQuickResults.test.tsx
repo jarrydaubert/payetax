@@ -9,10 +9,22 @@ import { SalaryQuickResults } from '../SalaryQuickResults';
 
 describe('SalaryQuickResults', () => {
   const mockResults: TaxCalculationResults = {
-    grossSalary: 30000,
+    grossSalary: {
+      annually: 30000,
+      monthly: 2500,
+      fourWeekly: 2307.69,
+      fortnightly: 1153.85,
+      weekly: 576.92,
+      daily: 115.38,
+      hourly: 14.42,
+    },
+    taxFreeAmount: 12570,
+    taxableIncome: 17430,
     incomeTax: {
       annually: 3486,
       monthly: 290.5,
+      fourWeekly: 268.15,
+      fortnightly: 134.08,
       weekly: 67.04,
       daily: 13.41,
       hourly: 1.68,
@@ -20,43 +32,41 @@ describe('SalaryQuickResults', () => {
     nationalInsurance: {
       annually: 2274,
       monthly: 189.5,
+      fourWeekly: 174.92,
+      fortnightly: 87.46,
       weekly: 43.73,
       daily: 8.75,
       hourly: 1.09,
     },
-    netPay: {
-      annually: 24240,
-      monthly: 2020,
-      weekly: 466.15,
-      daily: 93.23,
-      hourly: 11.65,
-    },
-    employerNI: {
-      annually: 3172,
-      monthly: 264.33,
-      weekly: 60.98,
-      daily: 12.2,
-      hourly: 1.53,
+    studentLoan: {
+      annually: 0,
+      monthly: 0,
+      fourWeekly: 0,
+      fortnightly: 0,
+      weekly: 0,
+      daily: 0,
+      hourly: 0,
     },
     pensionContribution: {
       annually: 0,
       monthly: 0,
+      fourWeekly: 0,
+      fortnightly: 0,
       weekly: 0,
       daily: 0,
       hourly: 0,
     },
-    studentLoanRepayment: {
-      annually: 0,
-      monthly: 0,
-      weekly: 0,
-      daily: 0,
-      hourly: 0,
+    employerNI: 3172,
+    netPay: {
+      annually: 24240,
+      monthly: 2020,
+      fourWeekly: 1864.62,
+      fortnightly: 932.31,
+      weekly: 466.15,
+      daily: 93.23,
+      hourly: 11.65,
     },
-    effectiveTaxRate: 19.2,
-    marginalTaxRate: 33.25,
-    taxYear: '2025-2026',
-    taxCode: '1257L',
-    isScottish: false,
+    taxBands: [{ name: 'Basic Rate', rate: 20, amount: 3486 }],
   };
 
   const mockComparisons = [
@@ -167,7 +177,7 @@ describe('SalaryQuickResults', () => {
     it('should calculate correct effective rate for high earner', () => {
       const highEarnerResults: TaxCalculationResults = {
         ...mockResults,
-        grossSalary: 100000,
+        grossSalary: { ...mockResults.grossSalary, annually: 100000 },
         incomeTax: { ...mockResults.incomeTax, annually: 27432 },
         nationalInsurance: { ...mockResults.nationalInsurance, annually: 7379 },
         netPay: { ...mockResults.netPay, annually: 65189 },
@@ -248,7 +258,7 @@ describe('SalaryQuickResults', () => {
     it('should format all numbers with UK locale', () => {
       const bigResults: TaxCalculationResults = {
         ...mockResults,
-        grossSalary: 100000,
+        grossSalary: { ...mockResults.grossSalary, annually: 100000 },
         incomeTax: { ...mockResults.incomeTax, annually: 27432, monthly: 2286 },
         nationalInsurance: { ...mockResults.nationalInsurance, annually: 7379, monthly: 614.92 },
         netPay: {
@@ -271,7 +281,7 @@ describe('SalaryQuickResults', () => {
     it('should handle small salaries correctly', () => {
       const smallResults: TaxCalculationResults = {
         ...mockResults,
-        grossSalary: 15000,
+        grossSalary: { ...mockResults.grossSalary, annually: 15000 },
         incomeTax: { ...mockResults.incomeTax, annually: 486, monthly: 40.5 },
         nationalInsurance: { ...mockResults.nationalInsurance, annually: 324, monthly: 27 },
         netPay: { ...mockResults.netPay, annually: 14190, monthly: 1182.5, weekly: 272.88 },
@@ -290,7 +300,7 @@ describe('SalaryQuickResults', () => {
     it('should handle £0 salary', () => {
       const zeroResults: TaxCalculationResults = {
         ...mockResults,
-        grossSalary: 0,
+        grossSalary: { ...mockResults.grossSalary, annually: 0 },
         incomeTax: { ...mockResults.incomeTax, annually: 0, monthly: 0, weekly: 0 },
         nationalInsurance: { ...mockResults.nationalInsurance, annually: 0, monthly: 0, weekly: 0 },
         netPay: { ...mockResults.netPay, annually: 0, monthly: 0, weekly: 0 },
@@ -330,7 +340,7 @@ describe('SalaryQuickResults', () => {
     it('should handle very high effective tax rate', () => {
       const highTaxResults: TaxCalculationResults = {
         ...mockResults,
-        grossSalary: 50000,
+        grossSalary: { ...mockResults.grossSalary, annually: 50000 },
         incomeTax: { ...mockResults.incomeTax, annually: 15000 },
         nationalInsurance: { ...mockResults.nationalInsurance, annually: 5000 },
         netPay: { ...mockResults.netPay, annually: 30000, monthly: 2500, weekly: 576.92 },

@@ -138,7 +138,7 @@ describe('FeatureCard', () => {
           bg: 'from-cyan-500/10 to-emerald-500/10',
           icon: 'text-cyan-500',
           border: 'border-cyan-500/20',
-        },
+        } as Feature['gradient'],
       };
       const { container } = render(<FeatureCard feature={featureWithGradient} />);
       const card = container.firstChild as HTMLElement;
@@ -153,7 +153,7 @@ describe('FeatureCard', () => {
           bg: 'from-yellow-500/10 to-orange-500/10',
           icon: 'text-yellow-500',
           border: 'border-yellow-500/20',
-        },
+        } as Feature['gradient'],
       };
       const { container } = render(<FeatureCard feature={featureWithGradient} />);
       const iconContainer = container.querySelector('[aria-hidden="true"]');
@@ -167,7 +167,7 @@ describe('FeatureCard', () => {
           bg: 'from-green-500/10 to-emerald-500/10',
           icon: 'text-green-500',
           border: 'border-green-500/20',
-        },
+        } as Feature['gradient'],
       };
       const { container } = render(<FeatureCard feature={featureWithGradient} />);
       const card = container.firstChild as HTMLElement;
@@ -274,7 +274,7 @@ describe('FeatureCard', () => {
           bg: 'from-purple-500/10 to-pink-500/10',
           icon: 'text-purple-500',
           border: 'border-purple-500/20',
-        },
+        } as Feature['gradient'],
       };
       render(<FeatureCard feature={fullFeature} variant='showcase' className='extra-class' />);
 

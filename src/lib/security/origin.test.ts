@@ -1,4 +1,5 @@
 import { getDefaultCsrfAllowedHosts, isValidRequestOrigin } from '@/lib/security/origin';
+import { setNodeEnv } from '@/test/env';
 
 function makeRequest(headersInit: Record<string, string | undefined>) {
   const headers = new Headers();
@@ -37,22 +38,22 @@ describe('security/origin', () => {
     const originalSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 
     afterEach(() => {
-      process.env.NODE_ENV = originalNodeEnv;
+      setNodeEnv(originalNodeEnv);
       process.env.NEXT_PUBLIC_SITE_URL = originalSiteUrl;
     });
 
     test('includes localhost in non-production', () => {
-      process.env.NODE_ENV = 'test';
+      setNodeEnv('test');
       expect(getDefaultCsrfAllowedHosts()).toContain('localhost:3000');
     });
 
     test('excludes localhost in production', () => {
-      process.env.NODE_ENV = 'production';
+      setNodeEnv('production');
       expect(getDefaultCsrfAllowedHosts()).not.toContain('localhost:3000');
     });
 
     test('adds host from NEXT_PUBLIC_SITE_URL when provided', () => {
-      process.env.NODE_ENV = 'production';
+      setNodeEnv('production');
       process.env.NEXT_PUBLIC_SITE_URL = 'https://custom-domain.example/path';
       expect(getDefaultCsrfAllowedHosts()).toContain('custom-domain.example');
     });

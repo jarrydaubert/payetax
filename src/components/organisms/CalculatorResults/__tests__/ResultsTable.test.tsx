@@ -68,9 +68,6 @@ describe('ResultsTable Component', () => {
       hourly: 11.78,
     },
     employerNI: 1872.48,
-    totalTaxBurden: 7386.48,
-    effectiveTaxRate: 24.62,
-    marginalTaxRate: 32,
     taxBands: [{ rate: 20, amount: 3486, name: 'Basic Rate' }],
   };
 
@@ -437,7 +434,7 @@ describe('ResultsTable Component', () => {
 
   describe('Allowances and Deductions', () => {
     it('should render allowances row', () => {
-      render(<ResultsTable results={mockResults} allowancesDeductions='1000' />);
+      render(<ResultsTable results={mockResults} allowancesDeductions={1000} />);
 
       expect(screen.getByText('Non-taxable allowance(s)')).toBeInTheDocument();
       expect(screen.getAllByText(/£1,000/).length).toBeGreaterThan(0);
@@ -794,9 +791,6 @@ describe('ResultsTable Component', () => {
           hourly: 0,
         },
         employerNI: 0,
-        totalTaxBurden: 0,
-        effectiveTaxRate: 0,
-        marginalTaxRate: 0,
         taxBands: [],
       };
 
@@ -1166,9 +1160,6 @@ describe('ResultsTable Component', () => {
           hourly: 31.16,
         },
         employerNI: 12890,
-        totalTaxBurden: 39632,
-        effectiveTaxRate: 39.63,
-        marginalTaxRate: 42,
         taxBands: [
           { rate: 20, amount: 7486, name: 'Basic Rate' },
           { rate: 40, amount: 20374, name: 'Higher Rate' },

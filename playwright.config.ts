@@ -120,7 +120,8 @@ export default defineConfig({
     command: 'bun run build && bun run start',
     url: process.env.PLAYWRIGHT_BASE_URL ?? DEFAULT_PLAYWRIGHT_BASE_URL,
     reuseExistingServer: false,
-    timeout: 120 * 1000,
+    // Budget covers a cold production build on CI runners, not just server start.
+    timeout: 300 * 1000,
     env: {
       NODE_ENV: 'production',
       PORT: String(DEFAULT_PLAYWRIGHT_PORT),

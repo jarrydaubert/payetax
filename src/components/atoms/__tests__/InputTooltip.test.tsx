@@ -4,6 +4,7 @@
 
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { setNodeEnv } from '@/test/env';
 import { InputTooltip } from '../InputTooltip';
 
 describe('InputTooltip Component', () => {
@@ -195,7 +196,7 @@ describe('InputTooltip Component', () => {
   describe('Warning Logs', () => {
     it('should warn when field not found in config', () => {
       const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'development';
+      setNodeEnv('development');
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
 
       render(
@@ -209,7 +210,7 @@ describe('InputTooltip Component', () => {
       );
 
       consoleSpy.mockRestore();
-      process.env.NODE_ENV = originalEnv;
+      setNodeEnv(originalEnv);
     });
   });
 });

@@ -82,8 +82,6 @@ describe('TaxYearSelect Component', () => {
     it('should call onChange when a tax year is selected', () => {
       render(<TaxYearSelect value='2024-2025' onChange={mockOnChange} />);
 
-      const _button = screen.getByRole('combobox');
-
       // Verify the component renders with correct initial value
       expect(screen.getByText('2024-2025')).toBeInTheDocument();
 

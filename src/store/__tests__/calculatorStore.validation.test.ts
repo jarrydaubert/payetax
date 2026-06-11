@@ -8,6 +8,7 @@
  */
 
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import type { TaxYear } from '@/constants/taxRates';
 
 // Mock Sentry before importing store
 jest.mock('@/lib/sentry', () => ({
@@ -31,6 +32,7 @@ jest.mock('@/lib/taxCalculator', () => ({
   })),
 }));
 
+import { setNodeEnv } from '@/test/env';
 import { useCalculatorStore } from '../calculatorStore';
 
 const CALCULATOR_STORAGE_KEY = 'tax-calculator-storage';
@@ -120,7 +122,7 @@ describe('Calculator Store Validation', () => {
       const validYears = ['2024-25', '2025-26'] as const;
 
       for (const year of validYears) {
-        setTaxYear(year);
+        setTaxYear(year as unknown as TaxYear);
         const normalized = year === '2024-25' ? '2024-2025' : '2025-2026';
         expect(useCalculatorStore.getState().input.taxYear).toBe(normalized);
       }
@@ -130,7 +132,7 @@ describe('Calculator Store Validation', () => {
       const { setTaxYear } = useCalculatorStore.getState();
 
       // Both formats should be valid
-      setTaxYear('2024-25' as TaxYear);
+      setTaxYear('2024-25' as unknown as TaxYear);
       expect(useCalculatorStore.getState().input.taxYear).toBe('2024-2025');
 
       setTaxYear('2024-2025' as TaxYear);
@@ -366,7 +368,7 @@ describe('Calculator Store Validation', () => {
       const { setPensionContribution } = useCalculatorStore.getState();
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
       const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'development';
+      setNodeEnv('development');
       const before = useCalculatorStore.getState().input.pensionContribution;
 
       setPensionContribution(-5);
@@ -374,7 +376,7 @@ describe('Calculator Store Validation', () => {
       // Invalid updates are ignored; in development we also warn.
       expect(useCalculatorStore.getState().input.pensionContribution).toBe(before);
       expect(consoleSpy).toHaveBeenCalled();
-      process.env.NODE_ENV = originalEnv;
+      setNodeEnv(originalEnv);
       consoleSpy.mockRestore();
     });
 
@@ -382,14 +384,14 @@ describe('Calculator Store Validation', () => {
       const { setPensionContribution } = useCalculatorStore.getState();
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
       const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'development';
+      setNodeEnv('development');
       const before = useCalculatorStore.getState().input.pensionContribution;
 
       setPensionContribution(101);
 
       expect(useCalculatorStore.getState().input.pensionContribution).toBe(before);
       expect(consoleSpy).toHaveBeenCalled();
-      process.env.NODE_ENV = originalEnv;
+      setNodeEnv(originalEnv);
       consoleSpy.mockRestore();
     });
   });
