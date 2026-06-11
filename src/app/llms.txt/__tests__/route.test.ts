@@ -9,7 +9,7 @@ jest.mock('@/lib/blog', () => ({
 describe('llms.txt route', () => {
   beforeEach(() => {
     jest.useFakeTimers();
-    jest.setSystemTime(new Date('2026-02-03T12:00:00Z'));
+    jest.setSystemTime(new Date('2026-06-11T12:00:00Z'));
   });
 
   afterEach(() => {
@@ -38,7 +38,10 @@ describe('llms.txt route', () => {
     const text = await response.text();
 
     expect(response.headers.get('Content-Type')).toBe('text/plain; charset=utf-8');
-    expect(text).toContain('Last updated: 2026-02-03');
+    expect(text).toContain('Last updated: 2026-06-11');
+    expect(text).toContain('## Crawler Policy');
+    expect(text).toContain('Search crawlers and AI crawlers are allowed.');
+    expect(text).toContain('/_vercel/ remain disallowed in robots.txt');
     expect(text).toContain('## Blog Posts - Tax Basics');
     expect(text).toContain('- [\\[Tax\\] Basics](https://payetax.co.uk/blog/intro-tax):');
     expect(text).toContain(`${longExcerpt.slice(0, 150)}...`);
