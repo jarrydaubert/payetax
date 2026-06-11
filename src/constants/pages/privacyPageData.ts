@@ -23,7 +23,7 @@ import type { z } from 'zod';
 import type { FeatureSchema } from '@/lib/validation/pageDataValidation';
 
 /** Update whenever the privacy policy materially changes. */
-export const PRIVACY_LAST_UPDATED = '7 June 2026';
+export const PRIVACY_LAST_UPDATED = '11 June 2026';
 
 /** Controller contact email (matches the address used on the compliance page). */
 export const PRIVACY_CONTACT_EMAIL = 'support@payetax.co.uk';
