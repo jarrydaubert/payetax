@@ -74,7 +74,7 @@ const PROOF_LINKS = [
 
 export function AboutPageContent() {
   return (
-    <main className='min-h-screen bg-background bg-ledger-grid'>
+    <div className='min-h-screen bg-background bg-ledger-grid'>
       <section className='border-border/70 border-b pt-24 pb-14 md:pt-28 md:pb-20'>
         <div className='container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
           <div className='grid gap-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(320px,0.72fr)] lg:items-end'>
@@ -256,7 +256,7 @@ export function AboutPageContent() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }
 
