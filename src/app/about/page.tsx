@@ -8,11 +8,12 @@ export default function AboutPage() {
       <StructuredData
         type='person'
         expert={{
-          name: 'Jarryd Daubert',
-          jobTitle: 'Creator & Developer',
-          description: 'Creator of PayeTax, building privacy-first tax tools for UK taxpayers.',
+          name: 'Jarryd Aubert',
+          jobTitle: 'Software tester and creator of PayeTax',
+          description:
+            'Creator of PayeTax, a UK tax calculator R&D project focused on deterministic calculation correctness, edge cases, privacy, and deployment hygiene.',
           organization: 'PayeTax',
-          expertise: ['UK PAYE tax', 'HMRC compliance', 'tax software'],
+          expertise: ['UK PAYE tax', 'HMRC compliance', 'tax calculation testing'],
         }}
       />
       <StructuredData

@@ -85,7 +85,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
           'nav-safe-top fixed right-0 left-0 z-50',
           'grid grid-cols-[1fr_auto_1fr] items-center',
           'px-4 pt-[calc(var(--pwa-safe-area-top,0px)+1rem)] pb-4 sm:px-8 sm:py-6',
-          'border-border border-b bg-background/95',
+          'border-border border-b bg-background',
           className,
         )}
         aria-label='Main navigation'
