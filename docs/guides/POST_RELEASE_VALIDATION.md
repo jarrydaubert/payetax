@@ -11,5 +11,6 @@ After a production deploy:
 - [ ] Director results email sends through the Brevo API.
 - [ ] Sentry reports no new release-blocking PAYE or Director calculator errors.
 - [ ] Vercel Web Analytics receives traffic if analytics changed.
+- [ ] Vercel Speed Insights receives real-user performance data after production traffic.
 - [ ] GA4 receives a page view after accepting analytics cookies if GA4 changed.
 - [ ] Rate-limit health check passes when using the configured secret.

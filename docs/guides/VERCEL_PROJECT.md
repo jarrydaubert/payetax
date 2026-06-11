@@ -19,6 +19,7 @@ This document records the project-link and environment hygiene that matters afte
 - Build command: `bun run build`.
 - Output handling: Vercel default for Next.js.
 - Vercel Web Analytics enabled in the current `payetax` project.
+- Vercel Speed Insights enabled in the current `payetax` project.
 - Production and preview env vars set from `.env.template` and `docs/guides/PRODUCTION_ENV_CONTRACT.md`.
 
 ## Local Link Recovery
@@ -49,6 +50,7 @@ Core production values:
 - Sentry values for calculator-focused monitoring and source maps.
 - GA4 measurement id for consent-based analytics.
 - Vercel Web Analytics enabled in the Vercel dashboard, not through an env var.
+- Vercel Speed Insights enabled in the Vercel dashboard, not through an env var.
 
 Never copy stale env vars from an old account without confirming the feature still exists.
 
@@ -92,9 +94,10 @@ Pass criteria:
 - There is no unexpected extra redirect hop.
 
 3. Check Vercel Web Analytics for live traffic if analytics changed.
-4. Check GA4 realtime only after accepting analytics cookies.
-5. Check calculator-focused Sentry for PAYE or Director calculator errors.
-6. Check `/api/ops/rate-limit-health` with the configured secret when rate limiting changed.
+4. Check Vercel Speed Insights for real-user performance data after a production deploy.
+5. Check GA4 realtime only after accepting analytics cookies.
+6. Check calculator-focused Sentry for PAYE or Director calculator errors.
+7. Check `/api/ops/rate-limit-health` with the configured secret when rate limiting changed.
 
 ## Retired Project Hygiene
 
