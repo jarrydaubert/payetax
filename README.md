@@ -10,6 +10,7 @@ The repo is public. Real secrets must live in Vercel or local ignored env files 
 - Bun package manager
 - Jest and Playwright
 - Vercel Web Analytics for cookieless traffic visibility
+- Vercel Speed Insights for real-user performance signals
 - GA4 for consent-based event analytics
 - Sentry for calculator-focused error monitoring
 - Brevo API for transactional results email
@@ -31,7 +32,7 @@ Removed:
 - Mailing-list setup
 - Partner lead capture
 - Competitor-style SEO pages
-- Extra analytics vendors beyond Vercel Web Analytics and GA4
+- Extra analytics vendors beyond Vercel Web Analytics, Vercel Speed Insights, and GA4
 
 ## Testing And Quality
 

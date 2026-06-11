@@ -43,6 +43,7 @@ Email:
 Analytics and monitoring:
 
 - Vercel Web Analytics must be enabled in the Vercel `payetax` project dashboard.
+- Vercel Speed Insights must be enabled in the Vercel `payetax` project dashboard.
 - `NEXT_PUBLIC_GA_ID`
 - `NEXT_PUBLIC_SENTRY_DSN`
 - `SENTRY_AUTH_TOKEN`
@@ -70,5 +71,6 @@ After deploy:
 - Send Director Intelligence results email.
 - Check Sentry for new PAYE or Director calculator errors.
 - Check Vercel Web Analytics for live traffic if analytics changed.
+- Check Vercel Speed Insights for real-user performance data after a production deploy.
 - Check GA4 realtime after accepting analytics cookies.
 - Check `/api/ops/rate-limit-health` with the configured secret when rate limiting changed. The check verifies Upstash REST `PING` plus a temporary write/read/delete probe.

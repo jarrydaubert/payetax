@@ -1,6 +1,7 @@
 // src/app/layout.tsx
 
 import { Analytics as VercelAnalytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
@@ -76,7 +77,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <StructuredData type='organization' />
 
         <ThemeProvider>
-          {analyticsEnabled ? <VercelAnalytics /> : null}
+          {analyticsEnabled ? (
+            <>
+              <VercelAnalytics />
+              <SpeedInsights />
+            </>
+          ) : null}
           <Suspense fallback={null}>{analyticsEnabled ? <GoogleAnalytics /> : null}</Suspense>
           <Layout>{children}</Layout>
         </ThemeProvider>

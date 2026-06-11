@@ -7,7 +7,7 @@ PayeTax is now a public R&D project.
 - Keep the calculator useful and accurate.
 - Keep the blog.
 - Keep transactional email for results.
-- Keep Vercel Web Analytics, GA4, calculator-focused Sentry, and Upstash where they support quality and debugging.
+- Keep Vercel Web Analytics, Vercel Speed Insights, GA4, calculator-focused Sentry, and Upstash where they support quality and debugging.
 - Avoid growth plumbing that does not serve the R&D goal.
 
 ## Current Risks

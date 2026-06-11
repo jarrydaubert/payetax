@@ -176,7 +176,7 @@ export function Analytics() {
   const vitalsInitialized = useRef(false);
 
   // Initialize consent state on mount. GA4 scripts are only loaded after consent;
-  // Vercel Web Analytics handles cookieless traffic visibility outside this component.
+  // Vercel Web Analytics and Speed Insights run outside this component.
   useEffect(() => {
     setAnalyticsConsentState(isAnalyticsConsented());
   }, [setAnalyticsConsentState]);

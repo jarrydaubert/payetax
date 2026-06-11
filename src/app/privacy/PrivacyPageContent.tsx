@@ -242,8 +242,9 @@ export function PrivacyPageContent() {
               <p>
                 We do not load analytics cookies before you consent. On your first visit you can
                 accept or decline analytics; declining is as easy as accepting. Google Analytics 4
-                runs only after you opt in, while cookieless traffic counts contain no personal
-                identifiers and help us understand basic usage either way.
+                runs only after you opt in, while Vercel&apos;s cookieless traffic and performance
+                signals contain no personal identifiers and help us understand basic usage and page
+                speed either way.
               </p>
               <p>
                 You can change your choice at any time using the{' '}

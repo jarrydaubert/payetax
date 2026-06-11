@@ -23,7 +23,7 @@ import type { z } from 'zod';
 import type { FeatureSchema } from '@/lib/validation/pageDataValidation';
 
 /** Update whenever the privacy policy materially changes. */
-export const PRIVACY_LAST_UPDATED = '7 June 2026';
+export const PRIVACY_LAST_UPDATED = '11 June 2026';
 
 /** Controller contact email (matches the address used on the compliance page). */
 export const PRIVACY_CONTACT_EMAIL = 'support@payetax.co.uk';
@@ -97,7 +97,7 @@ export const PRIVACY_DONT_DO = [
 export const PRIVACY_DO_DO = [
   'Calculate everything in your browser',
   'Only send data when you ask us to email results',
-  'Use cookieless traffic counts and consent-based analytics',
+  'Use cookieless traffic and performance signals plus consent-based analytics',
   'Process the minimum data needed to prevent abuse',
   'Tell you exactly which third parties are involved',
   'Let you exercise your UK GDPR rights at any time',
@@ -201,8 +201,8 @@ export interface PrivacyProcessor {
 export const PRIVACY_PROCESSORS: PrivacyProcessor[] = [
   {
     name: 'Vercel',
-    role: 'Hosting, content delivery, and cookieless traffic analytics',
-    data: 'Technical request data and aggregate, non-identifying visit counts',
+    role: 'Hosting, content delivery, cookieless traffic analytics, and speed insights',
+    data: 'Technical request data plus aggregate, non-identifying visit and performance signals',
   },
   {
     name: 'Brevo',
