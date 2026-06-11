@@ -224,7 +224,7 @@ describe('SimpleNavbar Component', () => {
 
       const nav = container.querySelector('nav');
       expect(nav).toHaveClass('border-b');
-      expect(nav).toHaveClass('bg-background/95');
+      expect(nav).toHaveClass('bg-background');
     });
 
     it('should apply consistent styling on all pages', () => {
@@ -234,7 +234,7 @@ describe('SimpleNavbar Component', () => {
 
       const nav = container.querySelector('nav');
       expect(nav).toHaveClass('border-b');
-      expect(nav).toHaveClass('bg-background/95');
+      expect(nav).toHaveClass('bg-background');
     });
 
     it('should include safe-area top padding on mobile nav', () => {

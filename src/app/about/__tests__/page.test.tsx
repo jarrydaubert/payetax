@@ -2,36 +2,35 @@ import { render, screen } from '@testing-library/react';
 import AboutPage from '../page';
 
 describe('AboutPage', () => {
-  it('renders redesigned narrative sections and primary CTAs', () => {
+  it('renders the R&D project narrative and primary routes', () => {
     render(<AboutPage />);
 
     expect(
       screen.getByRole('heading', {
-        name: /Trust your numbers without trading your privacy/i,
+        name: /A UK tax calculator built as a working test lab/i,
       }),
     ).toBeInTheDocument();
 
+    expect(screen.getByRole('heading', { name: /^What it is$/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /^What it is not$/i })).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: /How PayeTax differs in practice/i }),
+      screen.getByRole('heading', { name: /Boring controls on purpose/i }),
     ).toBeInTheDocument();
 
     const openCalculatorLink = screen.getByRole('link', {
-      name: /Open Calculator/i,
+      name: /Open calculator/i,
     });
     expect(openCalculatorLink).toHaveAttribute('href', '/');
-    expect(openCalculatorLink).toHaveClass('w-full');
 
-    const complianceLink = screen.getByRole('link', {
-      name: /Compliance & Sources/i,
+    const complianceLinks = screen.getAllByRole('link', {
+      name: /View sources|Compliance and sources/i,
     });
-    expect(complianceLink).toHaveAttribute('href', '/compliance');
-    expect(complianceLink).toHaveClass('w-full');
+    expect(complianceLinks.some((link) => link.getAttribute('href') === '/compliance')).toBe(true);
 
-    const installLink = screen.getByRole('link', {
-      name: /Install App/i,
+    const directorLink = screen.getByRole('link', {
+      name: /Director Intelligence/i,
     });
-    expect(installLink).toHaveAttribute('href', '/install');
-    expect(installLink).toHaveClass('w-full');
+    expect(directorLink).toHaveAttribute('href', '/tools/director-guide');
     expect(screen.queryByRole('button', { name: /Send feedback/i })).not.toBeInTheDocument();
   });
 });
