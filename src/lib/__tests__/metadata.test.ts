@@ -126,10 +126,11 @@ describe('Metadata Module', () => {
         type: 'article',
         publishedTime,
         modifiedTime,
-        authors: [{ name: 'John Doe' }, { name: 'Jane Smith' }],
+        authors: ['John Doe', 'Jane Smith'],
         section: 'Tax News',
         tags: ['tax', 'calculator', 'uk'],
       });
+      expect(metadata.authors).toEqual([{ name: 'John Doe' }, { name: 'Jane Smith' }]);
       expect(metadata.category).toBe('Finance');
     });
 
@@ -150,7 +151,8 @@ describe('Metadata Module', () => {
         publishedTime: '2024-01-15T10:00:00Z',
       });
 
-      expect(metadata.openGraph).toMatchObject({ authors: [{ name: 'PayeTax' }] });
+      expect(metadata.openGraph).toMatchObject({ authors: ['PayeTax'] });
+      expect(metadata.authors).toEqual([{ name: 'PayeTax' }]);
     });
 
     test('should handle noIndex parameter', () => {

@@ -97,6 +97,8 @@ export function generateMetadata({
   // Format title with site name if not already included
   const hasPayeTax = title.includes('PayeTax');
   const formattedTitle = hasPayeTax ? title : `${title} | PayeTax`;
+  const authorNames = authors && authors.length > 0 ? authors : ['PayeTax'];
+  const authorDescriptors = authorNames.map((name) => ({ name }));
 
   // Generate article-specific metadata if applicable
   const articleMetadata =
@@ -104,7 +106,7 @@ export function generateMetadata({
       ? {
           publishedTime,
           modifiedTime: modifiedTime || publishedTime,
-          authors: authors?.map((name) => ({ name })) || [{ name: 'PayeTax' }],
+          authors: authorNames,
           section,
           tags,
         }
@@ -123,7 +125,7 @@ export function generateMetadata({
         },
     description,
     // Authorship and publishing information
-    authors: authors?.map((name) => ({ name })) || [{ name: 'PayeTax' }],
+    authors: authorDescriptors,
     creator: 'PayeTax',
     publisher: 'PayeTax',
 
