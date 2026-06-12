@@ -53,6 +53,28 @@ function formatPercent(covered: number, total: number): string {
   return `${((covered / total) * 100).toFixed(2)}%`;
 }
 
+function readLcovLineCoverage(): { covered: number; total: number } | null {
+  const lcovPath = join(ROOT, 'audit-outputs/coverage/lcov.info');
+  if (!existsSync(lcovPath)) {
+    return null;
+  }
+
+  const content = readFileSync(lcovPath, 'utf-8');
+  let covered = 0;
+  let total = 0;
+
+  for (const line of content.split('\n')) {
+    if (line.startsWith('LH:')) {
+      covered += Number(line.slice(3));
+    }
+    if (line.startsWith('LF:')) {
+      total += Number(line.slice(3));
+    }
+  }
+
+  return total > 0 ? { covered, total } : null;
+}
+
 function printCoverageSummary(): void {
   const coveragePath = join(ROOT, 'audit-outputs/coverage/coverage-final.json');
   if (!existsSync(coveragePath)) {
@@ -102,11 +124,19 @@ function printCoverageSummary(): void {
     }
   }
 
+  const lcovLineCoverage = totalLines === 0 ? readLcovLineCoverage() : null;
+
   console.log('Coverage (from audit-outputs/coverage/coverage-final.json):');
   console.log(`  - statements: ${formatPercent(coveredStatements, totalStatements)}`);
   console.log(`  - branches:   ${formatPercent(coveredBranches, totalBranches)}`);
   console.log(`  - functions:  ${formatPercent(coveredFunctions, totalFunctions)}`);
-  console.log(`  - lines:      ${formatPercent(coveredLines, totalLines)}`);
+  console.log(
+    `  - lines:      ${
+      lcovLineCoverage
+        ? formatPercent(lcovLineCoverage.covered, lcovLineCoverage.total)
+        : formatPercent(coveredLines, totalLines)
+    }`,
+  );
 }
 
 function printE2ELastRun(): void {
@@ -116,6 +146,7 @@ function printE2ELastRun(): void {
     return;
   }
 
+  const lastRunStat = statSync(lastRunPath);
   const lastRun = JSON.parse(readFileSync(lastRunPath, 'utf-8')) as {
     status?: string;
     failedTests?: unknown[];
@@ -123,7 +154,7 @@ function printE2ELastRun(): void {
 
   const failedCount = Array.isArray(lastRun.failedTests) ? lastRun.failedTests.length : 0;
   console.log(
-    `Playwright last run: status=${lastRun.status ?? 'unknown'}, failedTests=${failedCount}`,
+    `Playwright last run: status=${lastRun.status ?? 'unknown'}, failedTests=${failedCount}, artifactUpdated=${lastRunStat.mtime.toISOString()}`,
   );
 }
 

@@ -108,9 +108,8 @@ Symptoms:
 - Operational health route returns the wrong status for missing/invalid secrets.
 
 Primary detectors:
-- Jest: Sentry scope, env, and rate-limit tests under `src/lib/__tests__/` and `src/lib/security/__tests__/`
+- Jest: Sentry scope, env, rate-limit, and rate-limit health route tests under `src/lib/__tests__/`, `src/lib/security/__tests__/`, and `src/app/api/ops/rate-limit-health/route.test.ts`
 - Scripts: `bun run check:env-contract`, `bun run check-version`
-- Next test to add if this endpoint changes: `src/app/api/ops/rate-limit-health/route.ts`
 
 ## Adding A New Test
 
