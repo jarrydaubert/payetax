@@ -20,11 +20,11 @@ Current automated evidence expected before broad changes merge:
 - `bun run test:full` for broad calculation, browser, route, or refactor changes
 - `bun audit` or `bun run audit:deps` when dependencies change
 
-Known targeted hardening gap:
+Tracked automated hardening gaps:
 
-- `src/app/api/ops/rate-limit-health/route.ts` does not yet have a dedicated route-level test.
+- None are currently open in this guide.
 
-The shared Upstash health probe and distributed limiter behaviour are covered in `src/lib/__tests__/rateLimit.test.ts`, and the production route is documented for manual operational checks. A dedicated route test would still be useful if this endpoint changes.
+Manual production confirmations still matter for provider and observability wiring, especially email deliverability and Sentry/Vercel dashboard visibility.
 
 ## Philosophy
 
@@ -171,6 +171,7 @@ Primary files and scripts:
 - `src/lib/security/__tests__/`
 - `src/lib/validation/__tests__/emailValidation.test.ts`
 - `src/lib/__tests__/rateLimit.test.ts`
+- `src/app/api/ops/rate-limit-health/route.test.ts`
 - `scripts/check-analytics-env-sync.ts`
 - `scripts/check-analytics-events.ts`
 - `scripts/check-version.ts`
@@ -328,7 +329,7 @@ bun run bundle:monitor      # Build + bundle threshold analysis
 
 ```bash
 bun run check:test-skips    # Block unapproved skip/todo debt
-bun run test:metrics        # Print test inventory, skip/todo counts, last E2E status, coverage summary
+bun run test:metrics        # Print test inventory, skip/todo counts, artifact-based last E2E status, coverage summary
 bun run clean:test          # Clear unit and E2E artifacts
 bun run test:e2e:clear      # Clear Playwright artifacts and storage state
 ```
@@ -395,6 +396,7 @@ Do not add low-value tests only to raise coverage. Add tests that catch a named 
 ## Skip And Todo Policy
 
 - No new `test.skip`, `it.skip`, `describe.skip`, or `it.todo` without explicit approval.
+- No committed `test.only`, `it.only`, or `describe.only`.
 - E2E skips must include a reason.
 - Skip/todo debt must include an issue tag such as `PAYTAX-###` or `P#-#`.
 - Commented-out assertions are not allowed in executable test files.
@@ -417,20 +419,15 @@ Use this rule of thumb:
 - Sitemap, robots, metadata, env, analytics, or config drift: route/config/contract test.
 - Provider delivery behaviour: unit/integration test with mocked provider responses, plus manual production confirmation when needed.
 
-## Current Gaps And Next Tests To Add
+## Manual Evidence To Capture
 
-These are useful next tests when the relevant boundary changes:
+These are useful next checks when the relevant boundary changes:
 
-1. Rate-limit health route.
-   - File: `src/app/api/ops/rate-limit-health/route.ts`.
-   - Why: this is an operational API boundary. The shared probe is covered, but the route wrapper should keep its secret-gating behaviour.
-   - Test with: missing secret, wrong secret, correct secret, Upstash unavailable, and healthy Upstash response.
-
-2. Production email smoke.
+1. Production email smoke.
    - Why: mocked Brevo boundary tests prove code paths, but not deliverability.
    - Test with: manual post-release send to a controlled address, then document result in release evidence.
 
-3. Live monitoring confirmation.
+2. Live monitoring confirmation.
    - Why: calculator-focused Sentry and Vercel env wiring are production configuration, not fully provable in local unit tests.
    - Test with: post-release Sentry event confirmation on PAYE or Director calculator flows and production env review.
 

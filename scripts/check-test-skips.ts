@@ -3,6 +3,7 @@
  * Guardrail: prevent hidden test-confidence regressions.
  *
  * Enforces:
+ * - No focused `.only` tests.
  * - No new skip/todo debt beyond allowlisted baseline.
  * - No bare `test.skip()` in E2E tests (must include reason).
  * - Skip/todo entries include an issue tag (PAYTAX-### or P#-#).
@@ -21,6 +22,7 @@ const TEST_ROOTS = [join(ROOT, 'src'), join(ROOT, 'e2e')];
 const TEST_EXTENSIONS = new Set(['.ts', '.tsx']);
 const TEST_FILE_SUFFIXES = ['.test.ts', '.test.tsx', '.spec.ts', '.spec.tsx'];
 
+const ONLY_REGEX = /\b(?:it|test|describe)\.only\s*\(/g;
 const SKIP_REGEX = /\b(?:it|test|describe)\.skip\s*\(/g;
 const TODO_REGEX = /\b(?:it|test)\.todo\s*\(/g;
 const BARE_PLAYWRIGHT_SKIP_REGEX = /test\.skip\(\s*\)/g;
@@ -89,8 +91,20 @@ function main(): void {
   for (const file of files) {
     const relPath = relative(ROOT, file);
     const content = readFileSync(file, 'utf-8');
+    const only = countMatches(content, ONLY_REGEX);
     const skip = countMatches(content, SKIP_REGEX);
     const todo = countMatches(content, TODO_REGEX);
+    const commentedExpectCount = countMatches(content, COMMENTED_EXPECT_REGEX);
+
+    if (only > 0) {
+      errors.push(`${relPath} contains ${only} focused .only test(s). Remove before commit.`);
+    }
+
+    if (commentedExpectCount > 0) {
+      errors.push(
+        `${relPath} contains ${commentedExpectCount} commented-out assertion(s). Remove them or convert to executable tests/todos.`,
+      );
+    }
 
     if (skip === 0 && todo === 0) {
       continue;
@@ -99,13 +113,6 @@ function main(): void {
     if (relPath.startsWith('e2e/') && BARE_PLAYWRIGHT_SKIP_REGEX.test(content)) {
       errors.push(
         `${relPath} contains bare test.skip() calls. Use test.skip(condition, 'reason') or test.skip(true, 'reason').`,
-      );
-    }
-
-    const commentedExpectCount = countMatches(content, COMMENTED_EXPECT_REGEX);
-    if (commentedExpectCount > 0) {
-      errors.push(
-        `${relPath} contains ${commentedExpectCount} commented-out assertion(s). Remove them or convert to executable tests/todos.`,
       );
     }
 
