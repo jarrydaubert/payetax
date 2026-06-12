@@ -99,7 +99,6 @@ Symptoms:
 
 Primary detectors:
 - Jest: `src/lib/email/__tests__/`
-- Next tests to add: mocked-provider tests for `src/lib/email/emailDelivery.ts` and `src/lib/email/outboundResultsDelivery.ts`
 
 ### OBSERVABILITY-CONTRACT (Monitoring or operational health drift)
 
@@ -111,7 +110,7 @@ Symptoms:
 Primary detectors:
 - Jest: Sentry scope, env, and rate-limit tests under `src/lib/__tests__/` and `src/lib/security/__tests__/`
 - Scripts: `bun run check:env-contract`, `bun run check-version`
-- Next tests to add: `src/app/api/ops/rate-limit-health/route.ts`
+- Next test to add if this endpoint changes: `src/app/api/ops/rate-limit-health/route.ts`
 
 ## Adding A New Test
 

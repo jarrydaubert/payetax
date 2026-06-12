@@ -10,8 +10,8 @@ PayeTax is now a public R&D project.
 - Keep Vercel Web Analytics, Vercel Speed Insights, GA4, calculator-focused Sentry, and Upstash where they support quality and debugging.
 - Avoid growth plumbing that does not serve the R&D goal.
 
-## Current Risks
+## Current Watchpoints
 
-- Vercel env values need confirming after the account migration.
-- Brevo API needs a confirmed key and verified sender.
-- Upstash configuration should be checked against production errors.
+- Brevo API, Upstash, Sentry, GA4, Vercel Web Analytics, and Vercel Speed Insights are wired for the current Vercel project.
+- Post-release validation should still include a real PAYE email send, a Director email send, and the rate-limit health endpoint when env values change.
+- Vercel Speed Insights data is available through the Vercel dashboard; CLI metric queries require an Observability Plus plan.
