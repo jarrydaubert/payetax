@@ -77,7 +77,18 @@ describe('sitemap', () => {
 
     expect(urls).toContain('https://example.com/');
     expect(urls).toContain('https://example.com/tools');
-    expect(urls.some((url) => url.includes('/calculator/'))).toBe(false);
-    expect(urls.some((url) => url.includes('/scenarios'))).toBe(false);
+    const retiredRouteFragments = [
+      '/calculator',
+      '/calculator/',
+      '/scenarios',
+      '/alternatives',
+      '/best-for',
+      '/best-uk-tax-calculators',
+      '/vs',
+    ];
+
+    for (const fragment of retiredRouteFragments) {
+      expect(urls.some((url) => url.includes(fragment))).toBe(false);
+    }
   });
 });

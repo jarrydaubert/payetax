@@ -19,10 +19,9 @@ describe('Metadata Module', () => {
     test('should generate default metadata', () => {
       const metadata = generateMetadata({});
 
-      expect(metadata.title).toEqual({
-        default: 'Free UK PAYE Tax Calculator 2026-2027 | Salary & Take-Home Pay | PayeTax',
-        template: '%s | PayeTax',
-      });
+      expect(metadata.title).toBe(
+        'Free UK PAYE Tax Calculator 2026-2027 | Salary & Take-Home Pay | PayeTax',
+      );
       expect(metadata.description).toContain('Free UK PAYE tax calculator');
       expect(metadata).not.toHaveProperty('keywords');
       expect(metadata.metadataBase).toBeInstanceOf(URL);
@@ -60,10 +59,7 @@ describe('Metadata Module', () => {
         title: 'Custom Page Title',
       });
 
-      expect(metadata.title).toEqual({
-        default: 'Custom Page Title | PayeTax',
-        template: '%s | PayeTax',
-      });
+      expect(metadata.title).toBe('Custom Page Title | PayeTax');
     });
 
     test('should not duplicate site name when already included', () => {
@@ -71,7 +67,6 @@ describe('Metadata Module', () => {
         title: 'Custom Page | PayeTax',
       });
 
-      // When title already contains PayeTax, returns string to avoid template duplication
       expect(metadata.title).toBe('Custom Page | PayeTax');
     });
 

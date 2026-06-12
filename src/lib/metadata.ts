@@ -112,17 +112,9 @@ export function generateMetadata({
         }
       : undefined;
 
-  // Generate base metadata
-  // If title already has PayeTax, use string to avoid template duplication
-  // If not, use object with template for child pages
   return {
     // Basic metadata
-    title: hasPayeTax
-      ? formattedTitle
-      : {
-          default: formattedTitle,
-          template: '%s | PayeTax',
-        },
+    title: formattedTitle,
     description,
     // Authorship and publishing information
     authors: authorDescriptors,

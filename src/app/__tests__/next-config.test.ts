@@ -5,7 +5,7 @@ jest.mock('@sentry/nextjs', () => ({
 jest.mock('@next/bundle-analyzer', () => () => (config: unknown) => config);
 
 describe('next.config canonical redirects', () => {
-  it('redirects stale blog category URLs to live category hubs', async () => {
+  it('redirects stale URLs to retained canonical surfaces', async () => {
     const { default: nextConfig } = await import('../../../next.config');
     const redirects = await nextConfig.redirects?.();
 
@@ -14,6 +14,61 @@ describe('next.config canonical redirects', () => {
         expect.objectContaining({
           source: '/calculator',
           destination: '/#tax-calculator',
+          permanent: true,
+        }),
+        expect.objectContaining({
+          source: '/calculator/:path*',
+          destination: '/#tax-calculator',
+          permanent: true,
+        }),
+        expect.objectContaining({
+          source: '/scenarios',
+          destination: '/#tax-calculator',
+          permanent: true,
+        }),
+        expect.objectContaining({
+          source: '/scenarios/:path*',
+          destination: '/#tax-calculator',
+          permanent: true,
+        }),
+        expect.objectContaining({
+          source: '/alternatives',
+          destination: '/tools',
+          permanent: true,
+        }),
+        expect.objectContaining({
+          source: '/alternatives/:path*',
+          destination: '/tools',
+          permanent: true,
+        }),
+        expect.objectContaining({
+          source: '/best-for',
+          destination: '/tools',
+          permanent: true,
+        }),
+        expect.objectContaining({
+          source: '/best-for/:path*',
+          destination: '/tools',
+          permanent: true,
+        }),
+        expect.objectContaining({
+          source: '/best-uk-tax-calculators',
+          destination: '/tools',
+          permanent: true,
+        }),
+        expect.objectContaining({
+          source: '/best-uk-tax-calculators/:path*',
+          destination: '/tools',
+          permanent: true,
+        }),
+        expect.objectContaining({
+          source: '/vs',
+          destination: '/tools',
+          permanent: true,
+        }),
+        expect.objectContaining({
+          source: '/vs/:path*',
+          destination: '/tools',
           permanent: true,
         }),
         expect.objectContaining({
