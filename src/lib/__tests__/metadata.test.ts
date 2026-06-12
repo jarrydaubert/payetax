@@ -54,6 +54,22 @@ describe('Metadata Module', () => {
       ]);
     });
 
+    test('should fall back to Vercel production URL when public site URL is unset', () => {
+      delete require.cache[require.resolve('../metadata')];
+      delete process.env.NEXT_PUBLIC_SITE_URL;
+      process.env.VERCEL_PROJECT_PRODUCTION_URL = 'production-domain.example';
+
+      const {
+        generateMetadata: newGenerateMetadata,
+        SITE_URL: newSiteUrl,
+      } = require('../metadata');
+      const metadata = newGenerateMetadata({ pathname: '/test' });
+
+      expect(newSiteUrl).toBe('https://production-domain.example');
+      expect(metadata.alternates?.canonical).toBe('https://production-domain.example/test');
+      expect(metadata.openGraph?.url).toBe('https://production-domain.example/test');
+    });
+
     test('should format title correctly when site name not included', () => {
       const metadata = generateMetadata({
         title: 'Custom Page Title',

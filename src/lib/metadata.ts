@@ -11,7 +11,17 @@ import type { Metadata, Viewport } from 'next';
 import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
 
 // Base domain for absolute URLs - exported for use in structured data
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://payetax.co.uk';
+function resolveSiteUrl() {
+  const rawSiteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : 'https://payetax.co.uk');
+
+  return rawSiteUrl.replace(/\/+$/, '');
+}
+
+export const SITE_URL = resolveSiteUrl();
 
 // Logo URL for structured data
 export const LOGO_URL = `${SITE_URL}/logo.png`;

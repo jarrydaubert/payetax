@@ -3,6 +3,7 @@
 import type { MetadataRoute } from 'next';
 import { RATES_LAST_VERIFIED } from '@/constants/freshness';
 import { getBlogCategories, getBlogPosts } from '@/lib/blog';
+import { SITE_URL } from '@/lib/metadata';
 
 export const revalidate = 86400;
 
@@ -14,12 +15,6 @@ interface SitemapEntry {
   changeFrequency: SitemapFrequency;
   priority: number;
 }
-
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  (process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : 'https://payetax.co.uk');
 
 function normaliseSitemapEntry(entry: SitemapEntry): MetadataRoute.Sitemap[number] {
   return {
