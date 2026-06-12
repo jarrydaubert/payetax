@@ -8,7 +8,7 @@ The aim is not to look busy. The aim is to prove that the calculator, surroundin
 
 ## Current Audit Snapshot
 
-Last audited: 2026-06-06.
+Last audited: 2026-06-12.
 
 Use this section as the current testing map, not as a frozen release certificate. Exact suite counts, coverage percentages, and generated route counts move as the app changes. Capture those run-specific numbers in PRs or release evidence instead of letting this guide go stale.
 
@@ -20,13 +20,11 @@ Current automated evidence expected before broad changes merge:
 - `bun run test:full` for broad calculation, browser, route, or refactor changes
 - `bun audit` or `bun run audit:deps` when dependencies change
 
-Known automated-coverage gaps:
+Known targeted hardening gap:
 
-- `src/app/api/ops/rate-limit-health/route.ts` is not unit-covered.
-- `src/lib/email/emailDelivery.ts` is not unit-covered.
-- `src/lib/email/outboundResultsDelivery.ts` is not unit-covered.
+- `src/app/api/ops/rate-limit-health/route.ts` does not yet have a dedicated route-level test.
 
-These gaps are tracked as useful next work because email delivery and operational health are production boundaries. They should be tested with mocked provider/network behaviour, not real email sends.
+The shared Upstash health probe and distributed limiter behaviour are covered in `src/lib/__tests__/rateLimit.test.ts`, and the production route is documented for manual operational checks. A dedicated route test would still be useful if this endpoint changes.
 
 ## Philosophy
 
@@ -421,23 +419,18 @@ Use this rule of thumb:
 
 ## Current Gaps And Next Tests To Add
 
-These are the most useful next automated tests:
+These are useful next tests when the relevant boundary changes:
 
-1. Email delivery boundary.
-   - Files: `src/lib/email/emailDelivery.ts`, `src/lib/email/outboundResultsDelivery.ts`.
-   - Why: production email depends on Brevo API configuration and provider responses.
-   - Test with: mocked `fetch`, configured/unconfigured env, success, provider failure, timeout/error path, and sanitised logging.
-
-2. Rate-limit health route.
+1. Rate-limit health route.
    - File: `src/app/api/ops/rate-limit-health/route.ts`.
-   - Why: this is an operational API boundary.
+   - Why: this is an operational API boundary. The shared probe is covered, but the route wrapper should keep its secret-gating behaviour.
    - Test with: missing secret, wrong secret, correct secret, Upstash unavailable, and healthy Upstash response.
 
-3. Production email smoke.
-   - Why: mocks prove code paths, but not deliverability.
+2. Production email smoke.
+   - Why: mocked Brevo boundary tests prove code paths, but not deliverability.
    - Test with: manual post-release send to a controlled address, then document result in release evidence.
 
-4. Live monitoring confirmation.
+3. Live monitoring confirmation.
    - Why: calculator-focused Sentry and Vercel env wiring are production configuration, not fully provable in local unit tests.
    - Test with: post-release Sentry event confirmation on PAYE or Director calculator flows and production env review.
 

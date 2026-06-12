@@ -21,7 +21,7 @@
 ```md
 ## Backlog
 
-Refs: P1-1
+Refs: BACKLOG-ID
 
 ## Why
 

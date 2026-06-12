@@ -2,17 +2,14 @@
 
 Current backlog for the public R&D version of PayeTax.
 
-## P1
+There are no active backlog items at the moment.
 
-| ID | Item | Acceptance |
-| --- | --- | --- |
-| P1-1 | Finish Brevo API cutover | PAYE results and director results use the shared outbound email boundary and pass tests. |
-| P1-2 | Verify Vercel env and project link | Current Vercel project has Brevo, Vercel Web Analytics, Vercel Speed Insights, GA4, calculator-focused Sentry, and Upstash configured without stale local project links. |
-| P1-3 | Recheck production rate limiting | Upstash-backed public mutation routes return expected health and limiter behaviour after env migration. |
+## Recently Closed
 
-## P2
+- Brevo API cutover is complete for PAYE and Director results email.
+- Email delivery has focused boundary tests for configured, unconfigured, success, provider failure, and network failure paths.
+- The current Vercel project link and production/preview env names have been verified for Brevo, Vercel Web Analytics, Vercel Speed Insights, GA4, calculator-focused Sentry, and Upstash.
+- Upstash-backed rate limiting has a production health endpoint and covered shared limiter diagnostics.
+- Public R&D docs have been aligned with the current repo scope.
 
-| ID | Item | Acceptance |
-| --- | --- | --- |
-| P2-1 | Tighten public docs for R&D positioning | README, AGENTS, ops, testing, and env docs stay aligned with the public repo scope. |
-| P2-2 | Add focused tests for email delivery boundary | Unit tests cover configured, unconfigured, and delivery-failed Brevo API outcomes without real network calls. |
+New work should add a small, concrete item here only when it is not going straight into an issue or pull request.
