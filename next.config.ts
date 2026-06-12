@@ -112,6 +112,62 @@ const nextConfig: NextConfig = {
         destination: '/#tax-calculator',
         permanent: true,
       },
+      // Retired programmatic SEO routes should resolve to retained surfaces, not 404.
+      {
+        source: '/calculator/:path*',
+        destination: '/#tax-calculator',
+        permanent: true,
+      },
+      {
+        source: '/scenarios',
+        destination: '/#tax-calculator',
+        permanent: true,
+      },
+      {
+        source: '/scenarios/:path*',
+        destination: '/#tax-calculator',
+        permanent: true,
+      },
+      {
+        source: '/alternatives',
+        destination: '/tools',
+        permanent: true,
+      },
+      {
+        source: '/alternatives/:path*',
+        destination: '/tools',
+        permanent: true,
+      },
+      {
+        source: '/best-for',
+        destination: '/tools',
+        permanent: true,
+      },
+      {
+        source: '/best-for/:path*',
+        destination: '/tools',
+        permanent: true,
+      },
+      {
+        source: '/best-uk-tax-calculators',
+        destination: '/tools',
+        permanent: true,
+      },
+      {
+        source: '/best-uk-tax-calculators/:path*',
+        destination: '/tools',
+        permanent: true,
+      },
+      {
+        source: '/vs',
+        destination: '/tools',
+        permanent: true,
+      },
+      {
+        source: '/vs/:path*',
+        destination: '/tools',
+        permanent: true,
+      },
       {
         source: '/blog/category/tax-tools',
         destination: '/blog/category/tax-basics',
