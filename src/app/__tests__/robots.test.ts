@@ -10,16 +10,25 @@ describe('robots metadata', () => {
       expect.arrayContaining([
         expect.objectContaining({
           userAgent: '*',
-          allow: '/',
-          disallow: expect.arrayContaining(['/_vercel/', '/monitoring']),
+          allow: expect.arrayContaining(['/', '/api/og', '/api/tax-rates']),
+          disallow: expect.arrayContaining(['/api/', '/_vercel/', '/monitoring']),
         }),
       ]),
     );
     expect(result.rules).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ userAgent: 'OAI-SearchBot', allow: '/' }),
-        expect.objectContaining({ userAgent: 'Claude-SearchBot', allow: '/' }),
-        expect.objectContaining({ userAgent: 'PerplexityBot', allow: '/' }),
+        expect.objectContaining({
+          userAgent: 'OAI-SearchBot',
+          allow: expect.arrayContaining(['/api/og', '/api/tax-rates']),
+        }),
+        expect.objectContaining({
+          userAgent: 'Claude-SearchBot',
+          allow: expect.arrayContaining(['/api/og', '/api/tax-rates']),
+        }),
+        expect.objectContaining({
+          userAgent: 'PerplexityBot',
+          allow: expect.arrayContaining(['/api/og', '/api/tax-rates']),
+        }),
       ]),
     );
     expect(rules.map((rule) => rule.userAgent)).not.toEqual(

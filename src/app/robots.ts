@@ -18,7 +18,10 @@ import { SITE_URL } from '@/lib/metadata';
  * - Apple: https://support.apple.com/en-gb/119829
  */
 
-// Shared disallow list for all allowed crawlers
+// Public API resources used by crawlers for social previews and Dataset schema.
+const ALLOW_PATHS = ['/', '/api/og', '/api/tax-rates'];
+
+// Shared disallow list for all allowed crawlers.
 const DISALLOW_PATHS = [
   '/api/',
   '/admin/',
@@ -35,19 +38,19 @@ export default function robots(): MetadataRoute.Robots {
       // Default rules for all crawlers
       {
         userAgent: '*',
-        allow: '/',
+        allow: ALLOW_PATHS,
         disallow: DISALLOW_PATHS,
       },
 
       // Core search engines
       {
         userAgent: 'Googlebot',
-        allow: '/',
+        allow: ALLOW_PATHS,
         disallow: DISALLOW_PATHS,
       },
       {
         userAgent: 'Bingbot',
-        allow: '/',
+        allow: ALLOW_PATHS,
         disallow: DISALLOW_PATHS,
       },
 
@@ -56,7 +59,7 @@ export default function robots(): MetadataRoute.Robots {
       // ChatGPT-User = user-triggered fetch (robots.txt may not apply)
       {
         userAgent: 'OAI-SearchBot',
-        allow: '/',
+        allow: ALLOW_PATHS,
         disallow: DISALLOW_PATHS,
       },
 
@@ -65,7 +68,7 @@ export default function robots(): MetadataRoute.Robots {
       // Claude-User = user-triggered fetch (robots.txt may not apply)
       {
         userAgent: 'Claude-SearchBot',
-        allow: '/',
+        allow: ALLOW_PATHS,
         disallow: DISALLOW_PATHS,
       },
 
@@ -74,7 +77,7 @@ export default function robots(): MetadataRoute.Robots {
       // Perplexity-User = user-triggered fetch (ignores robots.txt per their docs)
       {
         userAgent: 'PerplexityBot',
-        allow: '/',
+        allow: ALLOW_PATHS,
         disallow: DISALLOW_PATHS,
       },
     ],
