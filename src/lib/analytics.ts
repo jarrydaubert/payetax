@@ -233,10 +233,14 @@ export function trackPerformanceMetric(
 }
 
 /**
- * Track Core Web Vitals and page performance metrics
+ * Track lightweight GA4 page timing metrics.
  *
  * Call this from Analytics.tsx after consent is granted.
  * Do NOT call on module load (avoid side effects).
+ *
+ * Core Web Vitals are collected by Vercel Speed Insights. Keep GA4 timing
+ * deliberately narrow so consented sessions do not duplicate LCP/FCP beacons
+ * or run extra PerformanceObserver work on every page.
  */
 export function trackCoreWebVitals(): void {
   try {
@@ -263,44 +267,13 @@ export function trackCoreWebVitals(): void {
         trackPerformanceMetric('time_to_interactive', timeToInteractive);
       }
     }
-
-    // Track First Contentful Paint (FCP)
-    const fcpEntry = performance.getEntriesByName('first-contentful-paint')[0];
-    if (fcpEntry?.startTime) {
-      trackPerformanceMetric('first_contentful_paint', fcpEntry.startTime);
-    }
-
-    // Track Largest Contentful Paint (LCP) if available
-    if ('PerformanceObserver' in window) {
-      try {
-        const lcpObserver = new PerformanceObserver((list) => {
-          const entries = list.getEntries();
-          const lastEntry = entries[entries.length - 1] as PerformanceEntry & {
-            startTime: number;
-            renderTime?: number;
-            loadTime?: number;
-          };
-          if (lastEntry) {
-            // startTime is the canonical LCP value; renderTime/loadTime are fallbacks
-            const lcp = lastEntry.startTime ?? lastEntry.renderTime ?? lastEntry.loadTime ?? 0;
-            if (lcp > 0) {
-              trackPerformanceMetric('largest_contentful_paint', lcp);
-            }
-            lcpObserver.disconnect();
-          }
-        });
-        lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true });
-      } catch {
-        // LCP not supported
-      }
-    }
   } catch (error) {
     logAnalyticsWarning('Performance metrics tracking error:', error);
   }
 }
 
 /**
- * Initialize Core Web Vitals tracking (non-blocking)
+ * Initialize lightweight GA4 page timing tracking (non-blocking).
  *
  * Call this from Analytics.tsx once after consent is granted.
  * Uses requestIdleCallback to avoid blocking main thread.

@@ -1,13 +1,8 @@
 import type { Event } from '@sentry/nextjs';
 
-const MONITORED_EXACT_PATHS = new Set([
-  '/',
-  '/calculator',
-  '/api/send-results',
-  '/api/send-director-results',
-]);
+const MONITORED_EXACT_PATHS = new Set(['/', '/api/send-results', '/api/send-director-results']);
 
-const MONITORED_PATH_PREFIXES = ['/tools/director-guide'];
+const MONITORED_PATH_PREFIXES = ['/blog', '/tools'];
 
 function stripMethod(value: string): string {
   const methodMatch = value.match(

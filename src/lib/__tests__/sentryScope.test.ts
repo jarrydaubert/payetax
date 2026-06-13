@@ -17,9 +17,15 @@ describe('sentryScope', () => {
 
   it.each([
     '/',
-    '/calculator',
+    '/blog',
+    '/blog/tax-codes',
+    '/tools',
     '/tools/director-guide',
     '/tools/director-guide/company',
+    '/tools/scottish-tax-calculator',
+    '/tools/national-insurance-calculator',
+    '/tools/marriage-allowance-calculator',
+    '/tools/tax-code-decoder',
     '/api/send-results',
     '/api/send-director-results',
   ])('keeps calculator-related path %s reportable', (path) => {
@@ -27,11 +33,9 @@ describe('sentryScope', () => {
   });
 
   it.each([
-    '/blog',
-    '/blog/tax-codes',
+    '/calculator',
     '/about',
     '/privacy',
-    '/tools/tax-code-decoder',
   ])('treats non-calculator path %s as unmonitored', (path) => {
     expect(isSentryMonitoredPath(path)).toBe(false);
   });
@@ -39,7 +43,7 @@ describe('sentryScope', () => {
   it('drops events for unmonitored request paths', () => {
     const event: Event = {
       request: {
-        url: 'https://payetax.co.uk/blog/tax-codes',
+        url: 'https://payetax.co.uk/about',
       },
     };
 

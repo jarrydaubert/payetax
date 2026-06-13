@@ -172,7 +172,8 @@ export function Analytics() {
     };
   }, [pathname]);
 
-  // Track whether we've initialized Core Web Vitals (only do once)
+  // Track whether we've initialized lightweight GA4 page timings (only do once).
+  // Vercel Speed Insights owns Core Web Vitals.
   const vitalsInitialized = useRef(false);
 
   // Initialize consent state on mount. GA4 scripts are only loaded after consent;

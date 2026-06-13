@@ -12,7 +12,6 @@ export const ANALYTICS_EVENT_ACTIONS = [
   'calculator_error',
   'calculator_start',
   'calculator_usage',
-  'cta_clicked',
   'director_guide_buffer_shortfall_shown',
   'director_guide_mode_changed',
   'director_guide_safe_draw_calculated',
