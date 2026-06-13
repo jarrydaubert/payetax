@@ -1,7 +1,12 @@
 {
   "$schema": "./node_modules/knip/schema.json",
   "ignoreFiles": ["src/lib/env.ts", "public/register-sw.js", "public/sw.js"],
-  "ignoreBinaries": ["open", "scripts/import-blog-image.sh"],
+  "ignoreBinaries": [
+    "open",
+    "scripts/import-blog-image.sh",
+    "scripts/verify-rate-limit.ts",
+    "vercel"
+  ],
   "ignoreIssues": {
     "**/*.test.ts": ["unlisted"],
     "**/*.test.tsx": ["unlisted"],
