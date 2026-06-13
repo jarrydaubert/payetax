@@ -82,8 +82,7 @@
     container.id = 'sw-update-notification';
     container.setAttribute('role', 'status');
     container.setAttribute('aria-live', 'polite');
-    container.innerHTML =
-      '<div style="position:fixed;top:20px;right:20px;background:#1f2937;color:white;padding:16px 20px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3);z-index:10000;max-width:300px;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,sans-serif;font-size:14px;border:1px solid #374151"><div style="margin-bottom:12px"><strong>🚀 Update Available</strong></div><div style="margin-bottom:12px;opacity:0.9">A new version of PayeTax is ready!</div><div style="display:flex;gap:8px"><button id="sw-update-btn" style="background:#3b82f6;color:white;border:none;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:600">Update</button><button id="sw-dismiss-btn" style="background:transparent;color:#9ca3af;border:1px solid #4b5563;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:12px">Later</button></div></div>';
+    container.innerHTML = `<div style="position:fixed;top:20px;right:20px;background:#f8f5ed;color:#07111f;padding:16px 20px;border-radius:4px;box-shadow:0 8px 20px rgba(7,17,31,0.12);z-index:10000;max-width:320px;font-family:'Public Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px;border:1px solid #c8c0b3;border-left:4px solid #123a66"><div style="margin-bottom:12px"><strong>Update available</strong></div><div style="margin-bottom:12px;color:#344054">A new version of PayeTax is ready.</div><div style="display:flex;gap:8px"><button id="sw-update-btn" style="background:#123a66;color:#ffffff;border:1px solid #123a66;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:12px;font-weight:700">Update</button><button id="sw-dismiss-btn" style="background:#fffaf1;color:#344054;border:1px solid #c8c0b3;padding:8px 16px;border-radius:4px;cursor:pointer;font-size:12px">Later</button></div></div>`;
     document.body.appendChild(container);
 
     document.getElementById('sw-update-btn').addEventListener('click', () => {
@@ -136,7 +135,7 @@
     const container = document.createElement('div');
     container.setAttribute('role', 'status');
     container.setAttribute('aria-live', 'polite');
-    container.innerHTML = `<div style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:${isOnline ? '#10b981' : '#f59e0b'};color:white;padding:12px 20px;border-radius:6px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px;font-weight:500;z-index:10001;box-shadow:0 4px 12px rgba(0,0,0,0.2)">${isOnline ? '🌐 Back Online' : '📱 Offline Mode'}</div>`;
+    container.innerHTML = `<div style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#f8f5ed;color:#07111f;padding:12px 20px;border-radius:4px;font-family:'Public Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:14px;font-weight:700;z-index:10001;border:1px solid #c8c0b3;border-left:4px solid ${isOnline ? '#1f7a4d' : '#b7791f'};box-shadow:0 8px 20px rgba(7,17,31,0.12)">${isOnline ? 'Back online' : 'Offline mode'}</div>`;
     document.body.appendChild(container);
     setTimeout(() => {
       container.remove();

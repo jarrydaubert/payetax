@@ -58,7 +58,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         {/* PWA Meta Tags */}
         <meta name='application-name' content='PayeTax' />
         <meta name='apple-mobile-web-app-capable' content='yes' />
-        <meta name='apple-mobile-web-app-status-bar-style' content='black-translucent' />
+        <meta name='apple-mobile-web-app-status-bar-style' content='default' />
         <meta name='apple-mobile-web-app-title' content='PayeTax' />
         <meta name='mobile-web-app-capable' content='yes' />
         <meta name='msapplication-TileColor' content='#f8f5ed' />

@@ -1,5 +1,5 @@
 // Service Worker for PayeTax - UK PAYE Tax Calculator
-// Optimized for 2025 PWA best practices
+// Lean offline support for the public calculator and guide surfaces.
 
 const CACHE_NAME = 'payetax-v5.1.4';
 const STATIC_CACHE_NAME = 'payetax-static-v5.1.4';
@@ -8,6 +8,7 @@ const API_CACHE_NAME = 'payetax-api-v5.1.4';
 // Max entries per cache (cheaper than size-based eviction)
 const MAX_CACHE_ENTRIES = 100;
 const MAX_STATIC_ENTRIES = 200;
+const OFFLINE_FALLBACK_URL = '/offline';
 
 const isDev = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
 const devLog = (...args) => {
@@ -17,10 +18,13 @@ const devLog = (...args) => {
 // Assets to precache on install
 const PRECACHE_ASSETS = [
   '/',
+  OFFLINE_FALLBACK_URL,
   '/manifest.json',
   '/favicon.ico',
   '/android-chrome-192x192.png',
+  '/android-chrome-maskable-192x192.png',
   '/android-chrome-512x512.png',
+  '/android-chrome-maskable-512x512.png',
   '/apple-touch-icon.png',
 ];
 
@@ -154,7 +158,8 @@ async function handleNavigationWithPreload(request, event) {
   } catch (error) {
     devLog('Navigation failed, trying cache:', error);
     const cachedResponse = await caches.match(request);
-    return cachedResponse || caches.match('/');
+    const offlineResponse = await caches.match(OFFLINE_FALLBACK_URL);
+    return cachedResponse || offlineResponse || caches.match('/');
   }
 }
 
@@ -172,7 +177,10 @@ async function networkFirstStrategy(request) {
     devLog('Network failed, trying cache:', request.url);
     const cachedResponse = await caches.match(request);
     if (cachedResponse) return cachedResponse;
-    if (request.mode === 'navigate') return caches.match('/');
+    if (request.mode === 'navigate') {
+      const offlineResponse = await caches.match(OFFLINE_FALLBACK_URL);
+      return offlineResponse || caches.match('/');
+    }
     throw error;
   }
 }
@@ -262,76 +270,6 @@ function shouldUseCacheFirst(url) {
 
 function isAPIEndpoint(url) {
   return API_ENDPOINTS.some((endpoint) => url.includes(endpoint));
-}
-
-// Background sync for offline submissions
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'feedback-sync') {
-    event.waitUntil(syncFeedback());
-  }
-});
-
-async function syncFeedback() {
-  devLog('Syncing offline feedback submissions');
-  // Implementation would go here
-}
-
-// Push notifications
-self.addEventListener('push', (event) => {
-  if (!event.data) return;
-
-  const options = {
-    body: event.data.text(),
-    icon: '/android-chrome-192x192.png',
-    badge: '/favicon-32x32.png',
-    vibrate: [200, 100, 200],
-    data: { url: '/' },
-  };
-
-  event.waitUntil(self.registration.showNotification('PayeTax Tax Calculator', options));
-});
-
-// Notification clicks
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-  const targetUrl = event.notification.data?.url || '/';
-
-  event.waitUntil(
-    self.clients.matchAll().then((clients) => {
-      const client = clients.find((c) => c.url === targetUrl && 'focus' in c);
-      if (client) return client.focus();
-      if (self.clients.openWindow) return self.clients.openWindow(targetUrl);
-    }),
-  );
-});
-
-// Periodic background sync (experimental - progressive enhancement)
-self.addEventListener('periodicsync', (event) => {
-  if (event.tag === 'update-cache') {
-    event.waitUntil(updateCriticalAssets());
-  }
-});
-
-async function updateCriticalAssets() {
-  try {
-    const cache = await caches.open(CACHE_NAME);
-    const criticalPages = ['/', '/blog'];
-
-    await Promise.all(
-      criticalPages.map(async (page) => {
-        try {
-          const response = await fetch(page);
-          if (response.ok) await cache.put(page, response);
-        } catch (error) {
-          devLog('Failed to update:', page);
-        }
-      }),
-    );
-
-    devLog('Critical assets updated');
-  } catch (error) {
-    devLog('Periodic sync failed:', error);
-  }
 }
 
 // Handle messages from main thread
