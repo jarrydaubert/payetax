@@ -1,7 +1,7 @@
 /**
- * Calculator-focused Sentry error monitoring utilities
+ * Retained-surface Sentry error monitoring utilities
  *
- * Centralized Sentry utilities for calculator and email-results failures.
+ * Centralized Sentry utilities for calculator, tool, blog, and email-results failures.
  *
  * Features:
  * - Type-safe error tracking with custom contexts

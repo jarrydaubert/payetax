@@ -428,8 +428,8 @@ These are useful next checks when the relevant boundary changes:
    - Test with: manual post-release send to a controlled address, then document result in release evidence.
 
 2. Live monitoring confirmation.
-   - Why: calculator-focused Sentry and Vercel env wiring are production configuration, not fully provable in local unit tests.
-   - Test with: post-release Sentry event confirmation on PAYE or Director calculator flows and production env review.
+   - Why: retained-surface Sentry and Vercel env wiring are production configuration, not fully provable in local unit tests.
+   - Test with: post-release Sentry event confirmation on PAYE, tool, blog, or Director flows and production env review.
 
 ## Manual Visual And Lighthouse Checks
 

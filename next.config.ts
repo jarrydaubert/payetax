@@ -257,10 +257,11 @@ const nextConfig: NextConfig = {
   },
 };
 
-const configWithSentry = withSentryConfig(withBundleAnalyzer(nextConfig), {
+export const sentryConfigOptions = {
   org: 'jgf-projects',
   project: 'payetax',
   silent: !process.env.CI,
+  tunnelRoute: '/monitoring',
   suppressOnRouterTransitionStartWarning: true,
   widenClientFileUpload: true,
   bundleSizeOptimizations: {
@@ -271,6 +272,8 @@ const configWithSentry = withSentryConfig(withBundleAnalyzer(nextConfig), {
   sourcemaps: {
     deleteSourcemapsAfterUpload: true,
   },
-});
+};
+
+const configWithSentry = withSentryConfig(withBundleAnalyzer(nextConfig), sentryConfigOptions);
 
 export default configWithSentry;
