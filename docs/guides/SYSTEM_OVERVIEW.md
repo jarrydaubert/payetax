@@ -17,7 +17,7 @@ PayeTax is a Next.js and TypeScript public R&D project for UK tax calculation.
 - Vercel Web Analytics for cookieless traffic visibility
 - Vercel Speed Insights for real-user performance signals
 - GA4 for consent-based event analytics
-- Sentry calculator error monitoring and source maps
+- Sentry error monitoring for retained calculator, tool, blog, and email surfaces, plus source maps
 - Brevo API for transactional results email
 - Upstash Redis for distributed rate limiting
 

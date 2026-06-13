@@ -23,7 +23,7 @@ import type { z } from 'zod';
 import type { FeatureSchema } from '@/lib/validation/pageDataValidation';
 
 /** Update whenever the privacy policy materially changes. */
-export const PRIVACY_LAST_UPDATED = '11 June 2026';
+export const PRIVACY_LAST_UPDATED = '13 June 2026';
 
 /** Controller contact email (matches the address used on the compliance page). */
 export const PRIVACY_CONTACT_EMAIL = 'support@payetax.co.uk';
@@ -174,8 +174,8 @@ export const PRIVACY_DATA_CATEGORIES: PrivacyDataCategory[] = [
   },
   {
     category: 'Error diagnostics',
-    data: 'Technical error context on monitored calculator and email routes',
-    purpose: 'Detect and fix faults that break calculations or emails',
+    data: 'Technical error context on monitored calculator, tool, blog, and email routes',
+    purpose: 'Detect and fix faults that break calculations, public pages, or emails',
     lawfulBasis: 'Legitimate interests (Article 6(1)(f))',
     retention: 'Limited monitoring window',
   },
@@ -216,7 +216,7 @@ export const PRIVACY_PROCESSORS: PrivacyProcessor[] = [
   },
   {
     name: 'Sentry',
-    role: 'Error monitoring on key calculator and email routes',
+    role: 'Error monitoring on retained calculator, tool, blog, and email routes',
     data: 'Technical error and diagnostic context',
   },
   {

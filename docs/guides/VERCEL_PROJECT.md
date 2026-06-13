@@ -47,7 +47,7 @@ Core production values:
 
 - Brevo API values for PAYE and Director email-results flows.
 - Upstash Redis values for distributed rate limiting.
-- Sentry values for calculator-focused monitoring and source maps.
+- Sentry values for retained calculator, tool, blog, email monitoring, and source maps.
 - GA4 measurement id for consent-based analytics.
 - Vercel Web Analytics enabled in the Vercel dashboard, not through an env var.
 - Vercel Speed Insights enabled in the Vercel dashboard, not through an env var.
@@ -96,7 +96,7 @@ Pass criteria:
 3. Check Vercel Web Analytics for live traffic if analytics changed.
 4. Check Vercel Speed Insights for real-user performance data after a production deploy.
 5. Check GA4 realtime only after accepting analytics cookies.
-6. Check calculator-focused Sentry for PAYE or Director calculator errors.
+6. Check retained-surface Sentry for PAYE, tool, blog, or Director calculator errors.
 7. Check `/api/ops/rate-limit-health` with the configured secret when rate limiting changed.
 
 ## Retired Project Hygiene

@@ -143,7 +143,7 @@ describe('analytics', () => {
   describe('trackEvent', () => {
     it('tracks general analytics event', () => {
       const event: AnalyticsEvent = {
-        action: 'cta_clicked',
+        action: 'result_shared',
         category: 'engagement',
         label: 'Calculate Tax',
         value: 1,
@@ -151,7 +151,7 @@ describe('analytics', () => {
 
       trackEvent(event);
 
-      expect(mockGtag).toHaveBeenCalledWith('event', 'cta_clicked', {
+      expect(mockGtag).toHaveBeenCalledWith('event', 'result_shared', {
         category: 'engagement',
         label: 'Calculate Tax',
         value: 1,
@@ -468,22 +468,18 @@ describe('analytics', () => {
       );
     });
 
-    it('tracks First Contentful Paint', () => {
+    it('leaves paint and interaction Core Web Vitals to Speed Insights', () => {
       (performance.getEntriesByType as jest.Mock).mockReturnValue([]);
       (performance.getEntriesByName as jest.Mock).mockReturnValue([{ startTime: 800 }]);
+      const performanceObserver = jest.fn();
+      global.PerformanceObserver =
+        performanceObserver as unknown as typeof globalThis.PerformanceObserver;
 
       trackCoreWebVitals();
 
-      expect(mockGtag).toHaveBeenCalledWith(
-        'event',
-        'performance_metric',
-        expect.objectContaining({
-          category: 'performance',
-          label: 'first_contentful_paint',
-          value: 800,
-          unit: 'ms',
-        }),
-      );
+      expect(mockGtag).not.toHaveBeenCalled();
+      expect(performance.getEntriesByName).not.toHaveBeenCalled();
+      expect(performanceObserver).not.toHaveBeenCalled();
     });
 
     it('does not track when window is undefined', () => {
@@ -539,40 +535,6 @@ describe('analytics', () => {
         'Performance metrics tracking error:',
         expect.any(Error),
       );
-    });
-
-    it('tracks LCP when PerformanceObserver is available', () => {
-      (performance.getEntriesByType as jest.Mock).mockReturnValue([]);
-      (performance.getEntriesByName as jest.Mock).mockReturnValue([]);
-
-      // Mock PerformanceObserver
-      const observeFn = jest.fn();
-      const disconnectFn = jest.fn();
-      global.PerformanceObserver = jest.fn().mockImplementation((callback) => {
-        // Simulate LCP entry
-        setTimeout(() => {
-          callback({
-            getEntries: () => [{ renderTime: 1200 }],
-          });
-        }, 0);
-        return {
-          observe: observeFn,
-          disconnect: disconnectFn,
-        };
-      }) as unknown as typeof PerformanceObserver;
-
-      trackCoreWebVitals();
-
-      // Wait for async callback
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          expect(observeFn).toHaveBeenCalledWith({
-            type: 'largest-contentful-paint',
-            buffered: true,
-          });
-          resolve(undefined);
-        }, 10);
-      });
     });
   });
 });

@@ -7,7 +7,7 @@ describe('PrivacyPage', () => {
 
     expect(screen.getByText('Your Tax Data Stays')).toBeInTheDocument();
     expect(screen.getByText('On Your Device')).toBeInTheDocument();
-    expect(screen.getByText('Last updated: 11 June 2026')).toBeInTheDocument();
+    expect(screen.getByText('Last updated: 13 June 2026')).toBeInTheDocument();
   });
 
   it('renders the formal UK GDPR policy sections', () => {
