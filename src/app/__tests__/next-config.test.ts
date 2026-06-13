@@ -115,3 +115,15 @@ describe('next.config crawler headers', () => {
     );
   });
 });
+
+describe('next.config Sentry options', () => {
+  it('routes browser envelopes through a first-party tunnel', async () => {
+    const { sentryConfigOptions } = await import('../../../next.config');
+
+    expect(sentryConfigOptions).toEqual(
+      expect.objectContaining({
+        tunnelRoute: '/monitoring',
+      }),
+    );
+  });
+});

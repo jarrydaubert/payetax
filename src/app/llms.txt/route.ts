@@ -110,7 +110,7 @@ ${blogSections}
 - Framework: Next.js, React, TypeScript
 - Hosting: Vercel
 - Analytics: Vercel Web Analytics and Speed Insights for cookieless visibility and performance signals; GA4 after consent
-- Error monitoring: calculator-focused Sentry
+- Error monitoring: retained-surface Sentry
 - Privacy: interactive calculations run in-browser; salary inputs are not stored
 - PWA: installable progressive web app
 

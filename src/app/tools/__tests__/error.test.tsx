@@ -26,10 +26,17 @@ describe('ToolsError', () => {
     expect(screen.getByText(/Error ID:/i)).toBeInTheDocument();
   });
 
-  it('does not report non-director tool errors to Sentry', () => {
+  it('reports retained standalone tool errors to Sentry', () => {
     render(<ToolsError error={new Error('Boom')} reset={jest.fn()} />);
 
-    expect(captureException).not.toHaveBeenCalled();
+    expect(captureException).toHaveBeenCalledWith(
+      expect.any(Error),
+      expect.objectContaining({
+        tags: expect.objectContaining({
+          error_boundary: 'tools',
+        }),
+      }),
+    );
   });
 
   it('reports Director Intelligence errors to Sentry', () => {

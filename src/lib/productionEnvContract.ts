@@ -58,6 +58,14 @@ export const PRODUCTION_ENV_FEATURE_CONTRACT: readonly ProductionEnvFeatureContr
     ],
   },
   {
+    id: 'sentry',
+    label: 'Sentry retained-surface error monitoring',
+    enabled: true,
+    requiredEnv: ['NEXT_PUBLIC_SENTRY_DSN'],
+    verificationMode: 'env',
+    notes: ['Required so retained calculator, tool, blog, and email failure paths reach Sentry.'],
+  },
+  {
     id: 'results-email',
     label: 'PAYE and director results email delivery',
     enabled: true,
