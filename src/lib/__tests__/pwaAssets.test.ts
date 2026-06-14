@@ -32,6 +32,21 @@ function readPngDimensions(path: string): { width: number; height: number } {
   };
 }
 
+function extractPrecacheAssets(serviceWorker: string): string[] {
+  const match = serviceWorker.match(/const PRECACHE_ASSETS = \[(?<entries>[\s\S]*?)\];/);
+  if (!match?.groups?.entries) return [];
+
+  return match.groups.entries
+    .split('\n')
+    .map((entry) =>
+      entry
+        .trim()
+        .replace(/,$/, '')
+        .replace(/^['"]|['"]$/g, ''),
+    )
+    .filter(Boolean);
+}
+
 describe('PWA public assets', () => {
   it('keeps manifest launch colours aligned with the light Ledger theme', () => {
     const manifest = readManifest();
@@ -79,10 +94,10 @@ describe('PWA public assets', () => {
 
   it('serves the dedicated offline page as the navigation fallback', () => {
     const serviceWorker = readPublicText('sw.js');
+    const precacheAssets = extractPrecacheAssets(serviceWorker);
 
     expect(serviceWorker).toContain("const OFFLINE_FALLBACK_URL = '/offline';");
-    expect(serviceWorker).toContain('OFFLINE_FALLBACK_URL');
-    expect(serviceWorker).toContain("const PRECACHE_ASSETS = [\n  '/',\n  OFFLINE_FALLBACK_URL,");
+    expect(precacheAssets).toEqual(expect.arrayContaining(['/', 'OFFLINE_FALLBACK_URL']));
     expect(serviceWorker).toContain('function isRootNavigation(request)');
     expect(serviceWorker).toContain(
       'const rootResponse = await caches.match(request, { ignoreSearch: true });',
