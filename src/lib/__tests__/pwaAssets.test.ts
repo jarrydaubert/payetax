@@ -83,7 +83,18 @@ describe('PWA public assets', () => {
     expect(serviceWorker).toContain("const OFFLINE_FALLBACK_URL = '/offline';");
     expect(serviceWorker).toContain('OFFLINE_FALLBACK_URL');
     expect(serviceWorker).toContain("const PRECACHE_ASSETS = [\n  '/',\n  OFFLINE_FALLBACK_URL,");
-    expect(serviceWorker).toContain('cachedResponse || offlineResponse || caches.match');
+    expect(serviceWorker).toContain('function isRootNavigation(request)');
+    expect(serviceWorker).toContain(
+      'const rootResponse = await caches.match(request, { ignoreSearch: true });',
+    );
+    expect(serviceWorker).toContain("return offlineResponse || caches.match('/');");
+
+    const rootFallbackIndex = serviceWorker.indexOf('const rootResponse = await caches.match');
+    const offlineFallbackIndex = serviceWorker.indexOf(
+      'const offlineResponse = await caches.match(OFFLINE_FALLBACK_URL);',
+    );
+    expect(rootFallbackIndex).toBeGreaterThan(-1);
+    expect(offlineFallbackIndex).toBeGreaterThan(rootFallbackIndex);
   });
 
   it('does not keep unused feedback, push, or periodic-sync scaffolding in the service worker', () => {

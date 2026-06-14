@@ -157,9 +157,7 @@ async function handleNavigationWithPreload(request, event) {
     return networkResponse;
   } catch (error) {
     devLog('Navigation failed, trying cache:', error);
-    const cachedResponse = await caches.match(request);
-    const offlineResponse = await caches.match(OFFLINE_FALLBACK_URL);
-    return cachedResponse || offlineResponse || caches.match('/');
+    return getNavigationFallback(request);
   }
 }
 
@@ -175,14 +173,32 @@ async function networkFirstStrategy(request) {
     return networkResponse;
   } catch (error) {
     devLog('Network failed, trying cache:', request.url);
+    if (request.mode === 'navigate') {
+      return getNavigationFallback(request);
+    }
+
     const cachedResponse = await caches.match(request);
     if (cachedResponse) return cachedResponse;
-    if (request.mode === 'navigate') {
-      const offlineResponse = await caches.match(OFFLINE_FALLBACK_URL);
-      return offlineResponse || caches.match('/');
-    }
     throw error;
   }
+}
+
+function isRootNavigation(request) {
+  const url = new URL(request.url);
+  return url.origin === self.location.origin && url.pathname === '/';
+}
+
+async function getNavigationFallback(request) {
+  const cachedResponse = await caches.match(request);
+  if (cachedResponse) return cachedResponse;
+
+  if (isRootNavigation(request)) {
+    const rootResponse = await caches.match(request, { ignoreSearch: true });
+    if (rootResponse) return rootResponse;
+  }
+
+  const offlineResponse = await caches.match(OFFLINE_FALLBACK_URL);
+  return offlineResponse || caches.match('/');
 }
 
 // Cache-first strategy
