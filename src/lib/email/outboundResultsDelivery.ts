@@ -1,3 +1,4 @@
+import { RESULTS_EMAIL_FROM } from '@/constants/contact';
 import { CURRENT_TAX_YEAR, type PayPeriod, type TaxYear } from '@/constants/taxRates';
 import {
   generateDirectorEmailHtml,
@@ -39,7 +40,7 @@ export function sendPayeResultsEmail(args: {
 
   return sendOutboundEmail(
     {
-      from: process.env.BREVO_FROM_EMAIL || 'PayeTax <support@payetax.co.uk>',
+      from: process.env.BREVO_FROM_EMAIL || RESULTS_EMAIL_FROM,
       to: args.email,
       subject: `Your UK Tax Calculation - ${formatCurrency(results.netPay.annually)} take-home`,
       html: generatePayeEmailHtml(results, taxYearLabel),
@@ -65,7 +66,7 @@ export function sendDirectorResultsEmail(args: {
 
   return sendOutboundEmail(
     {
-      from: process.env.BREVO_FROM_EMAIL || 'PayeTax <support@payetax.co.uk>',
+      from: process.env.BREVO_FROM_EMAIL || RESULTS_EMAIL_FROM,
       to: args.email,
       subject: `Director Tax Strategy Report - ${formatCurrency(recommendedStrategy.takeHome)} Take-Home`,
       html: generateDirectorEmailHtml({

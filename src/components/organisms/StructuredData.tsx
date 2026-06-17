@@ -10,6 +10,7 @@
  */
 
 import type React from 'react';
+import { SITE_CONTACT_EMAIL } from '@/constants/contact';
 import { CURRENT_TAX_YEAR, formatTaxYearDisplay, TAX_RATES, TAX_YEARS } from '@/constants/taxRates';
 import { LOGO_URL, SITE_URL } from '@/lib/metadata';
 import { formatCurrency } from '@/lib/utils';
@@ -341,7 +342,7 @@ const ORG_DATA: OrganizationSchema = {
   description: 'Free UK PAYE tax calculator and financial tools for UK taxpayers.',
   contactPoint: {
     '@type': 'ContactPoint',
-    email: 'support@payetax.co.uk',
+    email: SITE_CONTACT_EMAIL,
     contactType: 'customer support',
   },
   sameAs: ['https://twitter.com/PayeTaxUK'],

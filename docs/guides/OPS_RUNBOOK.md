@@ -40,6 +40,8 @@ Email:
 - `BREVO_API_KEY`
 - `BREVO_FROM_EMAIL`
 
+Inbound support mail for `support@payetax.co.uk` should be routed in Cloudflare Email Routing. Do not keep an Outlook mailbox as a dependency for public contact mail.
+
 Analytics and monitoring:
 
 - Vercel Web Analytics must be enabled in the Vercel `payetax` project dashboard.

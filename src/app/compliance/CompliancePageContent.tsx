@@ -8,6 +8,7 @@ import { SectionHeading } from '@/components/molecules/SectionHeading';
 import { StatsGrid } from '@/components/molecules/StatsGrid';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { contactMailto, SITE_CONTACT_EMAIL } from '@/constants/contact';
 import {
   CURRENT_TAX_YEAR_DISPLAY_SHORT,
   formatIsoDateForDisplay,
@@ -234,8 +235,8 @@ export function CompliancePageContent() {
         description='If you have questions about our data sources, calculation methods, or compliance standards, reach out.'
         links={[
           {
-            text: 'support@payetax.co.uk',
-            href: `mailto:support@payetax.co.uk?subject=${encodeURIComponent('Compliance Question')}`,
+            text: SITE_CONTACT_EMAIL,
+            href: contactMailto('Compliance Question'),
             type: 'email',
           },
         ]}

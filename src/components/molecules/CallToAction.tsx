@@ -1,15 +1,41 @@
 // src/components/molecules/CallToAction.tsx
 'use client';
 
-import { Calculator, Mail, MessageSquare } from 'lucide-react';
+import { Calculator, type LucideIcon, Mail, MessageSquare } from 'lucide-react';
+import type { Route } from 'next';
 import Link from 'next/link';
 import type React from 'react';
 import { Button } from '@/components/ui/button';
+import { contactMailto } from '@/constants/contact';
 import { cn } from '@/lib/utils';
 
 interface CallToActionProps {
   variant?: 'contact' | 'calculator';
   className?: string;
+}
+
+type MailAction = {
+  href: `mailto:${string}`;
+  text: string;
+  icon: LucideIcon;
+};
+
+type RouteAction = {
+  href: Route;
+  text: string;
+  icon: LucideIcon;
+};
+
+type CtaConfig = {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  primaryAction: MailAction | RouteAction;
+  secondaryAction: RouteAction;
+};
+
+function isMailAction(action: MailAction | RouteAction): action is MailAction {
+  return action.href.startsWith('mailto:');
 }
 
 export default function CallToAction({
@@ -22,7 +48,7 @@ export default function CallToAction({
       title: 'Get in Touch',
       description: "Questions, suggestions, or just want to say hello? We'd love to hear from you.",
       primaryAction: {
-        href: 'mailto:support@payetax.co.uk?subject=Contact from PayeTax',
+        href: contactMailto('Contact from PayeTax'),
         text: 'Email Us',
         icon: Mail,
       },
@@ -48,7 +74,7 @@ export default function CallToAction({
         icon: MessageSquare,
       },
     },
-  } as const;
+  } satisfies Record<NonNullable<CallToActionProps['variant']>, CtaConfig>;
 
   const config = variants[variant];
   const IconComponent = config.icon;
@@ -72,7 +98,7 @@ export default function CallToAction({
 
       <div className='flex flex-col justify-center gap-4 sm:flex-row'>
         <Button asChild variant='outline' size='lg'>
-          {config.primaryAction.href.startsWith('mailto:') ? (
+          {isMailAction(config.primaryAction) ? (
             <a href={config.primaryAction.href}>
               <PrimaryIcon className={`mr-2 size-4`} aria-hidden='true' />
               {config.primaryAction.text}

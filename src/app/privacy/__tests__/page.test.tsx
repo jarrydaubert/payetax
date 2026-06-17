@@ -7,7 +7,7 @@ describe('PrivacyPage', () => {
 
     expect(screen.getByText('Your Tax Data Stays')).toBeInTheDocument();
     expect(screen.getByText('On Your Device')).toBeInTheDocument();
-    expect(screen.getByText('Last updated: 13 June 2026')).toBeInTheDocument();
+    expect(screen.getByText('Last updated: 17 June 2026')).toBeInTheDocument();
   });
 
   it('renders the formal UK GDPR policy sections', () => {
@@ -18,6 +18,8 @@ describe('PrivacyPage', () => {
     expect(screen.getByRole('heading', { name: /Data we process/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /Third parties we rely on/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /Your rights/i })).toBeInTheDocument();
+    expect(screen.getByText('Support messages')).toBeInTheDocument();
+    expect(screen.getByText('Cloudflare')).toBeInTheDocument();
 
     // Right to complain to the ICO.
     expect(screen.getByRole('link', { name: /ico\.org\.uk/i })).toHaveAttribute(

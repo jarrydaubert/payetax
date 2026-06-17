@@ -2,6 +2,7 @@
 // Tests for the simplified Ledger footer
 
 import { fireEvent, render, screen } from '@testing-library/react';
+import { SITE_CONTACT_MAILTO } from '@/constants/contact';
 import { Footer } from '../Footer';
 
 describe('Footer Component', () => {
@@ -74,7 +75,7 @@ describe('Footer Component', () => {
 
       const link = screen.getByRole('link', { name: /Support/i });
       expect(link).toBeInTheDocument();
-      expect(link).toHaveAttribute('href', 'mailto:support@payetax.co.uk');
+      expect(link).toHaveAttribute('href', SITE_CONTACT_MAILTO);
     });
 
     it('should render Tools link', () => {

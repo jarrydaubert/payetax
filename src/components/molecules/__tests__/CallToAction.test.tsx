@@ -1,5 +1,6 @@
 // src/components/ui/__tests__/CallToAction.test.tsx
 import { render, screen } from '@testing-library/react';
+import { SITE_CONTACT_MAILTO } from '@/constants/contact';
 import CallToAction from '../CallToAction';
 
 // Mock Next.js Link
@@ -24,10 +25,7 @@ describe('CallToAction Component', () => {
       render(<CallToAction variant='contact' />);
 
       const emailLink = screen.getByRole('link', { name: /Email Us/i });
-      expect(emailLink).toHaveAttribute(
-        'href',
-        expect.stringContaining('mailto:support@payetax.co.uk'),
-      );
+      expect(emailLink).toHaveAttribute('href', expect.stringContaining(SITE_CONTACT_MAILTO));
     });
   });
 
