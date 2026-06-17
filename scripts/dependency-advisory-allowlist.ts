@@ -23,4 +23,15 @@ export interface DependencyAdvisoryAllowlistEntry {
   removeAfter: string;
 }
 
-export const DEPENDENCY_ADVISORY_ALLOWLIST: readonly DependencyAdvisoryAllowlistEntry[] = [];
+export const DEPENDENCY_ADVISORY_ALLOWLIST: readonly DependencyAdvisoryAllowlistEntry[] = [
+  {
+    id: 'GHSA-H67P-54HQ-RP68',
+    package: 'js-yaml',
+    via: 'gray-matter@4.0.3 and Jest coverage tooling',
+    reason:
+      'gray-matter still depends on the js-yaml 3 API and calls safeLoad during blog frontmatter parsing; forcing js-yaml 4 breaks production page-data builds. The runtime path parses trusted repository MDX frontmatter, not user-supplied YAML.',
+    lastChecked: '2026-06-17',
+    reviewCadenceDays: 30,
+    removeAfter: '2026-07-17',
+  },
+];
