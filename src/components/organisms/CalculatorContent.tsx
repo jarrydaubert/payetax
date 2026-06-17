@@ -7,6 +7,7 @@ import { CalculatorHowToGuide } from '@/components/molecules/CalculatorHowToGuid
 import { FAQItem } from '@/components/molecules/FAQItem';
 import { SalaryComparisonTable } from '@/components/molecules/SalaryComparisonTable';
 import { TaxRatesOverview } from '@/components/molecules/TaxRatesOverview';
+import { SITE_CONTACT_MAILTO } from '@/constants/contact';
 import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
 import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
 import { calculateTax } from '@/lib/taxCalculator';
@@ -288,7 +289,7 @@ export function CalculatorContent() {
                 Read our tax guides
               </Link>
               {' or '}
-              <a href='mailto:support@payetax.co.uk' className='text-primary'>
+              <a href={SITE_CONTACT_MAILTO} className='text-primary'>
                 contact us
               </a>
             </p>

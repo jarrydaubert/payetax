@@ -46,6 +46,7 @@ Use `.env.template` as the source of required names.
 Core production values:
 
 - Brevo API values for PAYE and Director email-results flows.
+- Cloudflare Email Routing for inbound `support@payetax.co.uk` contact mail. This is DNS/routing infrastructure, not a Vercel env var.
 - Upstash Redis values for distributed rate limiting.
 - Sentry values for retained calculator, tool, blog, email monitoring, and source maps.
 - GA4 measurement id for consent-based analytics.

@@ -20,13 +20,14 @@ import Globe from 'lucide-react/dist/esm/icons/globe.mjs';
 import Lock from 'lucide-react/dist/esm/icons/lock.mjs';
 import Shield from 'lucide-react/dist/esm/icons/shield.mjs';
 import type { z } from 'zod';
+import { SITE_CONTACT_EMAIL } from '@/constants/contact';
 import type { FeatureSchema } from '@/lib/validation/pageDataValidation';
 
 /** Update whenever the privacy policy materially changes. */
-export const PRIVACY_LAST_UPDATED = '13 June 2026';
+export const PRIVACY_LAST_UPDATED = '17 June 2026';
 
 /** Controller contact email (matches the address used on the compliance page). */
-export const PRIVACY_CONTACT_EMAIL = 'support@payetax.co.uk';
+export const PRIVACY_CONTACT_EMAIL = SITE_CONTACT_EMAIL;
 
 // Note: DataFlowCard doesn't have a schema yet, but iconColor is a custom field
 interface DataFlowCard {
@@ -127,7 +128,7 @@ export const PRIVACY_DATA_FLOW: DataFlowCard[] = [
     iconColor: 'bg-primary/60',
     title: 'Trusted Processors',
     description:
-      'Brevo delivers result emails, Upstash powers abuse protection, and consent-based GA4 plus cookieless analytics and Sentry monitoring help us run the site. No cross-site tracking.',
+      'Brevo delivers result emails, Cloudflare routes support emails, Upstash powers abuse protection, and consent-based GA4 plus cookieless analytics and Sentry monitoring help us run the site. No cross-site tracking.',
   },
 ];
 
@@ -157,6 +158,13 @@ export const PRIVACY_DATA_CATEGORIES: PrivacyDataCategory[] = [
     purpose: 'Deliver the results email you requested',
     lawfulBasis: 'Performance of your request (Article 6(1)(b))',
     retention: 'Not stored by us; held only in our email provider’s sending logs',
+  },
+  {
+    category: 'Support messages',
+    data: 'Your email address, message content, and technical email headers if you contact us',
+    purpose: 'Respond to your question or request',
+    lawfulBasis: 'Legitimate interests (Article 6(1)(f))',
+    retention: 'Held only as needed to handle the enquiry and any follow-up',
   },
   {
     category: 'Analytics',
@@ -208,6 +216,11 @@ export const PRIVACY_PROCESSORS: PrivacyProcessor[] = [
     name: 'Brevo',
     role: 'Transactional email delivery for results you ask us to send',
     data: 'Your email address and the results included in that email',
+  },
+  {
+    name: 'Cloudflare',
+    role: 'Email routing for inbound support messages',
+    data: 'The sender, recipient, subject, and content of support emails you choose to send us',
   },
   {
     name: 'Google Analytics 4',

@@ -1,5 +1,6 @@
 // src/components/organisms/__tests__/CalculatorContent.test.tsx
 import { fireEvent, render, screen } from '@testing-library/react';
+import { SITE_CONTACT_MAILTO } from '@/constants/contact';
 import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
 import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
 import { calculateTax } from '@/lib/taxCalculator';
@@ -397,7 +398,7 @@ describe('CalculatorContent Component', () => {
       render(<CalculatorContent />);
 
       const link = screen.getByRole('link', { name: /contact us/i });
-      expect(link).toHaveAttribute('href', 'mailto:support@payetax.co.uk');
+      expect(link).toHaveAttribute('href', SITE_CONTACT_MAILTO);
     });
 
     it('should link to blog in FAQ footer', () => {

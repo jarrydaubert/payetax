@@ -4,6 +4,7 @@
 
 import Link from 'next/link';
 import { useCallback } from 'react';
+import { SITE_CONTACT_MAILTO } from '@/constants/contact';
 import { cn } from '@/lib/utils';
 
 /**
@@ -66,7 +67,7 @@ export function Footer({ className }: FooterProps) {
           </Link>
           <a
             className='inline-flex min-h-6 items-center hover:text-primary'
-            href='mailto:support@payetax.co.uk'
+            href={SITE_CONTACT_MAILTO}
           >
             Support
           </a>
