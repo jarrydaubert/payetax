@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { CURRENT_TAX_YEAR, TAX_RATES, TAX_YEARS } from '@/constants/taxRates';
+import { getCrawlableSalaryExamples } from '@/lib/crawlableTaxFacts';
 
 export const revalidate = 86400;
 
@@ -23,6 +24,7 @@ const TAX_RATES_DATASET = {
   taxYears: TAX_YEARS,
   temporalCoverage,
   rates: toJsonSafeValue(TAX_RATES),
+  takeHomeExamples: getCrawlableSalaryExamples(CURRENT_TAX_YEAR),
 };
 
 export function GET() {

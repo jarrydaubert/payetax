@@ -9,6 +9,7 @@
  */
 
 import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
+import { getCrawlableSalaryExamples } from '@/lib/crawlableTaxFacts';
 import { GET } from './route';
 
 describe('/api/tax-rates GET', () => {
@@ -20,6 +21,7 @@ describe('/api/tax-rates GET', () => {
     expect(json.dataset).toBe('uk-tax-rates');
     expect(json.currentTaxYear).toBe(CURRENT_TAX_YEAR);
     expect(json.rates[CURRENT_TAX_YEAR]).toBeDefined();
+    expect(json.takeHomeExamples).toEqual(getCrawlableSalaryExamples(CURRENT_TAX_YEAR));
   });
 
   it('serializes non-finite thresholds as null', async () => {

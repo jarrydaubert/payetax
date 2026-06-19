@@ -1,6 +1,8 @@
 // src/components/ui/__tests__/StructuredData.test.tsx
 import { render } from '@testing-library/react';
 import React from 'react';
+import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
+import { formatCurrency } from '@/lib/utils';
 import StructuredData from '../StructuredData';
 
 // Mock Next.js Script component to render as regular script tag
@@ -40,6 +42,28 @@ describe('StructuredData Component', () => {
         expect(data['@type']).toBe('Organization');
         expect(data.name).toBe('PayeTax');
       }
+    });
+
+    it('keeps higher-rate JSON-LD thresholds aligned with HMRC income ranges', () => {
+      const { container } = render(<StructuredData type='dataset' />);
+      const script = container.querySelector('script[type="application/ld+json"]');
+      const data = JSON.parse(script?.textContent ?? '{}');
+      const higherRate = data.variableMeasured.find(
+        (item: { name: string }) => item.name === 'Higher Rate Tax',
+      );
+      const additionalRate = data.variableMeasured.find(
+        (item: { name: string }) => item.name === 'Additional Rate Tax',
+      );
+      const currentRates = TAX_RATES[CURRENT_TAX_YEAR];
+      const officialHigherRateMax = currentRates.bands[1]?.threshold ?? 0;
+      const incorrectAllowanceAddedMax = currentRates.personalAllowance + officialHigherRateMax;
+
+      expect(higherRate.description).toContain(formatCurrency(officialHigherRateMax, 0));
+      expect(additionalRate.description).toContain(formatCurrency(officialHigherRateMax, 0));
+      expect(higherRate.description).not.toContain(formatCurrency(incorrectAllowanceAddedMax, 0));
+      expect(additionalRate.description).not.toContain(
+        formatCurrency(incorrectAllowanceAddedMax, 0),
+      );
     });
   });
 
