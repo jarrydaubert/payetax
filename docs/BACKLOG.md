@@ -44,6 +44,56 @@ Verified on 2026-06-19 against source code and current Google Search guidance.
    - DoD: StructuredData tests cover the final `sameAs` list.
    - DoD: the decision is documented if no additional verified profiles are available.
 
+### Live SEO / Product Audit Follow-ups
+
+Verified on 2026-06-19 against live PayeTax pages, source code, and cited competitor surfaces.
+
+1. Audit retired intent-route redirects and index remnants.
+   - Evidence: `next.config.ts` permanently redirects retired `/scenarios/*`, `/alternatives/*`, `/best-for/*`, `/best-uk-tax-calculators/*`, and `/vs/*` routes; live checks show `/alternatives/salary-calculator` and `/best-for/contractors` resolving to `/tools`, while `/scenarios/*` resolves to `/#tax-calculator`.
+   - DoD: Search Console or another live-index source confirms which retired URLs, if any, still receive impressions or indexed snippets.
+   - DoD: each remaining indexed retired URL has a documented decision: keep redirecting to a genuinely equivalent retained page, request removal/noindex where appropriate, or build a useful retained surface only when it fits the R&D scope.
+   - DoD: no competitor-style SEO page family or generic growth page family is restored by default.
+   - DoD: redirect tests cover representative retired routes and their intended destinations.
+
+2. Remove duplicate Editor's Picks output from the blog page.
+   - Evidence: `/blog` renders repeated Editor's Picks blocks in crawlable output; source renders separate desktop and mobile `EditorsPicksSticky` instances, and the component itself renders desktop/tablet plus mobile variants.
+   - DoD: the blog has one semantic Editor's Picks section in crawled text and the accessibility tree across desktop and mobile breakpoints.
+   - DoD: visual behavior remains responsive, with a sticky desktop sidebar and a compact mobile interaction if still desired.
+   - DoD: tests or an automated assertion prevent repeated Editor's Picks headings/lists from returning.
+
+3. Unify public version rendering from one source of truth.
+   - Evidence: live pages currently show `v5.1.4`, but source uses `APP_VERSION` from `package.json` on compliance while the footer reads `process.env.NEXT_PUBLIC_APP_VERSION`, allowing future deployment drift.
+   - DoD: footer and compliance use the same build-time version source, with no required Vercel env var for public version display.
+   - DoD: tests cover footer and compliance version rendering from the shared source.
+   - DoD: `bun run check-version` remains the release gate for package and service-worker cache alignment.
+
+4. Refresh stale-looking blog titles, slugs, and metadata for current tax-year positioning.
+   - Evidence: multiple posts published or updated in 2026 still present as `2025` in titles, slugs, SEO titles, and descriptions, while the main calculator is positioned around 2026-27.
+   - DoD: salary-guide titles and metadata use tax-year-first wording where appropriate, for example `2026-27` instead of a generic calendar `2025`.
+   - DoD: redirects are added for changed slugs, canonical URLs are updated, and internal links continue to resolve.
+   - DoD: content body calculations are rechecked against current tax-year constants before wording changes claim freshness.
+   - DoD: no broad programmatic salary-page family is added; refresh existing useful guides first.
+
+5. Add a mainstream trust summary near the top of the About page.
+   - Evidence: the live About page leads with the R&D/test-lab framing and later proof links; it does not immediately summarize who built the calculator, how calculations are checked, when rates were verified, and what limits apply in user-first language.
+   - DoD: the top viewport includes a concise trust block covering builder, verification method, latest rate verification date, privacy posture, and limitations.
+   - DoD: wording remains accurate to implementation and avoids invented credentials, review claims, production metrics, or advisory status.
+   - DoD: if any professional review note is added, the reviewer and review scope are genuine and documented.
+
+6. Improve result actions and preset exploration on the PAYE calculator.
+   - Evidence: the app already supports email results and What If comparison, and static salary examples exist; it does not expose copyable result summaries, CSV download, or salary/loan/region preset chips as first-class calculator controls.
+   - DoD: users can copy a concise monthly/annual breakdown without sending data to the server.
+   - DoD: any download/share action is client-side or uses the existing email-results flow with the current privacy guarantees.
+   - DoD: salary and modifier presets populate the calculator predictably, are keyboard accessible, and do not shift the layout.
+   - DoD: analytics events, if added, reuse the existing analytics contract and respect consent rules.
+
+7. Evaluate focused calculator variant gaps against the retained product scope.
+   - Evidence: the tools hub currently lists Director Intelligence, tax-code decoder, Scottish tax, NI, and Marriage Allowance calculators; The Salary Calculator exposes reverse/required salary, two-jobs, pro-rata, hourly, overtime/bonus, and two-salary comparison workflows.
+   - DoD: decide which variants are genuinely useful for PayeTax's deterministic R&D scope: reverse salary, two-job, pro-rata, bonus/overtime, and salary comparison.
+   - DoD: existing salary comparison logic is reused or retired deliberately rather than left as a hidden/partial capability.
+   - DoD: any accepted variant ships as a focused calculator/tool with tests, current tax-year metadata, and clear limitations.
+   - DoD: rejected variants are documented with the reason, especially when they would become growth-page clutter rather than useful tooling.
+
 ## Recently Closed
 
 - Brevo API cutover is complete for PAYE and Director results email.
