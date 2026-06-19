@@ -41,12 +41,39 @@ describe('sitemap', () => {
           url: 'https://example.com/',
           lastModified: '2026-04-15T00:00:00.000Z',
         }),
-        expect.objectContaining({ url: 'https://example.com/privacy' }),
-        expect.objectContaining({ url: 'https://example.com/install' }),
-        expect.objectContaining({ url: 'https://example.com/tools/director-guide' }),
-        expect.objectContaining({ url: 'https://example.com/tools/national-insurance-calculator' }),
-        expect.objectContaining({ url: 'https://example.com/blog/salary-guide', priority: 0.85 }),
-        expect.objectContaining({ url: 'https://example.com/blog/category/tax-basics' }),
+        expect.objectContaining({
+          url: 'https://example.com/blog',
+          lastModified: '2026-01-02T00:00:00.000Z',
+        }),
+        expect.objectContaining({
+          url: 'https://example.com/about',
+          lastModified: '2026-06-19T00:00:00.000Z',
+        }),
+        expect.objectContaining({
+          url: 'https://example.com/privacy',
+          lastModified: '2026-06-17T00:00:00.000Z',
+        }),
+        expect.objectContaining({
+          url: 'https://example.com/install',
+          lastModified: '2026-06-07T00:00:00.000Z',
+        }),
+        expect.objectContaining({
+          url: 'https://example.com/tools/director-guide',
+          lastModified: '2026-04-15T00:00:00.000Z',
+        }),
+        expect.objectContaining({
+          url: 'https://example.com/tools/national-insurance-calculator',
+          lastModified: '2026-04-15T00:00:00.000Z',
+        }),
+        expect.objectContaining({
+          url: 'https://example.com/blog/salary-guide',
+          lastModified: '2026-01-02T00:00:00.000Z',
+          priority: 0.85,
+        }),
+        expect.objectContaining({
+          url: 'https://example.com/blog/category/tax-basics',
+          lastModified: '2026-01-02T00:00:00.000Z',
+        }),
       ]),
     );
   });
