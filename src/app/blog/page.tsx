@@ -57,7 +57,7 @@ export async function generateMetadata({ searchParams }: BlogPageProps): Promise
   const title =
     page > 1 ? `TaxInsights by PayeTax | Page ${page}` : 'TaxInsights by PayeTax | UK Tax Guidance';
   const description =
-    'Expert UK tax guides based on official HMRC rates. PAYE, self-assessment, tax planning, and financial insights for 2025-26. Clear explanations, no jargon.';
+    'Clear UK tax guides based on official HMRC rates. PAYE, self-assessment, tax planning, and financial-year explainers for UK taxpayers.';
   const metadata = generateMetadataHelper({
     title,
     description,
@@ -114,7 +114,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
     '@type': 'Blog',
     name: 'TaxInsights by PayeTax',
     description:
-      'Expert UK tax guides based on official HMRC rates. PAYE, self-assessment, tax planning, and financial insights.',
+      'Clear UK tax guides based on official HMRC rates. PAYE, self-assessment, tax planning, and financial-year explainers.',
     url: `${SITE_URL}/blog`,
     publisher: {
       '@type': 'Organization',

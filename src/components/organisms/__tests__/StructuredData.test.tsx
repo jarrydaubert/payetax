@@ -41,6 +41,12 @@ describe('StructuredData Component', () => {
         const data = JSON.parse(script.textContent);
         expect(data['@type']).toBe('Organization');
         expect(data.name).toBe('PayeTax');
+        expect(data.sameAs).toEqual(
+          expect.arrayContaining([
+            'https://twitter.com/PayeTaxUK',
+            'https://github.com/jarrydaubert/payetax',
+          ]),
+        );
       }
     });
 

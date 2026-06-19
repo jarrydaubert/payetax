@@ -85,8 +85,9 @@ export type BlogConfig = z.infer<typeof BlogConfigSchema>;
 export const BLOG_BRAND = {
   name: 'TaxInsights',
   fullName: 'TaxInsights by PayeTax',
-  tagline: 'Expert UK Tax Guidance & Financial Insights',
-  description: 'Clear, actionable UK tax advice from qualified experts. No jargon, just insights.',
+  tagline: 'Clear UK Tax Guidance & PAYE Insights',
+  description:
+    'Clear UK tax explainers based on official sources. No jargon, just practical context.',
   author: 'TaxInsights Editorial Team',
   publisher: 'PayeTax',
   url: 'https://payetax.co.uk/blog',
@@ -201,8 +202,8 @@ export const DEFAULT_BLOG_METADATA = {
 export const BLOG_SEO_DEFAULTS = {
   titleTemplate: '%s | TaxInsights by PayeTax',
   descriptionTemplate:
-    'Read our latest article on %s. Expert UK tax advice and financial guidance from TaxInsights.',
-  keywords: ['UK tax', 'PAYE', 'tax calculator', 'financial advice', 'tax tips', 'TaxInsights'],
+    'Read our latest article on %s. Clear UK tax guidance and PAYE explainers from TaxInsights.',
+  keywords: ['UK tax', 'PAYE', 'tax calculator', 'tax guidance', 'tax tips', 'TaxInsights'],
 };
 
 /**
