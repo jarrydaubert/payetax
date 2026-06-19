@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { formatIsoDateForDisplay, RATES_LAST_VERIFIED } from '@/constants/freshness';
 import { cn } from '@/lib/utils';
 
 const LAB_NOTES = [
@@ -50,6 +51,29 @@ const BUILD_RULES = [
   'External services are kept purposeful: Brevo for result emails, Upstash for rate limiting, Sentry for calculator errors.',
   'Claims stay tied to implementation. If the app cannot prove something, the copy should not say it.',
 ];
+
+const TRUST_SUMMARY = [
+  {
+    label: 'Built by',
+    title: 'Jarryd Aubert',
+    body: 'A named engineering project with public methodology, source pages, and explicit calculation limits.',
+  },
+  {
+    label: 'Rates checked',
+    title: formatIsoDateForDisplay(RATES_LAST_VERIFIED),
+    body: 'Tax bands and thresholds are tied back to HMRC and Revenue Scotland sources.',
+  },
+  {
+    label: 'How it is tested',
+    title: 'Deterministic rules',
+    body: 'Calculator behaviour is kept repeatable so known inputs can be checked against expected outputs.',
+  },
+  {
+    label: 'Limits',
+    title: 'Guidance only',
+    body: 'PayeTax is not financial advice and does not replace a qualified accountant for personal circumstances.',
+  },
+] as const;
 
 const PROOF_LINKS = [
   {
@@ -100,6 +124,19 @@ export function AboutPageContent() {
                 <Button asChild size='touch' variant='outline' className='rounded-sm bg-card px-6'>
                   <Link href='/compliance'>View sources</Link>
                 </Button>
+              </div>
+              <div className='mt-8 grid gap-px overflow-hidden border border-border bg-border sm:grid-cols-2'>
+                {TRUST_SUMMARY.map((item) => (
+                  <div key={item.label} className='bg-card p-4 sm:p-5'>
+                    <p className='font-semibold text-[0.68rem] text-primary uppercase tracking-[0.24em]'>
+                      {item.label}
+                    </p>
+                    <h2 className='mt-2 font-display font-semibold text-foreground text-xl leading-tight'>
+                      {item.title}
+                    </h2>
+                    <p className='mt-2 text-foreground/72 text-sm leading-6'>{item.body}</p>
+                  </div>
+                ))}
               </div>
             </div>
 

@@ -24,6 +24,7 @@ import { SITE_CONTACT_EMAIL } from '@/constants/contact';
 import type { FeatureSchema } from '@/lib/validation/pageDataValidation';
 
 /** Update whenever the privacy policy materially changes. */
+export const PRIVACY_LAST_UPDATED_ISO = '2026-06-17';
 export const PRIVACY_LAST_UPDATED = '17 June 2026';
 
 /** Controller contact email (matches the address used on the compliance page). */

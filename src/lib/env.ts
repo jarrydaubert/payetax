@@ -14,7 +14,6 @@ export const PublicEnvSchema = z.object({
   NEXT_PUBLIC_SITE_URL: z.string().url('Site URL must be a valid URL').optional(),
   NEXT_PUBLIC_BASE_URL: z.string().url('Base URL must be a valid URL').optional(),
   NEXT_PUBLIC_VERCEL_URL: z.string().min(1, 'Vercel URL must not be empty').optional(),
-  NEXT_PUBLIC_APP_VERSION: z.string().min(1, 'App version must not be empty').optional(),
   NEXT_PUBLIC_SHOW_DEBUG_ERRORS: z
     .string()
     .transform((val) => val === 'true')
@@ -104,7 +103,6 @@ export function validatePublicEnv(): PublicEnv {
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
     NEXT_PUBLIC_VERCEL_URL: process.env.NEXT_PUBLIC_VERCEL_URL,
-    NEXT_PUBLIC_APP_VERSION: process.env.NEXT_PUBLIC_APP_VERSION,
     NEXT_PUBLIC_SHOW_DEBUG_ERRORS: process.env.NEXT_PUBLIC_SHOW_DEBUG_ERRORS,
     NEXT_PUBLIC_ENABLE_PWA: process.env.NEXT_PUBLIC_ENABLE_PWA,
     NEXT_PUBLIC_ENABLE_ANALYTICS: process.env.NEXT_PUBLIC_ENABLE_ANALYTICS,

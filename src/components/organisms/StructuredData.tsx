@@ -345,7 +345,7 @@ const ORG_DATA: OrganizationSchema = {
     email: SITE_CONTACT_EMAIL,
     contactType: 'customer support',
   },
-  sameAs: ['https://twitter.com/PayeTaxUK'],
+  sameAs: ['https://twitter.com/PayeTaxUK', 'https://github.com/jarrydaubert/payetax'],
 };
 
 const WEBSITE_DATA: WebsiteSchema = {

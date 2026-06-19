@@ -2,6 +2,7 @@
 
 import type { MetadataRoute } from 'next';
 import { RATES_LAST_VERIFIED } from '@/constants/freshness';
+import { PRIVACY_LAST_UPDATED_ISO } from '@/constants/pages/privacyPageData';
 import { getBlogCategories, getBlogPosts } from '@/lib/blog';
 import { SITE_URL } from '@/lib/metadata';
 
@@ -23,9 +24,63 @@ function normaliseSitemapEntry(entry: SitemapEntry): MetadataRoute.Sitemap[numbe
   };
 }
 
+function toUtcSitemapDate(value: string): string {
+  const normalisedValue = value.includes('T') ? value : `${value}T00:00:00.000Z`;
+  const parsed = new Date(normalisedValue);
+
+  if (Number.isNaN(parsed.getTime())) return value;
+
+  return parsed.toISOString();
+}
+
+function getLatestSitemapDate(values: Array<string | undefined>, fallback: string): string {
+  let latestDate: string | null = null;
+
+  for (const value of values) {
+    if (!value) continue;
+
+    const candidate = toUtcSitemapDate(value);
+    const candidateTime = Date.parse(candidate);
+
+    if (Number.isNaN(candidateTime)) continue;
+    if (!latestDate) {
+      latestDate = candidate;
+      continue;
+    }
+
+    const latestTime = Date.parse(latestDate);
+    if (Number.isNaN(latestTime)) return candidate;
+
+    latestDate = candidateTime > latestTime ? candidate : latestDate;
+  }
+
+  return latestDate ?? fallback;
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_URL;
-  const taxContentLastModified = `${RATES_LAST_VERIFIED}T00:00:00.000Z`;
+  const taxContentLastModified = toUtcSitemapDate(RATES_LAST_VERIFIED);
+  const aboutLastModified = toUtcSitemapDate('2026-06-19');
+  const installLastModified = toUtcSitemapDate('2026-06-07');
+  const privacyLastModified = toUtcSitemapDate(PRIVACY_LAST_UPDATED_ISO);
+
+  let blogPosts: SitemapEntry[] = [];
+  let blogContentLastModified = taxContentLastModified;
+  try {
+    const posts = await getBlogPosts({ pageSize: 1000 });
+    blogContentLastModified = getLatestSitemapDate(
+      posts.map((post) => post.updatedAt || post.publishedAt),
+      taxContentLastModified,
+    );
+    blogPosts = posts.map((post) => ({
+      url: `${baseUrl}/blog/${post.slug}`,
+      lastModified: toUtcSitemapDate(post.updatedAt || post.publishedAt),
+      changeFrequency: 'monthly',
+      priority: post.featured ? 0.85 : 0.7,
+    }));
+  } catch {
+    blogPosts = [];
+  }
 
   const staticPages: SitemapEntry[] = [
     {
@@ -36,19 +91,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${baseUrl}/blog`,
-      lastModified: taxContentLastModified,
+      lastModified: blogContentLastModified,
       changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
       url: `${baseUrl}/about`,
-      lastModified: taxContentLastModified,
+      lastModified: aboutLastModified,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
       url: `${baseUrl}/privacy`,
-      lastModified: taxContentLastModified,
+      lastModified: privacyLastModified,
       changeFrequency: 'yearly',
       priority: 0.4,
     },
@@ -60,7 +115,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     {
       url: `${baseUrl}/install`,
-      lastModified: taxContentLastModified,
+      lastModified: installLastModified,
       changeFrequency: 'monthly',
       priority: 0.5,
     },
@@ -102,19 +157,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  let blogPosts: SitemapEntry[] = [];
-  try {
-    const posts = await getBlogPosts({ pageSize: 1000 });
-    blogPosts = posts.map((post) => ({
-      url: `${baseUrl}/blog/${post.slug}`,
-      lastModified: post.updatedAt || post.publishedAt,
-      changeFrequency: 'monthly',
-      priority: post.featured ? 0.85 : 0.7,
-    }));
-  } catch {
-    blogPosts = [];
-  }
-
   let categoryPages: SitemapEntry[] = [];
   try {
     const categories = await getBlogCategories();
@@ -122,7 +164,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .filter((category) => (typeof category.count === 'number' ? category.count > 0 : true))
       .map((category) => ({
         url: `${baseUrl}/blog/category/${category.slug}`,
-        lastModified: taxContentLastModified,
+        lastModified: blogContentLastModified,
         changeFrequency: 'weekly',
         priority: 0.55,
       }));

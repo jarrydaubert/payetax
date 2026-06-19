@@ -14,6 +14,7 @@ import { ibmPlexMono, newsreader, publicSans } from '@/app/fonts';
 import GoogleAnalytics from '@/components/organisms/Analytics';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import Layout from '@/components/templates/Layout';
+import { APP_VERSION } from '@/constants/version';
 import { ThemeProvider } from '@/lib/theme';
 
 export const metadata: Metadata = {
@@ -84,7 +85,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </>
           ) : null}
           <Suspense fallback={null}>{analyticsEnabled ? <GoogleAnalytics /> : null}</Suspense>
-          <Layout>{children}</Layout>
+          <Layout appVersion={APP_VERSION}>{children}</Layout>
         </ThemeProvider>
 
         {/* Service Worker Registration - lazyOnload to avoid competing with initial hydration */}

@@ -2,13 +2,20 @@
 // Tests for the simplified Ledger footer
 
 import { fireEvent, render, screen } from '@testing-library/react';
+import type { ComponentProps } from 'react';
 import { SITE_CONTACT_MAILTO } from '@/constants/contact';
 import { Footer } from '../Footer';
+
+const TEST_APP_VERSION = '5.1.4-test';
+
+function renderFooter(props?: Partial<ComponentProps<typeof Footer>>) {
+  return render(<Footer appVersion={TEST_APP_VERSION} {...props} />);
+}
 
 describe('Footer Component', () => {
   describe('Rendering', () => {
     it('should render footer content in a div (molecule pattern)', () => {
-      const { container } = render(<Footer />);
+      const { container } = renderFooter();
 
       // Footer is a MOLECULE - it uses <div>, not <footer>
       // The parent template (Layout.tsx) wraps it in <footer>
@@ -18,7 +25,7 @@ describe('Footer Component', () => {
     });
 
     it('should render brand name', () => {
-      render(<Footer />);
+      renderFooter();
 
       const brand = screen.getByRole('link', { name: /paye tax/i });
       expect(brand).toBeInTheDocument();
@@ -26,15 +33,21 @@ describe('Footer Component', () => {
     });
 
     it('should render copyright notice', () => {
-      render(<Footer />);
+      renderFooter();
 
       expect(screen.getByText(/© 2026 PayeTax/i)).toBeInTheDocument();
+    });
+
+    it('should render the shared app version', () => {
+      renderFooter();
+
+      expect(screen.getByText(`v${TEST_APP_VERSION}`)).toBeInTheDocument();
     });
   });
 
   describe('Navigation Links', () => {
     it('should render Blog link', () => {
-      render(<Footer />);
+      renderFooter();
 
       const link = screen.getByRole('link', { name: /Blog/i });
       expect(link).toBeInTheDocument();
@@ -42,7 +55,7 @@ describe('Footer Component', () => {
     });
 
     it('should render About link', () => {
-      render(<Footer />);
+      renderFooter();
 
       const link = screen.getByRole('link', { name: /About/i });
       expect(link).toBeInTheDocument();
@@ -50,7 +63,7 @@ describe('Footer Component', () => {
     });
 
     it('should render Privacy link', () => {
-      render(<Footer />);
+      renderFooter();
 
       const link = screen.getByRole('link', { name: /Privacy/i });
       expect(link).toBeInTheDocument();
@@ -58,12 +71,12 @@ describe('Footer Component', () => {
     });
 
     it('should render Cookie Settings button', () => {
-      render(<Footer />);
+      renderFooter();
       expect(screen.getByRole('button', { name: /Cookie Settings/i })).toBeInTheDocument();
     });
 
     it('should render Compliance link', () => {
-      render(<Footer />);
+      renderFooter();
 
       const link = screen.getByRole('link', { name: /Compliance/i });
       expect(link).toBeInTheDocument();
@@ -71,7 +84,7 @@ describe('Footer Component', () => {
     });
 
     it('should render Support email link', () => {
-      render(<Footer />);
+      renderFooter();
 
       const link = screen.getByRole('link', { name: /Support/i });
       expect(link).toBeInTheDocument();
@@ -79,7 +92,7 @@ describe('Footer Component', () => {
     });
 
     it('should render Tools link', () => {
-      render(<Footer />);
+      renderFooter();
 
       // Strip-back consolidated the individual tool links into one /tools entry.
       const link = screen.getByRole('link', { name: /Tools/i });
@@ -88,7 +101,7 @@ describe('Footer Component', () => {
     });
 
     it('should render Install App link', () => {
-      render(<Footer />);
+      renderFooter();
 
       const link = screen.getByRole('link', { name: /Install App/i });
       expect(link).toBeInTheDocument();
@@ -96,7 +109,7 @@ describe('Footer Component', () => {
     });
 
     it('should have navigation links', () => {
-      render(<Footer />);
+      renderFooter();
 
       const links = screen.getAllByRole('link');
       // Brand + Blog, Tools, Install, About, Privacy, Compliance, Support
@@ -107,21 +120,21 @@ describe('Footer Component', () => {
 
   describe('Styling', () => {
     it('should apply custom className to root div', () => {
-      const { container } = render(<Footer className='custom-class' />);
+      const { container } = renderFooter({ className: 'custom-class' });
 
       const footerDiv = container.firstChild as HTMLElement;
       expect(footerDiv).toHaveClass('custom-class');
     });
 
     it('should use Ledger shell classes', () => {
-      const { container } = render(<Footer />);
+      const { container } = renderFooter();
 
       const footerDiv = container.firstChild as HTMLElement;
       expect(footerDiv).toHaveClass('border-t', 'px-8', 'py-12');
     });
 
     it('should have a responsive content grid', () => {
-      const { container } = render(<Footer />);
+      const { container } = renderFooter();
 
       const content = container.querySelector('.grid');
       expect(content).toBeInTheDocument();
@@ -131,14 +144,14 @@ describe('Footer Component', () => {
 
   describe('Accessibility', () => {
     it('should use div element (molecule pattern - template owns <footer>)', () => {
-      const { container } = render(<Footer />);
+      const { container } = renderFooter();
 
       const footerDiv = container.firstChild as HTMLElement;
       expect(footerDiv.tagName).toBe('DIV');
     });
 
     it('should have nav element with aria-label', () => {
-      render(<Footer />);
+      renderFooter();
 
       const nav = screen.getByRole('navigation', { name: /footer/i });
       expect(nav).toBeInTheDocument();
@@ -148,7 +161,7 @@ describe('Footer Component', () => {
       const listener = jest.fn();
       document.addEventListener('openCookiePreferences', listener);
 
-      render(<Footer />);
+      renderFooter();
       fireEvent.click(screen.getByRole('button', { name: /Cookie Settings/i }));
 
       expect(listener).toHaveBeenCalledTimes(1);
@@ -158,20 +171,20 @@ describe('Footer Component', () => {
 
   describe('Content', () => {
     it('should display current year in copyright', () => {
-      render(<Footer />);
+      renderFooter();
 
       expect(screen.getByText(/2026/i)).toBeInTheDocument();
     });
 
     it('should use the shared wordmark class on brand', () => {
-      const { container } = render(<Footer />);
+      const { container } = renderFooter();
 
       const brand = container.querySelector('.brand-wordmark');
       expect(brand).toBeInTheDocument();
     });
 
     it('should keep copyright compact on desktop', () => {
-      render(<Footer />);
+      renderFooter();
 
       const copy = screen.getByText(/© 2026 PayeTax/i);
       expect(copy).toHaveClass('whitespace-nowrap', 'md:justify-self-end');
