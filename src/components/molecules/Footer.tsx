@@ -5,7 +5,6 @@
 import Link from 'next/link';
 import { useCallback } from 'react';
 import { SITE_CONTACT_MAILTO } from '@/constants/contact';
-import { APP_VERSION } from '@/constants/version';
 import { cn } from '@/lib/utils';
 
 /**
@@ -20,10 +19,11 @@ import { cn } from '@/lib/utils';
  * - Copyright
  */
 interface FooterProps {
+  appVersion: string;
   className?: string;
 }
 
-export function Footer({ className }: FooterProps) {
+export function Footer({ appVersion, className }: FooterProps) {
   const openCookiePreferences = useCallback(() => {
     document.dispatchEvent(new Event('openCookiePreferences'));
   }, []);
@@ -77,7 +77,7 @@ export function Footer({ className }: FooterProps) {
         {/* Copyright & Version */}
         <div className='whitespace-nowrap text-muted-foreground text-sm md:justify-self-end'>
           &copy; 2026 PayeTax
-          <span className='ml-2 text-muted-foreground'>v{APP_VERSION}</span>
+          <span className='ml-2 text-muted-foreground'>v{appVersion}</span>
         </div>
       </div>
     </div>
