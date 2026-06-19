@@ -1,7 +1,6 @@
 import path from 'node:path';
 import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from 'next';
-import packageJson from './package.json';
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
@@ -71,10 +70,6 @@ function buildCsp(isDevelopment: boolean): string {
 }
 
 const nextConfig: NextConfig = {
-  env: {
-    NEXT_PUBLIC_APP_VERSION: packageJson.version,
-  },
-
   reactStrictMode: true,
   typedRoutes: true,
 
@@ -223,7 +218,15 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: '/api/:path*',
+        source: '/api/send-results',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+      },
+      {
+        source: '/api/send-director-results',
+        headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
+      },
+      {
+        source: '/api/ops/:path*',
         headers: [{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }],
       },
       {

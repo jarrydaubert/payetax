@@ -10,13 +10,14 @@ import PWAInstallBanner from '@/components/organisms/PWAInstallBanner';
 import SimpleNavbar from '@/components/organisms/SimpleNavbar';
 
 interface LayoutProps {
+  appVersion: string;
   children: React.ReactNode;
 }
 
 /** Routes that should be full-screen without header/footer */
 const FULL_SCREEN_ROUTES = ['/tools/director-guide'];
 
-export function Layout({ children }: LayoutProps): React.ReactElement {
+export function Layout({ appVersion, children }: LayoutProps): React.ReactElement {
   const pathname = usePathname();
   const isFullScreen = FULL_SCREEN_ROUTES.some((route) => pathname?.startsWith(route));
 
@@ -62,7 +63,7 @@ export function Layout({ children }: LayoutProps): React.ReactElement {
 
       {/* Footer - Template owns semantic <footer> tag */}
       <footer>
-        <Footer />
+        <Footer appVersion={appVersion} />
       </footer>
 
       {/* Cookie Banner - GDPR Compliance */}

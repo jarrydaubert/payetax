@@ -31,14 +31,26 @@ describe('robots metadata', () => {
         }),
       ]),
     );
-    expect(rules.map((rule) => rule.userAgent)).not.toEqual(
+    expect(result.rules).toEqual(
       expect.arrayContaining([
-        'GPTBot',
-        'ClaudeBot',
-        'Google-Extended',
-        'Applebot-Extended',
-        'CCBot',
+        expect.objectContaining({
+          userAgent: 'GPTBot',
+          disallow: ['/'],
+        }),
+        expect.objectContaining({
+          userAgent: 'Google-Extended',
+          disallow: ['/'],
+        }),
+        expect.objectContaining({
+          userAgent: 'Applebot-Extended',
+          disallow: ['/'],
+        }),
+        expect.objectContaining({
+          userAgent: 'CCBot',
+          disallow: ['/'],
+        }),
       ]),
     );
+    expect(rules.map((rule) => rule.userAgent)).not.toContain('ClaudeBot');
   });
 });

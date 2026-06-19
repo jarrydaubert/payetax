@@ -120,6 +120,26 @@ describe('CalculatorContainer Component', () => {
   const mockCalculate = jest.fn();
   const mockCalculatePreviousYear = jest.fn();
   const mockSetInput = jest.fn();
+  const mockInput = {
+    salary: 30000,
+    payPeriod: 'annually' as const,
+    taxYear: '2026-2027' as const,
+    taxCode: '1257L',
+    isScottish: false,
+    isMarried: false,
+    partnerGrossWage: 0,
+    isBlind: false,
+    age: undefined,
+    payNoNI: false,
+    pensionContribution: 0,
+    pensionContributionType: 'percentage' as const,
+    studentLoanPlans: 'none' as const,
+    niCategory: 'A' as const,
+    hoursPerWeek: 40,
+    allowancesDeductions: 0,
+    incomeSources: [],
+    region: 'England' as const,
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -132,10 +152,7 @@ describe('CalculatorContainer Component', () => {
     (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({
         previousYearResults: null,
-        input: {
-          studentLoanPlans: 'none',
-          allowancesDeductions: 0,
-        },
+        input: mockInput,
       }),
     );
   });
@@ -270,17 +287,20 @@ describe('CalculatorContainer Component', () => {
       expect(screen.getByTestId('results-table-mock')).toBeInTheDocument();
     });
 
-    it('should show the email results action when results exist', () => {
+    it('should show the result actions when results exist', () => {
       render(<CalculatorContainer />);
 
+      expect(
+        screen.getByRole('button', { name: /Copy tax calculation results/i }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /Download results as CSV file/i }),
+      ).toBeInTheDocument();
       expect(
         screen.getByRole('button', { name: /Email tax calculation results/i }),
       ).toBeInTheDocument();
       expect(
         screen.queryByRole('button', { name: /Print tax calculation results/i }),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.queryByRole('button', { name: /Download results as CSV file/i }),
       ).not.toBeInTheDocument();
     });
 
@@ -307,14 +327,81 @@ describe('CalculatorContainer Component', () => {
       render(<CalculatorContainer />);
 
       expect(
+        screen.queryByRole('button', { name: /Copy tax calculation results/i }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /Download results as CSV file/i }),
+      ).not.toBeInTheDocument();
+      expect(
         screen.queryByRole('button', { name: /Email tax calculation results/i }),
       ).not.toBeInTheDocument();
       expect(
         screen.queryByRole('button', { name: /Print tax calculation results/i }),
       ).not.toBeInTheDocument();
-      expect(
-        screen.queryByRole('button', { name: /Download results as CSV file/i }),
-      ).not.toBeInTheDocument();
+    });
+
+    it('should copy a concise browser-only result summary', async () => {
+      const writeText = jest.fn().mockResolvedValue(undefined);
+      Object.defineProperty(navigator, 'clipboard', {
+        configurable: true,
+        value: { writeText },
+      });
+
+      render(<CalculatorContainer />);
+
+      fireEvent.click(screen.getByRole('button', { name: /Copy tax calculation results/i }));
+
+      await waitFor(() => {
+        expect(writeText).toHaveBeenCalledWith(expect.stringContaining('PayeTax PAYE estimate'));
+      });
+      expect(writeText).toHaveBeenCalledWith(
+        expect.stringContaining('Annual take-home: £24,486.00'),
+      );
+      await waitFor(() => {
+        expect(screen.getByText(/Results copied/i)).toBeInTheDocument();
+      });
+    });
+
+    it('should download a client-side CSV of core result periods', async () => {
+      const createObjectURL = jest.fn((blob: Blob) => {
+        expect(blob).toBeInstanceOf(Blob);
+        return 'blob:payetax-results';
+      });
+      const revokeObjectURL = jest.fn();
+      const clickSpy = jest
+        .spyOn(HTMLAnchorElement.prototype, 'click')
+        .mockImplementation(() => undefined);
+
+      Object.defineProperty(URL, 'createObjectURL', {
+        configurable: true,
+        value: createObjectURL,
+      });
+      Object.defineProperty(URL, 'revokeObjectURL', {
+        configurable: true,
+        value: revokeObjectURL,
+      });
+
+      render(<CalculatorContainer />);
+
+      fireEvent.click(screen.getByRole('button', { name: /Download results as CSV file/i }));
+
+      expect(createObjectURL).toHaveBeenCalledTimes(1);
+      const blob = createObjectURL.mock.calls[0]?.[0];
+      if (!blob) throw new Error('Expected CSV Blob');
+      const blobText = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = () => reject(reader.error);
+        reader.readAsText(blob);
+      });
+      expect(blobText).toContain('Period,Gross salary,Income tax');
+      expect(clickSpy).toHaveBeenCalledTimes(1);
+      expect(revokeObjectURL).toHaveBeenCalledWith('blob:payetax-results');
+      await waitFor(() => {
+        expect(screen.getByText('CSV downloaded in your browser.')).toBeInTheDocument();
+      });
+
+      clickSpy.mockRestore();
     });
 
     it('should apply pension optimization before recalculating', () => {
@@ -400,10 +487,13 @@ describe('CalculatorContainer Component', () => {
         screen.getByRole('button', { name: /Email tax calculation results/i }),
       ).toBeInTheDocument();
       expect(
-        screen.queryByRole('button', { name: /Print tax calculation results/i }),
-      ).not.toBeInTheDocument();
+        screen.getByRole('button', { name: /Copy tax calculation results/i }),
+      ).toBeInTheDocument();
       expect(
-        screen.queryByRole('button', { name: /Download results as CSV file/i }),
+        screen.getByRole('button', { name: /Download results as CSV file/i }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: /Print tax calculation results/i }),
       ).not.toBeInTheDocument();
     });
   });

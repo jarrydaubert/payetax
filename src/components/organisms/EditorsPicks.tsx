@@ -2,15 +2,12 @@
 /**
  * Editor's Picks Sidebar
  *
- * Numbered list of curated articles.
- * - Desktop: Sticky sidebar
- * - Tablet: Below main content
- * - Mobile: Native details/summary accordion (zero CLS)
+ * Numbered list of curated articles rendered once in the DOM so crawlers and
+ * assistive tech do not receive duplicate responsive copies.
  *
  * @see docs/planning/BLOG_PAGE_BUILD.md
  */
 
-import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 
 import { cn } from '@/lib/utils';
@@ -28,48 +25,7 @@ export function EditorsPicks({ posts, className }: EditorsPicksProps) {
   const countLabel = `${displayedPosts.length} curated ${displayedPosts.length === 1 ? 'read' : 'reads'}`;
 
   return (
-    <div className={cn(className)}>
-      {/* Desktop/Tablet: Regular display */}
-      <div className='hidden md:block'>
-        <EditorsPicksPanel posts={displayedPosts} countLabel={countLabel} />
-      </div>
-
-      {/* Mobile: Native accordion using details/summary (zero CLS) */}
-      <details className='group rounded-sm border border-border bg-card md:hidden'>
-        <summary
-          className='flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-4 text-foreground hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background [&::-webkit-details-marker]:hidden'
-          aria-label="Toggle Editor's Picks section"
-        >
-          <span>
-            <span className='block font-semibold text-[0.7rem] text-primary uppercase tracking-[0.24em]'>
-              Editor&apos;s Picks
-            </span>
-            <span className='mt-1 block text-muted-foreground text-xs'>{countLabel}</span>
-          </span>
-          <ChevronDown
-            className='size-4 shrink-0 text-muted-foreground transition-transform group-open:rotate-180'
-            aria-hidden='true'
-          />
-        </summary>
-        <div className='border-border border-t'>
-          <EditorsPicksList posts={displayedPosts} />
-        </div>
-      </details>
-    </div>
-  );
-}
-
-interface EditorsPicksListProps {
-  posts: BlogPost[];
-}
-
-interface EditorsPicksPanelProps extends EditorsPicksListProps {
-  countLabel: string;
-}
-
-function EditorsPicksPanel({ posts, countLabel }: EditorsPicksPanelProps) {
-  return (
-    <aside aria-label="Editor's picks">
+    <aside aria-label="Editor's picks" className={cn(className)}>
       <div className='mb-4 flex items-baseline justify-between gap-3 sm:mb-6'>
         <h2 className='font-semibold text-primary text-xs uppercase tracking-[0.28em] sm:text-sm sm:tracking-widest'>
           Editor&apos;s Picks
@@ -78,10 +34,14 @@ function EditorsPicksPanel({ posts, countLabel }: EditorsPicksPanelProps) {
       </div>
 
       <div className='overflow-hidden rounded-sm border border-border bg-card'>
-        <EditorsPicksList posts={posts} />
+        <EditorsPicksList posts={displayedPosts} />
       </div>
     </aside>
   );
+}
+
+interface EditorsPicksListProps {
+  posts: BlogPost[];
 }
 
 function EditorsPicksList({ posts }: EditorsPicksListProps) {

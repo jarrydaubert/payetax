@@ -3,6 +3,7 @@
 import type { Metadata } from 'next';
 import dynamic from 'next/dynamic';
 import ServerHero from '@/components/molecules/ServerHero';
+import { CrawlableTaxFacts } from '@/components/organisms/CrawlableTaxFacts';
 import LandingPageSections, { faqs } from '@/components/organisms/LandingPageSections';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
@@ -57,6 +58,9 @@ export default function HomePage() {
       >
         <HomePageContent />
       </section>
+
+      {/* Static PAYE facts and examples for crawlers that do not execute client JavaScript */}
+      <CrawlableTaxFacts />
 
       {/* Landing page sections below the calculator */}
       <LandingPageSections />

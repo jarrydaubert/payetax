@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { formatIsoDateForDisplay, RATES_LAST_VERIFIED } from '@/constants/freshness';
 import AboutPage from '../page';
 
 describe('AboutPage', () => {
@@ -16,6 +17,14 @@ describe('AboutPage', () => {
     expect(
       screen.getByRole('heading', { name: /Boring controls on purpose/i }),
     ).toBeInTheDocument();
+    expect(screen.getByText('Built by')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Jarryd Aubert' })).toBeInTheDocument();
+    expect(screen.getByText('Rates checked')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: formatIsoDateForDisplay(RATES_LAST_VERIFIED) }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Limits')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Guidance only' })).toBeInTheDocument();
 
     const openCalculatorLink = screen.getByRole('link', {
       name: /Open calculator/i,

@@ -19,10 +19,11 @@ import { cn } from '@/lib/utils';
  * - Copyright
  */
 interface FooterProps {
+  appVersion: string;
   className?: string;
 }
 
-export function Footer({ className }: FooterProps) {
+export function Footer({ appVersion, className }: FooterProps) {
   const openCookiePreferences = useCallback(() => {
     document.dispatchEvent(new Event('openCookiePreferences'));
   }, []);
@@ -76,11 +77,7 @@ export function Footer({ className }: FooterProps) {
         {/* Copyright & Version */}
         <div className='whitespace-nowrap text-muted-foreground text-sm md:justify-self-end'>
           &copy; 2026 PayeTax
-          {process.env.NEXT_PUBLIC_APP_VERSION && (
-            <span className='ml-2 text-muted-foreground'>
-              v{process.env.NEXT_PUBLIC_APP_VERSION}
-            </span>
-          )}
+          <span className='ml-2 text-muted-foreground'>v{appVersion}</span>
         </div>
       </div>
     </div>

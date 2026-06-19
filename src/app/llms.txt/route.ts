@@ -8,6 +8,7 @@ import {
 } from '@/constants/sources';
 import { CURRENT_TAX_YEAR, formatTaxYearDisplay } from '@/constants/taxRates';
 import { getBlogCategories, getBlogPosts } from '@/lib/blog';
+import { getCrawlableTaxFactsMarkdown } from '@/lib/crawlableTaxFacts';
 import { SITE_URL } from '@/lib/metadata';
 import type { BlogCategory, BlogPost } from '@/types/blog';
 
@@ -66,6 +67,7 @@ export async function GET() {
 
   const lastUpdated = new Date().toISOString().split('T')[0];
   const currentTaxYearDisplay = formatTaxYearDisplay(CURRENT_TAX_YEAR, { separator: '-' });
+  const crawlableTaxFacts = getCrawlableTaxFactsMarkdown();
 
   const llmsTxt = `# PayeTax
 
@@ -102,6 +104,8 @@ Search crawlers and AI crawlers are allowed. Public calculator, tool, blog, and 
 - [HMRC National Insurance Rates](${HMRC_NI_RATES_URL})
 - [Revenue Scotland Tax Rates](${REVENUE_SCOTLAND_INCOME_TAX_URL})
 - [Student Loan Repayment Thresholds](${HMRC_STUDENT_LOAN_REPAYMENT_URL})
+
+${crawlableTaxFacts}
 
 ${blogSections}
 

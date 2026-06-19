@@ -6,10 +6,14 @@
 import { render, screen } from '@testing-library/react';
 import { Layout } from '../Layout';
 
+const TEST_APP_VERSION = '5.1.4-test';
+
 // Mock child components
 jest.mock('@/components/molecules/Footer', () => ({
   __esModule: true,
-  default: () => <footer data-testid='mock-footer'>Footer</footer>,
+  default: ({ appVersion }: { appVersion: string }) => (
+    <footer data-testid='mock-footer'>Footer v{appVersion}</footer>
+  ),
 }));
 
 jest.mock('@/components/organisms/SimpleNavbar', () => ({
@@ -38,7 +42,7 @@ describe('Layout Component', () => {
 
   it('should render children content', () => {
     render(
-      <Layout>
+      <Layout appVersion={TEST_APP_VERSION}>
         <div data-testid='test-content'>Test Content</div>
       </Layout>,
     );
@@ -49,7 +53,7 @@ describe('Layout Component', () => {
 
   it('should render navbar in header', () => {
     render(
-      <Layout>
+      <Layout appVersion={TEST_APP_VERSION}>
         <div>Content</div>
       </Layout>,
     );
@@ -61,7 +65,7 @@ describe('Layout Component', () => {
 
   it('should render footer', () => {
     render(
-      <Layout>
+      <Layout appVersion={TEST_APP_VERSION}>
         <div>Content</div>
       </Layout>,
     );
@@ -69,11 +73,12 @@ describe('Layout Component', () => {
     const footer = screen.getByTestId('mock-footer');
     expect(footer).toBeInTheDocument();
     expect(footer.closest('footer')).toBeInTheDocument();
+    expect(footer).toHaveTextContent(`v${TEST_APP_VERSION}`);
   });
 
   it('should render cookie banner', () => {
     render(
-      <Layout>
+      <Layout appVersion={TEST_APP_VERSION}>
         <div>Content</div>
       </Layout>,
     );
@@ -85,7 +90,7 @@ describe('Layout Component', () => {
     jest.spyOn(require('next/navigation'), 'usePathname').mockReturnValue('/tools/director-guide');
 
     render(
-      <Layout>
+      <Layout appVersion={TEST_APP_VERSION}>
         <div>Content</div>
       </Layout>,
     );
@@ -97,7 +102,7 @@ describe('Layout Component', () => {
 
   it('should render pwa install banner', () => {
     render(
-      <Layout>
+      <Layout appVersion={TEST_APP_VERSION}>
         <div>Content</div>
       </Layout>,
     );
@@ -107,7 +112,7 @@ describe('Layout Component', () => {
 
   it('should have skip-to-content link for accessibility', () => {
     render(
-      <Layout>
+      <Layout appVersion={TEST_APP_VERSION}>
         <div>Content</div>
       </Layout>,
     );
@@ -120,7 +125,7 @@ describe('Layout Component', () => {
 
   it('should link skip-to-content to main content ID', () => {
     const { container } = render(
-      <Layout>
+      <Layout appVersion={TEST_APP_VERSION}>
         <div>Content</div>
       </Layout>,
     );
@@ -138,7 +143,7 @@ describe('Layout Component', () => {
 
   it('should have accessible main content landmark', () => {
     const { container } = render(
-      <Layout>
+      <Layout appVersion={TEST_APP_VERSION}>
         <div>Content</div>
       </Layout>,
     );
@@ -150,7 +155,7 @@ describe('Layout Component', () => {
 
   it('should use flex layout with min-h-screen', () => {
     const { container } = render(
-      <Layout>
+      <Layout appVersion={TEST_APP_VERSION}>
         <div>Content</div>
       </Layout>,
     );
@@ -161,7 +166,7 @@ describe('Layout Component', () => {
 
   it('should set main content as flex-1', () => {
     const { container } = render(
-      <Layout>
+      <Layout appVersion={TEST_APP_VERSION}>
         <div>Content</div>
       </Layout>,
     );
@@ -172,7 +177,7 @@ describe('Layout Component', () => {
 
   it('should render all components in correct order', () => {
     const { container } = render(
-      <Layout>
+      <Layout appVersion={TEST_APP_VERSION}>
         <div data-testid='test-content'>Content</div>
       </Layout>,
     );
@@ -190,7 +195,7 @@ describe('Layout Component', () => {
 
   it('should handle multiple children in content area', () => {
     render(
-      <Layout>
+      <Layout appVersion={TEST_APP_VERSION}>
         <div data-testid='child-1'>Child 1</div>
         <div data-testid='child-2'>Child 2</div>
         <div data-testid='child-3'>Child 3</div>

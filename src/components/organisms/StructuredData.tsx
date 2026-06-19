@@ -345,7 +345,7 @@ const ORG_DATA: OrganizationSchema = {
     email: SITE_CONTACT_EMAIL,
     contactType: 'customer support',
   },
-  sameAs: ['https://twitter.com/PayeTaxUK'],
+  sameAs: ['https://twitter.com/PayeTaxUK', 'https://github.com/jarrydaubert/payetax'],
 };
 
 const WEBSITE_DATA: WebsiteSchema = {
@@ -492,7 +492,7 @@ function generateDatasetData(): DatasetSchema {
   const shortEndYear = safeEndYear.slice(-2);
 
   const basicRateMax = rates.personalAllowance + (basicBand?.threshold ?? 0);
-  const higherRateMax = rates.personalAllowance + (higherBand?.threshold ?? 0);
+  const higherRateMax = higherBand?.threshold ?? basicRateMax;
   const datasetYearLabel = `${safeStartYear}-${shortEndYear}`;
   const taxYearStartDate = `${safeStartYear}-04-06`;
   const taxYearEndDate = `${safeEndYear}-04-05`;

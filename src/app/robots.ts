@@ -7,7 +7,8 @@ import { SITE_URL } from '@/lib/metadata';
  * Generates robots.txt via Next.js App Router metadata route
  *
  * AEO (Answer Engine Optimization) strategy:
- * - ALLOW search crawlers and AI crawlers
+ * - ALLOW search and answer-engine crawlers that can cite the site
+ * - DISALLOW broad AI training/reuse crawlers where a vendor-specific control exists
  * - Keep operational/private paths out of crawler access
  *
  * Bot documentation:
@@ -16,6 +17,7 @@ import { SITE_URL } from '@/lib/metadata';
  * - Perplexity: https://docs.perplexity.ai/docs/resources/perplexity-crawlers
  * - Google: https://developers.google.com/search/docs/crawling-indexing/overview-google-crawlers
  * - Apple: https://support.apple.com/en-gb/119829
+ * - Common Crawl: https://commoncrawl.org/ccbot
  */
 
 // Public API resources used by crawlers for social previews and Dataset schema.
@@ -31,6 +33,10 @@ const DISALLOW_PATHS = [
   '/offline',
   '/monitoring',
 ];
+
+// Training/reuse controls: keep the site citable by search/answer bots without
+// implicitly opting unrelated public content into model training datasets.
+const AI_TRAINING_USER_AGENTS = ['GPTBot', 'Google-Extended', 'Applebot-Extended', 'CCBot'];
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -80,6 +86,11 @@ export default function robots(): MetadataRoute.Robots {
         allow: ALLOW_PATHS,
         disallow: DISALLOW_PATHS,
       },
+
+      ...AI_TRAINING_USER_AGENTS.map((userAgent) => ({
+        userAgent,
+        disallow: ['/'],
+      })),
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
   };

@@ -1,16 +1,18 @@
 // src/components/organisms/CalculatorInputs/__tests__/BasicInputs.test.tsx
 import { fireEvent, render, screen } from '@testing-library/react';
-import { trackFormInteraction } from '@/lib/analytics';
+import { trackEvent, trackFormInteraction } from '@/lib/analytics';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
 import { BasicInputs } from '../BasicInputs';
 
 // Mock the store
 jest.mock('@/store/calculatorStore');
 jest.mock('@/lib/analytics', () => ({
+  trackEvent: jest.fn(),
   trackFormInteraction: jest.fn(),
 }));
 
 describe('BasicInputs Component', () => {
+  const mockTrackEvent = trackEvent as jest.MockedFunction<typeof trackEvent>;
   const mockTrackFormInteraction = trackFormInteraction as jest.MockedFunction<
     typeof trackFormInteraction
   >;
@@ -28,6 +30,7 @@ describe('BasicInputs Component', () => {
   const mockSetAllowancesDeductions = jest.fn();
   const mockSetPensionContribution = jest.fn();
   const mockSetPensionContributionType = jest.fn();
+  const mockSetInput = jest.fn();
 
   const defaultInput = {
     salary: 30000,
@@ -68,6 +71,7 @@ describe('BasicInputs Component', () => {
       setAllowancesDeductions: mockSetAllowancesDeductions,
       setPensionContribution: mockSetPensionContribution,
       setPensionContributionType: mockSetPensionContributionType,
+      setInput: mockSetInput,
     });
   });
 
@@ -81,6 +85,14 @@ describe('BasicInputs Component', () => {
       render(<BasicInputs />);
       expect(screen.getByText('Salary')).toBeInTheDocument();
       expect(screen.getByTestId('salary-input')).toBeInTheDocument();
+    });
+
+    it('should render quick preset controls', () => {
+      render(<BasicInputs />);
+
+      expect(screen.getByRole('group', { name: /Quick presets/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: '£40k' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Plan 2 loan/i })).toBeInTheDocument();
     });
 
     it('should render pay period select inline with salary', () => {
@@ -167,6 +179,49 @@ describe('BasicInputs Component', () => {
       fireEvent.change(taxCodeInput, { target: { value: '1260L' } });
 
       expect(mockSetTaxCode).toHaveBeenCalledWith('1260L');
+    });
+
+    it('should apply a salary preset as an annual salary', () => {
+      render(<BasicInputs />);
+
+      fireEvent.click(screen.getByRole('button', { name: '£60k' }));
+
+      expect(mockSetSalary).toHaveBeenCalledWith(60000);
+      expect(mockSetPayPeriod).toHaveBeenCalledWith('annually');
+      expect(mockTrackEvent).toHaveBeenCalledWith({
+        action: 'calculator_action',
+        category: 'calculator',
+        label: 'preset_selected',
+        custom_data: { preset: '£60k' },
+      });
+    });
+
+    it('should apply the Scotland preset without overwriting a custom tax code', () => {
+      (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
+        selector({ input: { ...defaultInput, taxCode: 'BR' } }),
+      );
+
+      render(<BasicInputs />);
+
+      fireEvent.click(screen.getByRole('button', { name: 'Scotland' }));
+
+      expect(mockSetInput).toHaveBeenCalledWith({
+        region: 'Scotland',
+        isScottish: true,
+      });
+    });
+
+    it('should apply student loan and pension presets', () => {
+      render(<BasicInputs />);
+
+      fireEvent.click(screen.getByRole('button', { name: /Plan 2 loan/i }));
+      fireEvent.click(screen.getByRole('button', { name: /5% pension/i }));
+
+      expect(mockSetStudentLoanPlan).toHaveBeenCalledWith(['plan2']);
+      expect(mockSetInput).toHaveBeenCalledWith({
+        pensionContributionType: 'percentage',
+        pensionContribution: 5,
+      });
     });
 
     it('should convert tax code to uppercase', () => {

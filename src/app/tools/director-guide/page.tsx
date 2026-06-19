@@ -4,6 +4,7 @@ import { DirectorDashboard } from '@/components/organisms/DirectorGuide';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
 import { generateMetadata as generateBaseMetadata, SITE_URL } from '@/lib/metadata';
+import { directorGuideFaqItems } from './faq';
 
 export const metadata = generateBaseMetadata({
   title: `Director Pay Dashboard | Salary & Dividend Calculator ${CURRENT_TAX_YEAR_DISPLAY_SHORT}`,
@@ -35,32 +36,31 @@ export default function DirectorGuidePage() {
     },
   } as const;
 
-  // FAQ schema - uses softer language to avoid over-specific claims that may drift
-  const faqItems = [
-    {
-      question: `How do salary and dividends compare for company directors in ${CURRENT_TAX_YEAR_DISPLAY_SHORT}?`,
-      answer:
-        'Salary uses your Personal Allowance and can help build State Pension credits, while dividends are often taxed at different rates. The right mix depends on profits, Employment Allowance eligibility, and your wider income.',
-    },
-    {
-      question: 'Are dividends better than salary for directors?',
-      answer:
-        'Dividends can be more tax-efficient than additional salary because they avoid National Insurance. However, dividends must be paid from profits, and salary can help build State Pension credits. The mix depends on your total income and circumstances.',
-    },
-    {
-      question: 'How is Employer NI calculated on director salary?',
-      answer:
-        'Employer NI is charged on salary above the Secondary Threshold. Directors use an annual earnings period, so NI is calculated on total annual salary rather than per pay period. Companies eligible for Employment Allowance may offset some or all of this cost.',
-    },
-  ];
-
   return (
     <>
       <StructuredData type='breadcrumb' breadcrumbs={breadcrumbItems} />
       <StructuredData type='calculator' data={softwareSchema} />
-      <StructuredData type='faq' faqs={faqItems} />
+      <StructuredData type='faq' faqs={directorGuideFaqItems} />
       <StructuredData type='dataset' />
       <DirectorDashboard />
+      <section className='border-border/70 border-t bg-background py-12 md:py-16'>
+        <div className='container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8'>
+          <p className='font-semibold text-primary text-xs uppercase tracking-[0.28em]'>
+            Director FAQs
+          </p>
+          <h2 className='mt-3 font-display font-semibold text-3xl text-foreground leading-tight md:text-4xl'>
+            Common director pay questions
+          </h2>
+          <div className='mt-6 divide-y divide-border border-border border-y'>
+            {directorGuideFaqItems.map((item) => (
+              <article key={item.question} className='py-5'>
+                <h3 className='font-semibold text-foreground text-lg leading-7'>{item.question}</h3>
+                <p className='mt-2 text-foreground/75 leading-7'>{item.answer}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
     </>
   );
 }
