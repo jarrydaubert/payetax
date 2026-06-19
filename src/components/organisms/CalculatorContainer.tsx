@@ -2,7 +2,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { Mail, Sparkles } from 'lucide-react';
+import { Copy, Download, Mail, Sparkles } from 'lucide-react';
 import * as React from 'react';
 import { EmailResultsForm } from '@/components/molecules/EmailResultsForm';
 import { Card } from '@/components/ui/card';
@@ -18,7 +18,8 @@ import { ANIMATION_TRANSITIONS, ANIMATION_VARIANTS } from '@/constants/animation
 import { BREAKPOINTS, TIMERS } from '@/constants/ui';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { trackEvent } from '@/lib/analytics';
-import { cn } from '@/lib/utils';
+import type { TaxCalculationResults } from '@/lib/types/calculator';
+import { cn, formatCurrency } from '@/lib/utils';
 import type { PayeEmailInput } from '@/lib/validation/emailValidation';
 import { useShallow } from '@/lib/zustandShallow';
 import {
@@ -29,6 +30,135 @@ import {
 import { CalculatorInputsSection } from './CalculatorInputs/CalculatorInputsSection';
 import { ResultsSummaryCards } from './CalculatorResults/ResultsSummaryCards';
 import { ResultsTable } from './CalculatorResults/ResultsTable';
+
+type ResultExportInput = Pick<
+  PayeEmailInput,
+  | 'salary'
+  | 'payPeriod'
+  | 'taxYear'
+  | 'taxCode'
+  | 'studentLoanPlans'
+  | 'pensionContribution'
+  | 'pensionContributionType'
+> & {
+  region: string;
+};
+
+const RESULT_EXPORT_PERIODS = [
+  { key: 'annually', label: 'Annual' },
+  { key: 'monthly', label: 'Monthly' },
+  { key: 'weekly', label: 'Weekly' },
+] as const;
+
+function getStudentLoanLabel(plans: ResultExportInput['studentLoanPlans']): string {
+  if (plans === 'none') return 'None';
+  return plans.map((plan) => plan.replace('plan', 'Plan ')).join(' + ');
+}
+
+function buildResultsSummaryText(input: ResultExportInput, results: TaxCalculationResults): string {
+  return [
+    'PayeTax PAYE estimate',
+    `Tax year: ${input.taxYear}`,
+    `Region: ${input.region}`,
+    `Salary: ${formatCurrency(input.salary, 0)} ${input.payPeriod}`,
+    `Tax code: ${input.taxCode || 'Standard personal allowance'}`,
+    `Student loan: ${getStudentLoanLabel(input.studentLoanPlans)}`,
+    `Pension: ${input.pensionContribution}${input.pensionContributionType === 'percentage' ? '%' : ''}`,
+    '',
+    `Annual take-home: ${formatCurrency(results.netPay.annually)}`,
+    `Monthly take-home: ${formatCurrency(results.netPay.monthly)}`,
+    `Annual income tax: ${formatCurrency(results.incomeTax.annually)}`,
+    `Annual National Insurance: ${formatCurrency(results.nationalInsurance.annually)}`,
+    `Annual student loan: ${formatCurrency(results.studentLoan.annually)}`,
+    `Annual pension contribution: ${formatCurrency(results.pensionContribution.annually)}`,
+    '',
+    'Illustrative only. Not financial or tax advice.',
+    'Source: https://payetax.co.uk/',
+  ].join('\n');
+}
+
+function escapeCsvValue(value: string | number): string {
+  const text = String(value);
+  if (!/[",\n]/.test(text)) return text;
+  return `"${text.replaceAll('"', '""')}"`;
+}
+
+function buildResultsCsv(input: ResultExportInput, results: TaxCalculationResults): string {
+  const metadataRows = [
+    ['PayeTax PAYE estimate'],
+    ['Tax year', input.taxYear],
+    ['Region', input.region],
+    ['Salary', input.salary],
+    ['Pay period', input.payPeriod],
+    ['Tax code', input.taxCode || 'Standard personal allowance'],
+    ['Student loan', getStudentLoanLabel(input.studentLoanPlans)],
+    [],
+  ];
+
+  const resultRows = [
+    [
+      'Period',
+      'Gross salary',
+      'Income tax',
+      'National Insurance',
+      'Student loan',
+      'Pension',
+      'Take-home pay',
+    ],
+    ...RESULT_EXPORT_PERIODS.map(({ key, label }) => [
+      label,
+      results.grossSalary[key],
+      results.incomeTax[key],
+      results.nationalInsurance[key],
+      results.studentLoan[key],
+      results.pensionContribution[key],
+      results.netPay[key],
+    ]),
+  ];
+
+  return [...metadataRows, ...resultRows]
+    .map((row) => row.map(escapeCsvValue).join(','))
+    .join('\n');
+}
+
+async function copyTextToClipboard(text: string): Promise<void> {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+
+  try {
+    if (!document.execCommand('copy')) {
+      throw new Error('Clipboard fallback failed');
+    }
+  } finally {
+    textarea.remove();
+  }
+}
+
+function downloadTextFile(filename: string, contents: string, mimeType: string): void {
+  if (typeof URL.createObjectURL !== 'function') {
+    throw new Error('Downloads are not supported in this browser');
+  }
+
+  const blob = new Blob([contents], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
 
 export function CalculatorContainer() {
   // Use optimized selectors to prevent unnecessary re-renders
@@ -155,6 +285,56 @@ export function CalculatorContainer() {
     setVisiblePeriods(periods);
   };
 
+  const handleCopyResults = async () => {
+    if (!results) return;
+
+    try {
+      await copyTextToClipboard(buildResultsSummaryText(input, results));
+      setActionMessage({
+        tone: 'info',
+        text: 'Results copied. The summary stayed in your browser.',
+      });
+      setLiveMessage('Tax result summary copied to clipboard.');
+      trackEvent({
+        action: 'result_shared',
+        category: 'calculator',
+        label: 'copy_results',
+      });
+    } catch (error) {
+      console.error('[CalculatorContainer] Failed to copy results:', error);
+      setActionMessage({
+        tone: 'error',
+        text: 'Could not copy results. Please try again or use email results.',
+      });
+    }
+  };
+
+  const handleDownloadCsv = () => {
+    if (!results) return;
+
+    try {
+      const roundedSalary = Math.round(input.salary);
+      const filename = `payetax-${input.taxYear}-${roundedSalary || 'results'}.csv`;
+      downloadTextFile(filename, buildResultsCsv(input, results), 'text/csv;charset=utf-8');
+      setActionMessage({
+        tone: 'info',
+        text: 'CSV downloaded in your browser.',
+      });
+      setLiveMessage('Tax results CSV downloaded.');
+      trackEvent({
+        action: 'result_shared',
+        category: 'calculator',
+        label: 'download_csv',
+      });
+    } catch (error) {
+      console.error('[CalculatorContainer] Failed to download CSV:', error);
+      setActionMessage({
+        tone: 'error',
+        text: 'Could not download the CSV in this browser.',
+      });
+    }
+  };
+
   const handleApplyPensionOptimization = (pensionAmount: number) => {
     setActionMessage(null);
     try {
@@ -194,27 +374,49 @@ export function CalculatorContainer() {
     }
   };
 
-  const emailResultsAction = (
-    <Dialog>
-      <DialogTrigger asChild>
-        <button
-          type='button'
-          className='inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
-          aria-label='Email tax calculation results'
-          title='Email Results'
-        >
-          <Mail className='h-4 w-4' />
-          <span className='sr-only'>Email Results</span>
-        </button>
-      </DialogTrigger>
-      <DialogContent className='border-border/60 bg-card text-card-foreground sm:max-w-md'>
-        <DialogHeader>
-          <DialogTitle>Email Results</DialogTitle>
-          <DialogDescription>Send a copy of this calculation to your inbox.</DialogDescription>
-        </DialogHeader>
-        <EmailResultsForm input={emailInput} className='w-full' />
-      </DialogContent>
-    </Dialog>
+  const resultActions = (
+    <div className='flex shrink-0 items-center gap-2'>
+      <button
+        type='button'
+        className='inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+        aria-label='Copy tax calculation results'
+        title='Copy Results'
+        onClick={handleCopyResults}
+      >
+        <Copy className='h-4 w-4' />
+        <span className='sr-only'>Copy Results</span>
+      </button>
+      <button
+        type='button'
+        className='inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+        aria-label='Download results as CSV file'
+        title='Download CSV'
+        onClick={handleDownloadCsv}
+      >
+        <Download className='h-4 w-4' />
+        <span className='sr-only'>Download CSV</span>
+      </button>
+      <Dialog>
+        <DialogTrigger asChild>
+          <button
+            type='button'
+            className='inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+            aria-label='Email tax calculation results'
+            title='Email Results'
+          >
+            <Mail className='h-4 w-4' />
+            <span className='sr-only'>Email Results</span>
+          </button>
+        </DialogTrigger>
+        <DialogContent className='border-border/60 bg-card text-card-foreground sm:max-w-md'>
+          <DialogHeader>
+            <DialogTitle>Email Results</DialogTitle>
+            <DialogDescription>Send a copy of this calculation to your inbox.</DialogDescription>
+          </DialogHeader>
+          <EmailResultsForm input={emailInput} className='w-full' />
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 
   return (
@@ -287,7 +489,7 @@ export function CalculatorContainer() {
       >
         <CalculatorInputsSection
           onCalculate={handleCalculate}
-          resultAction={showResults ? emailResultsAction : undefined}
+          resultAction={showResults ? resultActions : undefined}
         />
       </Card>
 
