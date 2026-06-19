@@ -101,14 +101,37 @@ describe('next.config crawler headers', () => {
     expect(csp).toContain('https://*.ingest.de.sentry.io');
   });
 
-  it('adds an X-Robots-Tag header to API routes', async () => {
+  it('adds X-Robots-Tag only to private API routes', async () => {
     const { default: nextConfig } = await import('../../../next.config');
     const headers = await nextConfig.headers?.();
 
     expect(headers).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
+          source: '/api/send-results',
+          headers: expect.arrayContaining([{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }]),
+        }),
+        expect.objectContaining({
+          source: '/api/send-director-results',
+          headers: expect.arrayContaining([{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }]),
+        }),
+        expect.objectContaining({
+          source: '/api/ops/:path*',
+          headers: expect.arrayContaining([{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }]),
+        }),
+      ]),
+    );
+    expect(headers).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
           source: '/api/:path*',
+        }),
+      ]),
+    );
+    expect(headers).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          source: '/api/tax-rates',
           headers: expect.arrayContaining([{ key: 'X-Robots-Tag', value: 'noindex, nofollow' }]),
         }),
       ]),

@@ -210,14 +210,9 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             <div>
               <LatestArticles posts={latestPosts} />
             </div>
-            <div className='hidden lg:block'>
+            <div>
               <EditorsPicksSticky posts={editorsPicks} />
             </div>
-          </div>
-
-          {/* Mobile Editor's Picks */}
-          <div className='mt-8 sm:mt-12 lg:hidden'>
-            <EditorsPicksSticky posts={editorsPicks} />
           </div>
         </div>
 

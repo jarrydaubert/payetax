@@ -19,17 +19,18 @@ describe('EditorsPicks', () => {
 
     render(<EditorsPicks posts={posts} />);
 
-    expect(screen.getAllByText("Editor's Picks").length).toBeGreaterThanOrEqual(2);
-    expect(screen.getAllByRole('listitem').length).toBeGreaterThanOrEqual(5);
-    expect(screen.getAllByText('01').length).toBeGreaterThanOrEqual(2);
+    expect(screen.getByRole('complementary', { name: /editor's picks/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: "Editor's Picks" })).toBeInTheDocument();
+    expect(screen.getAllByRole('listitem')).toHaveLength(5);
+    expect(screen.getByText('01')).toBeInTheDocument();
   });
 
-  it('renders a mobile summary element for the accordion', () => {
+  it('renders picks once rather than duplicating responsive copies', () => {
     const posts = [1].map((index) => makePost(index));
 
     const { container } = render(<EditorsPicks posts={posts} />);
 
-    const summary = container.querySelector('summary[aria-label="Toggle Editor\'s Picks section"]');
-    expect(summary).toBeInTheDocument();
+    expect(container.querySelectorAll('aside[aria-label="Editor\'s picks"]')).toHaveLength(1);
+    expect(container.querySelector('details')).not.toBeInTheDocument();
   });
 });

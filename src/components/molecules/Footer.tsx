@@ -5,6 +5,7 @@
 import Link from 'next/link';
 import { useCallback } from 'react';
 import { SITE_CONTACT_MAILTO } from '@/constants/contact';
+import { APP_VERSION } from '@/constants/version';
 import { cn } from '@/lib/utils';
 
 /**
@@ -76,11 +77,7 @@ export function Footer({ className }: FooterProps) {
         {/* Copyright & Version */}
         <div className='whitespace-nowrap text-muted-foreground text-sm md:justify-self-end'>
           &copy; 2026 PayeTax
-          {process.env.NEXT_PUBLIC_APP_VERSION && (
-            <span className='ml-2 text-muted-foreground'>
-              v{process.env.NEXT_PUBLIC_APP_VERSION}
-            </span>
-          )}
+          <span className='ml-2 text-muted-foreground'>v{APP_VERSION}</span>
         </div>
       </div>
     </div>

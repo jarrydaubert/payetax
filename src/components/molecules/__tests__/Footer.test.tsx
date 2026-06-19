@@ -3,6 +3,7 @@
 
 import { fireEvent, render, screen } from '@testing-library/react';
 import { SITE_CONTACT_MAILTO } from '@/constants/contact';
+import { APP_VERSION } from '@/constants/version';
 import { Footer } from '../Footer';
 
 describe('Footer Component', () => {
@@ -29,6 +30,12 @@ describe('Footer Component', () => {
       render(<Footer />);
 
       expect(screen.getByText(/© 2026 PayeTax/i)).toBeInTheDocument();
+    });
+
+    it('should render the shared app version', () => {
+      render(<Footer />);
+
+      expect(screen.getByText(`v${APP_VERSION}`)).toBeInTheDocument();
     });
   });
 
