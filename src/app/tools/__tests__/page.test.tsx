@@ -11,6 +11,17 @@ describe('ToolsPage', () => {
     expect(screen.getByTestId('tools-link-national-insurance-calculator')).toBeInTheDocument();
   });
 
+  it('renders crawlable chooser and limit copy', () => {
+    render(<ToolsPage />);
+
+    expect(screen.getByText('Which PayeTax tool should I use?')).toBeInTheDocument();
+    expect(screen.getByText('Current coverage and limits')).toBeInTheDocument();
+    expect(screen.getByText('Does not cover')).toBeInTheDocument();
+    expect(
+      screen.getByText('Are the tools a replacement for payroll software?'),
+    ).toBeInTheDocument();
+  });
+
   it('does not render removed audience-marketing links', () => {
     render(<ToolsPage />);
 

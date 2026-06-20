@@ -19,11 +19,21 @@ import FileText from 'lucide-react/dist/esm/icons/file-text.mjs';
 import Shield from 'lucide-react/dist/esm/icons/shield.mjs';
 import { RATES_LAST_VERIFIED } from '@/constants/freshness';
 import {
+  HMRC_EMPLOYER_RATES_2026_2027_URL,
   HMRC_INCOME_TAX_RATES_URL,
   HMRC_STUDENT_LOAN_REPAYMENT_URL,
   ONS_ASHE_URL,
+  PAYETAX_REPOSITORY_URL,
   REVENUE_SCOTLAND_INCOME_TAX_URL,
 } from '@/constants/sources';
+
+type ComplianceFeatureDetail =
+  | string
+  | {
+      text: string;
+      href: string;
+      linkText: string;
+    };
 
 /**
  * Compliance feature interface
@@ -31,7 +41,7 @@ import {
 interface ComplianceFeature {
   title: string;
   description: string;
-  details: string[];
+  details: ComplianceFeatureDetail[];
   icon: LucideIcon;
   lastUpdated: string;
   source: string;
@@ -58,7 +68,17 @@ interface DataSource {
   reliability: string;
 }
 
+interface SourceReviewNote {
+  title: string;
+  sourceDate: string;
+  reviewedOn: string;
+  summary: string;
+  impact: string;
+  url: string;
+}
+
 const COMPLIANCE_LAST_REVIEWED = RATES_LAST_VERIFIED;
+const SOURCE_REVIEW_DATE = '2026-06-20';
 
 /**
  * HMRC compliance features and certifications
@@ -86,7 +106,11 @@ const COMPLIANCE_FEATURES: ComplianceFeature[] = [
       'Tested against HMRC published example calculations',
       'Formulas match official PAYE calculation methods',
       'Edge cases validated against gov.uk guidance',
-      'Open source — anyone can check our maths',
+      {
+        text: 'Open source — anyone can check our maths',
+        href: PAYETAX_REPOSITORY_URL,
+        linkText: 'View repository',
+      },
     ],
     icon: Shield,
     lastUpdated: COMPLIANCE_LAST_REVIEWED,
@@ -191,6 +215,18 @@ const DATA_SOURCES: DataSource[] = [
   },
 ];
 
+const SOURCE_REVIEW_NOTES: SourceReviewNote[] = [
+  {
+    title: 'GOV.UK employer rates update checked',
+    sourceDate: '2026-06-05',
+    reviewedOn: SOURCE_REVIEW_DATE,
+    summary: 'GOV.UK updated its 2026 to 2027 employer rates page for mileage allowance payments.',
+    impact:
+      'No change was required to PayeTax core PAYE salary calculations: income tax bands, employee NI category A rates, employer NI rate, and student-loan thresholds used by the calculator were unchanged.',
+    url: HMRC_EMPLOYER_RATES_2026_2027_URL,
+  },
+];
+
 /**
  * Compliance stats for StatsGrid component
  * Shows key compliance metrics
@@ -216,4 +252,10 @@ const complianceStats = [
   },
 ];
 
-export { COMPLIANCE_FEATURES, COMPLIANCE_STATEMENTS, complianceStats, DATA_SOURCES };
+export {
+  COMPLIANCE_FEATURES,
+  COMPLIANCE_STATEMENTS,
+  complianceStats,
+  DATA_SOURCES,
+  SOURCE_REVIEW_NOTES,
+};
