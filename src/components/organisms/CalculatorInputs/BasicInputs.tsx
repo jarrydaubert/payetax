@@ -8,7 +8,6 @@ import { LabelTooltip } from '@/components/atoms/LabelTooltip';
 import NumberInput from '@/components/atoms/NumberInput';
 import TaxYearSelect from '@/components/atoms/TaxYearSelect';
 import { IncomeSourceList } from '@/components/organisms/IncomeSourceList';
-import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,7 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { PERIODS, type StudentLoanPlan } from '@/constants/taxRates';
-import { trackEvent, trackFormInteraction } from '@/lib/analytics';
+import { trackFormInteraction } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
 
@@ -29,14 +28,6 @@ const STATE_PENSION_AGE = 66;
 
 /** Tax code validation: letters, numbers, optional K prefix, max 10 chars */
 const TAX_CODE_REGEX = /^[A-Z0-9]{0,10}$/;
-
-const SALARY_PRESETS = [
-  { label: '£30k', salary: 30_000 },
-  { label: '£40k', salary: 40_000 },
-  { label: '£50k', salary: 50_000 },
-  { label: '£60k', salary: 60_000 },
-  { label: '£100k trap', salary: 100_000 },
-] as const;
 
 export function BasicInputs() {
   const trackedFieldFocusesRef = useRef<Set<string>>(new Set());
@@ -58,7 +49,6 @@ export function BasicInputs() {
     setPensionContribution,
     setPensionContributionType,
     setAllowancesDeductions,
-    setInput,
   } = useCalculatorActions();
 
   // Generate unique IDs for accessibility
@@ -137,45 +127,6 @@ export function BasicInputs() {
 
     trackedFieldFocusesRef.current.add(fieldName);
     trackFormInteraction('paye_calculator', 'focus', fieldName);
-  };
-
-  const trackPresetSelected = (preset: string) => {
-    trackEvent({
-      action: 'calculator_action',
-      category: 'calculator',
-      label: 'preset_selected',
-      custom_data: { preset },
-    });
-  };
-
-  const applySalaryPreset = (salary: number, label: string) => {
-    setSalary(salary);
-    setPayPeriod(PERIODS.ANNUALLY);
-    trackPresetSelected(label);
-  };
-
-  const applyScotlandPreset = () => {
-    const shouldUseStandardScottishCode = input.taxCode === '' || input.taxCode === '1257L';
-
-    setInput({
-      region: 'Scotland',
-      isScottish: true,
-      ...(shouldUseStandardScottishCode ? { taxCode: 'S1257L' } : {}),
-    });
-    trackPresetSelected('scotland');
-  };
-
-  const applyPlanTwoPreset = () => {
-    setStudentLoanPlans(['plan2']);
-    trackPresetSelected('plan_2_student_loan');
-  };
-
-  const applyFivePercentPensionPreset = () => {
-    setInput({
-      pensionContributionType: 'percentage',
-      pensionContribution: 5,
-    });
-    trackPresetSelected('five_percent_pension');
   };
 
   const handleUndergraduateLoanChange = (value: string) => {
@@ -302,53 +253,6 @@ export function BasicInputs() {
           </span>
         </div>
       </div>
-
-      <fieldset className='space-y-2 rounded-md border border-border/70 bg-muted/30 p-3'>
-        <legend className='px-1 font-medium text-muted-foreground text-xs'>Quick presets</legend>
-        <div className='flex flex-wrap gap-2'>
-          {SALARY_PRESETS.map((preset) => (
-            <Button
-              key={preset.label}
-              type='button'
-              variant='outline'
-              size='sm'
-              className='h-8 px-2.5 text-xs'
-              onClick={() => applySalaryPreset(preset.salary, preset.label)}
-            >
-              {preset.label}
-            </Button>
-          ))}
-        </div>
-        <div className='flex flex-wrap gap-2'>
-          <Button
-            type='button'
-            variant='outline'
-            size='sm'
-            className='h-8 px-2.5 text-xs'
-            onClick={applyScotlandPreset}
-          >
-            Scotland
-          </Button>
-          <Button
-            type='button'
-            variant='outline'
-            size='sm'
-            className='h-8 px-2.5 text-xs'
-            onClick={applyPlanTwoPreset}
-          >
-            Plan 2 loan
-          </Button>
-          <Button
-            type='button'
-            variant='outline'
-            size='sm'
-            className='h-8 px-2.5 text-xs'
-            onClick={applyFivePercentPensionPreset}
-          >
-            5% pension
-          </Button>
-        </div>
-      </fieldset>
 
       {/* Tax Year */}
       <div className={fieldRowClass}>
