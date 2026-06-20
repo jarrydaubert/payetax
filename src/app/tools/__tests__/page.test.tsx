@@ -17,6 +17,14 @@ describe('ToolsPage', () => {
     expect(screen.getByText('Which PayeTax tool should I use?')).toBeInTheDocument();
     expect(screen.getByText('Current coverage and limits')).toBeInTheDocument();
     expect(screen.getByText('Does not cover')).toBeInTheDocument();
+    expect(screen.getByText('Compare salary and dividends')).toBeInTheDocument();
+    expect(screen.getByText(/Salary, dividends, Corporation Tax/)).toBeInTheDocument();
+    expect(screen.getByText(/Accountant-only judgements such as IR35 status/)).toBeInTheDocument();
+    expect(
+      screen
+        .getAllByRole('link', { name: /Director Intelligence/i })
+        .some((link) => link.getAttribute('href') === '/tools/director-guide'),
+    ).toBe(true);
     expect(
       screen.getByText('Are the tools a replacement for payroll software?'),
     ).toBeInTheDocument();
