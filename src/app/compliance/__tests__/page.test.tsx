@@ -9,4 +9,15 @@ describe('CompliancePage', () => {
     expect(screen.getByText('Tax Rates & Compliance')).toBeInTheDocument();
     expect(screen.getByText('Questions About Compliance?')).toBeInTheDocument();
   });
+
+  it('renders source review notes and visible repository proof', () => {
+    render(<CompliancePage />);
+
+    expect(screen.getByText('Recent Source Checks')).toBeInTheDocument();
+    expect(screen.getByText('GOV.UK employer rates update checked')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /View repository/i })).toHaveAttribute(
+      'href',
+      'https://github.com/jarrydaubert/payetax',
+    );
+  });
 });

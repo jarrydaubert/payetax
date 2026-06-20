@@ -19,6 +19,7 @@ import {
   COMPLIANCE_STATEMENTS,
   complianceStats,
   DATA_SOURCES,
+  SOURCE_REVIEW_NOTES,
 } from '@/constants/pages/compliancePageData';
 import { APP_VERSION } from '@/constants/version';
 import { cn } from '@/lib/utils';
@@ -125,14 +126,29 @@ export function CompliancePageContent() {
                   <ul className='space-y-2'>
                     {feature.details.map((detail) => (
                       <li
-                        key={detail}
+                        key={typeof detail === 'string' ? detail : detail.text}
                         className={cn('flex items-start gap-2 text-muted-foreground', 'text-sm')}
                       >
                         <CheckCircle
                           className='mt-0.5 size-4 flex-shrink-0 text-primary'
                           aria-hidden='true'
                         />
-                        <span>{detail}</span>
+                        {typeof detail === 'string' ? (
+                          <span>{detail}</span>
+                        ) : (
+                          <span>
+                            {detail.text}{' '}
+                            <a
+                              href={detail.href}
+                              target='_blank'
+                              rel='noopener noreferrer'
+                              className='inline-flex items-center gap-1 font-medium text-primary underline underline-offset-2 hover:text-primary/80'
+                            >
+                              {detail.linkText}
+                              <ExternalLink className='size-3' aria-hidden='true' />
+                            </a>
+                          </span>
+                        )}
                       </li>
                     ))}
                   </ul>
@@ -148,6 +164,57 @@ export function CompliancePageContent() {
                 </Card>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* Source Review Log */}
+      <section className={'border-border/60 border-y bg-card py-12 md:py-20'}>
+        <div className={'container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'}>
+          <SectionHeading
+            badge={{ icon: CheckCircle, text: 'Source Review Log' }}
+            title='Recent Source Checks'
+            subtitle='Public notes for source updates that were reviewed after the main rate verification date.'
+            align='center'
+          />
+
+          <div className='grid gap-4'>
+            {SOURCE_REVIEW_NOTES.map((note) => (
+              <Card key={`${note.title}-${note.sourceDate}`} className='border-primary/20 p-6'>
+                <div className='grid gap-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-start'>
+                  <div>
+                    <p className='font-medium text-primary text-xs uppercase tracking-wide'>
+                      Source update: {formatIsoDateForDisplay(note.sourceDate)}
+                    </p>
+                    <h3 className='mt-2 font-display font-semibold text-2xl text-foreground'>
+                      {note.title}
+                    </h3>
+                    <p className='mt-3 text-muted-foreground text-sm leading-relaxed'>
+                      {note.summary}
+                    </p>
+                    <p className='mt-3 text-muted-foreground text-sm leading-relaxed'>
+                      {note.impact}
+                    </p>
+                  </div>
+                  <div className='flex flex-col gap-3 md:items-end'>
+                    <p className='text-muted-foreground text-xs'>
+                      Reviewed: {formatIsoDateForDisplay(note.reviewedOn)}
+                    </p>
+                    <Button variant='outline' size='sm' asChild>
+                      <a
+                        href={note.url}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='flex items-center gap-2'
+                      >
+                        View GOV.UK update
+                        <ExternalLink className='size-4' aria-hidden='true' />
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
