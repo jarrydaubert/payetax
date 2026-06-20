@@ -62,7 +62,7 @@ export function CrawlableTaxFacts() {
       data-testid='crawlable-tax-facts'
     >
       <div className='mx-auto max-w-6xl'>
-        <div className='mb-8 grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-end'>
+        <div className='mb-8 grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-start'>
           <div>
             <div className='mb-3 font-semibold text-primary text-xs uppercase tracking-[0.18em]'>
               Static reference

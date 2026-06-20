@@ -305,26 +305,24 @@ export function BasicInputs() {
 
       <fieldset className='space-y-2 rounded-md border border-border/70 bg-muted/30 p-3'>
         <legend className='px-1 font-medium text-muted-foreground text-xs'>Quick presets</legend>
-        <div className='flex flex-wrap gap-2'>
+        <div className='grid grid-cols-2 gap-2'>
           {SALARY_PRESETS.map((preset) => (
             <Button
               key={preset.label}
               type='button'
               variant='outline'
               size='sm'
-              className='h-8 px-2.5 text-xs'
+              className='h-8 w-full justify-center px-2 text-xs'
               onClick={() => applySalaryPreset(preset.salary, preset.label)}
             >
               {preset.label}
             </Button>
           ))}
-        </div>
-        <div className='flex flex-wrap gap-2'>
           <Button
             type='button'
             variant='outline'
             size='sm'
-            className='h-8 px-2.5 text-xs'
+            className='h-8 w-full justify-center px-2 text-xs'
             onClick={applyScotlandPreset}
           >
             Scotland
@@ -333,7 +331,7 @@ export function BasicInputs() {
             type='button'
             variant='outline'
             size='sm'
-            className='h-8 px-2.5 text-xs'
+            className='h-8 w-full justify-center px-2 text-xs'
             onClick={applyPlanTwoPreset}
           >
             Plan 2 loan
@@ -342,7 +340,7 @@ export function BasicInputs() {
             type='button'
             variant='outline'
             size='sm'
-            className='h-8 px-2.5 text-xs'
+            className='h-8 w-full justify-center px-2 text-xs'
             onClick={applyFivePercentPensionPreset}
           >
             5% pension

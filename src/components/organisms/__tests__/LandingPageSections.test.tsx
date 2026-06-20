@@ -4,10 +4,11 @@ import LandingPageSections from '../LandingPageSections';
 
 describe('LandingPageSections', () => {
   it('renders the retained supporting sections', () => {
-    render(<LandingPageSections />);
+    const { container } = render(<LandingPageSections />);
 
     expect(screen.getByText('FAQ')).toBeInTheDocument();
     expect(screen.getByText(/HMRC rates verified/)).toBeInTheDocument();
+    expect(container.querySelectorAll('.max-w-6xl').length).toBeGreaterThanOrEqual(5);
   });
 
   it('does not render removed promotional sections', () => {

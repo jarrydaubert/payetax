@@ -70,7 +70,7 @@ export function FAQSection() {
       className='relative z-[1] border-border border-y bg-background px-4 py-16 md:py-24'
       id='faq'
     >
-      <div className='mx-auto mb-8 max-w-[960px] text-left'>
+      <div className='mx-auto mb-8 max-w-6xl text-left'>
         <div className='mb-3 font-semibold text-primary text-xs uppercase tracking-[0.18em]'>
           FAQ
         </div>
@@ -83,7 +83,7 @@ export function FAQSection() {
         </p>
       </div>
 
-      <div className='mx-auto grid max-w-[960px] border-border border-t md:grid-cols-2 md:gap-x-8'>
+      <div className='mx-auto grid max-w-6xl border-border border-t md:grid-cols-2 md:gap-x-8'>
         {faqs.map((faq) => (
           <div
             key={faq.question}
@@ -157,7 +157,7 @@ export function ToolsDirectory() {
   return (
     // biome-ignore lint/correctness/useUniqueElementIds: Static ID required for anchor navigation
     <section className='relative z-[1] bg-background px-4 py-16 md:py-24' id='tools'>
-      <div className='mx-auto mb-8 max-w-[960px] text-left'>
+      <div className='mx-auto mb-8 max-w-6xl text-left'>
         <div className='mb-3 font-semibold text-primary text-xs uppercase tracking-[0.18em]'>
           More tools
         </div>
@@ -169,7 +169,7 @@ export function ToolsDirectory() {
         </p>
       </div>
 
-      <div className='mx-auto grid max-w-[960px] gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+      <div className='mx-auto grid max-w-6xl gap-4 sm:grid-cols-2 lg:grid-cols-3'>
         {TOOLS.map((tool) => (
           <Link
             key={tool.href}

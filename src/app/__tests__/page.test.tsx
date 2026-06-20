@@ -16,7 +16,7 @@ describe('HomePage', () => {
     const facts = getCrawlableTaxFacts();
     const salary30k = facts.salaryExamples.find((example) => example.salary === 30_000);
 
-    render(<HomePage />);
+    const { container } = render(<HomePage />);
 
     expect(screen.getByTestId('crawlable-tax-facts')).toBeInTheDocument();
     expect(
@@ -25,6 +25,9 @@ describe('HomePage', () => {
     expect(screen.getByTestId('crawlable-tax-facts')).toHaveTextContent(facts.assumptions);
     expect(screen.getByText(salary30k?.annualTakeHomeLabel ?? '')).toBeInTheDocument();
     expect(screen.getAllByText('Employee NI category A primary rate')[0]).toBeInTheDocument();
+    expect(
+      container.querySelector('[data-testid="crawlable-tax-facts"] .lg\\:items-start'),
+    ).toBeInTheDocument();
   });
 
   it('keeps query-parameter calculator presets canonical to the homepage', () => {

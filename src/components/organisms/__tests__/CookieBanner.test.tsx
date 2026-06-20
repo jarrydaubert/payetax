@@ -39,6 +39,7 @@ describe('CookieBanner', () => {
     expect(screen.getByRole('button', { name: /Accept All/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Essential Only/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Manage Preferences/i })).toBeInTheDocument();
+    expect(screen.getByTestId('cookie-banner')).toHaveClass('sm:left-auto');
   });
 
   it('stores accepted preferences from banner', async () => {
