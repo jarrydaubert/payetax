@@ -79,7 +79,8 @@ describe('crawlableTaxFacts', () => {
     const firstExample = getCrawlableSalaryExamples(CURRENT_TAX_YEAR)[0];
 
     expect(markdown).toContain('## Citable PAYE Rates and Take-Home Examples');
-    expect(markdown).toContain('/#tax-rates-and-take-home');
+    expect(markdown).toContain('Machine-readable dataset: /api/tax-rates');
+    expect(markdown).not.toContain('/#tax-rates-and-take-home');
     expect(markdown).toContain(firstExample?.summary);
   });
 });

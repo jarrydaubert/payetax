@@ -286,7 +286,7 @@ export function getCrawlableTaxFactsMarkdown(taxYear: TaxYear = CURRENT_TAX_YEAR
 
   return `## Citable PAYE Rates and Take-Home Examples
 
-Static HTML section: /#tax-rates-and-take-home
+Machine-readable dataset: /api/tax-rates
 Tax year: ${facts.taxYearLongLabel} (${facts.taxYearDateRange})
 Rate verification date: ${facts.ratesVerifiedOn}
 Assumptions: ${facts.assumptions}
