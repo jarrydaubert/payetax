@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { PageHero } from '@/components/molecules/PageHero';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import { Card } from '@/components/ui/card';
+import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
 import { TOOLS } from '@/constants/pages/toolsData';
 import { generateMetadata as generateBaseMetadata, SITE_URL } from '@/lib/metadata';
 import { cn } from '@/lib/utils';
@@ -69,8 +70,7 @@ const toolGuideRows = [
 const toolsFaq = [
   {
     question: 'Which tax year do these tools use?',
-    answer:
-      'The retained calculators are positioned around the current 2026-27 tax year and link back to the Compliance page for source dates and rate verification notes.',
+    answer: `The retained calculators are positioned around the current ${CURRENT_TAX_YEAR_DISPLAY_SHORT} tax year and link back to the Compliance page for source dates and rate verification notes.`,
   },
   {
     question: 'Are the tools a replacement for payroll software?',
@@ -260,8 +260,9 @@ export default function ToolsPage() {
               </p>
               <ul className='mt-6 space-y-3 text-muted-foreground text-sm leading-relaxed'>
                 <li>
-                  <span className='font-medium text-foreground'>Tax year:</span> 2026-27 rates and
-                  thresholds for the retained calculators.
+                  <span className='font-medium text-foreground'>Tax year:</span>{' '}
+                  {CURRENT_TAX_YEAR_DISPLAY_SHORT} rates and thresholds for the retained
+                  calculators.
                 </li>
                 <li>
                   <span className='font-medium text-foreground'>Regions:</span> England, Wales,
