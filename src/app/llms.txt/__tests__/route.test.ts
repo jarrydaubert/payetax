@@ -1,5 +1,4 @@
 import { getBlogCategories, getBlogPosts } from '@/lib/blog';
-import { getCrawlableTaxFacts } from '@/lib/crawlableTaxFacts';
 import { GET } from '../route';
 
 jest.mock('@/lib/blog', () => ({
@@ -44,8 +43,8 @@ describe('llms.txt route', () => {
     expect(text).toContain('Search crawlers and AI crawlers are allowed.');
     expect(text).toContain('/_vercel/ remain disallowed in robots.txt');
     expect(text).toContain('## Citable PAYE Rates and Take-Home Examples');
-    expect(text).toContain('/#tax-rates-and-take-home');
-    expect(text).toContain(getCrawlableTaxFacts().salaryExamples[0]?.summary);
+    expect(text).toContain('Machine-readable dataset: /api/tax-rates');
+    expect(text).not.toContain('/#tax-rates-and-take-home');
     expect(text).toContain('## Blog Posts - Tax Basics');
     expect(text).toContain('- [\\[Tax\\] Basics](https://payetax.co.uk/blog/intro-tax):');
     expect(text).toContain(`${longExcerpt.slice(0, 150)}...`);

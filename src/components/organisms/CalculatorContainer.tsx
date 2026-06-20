@@ -422,7 +422,7 @@ export function CalculatorContainer() {
   return (
     <div
       className={cn(
-        'mx-auto flex w-full max-w-6xl flex-col sm:px-4 md:py-8 lg:grid lg:grid-cols-[390px_minmax(0,1fr)] xl:px-8',
+        'mx-auto flex w-full max-w-screen-2xl flex-col sm:px-4 md:py-8 lg:grid lg:grid-cols-[400px_minmax(0,1fr)] xl:grid-cols-[390px_minmax(0,1fr)] xl:px-8 2xl:grid-cols-[380px_minmax(0,1fr)]',
         'gap-3',
         'px-4',
         'py-4',

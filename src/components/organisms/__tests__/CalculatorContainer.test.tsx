@@ -428,7 +428,9 @@ describe('CalculatorContainer Component', () => {
       const section = screen.getByTestId('calculator-section');
       expect(section).toHaveClass('lg:grid');
       // Updated to match responsive grid columns
-      expect(section).toHaveClass('lg:grid-cols-[390px_minmax(0,1fr)]');
+      expect(section).toHaveClass('lg:grid-cols-[400px_minmax(0,1fr)]');
+      expect(section).toHaveClass('xl:grid-cols-[390px_minmax(0,1fr)]');
+      expect(section).toHaveClass('2xl:grid-cols-[380px_minmax(0,1fr)]');
     });
 
     it('should have responsive spacing', () => {
@@ -444,7 +446,8 @@ describe('CalculatorContainer Component', () => {
       render(<CalculatorContainer />);
 
       const section = screen.getByTestId('calculator-section');
-      expect(section).toHaveClass('max-w-6xl');
+      // Updated to match current max-width
+      expect(section).toHaveClass('max-w-screen-2xl');
     });
 
     it('should prevent the results column from stretching on desktop', () => {
