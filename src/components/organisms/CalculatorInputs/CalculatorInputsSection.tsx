@@ -76,12 +76,12 @@ export function CalculatorInputsSection({
         <BasicInputs />
 
         {/* Calculate and Reset buttons */}
-        <div className={cn('flex flex-wrap items-center', 'gap-2')}>
+        <div className={cn('flex', 'gap-2')}>
           <Button
             onClick={handleCalculate}
             disabled={isCalculating}
             size='default'
-            className='min-w-[9rem] flex-1 px-3'
+            className='min-w-0 flex-1 px-3'
             data-testid='calculate-button'
           >
             {isCalculating ? (
