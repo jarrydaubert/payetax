@@ -118,7 +118,7 @@ const CookieBanner: React.FC = () => {
         <aside
           aria-label='Cookie preferences'
           data-testid='cookie-banner'
-          className='safe-bottom fixed right-4 bottom-4 left-4 z-40 sm:right-auto sm:w-[24rem]'
+          className='safe-bottom fixed right-4 bottom-4 left-4 z-40 sm:left-auto sm:w-[24rem]'
         >
           <Card className='border-border bg-card'>
             <CardContent className='p-4'>
