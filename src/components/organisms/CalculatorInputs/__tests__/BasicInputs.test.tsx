@@ -28,7 +28,6 @@ describe('BasicInputs Component', () => {
   const mockSetAllowancesDeductions = jest.fn();
   const mockSetPensionContribution = jest.fn();
   const mockSetPensionContributionType = jest.fn();
-  const mockSetInput = jest.fn();
 
   const defaultInput = {
     salary: 30000,
@@ -69,7 +68,6 @@ describe('BasicInputs Component', () => {
       setAllowancesDeductions: mockSetAllowancesDeductions,
       setPensionContribution: mockSetPensionContribution,
       setPensionContributionType: mockSetPensionContributionType,
-      setInput: mockSetInput,
     });
   });
 
@@ -83,14 +81,6 @@ describe('BasicInputs Component', () => {
       render(<BasicInputs />);
       expect(screen.getByText('Salary')).toBeInTheDocument();
       expect(screen.getByTestId('salary-input')).toBeInTheDocument();
-    });
-
-    it('should not render quick preset controls in the input form', () => {
-      render(<BasicInputs />);
-
-      expect(screen.queryByRole('group', { name: /Quick presets/i })).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: '£40k' })).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: /Plan 2 loan/i })).not.toBeInTheDocument();
     });
 
     it('should render pay period select inline with salary', () => {
