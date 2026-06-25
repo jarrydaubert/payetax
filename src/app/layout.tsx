@@ -43,11 +43,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang='en-GB'
+      translate='no'
+      className='notranslate'
       data-theme='light'
       data-scroll-behavior='smooth'
       data-view-transition='enabled'
     >
       <head>
+        <meta name='google' content='notranslate' />
+
         {/* PWA Manifest */}
         <link rel='manifest' href='/manifest.json' />
 
