@@ -13,6 +13,10 @@ test.describe('Homepage portal stability', () => {
     await page.waitForLoadState('networkidle').catch(() => {});
     await dismissCookieBannerIfPresent(page);
 
+    await expect(page.locator('html')).toHaveAttribute('translate', 'no');
+    await expect(page.locator('html')).toHaveClass(/notranslate/);
+    await expect(page.locator('meta[name="google"]')).toHaveAttribute('content', 'notranslate');
+
     await page.getByTestId('salary-input').fill('50000');
     await page.getByTestId('calculate-button').click();
     await expect(page.getByTestId('tax-results')).toBeVisible();
