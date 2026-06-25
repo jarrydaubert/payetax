@@ -13,7 +13,7 @@ This document lists production environment variables for the public R&D version 
 | PAYE and director results email | `BREVO_API_KEY`, `BREVO_FROM_EMAIL` |
 | Distributed API rate limiting | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, `RATE_LIMIT_HEALTH_SECRET` |
 | Sentry calculator, tool, blog, and email error monitoring | `NEXT_PUBLIC_SENTRY_DSN` |
-| Sentry source maps | `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` |
+| Sentry production source maps | `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT`; optional `PAYETAX_ENABLE_SENTRY_SOURCEMAPS=true` for non-Vercel release builds |
 
 ## Local Development
 

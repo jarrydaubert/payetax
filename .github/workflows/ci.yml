@@ -57,7 +57,7 @@ jobs:
         run: bun run audit:deps
 
       - name: Build
-        run: bun run build
+        run: bun run build:ci
 
   # Non-blocking while flake behaviour on CI runners is measured.
   # Promote to a required check once it has run clean for a week.

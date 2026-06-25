@@ -6,7 +6,22 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
 });
 
-const isTruthy = (value: string | undefined) => value === '1' || value === 'true';
+const isTruthy = (value: string | undefined) => value === '1' || value?.toLowerCase() === 'true';
+
+const isFalsy = (value: string | undefined) => value === '0' || value?.toLowerCase() === 'false';
+
+export function shouldEnableSentrySourceMaps(
+  env: Record<string, string | undefined> = process.env,
+): boolean {
+  const explicitToggle = env.PAYETAX_ENABLE_SENTRY_SOURCEMAPS;
+
+  if (isTruthy(explicitToggle)) return true;
+  if (isFalsy(explicitToggle)) return false;
+
+  return env.VERCEL_ENV === 'production' && Boolean(env.SENTRY_AUTH_TOKEN?.trim());
+}
+
+export const sentrySourceMapsEnabled = shouldEnableSentrySourceMaps();
 
 const isVercelBuild =
   isTruthy(process.env.VERCEL) ||
@@ -176,8 +191,8 @@ const nextConfig: NextConfig = {
     ];
   },
 
-  // Needed for Sentry source map upload during production builds.
-  productionBrowserSourceMaps: true,
+  // Only release builds need browser source maps; CI/PR builds should stay lean.
+  productionBrowserSourceMaps: sentrySourceMapsEnabled,
 
   webpack: (config) => {
     config.resolve.alias = {
@@ -266,15 +281,23 @@ export const sentryConfigOptions = {
   silent: !process.env.CI,
   tunnelRoute: '/monitoring',
   suppressOnRouterTransitionStartWarning: true,
-  widenClientFileUpload: true,
+  widenClientFileUpload: sentrySourceMapsEnabled,
   bundleSizeOptimizations: {
     excludeDebugStatements: true,
     excludeReplayShadowDom: true,
     excludeReplayIframe: true,
   },
-  sourcemaps: {
-    deleteSourcemapsAfterUpload: true,
+  release: {
+    create: sentrySourceMapsEnabled,
+    finalize: sentrySourceMapsEnabled,
   },
+  sourcemaps: sentrySourceMapsEnabled
+    ? {
+        deleteSourcemapsAfterUpload: true,
+      }
+    : {
+        disable: true,
+      },
 };
 
 const configWithSentry = withSentryConfig(withBundleAnalyzer(nextConfig), sentryConfigOptions);
