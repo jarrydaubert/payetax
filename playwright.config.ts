@@ -117,7 +117,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'bun run build && bun run start',
+    command: 'bun run build:ci && bun run start',
     url: process.env.PLAYWRIGHT_BASE_URL ?? DEFAULT_PLAYWRIGHT_BASE_URL,
     reuseExistingServer: false,
     // Budget covers a cold production build on CI runners, not just server start.

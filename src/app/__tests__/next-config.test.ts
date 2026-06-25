@@ -149,4 +149,45 @@ describe('next.config Sentry options', () => {
       }),
     );
   });
+
+  it('skips Sentry source-map upload work for default local and CI builds', async () => {
+    const { default: nextConfig, sentryConfigOptions } = await import('../../../next.config');
+
+    expect(nextConfig.productionBrowserSourceMaps).toBe(false);
+    expect(sentryConfigOptions).toEqual(
+      expect.objectContaining({
+        widenClientFileUpload: false,
+        release: {
+          create: false,
+          finalize: false,
+        },
+        sourcemaps: {
+          disable: true,
+        },
+      }),
+    );
+  });
+
+  it('enables Sentry source maps for production Vercel builds with an auth token', async () => {
+    const { shouldEnableSentrySourceMaps } = await import('../../../next.config');
+
+    expect(
+      shouldEnableSentrySourceMaps({
+        VERCEL_ENV: 'production',
+        SENTRY_AUTH_TOKEN: 'sentry-token',
+      }),
+    ).toBe(true);
+  });
+
+  it('lets the explicit Sentry source-map toggle override production defaults', async () => {
+    const { shouldEnableSentrySourceMaps } = await import('../../../next.config');
+
+    expect(
+      shouldEnableSentrySourceMaps({
+        PAYETAX_ENABLE_SENTRY_SOURCEMAPS: 'false',
+        VERCEL_ENV: 'production',
+        SENTRY_AUTH_TOKEN: 'sentry-token',
+      }),
+    ).toBe(false);
+  });
 });

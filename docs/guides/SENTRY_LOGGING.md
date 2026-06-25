@@ -21,7 +21,8 @@ error UI, but their browser errors are filtered before they reach Sentry.
 - Blog rendering errors on public article routes.
 - Handled operational failures for PAYE and Director email-results API routes.
 - Calculator anomaly exceptions.
-- Source maps for production releases when `SENTRY_AUTH_TOKEN` is configured.
+- Source maps for production releases when `SENTRY_AUTH_TOKEN` is configured and the build is a
+  Vercel production build or `PAYETAX_ENABLE_SENTRY_SOURCEMAPS=true`.
 
 ## What Is Not Captured
 
@@ -30,6 +31,7 @@ error UI, but their browser errors are filtered before they reach Sentry.
 - Structured Sentry logs.
 - Static utility-page errors outside the monitored surfaces.
 - Raw user-entered salary, tax code, email, or pension values.
+- Source maps from CI, PR preview, and local builds by default.
 
 ## Files
 
