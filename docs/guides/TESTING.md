@@ -8,7 +8,7 @@ The aim is not to look busy. The aim is to prove that the calculator, surroundin
 
 ## Current Audit Snapshot
 
-Last audited: 2026-06-12.
+Last audited for strategy: 2026-06-26.
 
 Use this section as the current testing map, not as a frozen release certificate. Exact suite counts, coverage percentages, and generated route counts move as the app changes. Capture those run-specific numbers in PRs or release evidence instead of letting this guide go stale.
 
@@ -16,7 +16,7 @@ Current automated evidence expected before broad changes merge:
 
 - `bun run check:repo`
 - the smallest relevant Jest or Playwright check while developing
-- `bun run build`
+- `bun run build:ci`
 - `bun run test:full` for broad calculation, browser, route, or refactor changes
 - `bun audit` or `bun run audit:deps` when dependencies change
 
@@ -312,7 +312,8 @@ bun run test:quick          # Unit fast + critical E2E
 bun run test:ci             # Jest with coverage thresholds
 bun run test:e2e            # Full multi-browser Playwright suite
 bun run test:full           # Coverage Jest + full Playwright
-bun run build               # Production build
+bun run build:ci            # Lean production build for local/CI proof
+bun run build:release       # Release build with Sentry source maps enabled
 bun audit                   # Bun advisory check
 ```
 
@@ -353,8 +354,9 @@ Current GitHub hard gates:
 - tracked-env guard
 - frozen-lockfile install
 - `bun run check:repo`
+- `bun run test:ci`
 - `bun run audit:deps`
-- `bun run build`
+- `bun run build:ci`
 
 `CodeQL` does:
 
@@ -370,7 +372,7 @@ Expected PR evidence for meaningful code changes:
 
 - `bun run check:repo`
 - the smallest relevant unit or E2E check while developing
-- `bun run build`
+- `bun run build:ci`
 - `bun run test:full` for broad calculation, browser, route, or refactor changes
 
 ## Coverage Policy
@@ -465,8 +467,7 @@ Run at least two passes per strategy and compare medians. Treat extension-influe
 ## Related Docs
 
 - `docs/guides/BUG_CATALOG.md`
-- `docs/guides/POST_RELEASE_VALIDATION.md`
-- `docs/guides/PRODUCTION_ENV_CONTRACT.md`
-- `docs/guides/API_ROUTE_HARDENING.md`
-- `docs/guides/RATE_LIMIT_VERIFICATION.md`
+- `docs/guides/OPERATIONS.md`
+- `docs/guides/API_AND_ABUSE_CONTROLS.md`
+- `docs/guides/SENTRY_LOGGING.md`
 - `docs/business/PRODUCT_DIRECTION.md`

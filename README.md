@@ -48,7 +48,7 @@ PayeTax tests the project at several layers:
 - Playwright E2E for calculator flows, golden-master scenarios, accessibility, blog/navigation, mobile paths, and Director Intelligence
 - CI hard gates for repo checks, dependency audit, production build, and CodeQL JavaScript/TypeScript scanning
 
-The full testing approach is documented in [docs/guides/TESTING.md](docs/guides/TESTING.md), including what is tested, why each layer exists, current coverage gaps, and the difference between CI gates and local full-suite evidence.
+The full testing approach is documented in [docs/guides/TESTING.md](docs/guides/TESTING.md), including what is tested, why each layer exists, and the difference between CI gates and local full-suite evidence.
 
 ## Common Commands
 
@@ -58,9 +58,11 @@ bun run dev
 bun run check:repo
 bun run test:no-coverage
 bun run test:full
-bun run build
+bun run build:ci
 bun audit
 ```
+
+Use `bun run build:ci` for local and PR build proof. Use `bun run build:release` only when validating release behaviour that needs Sentry source maps. Vercel production should keep using `bun run build`.
 
 Use `bun run dev:turbo` only when explicitly checking the Turbopack dev path.
 
@@ -85,7 +87,7 @@ Other production controls:
 
 - Agent contract: [AGENTS.md](AGENTS.md)
 - Product direction: [docs/business/PRODUCT_DIRECTION.md](docs/business/PRODUCT_DIRECTION.md)
+- Docs policy: [docs/README.md](docs/README.md)
 - Testing: [docs/guides/TESTING.md](docs/guides/TESTING.md)
-- Ops: [docs/guides/OPS_RUNBOOK.md](docs/guides/OPS_RUNBOOK.md)
-- Vercel project: [docs/guides/VERCEL_PROJECT.md](docs/guides/VERCEL_PROJECT.md)
-- Env contract: [docs/guides/PRODUCTION_ENV_CONTRACT.md](docs/guides/PRODUCTION_ENV_CONTRACT.md)
+- Operations: [docs/guides/OPERATIONS.md](docs/guides/OPERATIONS.md)
+- API and abuse controls: [docs/guides/API_AND_ABUSE_CONTROLS.md](docs/guides/API_AND_ABUSE_CONTROLS.md)

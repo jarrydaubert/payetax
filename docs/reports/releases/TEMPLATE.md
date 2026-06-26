@@ -8,7 +8,7 @@ Release Notes URL: TBD
 Releasing Engineer: TBD
 Status: IN_PROGRESS
 
-Reference checklist: `docs/guides/POST_RELEASE_VALIDATION.md`
+Reference checklist: `docs/guides/OPERATIONS.md`
 
 Legend:
 - `- [x]` complete

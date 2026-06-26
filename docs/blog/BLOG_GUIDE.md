@@ -39,9 +39,9 @@ Purpose: create accurate, helpful content that drives users to the calculator an
 
 ## Publishing
 
-- Add new posts in the backlog before writing.
+- Add new posts to `docs/BACKLOG.md` or a GitHub issue before writing unless they are going straight into a focused pull request.
 - Update or retire posts when tax rules change.
-- Keep all work items in `docs/BACKLOG.md`.
+- Do not leave content work as loose notes in docs; use the backlog, an issue, or the pull request description.
 - Use `docs/blog/IMAGE_WORKFLOW.md` for featured-image prompts and import steps.
 
 ## Reader Journey Checklist
