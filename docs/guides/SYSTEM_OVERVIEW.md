@@ -31,3 +31,7 @@ PayeTax is a Next.js and TypeScript public R&D project for UK tax calculation.
 - Production env contract: `src/lib/productionEnvContract.ts`
 - Sitemap: `src/app/sitemap.ts`
 - CI: `.github/workflows/ci.yml`
+- Testing strategy: `docs/guides/TESTING.md`
+- Operations: `docs/guides/OPERATIONS.md`
+- API and abuse controls: `docs/guides/API_AND_ABUSE_CONTROLS.md`
+- Currency arithmetic decision: `docs/guides/CURRENCY_ARITHMETIC_DECISION.md`

@@ -70,7 +70,7 @@ Use the smallest relevant checks for the change:
 
 ```bash
 bun run check:repo
-bun run build
+bun run build:ci
 bun run fix-all
 ```
 

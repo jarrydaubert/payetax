@@ -23,11 +23,11 @@ It is not a commercial growth site. Keep the product useful, accurate, and simpl
 bun install --frozen-lockfile
 bun run check:repo
 bun run test:no-coverage
-bun run build
+bun run build:ci
 bun audit
 ```
 
-Use the smallest relevant check while developing, then run `bun run check:repo` and `bun run build` before committing broad changes.
+Use the smallest relevant check while developing, then run `bun run check:repo` and `bun run build:ci` before committing broad changes. Use `bun run build:release` only when validating release behaviour that needs Sentry source maps.
 
 ## CI And Repo Quality
 
@@ -63,6 +63,7 @@ If a Vercel CLI command cannot retrieve project settings, check `.vercel/project
 - Prefer existing patterns in `src/`, `scripts/`, and `docs/`.
 - Edit source files, not generated output, unless the repo clearly treats the file as committed source.
 - Keep docs aligned with code in the same change.
+- Keep evergreen docs useful and stable; put dated run evidence in PRs or `docs/reports/*`.
 - Verify commands before claiming they pass.
 - When touching frontend UI, inspect the changed route locally when practical.
 - For email, privacy, security, and tax claims, confirm the implementation before changing wording.
