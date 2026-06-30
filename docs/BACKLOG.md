@@ -6,7 +6,7 @@ Keep this file for active or parked future work only. Closed work belongs in Git
 
 ## Active
 
-No active backlog items. Keep this list empty until there is a specific verified issue or product improvement worth tracking.
+- Publish the Making Tax Digital for Income Tax 2026 explainer as a featured Tax Changes post, with official GOV.UK source checks and generated Ledger-style blog artwork.
 
 ## Parked
 
