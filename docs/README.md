@@ -10,8 +10,9 @@ When docs overlap, prefer sources in this order:
 2. `.env.template`, `package.json`, and workflow files for commands and environment names.
 3. `AGENTS.md` for contributor operating rules.
 4. `docs/business/PRODUCT_DIRECTION.md` for product scope decisions.
-5. `docs/guides/*` for operational and engineering guidance.
-6. `docs/reports/*` for dated historical evidence.
+5. `docs/blog/*` for public blog content, image, and refresh guidance.
+6. `docs/guides/*` for operational and engineering guidance.
+7. `docs/reports/*` for dated historical evidence.
 
 ## Evergreen Rules
 
@@ -42,7 +43,7 @@ Retire or merge docs that only repeat another source, record old status without 
 
 ## Doc Types
 
-- **Evergreen guides:** `README.md`, `AGENTS.md`, `docs/business/*`, and the canonical guides in `docs/guides/*`.
+- **Evergreen guides:** `README.md`, `AGENTS.md`, `docs/business/*`, `docs/blog/*`, and the canonical guides in `docs/guides/*`.
 - **Working queue:** `docs/BACKLOG.md`, only for active or parked future work.
 - **Historical evidence:** `docs/reports/*`; do not rewrite old reports to match new commands except to correct factual errors.
 - **Public content:** `content/blog/*`; review for tax-year accuracy and reader usefulness separately from engineering docs.
