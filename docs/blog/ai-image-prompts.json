@@ -1,14 +1,26 @@
 {
+  "version": "ledger-editorial-2026-07",
+  "benchmarkImage": "/images/blog/making-tax-digital-income-tax.jpg",
   "styleGuide": {
-    "description": "PayeTax blog images in the Ledger direction",
-    "aspectRatio": "16:10, 1600x1000px recommended",
-    "visualLanguage": "editorial, document-led, public-authority, tax-led",
+    "name": "Ledger editorial",
+    "description": "PayeTax blog images should feel like calm UK tax explainers built from paper, forms, calendars, calculators, and restrained editorial still-life composition.",
+    "aspectRatio": "16:10",
+    "recommendedImportSize": "1600x1000",
+    "visualLanguage": [
+      "editorial",
+      "document-led",
+      "public-authority",
+      "tax-led",
+      "warm",
+      "quiet",
+      "trustworthy"
+    ],
     "background": {
-      "base": "warm paper or off-white",
-      "texture": "subtle paper grain, faint ledger grid, or ruled document lines"
+      "base": "warm paper or off-white desk surface",
+      "texture": "subtle paper grain, faint ledger grid, ruled document lines, or calculator tape"
     },
-    "illustrationStyle": "flat or lightly dimensional editorial still life, not glossy fintech illustration",
-    "lighting": "clean daylight, low contrast, no glow",
+    "illustrationStyle": "realistic or lightly dimensional editorial still life, not glossy fintech illustration",
+    "lighting": "clean daylight, low contrast, soft natural shadows, no glow",
     "palette": {
       "paper": "#f8f3ea",
       "ink": "#07111f",
@@ -18,29 +30,148 @@
       "mutedRed": "#9f3d35",
       "mutedGold": "#a36b1f"
     },
+    "allowedObjects": [
+      "blank tax forms",
+      "payslips without readable text",
+      "calculator",
+      "calculator tape",
+      "calendar with abstract marker but no readable date text",
+      "plain envelopes",
+      "ledger notebook",
+      "pound coins",
+      "neatly stacked banknotes without readable markings",
+      "pen",
+      "paperclips",
+      "binder clips",
+      "folders",
+      "receipts without readable merchant text"
+    ],
     "avoid": [
+      "readable text",
+      "garbled pseudo-text",
+      "titles or labels in the image",
+      "logos",
+      "fake HMRC branding",
+      "official crests",
+      "QR codes",
+      "screenshots of websites or apps",
       "dark-slate fintech backgrounds",
-      "cyan or emerald glow",
+      "cyan glow",
+      "emerald glow",
       "purple gradients",
       "glassmorphism",
       "3D isometric app marketing scenes",
       "floating UI dashboards",
-      "text, titles, labels, logos, or fake HMRC branding"
+      "crypto or trading imagery",
+      "panic imagery",
+      "debt-collection imagery"
     ],
-    "notes": "The website supplies article titles and metadata. Images should support the subject without making unverifiable claims."
+    "notes": "The website supplies article titles and metadata. Images should support the subject without making factual, legal, or tax claims."
   },
-  "promptPatterns": {
-    "salaryGuides": "Editorial still life of a payslip, calculator tape, and neatly separated pound notes on warm paper. Faint ledger grid in the background. Ink-blue and muted-gold accents. No text.",
-    "taxBasics": "Clean tax explainer scene using forms, ruled paper, and a simple calculator. Public-authority tone, restrained ink-blue accents, flat document-led composition. No text.",
-    "taxPlanning": "Pension and tax-planning scene with annotated paper sheets, envelopes, and a calculator. Muted green and ink-blue accents. No text or labels.",
-    "directorGuides": "Limited-company director tax scene with ledger pages, dividend notes, company accounts, and a calculator. Broadsheet editorial tone, warm paper, ink-blue accents. No text.",
-    "studentLoans": "Student loan repayment scene with payslip, calculator, and stacked documents. Calm explanatory tone, paper background, ink-blue and muted-green accents. No text.",
-    "taxChanges": "Budget or tax-change scene with official-looking papers, a calendar, and a calculator. Muted red or gold accents for attention. No text or branding.",
-    "deadlines": "Tax deadline scene with calendar, forms, and envelope on a desk. Muted-gold attention accent, clean paper-led layout. No text."
+  "globalPromptSuffix": "Warm paper desk, faint ledger grid, realistic documents, calculator, restrained ink-blue accents, clean daylight, low contrast, 16:10 editorial still life. No text, no labels, no logos, no fake HMRC branding, no official crests, no digital dashboard, no glow.",
+  "categoryPrompts": {
+    "salary-guides": {
+      "accent": "muted-gold",
+      "prompt": "Editorial still life of a payslip, calculator tape, neatly separated pound coins, and a simple budget sheet on warm paper. Faint ledger grid in the background. Ink-blue and muted-gold accents."
+    },
+    "tax-basics": {
+      "accent": "ink-blue",
+      "prompt": "Clean UK tax explainer scene with blank forms, ruled paper, a calculator, and a pen arranged like a broadsheet still life. Public-authority tone, warm paper, restrained ink-blue accents."
+    },
+    "tax-tips": {
+      "accent": "muted-green",
+      "prompt": "Practical tax tips scene with a payslip, checklist-style blank paper, calculator, and small stacks of pound coins. Warm paper surface, restrained ink-blue and muted-green accents."
+    },
+    "tax-planning": {
+      "accent": "muted-green",
+      "prompt": "Tax-planning scene with pension papers, envelopes, calculator tape, ledger notebook, and neatly arranged coins. Warm paper, muted-green and ink-blue accents, calm editorial composition."
+    },
+    "tax-changes": {
+      "accent": "muted-red",
+      "prompt": "Budget or tax-change scene with official-looking blank papers, a small desk calendar marker, calculator, coins, and a folder. Muted-red or muted-gold attention accent, warm paper, no branding."
+    },
+    "tax-comparison": {
+      "accent": "ink-blue",
+      "prompt": "Comparison scene with two neat stacks of blank tax papers, side-by-side calculator tape, coins, and ruled ledger paper. Balanced composition, warm paper, ink-blue accents."
+    },
+    "student-loans": {
+      "accent": "muted-green",
+      "prompt": "Student loan repayment scene with a payslip, graduation-cap-shaped paperweight, calculator, stacked documents, and pound coins. Calm explanatory tone, paper background, ink-blue and muted-green accents."
+    },
+    "tax-deadlines": {
+      "accent": "muted-gold",
+      "prompt": "Tax deadline scene with a desk calendar, blank forms, plain envelope, calculator, and binder clips on warm paper. Muted-gold attention accent, clean paper-led layout."
+    }
+  },
+  "topicObjectHints": {
+    "making-tax-digital": [
+      "quarterly calendar marker",
+      "self-employment forms",
+      "property income papers",
+      "ledger notebook"
+    ],
+    "director": [
+      "company accounts folder",
+      "dividend voucher-style blank paper",
+      "salary payslip",
+      "calculator tape"
+    ],
+    "pension": [
+      "pension statement-style blank papers",
+      "envelope",
+      "ledger notebook",
+      "calculator"
+    ],
+    "student-loan": [
+      "graduation-cap-shaped paperweight",
+      "repayment payslip",
+      "stacked student finance papers",
+      "coins"
+    ],
+    "tax-code": ["payslip", "blank tax-code notice", "magnifying glass", "calculator"],
+    "deadline": ["calendar", "envelope", "binder clip", "blank reminder letter"],
+    "scotland": [
+      "two comparison stacks of papers",
+      "map-like abstract paper shapes",
+      "calculator",
+      "blue accent tabs"
+    ],
+    "salary-sacrifice": ["payslip", "pension envelope", "calculator tape", "split stack of coins"]
+  },
+  "postPromptRecipe": [
+    "Start with the category prompt matching the MDX category.",
+    "Add 2 to 4 topicObjectHints if they fit the post.",
+    "Add the globalPromptSuffix exactly or near-exactly.",
+    "Keep the prompt factual and visual. Do not ask the image to show rates, dates, thresholds, titles, or official logos."
+  ],
+  "altTextRecipe": {
+    "format": "Literal description of the image contents, under about 140 characters.",
+    "goodExamples": [
+      "Tax forms, calendar, calculator, and coins arranged on a warm paper desk",
+      "Payslip, calculator tape, and pound coins on ruled paper",
+      "Blank company accounts papers, dividend notes, and calculator on a desk"
+    ],
+    "avoidExamples": [
+      "Best UK tax calculator guide",
+      "Making Tax Digital 2026 deadline",
+      "HMRC official tax update"
+    ]
   },
   "filenameRules": {
     "format": "jpg",
     "shape": "short descriptive kebab-case matching the post topic",
-    "examples": ["100k-tax-trap.jpg", "director-tax-deadlines.jpg", "student-loan-thresholds.jpg"]
-  }
+    "preferExistingFilenameWhenRefreshing": true,
+    "examples": [
+      "100k-tax-trap.jpg",
+      "director-tax-deadlines.jpg",
+      "student-loan-thresholds.jpg",
+      "making-tax-digital-income-tax.jpg"
+    ]
+  },
+  "batchRefreshRules": [
+    "Refresh images in small visual batches rather than regenerating the whole library at once.",
+    "Keep filenames stable unless the old name is misleading or shared.",
+    "Inspect generated images before import and final jpgs after import.",
+    "Commit image refreshes separately from content rewrites."
+  ]
 }

@@ -24,6 +24,7 @@ import {
   type TaxYear,
 } from '@/constants/taxRates';
 import type { Region } from '@/lib/validation/directorValidation';
+import { getAdjustedPersonalAllowance } from './personalAllowance';
 import { roundToPence } from './utils';
 
 // ============================================================================
@@ -56,35 +57,27 @@ export interface IncomeTaxResult {
  * @param salary - Annual salary amount
  * @param region - 'rUK' or 'scotland' for rate determination
  * @param taxYear - Tax year for rates (defaults to the latest supported tax year)
+ * @param adjustedNetIncome - Income used only for Personal Allowance taper
  * @returns Full calculation result with breakdown
  */
 export function calculateIncomeTax(
   salary: number,
   region: Region,
   taxYear: TaxYear = CURRENT_TAX_YEAR,
+  adjustedNetIncome: number = salary,
 ): IncomeTaxResult {
   const rates = region === 'scotland' ? SCOTTISH_TAX_RATES[taxYear] : TAX_RATES[taxYear];
 
-  const basePersonalAllowance = rates.personalAllowance;
-  const reductionThreshold = rates.personalAllowanceReductionThreshold;
-  const reductionRate = rates.personalAllowanceReductionRate;
+  const personalAllowance = getAdjustedPersonalAllowance(adjustedNetIncome, taxYear);
 
   if (!Number.isFinite(salary) || salary <= 0) {
     return {
       salary: Number.isFinite(salary) ? salary : 0,
       incomeTax: 0,
-      personalAllowance: basePersonalAllowance,
+      personalAllowance,
       taxableIncome: 0,
       effectiveRate: 0,
     };
-  }
-
-  // Calculate personal allowance reduction for high earners
-  let personalAllowance = basePersonalAllowance;
-  if (salary > reductionThreshold) {
-    // HMRC annual taper rounds the allowance reduction down to the nearest whole pound.
-    const reduction = Math.floor((salary - reductionThreshold) * reductionRate);
-    personalAllowance = Math.max(0, basePersonalAllowance - reduction);
   }
 
   // Calculate taxable income
@@ -133,6 +126,7 @@ export function getIncomeTax(
   salary: number,
   region: Region,
   taxYear: TaxYear = CURRENT_TAX_YEAR,
+  adjustedNetIncome: number = salary,
 ): number {
-  return calculateIncomeTax(salary, region, taxYear).incomeTax;
+  return calculateIncomeTax(salary, region, taxYear, adjustedNetIncome).incomeTax;
 }

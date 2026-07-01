@@ -13,6 +13,7 @@ import { calculateSalaryScenario, calculateStrategyComparison } from '../strateg
 import { getStudentLoanRepayment } from '../studentLoan';
 
 const TAX_YEAR = '2025-2026' as const;
+const TAX_YEAR_2026 = '2026-2027' as const;
 
 const baseInput = {
   region: 'rUK' as const,
@@ -295,7 +296,7 @@ describe('Strategy Comparison helpers', () => {
     // Bug caught: director slider path ignoring other income when tapering personal allowance.
     const salary = 12570;
     const grossProfit = 80000;
-    const lowerOtherIncome = 99000;
+    const lowerOtherIncome = 10000;
     const higherOtherIncome = 100010;
 
     const belowTaper = calculateSalaryScenario({
@@ -315,12 +316,14 @@ describe('Strategy Comparison helpers', () => {
       hasEmploymentAllowance: false,
     });
 
+    const belowAdjustedNetIncome = salary + belowTaper.dividends + lowerOtherIncome;
+    const aboveAdjustedNetIncome = salary + aboveTaper.dividends + higherOtherIncome;
     const expectedBelowMarginalTax =
-      getIncomeTax(salary + lowerOtherIncome, 'rUK', TAX_YEAR) -
-      getIncomeTax(lowerOtherIncome, 'rUK', TAX_YEAR);
+      getIncomeTax(salary + lowerOtherIncome, 'rUK', TAX_YEAR, belowAdjustedNetIncome) -
+      getIncomeTax(lowerOtherIncome, 'rUK', TAX_YEAR, belowAdjustedNetIncome);
     const expectedAboveMarginalTax =
-      getIncomeTax(salary + higherOtherIncome, 'rUK', TAX_YEAR) -
-      getIncomeTax(higherOtherIncome, 'rUK', TAX_YEAR);
+      getIncomeTax(salary + higherOtherIncome, 'rUK', TAX_YEAR, aboveAdjustedNetIncome) -
+      getIncomeTax(higherOtherIncome, 'rUK', TAX_YEAR, aboveAdjustedNetIncome);
 
     expect(belowTaper.incomeTax).toBeCloseTo(expectedBelowMarginalTax, 2);
     expect(aboveTaper.incomeTax).toBeCloseTo(expectedAboveMarginalTax, 2);
@@ -374,5 +377,51 @@ describe('Strategy Comparison helpers', () => {
     expect(dividendsOnlyIncome).toBeGreaterThan(TAX_RATES[TAX_YEAR].studentLoan.plan2.threshold);
     expect(result.strategies.allDividends.studentLoan).toBeCloseTo(expectedStudentLoan.total, 2);
     expect(result.strategies.allDividends.studentLoan).toBeGreaterThan(0);
+  });
+
+  it('applies PA taper to the fixed £12,570 salary plus dividends strategy above £100k', () => {
+    const scenario = calculateSalaryScenario({
+      targetSalary: 12570,
+      grossProfit: 150000,
+      region: 'rUK',
+      taxYear: TAX_YEAR_2026,
+      otherIncome: 0,
+      hasEmploymentAllowance: false,
+    });
+
+    expect(scenario.salary).toBe(12570);
+    expect(scenario.dividends).toBe(103926.46);
+    expect(scenario.incomeTax).toBe(1649.6);
+    expect(scenario.dividendTax).toBe(29736.96);
+    expect(scenario.takeHome).toBe(85109.9);
+  });
+
+  it('corrects the £150k strategy comparison rows after PA taper', () => {
+    const result = calculateStrategyComparison(
+      {
+        region: 'rUK',
+        revenue: 150000,
+        includesVat: false,
+        expenses: 0,
+        employmentAllowance: false,
+        studentLoanPlans: [],
+      },
+      TAX_YEAR_2026,
+    );
+
+    expect(result.strategies.allSalary.takeHome).toBe(81261.98);
+    expect(result.strategies.allDividends.takeHome).toBe(84715.02);
+
+    const fixedLowSalary = calculateSalaryScenario({
+      targetSalary: 12570,
+      grossProfit: 150000,
+      region: 'rUK',
+      taxYear: TAX_YEAR_2026,
+      otherIncome: 0,
+      hasEmploymentAllowance: false,
+    });
+
+    expect(fixedLowSalary.takeHome).toBe(85109.9);
+    expect(fixedLowSalary.takeHome - result.strategies.allSalary.takeHome).toBeCloseTo(3847.92, 2);
   });
 });

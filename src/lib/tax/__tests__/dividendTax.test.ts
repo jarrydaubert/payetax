@@ -290,6 +290,40 @@ describe('Dividend Tax Calculator', () => {
         expect(result.allowanceUsed).toBe(12570 + 500);
         expect(result.taxableDividends).toBe(66930);
       });
+
+      it('should move the basic-rate boundary down when PA tapers', () => {
+        const result = calculateDividendTax(114000, 0, '2026-2027');
+
+        expect(result.allowanceUsed).toBe(5570 + 500);
+        expect(result.taxableDividends).toBe(107930);
+        expect(result.bandBreakdown).toContainEqual(
+          expect.objectContaining({
+            band: 'basic',
+            amount: 37200,
+            tax: 3999,
+          }),
+        );
+        expect(result.bandBreakdown).toContainEqual(
+          expect.objectContaining({
+            band: 'higher',
+            amount: 70730,
+            tax: 25285.98,
+          }),
+        );
+        expect(result.dividendTax).toBe(29284.98);
+      });
+
+      it('should keep the basic taxable dividend slice at £37,200 during the taper band', () => {
+        const result = calculateDividendTax(110000, 0, '2026-2027');
+
+        expect(result.allowanceUsed).toBe(7570 + 500);
+        expect(result.bandBreakdown).toContainEqual(
+          expect.objectContaining({
+            band: 'basic',
+            amount: 37200,
+          }),
+        );
+      });
     });
   });
 

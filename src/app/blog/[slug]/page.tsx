@@ -309,8 +309,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           </nav>
 
           <article>
-            <header className='mb-8 md:mb-12'>
-              <div className='mb-4 flex flex-wrap items-center gap-2'>
+            <header className='mb-10 md:mb-14'>
+              <div className='mb-5 flex flex-wrap items-center gap-2.5'>
                 <span
                   className={cn(
                     'border border-primary/35 bg-background px-3 py-1 font-medium text-primary uppercase tracking-[0.2em]',
@@ -334,7 +334,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
               <h1
                 className={cn(
-                  'mb-4 max-w-4xl font-display font-semibold text-foreground leading-[0.98] md:mb-6',
+                  'mb-5 max-w-4xl font-display font-semibold text-foreground leading-[1.04] md:mb-7',
                   'text-4xl',
                   'md:text-5xl',
                 )}
@@ -344,7 +344,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
               <p
                 className={cn(
-                  'mb-6 text-foreground/80 leading-relaxed md:mb-8',
+                  'mb-8 text-foreground/80 leading-relaxed md:mb-10',
                   'text-lg',
                   'md:text-xl',
                 )}
@@ -354,7 +354,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
               <div
                 className={cn(
-                  'flex flex-wrap items-center gap-4 text-foreground/60 md:gap-6',
+                  'grid gap-3 border-border/70 border-y py-4 text-foreground/60 sm:flex sm:flex-wrap sm:items-start sm:gap-x-6 sm:gap-y-3 md:py-5',
                   'text-sm',
                 )}
               >
@@ -378,19 +378,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 )}
                 <div className='flex items-center gap-2'>
                   <User className={'size-4'} aria-hidden='true' />
-                  <span className='flex flex-col'>
-                    <span>{authorName}</span>
-                    {authorName === 'PayeTax Editorial Team' && (
-                      <span className='text-xs'>
-                        Calculations verified against official HMRC rates.
-                      </span>
-                    )}
-                  </span>
+                  <span>{authorName}</span>
                 </div>
               </div>
             </header>
             {post.image && (
-              <div className='relative mb-8 aspect-video overflow-hidden border border-border md:mb-12'>
+              <div className='relative mb-10 aspect-[16/10] overflow-hidden border border-border md:mb-14'>
                 <Image
                   src={post.image}
                   alt={post.imageAlt || post.title}
@@ -403,7 +396,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 />
               </div>
             )}
-            <div className='relative lg:flex lg:gap-8'>
+            <div className='relative lg:flex lg:gap-10'>
               <TableOfContents content={post.content} className='w-56 shrink-0' />
 
               <div
@@ -463,7 +456,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                   </Link>
                 </Button>
               </div>
-            </div>{' '}
+            </div>
           </article>
 
           {relatedPosts.length > 0 && (

@@ -6,7 +6,7 @@ Keep this file for active or parked future work only. Closed work belongs in Git
 
 ## Active
 
-No active backlog items. Keep this list empty until there is a specific verified issue or product improvement worth tracking.
+- Refresh the blog system: regenerate legacy post images into the Ledger editorial style, audit all public posts for 2026/27 accuracy, and update/retire stale tax-year content in small verified batches.
 
 ## Parked
 

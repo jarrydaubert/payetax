@@ -36,6 +36,7 @@ import type {
 import { getCorporationTax } from './corporationTax';
 import { getDividendTax } from './dividendTax';
 import { getEmployerNI } from './employerNI';
+import { getIncomeTax } from './incomeTax';
 import { roundToPence } from './utils';
 
 // ============================================================================
@@ -202,11 +203,16 @@ export function calculateDirectorScenario(
   // Step 8: Calculate dividends available
   const dividendsAvailable = roundToPence(taxableProfit - corporationTax);
 
+  const adjustedNetIncome = salary + dividendsAvailable;
+
   // Step 9: Calculate dividend tax (dividends stack on top of salary)
   const dividendTax = getDividendTax(dividendsAvailable, salary, taxYear);
+  const incomeTaxOnSalary = getIncomeTax(salary, input.region, taxYear, adjustedNetIncome);
 
   // Step 10: Calculate take-home amounts
-  const annualTakeHome = roundToPence(salary + dividendsAvailable - dividendTax);
+  const annualTakeHome = roundToPence(
+    salary + dividendsAvailable - incomeTaxOnSalary - dividendTax,
+  );
   const remainingTakeHome = roundToPence(Math.max(0, annualTakeHome - input.alreadyTaken));
   const averageMonthlyPay = roundToPence(remainingTakeHome / 12);
 
@@ -216,11 +222,14 @@ export function calculateDirectorScenario(
   // Step 12: Calculate personal tax savings (with POA if applicable)
   // POA applies when total Self Assessment tax liability > £1,000
   // Total SA liability = income tax (not paid via PAYE) + dividend tax
-  // For our model: salary ≤ PA so income tax = £0, SA liability ≈ dividend tax
+  // When dividends taper the PA, the salary tax created by that taper is
+  // budgeted here because a PA-level payroll may not have collected it.
   // Note: POA doesn't apply if ≥80% of total tax was already collected via PAYE
-  const selfAssessmentLiability = dividendTax; // Income tax on PA salary = £0
+  const selfAssessmentLiability = incomeTaxOnSalary + dividendTax;
   const includesPOA = selfAssessmentLiability > POA_THRESHOLD;
-  const personalTaxAnnual = includesPOA ? roundToPence(dividendTax * POA_MULTIPLIER) : dividendTax;
+  const personalTaxAnnual = includesPOA
+    ? roundToPence(selfAssessmentLiability * POA_MULTIPLIER)
+    : selfAssessmentLiability;
   const personalTaxMonthly = roundToPence(personalTaxAnnual / 12);
 
   // Step 13: Collect warnings

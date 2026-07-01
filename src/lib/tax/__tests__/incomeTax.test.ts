@@ -50,6 +50,14 @@ describe('Income Tax Calculator', () => {
       expect(calculateIncomeTax(125139, 'rUK').personalAllowance).toBe(1);
       expect(calculateIncomeTax(125140, 'rUK').personalAllowance).toBe(0);
     });
+
+    it('can taper salary tax using dividend-inclusive adjusted net income', () => {
+      const result = calculateIncomeTax(12570, 'rUK', '2026-2027', 116496.46);
+
+      expect(result.personalAllowance).toBe(4322);
+      expect(result.taxableIncome).toBe(8248);
+      expect(result.incomeTax).toBe(1649.6);
+    });
   });
 
   describe('calculateIncomeTax (Scotland)', () => {

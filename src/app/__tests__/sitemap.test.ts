@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next';
+import { RATES_LAST_VERIFIED } from '@/constants/freshness';
 
 jest.mock('@/lib/blog', () => ({
   getBlogPosts: jest.fn(),
@@ -9,6 +10,8 @@ const { getBlogPosts, getBlogCategories } = jest.requireMock('@/lib/blog') as {
   getBlogPosts: jest.Mock;
   getBlogCategories: jest.Mock;
 };
+
+const ratesLastVerifiedSitemapDate = new Date(`${RATES_LAST_VERIFIED}T00:00:00.000Z`).toISOString();
 
 describe('sitemap', () => {
   const originalSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
@@ -39,7 +42,7 @@ describe('sitemap', () => {
       expect.arrayContaining([
         expect.objectContaining({
           url: 'https://example.com/',
-          lastModified: '2026-04-15T00:00:00.000Z',
+          lastModified: ratesLastVerifiedSitemapDate,
         }),
         expect.objectContaining({
           url: 'https://example.com/blog',
@@ -59,11 +62,11 @@ describe('sitemap', () => {
         }),
         expect.objectContaining({
           url: 'https://example.com/tools/director-guide',
-          lastModified: '2026-04-15T00:00:00.000Z',
+          lastModified: ratesLastVerifiedSitemapDate,
         }),
         expect.objectContaining({
           url: 'https://example.com/tools/national-insurance-calculator',
-          lastModified: '2026-04-15T00:00:00.000Z',
+          lastModified: ratesLastVerifiedSitemapDate,
         }),
         expect.objectContaining({
           url: 'https://example.com/blog/salary-guide',
