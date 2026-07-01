@@ -378,14 +378,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 )}
                 <div className='flex items-center gap-2'>
                   <User className={'size-4'} aria-hidden='true' />
-                  <span className='flex flex-col gap-0.5'>
-                    <span>{authorName}</span>
-                    {authorName === 'PayeTax Editorial Team' && (
-                      <span className='max-w-sm text-xs leading-relaxed'>
-                        Calculations verified against official HMRC rates.
-                      </span>
-                    )}
-                  </span>
+                  <span>{authorName}</span>
                 </div>
               </div>
             </header>
