@@ -12,7 +12,7 @@
 //
 // If you find hardcoded tax values elsewhere, that's a bug - please refactor to use this file.
 //
-// Updated: 2026-04-15 for tax year 2026-2027
+// Updated: 2026-07-01 for tax year 2026-2027
 // Sources:
 // - https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027
 // - https://www.gov.uk/government/publications/budget-2025-overview-of-tax-legislation-and-rates-ootlar/annex-a-rates-and-allowances
@@ -144,7 +144,7 @@ export const TAX_YEAR_SOURCES: Record<TaxYear, TaxYearLegislativeSources> = {
         'https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027',
       ],
     },
-    verifiedOn: '2026-04-15',
+    verifiedOn: '2026-07-01',
     notes: [
       '2026-27 dividend ordinary and upper rates increased, while the dividend allowance remained at £500.',
       'Scottish starter and basic thresholds increased for 2026-27; higher and above remain aligned to published Scottish Budget tables.',
