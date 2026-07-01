@@ -361,8 +361,15 @@ function calculateAllSalaryStrategy(opts: StrategyCalcOptions): StrategyResult {
     ? getEmployeeNIWithNoThreshold(salary, taxYear)
     : getEmployeeNI(salary, taxYear);
   // Income tax is on salary + other income + BIK, but we only show the tax portion attributable to salary + BIK
-  const totalIncomeTax = getIncomeTax(salary + otherIncome + companyCarBIK, region, taxYear);
-  const baseIncomeTax = otherIncome > 0 ? getIncomeTax(otherIncome, region, taxYear) : 0;
+  const adjustedNetIncome = salary + otherIncome + companyCarBIK;
+  const totalIncomeTax = getIncomeTax(
+    salary + otherIncome + companyCarBIK,
+    region,
+    taxYear,
+    adjustedNetIncome,
+  );
+  const baseIncomeTax =
+    otherIncome > 0 ? getIncomeTax(otherIncome, region, taxYear, adjustedNetIncome) : 0;
   const incomeTax = totalIncomeTax - baseIncomeTax; // Marginal tax from salary + BIK
   const corporationTax = 0; // All profit used for salary
   const dividends = 0;
@@ -452,9 +459,17 @@ export function calculateSalaryScenario(input: SalaryScenarioInput): SalaryScena
     ? getEmployeeNIWithNoThreshold(salary, taxYear)
     : getEmployeeNI(salary, taxYear);
 
+  const adjustedNetIncome = salary + dividends + otherIncome + companyCarBIK;
+
   // Income tax includes BIK as taxable benefit
-  const totalIncomeTax = getIncomeTax(salary + otherIncome + companyCarBIK, region, taxYear);
-  const baseIncomeTax = otherIncome > 0 ? getIncomeTax(otherIncome, region, taxYear) : 0;
+  const totalIncomeTax = getIncomeTax(
+    salary + otherIncome + companyCarBIK,
+    region,
+    taxYear,
+    adjustedNetIncome,
+  );
+  const baseIncomeTax =
+    otherIncome > 0 ? getIncomeTax(otherIncome, region, taxYear, adjustedNetIncome) : 0;
   const incomeTax = totalIncomeTax - baseIncomeTax;
 
   // Dividend tax - BIK uses up some of the tax bands
@@ -559,9 +574,17 @@ function calculateSalaryScenarioInternal(
     ? getEmployeeNIWithNoThreshold(salary, taxYear)
     : getEmployeeNI(salary, taxYear);
 
+  const adjustedNetIncome = salary + dividends + otherIncome + companyCarBIK;
+
   // Income tax includes BIK as taxable benefit
-  const totalIncomeTax = getIncomeTax(salary + otherIncome + companyCarBIK, region, taxYear);
-  const baseIncomeTax = otherIncome > 0 ? getIncomeTax(otherIncome, region, taxYear) : 0;
+  const totalIncomeTax = getIncomeTax(
+    salary + otherIncome + companyCarBIK,
+    region,
+    taxYear,
+    adjustedNetIncome,
+  );
+  const baseIncomeTax =
+    otherIncome > 0 ? getIncomeTax(otherIncome, region, taxYear, adjustedNetIncome) : 0;
   const incomeTax = totalIncomeTax - baseIncomeTax;
 
   // Dividend tax - BIK uses up some of the tax bands
@@ -742,13 +765,6 @@ function calculateAllDividendsStrategy(opts: StrategyCalcOptions): StrategyResul
   const employeeNI = 0;
 
   // BIK is still taxable even with £0 salary
-  const bikIncomeTax =
-    companyCarBIK > 0
-      ? getIncomeTax(otherIncome + companyCarBIK, region, taxYear) -
-        getIncomeTax(otherIncome, region, taxYear)
-      : 0;
-  const incomeTax = bikIncomeTax;
-
   // Losses reduce the taxable profit for CT (cannot go below 0)
   const taxableProfit = Math.max(0, grossProfit - lossesBroughtForward);
   const corporationTax = getCorporationTax(
@@ -759,6 +775,17 @@ function calculateAllDividendsStrategy(opts: StrategyCalcOptions): StrategyResul
   // Dividends come from post-CT profit, but losses don't create extra cash
   // So dividends = grossProfit - CT (where CT is calculated on reduced taxable profit)
   const dividends = grossProfit - corporationTax;
+
+  const adjustedNetIncome = dividends + otherIncome + companyCarBIK;
+
+  // BIK is still taxable even with £0 salary
+  const bikIncomeTax =
+    companyCarBIK > 0
+      ? getIncomeTax(otherIncome + companyCarBIK, region, taxYear, adjustedNetIncome) -
+        getIncomeTax(otherIncome, region, taxYear, adjustedNetIncome)
+      : 0;
+  const incomeTax = bikIncomeTax;
+
   // Dividend tax - BIK uses up some of the tax bands
   const dividendTax = getDividendTax(dividends, otherIncome + companyCarBIK, taxYear);
 
@@ -843,9 +870,17 @@ function calculateYourSetupStrategy(
   // Calculate taxes on user's setup
   const employeeNI = getEmployeeNI(salary, taxYear);
 
+  const adjustedNetIncome = salary + dividends + otherIncome + companyCarBIK;
+
   // Income tax on salary + other income + BIK
-  const totalIncomeTax = getIncomeTax(salary + otherIncome + companyCarBIK, region, taxYear);
-  const baseIncomeTax = otherIncome > 0 ? getIncomeTax(otherIncome, region, taxYear) : 0;
+  const totalIncomeTax = getIncomeTax(
+    salary + otherIncome + companyCarBIK,
+    region,
+    taxYear,
+    adjustedNetIncome,
+  );
+  const baseIncomeTax =
+    otherIncome > 0 ? getIncomeTax(otherIncome, region, taxYear, adjustedNetIncome) : 0;
   const incomeTax = totalIncomeTax - baseIncomeTax;
 
   // Corporation tax: based on profit minus salary cost and losses brought forward

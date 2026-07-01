@@ -14,6 +14,8 @@
 
 import { CURRENT_TAX_YEAR, TAX_RATES, type TaxYear } from '@/constants/taxRates';
 import { DIRECTOR_GUIDE_BUSINESS_THRESHOLDS } from './businessThresholds';
+import { getDividendTax } from './dividendTax';
+import { getIncomeTax } from './incomeTax';
 
 // ============================================================================
 // TYPES
@@ -180,15 +182,22 @@ export function getWarnings(input: WarningInput): Warning[] {
 
   // Payments on Account warning
   // SA liability >£1k AND <80% deducted at source
-  if (salary > 0 && dividends > 0) {
-    // Estimate SA liability (rough: dividend tax portion)
-    const estimatedDividendTax = estimateDividendTax(dividends, salary, taxYear);
-    const estimatedPAYE = estimateIncomeTax(salary, taxYear);
-    const totalTaxLiability = estimatedPAYE + estimatedDividendTax;
+  if (dividends > 0) {
+    const nonDividendIncome = salary + companyCarBIK;
+    const estimatedDividendTax = estimateDividendTax(dividends, nonDividendIncome, taxYear);
+    const estimatedPAYE = estimateIncomeTax(nonDividendIncome, taxYear, nonDividendIncome);
+    const incomeTaxWithDividends = estimateIncomeTax(
+      nonDividendIncome,
+      taxYear,
+      nonDividendIncome + dividends,
+    );
+    const taperCreatedIncomeTax = Math.max(0, incomeTaxWithDividends - estimatedPAYE);
+    const estimatedSelfAssessmentLiability = estimatedDividendTax + taperCreatedIncomeTax;
+    const totalTaxLiability = estimatedPAYE + estimatedSelfAssessmentLiability;
     const percentDeductedAtSource = totalTaxLiability > 0 ? estimatedPAYE / totalTaxLiability : 1;
 
     if (
-      estimatedDividendTax > SA_LIABILITY_THRESHOLD &&
+      estimatedSelfAssessmentLiability > SA_LIABILITY_THRESHOLD &&
       percentDeductedAtSource < SA_DEDUCTION_THRESHOLD
     ) {
       warnings.push({
@@ -352,46 +361,19 @@ export function getWarnings(input: WarningInput): Warning[] {
 // ============================================================================
 
 /**
- * Rough estimate of dividend tax for POA warning calculation
+ * Estimate dividend tax for POA warning calculation.
  */
 function estimateDividendTax(dividends: number, salary: number, taxYear: TaxYear): number {
-  const rates = TAX_RATES[taxYear];
-  const personalAllowance = rates.personalAllowance;
-  const basicRateLimit = rates.bands[0]?.threshold ?? 0;
-  const dividendAllowance = rates.dividendAllowance;
-
-  // Income already used by salary
-  const salaryAbovePA = Math.max(0, salary - personalAllowance);
-  const basicRateRemaining = Math.max(0, basicRateLimit - salaryAbovePA);
-
-  // Dividends after allowance
-  const taxableDividends = Math.max(0, dividends - dividendAllowance);
-  if (taxableDividends <= 0) return 0;
-
-  // Basic rate dividends (8.75%)
-  const basicRateDividends = Math.min(taxableDividends, basicRateRemaining);
-  // Higher rate dividends (33.75%)
-  const higherRateDividends = Math.max(0, taxableDividends - basicRateDividends);
-
-  return basicRateDividends * 0.0875 + higherRateDividends * 0.3375;
+  return getDividendTax(dividends, salary, taxYear);
 }
 
 /**
- * Rough estimate of income tax for POA warning calculation
+ * Estimate rUK income tax for POA warning calculation.
  */
-function estimateIncomeTax(salary: number, taxYear: TaxYear): number {
-  const rates = TAX_RATES[taxYear];
-  const personalAllowance = rates.personalAllowance;
-  const basicRateLimit = rates.bands[0]?.threshold ?? 0;
-
-  const taxableIncome = Math.max(0, salary - personalAllowance);
-  if (taxableIncome <= 0) return 0;
-
-  // Basic rate (20%)
-  const basicRateTax = Math.min(taxableIncome, basicRateLimit) * 0.2;
-  // Higher rate (40%)
-  const higherRateIncome = Math.max(0, taxableIncome - basicRateLimit);
-  const higherRateTax = higherRateIncome * 0.4;
-
-  return basicRateTax + higherRateTax;
+function estimateIncomeTax(
+  income: number,
+  taxYear: TaxYear,
+  adjustedNetIncome: number = income,
+): number {
+  return getIncomeTax(income, 'rUK', taxYear, adjustedNetIncome);
 }

@@ -192,11 +192,24 @@ describe('Warning Triggers', () => {
       );
     });
 
+    it('should warn about Payments on Account for all-dividend extraction', () => {
+      const warnings = getWarnings({
+        profit: 150000,
+        salary: 0,
+        dividends: 114000,
+        taxYear: '2026-2027',
+      });
+
+      expect(warnings.some((w) => w.type === 'PAYMENTS_ON_ACCOUNT' && w.severity === 'soft')).toBe(
+        true,
+      );
+    });
+
     it('should NOT warn about POA if SA liability <=£1k', () => {
       const input = {
         profit: 30000,
         salary: 12570,
-        dividends: 10000,
+        dividends: 9000,
       };
       // SA liability likely under £1k
       const warnings = getWarnings(input);

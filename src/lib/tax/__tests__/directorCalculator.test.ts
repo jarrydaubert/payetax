@@ -96,7 +96,26 @@ describe('Director Calculator', () => {
         if (isNormalMode(result)) {
           expect(result.dividendTax).toBeGreaterThan(POA_THRESHOLD);
           expect(result.includesPOA).toBe(true);
-          expect(result.personalTaxAnnual).toBeCloseTo(result.dividendTax * POA_MULTIPLIER, 2);
+          expect(result.personalTaxAnnual).toBeGreaterThanOrEqual(
+            result.dividendTax * POA_MULTIPLIER,
+          );
+        }
+      });
+
+      it('includes PA-taper salary tax when dividends push total income over £100k', () => {
+        const result = calculateDirectorScenario({
+          ...defaultInput,
+          revenue: 150000,
+          expenses: 0,
+        });
+
+        if (isNormalMode(result)) {
+          expect(result.salary).toBe(12570);
+          expect(result.dividendsAvailable).toBe(103926.46);
+          expect(result.dividendTax).toBe(29736.96);
+          expect(result.annualTakeHome).toBe(85109.9);
+          expect(result.includesPOA).toBe(true);
+          expect(result.personalTaxAnnual).toBe(47079.84);
         }
       });
 
