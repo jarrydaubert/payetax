@@ -16,7 +16,7 @@ Start here, then open the specific guide for the task.
 - New post: read `BLOG_GUIDE.md`, log the work in `docs/BACKLOG.md` or the PR, then use `IMAGE_WORKFLOW.md`.
 - Existing post refresh: use the refresh workflow and accuracy checklist in `BLOG_GUIDE.md`.
 - Image-only refresh: use `IMAGE_WORKFLOW.md` and `ai-image-prompts.json`; keep filenames stable unless there is a clear reason not to.
-- Full blog audit: inventory posts first, classify each as `keep`, `refresh`, `rewrite`, `merge`, or `retire`, then refresh in small batches.
+- Full blog audit: run `bun run blog:audit`, inventory posts first, classify each as `keep`, `refresh`, `rewrite`, `merge`, or `retire`, then refresh in small batches.
 
 ## Hard Rules
 

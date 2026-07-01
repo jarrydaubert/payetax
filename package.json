@@ -72,6 +72,7 @@
     "monitor-all": "bun run audit:security:summary && bun run bundle:analyze",
     "deploy": "bun run clean && bun run release && echo '✅ Ready for deployment!'",
     "debug": "bun run clean && bun run typecheck && bun run build:ci",
+    "blog:audit": "bun scripts/audit-blog-content.ts",
     "blog:image:import": "scripts/import-blog-image.sh",
     "golden:generate": "tsx e2e/scripts/generate-golden-master.ts"
   },

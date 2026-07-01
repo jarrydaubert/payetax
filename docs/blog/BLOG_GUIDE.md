@@ -122,14 +122,15 @@ Apply this before publishing or refreshing every post:
 
 Use this workflow for audits, tax-year refreshes, or consistency passes:
 
-1. Inventory the posts being touched and classify each as `keep`, `refresh`, `rewrite`, `merge`, or `retire`.
-2. Check frontmatter, slug/date alignment, current tax year, image path, and links.
-3. Source-check unstable claims against the hierarchy above.
-4. Compare calculator-linked examples with `src/constants/taxRates.ts` or the running calculator.
-5. Update prose, examples, metadata, disclaimer, and internal links together.
-6. Regenerate the featured image if the post image does not match the Ledger style in `docs/blog/IMAGE_WORKFLOW.md`.
-7. Update `updatedAt` only for meaningful factual refreshes.
-8. Record large refresh batches in `docs/BACKLOG.md`, a GitHub issue, or the PR description.
+1. Run `bun run blog:audit`.
+2. Inventory the posts being touched and classify each as `keep`, `refresh`, `rewrite`, `merge`, or `retire`.
+3. Check frontmatter, slug/date alignment, current tax year, image path, and links.
+4. Source-check unstable claims against the hierarchy above.
+5. Compare calculator-linked examples with `src/constants/taxRates.ts` or the running calculator.
+6. Update prose, examples, metadata, disclaimer, and internal links together.
+7. Regenerate the featured image if the post image does not match the Ledger style in `docs/blog/IMAGE_WORKFLOW.md`.
+8. Update `updatedAt` only for meaningful factual refreshes.
+9. Record large refresh batches in `docs/BACKLOG.md`, a GitHub issue, or the PR description.
 
 ## Accuracy Checklist
 
@@ -147,6 +148,12 @@ Before a content PR is ready:
 ## Verification
 
 For docs-only changes, run the smallest relevant checks.
+
+For blog refresh planning, run:
+
+```bash
+bun run blog:audit
+```
 
 For post or image changes, prefer:
 
