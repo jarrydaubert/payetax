@@ -130,8 +130,10 @@ function hasAmericanSpelling(content: string): boolean {
 function hasPastDeadlineRisk(content: string): boolean {
   const hasPastDeadlineSignal =
     /\b31 January 2026\b/i.test(content) ||
-    /\b5(?:th)? April 2026\b/i.test(content) ||
-    /\b(?:before|by) 6 April 2026\b/i.test(content);
+    /\b(?:before|by) 6 April 2026\b/i.test(content) ||
+    /\b(?:deadline|expires?|expire|use it or lose it|last chance|allowances?)[^.\n]{0,120}\b5(?:th)? April 2026\b/i.test(
+      content,
+    );
 
   if (!hasPastDeadlineSignal) return false;
 
@@ -144,6 +146,10 @@ function hasPastDeadlineRisk(content: string): boolean {
     );
 
   return !acknowledgesPassedDeadline;
+}
+
+function hasPostYearEndReviewSignal(content: string): boolean {
+  return /\b(?:after 5 April|has ended|has passed|post-year-end|what to review)\b/i.test(content);
 }
 
 function hasOldImageStyleSignal(imageAlt: string | undefined): boolean {
@@ -185,7 +191,12 @@ function auditPost(filename: string): BlogAuditEntry {
   if (hasOldImageStyleSignal(imageAlt)) flags.push('old-image-style-alt');
   if (bodyStatusLine) flags.push('body-status-line');
   if (earlyHorizontalRules > 0) flags.push(`early-horizontal-rules-${earlyHorizontalRules}`);
-  if (slug.includes('2025') && hasCurrentTaxYearSignal(`${title}\n${content.slice(0, 2000)}`)) {
+  const titleAndLeadContent = `${title}\n${content.slice(0, 2000)}`;
+  if (
+    slug.includes('2025') &&
+    hasCurrentTaxYearSignal(titleAndLeadContent) &&
+    !hasPostYearEndReviewSignal(titleAndLeadContent)
+  ) {
     flags.push('current-year-title-with-2025-slug');
   }
   if (hasPreviousTaxYearSignal(content) && !hasCurrentTaxYearSignal(content)) {
