@@ -42,6 +42,7 @@ const scriptSrcHosts = [
   'https://www.googletagmanager.com',
   'https://www.google-analytics.com',
   'https://js.sentry-cdn.com',
+  'https://va.vercel-scripts.com',
   'https://giscus.app',
 ];
 
@@ -51,6 +52,7 @@ const connectSrcHosts = [
   'https://www.googletagmanager.com',
   'https://*.ingest.sentry.io',
   'https://*.ingest.de.sentry.io',
+  'https://va.vercel-scripts.com',
   'https://vercel.live',
   'https://giscus.app',
 ];
