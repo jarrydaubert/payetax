@@ -124,7 +124,9 @@ function hasCurrentTaxYearSignal(content: string): boolean {
 }
 
 function hasAmericanSpelling(content: string): boolean {
-  return /\b(?:optimi[sz](?:e|ed|ing|ation)|maximi[sz](?:e|ed|ing|ation)|advisor)\b/i.test(content);
+  return /\b(?:optimiz(?:e|ed|ing|ation)|maximiz(?:e|ed|ing|ation)|minimiz(?:e|ed|ing|ation)|advisor)\b/i.test(
+    content,
+  );
 }
 
 function hasPastDeadlineRisk(content: string): boolean {
