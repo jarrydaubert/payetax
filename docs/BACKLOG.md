@@ -6,7 +6,7 @@ Keep this file for active or parked future work only. Closed work belongs in Git
 
 ## Active
 
-- Publish the Making Tax Digital for Income Tax 2026 explainer as a featured Tax Changes post, with official GOV.UK source checks and generated Ledger-style blog artwork.
+- Refresh the blog system: regenerate legacy post images into the Ledger editorial style, audit all public posts for 2026/27 accuracy, and update/retire stale tax-year content in small verified batches.
 
 ## Parked
 
