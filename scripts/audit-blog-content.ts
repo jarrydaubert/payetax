@@ -26,6 +26,14 @@ const TARGET_IMAGE_HEIGHT = 1000;
 
 const args = new Set(process.argv.slice(2));
 const strict = args.has('--strict');
+const showAll = args.has('--all');
+const limitArg = process.argv.slice(2).find((arg) => arg.startsWith('--limit='));
+const parsedLimit = limitArg ? Number.parseInt(limitArg.replace('--limit=', ''), 10) : undefined;
+const outputLimit = showAll
+  ? Number.POSITIVE_INFINITY
+  : Number.isFinite(parsedLimit)
+    ? parsedLimit
+    : 12;
 
 const categorySlugs = new Set(BLOG_CATEGORIES.map((category) => category.slug));
 
@@ -119,6 +127,25 @@ function hasAmericanSpelling(content: string): boolean {
   return /\b(?:optimi[sz](?:e|ed|ing|ation)|maximi[sz](?:e|ed|ing|ation)|advisor)\b/i.test(content);
 }
 
+function hasPastDeadlineRisk(content: string): boolean {
+  const hasPastDeadlineSignal =
+    /\b31 January 2026\b/i.test(content) ||
+    /\b5(?:th)? April 2026\b/i.test(content) ||
+    /\b(?:before|by) 6 April 2026\b/i.test(content);
+
+  if (!hasPastDeadlineSignal) return false;
+
+  const acknowledgesPassedDeadline =
+    /\b(?:deadline|date|window|tax year)\b[^.\n]{0,120}\b(?:has passed|now passed|was|were due)\b/i.test(
+      content,
+    ) ||
+    /\b(?:has passed|now passed)\b[^.\n]{0,120}\b(?:deadline|date|window|tax year)\b/i.test(
+      content,
+    );
+
+  return !acknowledgesPassedDeadline;
+}
+
 function hasOldImageStyleSignal(imageAlt: string | undefined): boolean {
   if (!imageAlt) return false;
   return /\b(?:isometric|glow|floating|maze|smartphone|icon|chart|complete guide|explained|official|HMRC)\b/i.test(
@@ -164,7 +191,7 @@ function auditPost(filename: string): BlogAuditEntry {
   if (hasPreviousTaxYearSignal(content) && !hasCurrentTaxYearSignal(content)) {
     flags.push('previous-tax-year-content');
   }
-  if (/January 2026|5th April 2026|5 April 2026/i.test(content)) {
+  if (hasPastDeadlineRisk(content)) {
     flags.push('past-deadline-review');
   }
   if (hasAmericanSpelling(`${title}\n${content}`)) flags.push('uk-english-review');
@@ -192,7 +219,10 @@ function printEntries(title: string, entries: BlogAuditEntry[], limit = 12): voi
     return;
   }
 
-  for (const entry of entries.slice(0, limit)) {
+  const visibleEntries =
+    limit === Number.POSITIVE_INFINITY ? entries : entries.slice(0, Math.max(0, limit));
+
+  for (const entry of visibleEntries) {
     const size = entry.imageSize ? `${entry.imageSize.width}x${entry.imageSize.height}` : 'n/a';
     console.log(`  - ${entry.slug}`);
     console.log(`    category: ${entry.category || 'missing'} | image: ${size}`);
@@ -202,8 +232,8 @@ function printEntries(title: string, entries: BlogAuditEntry[], limit = 12): voi
     }
   }
 
-  if (entries.length > limit) {
-    console.log(`  ...and ${entries.length - limit} more`);
+  if (entries.length > visibleEntries.length) {
+    console.log(`  ...and ${entries.length - visibleEntries.length} more`);
   }
 }
 
@@ -277,8 +307,8 @@ function main(): void {
   console.log(`  Image refresh candidates: ${missingOrBadImages.length}`);
   console.log(`  Content/structure review candidates: ${contentStructureQueue.length}`);
 
-  printEntries('Image refresh queue', missingOrBadImages);
-  printEntries('Content and spacing review queue', contentStructureQueue);
+  printEntries('Image refresh queue', missingOrBadImages, outputLimit);
+  printEntries('Content and spacing review queue', contentStructureQueue, outputLimit);
 
   if (strict && strictFailures.length > 0) {
     console.error('\nStrict blog audit failed.');
