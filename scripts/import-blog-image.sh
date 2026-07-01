@@ -64,10 +64,11 @@ require_command sips
 mkdir -p "$BLOG_IMAGE_DIR"
 
 DEST_PATH="$BLOG_IMAGE_DIR/$OUTPUT_FILENAME"
-TEMP_PATH="$(mktemp "/tmp/payetax-blog-image.XXXXXX.jpg")"
+TEMP_STEM="$(mktemp "/tmp/payetax-blog-image.XXXXXX")"
+TEMP_PATH="$TEMP_STEM.jpg"
 
 cleanup() {
-  rm -f "$TEMP_PATH"
+  rm -f "$TEMP_PATH" "$TEMP_STEM"
 }
 trap cleanup EXIT
 
