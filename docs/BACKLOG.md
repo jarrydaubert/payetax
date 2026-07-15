@@ -7,6 +7,7 @@ Keep this file for active or parked future work only. Closed work belongs in Git
 ## Active
 
 - Refresh the blog system: regenerate legacy post images into the Ledger editorial style, audit all public posts for 2026/27 accuracy, and update/retire stale tax-year content in small verified batches.
+- Generate the bespoke featured image for the EV salary sacrifice post (`electric-car-salary-sacrifice-guide`) with Codex before pushing: use the `electric-car-salary-sacrifice` prompt in `docs/blog/ai-image-prompts.json`, import via `bun run blog:image:import`, and replace the interim placeholder at `public/images/blog/electric-car-salary-sacrifice.jpg`.
 
 ## Parked
 
