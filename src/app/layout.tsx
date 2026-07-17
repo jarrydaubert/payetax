@@ -88,7 +88,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <SpeedInsights />
             </>
           ) : null}
-          <Suspense fallback={null}>{analyticsEnabled ? <GoogleAnalytics /> : null}</Suspense>
+          {/* Keep the consent controller mounted even when analytics is disabled so
+              stale GA cookies and expired consent are still cleaned up. Its central
+              gate prevents any Google bootstrap or event queue in that state. */}
+          <Suspense fallback={null}>
+            <GoogleAnalytics />
+          </Suspense>
           <Layout appVersion={APP_VERSION}>{children}</Layout>
         </ThemeProvider>
 

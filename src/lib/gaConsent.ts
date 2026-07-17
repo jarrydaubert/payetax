@@ -143,7 +143,7 @@ export function applyConsentUpdate(granted: boolean): void {
  * to Google.
  */
 export const gtagQueued = function gtagQueued() {
-  if (typeof window === 'undefined' || !isGoogleAnalyticsEnabled()) {
+  if (typeof window === 'undefined' || !isGoogleAnalyticsEnabled() || !isAnalyticsConsented()) {
     clearPendingEvents();
     return;
   }
@@ -170,7 +170,8 @@ export function markGaLoaded(): void {
   gaLoaded = true;
 
   if (!isAnalyticsConsented()) {
-    clearPendingEvents();
+    applyConsentUpdate(false);
+    removeGaCookies();
     return;
   }
 
