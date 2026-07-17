@@ -137,7 +137,13 @@
       "blue accent tabs"
     ],
     "salary-sacrifice": ["payslip", "pension envelope", "calculator tape", "split stack of coins"],
-    "electric-car-salary-sacrifice": ["car keys on a keyring", "neatly coiled charging cable", "payslip", "calculator tape", "muted-green accent tabs"]
+    "electric-car-salary-sacrifice": [
+      "car keys on a keyring",
+      "neatly coiled charging cable",
+      "payslip",
+      "calculator tape",
+      "muted-green accent tabs"
+    ]
   },
   "postPromptRecipe": [
     "Start with the category prompt matching the MDX category.",
