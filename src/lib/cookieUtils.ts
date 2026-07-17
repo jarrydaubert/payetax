@@ -7,7 +7,8 @@ export interface ConsentPreferences {
   analytics: boolean;
 }
 
-const CONSENT_KEY = 'cookie-consent';
+export const CONSENT_STORAGE_KEY = 'cookie-consent';
+const CONSENT_KEY = CONSENT_STORAGE_KEY;
 const CONSENT_TIMESTAMP_KEY = 'cookie-consent-timestamp';
 /** Approximately 12 months in milliseconds (365 days) */
 const TWELVE_MONTHS_MS = 365 * 24 * 60 * 60 * 1000;
@@ -74,17 +75,23 @@ export function getConsentTimestamp(): Date | null {
 /**
  * Check if consent is expired (after 12 months)
  * Uses millisecond arithmetic to avoid Date month edge cases
+ *
+ * A stored preference without a valid timestamp cannot prove freshness,
+ * so it is treated as expired and the user is re-prompted.
  */
 export function isConsentExpired(): boolean {
   const consentDate = getConsentTimestamp();
-  if (!consentDate) return false;
+  if (!consentDate) {
+    return safeGetItem(CONSENT_KEY) !== null;
+  }
 
   return Date.now() - consentDate.getTime() > TWELVE_MONTHS_MS;
 }
 
 export function setConsentPreferences(preferences: ConsentPreferences): void {
-  safeSetItem(CONSENT_KEY, JSON.stringify(preferences));
+  // Timestamp first: a preference visible without a timestamp reads as expired.
   safeSetItem(CONSENT_TIMESTAMP_KEY, new Date().toISOString());
+  safeSetItem(CONSENT_KEY, JSON.stringify(preferences));
 }
 
 /**

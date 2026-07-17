@@ -16,6 +16,7 @@ import {
 import { Switch } from '@/components/ui/switch';
 import type { ConsentPreferences } from '@/lib/cookieUtils';
 import {
+  CONSENT_STORAGE_KEY,
   clearCookieConsent,
   getConsentPreferences,
   isConsentExpired,
@@ -70,12 +71,30 @@ const CookieBanner: React.FC = () => {
       setModalOpen(true);
     };
 
+    // Keep the visible banner in sync with decisions made in other tabs:
+    // a stored decision elsewhere dismisses this tab's banner/modal, and a
+    // cleared decision (e.g. expiry) re-prompts here too.
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key !== null && event.key !== CONSENT_STORAGE_KEY) return;
+
+      const preferences = getConsentPreferences();
+      setModalOpen(false);
+      if (preferences) {
+        setAnalyticsDraft(preferences.analytics);
+        setShowBanner(false);
+      } else {
+        setShowBanner(true);
+      }
+    };
+
     initialize();
     document.addEventListener(OPEN_PREFERENCES_EVENT, handleOpenPreferences);
+    window.addEventListener('storage', handleStorageChange);
 
     return () => {
       if (timer) clearTimeout(timer);
       document.removeEventListener(OPEN_PREFERENCES_EVENT, handleOpenPreferences);
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, [loadCurrentPreferences]);
 

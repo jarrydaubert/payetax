@@ -29,6 +29,8 @@ export interface GtagEvent {
 interface ConsentBase {
   analytics_storage?: ConsentState;
   ad_storage?: ConsentState;
+  ad_user_data?: ConsentState;
+  ad_personalization?: ConsentState;
   functionality_storage?: ConsentState;
   personalization_storage?: ConsentState;
   security_storage?: ConsentState;

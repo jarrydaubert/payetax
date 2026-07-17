@@ -16,6 +16,7 @@
 
 import type { AnalyticsAction, SEOActionType } from '@/lib/analyticsEvents';
 import { isAnalyticsConsented } from '@/lib/cookieUtils';
+import { gtagQueued } from '@/lib/gaConsent';
 
 export type { AnalyticsAction, SEOActionType } from '@/lib/analyticsEvents';
 
@@ -97,19 +98,18 @@ export function trackSEOAction(action: SEOActionType, data: SEOAnalyticsData = {
       });
     }
 
-    // Track with Google Analytics if available
+    // Track with Google Analytics. Events queue until gtag.js has loaded,
+    // so nothing is lost right after acceptance; withdrawal purges the queue.
     // GA4: flatten all params (no custom_parameters wrapper)
-    if (window?.gtag) {
-      window.gtag('event', action, {
-        category: 'seo_actions',
-        label: data.source || 'unknown',
-        source: data.source,
-        target: data.target,
-        action_type: data.action_type,
-        destination: data.destination,
-        page_path: pagePath,
-      });
-    }
+    gtagQueued('event', action, {
+      category: 'seo_actions',
+      label: data.source || 'unknown',
+      source: data.source,
+      target: data.target,
+      action_type: data.action_type,
+      destination: data.destination,
+      page_path: pagePath,
+    });
   } catch (error) {
     logAnalyticsWarning('Analytics tracking error:', error);
   }
@@ -142,16 +142,15 @@ export function trackEvent(event: AnalyticsEvent): void {
       });
     }
 
-    // Track with Google Analytics if available
+    // Track with Google Analytics. Events queue until gtag.js has loaded,
+    // so nothing is lost right after acceptance; withdrawal purges the queue.
     // GA4: flatten all params (no custom_parameters wrapper)
-    if (window?.gtag) {
-      window.gtag('event', event.action, {
-        category: event.category || 'general',
-        label: event.label,
-        value: event.value,
-        ...(event.custom_data ?? {}),
-      });
-    }
+    gtagQueued('event', event.action, {
+      category: event.category || 'general',
+      label: event.label,
+      value: event.value,
+      ...(event.custom_data ?? {}),
+    });
   } catch (error) {
     logAnalyticsWarning('Analytics tracking error:', error);
   }
