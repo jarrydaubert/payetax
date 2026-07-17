@@ -4,8 +4,15 @@
 // src/components/organisms/__tests__/Analytics.test.tsx
 
 import { render, waitFor } from '@testing-library/react';
+import { getGoogleAnalyticsMeasurementId } from '@/lib/analyticsConfig';
+import { CONSENT_LIFETIME_MS } from '@/lib/cookieUtils';
 import { resetGaConsentStateForTests } from '@/lib/gaConsent';
 import { Analytics } from '../Analytics';
+
+jest.mock('@/lib/analyticsConfig', () => ({
+  getGoogleAnalyticsMeasurementId: jest.fn(),
+  isGoogleAnalyticsEnabled: jest.fn(() => true),
+}));
 
 // Mock next/navigation with a mutable pathname so route changes can be simulated
 let mockPathname = '/';
@@ -29,6 +36,7 @@ jest.mock('next/script', () => ({
 }));
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID as string;
+const mockGetMeasurementId = getGoogleAnalyticsMeasurementId as jest.Mock;
 
 type WindowWithGa = Window & {
   dataLayer?: IArguments[];
@@ -74,6 +82,7 @@ function clearAllCookies(): void {
 describe('Analytics Component', () => {
   beforeEach(() => {
     mockPathname = '/';
+    mockGetMeasurementId.mockReturnValue(GA_ID);
     resetGaConsentStateForTests();
     window.localStorage.clear();
     clearAllCookies();
@@ -169,6 +178,21 @@ describe('Analytics Component', () => {
       expect(document.cookie).not.toContain('_ga');
       expect(document.cookie).toContain('theme=dark');
     });
+
+    it('does not bootstrap or queue when the central analytics gate is closed', async () => {
+      mockGetMeasurementId.mockReturnValue(null);
+      storeConsent(true);
+
+      const { container } = render(<Analytics />);
+
+      await waitFor(() => {
+        expect(win.consentMode?.isConsentGiven).toBe(false);
+      });
+
+      expect(container.querySelector('#ga-script')).not.toBeInTheDocument();
+      expect(win.dataLayer).toBeUndefined();
+      expect(win.gtag).toBeUndefined();
+    });
   });
 
   describe('Page View Tracking', () => {
@@ -259,6 +283,7 @@ describe('Analytics Component', () => {
 
       writeCookie('_ga=GA1.1.111.222; path=/');
       writeCookie('_ga_TEST=GS1.1.333; path=/');
+      storeConsent(false);
 
       document.dispatchEvent(
         new CustomEvent('cookieConsentUpdated', { detail: { analytics: false } }),
@@ -280,11 +305,13 @@ describe('Analytics Component', () => {
       render(<Analytics />);
       await waitFor(() => expect(pageViews()).toHaveLength(1));
 
+      storeConsent(false);
       document.dispatchEvent(
         new CustomEvent('cookieConsentUpdated', { detail: { analytics: false } }),
       );
       await waitFor(() => expect(win.consentMode?.isConsentGiven).toBe(false));
 
+      storeConsent(true);
       document.dispatchEvent(
         new CustomEvent('cookieConsentUpdated', { detail: { analytics: true } }),
       );
@@ -320,6 +347,24 @@ describe('Analytics Component', () => {
       });
     });
 
+    it('does not duplicate a page view for a repeated accepted storage event', async () => {
+      storeConsent(true);
+      render(<Analytics />);
+      await waitFor(() => expect(pageViews()).toHaveLength(1));
+
+      storeConsent(true);
+      window.dispatchEvent(
+        new StorageEvent('storage', {
+          key: 'cookie-consent',
+          newValue: JSON.stringify({ analytics: true }),
+        }),
+      );
+
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      expect(pageViews()).toHaveLength(1);
+      expect(consentUpdates()).toHaveLength(1);
+    });
+
     it('handles consent revocation from another tab via storage event', async () => {
       storeConsent(true);
       render(<Analytics />);
@@ -337,6 +382,59 @@ describe('Analytics Component', () => {
         expect(win.consentMode?.isConsentGiven).toBe(false);
       });
       expect(win[`ga-disable-${GA_ID}`]).toBe(true);
+    });
+
+    it('does not grant cross-tab consent when the timestamp is missing', async () => {
+      render(<Analytics />);
+      await waitFor(() => expect(win.consentMode?.isConsentGiven).toBe(false));
+
+      window.localStorage.setItem('cookie-consent', JSON.stringify({ analytics: true }));
+      window.dispatchEvent(
+        new StorageEvent('storage', {
+          key: 'cookie-consent',
+          newValue: JSON.stringify({ analytics: true }),
+        }),
+      );
+
+      await waitFor(() => expect(win.consentMode?.isConsentGiven).toBe(false));
+      expect(window.localStorage.getItem('cookie-consent')).toBeNull();
+      expect(win.dataLayer).toBeUndefined();
+    });
+
+    it('withdraws consent when another tab removes only the timestamp', async () => {
+      storeConsent(true);
+      render(<Analytics />);
+      await waitFor(() => expect(win.consentMode?.isConsentGiven).toBe(true));
+
+      window.localStorage.removeItem('cookie-consent-timestamp');
+      window.dispatchEvent(
+        new StorageEvent('storage', {
+          key: 'cookie-consent-timestamp',
+          newValue: null,
+        }),
+      );
+
+      await waitFor(() => expect(win.consentMode?.isConsentGiven).toBe(false));
+      expect(win[`ga-disable-${GA_ID}`]).toBe(true);
+      expect(window.localStorage.getItem('cookie-consent')).toBeNull();
+    });
+
+    it('disables GA and removes its cookies when consent expires in an open tab', async () => {
+      const expiresSoon = new Date(Date.now() - CONSENT_LIFETIME_MS + 80);
+      window.localStorage.setItem('cookie-consent-timestamp', expiresSoon.toISOString());
+      window.localStorage.setItem('cookie-consent', JSON.stringify({ analytics: true }));
+
+      const { container } = render(<Analytics />);
+      await waitFor(() => expect(win.consentMode?.isConsentGiven).toBe(true));
+
+      writeCookie('_ga=GA1.1.111.222; path=/');
+
+      await new Promise((resolve) => setTimeout(resolve, 120));
+      await waitFor(() => expect(win.consentMode?.isConsentGiven).toBe(false));
+
+      expect(win[`ga-disable-${GA_ID}`]).toBe(true);
+      expect(document.cookie).not.toContain('_ga=');
+      expect(container.querySelector('#ga-script')).not.toBeInTheDocument();
     });
   });
 

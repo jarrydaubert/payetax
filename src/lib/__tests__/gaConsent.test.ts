@@ -15,9 +15,17 @@ jest.mock('@/lib/cookieUtils', () => ({
   isAnalyticsConsented: jest.fn(() => true),
 }));
 
+jest.mock('@/lib/analyticsConfig', () => ({
+  getGoogleAnalyticsMeasurementId: jest.fn(),
+  isGoogleAnalyticsEnabled: jest.fn(),
+}));
+
+import { getGoogleAnalyticsMeasurementId, isGoogleAnalyticsEnabled } from '@/lib/analyticsConfig';
 import { isAnalyticsConsented } from '@/lib/cookieUtils';
 
 const mockConsented = isAnalyticsConsented as jest.Mock;
+const mockMeasurementId = getGoogleAnalyticsMeasurementId as jest.Mock;
+const mockAnalyticsEnabled = isGoogleAnalyticsEnabled as jest.Mock;
 const GA_ID = 'G-TESTID1234';
 
 type WindowWithGa = Window & {
@@ -51,6 +59,8 @@ describe('gaConsent', () => {
   beforeEach(() => {
     resetGaConsentStateForTests();
     mockConsented.mockReturnValue(true);
+    mockMeasurementId.mockReturnValue(GA_ID);
+    mockAnalyticsEnabled.mockReturnValue(true);
     win.dataLayer = undefined;
     win.gtag = undefined;
     win[`ga-disable-${GA_ID}`] = undefined;
@@ -59,7 +69,7 @@ describe('gaConsent', () => {
 
   describe('bootstrapGa', () => {
     it('pushes js, denied consent default, then config with send_page_view disabled — in order', () => {
-      bootstrapGa(GA_ID);
+      bootstrapGa();
 
       const entries = dlEntries();
       const jsIndex = entries.findIndex((e) => e[0] === 'js');
@@ -82,18 +92,28 @@ describe('gaConsent', () => {
     });
 
     it('is idempotent — a second call pushes nothing new', () => {
-      bootstrapGa(GA_ID);
+      bootstrapGa();
       const lengthAfterFirst = win.dataLayer?.length ?? 0;
 
-      bootstrapGa(GA_ID);
+      bootstrapGa();
 
       expect(win.dataLayer?.length).toBe(lengthAfterFirst);
+    });
+
+    it('fails closed without the centrally enabled measurement ID', () => {
+      mockMeasurementId.mockReturnValue(null);
+
+      bootstrapGa();
+
+      expect(isGaBootstrapped()).toBe(false);
+      expect(win.dataLayer).toBeUndefined();
+      expect(win.gtag).toBeUndefined();
     });
   });
 
   describe('applyConsentUpdate', () => {
     it('never initialises gtag or the dataLayer on an unconsented visit', () => {
-      applyConsentUpdate(GA_ID, false);
+      applyConsentUpdate(false);
 
       expect(win.dataLayer).toBeUndefined();
       expect(win.gtag).toBeUndefined();
@@ -101,10 +121,10 @@ describe('gaConsent', () => {
     });
 
     it('pushes an explicit granted update after bootstrap (grant and re-grant)', () => {
-      bootstrapGa(GA_ID);
-      applyConsentUpdate(GA_ID, true);
-      applyConsentUpdate(GA_ID, false);
-      applyConsentUpdate(GA_ID, true);
+      bootstrapGa();
+      applyConsentUpdate(true);
+      applyConsentUpdate(false);
+      applyConsentUpdate(true);
 
       const updates = dlEntries().filter((e) => e[0] === 'consent' && e[1] === 'update');
       expect(updates).toHaveLength(3);
@@ -115,17 +135,17 @@ describe('gaConsent', () => {
     });
 
     it('sets the kill switch on denial and clears it on grant', () => {
-      applyConsentUpdate(GA_ID, false);
+      applyConsentUpdate(false);
       expect(win[`ga-disable-${GA_ID}`]).toBe(true);
 
-      applyConsentUpdate(GA_ID, true);
+      applyConsentUpdate(true);
       expect(win[`ga-disable-${GA_ID}`]).toBe(false);
     });
   });
 
   describe('event queue', () => {
     it('queues events before gtag.js loads and flushes them on load while consented', () => {
-      bootstrapGa(GA_ID);
+      bootstrapGa();
       gtagQueued('event', 'page_view', { page_path: '/' });
 
       expect(pendingEventCount()).toBe(1);
@@ -140,7 +160,7 @@ describe('gaConsent', () => {
     });
 
     it('pushes straight to the dataLayer once loaded', () => {
-      bootstrapGa(GA_ID);
+      bootstrapGa();
       markGaLoaded();
 
       gtagQueued('event', 'calculator_usage', { label: 'annual' });
@@ -150,7 +170,7 @@ describe('gaConsent', () => {
     });
 
     it('purges the queue when gtag.js loads after consent was withdrawn', () => {
-      bootstrapGa(GA_ID);
+      bootstrapGa();
       gtagQueued('event', 'page_view', { page_path: '/' });
       mockConsented.mockReturnValue(false);
 
@@ -162,15 +182,15 @@ describe('gaConsent', () => {
 
     it('an event queued after acceptance cannot survive withdrawal and replay after re-acceptance', () => {
       // accept → queue → withdraw before gtag.js loads → re-accept → load
-      bootstrapGa(GA_ID);
-      applyConsentUpdate(GA_ID, true);
+      bootstrapGa();
+      applyConsentUpdate(true);
       gtagQueued('event', 'calculator_start', { label: 'before-withdrawal' });
       expect(pendingEventCount()).toBe(1);
 
-      applyConsentUpdate(GA_ID, false); // withdrawal purges the queue
+      applyConsentUpdate(false); // withdrawal purges the queue
       expect(pendingEventCount()).toBe(0);
 
-      applyConsentUpdate(GA_ID, true); // re-accept
+      applyConsentUpdate(true); // re-accept
       gtagQueued('event', 'calculator_start', { label: 'after-re-accept' });
 
       markGaLoaded(); // gtag.js finishes loading
@@ -178,6 +198,18 @@ describe('gaConsent', () => {
       const events = dlEntries().filter((e) => e[0] === 'event' && e[1] === 'calculator_start');
       expect(events).toHaveLength(1);
       expect(events[0][2]).toMatchObject({ label: 'after-re-accept' });
+    });
+
+    it('never accumulates events while analytics is disabled or unconfigured', () => {
+      gtagQueued('event', 'calculator_start', { label: 'unconfigured' });
+      expect(pendingEventCount()).toBe(1);
+
+      mockAnalyticsEnabled.mockReturnValue(false);
+      mockMeasurementId.mockReturnValue(null);
+      gtagQueued('event', 'calculator_start', { label: 'disabled' });
+
+      expect(pendingEventCount()).toBe(0);
+      expect(win.dataLayer).toBeUndefined();
     });
   });
 
@@ -207,10 +239,10 @@ describe('gaConsent', () => {
 
   describe('setGaDisabled', () => {
     it('sets the per-measurement-id window flag', () => {
-      setGaDisabled(GA_ID, true);
+      setGaDisabled(true);
       expect(win[`ga-disable-${GA_ID}`]).toBe(true);
 
-      setGaDisabled(GA_ID, false);
+      setGaDisabled(false);
       expect(win[`ga-disable-${GA_ID}`]).toBe(false);
     });
   });

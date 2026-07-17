@@ -1,5 +1,7 @@
 import {
+  CONSENT_LIFETIME_MS,
   clearCookieConsent,
+  getConsentExpiryTime,
   getConsentPreferences,
   getConsentTimestamp,
   isAnalyticsConsented,
@@ -127,6 +129,7 @@ describe('cookieUtils', () => {
       localStorageMock.setItem('cookie-consent-timestamp', ts.toISOString());
 
       expect(getConsentTimestamp()?.toISOString()).toBe(ts.toISOString());
+      expect(getConsentExpiryTime()).toBe(ts.getTime() + CONSENT_LIFETIME_MS);
     });
 
     it('uses the canonical analytics consent helper', () => {

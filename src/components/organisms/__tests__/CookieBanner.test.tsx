@@ -4,6 +4,7 @@ import CookieBanner from '../CookieBanner';
 
 jest.mock('@/lib/cookieUtils', () => ({
   CONSENT_STORAGE_KEY: 'cookie-consent',
+  CONSENT_TIMESTAMP_STORAGE_KEY: 'cookie-consent-timestamp',
   clearCookieConsent: jest.fn(),
   getConsentPreferences: jest.fn(),
   isConsentExpired: jest.fn(),
@@ -124,6 +125,23 @@ describe('CookieBanner', () => {
     });
   });
 
+  it('cancels the delayed banner when another tab decides before it appears', () => {
+    render(<CookieBanner />);
+    jest.advanceTimersByTime(200);
+
+    (cookieUtils.getConsentPreferences as jest.Mock).mockReturnValue({ analytics: false });
+    fireEvent(
+      window,
+      new StorageEvent('storage', {
+        key: 'cookie-consent',
+        newValue: JSON.stringify({ analytics: false }),
+      }),
+    );
+    jest.advanceTimersByTime(500);
+
+    expect(screen.queryByTestId('cookie-banner')).not.toBeInTheDocument();
+  });
+
   it('re-prompts when consent is cleared from another tab', async () => {
     (cookieUtils.getConsentPreferences as jest.Mock).mockReturnValue({ analytics: true });
 
@@ -134,6 +152,18 @@ describe('CookieBanner', () => {
 
     (cookieUtils.getConsentPreferences as jest.Mock).mockReturnValue(null);
     fireEvent(window, new StorageEvent('storage', { key: 'cookie-consent', newValue: null }));
+
+    expect(await screen.findByTestId('cookie-banner')).toBeInTheDocument();
+  });
+
+  it('re-prompts in the same tab when Analytics reports consent expiry', async () => {
+    (cookieUtils.getConsentPreferences as jest.Mock).mockReturnValue({ analytics: true });
+
+    render(<CookieBanner />);
+    expect(screen.queryByTestId('cookie-banner')).not.toBeInTheDocument();
+
+    (cookieUtils.getConsentPreferences as jest.Mock).mockReturnValue(null);
+    fireEvent(document, new Event('cookieConsentExpired'));
 
     expect(await screen.findByTestId('cookie-banner')).toBeInTheDocument();
   });
