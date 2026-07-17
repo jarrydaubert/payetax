@@ -84,6 +84,31 @@ describe('cookieUtils', () => {
       expect(localStorageMock.removeItem).toHaveBeenCalledWith('cookie-consent');
       expect(localStorageMock.removeItem).toHaveBeenCalledWith('cookie-consent-timestamp');
     });
+
+    it('treats a stored preference without a timestamp as expired', () => {
+      localStorageMock.setItem('cookie-consent', JSON.stringify({ analytics: true }));
+
+      expect(isConsentExpired()).toBe(true);
+    });
+
+    it('is not expired when nothing is stored at all', () => {
+      expect(isConsentExpired()).toBe(false);
+    });
+
+    it('clears and re-prompts a preference that has no timestamp', () => {
+      localStorageMock.setItem('cookie-consent', JSON.stringify({ analytics: true }));
+
+      expect(getConsentPreferences()).toBeNull();
+      expect(isAnalyticsConsented()).toBe(false);
+      expect(localStorageMock.removeItem).toHaveBeenCalledWith('cookie-consent');
+    });
+
+    it('treats a legacy value without a timestamp as expired', () => {
+      localStorageMock.setItem('cookie-consent', 'accepted');
+
+      expect(getConsentPreferences()).toBeNull();
+      expect(isAnalyticsConsented()).toBe(false);
+    });
   });
 
   describe('helpers', () => {

@@ -22,19 +22,27 @@ async function globalSetup(config: FullConfig) {
     await page.waitForLoadState('domcontentloaded');
 
     // Accept cookies using the data-testid
-    const acceptButton = page.getByTestId('cookie-accept-analytics');
+    const acceptButton = page.getByTestId('cookie-accept-all');
     if (await acceptButton.isVisible({ timeout: 3000 }).catch(() => false)) {
       await acceptButton.click();
 
       await page
-        .waitForFunction(() => localStorage.getItem('cookie-consent') === 'accepted', {
-          timeout: 5000,
-        })
+        .waitForFunction(
+          () => {
+            try {
+              const raw = localStorage.getItem('cookie-consent');
+              return raw !== null && JSON.parse(raw).analytics === true;
+            } catch {
+              return false;
+            }
+          },
+          { timeout: 5000 },
+        )
         .catch(() => {});
 
       // Verify cookie consent was saved to localStorage
       const consent = await page.evaluate(() => localStorage.getItem('cookie-consent'));
-      if (consent === 'accepted') {
+      if (consent?.includes('"analytics":true')) {
         // biome-ignore lint/suspicious/noConsole: Setup logging for test diagnostics
         console.log('✅ Cookie consent accepted and saved to localStorage');
       } else {
