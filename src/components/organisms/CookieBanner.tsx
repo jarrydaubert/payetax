@@ -17,6 +17,7 @@ import { Switch } from '@/components/ui/switch';
 import type { ConsentPreferences } from '@/lib/cookieUtils';
 import {
   CONSENT_STORAGE_KEY,
+  CONSENT_TIMESTAMP_STORAGE_KEY,
   clearCookieConsent,
   getConsentPreferences,
   isConsentExpired,
@@ -24,6 +25,7 @@ import {
 } from '@/lib/cookieUtils';
 
 const CONSENT_UPDATED_EVENT = 'cookieConsentUpdated';
+const CONSENT_EXPIRED_EVENT = 'cookieConsentExpired';
 const OPEN_PREFERENCES_EVENT = 'openCookiePreferences';
 
 function notifyConsentUpdated(preferences: ConsentPreferences): void {
@@ -43,6 +45,13 @@ const CookieBanner: React.FC = () => {
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | null = null;
+
+    const cancelBannerTimer = () => {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+    };
 
     const initialize = () => {
       try {
@@ -66,6 +75,7 @@ const CookieBanner: React.FC = () => {
     };
 
     const handleOpenPreferences = () => {
+      cancelBannerTimer();
       loadCurrentPreferences();
       setShowBanner(false);
       setModalOpen(true);
@@ -74,9 +84,8 @@ const CookieBanner: React.FC = () => {
     // Keep the visible banner in sync with decisions made in other tabs:
     // a stored decision elsewhere dismisses this tab's banner/modal, and a
     // cleared decision (e.g. expiry) re-prompts here too.
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key !== null && event.key !== CONSENT_STORAGE_KEY) return;
-
+    const syncVisibleConsent = () => {
+      cancelBannerTimer();
       const preferences = getConsentPreferences();
       setModalOpen(false);
       if (preferences) {
@@ -87,13 +96,27 @@ const CookieBanner: React.FC = () => {
       }
     };
 
+    const handleStorageChange = (event: StorageEvent) => {
+      if (
+        event.key !== null &&
+        event.key !== CONSENT_STORAGE_KEY &&
+        event.key !== CONSENT_TIMESTAMP_STORAGE_KEY
+      ) {
+        return;
+      }
+
+      syncVisibleConsent();
+    };
+
     initialize();
     document.addEventListener(OPEN_PREFERENCES_EVENT, handleOpenPreferences);
+    document.addEventListener(CONSENT_EXPIRED_EVENT, syncVisibleConsent);
     window.addEventListener('storage', handleStorageChange);
 
     return () => {
-      if (timer) clearTimeout(timer);
+      cancelBannerTimer();
       document.removeEventListener(OPEN_PREFERENCES_EVENT, handleOpenPreferences);
+      document.removeEventListener(CONSENT_EXPIRED_EVENT, syncVisibleConsent);
       window.removeEventListener('storage', handleStorageChange);
     };
   }, [loadCurrentPreferences]);

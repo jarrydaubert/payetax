@@ -9,9 +9,10 @@ export interface ConsentPreferences {
 
 export const CONSENT_STORAGE_KEY = 'cookie-consent';
 const CONSENT_KEY = CONSENT_STORAGE_KEY;
-const CONSENT_TIMESTAMP_KEY = 'cookie-consent-timestamp';
+export const CONSENT_TIMESTAMP_STORAGE_KEY = 'cookie-consent-timestamp';
+const CONSENT_TIMESTAMP_KEY = CONSENT_TIMESTAMP_STORAGE_KEY;
 /** Approximately 12 months in milliseconds (365 days) */
-const TWELVE_MONTHS_MS = 365 * 24 * 60 * 60 * 1000;
+export const CONSENT_LIFETIME_MS = 365 * 24 * 60 * 60 * 1000;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -72,6 +73,12 @@ export function getConsentTimestamp(): Date | null {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
+/** Millisecond timestamp when the current consent choice expires. */
+export function getConsentExpiryTime(): number | null {
+  const consentDate = getConsentTimestamp();
+  return consentDate ? consentDate.getTime() + CONSENT_LIFETIME_MS : null;
+}
+
 /**
  * Check if consent is expired (after 12 months)
  * Uses millisecond arithmetic to avoid Date month edge cases
@@ -85,7 +92,7 @@ export function isConsentExpired(): boolean {
     return safeGetItem(CONSENT_KEY) !== null;
   }
 
-  return Date.now() - consentDate.getTime() > TWELVE_MONTHS_MS;
+  return Date.now() - consentDate.getTime() >= CONSENT_LIFETIME_MS;
 }
 
 export function setConsentPreferences(preferences: ConsentPreferences): void {

@@ -15,6 +15,7 @@
  * @module lib/gaConsent
  */
 
+import { getGoogleAnalyticsMeasurementId, isGoogleAnalyticsEnabled } from '@/lib/analyticsConfig';
 import { isAnalyticsConsented } from '@/lib/cookieUtils';
 
 import type { GtagFunction } from '@/types/gtag';
@@ -38,8 +39,9 @@ export function isGaBootstrapped(): boolean {
  * a loaded gtag.js sends no hits at all — including Enhanced Measurement
  * pings — which is what stops cookieless traffic after withdrawal.
  */
-export function setGaDisabled(measurementId: string, disabled: boolean): void {
-  if (typeof window === 'undefined') return;
+export function setGaDisabled(disabled: boolean): void {
+  const measurementId = getGoogleAnalyticsMeasurementId();
+  if (typeof window === 'undefined' || !measurementId) return;
   (window as unknown as Record<string, unknown>)[`ga-disable-${measurementId}`] = disabled;
 }
 
@@ -75,8 +77,9 @@ export function removeGaCookies(): void {
  * disabled. Navigation tracking sends explicit `page_view` events instead;
  * this config must never be reused as the navigation event.
  */
-export function bootstrapGa(measurementId: string): void {
-  if (typeof window === 'undefined' || bootstrapped) return;
+export function bootstrapGa(): void {
+  const measurementId = getGoogleAnalyticsMeasurementId();
+  if (typeof window === 'undefined' || !measurementId || bootstrapped) return;
   bootstrapped = true;
 
   window.dataLayer = window.dataLayer || [];
@@ -110,14 +113,17 @@ export function bootstrapGa(measurementId: string): void {
  * bootstrapped — an initial no-consent visit must not initialise gtag or
  * the dataLayer merely to record a denial.
  */
-export function applyConsentUpdate(measurementId: string, granted: boolean): void {
+export function applyConsentUpdate(granted: boolean): void {
   if (typeof window === 'undefined') return;
-
-  setGaDisabled(measurementId, !granted);
 
   if (!granted) {
     clearPendingEvents();
   }
+
+  const measurementId = getGoogleAnalyticsMeasurementId();
+  if (!measurementId) return;
+
+  setGaDisabled(!granted);
 
   if (bootstrapped && window.gtag) {
     window.gtag('consent', 'update', {
@@ -137,7 +143,10 @@ export function applyConsentUpdate(measurementId: string, granted: boolean): voi
  * to Google.
  */
 export const gtagQueued = function gtagQueued() {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined' || !isGoogleAnalyticsEnabled()) {
+    clearPendingEvents();
+    return;
+  }
   // biome-ignore lint/complexity/noArguments: gtag.js only processes Arguments objects pushed to the dataLayer
   const args = arguments;
   if (gaLoaded && window.dataLayer) {
@@ -153,6 +162,11 @@ export const gtagQueued = function gtagQueued() {
  * queue is purged (accept → withdraw-before-load leaves nothing to replay).
  */
 export function markGaLoaded(): void {
+  if (!isGoogleAnalyticsEnabled()) {
+    clearPendingEvents();
+    return;
+  }
+
   gaLoaded = true;
 
   if (!isAnalyticsConsented()) {

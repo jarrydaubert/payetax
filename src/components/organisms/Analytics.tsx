@@ -5,7 +5,13 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { initCoreWebVitals, trackEvent } from '@/lib/analytics';
-import { CONSENT_STORAGE_KEY, isAnalyticsConsented, isConsentPreferences } from '@/lib/cookieUtils';
+import { getGoogleAnalyticsMeasurementId } from '@/lib/analyticsConfig';
+import {
+  CONSENT_STORAGE_KEY,
+  CONSENT_TIMESTAMP_STORAGE_KEY,
+  getConsentExpiryTime,
+  isAnalyticsConsented,
+} from '@/lib/cookieUtils';
 import {
   applyConsentUpdate,
   bootstrapGa,
@@ -14,9 +20,7 @@ import {
   removeGaCookies,
 } from '@/lib/gaConsent';
 
-// GA4 Measurement ID - Configure NEXT_PUBLIC_GA_ID in Vercel environment variables
-const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID;
-const ANALYTICS_ENABLED = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS !== 'false';
+const MAX_TIMEOUT_MS = 2_147_483_647;
 
 // Track consent status in window object for persistence
 declare global {
@@ -40,9 +44,11 @@ declare global {
  *   queued events, and remove `_ga`/`_ga_*` cookies.
  */
 export function Analytics() {
+  const measurementId = getGoogleAnalyticsMeasurementId();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [hasConsent, setHasConsent] = useState(false);
+  const effectiveConsentRef = useRef(false);
   const lastTrackedUrl = useRef<string | null>(null);
 
   // Track whether we've initialized lightweight GA4 page timings (only once).
@@ -66,24 +72,28 @@ export function Analytics() {
    * record a denial. Ad/personalization storage stays denied in every state —
    * the banner only asks for analytics consent.
    */
-  const setAnalyticsConsentState = useCallback((nextConsent: boolean) => {
-    window.consentMode = {
-      isConsentGiven: nextConsent,
-    };
+  const setAnalyticsConsentState = useCallback(
+    (nextConsent: boolean) => {
+      const effectiveConsent = Boolean(nextConsent && measurementId);
 
-    if (GA_MEASUREMENT_ID) {
-      if (nextConsent) {
-        bootstrapGa(GA_MEASUREMENT_ID);
-        applyConsentUpdate(GA_MEASUREMENT_ID, true);
+      window.consentMode = {
+        isConsentGiven: effectiveConsent,
+      };
+
+      if (effectiveConsent && !effectiveConsentRef.current) {
+        bootstrapGa();
+        applyConsentUpdate(true);
         lastTrackedUrl.current = null;
-      } else {
-        applyConsentUpdate(GA_MEASUREMENT_ID, false);
+      } else if (!effectiveConsent) {
+        applyConsentUpdate(false);
         removeGaCookies();
       }
-    }
 
-    setHasConsent(nextConsent);
-  }, []);
+      effectiveConsentRef.current = effectiveConsent;
+      setHasConsent(effectiveConsent);
+    },
+    [measurementId],
+  );
 
   /**
    * Track SEO-relevant metrics
@@ -158,12 +168,44 @@ export function Analytics() {
     setAnalyticsConsentState(isAnalyticsConsented());
   }, [setAnalyticsConsentState]);
 
+  // A consent choice can expire while a tab remains open. Schedule the exact
+  // transition (in safe setTimeout-sized chunks) so GA is disabled and its
+  // cookies are removed without waiting for a reload or a later app event.
+  useEffect(() => {
+    if (!hasConsent) return;
+
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    const checkConsentExpiry = () => {
+      if (!isAnalyticsConsented()) {
+        setAnalyticsConsentState(false);
+        document.dispatchEvent(new Event('cookieConsentExpired'));
+        return;
+      }
+
+      const expiresAt = getConsentExpiryTime();
+      if (!expiresAt) {
+        setAnalyticsConsentState(false);
+        return;
+      }
+
+      const remaining = Math.max(1, expiresAt - Date.now());
+      timer = setTimeout(checkConsentExpiry, Math.min(remaining, MAX_TIMEOUT_MS));
+    };
+
+    checkConsentExpiry();
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [hasConsent, setAnalyticsConsentState]);
+
   // App-owned page-view tracking: one explicit page_view event per navigation.
   // Deduped only against the previous URL, so route revisits are counted and
   // effect re-runs with an unchanged URL are not. Events queue until gtag.js
   // loads, so nothing is lost right after acceptance.
   useEffect(() => {
-    if (!(hasConsent && GA_MEASUREMENT_ID)) return;
+    if (!(hasConsent && measurementId)) return;
 
     const url = getCurrentPagePath();
     if (lastTrackedUrl.current === url) return;
@@ -182,38 +224,18 @@ export function Analytics() {
 
     // Track additional SEO metrics and return cleanup
     return trackSEOMetrics();
-  }, [hasConsent, getCurrentPagePath, trackSEOMetrics]);
+  }, [hasConsent, measurementId, getCurrentPagePath, trackSEOMetrics]);
 
   // Handle storage events for consent changes from other tabs
   useEffect(() => {
-    const parseAnalyticsConsentValue = (value: string | null): boolean => {
-      if (value === 'accepted') return true;
-      if (value === 'declined') return false;
-      if (!value) return isAnalyticsConsented();
-
-      try {
-        const parsed: unknown = JSON.parse(value);
-        if (isConsentPreferences(parsed)) {
-          return parsed.analytics;
-        }
-      } catch {
-        return isAnalyticsConsented();
-      }
-
-      return isAnalyticsConsented();
-    };
-
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === CONSENT_STORAGE_KEY) {
-        const newConsent = parseAnalyticsConsentValue(e.newValue);
-        setAnalyticsConsentState(newConsent);
+      if (e.key === CONSENT_STORAGE_KEY || e.key === CONSENT_TIMESTAMP_STORAGE_KEY) {
+        setAnalyticsConsentState(isAnalyticsConsented());
       }
     };
 
-    const handleConsentUpdate = (event: Event) => {
-      const detail: unknown = (event as CustomEvent<unknown>).detail;
-      const newConsent = isConsentPreferences(detail) ? detail.analytics : isAnalyticsConsented();
-      setAnalyticsConsentState(newConsent);
+    const handleConsentUpdate = () => {
+      setAnalyticsConsentState(isAnalyticsConsented());
     };
 
     window.addEventListener('storage', handleStorageChange);
@@ -226,7 +248,7 @@ export function Analytics() {
   }, [setAnalyticsConsentState]);
 
   // Don't render GA4 unless it is enabled, configured, and consented.
-  if (!(ANALYTICS_ENABLED && GA_MEASUREMENT_ID && hasConsent)) {
+  if (!(measurementId && hasConsent)) {
     return null;
   }
 
@@ -234,7 +256,7 @@ export function Analytics() {
     // biome-ignore lint/correctness/useUniqueElementIds: Script id must be static to prevent duplicates
     <Script
       id='ga-script'
-      src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+      src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}
       strategy='lazyOnload'
       onLoad={markGaLoaded}
     />
