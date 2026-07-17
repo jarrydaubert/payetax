@@ -178,6 +178,16 @@ describe('gaConsent', () => {
 
       expect(pendingEventCount()).toBe(0);
       expect(dlEntries().some((e) => e[0] === 'event')).toBe(false);
+      expect(win[`ga-disable-${GA_ID}`]).toBe(true);
+    });
+
+    it('does not queue an event when consent is not currently valid', () => {
+      mockConsented.mockReturnValue(false);
+
+      gtagQueued('event', 'page_view', { page_path: '/' });
+
+      expect(pendingEventCount()).toBe(0);
+      expect(win.dataLayer).toBeUndefined();
     });
 
     it('an event queued after acceptance cannot survive withdrawal and replay after re-acceptance', () => {

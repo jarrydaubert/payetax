@@ -182,6 +182,7 @@ describe('Analytics Component', () => {
     it('does not bootstrap or queue when the central analytics gate is closed', async () => {
       mockGetMeasurementId.mockReturnValue(null);
       storeConsent(true);
+      writeCookie('_ga=GA1.1.111.222; path=/');
 
       const { container } = render(<Analytics />);
 
@@ -192,6 +193,7 @@ describe('Analytics Component', () => {
       expect(container.querySelector('#ga-script')).not.toBeInTheDocument();
       expect(win.dataLayer).toBeUndefined();
       expect(win.gtag).toBeUndefined();
+      expect(document.cookie).not.toContain('_ga=');
     });
   });
 
