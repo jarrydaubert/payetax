@@ -28,7 +28,14 @@ declare global {
 
 let bootstrapped = false;
 let gaLoaded = false;
+let gaLoadFailed = false;
+let runtimeConsentGranted = false;
 let pendingEvents: IArguments[] = [];
+const MAX_PENDING_EVENTS = 100;
+
+function isPageView(args: IArguments): boolean {
+  return args[0] === 'event' && args[1] === 'page_view';
+}
 
 export function isGaBootstrapped(): boolean {
   return bootstrapped;
@@ -114,20 +121,24 @@ export function bootstrapGa(): void {
  * the dataLayer merely to record a denial.
  */
 export function applyConsentUpdate(granted: boolean): void {
-  if (typeof window === 'undefined') return;
+  const measurementId = getGoogleAnalyticsMeasurementId();
+  runtimeConsentGranted = Boolean(granted && measurementId);
 
-  if (!granted) {
+  if (runtimeConsentGranted) {
+    gaLoadFailed = false;
+  }
+
+  if (!runtimeConsentGranted) {
     clearPendingEvents();
   }
 
-  const measurementId = getGoogleAnalyticsMeasurementId();
-  if (!measurementId) return;
+  if (typeof window === 'undefined' || !measurementId) return;
 
-  setGaDisabled(!granted);
+  setGaDisabled(!runtimeConsentGranted);
 
   if (bootstrapped && window.gtag) {
     window.gtag('consent', 'update', {
-      analytics_storage: granted ? 'granted' : 'denied',
+      analytics_storage: runtimeConsentGranted ? 'granted' : 'denied',
       ad_storage: 'denied',
       ad_user_data: 'denied',
       ad_personalization: 'denied',
@@ -143,7 +154,13 @@ export function applyConsentUpdate(granted: boolean): void {
  * to Google.
  */
 export const gtagQueued = function gtagQueued() {
-  if (typeof window === 'undefined' || !isGoogleAnalyticsEnabled() || !isAnalyticsConsented()) {
+  if (
+    typeof window === 'undefined' ||
+    !runtimeConsentGranted ||
+    gaLoadFailed ||
+    !isGoogleAnalyticsEnabled() ||
+    !isAnalyticsConsented()
+  ) {
     clearPendingEvents();
     return;
   }
@@ -152,6 +169,17 @@ export const gtagQueued = function gtagQueued() {
   if (gaLoaded && window.dataLayer) {
     window.dataLayer.push(args);
     return;
+  }
+  if (pendingEvents.length >= MAX_PENDING_EVENTS) {
+    const oldestNonPageView = pendingEvents.findIndex((pending) => !isPageView(pending));
+    if (oldestNonPageView >= 0) {
+      pendingEvents.splice(oldestNonPageView, 1);
+    } else if (!isPageView(args)) {
+      // Page views represent the exact navigation contract. If the bounded
+      // queue contains only page views, discard a lower-priority new event
+      // rather than silently losing a navigation.
+      return;
+    }
   }
   pendingEvents.push(args);
 } as GtagFunction;
@@ -168,8 +196,9 @@ export function markGaLoaded(): void {
   }
 
   gaLoaded = true;
+  gaLoadFailed = false;
 
-  if (!isAnalyticsConsented()) {
+  if (!(runtimeConsentGranted && isAnalyticsConsented())) {
     applyConsentUpdate(false);
     removeGaCookies();
     return;
@@ -180,6 +209,13 @@ export function markGaLoaded(): void {
     window.dataLayer.push(args);
   }
   pendingEvents = [];
+}
+
+/** A failed script load must not leave an undeliverable queue growing forever. */
+export function markGaLoadFailed(): void {
+  gaLoaded = false;
+  gaLoadFailed = true;
+  clearPendingEvents();
 }
 
 export function clearPendingEvents(): void {
@@ -195,5 +231,7 @@ export function pendingEventCount(): number {
 export function resetGaConsentStateForTests(): void {
   bootstrapped = false;
   gaLoaded = false;
+  gaLoadFailed = false;
+  runtimeConsentGranted = false;
   pendingEvents = [];
 }

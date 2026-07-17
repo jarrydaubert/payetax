@@ -23,6 +23,7 @@ describe('CookieBanner', () => {
     jest.useFakeTimers();
     (cookieUtils.getConsentPreferences as jest.Mock).mockReturnValue(null);
     (cookieUtils.isConsentExpired as jest.Mock).mockReturnValue(false);
+    (cookieUtils.setConsentPreferences as jest.Mock).mockReturnValue(true);
   });
 
   afterEach(() => {
@@ -64,6 +65,21 @@ describe('CookieBanner', () => {
     fireEvent.click(reject);
 
     expect(cookieUtils.setConsentPreferences).toHaveBeenCalledWith({ analytics: false });
+  });
+
+  it('fails closed when accepted preferences cannot be persisted', async () => {
+    (cookieUtils.setConsentPreferences as jest.Mock).mockReturnValue(false);
+    const consentUpdate = jest.fn();
+    document.addEventListener('cookieConsentUpdated', consentUpdate);
+    render(<CookieBanner />);
+    jest.advanceTimersByTime(600);
+
+    fireEvent.click(await screen.findByRole('button', { name: /Accept All/i }));
+
+    expect(consentUpdate).toHaveBeenCalledTimes(1);
+    expect((consentUpdate.mock.calls[0][0] as CustomEvent).detail).toEqual({ analytics: false });
+    expect(await screen.findByTestId('cookie-banner')).toBeInTheDocument();
+    document.removeEventListener('cookieConsentUpdated', consentUpdate);
   });
 
   it('opens centered modal from manage preferences and saves toggle state', async () => {

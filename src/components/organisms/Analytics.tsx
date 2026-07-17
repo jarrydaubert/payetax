@@ -10,13 +10,16 @@ import {
   CONSENT_STORAGE_KEY,
   CONSENT_TIMESTAMP_STORAGE_KEY,
   getConsentExpiryTime,
+  getConsentPreferences,
   isAnalyticsConsented,
+  isConsentPreferences,
 } from '@/lib/cookieUtils';
 import {
   applyConsentUpdate,
   bootstrapGa,
   gtagQueued,
   markGaLoaded,
+  markGaLoadFailed,
   removeGaCookies,
 } from '@/lib/gaConsent';
 
@@ -48,14 +51,17 @@ export function Analytics() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [hasConsent, setHasConsent] = useState(false);
+  const [consentExpiresAt, setConsentExpiresAt] = useState<number | null>(null);
+  const [gaScriptAttempt, setGaScriptAttempt] = useState(0);
+  const activeGaScriptAttemptRef = useRef(0);
   const effectiveConsentRef = useRef(false);
-  const lastTrackedUrl = useRef<string | null>(null);
+  const lastTrackedNavigation = useRef<string | null>(null);
 
   // Track whether we've initialized lightweight GA4 page timings (only once).
   // Vercel Speed Insights owns Core Web Vitals.
   const vitalsInitialized = useRef(false);
 
-  const getCurrentPagePath = useCallback(() => {
+  const getCurrentNavigationKey = useCallback(() => {
     const searchParamsString = searchParams?.toString();
     return pathname + (searchParamsString ? `?${searchParamsString}` : '');
   }, [pathname, searchParams]);
@@ -83,8 +89,16 @@ export function Analytics() {
       if (effectiveConsent && !effectiveConsentRef.current) {
         bootstrapGa();
         applyConsentUpdate(true);
-        lastTrackedUrl.current = null;
+        setGaScriptAttempt((attempt) => {
+          const nextAttempt = attempt + 1;
+          activeGaScriptAttemptRef.current = nextAttempt;
+          return nextAttempt;
+        });
+        lastTrackedNavigation.current = null;
       } else if (!effectiveConsent) {
+        // Invalidate callbacks from an in-flight script immediately. A later
+        // re-grant creates a new attempt with its own callbacks.
+        activeGaScriptAttemptRef.current = 0;
         applyConsentUpdate(false);
         removeGaCookies();
       }
@@ -166,39 +180,47 @@ export function Analytics() {
   // component. An unconsented mount also clears stale GA cookies.
   useEffect(() => {
     setAnalyticsConsentState(isAnalyticsConsented());
+    setConsentExpiresAt(getConsentExpiryTime());
   }, [setAnalyticsConsentState]);
 
-  // A consent choice can expire while a tab remains open. Schedule the exact
-  // transition (in safe setTimeout-sized chunks) so GA is disabled and its
-  // cookies are removed without waiting for a reload or a later app event.
+  // Every stored consent choice can expire while a tab remains open, including
+  // a rejection and choices made while GA is disabled or misconfigured.
+  // Schedule independently of effective GA consent so the banner always
+  // re-prompts after 12 months. consentExpiresAt re-arms the timer even when a
+  // same-tab update leaves hasConsent false (for example, reject-all).
   useEffect(() => {
-    if (!hasConsent) return;
-
     let timer: ReturnType<typeof setTimeout> | null = null;
 
-    const checkConsentExpiry = () => {
-      if (!isAnalyticsConsented()) {
+    function checkConsentExpiry() {
+      const preferences = getConsentPreferences();
+      if (!preferences) {
+        setConsentExpiresAt(null);
         setAnalyticsConsentState(false);
         document.dispatchEvent(new Event('cookieConsentExpired'));
         return;
       }
 
-      const expiresAt = getConsentExpiryTime();
-      if (!expiresAt) {
-        setAnalyticsConsentState(false);
+      scheduleConsentExpiry(getConsentExpiryTime());
+    }
+
+    function scheduleConsentExpiry(expiresAt: number | null) {
+      if (!expiresAt) return;
+
+      const remaining = expiresAt - Date.now();
+      if (remaining <= 0) {
+        checkConsentExpiry();
         return;
       }
 
-      const remaining = Math.max(1, expiresAt - Date.now());
       timer = setTimeout(checkConsentExpiry, Math.min(remaining, MAX_TIMEOUT_MS));
-    };
+    }
 
-    checkConsentExpiry();
+    scheduleConsentExpiry(consentExpiresAt);
 
     return () => {
       if (timer) clearTimeout(timer);
     };
-  }, [hasConsent, setAnalyticsConsentState]);
+  }, [consentExpiresAt, setAnalyticsConsentState]);
 
   // App-owned page-view tracking: one explicit page_view event per navigation.
   // Deduped only against the previous URL, so route revisits are counted and
@@ -207,13 +229,15 @@ export function Analytics() {
   useEffect(() => {
     if (!(hasConsent && measurementId)) return;
 
-    const url = getCurrentPagePath();
-    if (lastTrackedUrl.current === url) return;
-    lastTrackedUrl.current = url;
+    const navigationKey = getCurrentNavigationKey();
+    if (lastTrackedNavigation.current === navigationKey) return;
+    lastTrackedNavigation.current = navigationKey;
 
     gtagQueued('event', 'page_view', {
-      page_path: url,
-      page_location: window.location.href,
+      // Query values can contain tax details or arbitrary personal data. Use
+      // them only to distinguish client navigations, never in the GA payload.
+      page_path: pathname,
+      page_location: `${window.location.origin}${pathname}`,
       page_title: document.title,
     });
 
@@ -224,18 +248,31 @@ export function Analytics() {
 
     // Track additional SEO metrics and return cleanup
     return trackSEOMetrics();
-  }, [hasConsent, measurementId, getCurrentPagePath, trackSEOMetrics]);
+  }, [hasConsent, measurementId, pathname, getCurrentNavigationKey, trackSEOMetrics]);
 
   // Handle storage events for consent changes from other tabs
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === CONSENT_STORAGE_KEY || e.key === CONSENT_TIMESTAMP_STORAGE_KEY) {
+      if (
+        e.key === null ||
+        e.key === CONSENT_STORAGE_KEY ||
+        e.key === CONSENT_TIMESTAMP_STORAGE_KEY
+      ) {
         setAnalyticsConsentState(isAnalyticsConsented());
+        setConsentExpiresAt(getConsentExpiryTime());
       }
     };
 
-    const handleConsentUpdate = () => {
-      setAnalyticsConsentState(isAnalyticsConsented());
+    const handleConsentUpdate = (event: Event) => {
+      const detail: unknown = (event as CustomEvent<unknown>).detail;
+      const requestedConsent = isConsentPreferences(detail)
+        ? detail.analytics
+        : isAnalyticsConsented();
+
+      // A denial takes effect immediately even if localStorage persistence was
+      // interrupted. A grant still requires a valid stored decision.
+      setAnalyticsConsentState(requestedConsent && isAnalyticsConsented());
+      setConsentExpiresAt(getConsentExpiryTime());
     };
 
     window.addEventListener('storage', handleStorageChange);
@@ -256,9 +293,14 @@ export function Analytics() {
     // biome-ignore lint/correctness/useUniqueElementIds: Script id must be static to prevent duplicates
     <Script
       id='ga-script'
-      src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}
-      strategy='lazyOnload'
-      onLoad={markGaLoaded}
+      src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}&payetax_retry=${gaScriptAttempt}`}
+      strategy='afterInteractive'
+      onLoad={() => {
+        if (activeGaScriptAttemptRef.current === gaScriptAttempt) markGaLoaded();
+      }}
+      onError={() => {
+        if (activeGaScriptAttemptRef.current === gaScriptAttempt) markGaLoadFailed();
+      }}
     />
   );
 }

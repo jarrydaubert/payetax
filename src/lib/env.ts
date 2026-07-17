@@ -3,6 +3,7 @@
  */
 
 import { z } from 'zod';
+import { ANALYTICS_ENABLE_FLAG_VALUES } from '@/lib/analyticsConfig';
 
 const GA_ID_SCHEMA = z
   .string()
@@ -23,7 +24,7 @@ export const PublicEnvSchema = z.object({
     .transform((val) => val === 'true')
     .optional(),
   NEXT_PUBLIC_ENABLE_ANALYTICS: z
-    .string()
+    .enum(ANALYTICS_ENABLE_FLAG_VALUES)
     .transform((val) => val === 'true')
     .optional(),
 });
@@ -74,7 +75,7 @@ export const RequiredProductionEnvSchema = z
     BREVO_API_KEY: z.string().min(1, 'Brevo API key is required'),
     BREVO_FROM_EMAIL: z.string().min(1, 'Brevo from email is required'),
     NEXT_PUBLIC_ENABLE_ANALYTICS: z
-      .string()
+      .enum(ANALYTICS_ENABLE_FLAG_VALUES)
       .transform((val) => val === 'true')
       .optional(),
     NEXT_PUBLIC_GA_ID: GA_ID_SCHEMA.optional(),

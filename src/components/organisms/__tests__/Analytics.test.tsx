@@ -6,7 +6,7 @@
 import { render, waitFor } from '@testing-library/react';
 import { getGoogleAnalyticsMeasurementId } from '@/lib/analyticsConfig';
 import { CONSENT_LIFETIME_MS } from '@/lib/cookieUtils';
-import { resetGaConsentStateForTests } from '@/lib/gaConsent';
+import { pendingEventCount, resetGaConsentStateForTests } from '@/lib/gaConsent';
 import { Analytics } from '../Analytics';
 
 jest.mock('@/lib/analyticsConfig', () => ({
@@ -17,6 +17,8 @@ jest.mock('@/lib/analyticsConfig', () => ({
 // Mock next/navigation with a mutable pathname so route changes can be simulated
 let mockPathname = '/';
 const mockSearchParams = new URLSearchParams();
+let mockAutoLoadGaScript = true;
+const mockGaScriptCallbacks = new Map<number, { onLoad?: () => void; onError?: () => void }>();
 jest.mock('next/navigation', () => ({
   usePathname: () => mockPathname,
   useSearchParams: () => mockSearchParams,
@@ -25,13 +27,23 @@ jest.mock('next/navigation', () => ({
 // Mock next/script: simulate the external gtag.js script loading after mount
 jest.mock('next/script', () => ({
   __esModule: true,
-  default: ({ children, onLoad, onReady, ...props }: any) => {
+  default: ({ children, onLoad, onReady, onError, src, ...props }: any) => {
     const { useEffect } = require('react');
     useEffect(() => {
-      onLoad?.();
-      onReady?.();
-    }, [onLoad, onReady]);
-    return children ? <script {...props}>{children}</script> : <script {...props} />;
+      const attempt = Number(new URL(src).searchParams.get('payetax_retry'));
+      mockGaScriptCallbacks.set(attempt, { onLoad, onError });
+      if (mockAutoLoadGaScript) {
+        onLoad?.();
+        onReady?.();
+      }
+    }, [onLoad, onReady, onError, src]);
+    return children ? (
+      <script {...props} src={src}>
+        {children}
+      </script>
+    ) : (
+      <script {...props} src={src} />
+    );
   },
 }));
 
@@ -82,6 +94,8 @@ function clearAllCookies(): void {
 describe('Analytics Component', () => {
   beforeEach(() => {
     mockPathname = '/';
+    mockAutoLoadGaScript = true;
+    mockGaScriptCallbacks.clear();
     mockGetMeasurementId.mockReturnValue(GA_ID);
     resetGaConsentStateForTests();
     window.localStorage.clear();
@@ -120,6 +134,7 @@ describe('Analytics Component', () => {
         const script = container.querySelector('#ga-script');
         expect(script).toBeInTheDocument();
         expect(script?.getAttribute('src')).toContain(GA_ID);
+        expect(script).toHaveAttribute('strategy', 'afterInteractive');
       });
 
       const entries = dlEntries();
@@ -242,9 +257,11 @@ describe('Analytics Component', () => {
       ]);
     });
 
-    it('includes search params in the page path', async () => {
+    it('uses query changes for navigation dedupe without sending query values to GA', async () => {
       storeConsent(true);
-      const searchParams = new URLSearchParams('utm_source=test&utm_medium=email');
+      const searchParams = new URLSearchParams(
+        'email=alice%40example.com&taxCode=K500&utm_source=test',
+      );
       jest.spyOn(require('next/navigation'), 'useSearchParams').mockReturnValue(searchParams);
 
       render(<Analytics />);
@@ -252,7 +269,12 @@ describe('Analytics Component', () => {
       await waitFor(() => {
         expect(pageViews()).toHaveLength(1);
       });
-      expect((pageViews()[0][2] as { page_path: string }).page_path).toContain('utm_source=test');
+      const pageView = pageViews()[0][2] as { page_path: string; page_location: string };
+      expect(pageView.page_path).toBe('/');
+      expect(pageView.page_location).toBe(`${window.location.origin}/`);
+      expect(JSON.stringify(pageView)).not.toContain('alice@example.com');
+      expect(JSON.stringify(pageView)).not.toContain('K500');
+      expect(JSON.stringify(pageView)).not.toContain('utm_source');
     });
 
     it('handles undefined searchParams', async () => {
@@ -302,6 +324,20 @@ describe('Analytics Component', () => {
       expect(container.querySelector('#ga-script')).not.toBeInTheDocument();
     });
 
+    it('applies an explicit denial immediately when persisted consent is stale', async () => {
+      storeConsent(true);
+      render(<Analytics />);
+      await waitFor(() => expect(win.consentMode?.isConsentGiven).toBe(true));
+
+      // Simulate a storage write failure: the runtime denial must still win.
+      document.dispatchEvent(
+        new CustomEvent('cookieConsentUpdated', { detail: { analytics: false } }),
+      );
+
+      await waitFor(() => expect(win.consentMode?.isConsentGiven).toBe(false));
+      expect(win[`ga-disable-${GA_ID}`]).toBe(true);
+    });
+
     it('re-accepting in the same tab pushes an explicit granted update and resumes page views', async () => {
       storeConsent(true);
       render(<Analytics />);
@@ -330,6 +366,33 @@ describe('Analytics Component', () => {
       await waitFor(() => {
         expect(pageViews()).toHaveLength(2);
       });
+    });
+
+    it('ignores an out-of-order failure from a superseded script attempt', async () => {
+      mockAutoLoadGaScript = false;
+      storeConsent(true);
+      const { rerender } = render(<Analytics />);
+      await waitFor(() => expect(mockGaScriptCallbacks.has(1)).toBe(true));
+
+      storeConsent(false);
+      document.dispatchEvent(
+        new CustomEvent('cookieConsentUpdated', { detail: { analytics: false } }),
+      );
+      await waitFor(() => expect(win.consentMode?.isConsentGiven).toBe(false));
+      storeConsent(true);
+      document.dispatchEvent(
+        new CustomEvent('cookieConsentUpdated', { detail: { analytics: true } }),
+      );
+      await waitFor(() => expect(mockGaScriptCallbacks.has(2)).toBe(true));
+      await waitFor(() => expect(pendingEventCount()).toBe(1));
+
+      mockGaScriptCallbacks.get(2)?.onLoad?.();
+      await waitFor(() => expect(pageViews()).toHaveLength(1));
+      mockGaScriptCallbacks.get(1)?.onError?.();
+
+      mockPathname = '/tools';
+      rerender(<Analytics />);
+      await waitFor(() => expect(pageViews()).toHaveLength(2));
     });
 
     it('handles consent granted from another tab via storage event', async () => {
@@ -421,6 +484,20 @@ describe('Analytics Component', () => {
       expect(window.localStorage.getItem('cookie-consent')).toBeNull();
     });
 
+    it('withdraws consent when another tab clears localStorage', async () => {
+      storeConsent(true);
+      render(<Analytics />);
+      await waitFor(() => expect(win.consentMode?.isConsentGiven).toBe(true));
+      writeCookie('_ga=GA1.1.111.222; path=/');
+
+      window.localStorage.clear();
+      window.dispatchEvent(new StorageEvent('storage', { key: null }));
+
+      await waitFor(() => expect(win.consentMode?.isConsentGiven).toBe(false));
+      expect(win[`ga-disable-${GA_ID}`]).toBe(true);
+      expect(document.cookie).not.toContain('_ga=');
+    });
+
     it('disables GA and removes its cookies when consent expires in an open tab', async () => {
       const expiresSoon = new Date(Date.now() - CONSENT_LIFETIME_MS + 80);
       window.localStorage.setItem('cookie-consent-timestamp', expiresSoon.toISOString());
@@ -437,6 +514,44 @@ describe('Analytics Component', () => {
       expect(win[`ga-disable-${GA_ID}`]).toBe(true);
       expect(document.cookie).not.toContain('_ga=');
       expect(container.querySelector('#ga-script')).not.toBeInTheDocument();
+    });
+
+    it('expires a rejection recorded in an already-open tab', async () => {
+      const expiredHandler = jest.fn();
+      document.addEventListener('cookieConsentExpired', expiredHandler);
+      render(<Analytics />);
+      await waitFor(() => expect(win.consentMode?.isConsentGiven).toBe(false));
+
+      const expiresSoon = new Date(Date.now() - CONSENT_LIFETIME_MS + 80);
+      window.localStorage.setItem('cookie-consent-timestamp', expiresSoon.toISOString());
+      window.localStorage.setItem('cookie-consent', JSON.stringify({ analytics: false }));
+      document.dispatchEvent(
+        new CustomEvent('cookieConsentUpdated', { detail: { analytics: false } }),
+      );
+
+      await new Promise((resolve) => setTimeout(resolve, 120));
+      await waitFor(() => expect(expiredHandler).toHaveBeenCalledTimes(1));
+
+      expect(window.localStorage.getItem('cookie-consent')).toBeNull();
+      expect(window.localStorage.getItem('cookie-consent-timestamp')).toBeNull();
+      expect(win.dataLayer).toBeUndefined();
+      document.removeEventListener('cookieConsentExpired', expiredHandler);
+    });
+
+    it('expires stored consent in an open tab while the analytics gate is closed', async () => {
+      mockGetMeasurementId.mockReturnValue(null);
+      const expiresSoon = new Date(Date.now() - CONSENT_LIFETIME_MS + 80);
+      window.localStorage.setItem('cookie-consent-timestamp', expiresSoon.toISOString());
+      window.localStorage.setItem('cookie-consent', JSON.stringify({ analytics: true }));
+
+      render(<Analytics />);
+      await waitFor(() => expect(win.consentMode?.isConsentGiven).toBe(false));
+
+      await new Promise((resolve) => setTimeout(resolve, 120));
+      await waitFor(() => expect(window.localStorage.getItem('cookie-consent')).toBeNull());
+
+      expect(window.localStorage.getItem('cookie-consent-timestamp')).toBeNull();
+      expect(win.dataLayer).toBeUndefined();
     });
   });
 
@@ -466,10 +581,15 @@ describe('Analytics Component', () => {
 
       window.scrollY = 600;
       window.dispatchEvent(new Event('scroll'));
+      window.dispatchEvent(new Event('scroll'));
 
       await waitFor(() => {
         const scrollEvents = dlEntries().filter((e) => e[0] === 'event' && e[1] === 'scroll_depth');
-        expect(scrollEvents.length).toBeGreaterThan(0);
+        expect(scrollEvents).toHaveLength(2);
+        expect(scrollEvents.map((event) => (event[2] as { label: string }).label)).toEqual([
+          '25%',
+          '50%',
+        ]);
       });
     });
 

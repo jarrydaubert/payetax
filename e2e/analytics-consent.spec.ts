@@ -100,3 +100,95 @@ test('cancels a pending banner when another tab records a decision', async ({ co
     .poll(() => secondPage.evaluate(() => localStorage.getItem('cookie-consent')))
     .toBe(JSON.stringify({ analytics: false }));
 });
+
+test('does not replay a page view queued before withdrawal when gtag loads after re-acceptance', async ({
+  context,
+  page,
+}) => {
+  let releaseGoogleScript!: () => void;
+  const googleScriptGate = new Promise<void>((resolve) => {
+    releaseGoogleScript = resolve;
+  });
+  let googleScriptRequests = 0;
+
+  await context.route('https://www.googletagmanager.com/**', async (route) => {
+    googleScriptRequests += 1;
+    await googleScriptGate;
+    await route.fulfill({ contentType: 'application/javascript', body: '' });
+  });
+
+  await page.goto('/');
+  await page.getByTestId('cookie-accept-all').click();
+  await expect.poll(() => googleScriptRequests).toBe(1);
+  expect(await pageViewCount(page)).toBe(0);
+
+  await page.getByRole('button', { name: 'Cookie Settings' }).click();
+  await page.getByTestId('cookie-modal-reject-all').click();
+  await page.getByRole('button', { name: 'Cookie Settings' }).click();
+  await page.getByTestId('cookie-modal-accept-all').click();
+
+  releaseGoogleScript();
+  await expect.poll(() => pageViewCount(page)).toBe(1);
+
+  await page.getByRole('link', { name: 'Tools', exact: true }).click();
+  await expect(page).toHaveURL(/\/tools$/);
+  await expect.poll(() => pageViewCount(page)).toBe(2);
+});
+
+test('localStorage.clear in another tab stops GA and reopens the banner', async ({
+  context,
+  page,
+}) => {
+  await context.route('https://www.googletagmanager.com/**', async (route) => {
+    await route.fulfill({ contentType: 'application/javascript', body: '' });
+  });
+
+  await page.goto('/');
+  await page.getByTestId('cookie-accept-all').click();
+  await expect.poll(() => pageViewCount(page)).toBe(1);
+
+  const secondPage = await context.newPage();
+  await secondPage.goto('/');
+  await expect.poll(() => pageViewCount(secondPage)).toBe(1);
+  await context.addCookies([{ name: '_ga', value: 'GA1.1.111.222', url: secondPage.url() }]);
+
+  await page.evaluate(() => localStorage.clear());
+
+  await expect(secondPage.getByTestId('cookie-banner')).toBeVisible();
+  await expect
+    .poll(() =>
+      secondPage.evaluate(() => ({
+        disabled: Object.entries(window).find(([key]) => key.startsWith('ga-disable-G-'))?.[1],
+        cookies: document.cookie,
+      })),
+    )
+    .toEqual({ disabled: true, cookies: '' });
+});
+
+test('retries a failed gtag load after withdrawal and re-acceptance without replay', async ({
+  context,
+  page,
+}) => {
+  let googleScriptRequests = 0;
+  await context.route('https://www.googletagmanager.com/**', async (route) => {
+    googleScriptRequests += 1;
+    if (googleScriptRequests === 1) {
+      await route.abort('failed');
+      return;
+    }
+    await route.fulfill({ contentType: 'application/javascript', body: '' });
+  });
+
+  await page.goto('/');
+  await page.getByTestId('cookie-accept-all').click();
+  await expect.poll(() => googleScriptRequests).toBe(1);
+  expect(await pageViewCount(page)).toBe(0);
+
+  await page.getByRole('button', { name: 'Cookie Settings' }).click();
+  await page.getByTestId('cookie-modal-reject-all').click();
+  await page.getByRole('button', { name: 'Cookie Settings' }).click();
+  await page.getByTestId('cookie-modal-accept-all').click();
+
+  await expect.poll(() => googleScriptRequests).toBe(2);
+  await expect.poll(() => pageViewCount(page)).toBe(1);
+});

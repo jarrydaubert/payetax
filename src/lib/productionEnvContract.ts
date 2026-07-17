@@ -1,3 +1,5 @@
+import { isAnalyticsFlagEnabled } from '@/lib/analyticsConfig';
+
 export type ProductionEnvMap = Record<string, string | undefined>;
 
 export interface ProductionEnvFeatureContract {
@@ -34,7 +36,7 @@ export interface ProductionEnvContractEvaluation {
 export const PRODUCTION_ENV_CONTRACT_SCOPE = 'Retained R&D project flows only.';
 
 function isAnalyticsEnabled(env: ProductionEnvMap): boolean {
-  return env.NEXT_PUBLIC_ENABLE_ANALYTICS !== 'false';
+  return isAnalyticsFlagEnabled(env.NEXT_PUBLIC_ENABLE_ANALYTICS);
 }
 
 export const PRODUCTION_ENV_FEATURE_CONTRACT: readonly ProductionEnvFeatureContract[] = [
@@ -53,7 +55,7 @@ export const PRODUCTION_ENV_FEATURE_CONTRACT: readonly ProductionEnvFeatureContr
     requiredEnv: ['NEXT_PUBLIC_GA_ID'],
     verificationMode: 'env',
     notes: [
-      'Analytics defaults to enabled unless NEXT_PUBLIC_ENABLE_ANALYTICS=false is set.',
+      'GA4 is enabled when NEXT_PUBLIC_ENABLE_ANALYTICS is unset or exactly true; false and invalid values fail closed.',
       'Vercel Web Analytics and Speed Insights require dashboard features to be enabled, not env variables.',
     ],
   },

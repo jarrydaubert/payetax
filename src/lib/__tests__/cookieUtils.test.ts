@@ -38,7 +38,7 @@ describe('cookieUtils', () => {
 
   describe('structured preferences', () => {
     it('stores and reads structured preferences', () => {
-      setConsentPreferences({ analytics: true });
+      expect(setConsentPreferences({ analytics: true })).toBe(true);
 
       expect(getConsentPreferences()).toEqual({ analytics: true });
       expect(isAnalyticsConsented()).toBe(true);
@@ -110,6 +110,33 @@ describe('cookieUtils', () => {
 
       expect(getConsentPreferences()).toBeNull();
       expect(isAnalyticsConsented()).toBe(false);
+    });
+
+    it('treats a future timestamp as invalid and clears consent', () => {
+      localStorageMock.setItem('cookie-consent', JSON.stringify({ analytics: true }));
+      localStorageMock.setItem('cookie-consent-timestamp', '2099-01-01T00:00:00.000Z');
+
+      expect(getConsentPreferences()).toBeNull();
+      expect(isAnalyticsConsented()).toBe(false);
+      expect(localStorageMock.removeItem).toHaveBeenCalledWith('cookie-consent');
+      expect(localStorageMock.removeItem).toHaveBeenCalledWith('cookie-consent-timestamp');
+    });
+
+    it('fails closed when a withdrawal preference write is interrupted', () => {
+      setConsentPreferences({ analytics: true });
+      const originalSetItem = localStorageMock.setItem.getMockImplementation();
+      localStorageMock.setItem.mockImplementation((key: string, value: string) => {
+        if (key === 'cookie-consent') throw new Error('simulated write failure');
+        originalSetItem?.(key, value);
+      });
+
+      expect(setConsentPreferences({ analytics: false })).toBe(false);
+      expect(getConsentPreferences()).toBeNull();
+      expect(isAnalyticsConsented()).toBe(false);
+
+      if (originalSetItem) {
+        localStorageMock.setItem.mockImplementation(originalSetItem);
+      }
     });
   });
 

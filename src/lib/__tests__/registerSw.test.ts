@@ -49,6 +49,13 @@ describe('register-sw script', () => {
     jest.restoreAllMocks();
   });
 
+  it('does not bypass the app-owned analytics consent gate', () => {
+    const script = readFileSync(join(process.cwd(), 'public/register-sw.js'), 'utf8');
+
+    expect(script).not.toContain('window.gtag');
+    expect(script).not.toContain("localStorage.getItem('cookie-consent')");
+  });
+
   it('auto-activates waiting updates in standalone PWA mode', async () => {
     const waitingWorker = { postMessage: jest.fn() };
     const registration = {

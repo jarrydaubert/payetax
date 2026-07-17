@@ -7,9 +7,17 @@
  */
 
 const GA_MEASUREMENT_ID_PATTERN = /^G-[A-Z0-9]{10}$/i;
+export const ANALYTICS_ENABLE_FLAG_VALUES = ['true', 'false'] as const;
+
+/** Unset preserves the documented default-on behavior; invalid values fail closed. */
+export function isAnalyticsFlagEnabled(
+  value: string | undefined = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS,
+): boolean {
+  return value === undefined || value === 'true';
+}
 
 export function getGoogleAnalyticsMeasurementId(): string | null {
-  if (process.env.NEXT_PUBLIC_ENABLE_ANALYTICS === 'false') return null;
+  if (!isAnalyticsFlagEnabled()) return null;
 
   const measurementId = process.env.NEXT_PUBLIC_GA_ID?.trim();
   if (!(measurementId && GA_MEASUREMENT_ID_PATTERN.test(measurementId))) return null;

@@ -56,6 +56,23 @@ describe('productionEnvContract', () => {
     );
   });
 
+  it.each([
+    'FALSE',
+    '0',
+    ' false ',
+    'typo',
+  ])('fails closed for invalid analytics flag %p', (flag) => {
+    const evaluation = evaluateProductionEnvContract({
+      NEXT_PUBLIC_SITE_URL: 'https://payetax.co.uk',
+      NEXT_PUBLIC_ENABLE_ANALYTICS: flag,
+      NEXT_PUBLIC_SENTRY_DSN: 'https://public@example.ingest.sentry.io/123',
+      BREVO_API_KEY: 'brevo-key',
+      BREVO_FROM_EMAIL: 'hello@payetax.co.uk',
+    });
+
+    expect(evaluation.disabledFeatures.map((feature) => feature.id)).toContain('analytics');
+  });
+
   it('parses simple dotenv content used by the contract checker', () => {
     expect(
       parseDotEnvContent(`

@@ -23,7 +23,7 @@
     "test:e2e:smoke": "playwright test e2e/smoke.spec.ts e2e/homepage-portal-stability.spec.ts e2e/calculator-critical.spec.ts e2e/director-guide-critical.spec.ts e2e/payslip-regression.spec.ts --project=chromium --workers=1 && (test -n \"$CI\" || open audit-outputs/playwright-report/index.html)",
     "test:e2e:golden": "playwright test e2e/golden-master-PERFECT.spec.ts --project=chromium --workers=1 && (test -n \"$CI\" || open audit-outputs/playwright-report/index.html)",
     "test:e2e:critical": "bun run test:e2e:smoke && bun run test:e2e:golden",
-    "test:e2e:critical:ci": "playwright test e2e/smoke.spec.ts e2e/homepage-portal-stability.spec.ts e2e/calculator-critical.spec.ts e2e/director-guide-critical.spec.ts e2e/payslip-regression.spec.ts e2e/golden-master-PERFECT.spec.ts --project=chromium --workers=1",
+    "test:e2e:critical:ci": "NEXT_PUBLIC_ENABLE_ANALYTICS=true NEXT_PUBLIC_GA_ID=G-TESTLOCAL1 playwright test e2e/smoke.spec.ts e2e/homepage-portal-stability.spec.ts e2e/calculator-critical.spec.ts e2e/director-guide-critical.spec.ts e2e/payslip-regression.spec.ts e2e/golden-master-PERFECT.spec.ts e2e/analytics-consent.spec.ts --project=chromium --workers=1",
     "typecheck": "tsc --noEmit",
     "typecheck:tests": "tsc -p tsconfig.jest.json --noEmit && tsc -p tsconfig.e2e.json --noEmit",
     "format": "biome format --write .",

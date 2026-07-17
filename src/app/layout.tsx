@@ -15,6 +15,7 @@ import GoogleAnalytics from '@/components/organisms/Analytics';
 import { StructuredData } from '@/components/organisms/StructuredData';
 import Layout from '@/components/templates/Layout';
 import { APP_VERSION } from '@/constants/version';
+import { isAnalyticsFlagEnabled } from '@/lib/analyticsConfig';
 import { ThemeProvider } from '@/lib/theme';
 
 export const metadata: Metadata = {
@@ -38,7 +39,7 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  const analyticsEnabled = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS !== 'false';
+  const analyticsEnabled = isAnalyticsFlagEnabled();
 
   return (
     <html

@@ -5,6 +5,7 @@ import {
   gtagQueued,
   isGaBootstrapped,
   markGaLoaded,
+  markGaLoadFailed,
   pendingEventCount,
   removeGaCookies,
   resetGaConsentStateForTests,
@@ -146,6 +147,7 @@ describe('gaConsent', () => {
   describe('event queue', () => {
     it('queues events before gtag.js loads and flushes them on load while consented', () => {
       bootstrapGa();
+      applyConsentUpdate(true);
       gtagQueued('event', 'page_view', { page_path: '/' });
 
       expect(pendingEventCount()).toBe(1);
@@ -161,6 +163,7 @@ describe('gaConsent', () => {
 
     it('pushes straight to the dataLayer once loaded', () => {
       bootstrapGa();
+      applyConsentUpdate(true);
       markGaLoaded();
 
       gtagQueued('event', 'calculator_usage', { label: 'annual' });
@@ -171,6 +174,7 @@ describe('gaConsent', () => {
 
     it('purges the queue when gtag.js loads after consent was withdrawn', () => {
       bootstrapGa();
+      applyConsentUpdate(true);
       gtagQueued('event', 'page_view', { page_path: '/' });
       mockConsented.mockReturnValue(false);
 
@@ -211,6 +215,7 @@ describe('gaConsent', () => {
     });
 
     it('never accumulates events while analytics is disabled or unconfigured', () => {
+      applyConsentUpdate(true);
       gtagQueued('event', 'calculator_start', { label: 'unconfigured' });
       expect(pendingEventCount()).toBe(1);
 
@@ -220,6 +225,51 @@ describe('gaConsent', () => {
 
       expect(pendingEventCount()).toBe(0);
       expect(win.dataLayer).toBeUndefined();
+    });
+
+    it('does not queue from stale persisted consent after an explicit runtime denial', () => {
+      bootstrapGa();
+      applyConsentUpdate(true);
+      applyConsentUpdate(false);
+      mockConsented.mockReturnValue(true);
+
+      gtagQueued('event', 'calculator_start', { label: 'stale-storage' });
+
+      expect(pendingEventCount()).toBe(0);
+      expect(dlEntries().some((entry) => entry[0] === 'event')).toBe(false);
+    });
+
+    it('bounds lower-priority pre-load events without discarding page views', () => {
+      bootstrapGa();
+      applyConsentUpdate(true);
+
+      gtagQueued('event', 'page_view', { page_path: '/' });
+      for (let index = 0; index < 125; index += 1) {
+        gtagQueued('event', 'calculator_start', { value: index });
+      }
+
+      expect(pendingEventCount()).toBe(100);
+
+      markGaLoaded();
+      const events = dlEntries().filter((entry) => entry[0] === 'event');
+      expect(events.filter((entry) => entry[1] === 'page_view')).toHaveLength(1);
+      expect(events.filter((entry) => entry[1] === 'calculator_start')).toHaveLength(99);
+    });
+
+    it('clears and blocks the queue after a script failure until a new grant transition', () => {
+      bootstrapGa();
+      applyConsentUpdate(true);
+      gtagQueued('event', 'page_view', { page_path: '/' });
+      expect(pendingEventCount()).toBe(1);
+
+      markGaLoadFailed();
+      gtagQueued('event', 'calculator_start', { label: 'after-error' });
+      expect(pendingEventCount()).toBe(0);
+
+      applyConsentUpdate(false);
+      applyConsentUpdate(true);
+      gtagQueued('event', 'calculator_start', { label: 'after-retry' });
+      expect(pendingEventCount()).toBe(1);
     });
   });
 

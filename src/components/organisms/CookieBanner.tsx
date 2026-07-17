@@ -122,11 +122,13 @@ const CookieBanner: React.FC = () => {
   }, [loadCurrentPreferences]);
 
   const applyPreferences = useCallback((preferences: ConsentPreferences) => {
-    setConsentPreferences(preferences);
-    setAnalyticsDraft(preferences.analytics);
+    const persisted = setConsentPreferences(preferences);
+    const effectivePreferences = persisted ? preferences : { analytics: false };
+
+    setAnalyticsDraft(effectivePreferences.analytics);
     setModalOpen(false);
-    setShowBanner(false);
-    notifyConsentUpdated(preferences);
+    setShowBanner(!persisted);
+    notifyConsentUpdated(effectivePreferences);
   }, []);
 
   const handleAcceptAll = useCallback(() => {
