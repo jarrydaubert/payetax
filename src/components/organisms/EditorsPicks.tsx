@@ -57,7 +57,7 @@ function EditorsPicksList({ posts }: EditorsPicksListProps) {
               className='group grid grid-cols-[1.75rem_1fr] gap-3 px-3.5 py-3 transition-colors hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-4'
               prefetch={false}
             >
-              <span className='flex size-7 items-center justify-center rounded-sm border border-border bg-background font-mono font-semibold text-[0.68rem] text-primary tabular-nums transition-colors group-hover:border-primary/45'>
+              <span className='flex size-7 items-center justify-center self-center rounded-sm border border-border bg-background font-mono font-semibold text-[0.68rem] text-primary tabular-nums transition-colors group-hover:border-primary/45'>
                 {String(index + 1).padStart(2, '0')}
               </span>
 
