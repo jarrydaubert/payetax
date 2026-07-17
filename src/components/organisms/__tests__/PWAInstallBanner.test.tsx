@@ -1,5 +1,10 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { trackEvent } from '@/lib/analytics';
 import PWAInstallBanner from '../PWAInstallBanner';
+
+jest.mock('@/lib/analytics', () => ({
+  trackEvent: jest.fn(),
+}));
 
 jest.mock('next/link', () => {
   return ({ children, href }: { children: React.ReactNode; href: string }) => {
@@ -25,6 +30,7 @@ function dispatchInstallPromptEvent(
 describe('PWAInstallBanner', () => {
   beforeEach(() => {
     localStorage.clear();
+    jest.clearAllMocks();
   });
 
   it('renders nothing before install prompt event fires', () => {
@@ -75,5 +81,17 @@ describe('PWAInstallBanner', () => {
     dispatchInstallPromptEvent('accepted');
 
     expect(screen.queryByText('Install PayeTax')).not.toBeInTheDocument();
+  });
+
+  it('routes app-installed analytics through the shared tracker', () => {
+    render(<PWAInstallBanner />);
+
+    window.dispatchEvent(new Event('appinstalled'));
+
+    expect(trackEvent).toHaveBeenCalledWith({
+      action: 'pwa_installed',
+      category: 'engagement',
+      label: 'appinstalled',
+    });
   });
 });

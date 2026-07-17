@@ -19,6 +19,7 @@ import {
   PRIVACY_PRINCIPLES,
   PRIVACY_PROCESSORS,
   PRIVACY_RIGHTS,
+  PRIVACY_STORAGE_INVENTORY,
   PRIVACY_TOC,
 } from '@/constants/pages/privacyPageData';
 import { cn } from '@/lib/utils';
@@ -242,9 +243,50 @@ export function PrivacyPageContent() {
               <p>
                 We do not load analytics cookies before you consent. On your first visit you can
                 accept or decline analytics; declining is as easy as accepting. Google Analytics 4
-                runs only after you opt in, while Vercel&apos;s cookieless traffic and performance
-                signals contain no personal identifiers and help us understand basic usage and page
-                speed either way.
+                runs only after you opt in — and if you later withdraw consent, we switch it off and
+                remove its cookies. Vercel&apos;s traffic and performance signals are designed to
+                work without cookies or persistent identifiers and help us understand basic usage
+                and page speed either way.
+              </p>
+              <p>The analytics and consent storage used by this choice is:</p>
+              <div className='overflow-x-auto rounded-sm border border-border bg-background'>
+                <table className='w-full min-w-3xl border-collapse text-sm'>
+                  <thead>
+                    <tr className='border-border/60 border-b text-left'>
+                      <th className='px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
+                        Name
+                      </th>
+                      <th className='px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
+                        Type
+                      </th>
+                      <th className='px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
+                        Purpose
+                      </th>
+                      <th className='px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
+                        Duration
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {PRIVACY_STORAGE_INVENTORY.map((row) => (
+                      <tr
+                        key={row.name}
+                        className='border-border/40 border-b align-top last:border-0'
+                      >
+                        <td className='px-4 py-3 font-mono font-semibold text-foreground'>
+                          {row.name}
+                        </td>
+                        <td className='px-4 py-3 text-muted-foreground'>{row.type}</td>
+                        <td className='px-4 py-3 text-muted-foreground'>{row.purpose}</td>
+                        <td className='px-4 py-3 text-muted-foreground'>{row.duration}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p>
+                Cookie lifetimes above are browser-side and separate from the data-retention period
+                configured for the GA4 property.
               </p>
               <p>
                 You can change your choice at any time using the{' '}

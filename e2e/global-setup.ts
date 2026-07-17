@@ -22,28 +22,30 @@ async function globalSetup(config: FullConfig) {
     await page.waitForLoadState('domcontentloaded');
 
     // Accept cookies using the data-testid
-    const acceptButton = page.getByTestId('cookie-accept-analytics');
-    if (await acceptButton.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await acceptButton.click();
+    const acceptButton = page.getByTestId('cookie-accept-all');
+    await acceptButton.waitFor({ state: 'visible', timeout: 5000 });
+    await acceptButton.click();
 
-      await page
-        .waitForFunction(() => localStorage.getItem('cookie-consent') === 'accepted', {
-          timeout: 5000,
-        })
-        .catch(() => {});
+    await page.waitForFunction(
+      () => {
+        try {
+          const raw = localStorage.getItem('cookie-consent');
+          const timestamp = localStorage.getItem('cookie-consent-timestamp');
+          return (
+            raw !== null &&
+            JSON.parse(raw).analytics === true &&
+            timestamp !== null &&
+            !Number.isNaN(new Date(timestamp).getTime())
+          );
+        } catch {
+          return false;
+        }
+      },
+      { timeout: 5000 },
+    );
 
-      // Verify cookie consent was saved to localStorage
-      const consent = await page.evaluate(() => localStorage.getItem('cookie-consent'));
-      if (consent === 'accepted') {
-        // biome-ignore lint/suspicious/noConsole: Setup logging for test diagnostics
-        console.log('✅ Cookie consent accepted and saved to localStorage');
-      } else {
-        console.warn('⚠️  Cookie consent not saved (might be okay for some tests)');
-      }
-    } else {
-      // biome-ignore lint/suspicious/noConsole: Setup logging for test diagnostics
-      console.log('ℹ️  Cookie banner not visible (already accepted or not rendered)');
-    }
+    // biome-ignore lint/suspicious/noConsole: Setup logging for test diagnostics
+    console.log('✅ Cookie consent accepted with a valid timestamp');
 
     // Save storage state (includes localStorage with cookie consent)
     await context.storageState({ path: 'playwright/.auth/storageState.json' });

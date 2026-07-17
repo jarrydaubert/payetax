@@ -7,10 +7,12 @@ export interface ConsentPreferences {
   analytics: boolean;
 }
 
-const CONSENT_KEY = 'cookie-consent';
-const CONSENT_TIMESTAMP_KEY = 'cookie-consent-timestamp';
+export const CONSENT_STORAGE_KEY = 'cookie-consent';
+const CONSENT_KEY = CONSENT_STORAGE_KEY;
+export const CONSENT_TIMESTAMP_STORAGE_KEY = 'cookie-consent-timestamp';
+const CONSENT_TIMESTAMP_KEY = CONSENT_TIMESTAMP_STORAGE_KEY;
 /** Approximately 12 months in milliseconds (365 days) */
-const TWELVE_MONTHS_MS = 365 * 24 * 60 * 60 * 1000;
+export const CONSENT_LIFETIME_MS = 365 * 24 * 60 * 60 * 1000;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -71,20 +73,57 @@ export function getConsentTimestamp(): Date | null {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
+/** Millisecond timestamp when the current consent choice expires. */
+export function getConsentExpiryTime(): number | null {
+  const consentDate = getConsentTimestamp();
+  return consentDate ? consentDate.getTime() + CONSENT_LIFETIME_MS : null;
+}
+
 /**
  * Check if consent is expired (after 12 months)
  * Uses millisecond arithmetic to avoid Date month edge cases
+ *
+ * A stored preference without a valid timestamp cannot prove freshness,
+ * so it is treated as expired and the user is re-prompted.
  */
 export function isConsentExpired(): boolean {
   const consentDate = getConsentTimestamp();
-  if (!consentDate) return false;
+  if (!consentDate) {
+    return safeGetItem(CONSENT_KEY) !== null;
+  }
 
-  return Date.now() - consentDate.getTime() > TWELVE_MONTHS_MS;
+  const consentAge = Date.now() - consentDate.getTime();
+  return consentAge < 0 || consentAge >= CONSENT_LIFETIME_MS;
 }
 
-export function setConsentPreferences(preferences: ConsentPreferences): void {
-  safeSetItem(CONSENT_KEY, JSON.stringify(preferences));
-  safeSetItem(CONSENT_TIMESTAMP_KEY, new Date().toISOString());
+/**
+ * Persist a consent decision and verify both values were written.
+ *
+ * Denial clears the previous record first so a failed preference write cannot
+ * leave an old opt-in paired with a freshly extended timestamp. Any partial
+ * write is cleared and reported as a failed, therefore non-consenting, save.
+ */
+export function setConsentPreferences(preferences: ConsentPreferences): boolean {
+  const timestamp = new Date().toISOString();
+  const serializedPreferences = JSON.stringify(preferences);
+
+  if (!preferences.analytics) {
+    clearCookieConsent();
+  }
+
+  // Timestamp first: a preference visible without a timestamp reads as expired.
+  safeSetItem(CONSENT_TIMESTAMP_KEY, timestamp);
+  safeSetItem(CONSENT_KEY, serializedPreferences);
+
+  const persisted =
+    safeGetItem(CONSENT_TIMESTAMP_KEY) === timestamp &&
+    safeGetItem(CONSENT_KEY) === serializedPreferences;
+
+  if (!persisted) {
+    clearCookieConsent();
+  }
+
+  return persisted;
 }
 
 /**

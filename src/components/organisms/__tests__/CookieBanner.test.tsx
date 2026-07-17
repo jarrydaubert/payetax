@@ -3,6 +3,8 @@ import * as cookieUtils from '@/lib/cookieUtils';
 import CookieBanner from '../CookieBanner';
 
 jest.mock('@/lib/cookieUtils', () => ({
+  CONSENT_STORAGE_KEY: 'cookie-consent',
+  CONSENT_TIMESTAMP_STORAGE_KEY: 'cookie-consent-timestamp',
   clearCookieConsent: jest.fn(),
   getConsentPreferences: jest.fn(),
   isConsentExpired: jest.fn(),
@@ -21,6 +23,7 @@ describe('CookieBanner', () => {
     jest.useFakeTimers();
     (cookieUtils.getConsentPreferences as jest.Mock).mockReturnValue(null);
     (cookieUtils.isConsentExpired as jest.Mock).mockReturnValue(false);
+    (cookieUtils.setConsentPreferences as jest.Mock).mockReturnValue(true);
   });
 
   afterEach(() => {
@@ -64,6 +67,21 @@ describe('CookieBanner', () => {
     expect(cookieUtils.setConsentPreferences).toHaveBeenCalledWith({ analytics: false });
   });
 
+  it('fails closed when accepted preferences cannot be persisted', async () => {
+    (cookieUtils.setConsentPreferences as jest.Mock).mockReturnValue(false);
+    const consentUpdate = jest.fn();
+    document.addEventListener('cookieConsentUpdated', consentUpdate);
+    render(<CookieBanner />);
+    jest.advanceTimersByTime(600);
+
+    fireEvent.click(await screen.findByRole('button', { name: /Accept All/i }));
+
+    expect(consentUpdate).toHaveBeenCalledTimes(1);
+    expect((consentUpdate.mock.calls[0][0] as CustomEvent).detail).toEqual({ analytics: false });
+    expect(await screen.findByTestId('cookie-banner')).toBeInTheDocument();
+    document.removeEventListener('cookieConsentUpdated', consentUpdate);
+  });
+
   it('opens centered modal from manage preferences and saves toggle state', async () => {
     render(<CookieBanner />);
     jest.advanceTimersByTime(600);
@@ -101,5 +119,68 @@ describe('CookieBanner', () => {
     document.dispatchEvent(new Event('openCookiePreferences'));
 
     expect(await screen.findByText(/Privacy Overview/i)).toBeInTheDocument();
+  });
+
+  it('hides the banner when a decision is stored from another tab', async () => {
+    render(<CookieBanner />);
+    jest.advanceTimersByTime(600);
+
+    expect(await screen.findByTestId('cookie-banner')).toBeInTheDocument();
+
+    (cookieUtils.getConsentPreferences as jest.Mock).mockReturnValue({ analytics: false });
+    fireEvent(
+      window,
+      new StorageEvent('storage', {
+        key: 'cookie-consent',
+        newValue: JSON.stringify({ analytics: false }),
+      }),
+    );
+
+    await waitFor(() => {
+      expect(screen.queryByTestId('cookie-banner')).not.toBeInTheDocument();
+    });
+  });
+
+  it('cancels the delayed banner when another tab decides before it appears', () => {
+    render(<CookieBanner />);
+    jest.advanceTimersByTime(200);
+
+    (cookieUtils.getConsentPreferences as jest.Mock).mockReturnValue({ analytics: false });
+    fireEvent(
+      window,
+      new StorageEvent('storage', {
+        key: 'cookie-consent',
+        newValue: JSON.stringify({ analytics: false }),
+      }),
+    );
+    jest.advanceTimersByTime(500);
+
+    expect(screen.queryByTestId('cookie-banner')).not.toBeInTheDocument();
+  });
+
+  it('re-prompts when consent is cleared from another tab', async () => {
+    (cookieUtils.getConsentPreferences as jest.Mock).mockReturnValue({ analytics: true });
+
+    render(<CookieBanner />);
+    jest.advanceTimersByTime(600);
+
+    expect(screen.queryByTestId('cookie-banner')).not.toBeInTheDocument();
+
+    (cookieUtils.getConsentPreferences as jest.Mock).mockReturnValue(null);
+    fireEvent(window, new StorageEvent('storage', { key: 'cookie-consent', newValue: null }));
+
+    expect(await screen.findByTestId('cookie-banner')).toBeInTheDocument();
+  });
+
+  it('re-prompts in the same tab when Analytics reports consent expiry', async () => {
+    (cookieUtils.getConsentPreferences as jest.Mock).mockReturnValue({ analytics: true });
+
+    render(<CookieBanner />);
+    expect(screen.queryByTestId('cookie-banner')).not.toBeInTheDocument();
+
+    (cookieUtils.getConsentPreferences as jest.Mock).mockReturnValue(null);
+    fireEvent(document, new Event('cookieConsentExpired'));
+
+    expect(await screen.findByTestId('cookie-banner')).toBeInTheDocument();
   });
 });

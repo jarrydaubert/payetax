@@ -18,6 +18,13 @@ jest.mock('@/lib/cookieUtils', () => ({
   isAnalyticsConsented: jest.fn(() => true),
 }));
 
+// Forward the queue to window.gtag so existing call assertions keep working.
+// Real queue/purge semantics are covered in src/lib/__tests__/gaConsent.test.ts.
+jest.mock('@/lib/gaConsent', () => ({
+  gtagQueued: (...args: unknown[]) =>
+    (window as Window & { gtag?: (...gtagArgs: unknown[]) => void }).gtag?.(...args),
+}));
+
 describe('analytics', () => {
   let consoleLogSpy: jest.SpyInstance;
   let consoleWarnSpy: jest.SpyInstance;

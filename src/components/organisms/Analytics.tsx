@@ -5,19 +5,29 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { initCoreWebVitals, trackEvent } from '@/lib/analytics';
-import { isAnalyticsConsented, isConsentPreferences } from '@/lib/cookieUtils';
+import { getGoogleAnalyticsMeasurementId } from '@/lib/analyticsConfig';
+import {
+  CONSENT_STORAGE_KEY,
+  CONSENT_TIMESTAMP_STORAGE_KEY,
+  getConsentExpiryTime,
+  getConsentPreferences,
+  isAnalyticsConsented,
+  isConsentPreferences,
+} from '@/lib/cookieUtils';
+import {
+  applyConsentUpdate,
+  bootstrapGa,
+  gtagQueued,
+  markGaLoaded,
+  markGaLoadFailed,
+  removeGaCookies,
+} from '@/lib/gaConsent';
 
-import type { GtagFunction } from '@/types/gtag';
-
-// GA4 Measurement ID - Configure NEXT_PUBLIC_GA_ID in Vercel environment variables
-const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_ID;
-const ANALYTICS_ENABLED = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS !== 'false';
+const MAX_TIMEOUT_MS = 2_147_483_647;
 
 // Track consent status in window object for persistence
 declare global {
   interface Window {
-    gtag?: GtagFunction;
-    dataLayer: IArguments[];
     consentMode?: {
       isConsentGiven: boolean;
     };
@@ -25,85 +35,78 @@ declare global {
 }
 
 /**
- * Enhanced Google Analytics component with privacy controls
- * - GA4 implementation
- * - Consent management
- * - Event tracking
- * - SEO performance monitoring
+ * Google Analytics component with privacy controls (basic Consent Mode).
+ *
+ * - gtag.js is only loaded after analytics consent; unconsented visits stay
+ *   Google-free (no script, no dataLayer, no denied-update pings).
+ * - The app owns page-view and scroll tracking: one explicit `page_view`
+ *   event per navigation (route revisits included), custom scroll_depth
+ *   thresholds. GA4 Enhanced Measurement history/scroll options must stay
+ *   disabled on the data stream to keep single ownership.
+ * - Rejection, withdrawal, and expiry flip the ga-disable kill switch, purge
+ *   queued events, and remove `_ga`/`_ga_*` cookies.
  */
 export function Analytics() {
+  const measurementId = getGoogleAnalyticsMeasurementId();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [hasConsent, setHasConsent] = useState(false);
-  const [isScriptReady, setIsScriptReady] = useState(false);
-  const sentPageViews = useRef(new Set<string>());
+  const [consentExpiresAt, setConsentExpiresAt] = useState<number | null>(null);
+  const [gaScriptAttempt, setGaScriptAttempt] = useState(0);
+  const activeGaScriptAttemptRef = useRef(0);
+  const effectiveConsentRef = useRef(false);
+  const lastTrackedNavigation = useRef<string | null>(null);
 
-  const getCurrentPagePath = useCallback(() => {
+  // Track whether we've initialized lightweight GA4 page timings (only once).
+  // Vercel Speed Insights owns Core Web Vitals.
+  const vitalsInitialized = useRef(false);
+
+  const getCurrentNavigationKey = useCallback(() => {
     const searchParamsString = searchParams?.toString();
     return pathname + (searchParamsString ? `?${searchParamsString}` : '');
   }, [pathname, searchParams]);
 
-  const markAnalyticsReady = useCallback(() => {
-    if (typeof window !== 'undefined' && window.gtag) {
-      setIsScriptReady(true);
-    }
-  }, []);
-
   /**
-   * Update consent settings in Google Analytics
-   * Only toggles analytics_storage - ad/personalization remain denied
-   * since we only ask for analytics consent in our cookie banner
+   * Apply a consent decision to GA.
+   *
+   * Grant (first grant and re-grant after a same-tab withdrawal): one-time
+   * bootstrap, explicit analytics_storage=granted update, and re-armed
+   * page-view tracking so the current page is counted again.
+   *
+   * Denial (rejection, withdrawal, expiry, unconsented mount): kill switch on,
+   * queued events purged, GA cookies removed. Never initialises gtag just to
+   * record a denial. Ad/personalization storage stays denied in every state —
+   * the banner only asks for analytics consent.
    */
-  const updateConsent = useCallback((hasConsent: boolean) => {
-    if (typeof window === 'undefined' || !window.gtag) return;
-
-    window.gtag('consent', 'update', {
-      analytics_storage: hasConsent ? 'granted' : 'denied',
-      // Keep ad-related storage denied - we only have analytics consent
-      ad_storage: 'denied',
-      ad_user_data: 'denied',
-      ad_personalization: 'denied',
-    });
-
-    // Store in window for other components to access
-    if (window.consentMode) {
-      window.consentMode.isConsentGiven = hasConsent;
-    }
-  }, []);
-
-  const sendCurrentPageView = useCallback(
-    (hasConsent = isAnalyticsConsented()) => {
-      if (!(GA_MEASUREMENT_ID && window?.gtag && hasConsent)) return false;
-
-      const url = getCurrentPagePath();
-      if (sentPageViews.current.has(url)) return false;
-
-      sentPageViews.current.add(url);
-      window.gtag('config', GA_MEASUREMENT_ID, {
-        page_path: url,
-        send_page_view: true,
-        anonymize_ip: true,
-        transport_type: 'beacon',
-      });
-
-      return true;
-    },
-    [getCurrentPagePath],
-  );
-
   const setAnalyticsConsentState = useCallback(
-    (hasConsent: boolean) => {
+    (nextConsent: boolean) => {
+      const effectiveConsent = Boolean(nextConsent && measurementId);
+
       window.consentMode = {
-        isConsentGiven: hasConsent,
+        isConsentGiven: effectiveConsent,
       };
 
-      setHasConsent(hasConsent);
-
-      if (isScriptReady) {
-        updateConsent(hasConsent);
+      if (effectiveConsent && !effectiveConsentRef.current) {
+        bootstrapGa();
+        applyConsentUpdate(true);
+        setGaScriptAttempt((attempt) => {
+          const nextAttempt = attempt + 1;
+          activeGaScriptAttemptRef.current = nextAttempt;
+          return nextAttempt;
+        });
+        lastTrackedNavigation.current = null;
+      } else if (!effectiveConsent) {
+        // Invalidate callbacks from an in-flight script immediately. A later
+        // re-grant creates a new attempt with its own callbacks.
+        activeGaScriptAttemptRef.current = 0;
+        applyConsentUpdate(false);
+        removeGaCookies();
       }
+
+      effectiveConsentRef.current = effectiveConsent;
+      setHasConsent(effectiveConsent);
     },
-    [isScriptReady, updateConsent],
+    [measurementId],
   );
 
   /**
@@ -115,7 +118,7 @@ export function Analytics() {
    * Always returns a cleanup function for consistent effect usage
    */
   const trackSEOMetrics = useCallback((): (() => void) => {
-    if (typeof window === 'undefined' || !window.gtag) {
+    if (typeof window === 'undefined') {
       return () => {}; // No-op cleanup
     }
 
@@ -172,64 +175,104 @@ export function Analytics() {
     };
   }, [pathname]);
 
-  // Track whether we've initialized lightweight GA4 page timings (only do once).
-  // Vercel Speed Insights owns Core Web Vitals.
-  const vitalsInitialized = useRef(false);
-
-  // Initialize consent state on mount. GA4 scripts are only loaded after consent;
-  // Vercel Web Analytics and Speed Insights run outside this component.
+  // Initialize consent state on mount. GA4 scripts are only loaded after
+  // consent; Vercel Web Analytics and Speed Insights run outside this
+  // component. An unconsented mount also clears stale GA cookies.
   useEffect(() => {
     setAnalyticsConsentState(isAnalyticsConsented());
+    setConsentExpiresAt(getConsentExpiryTime());
   }, [setAnalyticsConsentState]);
 
-  // Track page views when pathname/search params change and consented GA4 is ready.
+  // Every stored consent choice can expire while a tab remains open, including
+  // a rejection and choices made while GA is disabled or misconfigured.
+  // Schedule independently of effective GA consent so the banner always
+  // re-prompts after 12 months. consentExpiresAt re-arms the timer even when a
+  // same-tab update leaves hasConsent false (for example, reject-all).
   useEffect(() => {
-    if (!(hasConsent && isScriptReady && GA_MEASUREMENT_ID && window?.gtag)) return;
+    let timer: ReturnType<typeof setTimeout> | null = null;
 
-    updateConsent(true);
+    function checkConsentExpiry() {
+      const preferences = getConsentPreferences();
+      if (!preferences) {
+        setConsentExpiresAt(null);
+        setAnalyticsConsentState(false);
+        document.dispatchEvent(new Event('cookieConsentExpired'));
+        return;
+      }
+
+      scheduleConsentExpiry(getConsentExpiryTime());
+    }
+
+    function scheduleConsentExpiry(expiresAt: number | null) {
+      if (!expiresAt) return;
+
+      const remaining = expiresAt - Date.now();
+      if (remaining <= 0) {
+        checkConsentExpiry();
+        return;
+      }
+
+      timer = setTimeout(checkConsentExpiry, Math.min(remaining, MAX_TIMEOUT_MS));
+    }
+
+    scheduleConsentExpiry(consentExpiresAt);
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [consentExpiresAt, setAnalyticsConsentState]);
+
+  // App-owned page-view tracking: one explicit page_view event per navigation.
+  // Deduped only against the previous URL, so route revisits are counted and
+  // effect re-runs with an unchanged URL are not. Events queue until gtag.js
+  // loads, so nothing is lost right after acceptance.
+  useEffect(() => {
+    if (!(hasConsent && measurementId)) return;
+
+    const navigationKey = getCurrentNavigationKey();
+    if (lastTrackedNavigation.current === navigationKey) return;
+    lastTrackedNavigation.current = navigationKey;
+
+    gtagQueued('event', 'page_view', {
+      // Query values can contain tax details or arbitrary personal data. Use
+      // them only to distinguish client navigations, never in the GA payload.
+      page_path: pathname,
+      page_location: `${window.location.origin}${pathname}`,
+      page_title: document.title,
+    });
 
     if (!vitalsInitialized.current) {
       vitalsInitialized.current = true;
       initCoreWebVitals();
     }
 
-    if (!sendCurrentPageView(true)) return;
-
     // Track additional SEO metrics and return cleanup
-    const cleanup = trackSEOMetrics();
-    return cleanup;
-  }, [hasConsent, isScriptReady, sendCurrentPageView, trackSEOMetrics, updateConsent]);
+    return trackSEOMetrics();
+  }, [hasConsent, measurementId, pathname, getCurrentNavigationKey, trackSEOMetrics]);
 
   // Handle storage events for consent changes from other tabs
   useEffect(() => {
-    const parseAnalyticsConsentValue = (value: string | null): boolean => {
-      if (value === 'accepted') return true;
-      if (value === 'declined') return false;
-      if (!value) return isAnalyticsConsented();
-
-      try {
-        const parsed: unknown = JSON.parse(value);
-        if (isConsentPreferences(parsed)) {
-          return parsed.analytics;
-        }
-      } catch {
-        return isAnalyticsConsented();
-      }
-
-      return isAnalyticsConsented();
-    };
-
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'cookie-consent') {
-        const newConsent = parseAnalyticsConsentValue(e.newValue);
-        setAnalyticsConsentState(newConsent);
+      if (
+        e.key === null ||
+        e.key === CONSENT_STORAGE_KEY ||
+        e.key === CONSENT_TIMESTAMP_STORAGE_KEY
+      ) {
+        setAnalyticsConsentState(isAnalyticsConsented());
+        setConsentExpiresAt(getConsentExpiryTime());
       }
     };
 
     const handleConsentUpdate = (event: Event) => {
       const detail: unknown = (event as CustomEvent<unknown>).detail;
-      const newConsent = isConsentPreferences(detail) ? detail.analytics : isAnalyticsConsented();
-      setAnalyticsConsentState(newConsent);
+      const requestedConsent = isConsentPreferences(detail)
+        ? detail.analytics
+        : isAnalyticsConsented();
+
+      // A denial takes effect immediately even if localStorage persistence was
+      // interrupted. A grant still requires a valid stored decision.
+      setAnalyticsConsentState(requestedConsent && isAnalyticsConsented());
+      setConsentExpiresAt(getConsentExpiryTime());
     };
 
     window.addEventListener('storage', handleStorageChange);
@@ -242,51 +285,23 @@ export function Analytics() {
   }, [setAnalyticsConsentState]);
 
   // Don't render GA4 unless it is enabled, configured, and consented.
-  if (!(ANALYTICS_ENABLED && GA_MEASUREMENT_ID && hasConsent)) {
+  if (!(measurementId && hasConsent)) {
     return null;
   }
 
   return (
-    <>
-      {/* Google Analytics Script - static id prevents duplicate script injection */}
-      {/* biome-ignore lint/correctness/useUniqueElementIds: Script id must be static to prevent duplicates */}
-      <Script
-        id='ga-script'
-        src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-        strategy='lazyOnload'
-        onLoad={markAnalyticsReady}
-      />
-
-      {/* Google Analytics Initialization - static id prevents duplicate execution */}
-      {/* biome-ignore lint/correctness/useUniqueElementIds: Script id must be static to prevent duplicates */}
-      <Script id='ga-init' strategy='lazyOnload' onReady={markAnalyticsReady}>
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          
-          // GA4 is only loaded after consent, so initialize consent mode as granted
-          // for analytics while keeping ad and personalization storage denied.
-          gtag('consent', 'default', {
-            'analytics_storage': 'granted',
-            'ad_storage': 'denied',
-            'ad_user_data': 'denied',
-            'ad_personalization': 'denied',
-            'functionality_storage': 'denied',
-            'personalization_storage': 'denied',
-            'security_storage': 'granted'
-          });
-          
-          // Configure GA (page_view disabled - we track manually after consent check)
-          gtag('config', '${GA_MEASUREMENT_ID}', {
-            send_page_view: false,
-            anonymize_ip: true,
-            cookie_domain: 'payetax.co.uk',
-            transport_type: 'beacon'
-          });
-        `}
-      </Script>
-    </>
+    // biome-ignore lint/correctness/useUniqueElementIds: Script id must be static to prevent duplicates
+    <Script
+      id='ga-script'
+      src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}&payetax_retry=${gaScriptAttempt}`}
+      strategy='afterInteractive'
+      onLoad={() => {
+        if (activeGaScriptAttemptRef.current === gaScriptAttempt) markGaLoaded();
+      }}
+      onError={() => {
+        if (activeGaScriptAttemptRef.current === gaScriptAttempt) markGaLoadFailed();
+      }}
+    />
   );
 }
 

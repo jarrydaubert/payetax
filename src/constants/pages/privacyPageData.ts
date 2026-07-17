@@ -24,8 +24,8 @@ import { SITE_CONTACT_EMAIL } from '@/constants/contact';
 import type { FeatureSchema } from '@/lib/validation/pageDataValidation';
 
 /** Update whenever the privacy policy materially changes. */
-export const PRIVACY_LAST_UPDATED_ISO = '2026-06-17';
-export const PRIVACY_LAST_UPDATED = '17 June 2026';
+export const PRIVACY_LAST_UPDATED_ISO = '2026-07-17';
+export const PRIVACY_LAST_UPDATED = '17 July 2026';
 
 /** Controller contact email (matches the address used on the compliance page). */
 export const PRIVACY_CONTACT_EMAIL = SITE_CONTACT_EMAIL;
@@ -65,7 +65,7 @@ export const PRIVACY_PRINCIPLES = [
     icon: Eye,
     title: 'Consent-Based Analytics',
     description:
-      'Google Analytics only runs after you accept analytics cookies. Cookieless traffic counts contain no personal data. You can decline and the calculator works identically.',
+      'Google Analytics only runs after you accept analytics cookies, and withdrawing consent switches it off and removes its cookies. You can decline and the calculator works identically.',
     gradient: {
       icon: 'text-primary',
     },
@@ -176,7 +176,7 @@ export const PRIVACY_DATA_CATEGORIES: PrivacyDataCategory[] = [
   },
   {
     category: 'Aggregate traffic',
-    data: 'Cookieless, aggregated visit counts with no personal identifiers',
+    data: 'Aggregated visit and performance counts, designed to work without cookies or persistent identifiers',
     purpose: 'Basic, privacy-preserving traffic measurement',
     lawfulBasis: 'Legitimate interests (Article 6(1)(f))',
     retention: 'Aggregated; not tied to an individual',
@@ -211,7 +211,7 @@ export const PRIVACY_PROCESSORS: PrivacyProcessor[] = [
   {
     name: 'Vercel',
     role: 'Hosting, content delivery, cookieless traffic analytics, and speed insights',
-    data: 'Technical request data plus aggregate, non-identifying visit and performance signals',
+    data: 'Technical request data plus aggregated visit and performance signals, designed to work without cookies or persistent identifiers',
   },
   {
     name: 'Brevo',
@@ -237,6 +237,48 @@ export const PRIVACY_PROCESSORS: PrivacyProcessor[] = [
     name: 'Upstash',
     role: 'Distributed rate limiting and abuse protection',
     data: 'A short-lived client identifier derived from your IP address',
+  },
+];
+
+/**
+ * Cookie and local-storage inventory.
+ * Rendered in the cookies section of the formal policy.
+ *
+ * GA cookie lifetimes are browser-side defaults and deliberately stated
+ * separately from GA4's server-side data-retention settings.
+ */
+export interface PrivacyStorageItem {
+  name: string;
+  type: string;
+  purpose: string;
+  duration: string;
+}
+
+export const PRIVACY_STORAGE_INVENTORY: PrivacyStorageItem[] = [
+  {
+    name: '_ga',
+    type: 'Cookie (Google Analytics)',
+    purpose: 'Distinguishes visitors for consent-based analytics',
+    duration:
+      'Google’s default of up to 2 years, subject to browser restrictions; removed when you reject or withdraw consent or your consent expires',
+  },
+  {
+    name: '_ga_*',
+    type: 'Cookie (Google Analytics)',
+    purpose: 'Keeps analytics session state for consent-based analytics',
+    duration: 'Same as _ga',
+  },
+  {
+    name: 'cookie-consent',
+    type: 'localStorage (essential)',
+    purpose: 'Remembers your consent choice',
+    duration: 'Until you clear it; we re-ask after 12 months',
+  },
+  {
+    name: 'cookie-consent-timestamp',
+    type: 'localStorage (essential)',
+    purpose: 'Records when you made your choice so it can expire',
+    duration: 'Until you clear it; a choice without a valid timestamp is treated as expired',
   },
 ];
 
