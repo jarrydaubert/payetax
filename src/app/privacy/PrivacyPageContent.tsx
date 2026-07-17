@@ -248,7 +248,7 @@ export function PrivacyPageContent() {
                 work without cookies or persistent identifiers and help us understand basic usage
                 and page speed either way.
               </p>
-              <p>This is everything the site stores in your browser:</p>
+              <p>The analytics and consent storage used by this choice is:</p>
               <div className='overflow-x-auto rounded-sm border border-border bg-background'>
                 <table className='w-full min-w-3xl border-collapse text-sm'>
                   <thead>
@@ -285,9 +285,8 @@ export function PrivacyPageContent() {
                 </table>
               </div>
               <p>
-                Cookie lifetimes above are browser-side and separate from how long Google retains
-                analytics data on its servers: our GA4 property keeps event-level data for 2 months
-                and user-level data for 14 months.
+                Cookie lifetimes above are browser-side and separate from the data-retention period
+                configured for the GA4 property.
               </p>
               <p>
                 You can change your choice at any time using the{' '}
