@@ -12,6 +12,9 @@ describe('TaxCodeSchema', () => {
       'CBR',
       'SD0',
       'SD0W1',
+      'SD2',
+      'SD3',
+      'SD2M1',
       'SNT',
       'S0T',
       'C0T',
@@ -23,6 +26,12 @@ describe('TaxCodeSchema', () => {
       if (result.success) {
         expect(result.data).toBe(code);
       }
+    }
+  });
+
+  it('rejects D2/D3 without the Scottish prefix (no rUK equivalent exists)', () => {
+    for (const code of ['D2', 'D3', 'CD2', 'CD3']) {
+      expect(TaxCodeSchema.safeParse(code).success).toBe(false);
     }
   });
 });

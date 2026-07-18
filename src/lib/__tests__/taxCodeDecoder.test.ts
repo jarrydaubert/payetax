@@ -80,13 +80,60 @@ describe('taxCodeDecoder', () => {
       expect(result.details.some((d) => d.includes('Scottish'))).toBe(true);
     });
 
-    it('should decode SBR correctly', () => {
+    it('should decode SBR as the Scottish basic rate', () => {
       const result = decodeTaxCode('SBR');
 
       expect(result.isValid).toBe(true);
       expect(result.isScottish).toBe(true);
       expect(result.letter).toBe('BR');
       expect(result.allowance).toBe(0);
+      expect(result.meaning).toBe('Scottish basic rate on all income');
+      expect(result.details.some((d) => d.includes('20%'))).toBe(true);
+    });
+
+    it('should decode SD0 as the Scottish intermediate rate (21%, not rUK 40%)', () => {
+      const result = decodeTaxCode('SD0');
+
+      expect(result.isValid).toBe(true);
+      expect(result.isScottish).toBe(true);
+      expect(result.letter).toBe('D0');
+      expect(result.allowance).toBe(0);
+      expect(result.meaning).toBe('Scottish intermediate rate on all income');
+      expect(result.details.some((d) => d.includes('21%'))).toBe(true);
+    });
+
+    it('should decode SD1 as the Scottish higher rate (42%, not rUK 45%)', () => {
+      const result = decodeTaxCode('SD1');
+
+      expect(result.isValid).toBe(true);
+      expect(result.letter).toBe('D1');
+      expect(result.meaning).toBe('Scottish higher rate on all income');
+      expect(result.details.some((d) => d.includes('42%'))).toBe(true);
+    });
+
+    it('should decode SD2 as the Scottish advanced rate', () => {
+      const result = decodeTaxCode('SD2');
+
+      expect(result.isValid).toBe(true);
+      expect(result.letter).toBe('D2');
+      expect(result.allowance).toBe(0);
+      expect(result.meaning).toBe('Scottish advanced rate on all income');
+      expect(result.details.some((d) => d.includes('45%'))).toBe(true);
+    });
+
+    it('should decode SD3 as the Scottish top rate', () => {
+      const result = decodeTaxCode('SD3');
+
+      expect(result.isValid).toBe(true);
+      expect(result.letter).toBe('D3');
+      expect(result.allowance).toBe(0);
+      expect(result.meaning).toBe('Scottish top rate on all income');
+      expect(result.details.some((d) => d.includes('48%'))).toBe(true);
+    });
+
+    it('should reject bare D2/D3 (Scottish-only codes)', () => {
+      expect(decodeTaxCode('D2').isValid).toBe(false);
+      expect(decodeTaxCode('D3').isValid).toBe(false);
     });
 
     it('should decode S0T correctly', () => {

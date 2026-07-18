@@ -1,0 +1,261 @@
+{
+  "suite": "Scottish and rUK flat-rate secondary tax codes",
+  "source": {
+    "authority": "Scottish Government / HMRC",
+    "urls": [
+      "https://www.gov.scot/publications/scottish-income-tax-rates-and-bands/pages/2026-to-2027/",
+      "https://www.gov.uk/tax-codes/what-your-tax-code-means",
+      "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027"
+    ],
+    "taxYear": "2026-2027",
+    "verifiedOn": "2026-07-18"
+  },
+  "tolerancePence": 2,
+  "scenarios": [
+    {
+      "id": "scot-sbr-30k",
+      "description": "SBR taxes all income at the Scottish basic rate (20%). £30,000 -> £6,000/yr.",
+      "input": {
+        "salary": 30000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "SBR",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 0,
+        "incomeTaxAnnual": 6000.0,
+        "nationalInsuranceAnnual": 1393.92,
+        "taxBandRates": [20]
+      },
+      "decoder": {
+        "isValid": true,
+        "allowance": 0,
+        "meaningIncludes": "basic"
+      }
+    },
+    {
+      "id": "scot-sd0-30k",
+      "description": "SD0 taxes all income at the Scottish intermediate rate (21%). £30,000 -> £6,300/yr.",
+      "input": {
+        "salary": 30000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "SD0",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 0,
+        "incomeTaxAnnual": 6300.0,
+        "nationalInsuranceAnnual": 1393.92,
+        "taxBandRates": [21]
+      },
+      "decoder": {
+        "isValid": true,
+        "allowance": 0,
+        "meaningIncludes": "intermediate"
+      }
+    },
+    {
+      "id": "scot-sd1-30k",
+      "description": "SD1 taxes all income at the Scottish higher rate (42%). £30,000 -> £12,600/yr.",
+      "input": {
+        "salary": 30000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "SD1",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 0,
+        "incomeTaxAnnual": 12600.0,
+        "nationalInsuranceAnnual": 1393.92,
+        "taxBandRates": [42]
+      },
+      "decoder": {
+        "isValid": true,
+        "allowance": 0,
+        "meaningIncludes": "higher"
+      }
+    },
+    {
+      "id": "scot-sd2-30k",
+      "description": "SD2 taxes all income at the Scottish advanced rate (45%). £30,000 -> £13,500/yr.",
+      "input": {
+        "salary": 30000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "SD2",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 0,
+        "incomeTaxAnnual": 13500.0,
+        "nationalInsuranceAnnual": 1393.92,
+        "taxBandRates": [45]
+      },
+      "decoder": {
+        "isValid": true,
+        "allowance": 0,
+        "meaningIncludes": "advanced"
+      }
+    },
+    {
+      "id": "scot-sd3-30k",
+      "description": "SD3 taxes all income at the Scottish top rate (48%). £30,000 -> £14,400/yr.",
+      "input": {
+        "salary": 30000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "SD3",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 0,
+        "incomeTaxAnnual": 14400.0,
+        "nationalInsuranceAnnual": 1393.92,
+        "taxBandRates": [48]
+      },
+      "decoder": {
+        "isValid": true,
+        "allowance": 0,
+        "meaningIncludes": "top"
+      }
+    },
+    {
+      "id": "ruk-br-30k",
+      "description": "rUK BR taxes all income at the basic rate (20%). £30,000 -> £6,000/yr. Anchors that Scottish fixes do not disturb rUK overrides.",
+      "input": {
+        "salary": 30000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "BR",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 0,
+        "incomeTaxAnnual": 6000.0,
+        "taxBandRates": [20]
+      },
+      "decoder": {
+        "isValid": true,
+        "allowance": 0,
+        "meaningIncludes": "basic"
+      }
+    },
+    {
+      "id": "ruk-d0-30k",
+      "description": "rUK D0 taxes all income at the higher rate (40%). £30,000 -> £12,000/yr.",
+      "input": {
+        "salary": 30000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "D0",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 0,
+        "incomeTaxAnnual": 12000.0,
+        "taxBandRates": [40]
+      },
+      "decoder": {
+        "isValid": true,
+        "allowance": 0,
+        "meaningIncludes": "higher"
+      }
+    },
+    {
+      "id": "ruk-d1-30k",
+      "description": "rUK D1 taxes all income at the additional rate (45%). £30,000 -> £13,500/yr.",
+      "input": {
+        "salary": 30000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "D1",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 0,
+        "incomeTaxAnnual": 13500.0,
+        "taxBandRates": [45]
+      },
+      "decoder": {
+        "isValid": true,
+        "allowance": 0,
+        "meaningIncludes": "additional"
+      }
+    }
+  ]
+}

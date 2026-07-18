@@ -255,6 +255,7 @@ export const WhatIfTypeSchema = z.enum(['percentage', 'amount', 'total']);
  * - Standard: 1257L, S1257L (Scottish), C1257L (Welsh)
  * - K codes: K100, SK200, CK100 (negative allowance)
  * - Special: BR, D0, D1, NT, 0T (also valid with prefixes: SBR, SD0, SNT, CBR, etc.)
+ * - Scottish-only: SD2 (advanced rate), SD3 (top rate) — invalid without the S prefix
  * - Emergency: 1257L M1, 1257L W1, 1257L X (suffix can follow prefixed special codes too, e.g. SD0W1)
  *
  * Handles:
@@ -279,6 +280,11 @@ export const TaxCodeSchema = z
         // Special codes (also valid with prefixes, e.g. SBR, CBR, SD0, SNT, S0T).
         const specialCodes = ['BR', 'D0', 'D1', 'NT', '0T'];
         if (specialCodes.includes(codeWithoutPrefix)) return true;
+
+        // Scottish-only flat-rate codes for the advanced (SD2) and top (SD3) bands.
+        if (['D2', 'D3'].includes(codeWithoutPrefix)) {
+          return codeWithoutEmergency.startsWith('S');
+        }
 
         // Standard format: numbers, optional letter suffix.
         const standardPattern = /^[0-9]+[LMNPTX]?$/;

@@ -1,0 +1,105 @@
+{
+  "suite": "K-code overriding limit (50% of relevant payments)",
+  "source": {
+    "authority": "UK legislation / HMRC",
+    "urls": [
+      "https://www.legislation.gov.uk/uksi/2003/2682/regulation/2",
+      "https://www.gov.uk/hmrc-internal-manuals/paye-manual/paye11095",
+      "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027"
+    ],
+    "taxYear": "2026-2027",
+    "verifiedOn": "2026-07-18"
+  },
+  "tolerancePence": 2,
+  "scenarios": [
+    {
+      "id": "k2500-10k-cap-binds",
+      "description": "K2500 on £10,000: uncapped month-1 tax would be £583.20/mo (58% of pay). The overriding limit caps the deduction at 50% of the £833.33 monthly payment, floored to the penny = £416.66/mo (£4,999.92/yr).",
+      "input": {
+        "salary": 10000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "K2500",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": -25000,
+        "incomeTaxAnnual": 4999.92,
+        "nationalInsuranceAnnual": 0,
+        "netPayAnnual": 5000.08
+      },
+      "invariants": ["income-tax-within-overriding-limit"],
+      "decoder": {
+        "isValid": true,
+        "allowance": -25000,
+        "meaningIncludes": "add"
+      }
+    },
+    {
+      "id": "k4000-12k-cap-binds",
+      "description": "K4000 on £12,000: uncapped month-1 tax would be £1,104.80/mo (110% of pay). Capped at 50% of the £1,000 monthly payment = £500/mo (£6,000/yr).",
+      "input": {
+        "salary": 12000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "K4000",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": -40000,
+        "incomeTaxAnnual": 6000.0,
+        "nationalInsuranceAnnual": 0
+      },
+      "invariants": ["income-tax-within-overriding-limit"]
+    },
+    {
+      "id": "k600-30k-cap-not-binding",
+      "description": "K600 on £30,000: taxable floor(2500+500)=3000, all basic rate -> £600/mo (£7,200/yr), well under the £1,250 monthly limit. Anchors that the cap does not alter lawful K-code deductions.",
+      "input": {
+        "salary": 30000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "K600",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": -6000,
+        "incomeTaxAnnual": 7200.0,
+        "nationalInsuranceAnnual": 1393.92
+      },
+      "invariants": ["income-tax-within-overriding-limit"],
+      "decoder": {
+        "isValid": true,
+        "allowance": -6000,
+        "meaningIncludes": "add"
+      }
+    }
+  ]
+}

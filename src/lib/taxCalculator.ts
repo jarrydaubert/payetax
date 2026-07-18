@@ -122,14 +122,17 @@ export interface TaxCodeParseResult {
   /** Personal allowance amount. Negative for K-codes (adds to taxable income). */
   allowance: number;
   /**
-   * Special tax code that overrides normal band calculations:
-   * - 'BR': All income taxed at basic rate (20%)
-   * - 'D0': All income taxed at higher rate (40%)
-   * - 'D1': All income taxed at additional rate (45%)
+   * Special tax code that overrides normal band calculations.
+   * The flat rate applied depends on the regime (rUK vs Scottish):
+   * - 'BR': all income at the basic rate (rUK 20% / Scottish basic 20%)
+   * - 'D0': rUK higher rate (40%) / Scottish intermediate rate (21%)
+   * - 'D1': rUK additional rate (45%) / Scottish higher rate (42%)
+   * - 'D2': Scottish advanced rate only (45%) — no rUK equivalent
+   * - 'D3': Scottish top rate only (48%) — no rUK equivalent
    * - 'NT': No tax deducted
    * - null: Use normal progressive bands
    */
-  bandOverride: 'BR' | 'D0' | 'D1' | 'NT' | null;
+  bandOverride: 'BR' | 'D0' | 'D1' | 'D2' | 'D3' | 'NT' | null;
   /** Whether this is a K-code (benefits/underpayment exceed allowance) */
   isKCode: boolean;
   /** Whether W1/M1/X suffix present (non-cumulative/emergency basis) */
@@ -174,6 +177,7 @@ export function parseTaxCode(taxCode: string, defaultAllowance: number): TaxCode
   const codeWithoutEmergency = code.replace(/[WM]1$|X$/, '');
 
   // Remove Scottish (S) or Welsh (C) prefix - affects which tax rates to use, not allowance
+  const hasScottishPrefix = codeWithoutEmergency.startsWith('S');
   const codeWithoutPrefix = codeWithoutEmergency.replace(/^[SC]/, '');
 
   // Handle special codes that override normal band calculations
@@ -186,6 +190,11 @@ export function parseTaxCode(taxCode: string, defaultAllowance: number): TaxCode
   }
   if (codeWithoutPrefix === 'D1') {
     return { ...result, allowance: 0, bandOverride: 'D1' };
+  }
+  // SD2/SD3 exist only in the Scottish regime (advanced and top rate codes).
+  // A bare D2/D3 is not an HMRC code, so it falls through to the default allowance.
+  if ((codeWithoutPrefix === 'D2' || codeWithoutPrefix === 'D3') && hasScottishPrefix) {
+    return { ...result, allowance: 0, bandOverride: codeWithoutPrefix };
   }
   if (codeWithoutPrefix === 'NT') {
     return { ...result, allowance: 0, bandOverride: 'NT' };
@@ -468,6 +477,52 @@ export function convertToPeriods(
   };
 }
 
+type BandOverrideCode = 'BR' | 'D0' | 'D1' | 'D2' | 'D3' | 'NT';
+
+/** Which band's rate each flat-rate code uses, per regime. */
+const RUK_OVERRIDE_BANDS: Partial<Record<BandOverrideCode, { bandName: string; label: string }>> = {
+  BR: { bandName: 'Basic rate', label: 'Basic Rate (BR code)' },
+  D0: { bandName: 'Higher rate', label: 'Higher Rate (D0 code)' },
+  D1: { bandName: 'Additional rate', label: 'Additional Rate (D1 code)' },
+};
+
+const SCOTTISH_OVERRIDE_BANDS: Partial<
+  Record<BandOverrideCode, { bandName: string; label: string }>
+> = {
+  BR: { bandName: 'Basic rate', label: 'Scottish Basic Rate (SBR code)' },
+  D0: { bandName: 'Intermediate rate', label: 'Scottish Intermediate Rate (SD0 code)' },
+  D1: { bandName: 'Higher rate', label: 'Scottish Higher Rate (SD1 code)' },
+  D2: { bandName: 'Advanced rate', label: 'Scottish Advanced Rate (SD2 code)' },
+  D3: { bandName: 'Top rate', label: 'Scottish Top Rate (SD3 code)' },
+};
+
+/**
+ * Resolve the flat rate for a band-override tax code from the year's band table.
+ *
+ * Scottish codes use Scottish band rates (SD0 = intermediate 21%, SD1 = higher 42%,
+ * SD2 = advanced 45%, SD3 = top 48%); rUK codes use rUK band rates (D0 = 40%,
+ * D1 = 45%). Falls back to the year's highest band when a named band is absent
+ * (e.g. SD2 in 2023-24, before the advanced rate existed, resolves to the top rate).
+ */
+function resolveBandOverride(
+  code: BandOverrideCode,
+  hasScottishPrefix: boolean,
+  bands: Array<{ name: string; rate: number; threshold: number }>,
+): { rate: number; name: string } {
+  if (code === 'NT') {
+    return { rate: 0, name: 'No Tax (NT code)' };
+  }
+
+  const mapping = (hasScottishPrefix ? SCOTTISH_OVERRIDE_BANDS : RUK_OVERRIDE_BANDS)[code];
+  const topBand = bands[bands.length - 1];
+  const band = bands.find((candidate) => candidate.name === mapping?.bandName) ?? topBand;
+
+  return {
+    rate: band?.rate ?? 0,
+    name: mapping?.label ?? `Flat Rate (${code} code)`,
+  };
+}
+
 // ============================================================================
 // END HELPER FUNCTIONS
 // ============================================================================
@@ -722,33 +777,10 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     annualTaxFreeAmount += taxRates.blindPersonsAllowance;
   }
 
-  // Age-Related Personal Allowances (LEGACY - applies only to those born before 6 April 1938)
-  // NOTE: Age allowances were frozen in April 2016 and are being phased out
-  // Most people aged 65+ now use the standard personal allowance
-  // However, for those who were already receiving it, it continues
-  // These values are frozen across all tax years
-  // In practice, very few users will be affected by this
-  if (input.age && input.age >= 65) {
-    let ageAllowance = 0;
-
-    // Determine base age allowance from tax rates constants
-    if (input.age >= 75) {
-      ageAllowance = taxRates.ageAllowance75plus; // Higher allowance for 75+
-    } else if (input.age >= 65) {
-      ageAllowance = taxRates.ageAllowance65to74; // Standard age allowance for 65-74
-    }
-
-    // Apply income taper for high earners (based on total income, not just salary)
-    const ageTaperThreshold = taxRates.ageAllowanceTaperThreshold;
-    if (totalGrossIncome > ageTaperThreshold && ageAllowance > 0) {
-      const excessIncome = totalGrossIncome - ageTaperThreshold;
-      const taperReduction = Math.floor(excessIncome / 2);
-      ageAllowance = Math.max(0, ageAllowance - taperReduction);
-    }
-
-    // Add the age allowance to the tax-free amount
-    annualTaxFreeAmount += ageAllowance;
-  }
+  // NOTE: Age does NOT change the Personal Allowance. Age-related allowances were
+  // abolished from 2016-17 (Finance Act 2015) — everyone gets the standard allowance
+  // regardless of date of birth. Age only affects employee NI (see State Pension age
+  // exemption in the NI section below).
 
   // Marriage Allowance (transferable allowance for married couples/civil partners)
   // CRITICAL FIX: Logic was backwards!
@@ -814,16 +846,20 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     let remainingMonthlyIncome = monthlyTaxableIncome;
 
     // Handle special tax codes that override normal band calculations
-    // These codes tax ALL income at a single rate, ignoring progressive bands
+    // These codes tax ALL income at a single rate, ignoring progressive bands.
+    // The rate depends on the regime: rUK BR/D0/D1 map to basic/higher/additional,
+    // while Scottish SBR/SD0/SD1/SD2/SD3 map to basic/intermediate/higher/advanced/top.
+    // The regime comes from the CODE's prefix, not the region toggle — HMRC bakes
+    // the regime into the code it issues (a bare D0 deducts rUK 40% wherever the
+    // employee lives), which also keeps the calculator consistent with the decoder.
+    // Rates are resolved from the year's band table so they stay single-sourced.
+    // @see https://www.gov.uk/tax-codes/what-your-tax-code-means
     if (taxCodeBandOverride) {
-      const overrideRates: Record<'BR' | 'D0' | 'D1' | 'NT', { rate: number; name: string }> = {
-        BR: { rate: 20, name: 'Basic Rate (BR code)' },
-        D0: { rate: 40, name: 'Higher Rate (D0 code)' },
-        D1: { rate: 45, name: 'Additional Rate (D1 code)' },
-        NT: { rate: 0, name: 'No Tax (NT code)' },
-      };
-
-      const override = overrideRates[taxCodeBandOverride];
+      const override = resolveBandOverride(
+        taxCodeBandOverride,
+        hasScottishPrefix,
+        hasScottishPrefix ? scottishRates.bands : standardRates.bands,
+      );
       monthlyTax = roundToPence((monthlyTaxableIncome * override.rate) / 100);
       taxBands.push({
         name: override.name,
@@ -975,6 +1011,17 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
 
   // Round monthly tax to pence for accuracy
   monthlyTax = roundToPence(monthlyTax);
+
+  // Overriding limit: PAYE Regulations 2003 (SI 2003/2682) reg 2 caps the tax
+  // deducted from a relevant payment at 50% of that payment. Originally a K-code
+  // rule, it was extended to all tax codes from 6 April 2015 (SI 2014/2689).
+  // The engine's payment base for the month is gross pay less pre-tax pension.
+  // Floored to the penny: the deduction must never exceed the limit.
+  const monthlyOverridingLimit =
+    Math.floor(Math.max(0, monthlyTaxableAdjustedSalary) * 0.5 * 100) / 100;
+  if (monthlyTax > monthlyOverridingLimit) {
+    monthlyTax = monthlyOverridingLimit;
+  }
 
   // Calculate annual tax (for output)
   const annualTax = monthlyTax * 12;

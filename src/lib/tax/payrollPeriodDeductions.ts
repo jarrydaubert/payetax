@@ -165,12 +165,19 @@ export function calculatePayrollPeriodDeductions(
       ? periodThresholds.payeFreePay * safePeriodNumber
       : Math.ceil((annualTaxFreeAmount * safePeriodNumber) / periodBasis.periodsPerYear);
   const taxablePayToDate = Math.floor(Math.max(0, grossPayToDate - taxFreePayToDate));
+  // This helper models rUK cumulative PAYE only. Scottish-only D2/D3 flat-rate
+  // codes are outside its scope: fall back to progressive bands on the zero
+  // allowance the parser already assigned, rather than inventing an rUK rate.
+  const bandOverride =
+    parsedTaxCode.bandOverride === 'D2' || parsedTaxCode.bandOverride === 'D3'
+      ? null
+      : parsedTaxCode.bandOverride;
   const incomeTaxToDate = calculateCumulativeIncomeTax(
     taxablePayToDate,
     taxRates,
     safePeriodNumber,
     periodBasis.periodsPerYear,
-    parsedTaxCode.bandOverride,
+    bandOverride,
   );
   const incomeTax = roundToPence(Math.max(0, incomeTaxToDate - previousTaxPaid));
 

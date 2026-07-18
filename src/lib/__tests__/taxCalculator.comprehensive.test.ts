@@ -364,7 +364,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
       const testCases = [
         { age: -1, expectedPA: 12570 }, // Negative age
         { age: 0, expectedPA: 12570 }, // Zero age
-        { age: 150, expectedPA: 12570 + 3960 }, // Very old (still gets 75+ allowance)
+        { age: 150, expectedPA: 12570 }, // Very old — age never changes the allowance
         { age: undefined, expectedPA: 12570 }, // No age
       ];
 
@@ -427,8 +427,9 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           partnerGrossWage: 8000,
         }),
       );
-      // £12,570 + £3,960 (age 75+) + £3,130 (blind) + £1,260 (marriage) = £20,920
-      expect(result.taxFreeAmount).toBe(20920);
+      // £12,570 + £3,130 (blind) + £1,260 (marriage) = £16,960.
+      // Age adds nothing — age-related allowances were abolished from 2016-17.
+      expect(result.taxFreeAmount).toBe(16960);
     });
 
     it('high earner with all deductions', () => {
