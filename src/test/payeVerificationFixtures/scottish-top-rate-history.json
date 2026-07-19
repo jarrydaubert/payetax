@@ -5,6 +5,7 @@
     "urls": [
       "https://www.gov.scot/publications/scottish-income-tax-2023-2024/",
       "https://www.gov.scot/publications/scottish-income-tax-rates-and-bands/pages/rates-and-bands-2024-to-2025/",
+      "https://www.gov.scot/publications/scottish-rate-resolution-2024-25-draft-motion-explanatory-note/",
       "https://www.mygov.scot/scottish-income-tax/current-income-tax-rates",
       "https://www.gov.scot/publications/scottish-income-tax-rates-and-bands/pages/2026-to-2027/"
     ],
@@ -46,7 +47,7 @@
     },
     {
       "id": "progressive-150k-2024-25",
-      "description": "S1257L £150,000 in 2024-25 reaches the 48% top band. Month-1 derivation: PA fully tapered to 0; taxable 12,500/mo; monthly boundaries ceil(2306/12)=193, 1166, 2591, 5203, 9381; tax = 193x19% + 973x20% + 1425x21% + 2612x42% + 4178x45% + 3119x48% = 36.67+194.60+299.25+1097.04+1880.10+1497.12 = 5,004.78/mo (60,057.36/yr). At the old 47% rate the last slice was 1,465.93 (59,683.08/yr).",
+      "description": "S1257L £150,000 in 2024-25 reaches the 48% top band, which per the Scottish Rate Resolution starts at £125,140 of TAXABLE income. Month-1 derivation: PA fully tapered to 0; taxable 12,500/mo; monthly boundaries ceil(2306/12)=193, 1166, 2591, 5203, ceil(125140/12)=10429; tax = 193x19% + 973x20% + 1425x21% + 2612x42% + 5226x45% + 2071x48% = 36.67+194.60+299.25+1097.04+2351.70+994.08 = 4,973.34/mo (59,680.08/yr).",
       "input": {
         "salary": 150000,
         "payPeriod": "annually",
@@ -65,9 +66,35 @@
       },
       "expected": {
         "taxFreeAmount": 0,
-        "incomeTaxAnnual": 60057.36,
+        "incomeTaxAnnual": 59680.08,
         "nationalInsuranceAnnual": 5010.0,
         "taxBandRates": [19, 20, 21, 42, 45, 48]
+      }
+    },
+    {
+      "id": "progressive-120k-2026-27-no-top-rate",
+      "description": "S1257L £120,000 in 2026-27: taxable income is 9,785/mo (PA tapered to 2,570, free pay ceil(2570/12)=215), which is BELOW the top-rate boundary ceil(125140/12)=10429 — the advanced 45% band must be the last band applied. Guards against the top band re-starting at taxable 112,570 (the pre-correction defect, which overtaxed total incomes from ~£116,760). Tax = 331x19% + 1082x20% + 1178x21% + 2612x42% + 4582x45% = 62.89+216.40+247.38+1097.04+2061.90 = 3,685.61/mo (44,227.32/yr).",
+      "input": {
+        "salary": 120000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "S1257L",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 2570,
+        "incomeTaxAnnual": 44227.32,
+        "nationalInsuranceAnnual": 4410.0,
+        "taxBandRates": [19, 20, 21, 42, 45]
       }
     },
     {

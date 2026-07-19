@@ -671,7 +671,10 @@ export const SCOTTISH_TAX_RATES: Record<
       { name: 'Basic rate', rate: 20, threshold: 16956 },
       { name: 'Intermediate rate', rate: 21, threshold: 31092 },
       { name: 'Higher rate', rate: 42, threshold: 62430 },
-      { name: 'Advanced rate', rate: 45, threshold: 112570 },
+      // Advanced band runs to £125,140 of TAXABLE income per the Scottish Rate
+      // Resolution — the Personal Allowance is fully tapered before that point,
+      // so the top rate starts at £125,140 whether measured as taxable or total.
+      { name: 'Advanced rate', rate: 45, threshold: 125140 },
       { name: 'Top rate', rate: 48, threshold: Number.POSITIVE_INFINITY },
     ],
     marriageAllowance: 1260,
@@ -689,8 +692,10 @@ export const SCOTTISH_TAX_RATES: Record<
       { name: 'Starter rate', rate: 19, threshold: 2162 }, // £12,571-£14,732 total income
       { name: 'Basic rate', rate: 20, threshold: 13118 }, // £14,733-£25,688 total income
       { name: 'Intermediate rate', rate: 21, threshold: 31092 }, // £25,689-£43,662 total income
-      { name: 'Higher rate', rate: 42, threshold: 112570 }, // £43,663-£125,140 total income
-      { name: 'Top rate', rate: 47, threshold: Number.POSITIVE_INFINITY }, // Above £125,140 total income
+      // Higher band runs to £125,140 of TAXABLE income (SRR); PA is fully
+      // tapered before the top-rate boundary, so taxable = total there.
+      { name: 'Higher rate', rate: 42, threshold: 125140 }, // £43,663 total income to £125,140
+      { name: 'Top rate', rate: 47, threshold: Number.POSITIVE_INFINITY }, // Above £125,140
     ],
     marriageAllowance: 1260,
     blindPersonsAllowance: 2870,
@@ -708,10 +713,13 @@ export const SCOTTISH_TAX_RATES: Record<
       { name: 'Basic rate', rate: 20, threshold: 13991 }, // £14,877-£26,561 total income
       { name: 'Intermediate rate', rate: 21, threshold: 31092 }, // £26,562-£43,662 total income
       { name: 'Higher rate', rate: 42, threshold: 62430 }, // £43,663-£75,000 total income
-      { name: 'Advanced rate', rate: 45, threshold: 112570 }, // £75,001-£125,140 total income
+      // Advanced band runs to £125,140 of TAXABLE income per the 2024-25
+      // Scottish Rate Resolution ("above £62,430 and up to £125,140"); PA is
+      // fully tapered before the top-rate boundary, so taxable = total there.
+      { name: 'Advanced rate', rate: 45, threshold: 125140 }, // £75,001 total income to £125,140
       // Top rate rose from 47% to 48% at the 2024-25 Scottish Budget.
       // Source: https://www.gov.scot/publications/scottish-income-tax-rates-and-bands/pages/rates-and-bands-2024-to-2025/
-      { name: 'Top rate', rate: 48, threshold: Number.POSITIVE_INFINITY }, // Above £125,140 total income
+      { name: 'Top rate', rate: 48, threshold: Number.POSITIVE_INFINITY }, // Above £125,140
     ],
     marriageAllowance: 1260,
     blindPersonsAllowance: 3070,
@@ -729,8 +737,10 @@ export const SCOTTISH_TAX_RATES: Record<
       { name: 'Basic rate', rate: 20, threshold: 14921 }, // £15,398-£27,491 total income
       { name: 'Intermediate rate', rate: 21, threshold: 31092 }, // £27,492-£43,662 total income
       { name: 'Higher rate', rate: 42, threshold: 62430 }, // £43,663-£75,000 total income
-      { name: 'Advanced rate', rate: 45, threshold: 112570 }, // £75,001-£125,140 total income
-      { name: 'Top rate', rate: 48, threshold: Number.POSITIVE_INFINITY }, // Above £125,140 total income
+      // Advanced band runs to £125,140 of TAXABLE income (SRR); PA is fully
+      // tapered before the top-rate boundary, so taxable = total there.
+      { name: 'Advanced rate', rate: 45, threshold: 125140 }, // £75,001 total income to £125,140
+      { name: 'Top rate', rate: 48, threshold: Number.POSITIVE_INFINITY }, // Above £125,140
     ],
     marriageAllowance: 1260,
     blindPersonsAllowance: 3130, // Updated from £3,070 for 2025-2026

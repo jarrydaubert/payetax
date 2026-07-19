@@ -872,9 +872,9 @@ describe('Tax Calculator', () => {
 
       // With £150,000 income:
       // Personal allowance is fully tapered (income > £125,140)
-      // Taxable: £150,000 - £0 PA = £150,000
-      // Top rate applies to taxable income above £112,570
-      expect(topBand?.amount).toBeCloseTo(37428, 2);
+      // Top rate applies to taxable income above £125,140 (SRR boundary):
+      // monthly taxable 12,500 - ceil(125,140/12)=10,429 -> 2,071/mo = £24,852/yr
+      expect(topBand?.amount).toBeCloseTo(24852, 2);
     });
   });
 
