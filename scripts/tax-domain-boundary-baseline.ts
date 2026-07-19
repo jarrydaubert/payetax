@@ -43,16 +43,6 @@ const BASELINE_ENTRIES = [
     ['CURRENT_TAX_YEAR', 'TAX_RATES', 'type:NICategory'],
   ],
   [
-    'src/app/tools/scottish-tax-calculator/ScottishTaxCalculatorClient.tsx',
-    '@/constants/taxRates',
-    ['CURRENT_TAX_YEAR', 'SCOTTISH_TAX_RATES', 'TAX_RATES'],
-  ],
-  [
-    'src/app/tools/scottish-tax-calculator/ScottishTaxCalculatorClient.tsx',
-    '@/lib/tax/utils',
-    ['taxableThresholdToTotalIncome'],
-  ],
-  [
     'src/app/tools/tax-code-decoder/TaxCodeDecoderClient.tsx',
     '@/lib/taxCodeDecoder',
     ['decodeTaxCode', 'formatAllowance', 'type:TaxCodeDecoded'],

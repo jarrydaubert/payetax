@@ -8,47 +8,19 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
-import { CURRENT_TAX_YEAR, SCOTTISH_TAX_RATES, TAX_RATES } from '@/constants/taxRates';
-import { taxableThresholdToTotalIncome } from '@/lib/tax/utils';
+import {
+  CURRENT_TAX_YEAR,
+  calculateIncomeTax,
+  SCOTTISH_TAX_RATES,
+  taxableThresholdToTotalIncome,
+} from '@/lib/tax';
 import { cn, formatCurrency } from '@/lib/utils';
 
 const TAX_YEAR = CURRENT_TAX_YEAR;
 const scottishRates = SCOTTISH_TAX_RATES[TAX_YEAR];
-const englishRates = TAX_RATES[TAX_YEAR];
 
 // Quick salary examples for comparison
 const EXAMPLE_SALARIES = [30000, 50000, 70000, 100000, 150000];
-
-function calculateTax(
-  salary: number,
-  bands: typeof scottishRates.bands,
-  personalAllowance: number,
-  paReductionThreshold: number,
-  paReductionRate: number,
-): number {
-  // Handle personal allowance reduction for high earners
-  let effectiveAllowance = personalAllowance;
-  if (salary > paReductionThreshold) {
-    const reduction = Math.floor((salary - paReductionThreshold) * paReductionRate);
-    effectiveAllowance = Math.max(0, personalAllowance - reduction);
-  }
-
-  const taxableIncome = Math.max(0, salary - effectiveAllowance);
-  let tax = 0;
-  let remainingIncome = taxableIncome;
-  let previousThreshold = 0;
-
-  for (const band of bands) {
-    const bandWidth = band.threshold - previousThreshold;
-    const incomeInBand = Math.min(remainingIncome, bandWidth);
-    tax += incomeInBand * (band.rate / 100);
-    remainingIncome -= incomeInBand;
-    previousThreshold = band.threshold;
-    if (remainingIncome <= 0) break;
-  }
-
-  return Math.round(tax);
-}
 
 export function ScottishTaxCalculatorClient() {
   const inputId = useId();
@@ -61,20 +33,8 @@ export function ScottishTaxCalculatorClient() {
 
   // Shared comparison logic
   const runComparison = (salaryValue: number) => {
-    const scottishTax = calculateTax(
-      salaryValue,
-      scottishRates.bands,
-      scottishRates.personalAllowance,
-      scottishRates.personalAllowanceReductionThreshold,
-      scottishRates.personalAllowanceReductionRate,
-    );
-    const englishTax = calculateTax(
-      salaryValue,
-      englishRates.bands,
-      englishRates.personalAllowance,
-      englishRates.personalAllowanceReductionThreshold,
-      englishRates.personalAllowanceReductionRate,
-    );
+    const scottishTax = Math.round(calculateIncomeTax(salaryValue, 'scotland', TAX_YEAR).incomeTax);
+    const englishTax = Math.round(calculateIncomeTax(salaryValue, 'rUK', TAX_YEAR).incomeTax);
     setComparison({
       scottishTax,
       englishTax,

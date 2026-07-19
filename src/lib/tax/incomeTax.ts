@@ -25,6 +25,7 @@ import {
 } from '@/constants/taxRates';
 import type { Region } from '@/lib/validation/directorValidation';
 import { getAdjustedPersonalAllowance } from './personalAllowance';
+import { sliceScottishTaxableIncome } from './scottishIncomeTax';
 import { roundToPence } from './utils';
 
 // ============================================================================
@@ -93,19 +94,31 @@ export function calculateIncomeTax(
     };
   }
 
-  // Calculate tax using progressive bands
   let incomeTax = 0;
-  let remainingIncome = taxableIncome;
-  let previousThreshold = 0;
 
-  for (const band of rates.bands) {
-    if (remainingIncome <= 0) break;
+  if (region === 'scotland') {
+    incomeTax = sliceScottishTaxableIncome(
+      taxableIncome,
+      rates.bands.map((band) => ({
+        name: band.name,
+        rate: band.rate,
+        taxableIncomeUpperBound: band.threshold,
+      })),
+    ).incomeTax;
+  } else {
+    // Keep the rUK mechanic unchanged in this Scottish-only slice.
+    let remainingIncome = taxableIncome;
+    let previousThreshold = 0;
 
-    const bandWidth = band.threshold - previousThreshold;
-    const incomeInBand = Math.min(remainingIncome, bandWidth);
-    incomeTax += incomeInBand * (band.rate / 100);
-    remainingIncome -= incomeInBand;
-    previousThreshold = band.threshold;
+    for (const band of rates.bands) {
+      if (remainingIncome <= 0) break;
+
+      const bandWidth = band.threshold - previousThreshold;
+      const incomeInBand = Math.min(remainingIncome, bandWidth);
+      incomeTax += incomeInBand * (band.rate / 100);
+      remainingIncome -= incomeInBand;
+      previousThreshold = band.threshold;
+    }
   }
 
   const effectiveRate = salary > 0 ? (incomeTax / salary) * 100 : 0;

@@ -57,6 +57,7 @@ import {
 } from '@/constants/taxRates';
 import type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
 import { convertPeriodToAnnual } from './periodCalculator';
+import { sliceScottishTaxableIncome } from './tax/scottishIncomeTax';
 import { roundToPence } from './tax/utils';
 
 export type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
@@ -880,77 +881,25 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     }
     // Normal progressive tax calculation (only if no band override)
     else {
-      // CRITICAL: Scottish vs Standard UK Tax Band Calculation
-      // The two systems use fundamentally different approaches:
-      //
-      // SCOTTISH SYSTEM (absolute thresholds):
-      // - 19% Starter Rate: £0 - £2,306 of TOTAL income
-      // - 20% Basic Rate: £2,307 - £13,991 of TOTAL income
-      // - 21% Intermediate: £13,992 - £31,092 of TOTAL income
-      // - Bands are absolute ranges from £0 (like staircases)
-      //
-      // STANDARD UK SYSTEM (cumulative above personal allowance):
-      // - 20% Basic Rate: £0 - £37,700 of TAXABLE income (after personal allowance)
-      // - 40% Higher Rate: £37,701 - £125,140 of TAXABLE income
-      // - Bands are ranges above the personal allowance threshold
-
       if (isScottish) {
-        // SCOTTISH TAX CALCULATION ALGORITHM
-        // Scottish bands apply to TOTAL taxable income (not cumulative above personal allowance)
-        // This means we need to calculate which portions fall into which absolute bands
+        // Canonical policy thresholds are annual taxable-income upper bounds.
+        // Period conversion and PAYE rounding stay outside the shared slicer.
+        const calculation = sliceScottishTaxableIncome(
+          monthlyTaxableIncome,
+          taxRates.bands.map((band) => ({
+            name: band.name,
+            rate: band.rate,
+            taxableIncomeUpperBound: getMonthlyPayrollBandThreshold(band.threshold),
+          })),
+        );
+        monthlyTax = calculation.incomeTax;
 
-        // Convert annual band thresholds to monthly equivalents for consistent processing
-        // Example: Annual threshold £2,306 becomes monthly threshold £192.17
-        const monthlyBoundaries = [
-          0, // Always start from £0
-          ...taxRates.bands.map((band) => getMonthlyPayrollBandThreshold(band.threshold)),
-          Number.POSITIVE_INFINITY, // Top band has no upper limit
-        ];
-
-        // Process each Scottish tax band in order
-        for (let i = 0; i < taxRates.bands.length; i++) {
-          const band = taxRates.bands[i];
-          if (!band) continue;
-          const lowerBound = monthlyBoundaries[i] ?? 0; // Start of this band
-          const upperBound = monthlyBoundaries[i + 1] ?? Number.POSITIVE_INFINITY; // Start of next band (or infinity)
-
-          // Calculate how much taxable income falls within this specific band
-          // We compare:
-          // 1. The width of this band (upperBound - lowerBound)
-          // 2. How much income we still need to process (remainingMonthlyIncome)
-          // Take the smaller of the two
-          const monthlyIncomeInBand = Math.max(
-            0, // Cannot have negative income in a band
-            Math.min(
-              upperBound - lowerBound, // Maximum possible income for this band
-              remainingMonthlyIncome, // Actual remaining income to be taxed
-            ),
-          );
-
-          // Only calculate tax if there's income in this band
-          if (monthlyIncomeInBand > 0) {
-            // Apply this band's tax rate to the income within it
-            const monthlyTaxForBand = (monthlyIncomeInBand * band.rate) / 100;
-
-            // Accumulate total monthly tax
-            monthlyTax += monthlyTaxForBand;
-
-            // Scale back to annual for results output (UI displays annual figures)
-            const annualIncomeInBand = monthlyIncomeInBand * 12;
-
-            // Record this band's contribution for tax breakdown display
-            taxBands.push({
-              name: band.name, // e.g., "Scottish Starter Rate (19%)"
-              rate: band.rate, // e.g., 19
-              amount: annualIncomeInBand, // Annual amount of income taxed at this rate
-            });
-
-            // Reduce remaining income
-            remainingMonthlyIncome -= monthlyIncomeInBand;
-          }
-
-          // If no more income to tax, break out of loop
-          if (remainingMonthlyIncome <= 0) break;
+        for (const slice of calculation.slices) {
+          taxBands.push({
+            name: slice.name,
+            rate: slice.rate,
+            amount: slice.taxableAmount * 12,
+          });
         }
       } else {
         // STANDARD UK TAX CALCULATION ALGORITHM

@@ -12,5 +12,8 @@ describe('ScottishTaxCalculatorClient', () => {
 
     expect(await screen.findByText('Scottish Tax')).toBeInTheDocument();
     expect(screen.getByText('English Tax')).toBeInTheDocument();
+    expect(screen.getByText('£8,982')).toBeInTheDocument();
+    expect(screen.getByText('£7,486')).toBeInTheDocument();
+    expect(screen.getByText('+£1,496/year')).toBeInTheDocument();
   });
 });
