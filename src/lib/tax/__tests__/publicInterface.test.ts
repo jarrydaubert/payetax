@@ -8,10 +8,12 @@ describe('tax-domain public interface', () => {
       'TAX_RATES',
       'TAX_YEARS',
       'TAX_YEAR_SOURCES',
+      'calculateIncomeTax',
       'calculateTax',
       'decodeTaxCode',
       'formatAllowance',
       'formatTaxYearDisplay',
+      'sliceScottishTaxableIncome',
       'taxableThresholdToTotalIncome',
     ]);
   });

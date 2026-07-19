@@ -19,4 +19,12 @@ export type { TaxCalculationInput, TaxCalculationResults } from '@/lib/taxCalcul
 export { calculateTax } from '@/lib/taxCalculator';
 export type { TaxCodeDecoded } from '@/lib/taxCodeDecoder';
 export { decodeTaxCode, formatAllowance } from '@/lib/taxCodeDecoder';
+export type { IncomeTaxResult } from './incomeTax';
+export { calculateIncomeTax } from './incomeTax';
+export type {
+  ScottishTaxableIncomeBand,
+  ScottishTaxBandCalculation,
+  ScottishTaxBandSlice,
+} from './scottishIncomeTax';
+export { sliceScottishTaxableIncome } from './scottishIncomeTax';
 export { taxableThresholdToTotalIncome } from './utils';
