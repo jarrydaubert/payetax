@@ -360,6 +360,15 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
       expect(Math.abs(k100Result.taxFreeAmount)).toBe(1000);
     });
 
+    it('falls back to the current tax year for malformed tax-year strings', () => {
+      const malformed = calculateTax(
+        createInput({ salary: 30000, taxYear: '2026' as never }), // no separator
+      );
+      const current = calculateTax(createInput({ salary: 30000, taxYear: '2026-2027' }));
+      expect(malformed.incomeTax.annually).toBe(current.incomeTax.annually);
+      expect(malformed.nationalInsurance.annually).toBe(current.nationalInsurance.annually);
+    });
+
     it('handles invalid age values', () => {
       const testCases = [
         { age: -1, expectedPA: 12570 }, // Negative age
