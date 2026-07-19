@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
 import { CURRENT_TAX_YEAR, SCOTTISH_TAX_RATES, TAX_RATES } from '@/constants/taxRates';
+import { taxableThresholdToTotalIncome } from '@/lib/tax/utils';
 import { cn, formatCurrency } from '@/lib/utils';
 
 const TAX_YEAR = CURRENT_TAX_YEAR;
@@ -269,12 +270,23 @@ export function ScottishTaxCalculatorClient() {
                 {scottishRates.bands.map((band, index) => {
                   const prevThreshold =
                     index === 0 ? 0 : (scottishRates.bands[index - 1]?.threshold ?? 0);
-                  // Use exact thresholds (half-open intervals [prev+1, threshold])
-                  const startIncome = scottishRates.personalAllowance + prevThreshold + 1;
+                  // Thresholds are taxable-income amounts; map to total income
+                  // with the taper-aware helper so the boundary above £100k is
+                  // right (top rate starts at £125,140, where the PA is zero).
+                  const startIncome =
+                    taxableThresholdToTotalIncome(
+                      prevThreshold,
+                      scottishRates.personalAllowance,
+                      scottishRates.personalAllowanceReductionThreshold,
+                    ) + 1;
                   const endIncome =
                     band.threshold === Number.POSITIVE_INFINITY
                       ? null
-                      : scottishRates.personalAllowance + band.threshold;
+                      : taxableThresholdToTotalIncome(
+                          band.threshold,
+                          scottishRates.personalAllowance,
+                          scottishRates.personalAllowanceReductionThreshold,
+                        );
 
                   return (
                     <tr key={band.name} className='border-border/50 border-b last:border-0'>

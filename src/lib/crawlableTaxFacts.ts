@@ -6,6 +6,7 @@ import {
   TAX_YEAR_SOURCES,
   type TaxYear,
 } from '@/constants/taxRates';
+import { taxableThresholdToTotalIncome } from '@/lib/tax/utils';
 import { calculateTax } from '@/lib/taxCalculator';
 import { formatCurrency } from '@/lib/utils';
 
@@ -167,7 +168,14 @@ function getScottishIncomeTaxBands(taxYear: TaxYear): CrawlableRateBand[] {
 
   for (const band of rates.bands) {
     if (Number.isFinite(band.threshold)) {
-      const upper = rates.personalAllowance + band.threshold;
+      // Thresholds are taxable-income amounts; the taper-aware mapping keeps
+      // the displayed total-income boundary correct above £100k (the top-rate
+      // boundary is £125,140, where the Personal Allowance is fully tapered).
+      const upper = taxableThresholdToTotalIncome(
+        band.threshold,
+        rates.personalAllowance,
+        rates.personalAllowanceReductionThreshold,
+      );
       bands.push({
         band: band.name,
         range: boundedRange(previousUpper + 1, upper),

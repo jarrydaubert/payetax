@@ -79,7 +79,7 @@ describe('Tax Calculations', () => {
       // Basic: 20% (£15,398 - £27,491) - threshold 14921
       // Intermediate: 21% (£27,492 - £43,662) - threshold 31092
       // Higher: 42% (£43,663 - £75,000) - threshold 62430
-      // Advanced: 45% (£75,001 - £125,140) - threshold 112570
+      // Advanced: 45% (£75,001 - £125,140) - threshold 125140 taxable (SRR)
       // Top: 48% (over £125,140)
       const salary = 80000;
       const result = calculateIncomeTax(salary, 'scotland', TAX_YEAR);

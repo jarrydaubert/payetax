@@ -860,20 +860,21 @@ describe('Tax Calculator', () => {
       expect(higherBand).toBeDefined();
     });
 
-    it('calculates Top rate (47%) correctly for very high earners', () => {
+    it('calculates Top rate (48%) correctly for very high earners', () => {
       const input = createBasicInput(150000, { isScottish: true });
       const result = calculateTax(input);
 
-      // Should have Top rate band (47% - corrected from 48%)
-      const topBand = result.taxBands.find((band) => band.rate === 47);
+      // 2024-25 Scottish top rate is 48% (raised from 47% at the 2024-25 Budget)
+      // Source: https://www.gov.scot/publications/scottish-income-tax-rates-and-bands/pages/rates-and-bands-2024-to-2025/
+      const topBand = result.taxBands.find((band) => band.rate === 48);
       expect(topBand).toBeDefined();
       expect(topBand?.name).toBe('Top rate');
 
       // With £150,000 income:
       // Personal allowance is fully tapered (income > £125,140)
-      // Taxable: £150,000 - £0 PA = £150,000
-      // Top rate applies to taxable income above £112,570
-      expect(topBand?.amount).toBeCloseTo(37428, 2);
+      // Top rate applies to taxable income above £125,140 (SRR boundary):
+      // monthly taxable 12,500 - ceil(125,140/12)=10,429 -> 2,071/mo = £24,852/yr
+      expect(topBand?.amount).toBeCloseTo(24852, 2);
     });
   });
 

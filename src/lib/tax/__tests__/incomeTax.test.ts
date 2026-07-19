@@ -66,7 +66,10 @@ describe('Income Tax Calculator', () => {
       expect(calculateIncomeTax(27491, 'scotland').incomeTax).toBeCloseTo(2944.53, 2);
       expect(calculateIncomeTax(43662, 'scotland').incomeTax).toBeCloseTo(6320.09, 2);
       expect(calculateIncomeTax(75000, 'scotland').incomeTax).toBeCloseTo(19482.05, 2);
-      expect(calculateIncomeTax(125140, 'scotland').incomeTax).toBeCloseTo(48078.65, 2);
+      // Advanced band runs to £125,140 TAXABLE (SRR); at £125,140 total income
+      // the PA is fully tapered, so nothing is taxed at the 48% top rate yet:
+      // 3,967x19% + 12,989x20% + 14,136x21% + 31,338x42% + 62,710x45% = 47,701.55
+      expect(calculateIncomeTax(125140, 'scotland').incomeTax).toBeCloseTo(47701.55, 2);
     });
 
     it('taxes the first pound into the next band at each boundary', () => {
@@ -74,7 +77,8 @@ describe('Income Tax Calculator', () => {
       expect(calculateIncomeTax(27492, 'scotland').incomeTax).toBeCloseTo(2944.73, 2);
       expect(calculateIncomeTax(43663, 'scotland').incomeTax).toBeCloseTo(6320.51, 2);
       expect(calculateIncomeTax(75001, 'scotland').incomeTax).toBeCloseTo(19482.5, 2);
-      expect(calculateIncomeTax(125141, 'scotland').incomeTax).toBeCloseTo(48079.13, 2);
+      // First pound above the £125,140 taxable boundary is taxed at 48%.
+      expect(calculateIncomeTax(125141, 'scotland').incomeTax).toBeCloseTo(47702.03, 2);
     });
   });
 

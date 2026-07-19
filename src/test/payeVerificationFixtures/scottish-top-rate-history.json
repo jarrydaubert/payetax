@@ -1,0 +1,179 @@
+{
+  "suite": "Scottish top-rate history: 47% (2023-24) vs 48% (2024-25 onward)",
+  "source": {
+    "authority": "Scottish Government",
+    "urls": [
+      "https://www.gov.scot/publications/scottish-income-tax-2023-2024/",
+      "https://www.gov.scot/publications/scottish-income-tax-rates-and-bands/pages/rates-and-bands-2024-to-2025/",
+      "https://www.gov.scot/publications/scottish-rate-resolution-2024-25-draft-motion-explanatory-note/",
+      "https://www.mygov.scot/scottish-income-tax/current-income-tax-rates",
+      "https://www.gov.scot/publications/scottish-income-tax-rates-and-bands/pages/2026-to-2027/"
+    ],
+    "taxYear": "2023-2027",
+    "verifiedOn": "2026-07-19"
+  },
+  "tolerancePence": 2,
+  "scenarios": [
+    {
+      "id": "sd3-30k-2024-25",
+      "description": "SD3 in 2024-25 applies the 48% top rate (raised from 47% at the 2024-25 Scottish Budget). £30,000 -> £1,200/mo, £14,400/yr. The engine previously stored 47% and returned £14,100.",
+      "input": {
+        "salary": 30000,
+        "payPeriod": "annually",
+        "taxYear": "2024-2025",
+        "taxCode": "SD3",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 0,
+        "incomeTaxAnnual": 14400.0,
+        "nationalInsuranceAnnual": 1393.92,
+        "taxBandRates": [48]
+      },
+      "decoder": {
+        "isValid": true,
+        "allowance": 0,
+        "meaningIncludes": "top"
+      }
+    },
+    {
+      "id": "progressive-150k-2024-25",
+      "description": "S1257L £150,000 in 2024-25 reaches the 48% top band, which per the Scottish Rate Resolution starts at £125,140 of TAXABLE income. Month-1 derivation: PA fully tapered to 0; taxable 12,500/mo; monthly boundaries ceil(2306/12)=193, 1166, 2591, 5203, ceil(125140/12)=10429; tax = 193x19% + 973x20% + 1425x21% + 2612x42% + 5226x45% + 2071x48% = 36.67+194.60+299.25+1097.04+2351.70+994.08 = 4,973.34/mo (59,680.08/yr).",
+      "input": {
+        "salary": 150000,
+        "payPeriod": "annually",
+        "taxYear": "2024-2025",
+        "taxCode": "S1257L",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 0,
+        "incomeTaxAnnual": 59680.08,
+        "nationalInsuranceAnnual": 5010.0,
+        "taxBandRates": [19, 20, 21, 42, 45, 48]
+      }
+    },
+    {
+      "id": "progressive-120k-2026-27-no-top-rate",
+      "description": "S1257L £120,000 in 2026-27: taxable income is 9,785/mo (PA tapered to 2,570, free pay ceil(2570/12)=215), which is BELOW the top-rate boundary ceil(125140/12)=10429 — the advanced 45% band must be the last band applied. Guards against the top band re-starting at taxable 112,570 (the pre-correction defect, which overtaxed total incomes from ~£116,760). Tax = 331x19% + 1082x20% + 1178x21% + 2612x42% + 4582x45% = 62.89+216.40+247.38+1097.04+2061.90 = 3,685.61/mo (44,227.32/yr).",
+      "input": {
+        "salary": 120000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "S1257L",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 2570,
+        "incomeTaxAnnual": 44227.32,
+        "nationalInsuranceAnnual": 4410.0,
+        "taxBandRates": [19, 20, 21, 42, 45]
+      }
+    },
+    {
+      "id": "sd2-30k-2023-24",
+      "description": "SD2 in 2023-24 (five-band year, no Advanced rate) was that year's top-rate code: 47%. £30,000 -> £1,175/mo, £14,100/yr. Preserves correct prior-year behaviour after the 2024-25 correction. NI figure follows the engine's flat 12% 2023-24 model (the statutory year blended 12%/10% after the 6 Jan 2024 cut) — it anchors engine consistency, not statutory NI.",
+      "input": {
+        "salary": 30000,
+        "payPeriod": "annually",
+        "taxYear": "2023-2024",
+        "taxCode": "SD2",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 0,
+        "incomeTaxAnnual": 14100.0,
+        "nationalInsuranceAnnual": 2090.88,
+        "taxBandRates": [47]
+      }
+    },
+    {
+      "id": "sd3-30k-2025-26",
+      "description": "SD3 in 2025-26 applies the 48% top rate. £30,000 -> £14,400/yr. Guards against cross-year drift below the current year.",
+      "input": {
+        "salary": 30000,
+        "payPeriod": "annually",
+        "taxYear": "2025-2026",
+        "taxCode": "SD3",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 0,
+        "incomeTaxAnnual": 14400.0,
+        "nationalInsuranceAnnual": 1393.92,
+        "taxBandRates": [48]
+      }
+    },
+    {
+      "id": "sd3-30k-2026-27",
+      "description": "SD3 in 2026-27 applies the 48% top rate. £30,000 -> £14,400/yr. Duplicates the flat-rate suite anchor deliberately so this history suite is self-contained across all supported years.",
+      "input": {
+        "salary": 30000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "SD3",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 0,
+        "incomeTaxAnnual": 14400.0,
+        "nationalInsuranceAnnual": 1393.92,
+        "taxBandRates": [48]
+      }
+    }
+  ]
+}

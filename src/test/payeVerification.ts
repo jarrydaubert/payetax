@@ -22,7 +22,10 @@ export interface FixtureSource {
   authority: string;
   /** Official URLs the expected values were verified against. */
   urls: string[];
-  /** Tax year the scenarios target, e.g. "2026-2027". */
+  /**
+   * Tax year the scenarios target, e.g. "2026-2027". Multi-year suites may use
+   * a span like "2023-2027"; each scenario's input.taxYear is the operative value.
+   */
   taxYear: string;
   /** ISO date (YYYY-MM-DD) the sources were last checked. */
   verifiedOn: string;
