@@ -69,6 +69,7 @@ export interface PolicyCatalog {
 const CODE_EXTENSIONS = new Set(['.js', '.jsx', '.ts', '.tsx']);
 const TAX_FACT_EXTENSIONS = new Set(['.js', '.jsx', '.json', '.md', '.mdx', '.ts', '.tsx']);
 const TEST_FILE_PATTERN = /(?:^|\/)(?:__tests__|test)(?:\/|$)|\.(?:spec|test)\.[jt]sx?$/;
+const EXPLICIT_RATE_CONTAINERS = new Set(['CT_RATES', 'DIVIDEND_TAX_RATES', 'SCOTTISH_TAX_RATES']);
 
 export const TAX_FACT_EXCEPTION_RULES = [
   {
@@ -338,7 +339,18 @@ function collectPolicyNumbers(
   if (typeof value === 'number') {
     if (!Number.isFinite(value)) return;
     const key = path.at(-1)?.toLowerCase() ?? '';
-    if (key.includes('rate') || path.some((part) => part.toLowerCase() === 'rate')) {
+    const isMonetaryField = /(?:allowance|amount|limit|threshold)$/.test(key);
+    const isRateField = /rate$/.test(key);
+    const isExplicitRateContainer = path
+      .slice(0, -1)
+      .some(
+        (part) =>
+          EXPLICIT_RATE_CONTAINERS.has(part) || ['rate', 'rates'].includes(part.toLowerCase()),
+      );
+
+    if (isMonetaryField && Math.abs(value) >= 100) {
+      amounts.add(value);
+    } else if (isRateField || isExplicitRateContainer) {
       rates.add(value <= 1 ? value * 100 : value);
     } else if (Math.abs(value) >= 100) {
       amounts.add(value);
@@ -420,16 +432,28 @@ function addOccurrence(
   value: string,
 ): void {
   const location = lineAndColumn(source.content, index, lineStarts);
-  const normalizedLine = location.lineText
-    .replace(/rate[-_ ]?limit/gi, '')
-    .replace(/tax-fact-scan: official-quotation/g, '');
+  const normalizedLine = location.lineText.replace(/tax-fact-scan: official-quotation/g, '');
+  const operationalRateLimitContext =
+    /\b(?:api|client|distributed|email|endpoint|ip|redis|request|requests|upstash)[-_ ]?rate[-_ ]?limit\b/i.test(
+      normalizedLine,
+    ) ||
+    /\brate[-_ ]?limit[-_ ]?(?:max|requests?|window)\b/i.test(normalizedLine) ||
+    /\bRATE_LIMIT\b/.test(normalizedLine);
+  const taxPolicyContext = normalizedLine.match(
+    /\b(?:allowance|band|corporation|dividend|income|national insurance|NI|PAYE|profit|student loan|tax|threshold|VAT)\b|(?:Allowance|Band|Corporation|Dividend|Income|Insurance|Paye|PAYE|Profit|StudentLoan|Tax|Threshold|Vat|VAT)\b/,
+  );
   const amountContext = normalizedLine.match(
-    /\b(?:allowance|band|corporation|dividend|income|national insurance|NI|PAYE|pension|profit|rate|student loan|tax|threshold|VAT)\b|(?:Allowance|Band|Corporation|Dividend|Income|Insurance|Paye|PAYE|Pension|Profit|Rate|StudentLoan|Tax|Threshold|Vat|VAT)\b/,
+    /\b(?:allowance|band|corporation|dividend|income|limit|national insurance|NI|PAYE|pension|profit|rate|student loan|tax|threshold|VAT)\b|(?:Allowance|Band|Corporation|Dividend|Income|Insurance|Limit|Paye|PAYE|Pension|Profit|Rate|StudentLoan|Tax|Threshold|Vat|VAT)\b/,
   );
   const rateContext = normalizedLine.match(
     /\b(?:band|corporation tax|dividend tax|income tax|national insurance|NI|PAYE|rate|student loan|tax|VAT)\b|(?:Band|CorporationTax|DividendTax|IncomeTax|NationalInsurance|Paye|PAYE|Rate|StudentLoan|Tax|Vat|VAT)\b/,
   );
-  if (kind === 'policy-value' && !amountContext) return;
+  if (
+    kind === 'policy-value' &&
+    (!amountContext || (operationalRateLimitContext && !taxPolicyContext))
+  ) {
+    return;
+  }
   if (kind === 'rate' && !rateContext) return;
   const key = `${source.path}|${kind}|${value}|${index}`;
   if (seen.has(key)) return;

@@ -123,6 +123,8 @@ const BASELINE_ENTRIES = [
     '50000',
     1,
   ],
+  ['src/components/molecules/DirectorGuide/dashboard/EducationPanel.tsx', 'rate', '19', 1],
+  ['src/components/molecules/DirectorGuide/dashboard/EducationPanel.tsx', 'rate', '25', 1],
   ['src/components/molecules/DirectorGuide/dashboard/EducationPanel.tsx', 'rate', '33.75', 1],
   [
     'src/components/molecules/DirectorGuide/dashboard/SurvivalModePanel.tsx',

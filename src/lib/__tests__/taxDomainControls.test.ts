@@ -6,6 +6,7 @@ import {
   aggregateTaxFactFindings,
   compareTaxFactBaseline,
   compareTaxImportBaseline,
+  createPolicyCatalog,
   findTaxImportViolations,
   type SourceText,
   scanTaxFacts,
@@ -142,6 +143,26 @@ describe('tax-domain repository controls', () => {
       taxYears: ['2026-2027'],
     };
 
+    it.each([
+      ['MAIN_RATE_LIMIT', 250_000],
+      ['SMALL_PROFITS_LIMIT', 50_000],
+    ])('catalogues CT_RATES.%s as a monetary amount', (_field, value) => {
+      const policyCatalog = createPolicyCatalog();
+
+      expect(policyCatalog.amounts).toContain(value);
+      expect(policyCatalog.ratePercents).not.toContain(value);
+    });
+
+    it.each([
+      ['SMALL_PROFITS_RATE', 19],
+      ['MAIN_RATE', 25],
+      ['MARGINAL_RELIEF_FRACTION', 1.5],
+    ])('catalogues CT_RATES.%s as a percentage rate', (_field, value) => {
+      const policyCatalog = createPolicyCatalog();
+
+      expect(policyCatalog.ratePercents).toContain(value);
+    });
+
     it('reports policy values, rates and tax years with deterministic exceptions', () => {
       const occurrences = scanTaxFacts(
         [
@@ -231,16 +252,50 @@ describe('tax-domain repository controls', () => {
       ]);
     });
 
-    it('keeps report-only advisory while strict mode fails on a new fact', () => {
+    it.each([
+      ["const corporationTaxThreshold = '£250,000';", 1],
+      ['const mainRateLimit = 250000;', 1],
+      ['const basicRateLimit = 250000;', 1],
+    ])('detects corporation-tax policy copies: %s', (content, expectedCount) => {
+      const occurrences = scanTaxFacts([{ path: 'src/app/example.ts', content }], {
+        amounts: [250_000],
+        ratePercents: [],
+        taxYears: [],
+      });
+
+      expect(occurrences).toHaveLength(expectedCount);
+      expect(occurrences[0]).toMatchObject({
+        file: 'src/app/example.ts',
+        kind: 'policy-value',
+        value: '250000',
+      });
+    });
+
+    it.each([
+      ['const requestRateLimit = 250000;'],
+      ['const request_rate_limit = 250000;'],
+      ['const RATE_LIMIT = 250000;'],
+      ['const rateLimitWindow = 250000;'],
+    ])('excludes operational request limits: %s', (content) => {
+      expect(
+        scanTaxFacts([{ path: 'src/app/example.ts', content }], {
+          amounts: [250_000],
+          ratePercents: [],
+          taxYears: [],
+        }),
+      ).toEqual([]);
+    });
+
+    it.each([
+      ["export const corporationTaxThreshold = '£250,000';"],
+      ['export const mainRateLimit = 250000;'],
+    ])('keeps report-only advisory while strict mode fails on: %s', (policyCopy) => {
       const fixtureRoot = mkdtempSync(join(tmpdir(), 'payetax-tax-facts-'));
       try {
         for (const directory of ['content/blog', 'e2e', 'scripts', 'src/app']) {
           mkdirSync(join(fixtureRoot, directory), { recursive: true });
         }
-        writeFileSync(
-          join(fixtureRoot, 'src/app/new-fact.ts'),
-          'export const personalAllowanceThreshold = 12_570;',
-        );
+        writeFileSync(join(fixtureRoot, 'src/app/new-fact.ts'), policyCopy);
         const command = resolve(process.cwd(), 'scripts/check-tax-facts.ts');
         const env = { ...process.env, PAYETAX_REPO_CHECK_ROOT: fixtureRoot };
 
@@ -259,6 +314,7 @@ describe('tax-domain repository controls', () => {
         expect(reportOnly.stderr).toContain('src/app/new-fact.ts');
         expect(strict.status).toBe(1);
         expect(strict.stderr).toContain('src/app/new-fact.ts');
+        expect(strict.stderr).toContain('policy-value=250000 (+1)');
       } finally {
         rmSync(fixtureRoot, { recursive: true, force: true });
       }
