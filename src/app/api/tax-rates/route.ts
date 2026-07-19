@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { CURRENT_TAX_YEAR, TAX_RATES, TAX_YEARS } from '@/constants/taxRates';
 import { getCrawlableSalaryExamples } from '@/lib/crawlableTaxFacts';
+import { CURRENT_TAX_YEAR, TAX_RATES, TAX_YEARS } from '@/lib/tax';
 
 export const revalidate = 86400;
 

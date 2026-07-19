@@ -1,13 +1,13 @@
 import {
   CURRENT_TAX_YEAR,
+  calculateTax,
   formatTaxYearDisplay,
   SCOTTISH_TAX_RATES,
   TAX_RATES,
   TAX_YEAR_SOURCES,
   type TaxYear,
-} from '@/constants/taxRates';
-import { taxableThresholdToTotalIncome } from '@/lib/tax/utils';
-import { calculateTax } from '@/lib/taxCalculator';
+  taxableThresholdToTotalIncome,
+} from '@/lib/tax';
 import { formatCurrency } from '@/lib/utils';
 
 export const CRAWLABLE_SALARY_EXAMPLE_AMOUNTS = [
