@@ -6,11 +6,8 @@ import {
   TAX_RATES,
   type TaxYear,
 } from '@/constants/taxRates';
-import {
-  calculateAllowanceReduction,
-  parseTaxCode,
-  type TaxCalculationInput,
-} from '@/lib/taxCalculator';
+import { calculateAllowanceReduction, type TaxCalculationInput } from '@/lib/taxCalculator';
+import { parseTaxCode } from './taxCode';
 import { roundToPence } from './utils';
 
 type PayrollDeductionPeriod = Extract<

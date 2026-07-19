@@ -49,12 +49,3 @@ export function getPersonalAllowance(taxYear: TaxYear = CURRENT_TAX_YEAR): numbe
   const fallbackAllowance = TAX_RATES[CURRENT_TAX_YEAR]?.personalAllowance ?? 0;
   return TAX_RATES[taxYear]?.personalAllowance ?? fallbackAllowance;
 }
-
-/**
- * Get default tax code with allowance explanation
- */
-export function getTaxCodeExplanation(taxCode: string = '1257L'): string {
-  const numericPart = parseInt(taxCode.replace(/[^0-9]/g, ''), 10);
-  const allowance = numericPart * 10;
-  return `${taxCode} means ${formatCurrency(allowance)} tax-free allowance`;
-}

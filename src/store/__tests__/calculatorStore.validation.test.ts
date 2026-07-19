@@ -180,10 +180,14 @@ describe('Calculator Store Validation', () => {
         'SBR',
         'SD0',
         'SD1',
+        'SD2',
+        'SD3',
         'SNT',
         'CBR',
         'C0T',
         'SD0W1',
+        'SD2M1',
+        '1257LX',
       ];
 
       for (const code of validCodes) {
@@ -217,6 +221,14 @@ describe('Calculator Store Validation', () => {
       setTaxCode('  1257L  ');
 
       expect(useCalculatorStore.getState().input.taxCode).toBe('1257L');
+    });
+
+    it('should compact a spaced emergency suffix through the shared normalizer', () => {
+      const { setTaxCode } = useCalculatorStore.getState();
+
+      setTaxCode(' s1257l w1 ');
+
+      expect(useCalculatorStore.getState().input.taxCode).toBe('S1257LW1');
     });
 
     it('should allow empty tax code', () => {

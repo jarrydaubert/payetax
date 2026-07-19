@@ -4,7 +4,6 @@ import { TAX_RATES } from '@/constants/taxRates';
 import {
   getCurrentTaxYearLabel,
   getPersonalAllowance,
-  getTaxCodeExplanation,
   getTaxRateDescription,
 } from '../taxRateDescriptions';
 
@@ -141,59 +140,6 @@ describe('Tax Rate Descriptions', () => {
     test('should handle undefined tax year', () => {
       const allowance = getPersonalAllowance(undefined as never);
       expect(allowance).toBe(12570);
-    });
-  });
-
-  describe('getTaxCodeExplanation', () => {
-    test('should explain default tax code (1257L)', () => {
-      const explanation = getTaxCodeExplanation();
-      expect(explanation).toBe('1257L means £12,570 tax-free allowance');
-    });
-
-    test('should explain custom tax code', () => {
-      const explanation = getTaxCodeExplanation('1000M');
-      expect(explanation).toBe('1000M means £10,000 tax-free allowance');
-    });
-
-    test('should explain high allowance tax code', () => {
-      const explanation = getTaxCodeExplanation('1500N');
-      expect(explanation).toBe('1500N means £15,000 tax-free allowance');
-    });
-
-    test('should handle tax codes with different letters', () => {
-      const explanations = [
-        getTaxCodeExplanation('1257L'),
-        getTaxCodeExplanation('1257M'),
-        getTaxCodeExplanation('1257N'),
-        getTaxCodeExplanation('1257T'),
-      ];
-
-      for (const explanation of explanations) {
-        expect(explanation).toContain('£12,570 tax-free allowance');
-      }
-    });
-
-    test('should extract numbers correctly from complex tax codes', () => {
-      const explanation = getTaxCodeExplanation('S1257L'); // Scottish tax code
-      expect(explanation).toBe('S1257L means £12,570 tax-free allowance');
-    });
-
-    test('should handle tax codes with no numbers', () => {
-      const explanation = getTaxCodeExplanation('BR');
-      expect(explanation).toBe('BR means £NaN tax-free allowance');
-    });
-
-    test('should handle empty or invalid tax codes', () => {
-      const explanationEmpty = getTaxCodeExplanation('');
-      const explanationInvalid = getTaxCodeExplanation('INVALID');
-
-      expect(explanationEmpty).toBe(' means £NaN tax-free allowance');
-      expect(explanationInvalid).toBe('INVALID means £NaN tax-free allowance');
-    });
-
-    test('should handle tax codes with multiple numbers correctly', () => {
-      const explanation = getTaxCodeExplanation('1234L567'); // Complex case
-      expect(explanation).toBe('1234L567 means £12,345,670 tax-free allowance');
     });
   });
 });

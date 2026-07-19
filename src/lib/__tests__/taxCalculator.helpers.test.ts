@@ -7,6 +7,7 @@
  * - ROUNDING: NI and student loan rounding changes
  */
 
+import { parseTaxCode } from '@/lib/tax';
 import {
   calculateAllowanceReduction,
   calculateIncomeTaxFromBands,
@@ -14,7 +15,6 @@ import {
   calculatePensionAmount,
   calculateStudentLoanRepayments,
   convertToPeriods,
-  parseTaxCode,
 } from '../taxCalculator';
 
 describe('taxCalculator helpers', () => {

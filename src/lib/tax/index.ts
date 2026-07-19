@@ -17,8 +17,6 @@ export {
 } from '@/constants/taxRates';
 export type { TaxCalculationInput, TaxCalculationResults } from '@/lib/taxCalculator';
 export { calculateTax } from '@/lib/taxCalculator';
-export type { TaxCodeDecoded } from '@/lib/taxCodeDecoder';
-export { decodeTaxCode, formatAllowance } from '@/lib/taxCodeDecoder';
 export type { IncomeTaxResult } from './incomeTax';
 export { calculateIncomeTax } from './incomeTax';
 export type {
@@ -27,4 +25,21 @@ export type {
   ScottishTaxBandSlice,
 } from './scottishIncomeTax';
 export { sliceScottishTaxableIncome } from './scottishIncomeTax';
+export type {
+  TaxCodeBandOverride,
+  TaxCodeClassification,
+  TaxCodeDecoded,
+  TaxCodeEmergencySuffix,
+  TaxCodeParseResult,
+  TaxCodePrefix,
+} from './taxCode';
+export {
+  decodeTaxCode,
+  formatAllowance,
+  hasEmergencyTaxCodeSuffix,
+  isTaxCodeEditCandidate,
+  isValidTaxCode,
+  normalizeTaxCode,
+  parseTaxCode,
+} from './taxCode';
 export { taxableThresholdToTotalIncome } from './utils';
