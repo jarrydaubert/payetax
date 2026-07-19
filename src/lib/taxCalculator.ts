@@ -515,11 +515,22 @@ function resolveBandOverride(
 
   const mapping = (hasScottishPrefix ? SCOTTISH_OVERRIDE_BANDS : RUK_OVERRIDE_BANDS)[code];
   const topBand = bands[bands.length - 1];
-  const band = bands.find((candidate) => candidate.name === mapping?.bandName) ?? topBand;
+  const namedBand = bands.find((candidate) => candidate.name === mapping?.bandName);
+  const band = namedBand ?? topBand;
+
+  // When the named band is absent (e.g. SD2 in 2023-24, before the Advanced
+  // rate existed), the code resolves to the top band — label it as such rather
+  // than claiming a band that year did not have.
+  let name = `Flat Rate (${code} code)`;
+  if (namedBand && mapping) {
+    name = mapping.label;
+  } else if (!namedBand && hasScottishPrefix) {
+    name = `Scottish Top Rate (S${code} code)`;
+  }
 
   return {
     rate: band?.rate ?? 0,
-    name: mapping?.label ?? `Flat Rate (${code} code)`,
+    name,
   };
 }
 

@@ -72,12 +72,14 @@ describe('Tax code overrides', () => {
   describe('Scottish flat-rate codes in years without an Advanced rate band', () => {
     // 2023-24 Scotland had five bands (no Advanced rate): SD2 was the top-rate
     // code that year, so the top-band fallback is the statutorily correct rate.
-    it('SD2 in 2023-24 falls back to the top rate (47%)', () => {
+    it('SD2 in 2023-24 falls back to the top rate (47%) and is labelled as such', () => {
       const result = calculateTax({ ...baseInput, taxYear: '2023-2024', taxCode: 'SD2' });
 
       expect(result.taxFreeAmount).toBe(0);
       expect(result.taxBands).toHaveLength(1);
       expect(result.taxBands[0]?.rate).toBe(47);
+      // No Advanced rate existed in 2023-24, so the label must say Top Rate.
+      expect(result.taxBands[0]?.name).toBe('Scottish Top Rate (SD2 code)');
       expect(result.incomeTax.annually).toBeCloseTo(14100, 2); // 47% of £30,000
     });
 

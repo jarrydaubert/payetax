@@ -709,7 +709,9 @@ export const SCOTTISH_TAX_RATES: Record<
       { name: 'Intermediate rate', rate: 21, threshold: 31092 }, // £26,562-£43,662 total income
       { name: 'Higher rate', rate: 42, threshold: 62430 }, // £43,663-£75,000 total income
       { name: 'Advanced rate', rate: 45, threshold: 112570 }, // £75,001-£125,140 total income
-      { name: 'Top rate', rate: 47, threshold: Number.POSITIVE_INFINITY }, // Above £125,140 total income (corrected from 48%)
+      // Top rate rose from 47% to 48% at the 2024-25 Scottish Budget.
+      // Source: https://www.gov.scot/publications/scottish-income-tax-rates-and-bands/pages/rates-and-bands-2024-to-2025/
+      { name: 'Top rate', rate: 48, threshold: Number.POSITIVE_INFINITY }, // Above £125,140 total income
     ],
     marriageAllowance: 1260,
     blindPersonsAllowance: 3070,
