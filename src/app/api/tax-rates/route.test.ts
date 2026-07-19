@@ -8,8 +8,8 @@
  * - Cache header regressions on the public dataset endpoint
  */
 
-import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
 import { getCrawlableSalaryExamples } from '@/lib/crawlableTaxFacts';
+import { CURRENT_TAX_YEAR } from '@/lib/tax';
 import { GET } from './route';
 
 describe('/api/tax-rates GET', () => {

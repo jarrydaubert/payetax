@@ -300,7 +300,7 @@ bun install --frozen-lockfile
 ### Fast Local Checks
 
 ```bash
-bun run check:repo          # Lint, typecheck, version sync, env contract, analytics contract, skip guard
+bun run check:repo          # Lint, typecheck, contracts, tax-domain guards, freshness, test hygiene
 bun run test:no-coverage    # Jest without coverage thresholds
 bun run test:e2e:critical   # Chromium smoke + critical + golden paths
 bun run test:quick          # Unit fast + critical E2E
@@ -330,10 +330,38 @@ bun run bundle:monitor      # Build + bundle threshold analysis
 
 ```bash
 bun run check:test-skips    # Block unapproved skip/todo debt
+bun run check:tax-imports   # Block new application imports of tax-domain internals
+bun run check:tax-facts     # Deterministic report of hardcoded policy facts outside approved locations
+bun run check:tax-facts:strict # Fail if the tax-fact report finds anything above baseline
 bun run test:metrics        # Print test inventory, skip/todo counts, artifact-based last E2E status, coverage summary
 bun run clean:test          # Clear unit and E2E artifacts
 bun run test:e2e:clear      # Clear Playwright artifacts and storage state
 ```
+
+### Tax-Domain Drift Controls
+
+Application consumers use `@/lib/tax` as the supported tax-domain import. `check:tax-imports`
+parses production TypeScript and JavaScript imports and fails when code reaches into
+`constants/taxRates`, the legacy calculator or decoder modules, or `lib/tax/*` internals.
+Existing migration debt is recorded exactly in `scripts/tax-domain-boundary-baseline.ts`,
+including imported bindings, so expanding an allowlisted import is still a new violation.
+
+`check:tax-facts` derives likely policy values from the current policy records and scans source,
+scripts, E2E support, and blog content for matching thresholds, rates, and tax years. The initial
+CI mode is report-only because existing findings include genuine debt and heuristic matches;
+`--strict` is available as the promotion path. The checked-in baseline records file, fact kind,
+value, and count, so additions are labelled separately. Approved policy locations and explicit
+exceptions for verification fixtures, dated historical posts, and lines marked
+`tax-fact-scan: official-quotation` are printed on every run. Neither command rewrites files.
+
+These checks complement existing controls instead of duplicating them:
+
+- `check:rate-freshness` verifies that the current policy record has recent source verification;
+  it does not inventory copied values.
+- `blog:audit` checks editorial/frontmatter quality; the tax-fact scan only classifies likely
+  literal policy drift and preserves dated content through its exception model.
+- Calculation fixtures and unit tests continue to verify outcomes; the boundary check only
+  controls dependency direction.
 
 ## CI And Repo Quality
 

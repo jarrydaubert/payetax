@@ -11,8 +11,8 @@
 
 import type React from 'react';
 import { SITE_CONTACT_EMAIL } from '@/constants/contact';
-import { CURRENT_TAX_YEAR, formatTaxYearDisplay, TAX_RATES, TAX_YEARS } from '@/constants/taxRates';
 import { LOGO_URL, SITE_URL } from '@/lib/metadata';
+import { CURRENT_TAX_YEAR, formatTaxYearDisplay, TAX_RATES, TAX_YEARS } from '@/lib/tax';
 import { formatCurrency } from '@/lib/utils';
 
 /**
