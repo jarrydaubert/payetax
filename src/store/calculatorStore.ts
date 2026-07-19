@@ -106,8 +106,10 @@ const TAX_YEAR_INPUT_SCHEMA = z
 const PAY_PERIOD_VALUES = Object.values(PERIODS) as [PayPeriod, ...PayPeriod[]];
 const STUDENT_LOAN_PLAN_VALUES = ['plan1', 'plan2', 'plan4', 'plan5', 'postgrad'] as const;
 const TAX_REGION_VALUES = ['England', 'Scotland', 'Wales', 'Northern Ireland'] as const;
+// SD2/SD3 (Scottish advanced/top flat rates) are only valid with the S prefix,
+// so the S-prefixed branch admits D[0-3] while the general branch stays D[01].
 const TAX_CODE_EDIT_PATTERN =
-  /^(?:[SC]?|[SC]?(?:K\d*|BR?|D[01]?|NT?|0T?|\d+[LMNPTX]?)(?:W1?|M1?|X)?)$/;
+  /^(?:[SC]?|SD[0-3]?(?:W1?|M1?|X)?|[SC]?(?:K\d*|BR?|D[01]?|NT?|0T?|\d+[LMNPTX]?)(?:W1?|M1?|X)?)$/;
 
 const SALARY_INPUT_SCHEMA = z
   .number()

@@ -1,0 +1,124 @@
+{
+  "suite": "UK baseline PAYE scenarios (regression anchors)",
+  "source": {
+    "authority": "HMRC",
+    "urls": [
+      "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027",
+      "https://www.gov.uk/income-tax-rates",
+      "https://www.gov.scot/publications/scottish-income-tax-rates-and-bands/pages/2026-to-2027/"
+    ],
+    "taxYear": "2026-2027",
+    "verifiedOn": "2026-07-18"
+  },
+  "tolerancePence": 2,
+  "scenarios": [
+    {
+      "id": "uk-40k-1257L",
+      "description": "£40,000 rUK, 1257L. Hand-derived month-1 method: taxable floor(3333.33-1048)=2285, all basic 20% = £457.00/mo; NI 8% of 2285.33 = £182.83/mo.",
+      "input": {
+        "salary": 40000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 12570,
+        "incomeTaxAnnual": 5484.0,
+        "nationalInsuranceAnnual": 2193.96,
+        "netPayAnnual": 32322.04,
+        "taxBandRates": [20]
+      }
+    },
+    {
+      "id": "uk-60k-1257L",
+      "description": "£60,000 rUK, 1257L. Taxable floor(5000-1048)=3952; 3142 at 20% + 810 at 40% = £952.40/mo; NI 251.28+16.22 = £267.50/mo.",
+      "input": {
+        "salary": 60000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 12570,
+        "incomeTaxAnnual": 11428.8,
+        "nationalInsuranceAnnual": 3210.0,
+        "netPayAnnual": 45361.2,
+        "taxBandRates": [20, 40]
+      }
+    },
+    {
+      "id": "uk-110k-pa-taper",
+      "description": "£110,000 rUK. PA taper: 12570 - floor(10000/2) = £7,570 (free pay ceil(7570/12)=631). Taxable floor(9166.67-631)=8535; 3142 at 20% + 5393 at 40% = £2,785.60/mo; NI 251.28+99.55 = £350.83/mo.",
+      "input": {
+        "salary": 110000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 7570,
+        "incomeTaxAnnual": 33427.2,
+        "nationalInsuranceAnnual": 4209.96,
+        "netPayAnnual": 72362.84,
+        "taxBandRates": [20, 40]
+      }
+    },
+    {
+      "id": "scot-30k-S1257L",
+      "description": "£30,000 Scottish, S1257L. Taxable floor(2500-1048)=1452; 331 at 19% + 1082 at 20% + 39 at 21% = £287.48/mo (monthly band thresholds ceil(3967/12)=331, ceil(16956/12)=1413).",
+      "input": {
+        "salary": 30000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "S1257L",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 12570,
+        "incomeTaxAnnual": 3449.76,
+        "nationalInsuranceAnnual": 1393.92,
+        "netPayAnnual": 25156.32,
+        "taxBandRates": [19, 20, 21]
+      }
+    }
+  ]
+}

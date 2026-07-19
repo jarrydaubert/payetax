@@ -1,6 +1,11 @@
 // src/lib/taxCodeDecoder.ts
 
-import { CURRENT_TAX_YEAR, formatTaxYearDisplay, TAX_RATES } from '@/constants/taxRates';
+import {
+  CURRENT_TAX_YEAR,
+  formatTaxYearDisplay,
+  SCOTTISH_TAX_RATES,
+  TAX_RATES,
+} from '@/constants/taxRates';
 
 // Get the standard personal allowance from the single source of truth
 // Using the latest tax year for reference
@@ -97,6 +102,39 @@ const LETTER_MEANINGS: Record<string, LetterInfo> = {
   },
 };
 
+// Scottish flat-rate codes (SBR, SD0, SD1, SD2, SD3) use Scottish band rates,
+// which differ from the rUK BR/D0/D1 meanings: SD0 is the intermediate rate,
+// SD1 the higher rate, SD2 the advanced rate, and SD3 the top rate.
+// Rates are looked up from the Scottish band table so they stay single-sourced.
+const SCOTTISH_BANDS = SCOTTISH_TAX_RATES[CURRENT_TAX_YEAR].bands;
+
+function scottishBandRate(bandName: string): number {
+  return SCOTTISH_BANDS.find((band) => band.name === bandName)?.rate ?? 0;
+}
+
+const SCOTTISH_FLAT_RATE_CODES: Record<string, LetterInfo> = {
+  BR: {
+    meaning: 'Scottish basic rate on all income',
+    details: `All your income from this job or pension is taxed at the Scottish basic rate (${scottishBandRate('Basic rate')}%). This is usually used for a second job.`,
+  },
+  D0: {
+    meaning: 'Scottish intermediate rate on all income',
+    details: `All your income from this job or pension is taxed at the Scottish intermediate rate (${scottishBandRate('Intermediate rate')}%). This is usually used for a second job.`,
+  },
+  D1: {
+    meaning: 'Scottish higher rate on all income',
+    details: `All your income from this job or pension is taxed at the Scottish higher rate (${scottishBandRate('Higher rate')}%). This is usually used for a second job.`,
+  },
+  D2: {
+    meaning: 'Scottish advanced rate on all income',
+    details: `All your income from this job or pension is taxed at the Scottish advanced rate (${scottishBandRate('Advanced rate')}%). This is usually used for a second job or pension.`,
+  },
+  D3: {
+    meaning: 'Scottish top rate on all income',
+    details: `All your income from this job or pension is taxed at the Scottish top rate (${scottishBandRate('Top rate')}%). This is usually used for a second job or pension.`,
+  },
+};
+
 export function decodeTaxCode(rawCode: string): TaxCodeDecoded {
   const code = rawCode.toUpperCase().trim();
 
@@ -155,6 +193,20 @@ export function decodeTaxCode(rawCode: string): TaxCodeDecoded {
   const codeWithoutSuffix = result.suffix
     ? codeWithoutPrefix.slice(0, -result.suffix.length)
     : codeWithoutPrefix;
+
+  // Scottish flat-rate codes take precedence over the rUK meanings so that
+  // the decoder agrees with the calculator (SD0 = intermediate 21%, not 40%).
+  const scottishFlatRateInfo = result.isScottish
+    ? SCOTTISH_FLAT_RATE_CODES[codeWithoutSuffix]
+    : undefined;
+  if (scottishFlatRateInfo) {
+    result.isValid = true;
+    result.letter = codeWithoutSuffix;
+    result.allowance = 0;
+    result.meaning = scottishFlatRateInfo.meaning;
+    result.details.push(scottishFlatRateInfo.details);
+    return result;
+  }
 
   // Check for special codes (BR, D0, D1, NT, 0T, K codes)
   if (['BR', 'D0', 'D1', 'NT'].includes(codeWithoutSuffix)) {

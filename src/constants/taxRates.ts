@@ -276,10 +276,6 @@ export const TAX_RATES: Record<
       start: number; // High Income Child Benefit Charge start threshold
       end: number; // HICBC full clawback threshold
     };
-    // Age-related allowances (LEGACY - frozen since 2016, applies only to those born before 6 April 1938)
-    ageAllowance65to74: number;
-    ageAllowance75plus: number;
-    ageAllowanceTaperThreshold: number;
     nationalInsurance: {
       employee: Record<
         NICategory,
@@ -324,9 +320,6 @@ export const TAX_RATES: Record<
       start: 60000,
       end: 80000,
     },
-    ageAllowance65to74: 3660,
-    ageAllowance75plus: 3960,
-    ageAllowanceTaperThreshold: 34600,
     nationalInsurance: {
       employee: {
         A: {
@@ -410,10 +403,6 @@ export const TAX_RATES: Record<
       start: 50000,
       end: 60000,
     },
-    // Age-related allowances (LEGACY - frozen since 2016, only for those born before 6 April 1938)
-    ageAllowance65to74: 3660,
-    ageAllowance75plus: 3960,
-    ageAllowanceTaperThreshold: 34600,
     nationalInsurance: {
       employee: {
         A: {
@@ -503,10 +492,6 @@ export const TAX_RATES: Record<
       start: 60000,
       end: 80000,
     },
-    // Age-related allowances (LEGACY - frozen since 2016, only for those born before 6 April 1938)
-    ageAllowance65to74: 3660,
-    ageAllowance75plus: 3960,
-    ageAllowanceTaperThreshold: 34600,
     nationalInsurance: {
       employee: {
         A: {
@@ -592,10 +577,6 @@ export const TAX_RATES: Record<
       start: 60000,
       end: 80000,
     },
-    // Age-related allowances (LEGACY - frozen since 2016, only for those born before 6 April 1938)
-    ageAllowance65to74: 3660,
-    ageAllowance75plus: 3960,
-    ageAllowanceTaperThreshold: 34600,
     nationalInsurance: {
       employee: {
         A: {
@@ -679,10 +660,6 @@ export const SCOTTISH_TAX_RATES: Record<
     bands: TaxBand[];
     marriageAllowance: number;
     blindPersonsAllowance: number;
-    // Age-related allowances (LEGACY - frozen since 2016, applies only to those born before 6 April 1938)
-    ageAllowance65to74: number;
-    ageAllowance75plus: number;
-    ageAllowanceTaperThreshold: number;
   }
 > = {
   '2026-2027': {
@@ -699,9 +676,6 @@ export const SCOTTISH_TAX_RATES: Record<
     ],
     marriageAllowance: 1260,
     blindPersonsAllowance: 3250,
-    ageAllowance65to74: 3660,
-    ageAllowance75plus: 3960,
-    ageAllowanceTaperThreshold: 34600,
   },
   '2023-2024': {
     personalAllowance: 12570,
@@ -720,9 +694,6 @@ export const SCOTTISH_TAX_RATES: Record<
     ],
     marriageAllowance: 1260,
     blindPersonsAllowance: 2870,
-    ageAllowance65to74: 3660,
-    ageAllowance75plus: 3960,
-    ageAllowanceTaperThreshold: 34600,
   },
   '2024-2025': {
     personalAllowance: 12570,
@@ -742,9 +713,6 @@ export const SCOTTISH_TAX_RATES: Record<
     ],
     marriageAllowance: 1260,
     blindPersonsAllowance: 3070,
-    ageAllowance65to74: 3660,
-    ageAllowance75plus: 3960,
-    ageAllowanceTaperThreshold: 34600,
   },
   '2025-2026': {
     personalAllowance: 12570,
@@ -764,9 +732,6 @@ export const SCOTTISH_TAX_RATES: Record<
     ],
     marriageAllowance: 1260,
     blindPersonsAllowance: 3130, // Updated from £3,070 for 2025-2026
-    ageAllowance65to74: 3660,
-    ageAllowance75plus: 3960,
-    ageAllowanceTaperThreshold: 34600,
   },
 };
 

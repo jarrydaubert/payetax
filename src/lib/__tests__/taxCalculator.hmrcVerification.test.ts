@@ -314,48 +314,45 @@ describe('HMRC Rate Verification & Edge Cases', () => {
     });
   });
 
-  describe('Age Allowance with High Income', () => {
-    it('Age 67, £34,600 - full age allowance', () => {
+  describe('Age never changes the Personal Allowance (abolished 2016-17)', () => {
+    it('Age 67, £34,600 - standard Personal Allowance', () => {
       const result = calculateTax(
         createInput({
           salary: 34600,
           age: 67,
         }),
       );
-      expect(result.taxFreeAmount).toBe(12570 + 3660);
+      expect(result.taxFreeAmount).toBe(12570);
     });
 
-    it('Age 67, £41,920 - age allowance fully tapered', () => {
+    it('Age 67, £41,920 - standard Personal Allowance', () => {
       const result = calculateTax(
         createInput({
           salary: 41920,
           age: 67,
         }),
       );
-      // (£41,920 - £34,600) ÷ 2 = £3,660 reduction
       expect(result.taxFreeAmount).toBe(12570);
     });
 
-    it('Age 75, £42,520 - age allowance fully tapered', () => {
+    it('Age 75, £42,520 - standard Personal Allowance (no 75+ uplift)', () => {
       const result = calculateTax(
         createInput({
           salary: 42520,
           age: 75,
         }),
       );
-      // (£42,520 - £34,600) ÷ 2 = £3,960 reduction
       expect(result.taxFreeAmount).toBe(12570);
     });
 
-    it('Age 67, £110,000 - both allowances reduced', () => {
+    it('Age 67, £110,000 - only the £100k taper applies', () => {
       const result = calculateTax(
         createInput({
           salary: 110000,
           age: 67,
         }),
       );
-      // Age allowance: fully tapered (income > £41,920)
-      // PA reduction: (£110,000 - £100,000) ÷ 2 = £5,000
+      // PA reduction: (£110,000 - £100,000) ÷ 2 = £5,000; age adds nothing
       expect(result.taxFreeAmount).toBe(12570 - 5000);
     });
   });
@@ -374,7 +371,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       expect(result.taxFreeAmount).toBe(16960);
     });
 
-    it('Age + Marriage + Blind allowances', () => {
+    it('Age 67 + Marriage + Blind allowances (age adds nothing)', () => {
       const result = calculateTax(
         createInput({
           salary: 30000,
@@ -384,11 +381,12 @@ describe('HMRC Rate Verification & Edge Cases', () => {
           isBlind: true,
         }),
       );
-      // £12,570 + £3,660 + £1,260 + £3,130 = £20,620 (2025-26 blind allowance)
-      expect(result.taxFreeAmount).toBe(20620);
+      // £12,570 + £1,260 + £3,130 = £16,960 (2025-26 blind allowance);
+      // age-related allowances were abolished from 2016-17.
+      expect(result.taxFreeAmount).toBe(16960);
     });
 
-    it('Age 75 + all allowances + pension contribution', () => {
+    it('Age 75 + all allowances + pension contribution (age adds nothing)', () => {
       const result = calculateTax(
         createInput({
           salary: 35000,
@@ -400,9 +398,8 @@ describe('HMRC Rate Verification & Edge Cases', () => {
           pensionContributionType: 'percentage',
         }),
       );
-      // Allowances: £12,570 + £3,960 + £1,260 + £3,070 = £20,860
-      // Income partially tapered but complex calculation
-      expect(result.taxFreeAmount).toBeLessThanOrEqual(20860);
+      // Allowances: £12,570 + £1,260 + £3,130 = £16,960 (2025-26 blind allowance)
+      expect(result.taxFreeAmount).toBe(16960);
       expect(result.pensionContribution.annually).toBe(3500);
     });
   });

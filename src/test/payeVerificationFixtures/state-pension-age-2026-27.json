@@ -1,0 +1,163 @@
+{
+  "suite": "State Pension age: NI exemption without any age-related allowance",
+  "source": {
+    "authority": "HMRC / UK Parliament",
+    "urls": [
+      "https://commonslibrary.parliament.uk/research-briefings/sn06158/",
+      "https://www.gov.uk/income-tax-rates",
+      "https://www.gov.uk/national-insurance-when-you-reach-state-pension-age",
+      "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027"
+    ],
+    "taxYear": "2026-2027",
+    "verifiedOn": "2026-07-18"
+  },
+  "tolerancePence": 2,
+  "scenarios": [
+    {
+      "id": "spa-20k-age67",
+      "description": "£20,000 at age 67 (the UI's over-SPA choice). Employee NI is exempt, but the Personal Allowance stays at the standard £12,570 — age-related allowances were abolished from 2016-17 (Finance Act 2015). Tax: taxable floor(1666.67-1048)=618 at 20% = £123.60/mo (£1,483.20/yr).",
+      "input": {
+        "salary": 20000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "age": 67,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 12570,
+        "incomeTaxAnnual": 1483.2,
+        "nationalInsuranceAnnual": 0
+      },
+      "invariants": [
+        "employee-ni-is-zero",
+        "employer-ni-is-positive",
+        "tax-free-amount-is-standard-personal-allowance"
+      ]
+    },
+    {
+      "id": "spa-20k-age78",
+      "description": "£20,000 at age 78. Identical income tax to any other adult — no 75+ allowance exists in any supported tax year.",
+      "input": {
+        "salary": 20000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "age": 78,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 12570,
+        "incomeTaxAnnual": 1483.2,
+        "nationalInsuranceAnnual": 0
+      },
+      "invariants": [
+        "employee-ni-is-zero",
+        "employer-ni-is-positive",
+        "tax-free-amount-is-standard-personal-allowance"
+      ]
+    },
+    {
+      "id": "spa-20k-under-spa-baseline",
+      "description": "£20,000 with no age given. Same income tax as the over-SPA scenarios; NI 8% of (1666.67-1048) = £49.49/mo (£593.88/yr). Proves age only affects NI, never income tax.",
+      "input": {
+        "salary": 20000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 12570,
+        "incomeTaxAnnual": 1483.2,
+        "nationalInsuranceAnnual": 593.88
+      },
+      "invariants": ["tax-free-amount-is-standard-personal-allowance"]
+    },
+    {
+      "id": "spa-36k-age67",
+      "description": "£36,000 at age 67 — sits inside the abolished allowance's old £34,600 taper zone. Correct law: standard PA, taxable floor(3000-1048)=1952 at 20% = £390.40/mo (£4,684.80/yr). Guards against any taper artifact reappearing.",
+      "input": {
+        "salary": 36000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "age": 67,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 12570,
+        "incomeTaxAnnual": 4684.8,
+        "nationalInsuranceAnnual": 0
+      },
+      "invariants": [
+        "employee-ni-is-zero",
+        "employer-ni-is-positive",
+        "tax-free-amount-is-standard-personal-allowance"
+      ]
+    },
+    {
+      "id": "age65-25k-under-spa",
+      "description": "£25,000 at age 65 — under SPA, so full NI applies (8% of 1035.33 = £82.83/mo, £993.96/yr) and there is no 65-74 allowance. Tax: taxable floor(2083.33-1048)=1035 at 20% = £207/mo (£2,484/yr).",
+      "input": {
+        "salary": 25000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "age": 65,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 12570,
+        "incomeTaxAnnual": 2484.0,
+        "nationalInsuranceAnnual": 993.96
+      },
+      "invariants": ["tax-free-amount-is-standard-personal-allowance"]
+    }
+  ]
+}
