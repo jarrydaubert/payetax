@@ -52,7 +52,7 @@ import {
   setContext,
   startPerformanceTransaction,
 } from '@/lib/sentry';
-import { calculateTax } from '@/lib/taxCalculator';
+import { calculateTax, isTaxCodeEditCandidate, normalizeTaxCode } from '@/lib/tax';
 import {
   INCOME_SOURCE_TYPES,
   INCOME_TYPE_LABELS,
@@ -106,11 +106,6 @@ const TAX_YEAR_INPUT_SCHEMA = z
 const PAY_PERIOD_VALUES = Object.values(PERIODS) as [PayPeriod, ...PayPeriod[]];
 const STUDENT_LOAN_PLAN_VALUES = ['plan1', 'plan2', 'plan4', 'plan5', 'postgrad'] as const;
 const TAX_REGION_VALUES = ['England', 'Scotland', 'Wales', 'Northern Ireland'] as const;
-// SD2/SD3 (Scottish advanced/top flat rates) are only valid with the S prefix,
-// so the S-prefixed branch admits D[0-3] while the general branch stays D[01].
-const TAX_CODE_EDIT_PATTERN =
-  /^(?:[SC]?|SD[0-3]?(?:W1?|M1?|X)?|[SC]?(?:K\d*|BR?|D[01]?|NT?|0T?|\d+[LMNPTX]?)(?:W1?|M1?|X)?)$/;
-
 const SALARY_INPUT_SCHEMA = z
   .number()
   .min(0, 'Salary must be positive')
@@ -118,14 +113,6 @@ const SALARY_INPUT_SCHEMA = z
   .finite('Salary must be a valid number');
 
 const PAY_PERIOD_INPUT_SCHEMA = z.enum(PAY_PERIOD_VALUES);
-
-const TAX_CODE_INPUT_SCHEMA = z
-  .string()
-  .min(1)
-  .transform((val) => val.trim().replace(/\s+/g, '').toUpperCase())
-  .refine((code) => TAX_CODE_EDIT_PATTERN.test(code), {
-    message: 'Invalid tax code format (e.g., 1257L, BR, S1257L, K100)',
-  });
 
 const REGION_INPUT_SCHEMA = z.enum(TAX_REGION_VALUES);
 
@@ -618,19 +605,15 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          const validated = TAX_CODE_INPUT_SCHEMA.safeParse(taxCode);
-
-          if (!validated.success) {
+          const normalizedTaxCode = normalizeTaxCode(taxCode, 'edit');
+          if (!isTaxCodeEditCandidate(normalizedTaxCode)) {
             // Invalid tax code - just log and don't update state
             // This is expected user behavior, not an error
-            logCalculatorWarning(
-              '[Calculator] Invalid tax code:',
-              validated.error.issues[0]?.message ?? 'Validation failed',
-            );
+            logCalculatorWarning('[Calculator] Invalid tax code:', normalizedTaxCode);
             return;
           }
 
-          set((state) => ({ input: { ...state.input, taxCode: validated.data } }));
+          set((state) => ({ input: { ...state.input, taxCode: normalizedTaxCode } }));
         },
         setRegion: (region) => {
           const validated = REGION_INPUT_SCHEMA.safeParse(region);

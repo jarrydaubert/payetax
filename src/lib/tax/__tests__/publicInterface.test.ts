@@ -13,6 +13,11 @@ describe('tax-domain public interface', () => {
       'decodeTaxCode',
       'formatAllowance',
       'formatTaxYearDisplay',
+      'hasEmergencyTaxCodeSuffix',
+      'isTaxCodeEditCandidate',
+      'isValidTaxCode',
+      'normalizeTaxCode',
+      'parseTaxCode',
       'sliceScottishTaxableIncome',
       'taxableThresholdToTotalIncome',
     ]);

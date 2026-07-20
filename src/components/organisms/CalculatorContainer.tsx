@@ -18,6 +18,7 @@ import { ANIMATION_TRANSITIONS, ANIMATION_VARIANTS } from '@/constants/animation
 import { BREAKPOINTS, TIMERS } from '@/constants/ui';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { trackEvent } from '@/lib/analytics';
+import { hasEmergencyTaxCodeSuffix } from '@/lib/tax';
 import { cn } from '@/lib/utils';
 import type { PayeEmailInput } from '@/lib/validation/emailValidation';
 import { useShallow } from '@/lib/zustandShallow';
@@ -127,7 +128,7 @@ export function CalculatorContainer() {
       calculatePreviousYear();
     });
 
-    if (/\s*(W1|M1|X)$/i.test(input.taxCode)) {
+    if (hasEmergencyTaxCodeSuffix(input.taxCode)) {
       setActionMessage({
         tone: 'info',
         text: 'Emergency tax code detected. W1, M1, and X codes are non-cumulative and may differ from your final annual tax position.',

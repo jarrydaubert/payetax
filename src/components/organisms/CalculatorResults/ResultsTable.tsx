@@ -36,6 +36,7 @@ import {
   type ResultsTableRowViewModel,
 } from '@/lib/calculatorResultsPresenter';
 import { calculateOptimalPension } from '@/lib/pensionOptimizer';
+import { parseTaxCode } from '@/lib/tax';
 import type { TaxCalculationResults } from '@/lib/types/calculator';
 import { cn } from '@/lib/utils';
 
@@ -142,8 +143,10 @@ export function ResultsTable({
     if (!isMarried) return false;
     if (partnerGrossWage == null) return false;
 
-    // Check if user already has M code (already claiming)
-    const hasMarriageCode = taxCode.toUpperCase().includes('M');
+    // Preserve the existing M/M1 UI gate while deriving both markers from the
+    // shared grammar instead of reinterpreting the raw code locally.
+    const parsedTaxCode = parseTaxCode(taxCode, 0);
+    const hasMarriageCode = parsedTaxCode.letter === 'M' || parsedTaxCode.suffix === 'M1';
     if (hasMarriageCode) return false;
 
     // Get tax constants for the current year

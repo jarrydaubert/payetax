@@ -167,7 +167,6 @@ function isApplicationSource(path: string): boolean {
   if (path.startsWith('src/lib/tax/')) return false;
   if (path === 'src/constants/taxRates.ts') return false;
   if (path === 'src/lib/taxCalculator.ts') return false;
-  if (path === 'src/lib/taxCodeDecoder.ts') return false;
   if (path === 'scripts/tax-domain-controls.ts') return false;
   return true;
 }

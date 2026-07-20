@@ -42,11 +42,6 @@ const BASELINE_ENTRIES = [
     '@/constants/taxRates',
     ['CURRENT_TAX_YEAR', 'TAX_RATES', 'type:NICategory'],
   ],
-  [
-    'src/app/tools/tax-code-decoder/TaxCodeDecoderClient.tsx',
-    '@/lib/taxCodeDecoder',
-    ['decodeTaxCode', 'formatAllowance', 'type:TaxCodeDecoded'],
-  ],
   ['src/components/atoms/TaxYearSelect.tsx', '@/constants/taxRates', ['TAX_YEARS', 'type:TaxYear']],
   [
     'src/components/molecules/DirectorGuide/calculator/PensionGapWarning.tsx',
@@ -260,7 +255,6 @@ const BASELINE_ENTRIES = [
     '@/constants/taxRates',
     ['PERIODS', 'type:NICategory', 'type:PayPeriod', 'type:StudentLoanSelection', 'type:TaxYear'],
   ],
-  ['src/lib/validation.ts', '@/constants/taxRates', ['PERIODS', 'TAX_YEARS', 'type:PayPeriod']],
   ['src/lib/validation/atomsValidation.ts', '@/constants/taxRates', ['TAX_YEARS']],
   [
     'src/lib/validation/directorValidation.ts',
@@ -287,7 +281,6 @@ const BASELINE_ENTRIES = [
       'type:TaxYear',
     ],
   ],
-  ['src/store/calculatorStore.ts', '@/lib/taxCalculator', ['calculateTax']],
   ['src/store/directorGuideStore.ts', '@/constants/taxRates', ['type:StudentLoanPlan']],
   [
     'src/store/directorGuideStore.ts',

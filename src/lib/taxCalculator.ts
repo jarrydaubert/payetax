@@ -48,7 +48,6 @@ import {
   type PayPeriod,
   PERIOD_CONVERSION_FACTORS,
   PERIODS,
-  SCOTTISH_PREFIX,
   SCOTTISH_TAX_RATES,
   type StudentLoanSelection,
   TAX_RATES,
@@ -58,6 +57,7 @@ import {
 import type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
 import { convertPeriodToAnnual } from './periodCalculator';
 import { sliceScottishTaxableIncome } from './tax/scottishIncomeTax';
+import { parseTaxCode } from './tax/taxCode';
 import { roundToPence } from './tax/utils';
 
 export type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
@@ -110,126 +110,6 @@ function resolveSupportedTaxYear(taxYear: string | undefined): TaxYear {
 // HELPER FUNCTIONS - Extracted for maintainability
 // Exported for testing. Used by calculateTax() for consistent behavior.
 // ============================================================================
-
-/**
- * Result of parsing a UK HMRC tax code.
- *
- * Tax codes control how much tax-free allowance an employee receives.
- * Special codes override normal progressive band calculations.
- *
- * @see https://www.gov.uk/tax-codes
- */
-export interface TaxCodeParseResult {
-  /** Personal allowance amount. Negative for K-codes (adds to taxable income). */
-  allowance: number;
-  /**
-   * Special tax code that overrides normal band calculations.
-   * The flat rate applied depends on the regime (rUK vs Scottish):
-   * - 'BR': all income at the basic rate (rUK 20% / Scottish basic 20%)
-   * - 'D0': rUK higher rate (40%) / Scottish intermediate rate (21%)
-   * - 'D1': rUK additional rate (45%) / Scottish higher rate (42%)
-   * - 'D2': Scottish advanced rate only (45%) — no rUK equivalent
-   * - 'D3': Scottish top rate only (48%) — no rUK equivalent
-   * - 'NT': No tax deducted
-   * - null: Use normal progressive bands
-   */
-  bandOverride: 'BR' | 'D0' | 'D1' | 'D2' | 'D3' | 'NT' | null;
-  /** Whether this is a K-code (benefits/underpayment exceed allowance) */
-  isKCode: boolean;
-  /** Whether W1/M1/X suffix present (non-cumulative/emergency basis) */
-  isEmergency: boolean;
-}
-
-/**
- * Parse UK HMRC tax code into its components.
- *
- * Handles all standard HMRC tax code formats:
- * - Standard codes: 1257L, 1100T, 1000M (number × 10 = allowance)
- * - Scottish/Welsh prefixes: S1257L, C1257L (same calculation, different rates)
- * - K-codes: K100, SK500 (NEGATIVE allowance - adds to taxable income)
- * - Special codes: BR, D0, D1, NT, 0T (override normal band logic)
- * - Emergency suffixes: W1, M1, X (non-cumulative basis - not modeled here)
- *
- * @param taxCode - The HMRC tax code string (e.g., "1257L", "K100", "BR")
- * @param defaultAllowance - Fallback allowance if code cannot be parsed
- * @returns Parsed tax code components for use in calculations
- *
- * @example
- * parseTaxCode("1257L", 12570) // { allowance: 12570, bandOverride: null, isKCode: false }
- * parseTaxCode("K100", 12570)  // { allowance: -1000, bandOverride: null, isKCode: true }
- * parseTaxCode("BR", 12570)    // { allowance: 0, bandOverride: 'BR', isKCode: false }
- */
-export function parseTaxCode(taxCode: string, defaultAllowance: number): TaxCodeParseResult {
-  const result: TaxCodeParseResult = {
-    allowance: defaultAllowance,
-    bandOverride: null,
-    isKCode: false,
-    isEmergency: false,
-  };
-
-  if (!taxCode?.trim()) return result;
-
-  const code = taxCode.toUpperCase().trim();
-
-  // Check for emergency/non-cumulative suffixes (W1, M1, X)
-  // These indicate HMRC doesn't have full year info - each period calculated independently
-  // Note: We flag but don't model non-cumulative basis (would need period-by-period tracking)
-  result.isEmergency = /[WM]1$|X$/.test(code);
-  const codeWithoutEmergency = code.replace(/[WM]1$|X$/, '');
-
-  // Remove Scottish (S) or Welsh (C) prefix - affects which tax rates to use, not allowance
-  const hasScottishPrefix = codeWithoutEmergency.startsWith('S');
-  const codeWithoutPrefix = codeWithoutEmergency.replace(/^[SC]/, '');
-
-  // Handle special codes that override normal band calculations
-  // These codes mean ALL income is taxed at a specific rate (no allowance)
-  if (codeWithoutPrefix === 'BR') {
-    return { ...result, allowance: 0, bandOverride: 'BR' };
-  }
-  if (codeWithoutPrefix === 'D0') {
-    return { ...result, allowance: 0, bandOverride: 'D0' };
-  }
-  if (codeWithoutPrefix === 'D1') {
-    return { ...result, allowance: 0, bandOverride: 'D1' };
-  }
-  // SD2/SD3 exist only in the Scottish regime (advanced and top rate codes).
-  // A bare D2/D3 is not an HMRC code, so it falls through to the default allowance.
-  if ((codeWithoutPrefix === 'D2' || codeWithoutPrefix === 'D3') && hasScottishPrefix) {
-    return { ...result, allowance: 0, bandOverride: codeWithoutPrefix };
-  }
-  if (codeWithoutPrefix === 'NT') {
-    return { ...result, allowance: 0, bandOverride: 'NT' };
-  }
-  // 0T = zero allowance but normal progressive bands (often used when HMRC reviewing)
-  if (codeWithoutPrefix === '0T') {
-    return { ...result, allowance: 0 };
-  }
-
-  // Handle K-codes: Kxxx means NEGATIVE allowance (adds to taxable income)
-  // Used when benefits-in-kind or previous underpayments exceed personal allowance
-  // Example: K100 means add £1,000 to taxable income
-  if (codeWithoutPrefix.startsWith('K')) {
-    const numericPart = Number.parseInt(codeWithoutPrefix.substring(1), 10);
-    if (!Number.isNaN(numericPart)) {
-      return { ...result, allowance: -(numericPart * 10), isKCode: true };
-    }
-    // Invalid K-code format - fall through to default
-  }
-
-  // Standard tax codes: number followed by optional letter (L, M, N, T, etc.)
-  // The number × 10 = annual tax-free allowance
-  // Example: 1257L = £12,570 allowance (the standard personal allowance)
-  const standardMatch = codeWithoutPrefix.match(/^(\d+)[LMNTKX]?$/);
-  if (standardMatch?.[1]) {
-    const numericPart = Number.parseInt(standardMatch[1], 10);
-    if (!Number.isNaN(numericPart)) {
-      return { ...result, allowance: numericPart * 10 };
-    }
-  }
-
-  // Unrecognized format - return default allowance
-  return result;
-}
 
 /**
  * Calculate high income personal allowance reduction (HMRC "60% Tax Trap")
@@ -651,17 +531,16 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
       ? input.taxCode
       : DEFAULT_TAX_CODE;
 
-  // Determine if using Scottish rates.
-  // Prefix precedence: Welsh C-prefix always uses rUK bands, Scottish S-prefix always uses Scottish bands.
-  const normalizedTaxCode = taxCodeInput.toUpperCase().trim();
-  const hasScottishPrefix = normalizedTaxCode.startsWith(SCOTTISH_PREFIX);
-  const hasWelshPrefix = normalizedTaxCode.startsWith('C');
-  const isScottish = hasWelshPrefix ? false : input.isScottish || hasScottishPrefix;
   const taxYear = resolveSupportedTaxYear(input.taxYear);
 
   // Get the tax rates for the selected year
   const standardRates = TAX_RATES[taxYear];
   const scottishRates = SCOTTISH_TAX_RATES[taxYear];
+
+  // Prefix classification belongs to the shared tax-code grammar. Welsh C-prefix
+  // takes precedence over a region toggle; Scottish S-prefix selects Scottish rates.
+  const taxCodeResult = parseTaxCode(taxCodeInput, standardRates.personalAllowance);
+  const isScottish = taxCodeResult.isWelsh ? false : input.isScottish || taxCodeResult.isScottish;
 
   // Choose appropriate tax rates based on whether the taxpayer is Scottish
   const taxRates = isScottish ? scottishRates : standardRates;
@@ -752,7 +631,6 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
 
   // Parse tax code using comprehensive parser that handles all HMRC code types
   // This correctly handles K-codes (negative allowance), BR/D0/D1/NT (band overrides), and emergency codes
-  const taxCodeResult = parseTaxCode(taxCodeInput, taxRates.personalAllowance);
   let annualTaxFreeAmount = taxCodeResult.allowance;
 
   // Store band override for use in tax calculation section
@@ -869,8 +747,8 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     if (taxCodeBandOverride) {
       const override = resolveBandOverride(
         taxCodeBandOverride,
-        hasScottishPrefix,
-        hasScottishPrefix ? scottishRates.bands : standardRates.bands,
+        taxCodeResult.isScottish,
+        taxCodeResult.isScottish ? scottishRates.bands : standardRates.bands,
       );
       monthlyTax = roundToPence((monthlyTaxableIncome * override.rate) / 100);
       taxBands.push({

@@ -7,7 +7,7 @@ import { useId, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { decodeTaxCode, formatAllowance, type TaxCodeDecoded } from '@/lib/taxCodeDecoder';
+import { decodeTaxCode, formatAllowance, normalizeTaxCode, type TaxCodeDecoded } from '@/lib/tax';
 import { cn } from '@/lib/utils';
 
 const EXAMPLE_CODES = ['1257L', 'BR', 'S1257L', 'K100', '1000M', 'D0', '0T', '1257L W1'];
@@ -20,7 +20,7 @@ export function TaxCodeDecoderClient() {
   const handleDecode = (codeToUse?: string) => {
     const inputCode = codeToUse || code;
     // Normalize: trim, collapse whitespace, uppercase
-    const normalized = inputCode.trim().replace(/\s+/g, ' ').toUpperCase();
+    const normalized = normalizeTaxCode(inputCode, 'display');
     if (!normalized) return;
     setCode(normalized);
     setResult(decodeTaxCode(normalized));

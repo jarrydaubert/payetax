@@ -11,6 +11,7 @@
  */
 
 import type { PayPeriod } from '@/constants/taxRates';
+import { decodeTaxCode } from '@/lib/tax';
 import {
   type FixtureInvariant,
   loadVerificationSuites,
@@ -18,7 +19,6 @@ import {
   type VerificationSuite,
 } from '@/test/payeVerification';
 import { calculateTax, type TaxCalculationResults } from '../taxCalculator';
-import { decodeTaxCode } from '../taxCodeDecoder';
 
 const suites: VerificationSuite[] = loadVerificationSuites();
 

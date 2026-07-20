@@ -12,7 +12,7 @@
  * - Invalid/edge cases
  */
 
-import { decodeTaxCode, formatAllowance } from '../taxCodeDecoder';
+import { decodeTaxCode, formatAllowance } from '@/lib/tax';
 
 describe('taxCodeDecoder', () => {
   describe('Standard Tax Codes', () => {

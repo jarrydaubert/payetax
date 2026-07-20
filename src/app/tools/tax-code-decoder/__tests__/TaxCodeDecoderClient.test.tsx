@@ -13,4 +13,15 @@ describe('TaxCodeDecoderClient', () => {
     expect(await screen.findByText('Standard personal allowance')).toBeInTheDocument();
     expect(screen.getByText('Personal Allowance')).toBeInTheDocument();
   });
+
+  it('decodes the displayed space-separated emergency example', async () => {
+    const user = userEvent.setup();
+
+    render(<TaxCodeDecoderClient />);
+
+    await user.click(screen.getByRole('button', { name: '1257L W1' }));
+
+    expect(await screen.findByText('Standard personal allowance')).toBeInTheDocument();
+    expect(screen.getByText('Emergency Code')).toBeInTheDocument();
+  });
 });
