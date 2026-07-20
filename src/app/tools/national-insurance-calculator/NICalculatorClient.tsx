@@ -8,11 +8,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
-import { CURRENT_TAX_YEAR, type NICategory, TAX_RATES } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, getEmployeeNI, getEmployerNI, type NICategory } from '@/lib/tax';
 import { cn, formatCurrency } from '@/lib/utils';
 
 const TAX_YEAR = CURRENT_TAX_YEAR;
-const niRates = TAX_RATES[TAX_YEAR].nationalInsurance;
 
 const EXAMPLE_SALARIES = [25000, 35000, 50000, 70000, 100000];
 
@@ -26,34 +25,16 @@ const NI_CATEGORIES: { code: NICategory; description: string; common: boolean }[
   { code: 'Z', description: 'Under 21 with deferment', common: false },
 ];
 
+/**
+ * Annual NI for the tool, via the shared tax-domain mechanics.
+ *
+ * This tool presents whole-pound annual figures, so the pence-accurate shared
+ * results are rounded for display only.
+ */
 function calculateNI(salary: number, category: NICategory): { employee: number; employer: number } {
-  const employeeRates = niRates.employee[category];
-  const employerRates = niRates.employer[category];
-
-  // Employee NI
-  let employeeNI = 0;
-  const primaryThreshold = employeeRates.primary.threshold;
-  const upperThreshold = employeeRates.upper.threshold;
-
-  if (salary > primaryThreshold) {
-    const incomeInMainBand = Math.min(salary, upperThreshold) - primaryThreshold;
-    employeeNI += incomeInMainBand * (employeeRates.primary.rate / 100);
-  }
-  if (salary > upperThreshold) {
-    const incomeInUpperBand = salary - upperThreshold;
-    employeeNI += incomeInUpperBand * (employeeRates.upper.rate / 100);
-  }
-
-  // Employer NI
-  let employerNI = 0;
-  const secondaryThreshold = employerRates.secondary.threshold;
-  if (salary > secondaryThreshold) {
-    employerNI = (salary - secondaryThreshold) * (employerRates.secondary.rate / 100);
-  }
-
   return {
-    employee: Math.round(employeeNI),
-    employer: Math.round(employerNI),
+    employee: Math.round(getEmployeeNI(salary, TAX_YEAR, { niCategory: category })),
+    employer: Math.round(getEmployerNI(salary, TAX_YEAR, { niCategory: category })),
   };
 }
 

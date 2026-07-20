@@ -156,7 +156,11 @@ export const TAX_YEAR_SOURCES: Record<TaxYear, TaxYearLegislativeSources> = {
       scotlandBands: ['https://www.gov.scot/publications/scottish-income-tax-2023-2024/'],
     },
     nationalInsurance: {
-      employeeAndEmployerClass1: ['https://www.gov.uk/national-insurance-rates-letters'],
+      employeeAndEmployerClass1: [
+        'https://www.gov.uk/national-insurance-rates-letters',
+        'https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2023-to-2024',
+        'https://www.gov.uk/hmrc-internal-manuals/national-insurance-manual/nim01625',
+      ],
       employmentAllowanceAndClass1A: [
         'https://www.gov.uk/claim-employment-allowance',
         'https://www.gov.uk/government/publications/rates-and-allowances-national-insurance-contributions/rates-and-allowances-national-insurance-contributions',
@@ -168,9 +172,11 @@ export const TAX_YEAR_SOURCES: Record<TaxYear, TaxYearLegislativeSources> = {
     studentLoan: {
       plansAndThresholds: ['https://www.gov.uk/repaying-your-student-loan/what-you-pay'],
     },
-    verifiedOn: '2026-02-19',
+    verifiedOn: '2026-07-20',
     notes: [
       'Use HMRC/GOV.UK published 2023-24 rates and thresholds when amending historical values.',
+      'The main primary percentage was cut from 12% to 10% for earnings paid on or after 6 January 2024, and the reduced rate from 5.85% to 3.85%. Payroll periods take the rate in force on the pay date; the annual earnings period (directors) takes HMRC published blended rates of 11.5% and 5.35%. These are two separate statutory bases and do not reconcile to the same figure.',
+      'The additional (upper) rate, employer secondary rate, Class 1A and Class 1B rates were unchanged mid-year.',
     ],
   },
   '2024-2025': {
@@ -181,7 +187,10 @@ export const TAX_YEAR_SOURCES: Record<TaxYear, TaxYearLegislativeSources> = {
       ],
     },
     nationalInsurance: {
-      employeeAndEmployerClass1: ['https://www.gov.uk/national-insurance-rates-letters'],
+      employeeAndEmployerClass1: [
+        'https://www.gov.uk/national-insurance-rates-letters',
+        'https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2024-to-2025',
+      ],
       employmentAllowanceAndClass1A: [
         'https://www.gov.uk/claim-employment-allowance',
         'https://www.gov.uk/government/publications/rates-and-allowances-national-insurance-contributions/rates-and-allowances-national-insurance-contributions',
@@ -193,7 +202,10 @@ export const TAX_YEAR_SOURCES: Record<TaxYear, TaxYearLegislativeSources> = {
     studentLoan: {
       plansAndThresholds: ['https://www.gov.uk/repaying-your-student-loan/what-you-pay'],
     },
-    verifiedOn: '2026-02-19',
+    verifiedOn: '2026-07-20',
+    notes: [
+      "Class 1 NI re-verified against the published employer tables. The married women's/widows' reduced rate (category B) was corrected to 1.85%; it had been recorded as 5%.",
+    ],
   },
   '2025-2026': {
     incomeTax: {
@@ -201,7 +213,10 @@ export const TAX_YEAR_SOURCES: Record<TaxYear, TaxYearLegislativeSources> = {
       scotlandBands: ['https://www.mygov.scot/scottish-income-tax/current-income-tax-rates'],
     },
     nationalInsurance: {
-      employeeAndEmployerClass1: ['https://www.gov.uk/national-insurance-rates-letters'],
+      employeeAndEmployerClass1: [
+        'https://www.gov.uk/national-insurance-rates-letters',
+        'https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2025-to-2026',
+      ],
       employmentAllowanceAndClass1A: [
         'https://www.gov.uk/claim-employment-allowance',
         'https://www.gov.uk/government/publications/rates-and-allowances-national-insurance-contributions/rates-and-allowances-national-insurance-contributions',
@@ -213,9 +228,10 @@ export const TAX_YEAR_SOURCES: Record<TaxYear, TaxYearLegislativeSources> = {
     studentLoan: {
       plansAndThresholds: ['https://www.gov.uk/repaying-your-student-loan/what-you-pay'],
     },
-    verifiedOn: '2026-02-19',
+    verifiedOn: '2026-07-20',
     notes: [
       'Employer NI secondary threshold/rate and Employment Allowance updates are from Autumn Budget 2024 implementation for 2025-26.',
+      "Class 1 NI re-verified against the published employer tables. The married women's/widows' reduced rate (category B) was corrected to 1.85%; it had been recorded as 5%.",
     ],
   },
 };
@@ -280,14 +296,41 @@ export const TAX_RATES: Record<
       employee: Record<
         NICategory,
         {
+          /**
+           * `rate` is the primary percentage in force on 6 April of the tax year.
+           * Where a rate changed mid-year, `primaryRateChanges` carries the later
+           * values and `primary.rate` stays the opening rate.
+           */
           primary: { threshold: number; rate: number };
           upper: { threshold: number; rate: number };
+          /**
+           * Effective-dated primary rate changes within the tax year, ascending by
+           * date. Present only where HMRC changed the rate mid-year. Payroll (pay
+           * period) calculations select a rate by pay date; they never average.
+           */
+          primaryRateChanges?: readonly { effectiveFrom: string; rate: number }[];
+          /**
+           * HMRC's published blended primary rate for the annual earnings period
+           * (directors). Present only alongside `primaryRateChanges`. This is a
+           * published statutory figure, not a value derived from the changes above.
+           */
+          directorsPrimaryRate?: number;
         }
       >;
       employer: Record<
         NICategory,
         {
-          secondary: { threshold: number; rate: number };
+          /**
+           * `threshold` is the annual secondary threshold. `weeklyThreshold` and
+           * `monthlyThreshold` are HMRC's published period figures, which are not
+           * the annual value divided by 52 or 12.
+           */
+          secondary: {
+            threshold: number;
+            rate: number;
+            weeklyThreshold: number;
+            monthlyThreshold: number;
+          };
         }
       >;
       employmentAllowance: number; // Annual EA that can offset employer NI
@@ -352,26 +395,30 @@ export const TAX_RATES: Record<
         },
       },
       employer: {
+        // Secondary Threshold: £96/week, £417/month, £5,000/year
         A: {
-          secondary: { threshold: 5000, rate: 15 },
+          secondary: { threshold: 5000, rate: 15, weeklyThreshold: 96, monthlyThreshold: 417 },
         },
         B: {
-          secondary: { threshold: 5000, rate: 15 },
+          secondary: { threshold: 5000, rate: 15, weeklyThreshold: 96, monthlyThreshold: 417 },
         },
         C: {
-          secondary: { threshold: 5000, rate: 15 },
+          secondary: { threshold: 5000, rate: 15, weeklyThreshold: 96, monthlyThreshold: 417 },
         },
         H: {
-          secondary: { threshold: 50270, rate: 15 },
+          // Apprentice under 25: 0% up to Apprentice Upper Secondary Threshold
+          secondary: { threshold: 50270, rate: 15, weeklyThreshold: 967, monthlyThreshold: 4189 },
         },
         J: {
-          secondary: { threshold: 5000, rate: 15 },
+          secondary: { threshold: 5000, rate: 15, weeklyThreshold: 96, monthlyThreshold: 417 },
         },
         M: {
-          secondary: { threshold: 50270, rate: 15 },
+          // Under 21: 0% up to Upper Secondary Threshold
+          secondary: { threshold: 50270, rate: 15, weeklyThreshold: 967, monthlyThreshold: 4189 },
         },
         Z: {
-          secondary: { threshold: 50270, rate: 15 },
+          // Under 21 with deferment: same employer UST as category M
+          secondary: { threshold: 50270, rate: 15, weeklyThreshold: 967, monthlyThreshold: 4189 },
         },
       },
       employmentAllowance: 10500,
@@ -404,59 +451,78 @@ export const TAX_RATES: Record<
       end: 60000,
     },
     nationalInsurance: {
+      // The main primary percentage was cut from 6 January 2024 (Autumn Statement 2023).
+      // `primary.rate` is the opening rate; `primaryRateChanges` carries the cut, and
+      // `directorsPrimaryRate` is HMRC's published annual earnings-period (blended) rate.
+      // The additional (upper) rate and every employer rate were unchanged.
       employee: {
         A: {
           primary: { threshold: 12570, rate: 12 },
           upper: { threshold: 50270, rate: 2 },
+          primaryRateChanges: [{ effectiveFrom: '2024-01-06', rate: 10 }],
+          directorsPrimaryRate: 11.5,
         },
         B: {
+          // Married women's/widows' reduced rate: 5.85% then 3.85%, blended 5.35%
           primary: { threshold: 12570, rate: 5.85 },
           upper: { threshold: 50270, rate: 2 },
+          primaryRateChanges: [{ effectiveFrom: '2024-01-06', rate: 3.85 }],
+          directorsPrimaryRate: 5.35,
         },
         C: {
+          // Over State Pension age: no employee contributions, so nothing changed
           primary: { threshold: 12570, rate: 0 },
           upper: { threshold: 50270, rate: 0 },
         },
         H: {
           primary: { threshold: 12570, rate: 12 },
           upper: { threshold: 50270, rate: 2 },
+          primaryRateChanges: [{ effectiveFrom: '2024-01-06', rate: 10 }],
+          directorsPrimaryRate: 11.5,
         },
         J: {
+          // Deferment: charged at the additional rate throughout, so unchanged
           primary: { threshold: 12570, rate: 2 },
           upper: { threshold: 50270, rate: 2 },
         },
         M: {
           primary: { threshold: 12570, rate: 12 },
           upper: { threshold: 50270, rate: 2 },
+          primaryRateChanges: [{ effectiveFrom: '2024-01-06', rate: 10 }],
+          directorsPrimaryRate: 11.5,
         },
         Z: {
+          // Deferment: charged at the additional rate throughout, so unchanged
           primary: { threshold: 12570, rate: 2 },
           upper: { threshold: 50270, rate: 2 },
         },
       },
       employer: {
+        // Secondary Threshold: £175/week, £758/month, £9,100/year.
+        // The employer secondary rate did not change mid-year in 2023-24.
         A: {
-          secondary: { threshold: 9100, rate: 13.8 },
+          secondary: { threshold: 9100, rate: 13.8, weeklyThreshold: 175, monthlyThreshold: 758 },
         },
         B: {
-          secondary: { threshold: 9100, rate: 13.8 },
+          secondary: { threshold: 9100, rate: 13.8, weeklyThreshold: 175, monthlyThreshold: 758 },
         },
         C: {
-          secondary: { threshold: 9100, rate: 13.8 },
+          secondary: { threshold: 9100, rate: 13.8, weeklyThreshold: 175, monthlyThreshold: 758 },
         },
         H: {
-          // Apprentice under 25: 0% up to Upper Secondary Threshold (UST), then normal rate
-          secondary: { threshold: 50270, rate: 13.8 }, // UST = £50,270
+          // Apprentice under 25: 0% up to Apprentice Upper Secondary Threshold
+          secondary: { threshold: 50270, rate: 13.8, weeklyThreshold: 967, monthlyThreshold: 4189 },
         },
         J: {
-          secondary: { threshold: 9100, rate: 13.8 },
+          secondary: { threshold: 9100, rate: 13.8, weeklyThreshold: 175, monthlyThreshold: 758 },
         },
         M: {
-          // Under 21: 0% up to Upper Secondary Threshold (UST), then normal rate
-          secondary: { threshold: 50270, rate: 13.8 }, // UST = £50,270
+          // Under 21: 0% up to Upper Secondary Threshold
+          secondary: { threshold: 50270, rate: 13.8, weeklyThreshold: 967, monthlyThreshold: 4189 },
         },
         Z: {
-          secondary: { threshold: 9100, rate: 13.8 },
+          // Under 21 with deferment: same employer UST as category M
+          secondary: { threshold: 50270, rate: 13.8, weeklyThreshold: 967, monthlyThreshold: 4189 },
         },
       },
       employmentAllowance: 5000, // £5,000 for 2023-24
@@ -499,7 +565,9 @@ export const TAX_RATES: Record<
           upper: { threshold: 50270, rate: 2 },
         },
         B: {
-          primary: { threshold: 12570, rate: 5 }, // Reduced from 5.85% to 5%
+          // Married women's/widows' reduced rate tracks the main rate's cuts:
+          // 5.85% -> 3.85% (6 Jan 2024) -> 1.85% (6 Apr 2024)
+          primary: { threshold: 12570, rate: 1.85 },
           upper: { threshold: 50270, rate: 2 },
         },
         C: {
@@ -524,28 +592,30 @@ export const TAX_RATES: Record<
         },
       },
       employer: {
+        // Secondary Threshold: £175/week, £758/month, £9,100/year
         A: {
-          secondary: { threshold: 9100, rate: 13.8 },
+          secondary: { threshold: 9100, rate: 13.8, weeklyThreshold: 175, monthlyThreshold: 758 },
         },
         B: {
-          secondary: { threshold: 9100, rate: 13.8 },
+          secondary: { threshold: 9100, rate: 13.8, weeklyThreshold: 175, monthlyThreshold: 758 },
         },
         C: {
-          secondary: { threshold: 9100, rate: 13.8 },
+          secondary: { threshold: 9100, rate: 13.8, weeklyThreshold: 175, monthlyThreshold: 758 },
         },
         H: {
-          // Apprentice under 25: 0% up to Upper Secondary Threshold (UST), then normal rate
-          secondary: { threshold: 50270, rate: 13.8 }, // UST = £50,270
+          // Apprentice under 25: 0% up to Apprentice Upper Secondary Threshold
+          secondary: { threshold: 50270, rate: 13.8, weeklyThreshold: 967, monthlyThreshold: 4189 },
         },
         J: {
-          secondary: { threshold: 9100, rate: 13.8 },
+          secondary: { threshold: 9100, rate: 13.8, weeklyThreshold: 175, monthlyThreshold: 758 },
         },
         M: {
-          // Under 21: 0% up to Upper Secondary Threshold (UST), then normal rate
-          secondary: { threshold: 50270, rate: 13.8 }, // UST = £50,270
+          // Under 21: 0% up to Upper Secondary Threshold
+          secondary: { threshold: 50270, rate: 13.8, weeklyThreshold: 967, monthlyThreshold: 4189 },
         },
         Z: {
-          secondary: { threshold: 9100, rate: 13.8 },
+          // Under 21 with deferment: same employer UST as category M
+          secondary: { threshold: 50270, rate: 13.8, weeklyThreshold: 967, monthlyThreshold: 4189 },
         },
       },
       employmentAllowance: 5000, // £5,000 for 2024-25
@@ -584,7 +654,8 @@ export const TAX_RATES: Record<
           upper: { threshold: 50270, rate: 2 },
         },
         B: {
-          primary: { threshold: 12570, rate: 5 }, // Maintained at 5% for 2025-2026
+          // Married women's/widows' reduced rate, unchanged from 2024-25
+          primary: { threshold: 12570, rate: 1.85 },
           upper: { threshold: 50270, rate: 2 },
         },
         C: {
@@ -610,28 +681,30 @@ export const TAX_RATES: Record<
       },
       employer: {
         // Updated employer NI rates for 2025-2026 as per Autumn Budget 2024
+        // Secondary Threshold: £96/week, £417/month, £5,000/year
         A: {
-          secondary: { threshold: 5000, rate: 15 }, // Updated from £9,100/13.8% to £5,000/15%
+          secondary: { threshold: 5000, rate: 15, weeklyThreshold: 96, monthlyThreshold: 417 },
         },
         B: {
-          secondary: { threshold: 5000, rate: 15 }, // Updated from £9,100/13.8% to £5,000/15%
+          secondary: { threshold: 5000, rate: 15, weeklyThreshold: 96, monthlyThreshold: 417 },
         },
         C: {
-          secondary: { threshold: 5000, rate: 15 }, // Updated from £9,100/13.8% to £5,000/15%
+          secondary: { threshold: 5000, rate: 15, weeklyThreshold: 96, monthlyThreshold: 417 },
         },
         H: {
-          // Apprentice under 25: 0% up to Upper Secondary Threshold (UST), then normal rate
-          secondary: { threshold: 50270, rate: 15 }, // UST = £50,270
+          // Apprentice under 25: 0% up to Apprentice Upper Secondary Threshold
+          secondary: { threshold: 50270, rate: 15, weeklyThreshold: 967, monthlyThreshold: 4189 },
         },
         J: {
-          secondary: { threshold: 5000, rate: 15 }, // Updated from £9,100/13.8% to £5,000/15%
+          secondary: { threshold: 5000, rate: 15, weeklyThreshold: 96, monthlyThreshold: 417 },
         },
         M: {
-          // Under 21: 0% up to Upper Secondary Threshold (UST), then normal rate
-          secondary: { threshold: 50270, rate: 15 }, // UST = £50,270
+          // Under 21: 0% up to Upper Secondary Threshold
+          secondary: { threshold: 50270, rate: 15, weeklyThreshold: 967, monthlyThreshold: 4189 },
         },
         Z: {
-          secondary: { threshold: 5000, rate: 15 }, // Updated from £9,100/13.8% to £5,000/15%
+          // Under 21 with deferment: same employer UST as category M
+          secondary: { threshold: 50270, rate: 15, weeklyThreshold: 967, monthlyThreshold: 4189 },
         },
       },
       employmentAllowance: 10500, // Increased from £5,000 to £10,500 in Autumn Budget 2024

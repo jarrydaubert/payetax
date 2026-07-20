@@ -163,8 +163,10 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
             expect(result.nationalInsurance.annually).toBeCloseTo(1393.92, 2);
             break;
           case 'B':
-            // Married woman/widow: 5% on £12,570-£50,270
-            expect(result.nationalInsurance.annually).toBeCloseTo(871.2, 2);
+            // Married woman/widow reduced rate: 1.85% between the primary
+            // threshold and the upper earnings limit.
+            // £2,500/month - £1,048 = £1,452 x 1.85% = £26.86, x 12 = £322.32.
+            expect(result.nationalInsurance.annually).toBeCloseTo(322.32, 2);
             break;
           case 'C':
             // Over state pension age: 0%

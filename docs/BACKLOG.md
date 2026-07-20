@@ -8,7 +8,6 @@ Keep this file for active or parked future work only. Closed work belongs in Git
 
 ### Tax correctness and product semantics
 
-- 2023/24 employee NI mid-year change: the engine models a flat 12% year; the statutory year blended 12%/10% from 6 January 2024. Decide whether to model effective-dated rates or document the simplification everywhere 2023/24 output appears (fixtures already annotate it).
 - K-code overriding limit base: the 50% cap uses gross-minus-pension including non-employment income the engine also PAYE-taxes monthly. Decide the correct payment base for mixed-income users and add fixtures.
 - Pension method semantics: the engine treats every pension input as salary sacrifice (reduces NI). Add explicit salary-sacrifice / net-pay / relief-at-source handling or, at minimum, disclose the assumption at the input and in results.
 - Emergency codes W1/M1/X: parsed and flagged internally but silently computed cumulatively with no caveat in the main calculator results. Model the non-cumulative basis or disclose.
@@ -23,10 +22,10 @@ Keep this file for active or parked future work only. Closed work belongs in Git
 - Unambiguous annual-policy schema: unit- and basis-explicit fields (taxable vs total income, percent vs fraction, per-year vs per-week), effective-dated rates for mid-year changes.
 - One supported tax-domain public interface (`src/lib/tax/index.ts`); application code stops importing `constants/taxRates` and domain internals directly.
 - Consolidate income-tax band mechanics (currently 4 implementations plus 2 display interpreters).
-- Consolidate employee/employer NI mechanics (currently 4 implementations).
 - Consolidate student-loan mechanics (currently 3 implementations).
 - One tax-code grammar shared by engine, decoder, validation schema and store edit-gate (currently 4).
-- Remove shadow helpers that tests exercise but production never calls (`calculateNIContributions`, `calculateIncomeTaxFromBands`, `calculateStudentLoanRepayments`, `payrollPeriodDeductions` as production-adjacent code, `taxRateDescriptions`).
+- Remove shadow helpers that tests exercise but production never calls (`calculateIncomeTaxFromBands`, `calculateStudentLoanRepayments`, `payrollPeriodDeductions` as production-adjacent code, `taxRateDescriptions`).
+- NI pay-date basis: payroll rate selection derives a pay date from the tax period start, so a weekly or four-weekly period straddling a mid-year rate change takes the earlier rate. Accept a real pay date where callers have one.
 - Explicit ownership of pay-period conversion and rounding rules (factors, ceil/floor conventions, period scaling) in one place.
 - Generated projections as the only path for UI band tables, tools, `/api/tax-rates`, structured data and llms.txt facts (Dataset JSON-LD currently projects independently of `crawlableTaxFacts`).
 - Generated MDX tax facts: server components for band tables, threshold facts, worked examples, current-year labels, source links and last-verified dates; evergreen posts consume them, historical posts stay pinned to their stated year.

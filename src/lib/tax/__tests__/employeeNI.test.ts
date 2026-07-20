@@ -46,7 +46,16 @@ describe('Employee NI Calculator', () => {
     });
 
     it('uses year-specific NI rates', () => {
-      expect(calculateEmployeeNI(50270, '2023-2024').employeeNI).toBeCloseTo(4524, 2);
+      // 2023-24 uses HMRC's published blended rate for the annual earnings
+      // period, because the main primary rate was cut from 12% to 10% for
+      // earnings paid on or after 6 January 2024:
+      //   £50,270 - £12,570 = £37,700 x 11.5% = £4,335.50
+      // This module is the annual (directors) basis. The payroll basis charges
+      // each pay period at the rate in force on its pay date and gives a
+      // different figure; see nationalInsuranceVertical.test.ts.
+      // https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2023-to-2024
+      // https://www.gov.uk/hmrc-internal-manuals/national-insurance-manual/nim01625
+      expect(calculateEmployeeNI(50270, '2023-2024').employeeNI).toBeCloseTo(4335.5, 2);
       expect(calculateEmployeeNI(50270, '2024-2025').employeeNI).toBeCloseTo(3016, 2);
       expect(calculateEmployeeNI(50270, '2025-2026').employeeNI).toBeCloseTo(3016, 2);
     });

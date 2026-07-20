@@ -12,7 +12,7 @@
 import { AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
 import { useMemo } from 'react';
 import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario';
-import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, getEmployerNI, getEmployerNIRate, TAX_RATES } from '@/lib/tax';
 import { formatCurrency } from '@/lib/utils';
 
 const TAX_YEAR = CURRENT_TAX_YEAR;
@@ -26,18 +26,16 @@ export function PensionGapWarning() {
   }, [activeScenario]);
 
   // Thresholds from tax rates
-  const secondaryThreshold = TAX_RATES[TAX_YEAR].nationalInsurance.employer.A.secondary.threshold; // £5,000
-  const lowerEarningsLimit = TAX_RATES[TAX_YEAR].nationalInsurance.lowerEarningsLimit; // £6,500
-  const niRate = TAX_RATES[TAX_YEAR].nationalInsurance.employer.A.secondary.rate / 100; // 15%
+  const secondaryThreshold = TAX_RATES[TAX_YEAR].nationalInsurance.employer.A.secondary.threshold;
+  const lowerEarningsLimit = TAX_RATES[TAX_YEAR].nationalInsurance.lowerEarningsLimit;
+  const niRate = getEmployerNIRate(TAX_YEAR);
 
   // Determine status
   const inGapZone = currentSalary >= secondaryThreshold && currentSalary < lowerEarningsLimit;
   const qualifiesForPension = currentSalary >= lowerEarningsLimit;
 
   // Calculate gap zone costs
-  const employerNIBeingPaid = inGapZone
-    ? Math.round((currentSalary - secondaryThreshold) * niRate)
-    : 0;
+  const employerNIBeingPaid = inGapZone ? Math.round(getEmployerNI(currentSalary, TAX_YEAR)) : 0;
   const extraNeededForPension = lowerEarningsLimit - currentSalary;
   const extraMonthlyCost =
     extraNeededForPension > 0 ? Math.round((extraNeededForPension * niRate) / 12) : 0;

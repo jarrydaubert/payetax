@@ -176,26 +176,7 @@ function normalizeAssociatedCompaniesCount(value: number | undefined): number {
 function getEmployeeNIWithNoThreshold(salary: number, taxYear: TaxYear): number {
   if (salary <= 0) return 0;
 
-  const rates = TAX_RATES[taxYear];
-  const employeeRates = rates.nationalInsurance.employee.A;
-  const upperEarningsLimit = employeeRates.upper.threshold;
-  const primaryRate = employeeRates.primary.rate / 100;
-  const upperRate = employeeRates.upper.rate / 100;
-
-  let employeeNI = 0;
-
-  // NI on all earnings up to UEL at primary rate (no threshold)
-  const earningsInPrimaryBand = Math.min(salary, upperEarningsLimit);
-  if (earningsInPrimaryBand > 0) {
-    employeeNI += earningsInPrimaryBand * primaryRate;
-  }
-
-  // NI on earnings above UEL
-  if (salary > upperEarningsLimit) {
-    employeeNI += (salary - upperEarningsLimit) * upperRate;
-  }
-
-  return Math.round(employeeNI * 100) / 100;
+  return getEmployeeNI(salary, taxYear, { applyPrimaryThreshold: false });
 }
 
 // ============================================================================

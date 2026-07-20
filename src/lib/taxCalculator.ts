@@ -56,6 +56,13 @@ import {
 } from '@/constants/taxRates';
 import type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
 import { convertPeriodToAnnual } from './periodCalculator';
+import {
+  getClass1PeriodThresholds,
+  getEmployeeClass1MonthSegments,
+  isEmployeeNIExempt,
+  sliceClass1EmployeeEarnings,
+  sliceClass1EmployerEarnings,
+} from './tax/nationalInsurance';
 import { sliceScottishTaxableIncome } from './tax/scottishIncomeTax';
 import { parseTaxCode } from './tax/taxCode';
 import { roundToPence } from './tax/utils';
@@ -190,47 +197,6 @@ export function calculateIncomeTaxFromBands(
   }
 
   return { monthlyTax: roundToPence(monthlyTax), taxBandsApplied };
-}
-
-/**
- * Calculate National Insurance contributions
- */
-export function calculateNIContributions(
-  monthlyEmploymentIncome: number,
-  rates: {
-    primaryThreshold: number;
-    upperEarningsLimit: number;
-    employeeRate: number;
-    employeeRateAboveUEL: number;
-    monthlyPrimaryThreshold?: number;
-    monthlyUpperEarningsLimit?: number;
-  },
-  payNoNI: boolean,
-  isOverStatePensionAge: boolean,
-): number {
-  if (payNoNI || isOverStatePensionAge) return 0;
-
-  const monthlyPrimaryThreshold = rates.monthlyPrimaryThreshold ?? rates.primaryThreshold / 12;
-  const monthlyUEL = rates.monthlyUpperEarningsLimit ?? rates.upperEarningsLimit / 12;
-
-  let monthlyNI = 0;
-
-  if (monthlyEmploymentIncome > monthlyPrimaryThreshold) {
-    // NI on income between primary threshold and UEL
-    const incomeInMainBand = Math.min(
-      monthlyEmploymentIncome - monthlyPrimaryThreshold,
-      monthlyUEL - monthlyPrimaryThreshold,
-    );
-    monthlyNI += (incomeInMainBand * rates.employeeRate) / 100;
-
-    // NI on income above UEL (lower rate)
-    if (monthlyEmploymentIncome > monthlyUEL) {
-      const incomeAboveUEL = monthlyEmploymentIncome - monthlyUEL;
-      monthlyNI += (incomeAboveUEL * rates.employeeRateAboveUEL) / 100;
-    }
-  }
-
-  return roundToPence(monthlyNI);
 }
 
 /**
@@ -876,71 +842,67 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // to ensure NI is calculated correctly for people with multiple income types.
   //
 
-  let monthlyNationalInsurance = 0;
+  // Employee NI is exempt for payNoNI, category C, or State Pension age.
+  // Employer NI below is charged regardless.
+  const employeeNIExempt = isEmployeeNIExempt({
+    age: input.age,
+    niCategory: input.niCategory,
+    payNoNI: input.payNoNI,
+  });
 
-  // Auto-detect state pension age for NI exemption
-  // State Pension Age: 66 (current), rising to 67 by 2028
-  // Source: https://www.gov.uk/state-pension-age
-  const isOverStatePensionAge = input.age !== undefined && input.age >= 66;
+  // Where a primary rate changed mid-year, the year splits into rate segments by
+  // tax month. Each segment is rounded as its own payroll month and multiplied by
+  // the months it covers, so no rate is averaged across the year. Single-rate
+  // years return one 12-month segment, which reduces to the long-standing
+  // `roundToPence(monthly) * 12` arithmetic exactly. Effective dates live in the
+  // canonical policy record.
+  let annualNationalInsurance = 0;
 
-  // Only calculate employee NI if not exempt
-  // Exemptions:
-  // - payNoNI flag: Manual override (e.g., other exemption reasons)
-  // - NI Category 'C': Employees over State Pension age (employer still pays)
-  // - Age >= 66: Automatic exemption at State Pension Age
-  if (!input.payNoNI && input.niCategory !== 'C' && !isOverStatePensionAge) {
-    const niRates = standardRates.nationalInsurance.employee[input.niCategory];
-    const periodThresholds = PAYROLL_PERIOD_THRESHOLDS[taxYear].monthly;
-
-    const monthlyPrimaryThreshold = periodThresholds.niPrimary;
-    const monthlyUpperThreshold = periodThresholds.niUpper;
+  if (!employeeNIExempt) {
+    const periodThresholds = getClass1PeriodThresholds(taxYear, input.niCategory, PERIODS.MONTHLY);
+    const upperRate = standardRates.nationalInsurance.employee[input.niCategory].upper.rate;
 
     // NI base: Employment income minus pension (salary sacrifice reduces NI liability)
     const monthlyTaxableAdjustedEmploymentIncome =
       monthlyEmploymentIncome - monthlyPensionContribution;
 
-    // Primary threshold (lower rate)
-    if (monthlyTaxableAdjustedEmploymentIncome > monthlyPrimaryThreshold) {
-      const lowerAmount = Math.min(
-        monthlyTaxableAdjustedEmploymentIncome - monthlyPrimaryThreshold,
-        monthlyUpperThreshold - monthlyPrimaryThreshold,
+    for (const segment of getEmployeeClass1MonthSegments(taxYear, input.niCategory)) {
+      const segmentMonthlyNI = roundToPence(
+        sliceClass1EmployeeEarnings(monthlyTaxableAdjustedEmploymentIncome, {
+          primaryThreshold: periodThresholds.primary,
+          upperEarningsLimit: periodThresholds.upper,
+          primaryRate: segment.rate,
+          upperRate,
+        }).employeeNI,
       );
-      monthlyNationalInsurance += (lowerAmount * niRates.primary.rate) / 100;
-    }
 
-    // Upper threshold (higher rate)
-    if (monthlyTaxableAdjustedEmploymentIncome > monthlyUpperThreshold) {
-      const upperAmount = monthlyTaxableAdjustedEmploymentIncome - monthlyUpperThreshold;
-      monthlyNationalInsurance += (upperAmount * niRates.upper.rate) / 100;
+      annualNationalInsurance += segmentMonthlyNI * segment.months;
     }
   }
 
-  // Round monthly NI to pence for accuracy
-  monthlyNationalInsurance = roundToPence(monthlyNationalInsurance);
-
-  // Calculate annual NI (for output)
-  const annualNationalInsurance = monthlyNationalInsurance * 12;
+  // Monthly NI drives net pay and every period conversion below. For a year with
+  // one rate this returns the same figure the segment loop rounded.
+  const monthlyNationalInsurance = roundToPence(annualNationalInsurance / 12);
 
   // ---------------
   // 8. Calculate Employer's NI (monthly calculation)
   // ---------------
 
-  let monthlyEmployerNI = 0;
-
-  // Calculate employer's NI (even if employee is exempt)
-  const employerRates = standardRates.nationalInsurance.employer[input.niCategory];
-
-  // Convert employer threshold to monthly
-  const monthlyEmployerThreshold = employerRates.secondary.threshold / 12;
-
+  // Employer NI is charged even when the employee is exempt (e.g. State Pension age).
+  // The monthly secondary threshold is HMRC's published period figure, which is not
+  // the annual threshold divided by 12; both live in the canonical policy record.
   // Employer NI is calculated on employment income only (not rental, pension income, etc.)
-  if (monthlyEmploymentIncome > monthlyEmployerThreshold) {
-    monthlyEmployerNI =
-      ((monthlyEmploymentIncome - monthlyEmployerThreshold) * employerRates.secondary.rate) / 100;
-  }
+  const employerRates = standardRates.nationalInsurance.employer[input.niCategory];
+  const monthlyEmployerNI = sliceClass1EmployerEarnings(monthlyEmploymentIncome, {
+    secondaryThreshold: getClass1PeriodThresholds(taxYear, input.niCategory, PERIODS.MONTHLY)
+      .secondary,
+    secondaryRate: employerRates.secondary.rate,
+  }).employerNI;
 
-  // Calculate annual employer NI (for output)
-  const annualEmployerNI = monthlyEmployerNI * 12;
+  // Calculate annual employer NI (for output). Rounded per month before scaling,
+  // matching both real payroll and the employee path above, which rounds each
+  // payroll month before multiplying by the months in its rate segment.
+  const annualEmployerNI = roundToPence(roundToPence(monthlyEmployerNI) * 12);
 
   // ---------------
   // 9. Calculate Student Loan repayments (monthly calculation)

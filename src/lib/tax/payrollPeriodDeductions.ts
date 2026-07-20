@@ -7,6 +7,11 @@ import {
   type TaxYear,
 } from '@/constants/taxRates';
 import { calculateAllowanceReduction, type TaxCalculationInput } from '@/lib/taxCalculator';
+import {
+  getEmployeeClass1RateForPayDate,
+  getPayDateForTaxPeriod,
+  sliceClass1EmployeeEarnings,
+} from './nationalInsurance';
 import { parseTaxCode } from './taxCode';
 import { roundToPence } from './utils';
 
@@ -178,23 +183,20 @@ export function calculatePayrollPeriodDeductions(
   );
   const incomeTax = roundToPence(Math.max(0, incomeTaxToDate - previousTaxPaid));
 
+  // NI is non-cumulative for non-directors: each period stands alone, charged at
+  // the rate in force on that period's pay date. The pay date is derived from the
+  // period rather than assumed, so a mid-year rate change (2023-24) lands on the
+  // correct periods instead of defaulting to the opening rate.
   const niRates = taxRates.nationalInsurance.employee[input.niCategory];
-  let nationalInsurance = 0;
-
-  if (grossPay > periodThresholds.niPrimary) {
-    nationalInsurance +=
-      Math.min(
-        grossPay - periodThresholds.niPrimary,
-        periodThresholds.niUpper - periodThresholds.niPrimary,
-      ) *
-      (niRates.primary.rate / 100);
-
-    if (grossPay > periodThresholds.niUpper) {
-      nationalInsurance += (grossPay - periodThresholds.niUpper) * (niRates.upper.rate / 100);
-    }
-  }
-
-  nationalInsurance = roundToPence(nationalInsurance);
+  const payDate = getPayDateForTaxPeriod(taxYear, input.payPeriod, safePeriodNumber);
+  const nationalInsurance = roundToPence(
+    sliceClass1EmployeeEarnings(grossPay, {
+      primaryThreshold: periodThresholds.niPrimary,
+      upperEarningsLimit: periodThresholds.niUpper,
+      primaryRate: getEmployeeClass1RateForPayDate(taxYear, input.niCategory, payDate),
+      upperRate: niRates.upper.rate,
+    }).employeeNI,
+  );
   const netPay = roundToPence(grossPay - incomeTax - nationalInsurance);
 
   return {
