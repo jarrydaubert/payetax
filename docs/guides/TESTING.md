@@ -191,6 +191,7 @@ Examples:
 - `src/lib/__tests__/taxCalculator.hmrcPayrollFixtures.test.ts`
 - `src/lib/tax/__tests__/incomeTax.test.ts`
 - `src/lib/tax/__tests__/employeeNI.test.ts`
+- `src/lib/__tests__/nationalInsuranceVertical.test.ts`
 - `src/lib/tax/__tests__/directorCalculator.*.test.ts`
 
 These tests should use hand-anchored expected values, HMRC examples, payslip-derived expectations, or explicit legal/rate-table assumptions. They should not derive the expected answer from the same production constants or implementation path they are trying to test.
@@ -286,6 +287,7 @@ Rules:
 - Avoid integer precision assertions for tax-critical values.
 - Assert engine behaviour when published annual examples differ by a few pence from monthly-annualised output, and explain the rounding reason in the test.
 - When changing thresholds, add or update direct boundary tests such as marriage allowance and HICBC threshold pairs.
+- Do not assert equality between two statutory bases that legitimately differ. National Insurance has a payroll (pay period) basis and an annual earnings-period (directors) basis, which use different published thresholds and so give different answers for the same salary. Pin each against its own source and, where the gap matters, assert the gap itself so it cannot drift silently.
 
 The golden master is the browser regression baseline for rounding-sensitive scenarios, not the legal source of truth.
 

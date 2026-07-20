@@ -8,7 +8,7 @@
 'use client';
 
 import { AlertTriangle } from 'lucide-react';
-import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, getEmployerNI, TAX_RATES } from '@/lib/tax';
 import { cn, formatCurrency } from '@/lib/utils';
 import { useDirectorFormSlice, useStrategyComparison } from '@/store/directorGuideStore';
 
@@ -27,10 +27,8 @@ export function SurvivalModePanel({ className }: { className?: string }) {
 
   if (!comparison || comparison.grossProfit > 0) return null;
 
-  const niCreditsSalary = rates.nationalInsurance.lowerEarningsLimit; // ~£6,500 in 2025-26
-  const employerThreshold = rates.nationalInsurance.employer.A.secondary.threshold;
-  const employerRate = rates.nationalInsurance.employer.A.secondary.rate / 100;
-  const employerNI = Math.max(0, (niCreditsSalary - employerThreshold) * employerRate);
+  const niCreditsSalary = rates.nationalInsurance.lowerEarningsLimit;
+  const employerNI = getEmployerNI(niCreditsSalary, TAX_YEAR);
 
   const pensionForProfit = formData.isPensionAlreadyDeducted ? 0 : formData.pensionContribution;
   const profitBeforeSalary =

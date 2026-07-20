@@ -11,7 +11,6 @@ import { parseTaxCode } from '@/lib/tax';
 import {
   calculateAllowanceReduction,
   calculateIncomeTaxFromBands,
-  calculateNIContributions,
   calculatePensionAmount,
   calculateStudentLoanRepayments,
   convertToPeriods,
@@ -101,32 +100,10 @@ describe('taxCalculator helpers', () => {
     });
   });
 
-  describe('calculateNIContributions', () => {
-    const rates = {
-      primaryThreshold: 12570,
-      upperEarningsLimit: 50270,
-      employeeRate: 8,
-      employeeRateAboveUEL: 2,
-    };
-
-    it('returns zero when payNoNI is true', () => {
-      expect(calculateNIContributions(3000, rates, true, false)).toBe(0);
-    });
-
-    it('returns zero for state pension age', () => {
-      expect(calculateNIContributions(3000, rates, false, true)).toBe(0);
-    });
-
-    it('calculates NI within primary band', () => {
-      // 3000 - 1047.5 = 1952.5 * 8% = 156.2
-      expect(calculateNIContributions(3000, rates, false, false)).toBeCloseTo(156.2, 2);
-    });
-
-    it('calculates NI above the upper earnings limit', () => {
-      // Above UEL applies reduced rate
-      expect(calculateNIContributions(6000, rates, false, false)).toBeCloseTo(287.55, 2);
-    });
-  });
+  // NI helper coverage moved to the shared mechanic. `calculateNIContributions`
+  // was deleted with the NI vertical: it had no production callers, and its
+  // £1,047.50 monthly threshold (annual / 12) had already drifted from the
+  // engine's published £1,048. See nationalInsuranceVertical.test.ts.
 
   describe('calculateStudentLoanRepayments', () => {
     it('returns zero when no plans selected', () => {

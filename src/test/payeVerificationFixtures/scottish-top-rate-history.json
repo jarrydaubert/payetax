@@ -7,10 +7,11 @@
       "https://www.gov.scot/publications/scottish-income-tax-rates-and-bands/pages/rates-and-bands-2024-to-2025/",
       "https://www.gov.scot/publications/scottish-rate-resolution-2024-25-draft-motion-explanatory-note/",
       "https://www.mygov.scot/scottish-income-tax/current-income-tax-rates",
-      "https://www.gov.scot/publications/scottish-income-tax-rates-and-bands/pages/2026-to-2027/"
+      "https://www.gov.scot/publications/scottish-income-tax-rates-and-bands/pages/2026-to-2027/",
+      "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2023-to-2024"
     ],
     "taxYear": "2023-2027",
-    "verifiedOn": "2026-07-19"
+    "verifiedOn": "2026-07-20"
   },
   "tolerancePence": 2,
   "scenarios": [
@@ -99,7 +100,7 @@
     },
     {
       "id": "sd2-30k-2023-24",
-      "description": "SD2 in 2023-24 (five-band year, no Advanced rate) was that year's top-rate code: 47%. £30,000 -> £1,175/mo, £14,100/yr. Preserves correct prior-year behaviour after the 2024-25 correction. NI figure follows the engine's flat 12% 2023-24 model (the statutory year blended 12%/10% after the 6 Jan 2024 cut) — it anchors engine consistency, not statutory NI.",
+      "description": "SD2 in 2023-24 (five-band year, no Advanced rate) was that year's top-rate code: 47%. £30,000 -> £1,175/mo, £14,100/yr. Preserves correct prior-year behaviour after the 2024-25 correction. NI now follows the statutory 2023-24 payroll basis: the main primary rate was 12% to 5 January 2024 and 10% from 6 January 2024, so £30,000 gives 9 tax months at £174.24 plus 3 at £145.20 = £2,003.76. This replaces the engine's former flat-12% model (£2,090.88).",
       "input": {
         "salary": 30000,
         "payPeriod": "annually",
@@ -119,7 +120,7 @@
       "expected": {
         "taxFreeAmount": 0,
         "incomeTaxAnnual": 14100.0,
-        "nationalInsuranceAnnual": 2090.88,
+        "nationalInsuranceAnnual": 2003.76,
         "taxBandRates": [47]
       }
     },

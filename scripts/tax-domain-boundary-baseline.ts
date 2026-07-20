@@ -37,17 +37,7 @@ const BASELINE_ENTRIES = [
     '@/lib/tax/marriageAllowance',
     ['calculateMarriageAllowanceNetSaving'],
   ],
-  [
-    'src/app/tools/national-insurance-calculator/NICalculatorClient.tsx',
-    '@/constants/taxRates',
-    ['CURRENT_TAX_YEAR', 'TAX_RATES', 'type:NICategory'],
-  ],
   ['src/components/atoms/TaxYearSelect.tsx', '@/constants/taxRates', ['TAX_YEARS', 'type:TaxYear']],
-  [
-    'src/components/molecules/DirectorGuide/calculator/PensionGapWarning.tsx',
-    '@/constants/taxRates',
-    ['CURRENT_TAX_YEAR', 'TAX_RATES'],
-  ],
   [
     'src/components/molecules/DirectorGuide/calculator/SalarySlider.tsx',
     '@/constants/taxRates',
@@ -97,11 +87,6 @@ const BASELINE_ENTRIES = [
     'src/components/molecules/DirectorGuide/dashboard/InputsPanel.tsx',
     '@/lib/tax/studentLoanPlans',
     ['getAvailableDirectorStudentLoanPlans'],
-  ],
-  [
-    'src/components/molecules/DirectorGuide/dashboard/SurvivalModePanel.tsx',
-    '@/constants/taxRates',
-    ['CURRENT_TAX_YEAR', 'TAX_RATES'],
   ],
   [
     'src/components/molecules/DirectorGuide/EmailResultsDialog.tsx',

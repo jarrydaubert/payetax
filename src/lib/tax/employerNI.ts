@@ -17,7 +17,8 @@
  * 4. This is why we recommend £12,570 salary (uses PA but triggers some Employer NI)
  */
 
-import { CURRENT_TAX_YEAR, TAX_RATES, type TaxYear } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, type NICategory, TAX_RATES, type TaxYear } from '@/constants/taxRates';
+import { sliceClass1EmployerEarnings } from './nationalInsurance';
 import { roundToPence } from './utils';
 
 // ============================================================================
@@ -68,10 +69,12 @@ export interface EmployerNIResult {
 export function calculateEmployerNI(
   salary: number,
   taxYear: TaxYear = CURRENT_TAX_YEAR,
+  options: { niCategory?: NICategory } = {},
 ): EmployerNIResult {
+  const { niCategory = 'A' } = options;
   // Get employer NI rates from tax rates constant
   const rates = TAX_RATES[taxYear];
-  const employerRates = rates.nationalInsurance.employer.A.secondary;
+  const employerRates = rates.nationalInsurance.employer[niCategory].secondary;
 
   const threshold = employerRates.threshold;
   const rate = employerRates.rate / 100; // Convert from percentage to decimal
@@ -87,18 +90,17 @@ export function calculateEmployerNI(
     };
   }
 
-  // Calculate salary above threshold
-  const salaryAboveThreshold = Math.max(0, salary - threshold);
-
-  // Calculate Employer NI
-  const employerNI = roundToPence(salaryAboveThreshold * rate);
+  const { employerNI, earningsAboveSecondaryThreshold } = sliceClass1EmployerEarnings(salary, {
+    secondaryThreshold: threshold,
+    secondaryRate: employerRates.rate,
+  });
 
   return {
     salary,
-    employerNI,
+    employerNI: roundToPence(employerNI),
     threshold,
     rate,
-    salaryAboveThreshold,
+    salaryAboveThreshold: earningsAboveSecondaryThreshold,
   };
 }
 
@@ -111,8 +113,12 @@ export function calculateEmployerNI(
  * @param taxYear - Tax year for rates
  * @returns Employer NI due (rounded to pence)
  */
-export function getEmployerNI(salary: number, taxYear: TaxYear = CURRENT_TAX_YEAR): number {
-  return calculateEmployerNI(salary, taxYear).employerNI;
+export function getEmployerNI(
+  salary: number,
+  taxYear: TaxYear = CURRENT_TAX_YEAR,
+  options: { niCategory?: NICategory } = {},
+): number {
+  return calculateEmployerNI(salary, taxYear, options).employerNI;
 }
 
 /**
@@ -123,9 +129,12 @@ export function getEmployerNI(salary: number, taxYear: TaxYear = CURRENT_TAX_YEA
  * @param taxYear - Tax year for rates
  * @returns Annual threshold amount
  */
-export function getEmployerNIThreshold(taxYear: TaxYear = CURRENT_TAX_YEAR): number {
+export function getEmployerNIThreshold(
+  taxYear: TaxYear = CURRENT_TAX_YEAR,
+  niCategory: NICategory = 'A',
+): number {
   const rates = TAX_RATES[taxYear];
-  return rates.nationalInsurance.employer.A.secondary.threshold;
+  return rates.nationalInsurance.employer[niCategory].secondary.threshold;
 }
 
 /**
@@ -134,7 +143,10 @@ export function getEmployerNIThreshold(taxYear: TaxYear = CURRENT_TAX_YEAR): num
  * @param taxYear - Tax year for rates
  * @returns Rate as decimal (e.g., 0.15 for 15%)
  */
-export function getEmployerNIRate(taxYear: TaxYear = CURRENT_TAX_YEAR): number {
+export function getEmployerNIRate(
+  taxYear: TaxYear = CURRENT_TAX_YEAR,
+  niCategory: NICategory = 'A',
+): number {
   const rates = TAX_RATES[taxYear];
-  return rates.nationalInsurance.employer.A.secondary.rate / 100;
+  return rates.nationalInsurance.employer[niCategory].secondary.rate / 100;
 }

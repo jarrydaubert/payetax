@@ -465,7 +465,11 @@ describe('HMRC Rate Verification & Edge Cases', () => {
           niCategory: 'B',
         }),
       );
-      expect(result.nationalInsurance.annually).toBeCloseTo(871.2, 2);
+      // Reduced rate is 1.85%: £2,500/month - £1,048 primary threshold = £1,452,
+      // x 1.85% = £26.86 a month, x 12 = £322.32.
+      // Previously asserted £871.20 against a 5% rate that HMRC does not publish.
+      // https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027
+      expect(result.nationalInsurance.annually).toBeCloseTo(322.32, 2);
     });
 
     it('Category C - over state pension age', () => {
