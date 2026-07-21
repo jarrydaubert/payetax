@@ -1,4 +1,6 @@
 import { SCOTTISH_TAX_RATES, TAX_RATES, type TaxBand, type TaxYear } from '@/constants/taxRates';
+import { sliceRukTaxableIncome } from './rukIncomeTax';
+import { sliceScottishTaxableIncome } from './scottishIncomeTax';
 
 export type MarriageAllowanceRegion = 'rUK' | 'scotland';
 
@@ -25,26 +27,20 @@ function getRateContext(taxYear: TaxYear, region: MarriageAllowanceRegion): TaxR
   };
 }
 
-function calculateIncomeTax(taxableIncome: number, bands: TaxBand[]): number {
-  let remaining = Math.max(0, taxableIncome);
-  let previousThreshold = 0;
-  let tax = 0;
+function calculateIncomeTax(
+  taxableIncome: number,
+  bands: TaxBand[],
+  region: MarriageAllowanceRegion,
+): number {
+  const sliceBands = bands.map((band) => ({
+    name: band.name,
+    rate: band.rate,
+    taxableIncomeUpperBound: band.threshold,
+  }));
 
-  for (const band of bands) {
-    const bandThreshold = band.threshold;
-    const bandWidth = Math.max(0, bandThreshold - previousThreshold);
-    const incomeInBand = Math.min(remaining, bandWidth);
-
-    if (incomeInBand > 0) {
-      tax += (incomeInBand * band.rate) / 100;
-      remaining -= incomeInBand;
-    }
-
-    if (remaining <= 0) break;
-    previousThreshold = bandThreshold;
-  }
-
-  return tax;
+  return region === 'scotland'
+    ? sliceScottishTaxableIncome(taxableIncome, sliceBands).incomeTax
+    : sliceRukTaxableIncome(taxableIncome, sliceBands).incomeTax;
 }
 
 export interface MarriageAllowanceNetSavingInput {
@@ -79,20 +75,24 @@ export function calculateMarriageAllowanceNetSaving(
   const recipientTaxBefore = calculateIncomeTax(
     Math.max(0, recipientIncome - personalAllowance),
     context.bands,
+    region,
   );
   const recipientTaxAfter = calculateIncomeTax(
     Math.max(0, recipientIncome - (personalAllowance + transferAmount)),
     context.bands,
+    region,
   );
   const recipientSaving = Math.max(0, recipientTaxBefore - recipientTaxAfter);
 
   const transferorTaxBefore = calculateIncomeTax(
     Math.max(0, transferorIncome - personalAllowance),
     context.bands,
+    region,
   );
   const transferorTaxAfter = calculateIncomeTax(
     Math.max(0, transferorIncome - Math.max(0, personalAllowance - transferAmount)),
     context.bands,
+    region,
   );
   const transferorAdditionalTax = Math.max(0, transferorTaxAfter - transferorTaxBefore);
 

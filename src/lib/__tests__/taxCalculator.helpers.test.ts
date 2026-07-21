@@ -10,7 +10,6 @@
 import { parseTaxCode } from '@/lib/tax';
 import {
   calculateAllowanceReduction,
-  calculateIncomeTaxFromBands,
   calculatePensionAmount,
   calculateStudentLoanRepayments,
   convertToPeriods,
@@ -71,34 +70,10 @@ describe('taxCalculator helpers', () => {
     });
   });
 
-  describe('calculateIncomeTaxFromBands', () => {
-    it('calculates basic rate tax for a single band', () => {
-      const bands = [
-        { name: 'Basic', rate: 20, threshold: 37700 },
-        { name: 'Higher', rate: 40, threshold: 125140 },
-      ];
-      const monthlyAllowance = 12570 / 12;
-      const { monthlyTax, taxBandsApplied } = calculateIncomeTaxFromBands(
-        2000,
-        bands,
-        monthlyAllowance,
-      );
-
-      expect(monthlyTax).toBeCloseTo(400, 2);
-      expect(taxBandsApplied[0]?.rate).toBe(20);
-    });
-
-    it('applies higher rate once basic band is exceeded', () => {
-      const bands = [
-        { name: 'Basic', rate: 20, threshold: 37700 },
-        { name: 'Higher', rate: 40, threshold: 125140 },
-      ];
-      const monthlyAllowance = 12570 / 12;
-      const { monthlyTax } = calculateIncomeTaxFromBands(4000, bands, monthlyAllowance);
-
-      expect(monthlyTax).toBeGreaterThan(800); // More than simple 20% of 4,000
-    });
-  });
+  // Band coverage moved to the shared mechanic. `calculateIncomeTaxFromBands`
+  // was deleted with the rUK income-tax vertical: it had no production callers,
+  // and it re-derived band boundaries from an allowance parameter instead of
+  // the engine's cumulative taxable-income thresholds. See rukIncomeTax.test.ts.
 
   // NI helper coverage moved to the shared mechanic. `calculateNIContributions`
   // was deleted with the NI vertical: it had no production callers, and its

@@ -63,6 +63,7 @@ import {
   sliceClass1EmployeeEarnings,
   sliceClass1EmployerEarnings,
 } from './tax/nationalInsurance';
+import { sliceRukTaxableIncome } from './tax/rukIncomeTax';
 import { sliceScottishTaxableIncome } from './tax/scottishIncomeTax';
 import { parseTaxCode } from './tax/taxCode';
 import { roundToPence } from './tax/utils';
@@ -150,53 +151,6 @@ export function calculatePensionAmount(
   }
   // Fixed amount - convert to monthly equivalent
   return contribution / 12;
-}
-
-/**
- * Calculate income tax using progressive tax bands
- * Returns { totalTax, taxBands } for the given monthly income
- */
-export function calculateIncomeTaxFromBands(
-  monthlyTaxableIncome: number,
-  taxBands: Array<{ name: string; rate: number; threshold: number }>,
-  monthlyAllowance: number,
-): { monthlyTax: number; taxBandsApplied: Array<{ name: string; rate: number; amount: number }> } {
-  let remainingIncome = monthlyTaxableIncome;
-  let monthlyTax = 0;
-  const taxBandsApplied: Array<{ name: string; rate: number; amount: number }> = [];
-
-  for (let i = 0; i < taxBands.length; i++) {
-    if (remainingIncome <= 0) break;
-
-    const band = taxBands[i];
-    if (!band) continue;
-    const nextBand = taxBands[i + 1];
-    const prevBand = taxBands[i - 1];
-
-    // Calculate band boundaries (monthly)
-    const bandStart = i === 0 ? 0 : ((prevBand?.threshold ?? 0) - monthlyAllowance * 12) / 12;
-    const bandEnd = nextBand
-      ? (band.threshold - monthlyAllowance * 12) / 12
-      : Number.POSITIVE_INFINITY;
-    const bandWidth = Math.max(0, bandEnd - Math.max(0, bandStart));
-
-    // Calculate tax for this band
-    const incomeInBand = Math.min(remainingIncome, bandWidth);
-    const taxForBand = roundToPence((incomeInBand * band.rate) / 100);
-
-    if (taxForBand > 0) {
-      monthlyTax += taxForBand;
-      taxBandsApplied.push({
-        name: band.name,
-        rate: band.rate,
-        amount: roundToPence(taxForBand * 12), // Store as annual
-      });
-    }
-
-    remainingIncome -= incomeInBand;
-  }
-
-  return { monthlyTax: roundToPence(monthlyTax), taxBandsApplied };
 }
 
 /**
@@ -699,8 +653,6 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
 
   // If there's taxable income, calculate tax bands
   if (monthlyTaxableIncome > 0) {
-    let remainingMonthlyIncome = monthlyTaxableIncome;
-
     // Handle special tax codes that override normal band calculations
     // These codes tax ALL income at a single rate, ignoring progressive bands.
     // The rate depends on the regime: rUK BR/D0/D1 map to basic/higher/additional,
@@ -746,68 +698,24 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
           });
         }
       } else {
-        // STANDARD UK TAX CALCULATION ALGORITHM
-        // Standard UK bands apply CUMULATIVELY above the personal allowance
-        // This is the "traditional" system used in England, Wales, and Northern Ireland
-        //
-        // Key difference from Scottish: bands are "stacked" on top of each other
-        // Example with £50,000 taxable income:
-        // - First £37,700: 20% basic rate
-        // - Next £12,300: 40% higher rate
-        // Each band only applies to income WITHIN that band's range
+        // Canonical policy thresholds are annual taxable-income upper bounds.
+        // Period conversion and PAYE rounding stay outside the shared slicer.
+        const calculation = sliceRukTaxableIncome(
+          monthlyTaxableIncome,
+          taxRates.bands.map((band) => ({
+            name: band.name,
+            rate: band.rate,
+            taxableIncomeUpperBound: getMonthlyPayrollBandThreshold(band.threshold),
+          })),
+        );
+        monthlyTax = calculation.incomeTax;
 
-        let previousMonthlyThreshold = 0; // Track cumulative band positions
-
-        // Process each standard UK tax band sequentially
-        for (let i = 0; i < taxRates.bands.length; i++) {
-          const band = taxRates.bands[i];
-          if (!band) continue;
-
-          // Convert annual band threshold to the whole-pound monthly payroll threshold.
-          const monthlyThreshold = getMonthlyPayrollBandThreshold(band.threshold);
-
-          // Calculate the "width" of this tax band
-          // This is how much income can be taxed at this band's rate
-          // Example: Basic rate width = £3,141.67 - £0 = £3,141.67
-          const monthlyBandWidth = monthlyThreshold - previousMonthlyThreshold;
-
-          // Determine how much of the taxpayer's income falls into this band
-          // Takes the minimum of:
-          // 1. How much income is left to be taxed
-          // 2. How much this band can accommodate
-          const monthlyIncomeInBand = Math.min(remainingMonthlyIncome, monthlyBandWidth);
-
-          // Only process bands that have taxable income
-          if (monthlyIncomeInBand > 0) {
-            // Apply this band's tax rate to the income portion within it
-            // Example: £1,000 in basic rate band = £1,000 × 20% = £200 tax
-            const monthlyTaxForBand = (monthlyIncomeInBand * band.rate) / 100;
-
-            // Accumulate total monthly tax from all bands
-            monthlyTax += monthlyTaxForBand;
-
-            // Convert back to annual for results display consistency
-            const annualIncomeInBand = monthlyIncomeInBand * 12;
-
-            // Record this band's contribution for tax breakdown UI
-            taxBands.push({
-              name: band.name, // e.g., "Basic Rate (20%)", "Higher Rate (40%)"
-              rate: band.rate, // e.g., 20, 40, 45
-              amount: annualIncomeInBand, // Annual income amount taxed at this rate
-            });
-
-            // Remove processed income from remaining total
-            // This ensures we don't double-tax the same income
-            remainingMonthlyIncome -= monthlyIncomeInBand;
-          }
-
-          // Early exit optimization: if all income has been processed, stop
-          // This prevents unnecessary loop iterations for lower earners
-          if (remainingMonthlyIncome <= 0) break;
-
-          // Update threshold for next band calculation
-          // This builds the "cumulative" nature of standard UK bands
-          previousMonthlyThreshold = monthlyThreshold;
+        for (const slice of calculation.slices) {
+          taxBands.push({
+            name: slice.name,
+            rate: slice.rate,
+            amount: slice.taxableAmount * 12,
+          });
         }
       }
     } // Close the else block for taxCodeBandOverride check

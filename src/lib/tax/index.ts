@@ -49,6 +49,12 @@ export {
   sliceClass1EmployerEarnings,
 } from './nationalInsurance';
 export type {
+  RukTaxableIncomeBand,
+  RukTaxBandCalculation,
+  RukTaxBandSlice,
+} from './rukIncomeTax';
+export { sliceRukTaxableIncome } from './rukIncomeTax';
+export type {
   ScottishTaxableIncomeBand,
   ScottishTaxBandCalculation,
   ScottishTaxBandSlice,

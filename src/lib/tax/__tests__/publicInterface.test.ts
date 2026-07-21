@@ -33,6 +33,7 @@ describe('tax-domain public interface', () => {
       'parseTaxCode',
       'sliceClass1EmployeeEarnings',
       'sliceClass1EmployerEarnings',
+      'sliceRukTaxableIncome',
       'sliceScottishTaxableIncome',
       'taxableThresholdToTotalIncome',
     ]);
