@@ -34,7 +34,7 @@ Use the smallest relevant check while developing, then run `bun run check:repo` 
 Prefer loop primitives with deterministic stop conditions over open-ended iterative prompting:
 
 - **Verification:** for any UI change, use the `verify-frontend-change` skill (`.claude/skills/verify-frontend-change/SKILL.md`). Do not report UI work done on a successful edit alone.
-- **Goal loops:** hand off the stop condition instead of checking each turn, e.g. `/goal bun run check:repo and bun run test:e2e:critical pass, stop after 5 tries`. For calculation-logic changes, use the golden-master spec as the stop condition.
+- **Goal loops:** hand off the stop condition instead of checking each turn, e.g. `/goal bun run check:repo and bun run test:e2e:critical pass, stop after 5 tries`. For changes to calculation logic or expected tax outputs, the stop condition must include the independent PAYE verification tests (hand-derived fixtures in `src/test/payeVerificationFixtures/`; run `bun run test:no-coverage` — no smaller supported command exists) **and** the golden-master E2E slice for browser/result regression. Golden-master expectations are generated from the production engine, so they are not a correctness oracle on their own.
 - **PR loops:** `/loop 10m check my open PR, address review comments, fix failing CI` — stops on merge.
 - **Scheduled upkeep:** a weekly `/schedule` routine running `bun run check:rate-freshness`, `bun run audit:deps`, and `bun audit`. Report findings; do not auto-merge dependency changes.
 
