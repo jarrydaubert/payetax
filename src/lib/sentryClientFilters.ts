@@ -10,6 +10,8 @@ const CUSTOM_EVENT_PROMISE_REJECTION =
   'Event `CustomEvent` (type=unhandledrejection) captured as promise rejection';
 const INJECTED_APP_SCRIPT_URL_PATTERN = /^app:\/\/\/[a-f0-9]+\/script\.js$/i;
 const INVALID_TOKEN_SYNTAX_ERROR = 'Invalid or unexpected token';
+const OPENSPAN_INJECTED_SCRIPT_URL = 'app:///injection_files/OpenSpanDocumentScriptRollup.js';
+const UNDEFINED_JSON_SYNTAX_ERROR = '"undefined" is not valid JSON';
 const REACT_REMOVE_CHILD_NOT_FOUND_ERROR =
   "Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.";
 const REACT_DOM_CLIENT_FRAME_PATTERN =
@@ -72,6 +74,23 @@ function getFrameUrls(frame: SentryStackFrame): string[] {
   );
 }
 
+function isOpenSpanInjectedFrame(frame: SentryStackFrame): boolean {
+  return getFrameUrls(frame).includes(OPENSPAN_INJECTED_SCRIPT_URL);
+}
+
+function isInjectedOpenSpanJsonSyntaxError(event: Event): boolean {
+  return (event.exception?.values ?? []).some((exception: SentryException) => {
+    if (exception.type !== 'SyntaxError' || exception.value !== UNDEFINED_JSON_SYNTAX_ERROR) {
+      return false;
+    }
+
+    // Drop only when every frame is positively identified as the OpenSpan
+    // injected script; a frame with another URL or no URL keeps the event.
+    const frames = (exception.stacktrace?.frames ?? []) as SentryStackFrame[];
+    return frames.length > 0 && frames.every(isOpenSpanInjectedFrame);
+  });
+}
+
 function isReactDomClientFrame(frame: SentryStackFrame): boolean {
   return getFrameUrls(frame).some((url) => REACT_DOM_CLIENT_FRAME_PATTERN.test(url));
 }
@@ -116,6 +135,10 @@ export function shouldDropClientSentryEvent(event: Event, hint?: EventHint): boo
   }
 
   if (isInjectedAppScriptSyntaxError(event)) {
+    return true;
+  }
+
+  if (isInjectedOpenSpanJsonSyntaxError(event)) {
     return true;
   }
 

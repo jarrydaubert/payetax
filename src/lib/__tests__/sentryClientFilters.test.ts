@@ -3,6 +3,7 @@ import { shouldDropClientSentryEvent } from '@/lib/sentryClientFilters';
 
 const REACT_REMOVE_CHILD_NOT_FOUND_ERROR =
   "Failed to execute 'removeChild' on 'Node': The node to be removed is not a child of this node.";
+const OPENSPAN_INJECTED_SCRIPT_URL = 'app:///injection_files/OpenSpanDocumentScriptRollup.js';
 
 const eventWithExceptionValue = (value: string): Event => ({
   exception: {
@@ -21,6 +22,28 @@ const eventWithInjectedScriptSyntaxError = (): Event => ({
             {
               filename: 'app:///f3e623ce0222733b/script.js',
               abs_path: 'app:///f3e623ce0222733b/script.js',
+              lineno: 1,
+              colno: 1,
+              in_app: true,
+            },
+          ],
+        },
+      },
+    ],
+  },
+});
+
+const eventWithInjectedOpenSpanJsonSyntaxError = (): Event => ({
+  exception: {
+    values: [
+      {
+        type: 'SyntaxError',
+        value: '"undefined" is not valid JSON',
+        stacktrace: {
+          frames: [
+            {
+              filename: OPENSPAN_INJECTED_SCRIPT_URL,
+              abs_path: OPENSPAN_INJECTED_SCRIPT_URL,
               lineno: 1,
               colno: 1,
               in_app: true,
@@ -81,6 +104,77 @@ describe('shouldDropClientSentryEvent', () => {
 
   it('drops injected app-scheme script syntax noise', () => {
     expect(shouldDropClientSentryEvent(eventWithInjectedScriptSyntaxError())).toBe(true);
+  });
+
+  it('drops the exact injected OpenSpan JSON syntax error even when marked in-app', () => {
+    expect(shouldDropClientSentryEvent(eventWithInjectedOpenSpanJsonSyntaxError())).toBe(true);
+  });
+
+  it('keeps equivalent first-party JSON syntax errors reportable', () => {
+    const event = eventWithInjectedOpenSpanJsonSyntaxError();
+    const exception = event.exception?.values?.[0];
+    if (exception?.stacktrace) {
+      exception.stacktrace.frames = [
+        {
+          filename: 'app:///_next/static/chunks/app/blog/page.js',
+          in_app: true,
+        },
+      ];
+    }
+
+    expect(shouldDropClientSentryEvent(event)).toBe(false);
+  });
+
+  it('keeps other OpenSpan JSON syntax errors reportable', () => {
+    const event = eventWithInjectedOpenSpanJsonSyntaxError();
+    const exception = event.exception?.values?.[0];
+    if (exception) {
+      exception.value = 'Unexpected token u in JSON at position 0';
+    }
+
+    expect(shouldDropClientSentryEvent(event)).toBe(false);
+  });
+
+  it('keeps OpenSpan JSON syntax errors with another first-party frame reportable', () => {
+    const event = eventWithInjectedOpenSpanJsonSyntaxError();
+    event.exception?.values?.[0]?.stacktrace?.frames?.push({
+      filename: 'app:///_next/static/chunks/app/blog/page.js',
+      in_app: true,
+    });
+
+    expect(shouldDropClientSentryEvent(event)).toBe(false);
+  });
+
+  it('keeps OpenSpan JSON syntax errors with a first-party frame lacking in_app reportable', () => {
+    const event = eventWithInjectedOpenSpanJsonSyntaxError();
+    event.exception?.values?.[0]?.stacktrace?.frames?.push({
+      filename: 'app:///_next/static/chunks/app/blog/page.js',
+    });
+
+    expect(shouldDropClientSentryEvent(event)).toBe(false);
+  });
+
+  it('keeps OpenSpan JSON syntax errors with an unidentified frame reportable', () => {
+    const event = eventWithInjectedOpenSpanJsonSyntaxError();
+    event.exception?.values?.[0]?.stacktrace?.frames?.push({
+      lineno: 1,
+      colno: 1,
+    });
+
+    expect(shouldDropClientSentryEvent(event)).toBe(false);
+  });
+
+  it('drops an exclusively OpenSpan multi-frame stack', () => {
+    const event = eventWithInjectedOpenSpanJsonSyntaxError();
+    event.exception?.values?.[0]?.stacktrace?.frames?.push({
+      filename: OPENSPAN_INJECTED_SCRIPT_URL,
+      abs_path: OPENSPAN_INJECTED_SCRIPT_URL,
+      lineno: 2,
+      colno: 7,
+      in_app: false,
+    });
+
+    expect(shouldDropClientSentryEvent(event)).toBe(true);
   });
 
   it('drops translated-DOM React removeChild noise from browser page translation', () => {
