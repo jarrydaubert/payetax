@@ -35,7 +35,8 @@ Columns: Concern | Current owner | Consumers (production) | Duplicate logic or v
 - **Verified complete:** National Insurance mechanics (#88); Tax-code interpretation (#87). No duplicate math, single owner, delegating consumers, absence of the old shadow helpers asserted by tests.
 - **Partial:** Policy data (canonical for rate/threshold tables, but pension-AA/taper + POA thresholds sit outside it); Policy selection (engine resolver exists, other paths default ad-hoc); Period conversion + rounding (single rounding owner but two production duplicate definitions + two conversion-factor encodings); Application orchestration (two intended routes, but the director route exposes the income-tax duplication); Result assembly (deductions transparent; selected policy not echoed); Independent verification (genuinely independent and hand-derived, but per-suite not per-scenario provenance, year coverage concentrated).
 - **Requires work:** Income Tax mechanics (3 live rUK band iterations); Student-loan mechanics (2 live + 1 dead); Pension-method handling (single hidden assumption, no RAS/net-pay).
-- **Obsolete / superseded (dead or shadow — carry no unique live behaviour):** `calculateIncomeTaxFromBands`, `calculateStudentLoanRepayments`, `convertToPeriods` (all exported from `taxCalculator.ts`, test-only); `payrollPeriodDeductions.ts` (test-only shadow, holds the cumulative-PAYE income-tax loop). The 2026-07-19 report's `calculateNIContributions` and `taxRateDescriptions` findings are resolved/removed.
+- **Obsolete / superseded (dead or shadow — carry no unique live behaviour):** `calculateIncomeTaxFromBands`, `calculateStudentLoanRepayments`, `convertToPeriods` (all exported from `taxCalculator.ts`, test-only); `payrollPeriodDeductions.ts` (test-only shadow, holds the cumulative-PAYE income-tax loop). Of the 2026-07-19 report's shadow findings, only `calculateNIContributions` is resolved/removed (#88).
+- **Unresolved dead/test-only display projection:** `src/lib/taxRateDescriptions.ts` still exists, with **zero production consumers** (only its own test references it), and still formats rates by multiplying percentage-stored values by 100 (`band.rate * 100` at lines 20/32/33 → e.g. "2000%"). It is **not** resolved by this audit and remains owned by the existing detailed backlog items in `docs/BACKLOG.md` ("Dead `taxRateDescriptions.ts` module…" and "Remove shadow helpers…"). Contrary to an earlier draft of this report, it has **not** been removed.
 
 ## Drift-guard state (evidence, not action)
 
@@ -48,11 +49,12 @@ A current, evidence-backed ownership map now exists (this report). Two deduction
 consolidated (NI, tax codes); the remaining duplication is concentrated in **rUK income-tax band
 iteration (×3 live), student-loan repayment (×2 live), the personal-allowance taper (×3 forward
 implementations), and `roundToPence` (×3)**, plus split period-conversion ownership. Each of these,
-and pension-method handling, result-policy transparency, and per-scenario fixture provenance, is
-already represented by its own Foundation burn-down row and/or detailed backlog item — so the
-**Current ownership audit** row's outcome is satisfied and it is removed, with this report as the
-preserved evidence. No generic rules engine, plugin system, folder restructuring, duplicate
-calculator or exhaustive JSON matrix is proposed.
+and pension-method handling, result-policy transparency, per-scenario fixture provenance, and the
+still-present dead `taxRateDescriptions.ts` display module, is already represented by its own
+Foundation burn-down row and/or detailed backlog item — so the **Current ownership audit** row's
+outcome is satisfied (the map accurately records the unresolved work, which remains tracked
+elsewhere) and it is removed, with this report as the preserved evidence. No generic rules engine,
+plugin system, folder restructuring, duplicate calculator or exhaustive JSON matrix is proposed.
 
 ## Limitations
 
