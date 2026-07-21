@@ -36,7 +36,6 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
-!.env.local.example
 !.env.template
 .env.local
 .env.production.local
@@ -62,11 +61,12 @@ next-env.d.ts
 # Consolidated Audit & Reports Directory
 /audit-outputs
 
-# Legacy report paths (during migration) - NOW CLEANED UP
+# Legacy root report paths (pre-audit-outputs migration)
 /playwright-report
-/test-results
 lighthouse-report.html
 security-audit-history.json
+
+# Bundle size history (generated at root by scripts/bundle-analyzer.js)
 /bundle-history.json
 
 # Mac OS clutter
@@ -82,3 +82,6 @@ playwright/.auth/
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Claude Code local settings
+.claude/settings.local.json
