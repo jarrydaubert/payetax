@@ -51,7 +51,6 @@ Status is `To verify` for every row until a focused audit establishes whether ea
 | A transparent result that clearly exposes the selected policy, calculation basis, relevant pay bases and individual deductions | One result exposes the policy selected, the calculation basis, the relevant pay bases and each individual deduction, without callers reassembling them. | To verify | |
 | Compact independent full-calculation fixture set | A small set of JSON fixtures, derived independently of production code, covers representative full-calculation interactions. | To verify | |
 | Balanced test portfolio and updated `TESTING.md` | JSON fixtures, TypeScript rule and boundary tests, and Playwright journeys are balanced, with `TESTING.md` describing the split. | To verify | |
-| Root repository hygiene and generated-artifact ownership | Every root item has a clear current purpose; required framework and tooling files remain in conventional locations, generated caches and disposable outputs are ignored, deliberately tracked evidence is justified, and obsolete or duplicated items are resolved without cosmetic restructuring. | To verify | |
 | Final backlog reconciliation | After the foundation audit, the detailed backlog items are reconciled against verified outcomes. | To verify | |
 
 **Burn-down rule**
