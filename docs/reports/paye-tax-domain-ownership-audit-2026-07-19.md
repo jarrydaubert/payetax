@@ -1,5 +1,10 @@
 # PayeTax Tax-Domain Ownership Audit — 2026-07-19
 
+> **Superseded by `paye-tax-domain-ownership-audit-2026-07-21.md`** (snapshot `889dce7f`, after
+> PRs #84–#91). Several findings below are resolved: NI mechanics unified (#88), tax-code grammar
+> unified (#87), Scottish band mechanic shared (#86), `@/lib/tax` boundary + guard added (#85),
+> `calculateNIContributions` deleted (#88). Retained as a historical snapshot at `d15ff79c`.
+
 Dated evidence report. Snapshot of `origin/main` at `d15ff79c` (includes PR #82 and PR #83).
 Method: ownership conclusions are based on actual import and execution paths (grep of
 non-test importers, headless execution of modules), not on comments claiming canonicity.
