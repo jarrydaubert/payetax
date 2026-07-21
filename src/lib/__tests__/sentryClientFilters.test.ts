@@ -145,6 +145,38 @@ describe('shouldDropClientSentryEvent', () => {
     expect(shouldDropClientSentryEvent(event)).toBe(false);
   });
 
+  it('keeps OpenSpan JSON syntax errors with a first-party frame lacking in_app reportable', () => {
+    const event = eventWithInjectedOpenSpanJsonSyntaxError();
+    event.exception?.values?.[0]?.stacktrace?.frames?.push({
+      filename: 'app:///_next/static/chunks/app/blog/page.js',
+    });
+
+    expect(shouldDropClientSentryEvent(event)).toBe(false);
+  });
+
+  it('keeps OpenSpan JSON syntax errors with an unidentified frame reportable', () => {
+    const event = eventWithInjectedOpenSpanJsonSyntaxError();
+    event.exception?.values?.[0]?.stacktrace?.frames?.push({
+      lineno: 1,
+      colno: 1,
+    });
+
+    expect(shouldDropClientSentryEvent(event)).toBe(false);
+  });
+
+  it('drops an exclusively OpenSpan multi-frame stack', () => {
+    const event = eventWithInjectedOpenSpanJsonSyntaxError();
+    event.exception?.values?.[0]?.stacktrace?.frames?.push({
+      filename: OPENSPAN_INJECTED_SCRIPT_URL,
+      abs_path: OPENSPAN_INJECTED_SCRIPT_URL,
+      lineno: 2,
+      colno: 7,
+      in_app: false,
+    });
+
+    expect(shouldDropClientSentryEvent(event)).toBe(true);
+  });
+
   it('drops translated-DOM React removeChild noise from browser page translation', () => {
     expect(shouldDropClientSentryEvent(eventWithTranslatedReactRemoveChildError())).toBe(true);
   });

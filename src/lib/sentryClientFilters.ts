@@ -84,12 +84,10 @@ function isInjectedOpenSpanJsonSyntaxError(event: Event): boolean {
       return false;
     }
 
+    // Drop only when every frame is positively identified as the OpenSpan
+    // injected script; a frame with another URL or no URL keeps the event.
     const frames = (exception.stacktrace?.frames ?? []) as SentryStackFrame[];
-    if (!frames.some(isOpenSpanInjectedFrame)) {
-      return false;
-    }
-
-    return !frames.some((frame) => isInAppFrame(frame) && !isOpenSpanInjectedFrame(frame));
+    return frames.length > 0 && frames.every(isOpenSpanInjectedFrame);
   });
 }
 
