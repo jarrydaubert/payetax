@@ -41,7 +41,6 @@ Status is `To verify` for every row until a focused audit establishes whether ea
 | Effective-dated policy model | Published rates, thresholds and effective dates live in one model that represents mid-year changes as data. | To verify | |
 | One policy selector | A single selector resolves the policy in force for a tax year and effective date; consumers do not re-derive it. | To verify | |
 | One shared pay-basis derivation | Pay-period and annual bases are derived once and shared, not recomputed per consumer. | To verify | |
-| One rule owner for student loans | Student loan mechanics live in one clearly owned rule module. | To verify | |
 | Explicit pension-method handling | Salary-sacrifice, net-pay and relief-at-source are handled explicitly, with the method exposed in the result. | To verify | |
 | Shared period-conversion and rounding ownership | Period-conversion factors and rounding conventions are owned in one place and reused. | To verify | |
 | One supported route for each statutory calculation | Each statutory calculation is reachable through one supported route, with no duplicate or test-only calculators. | To verify | |
@@ -75,9 +74,8 @@ Status is `To verify` for every row until a focused audit establishes whether ea
 - Unambiguous annual-policy schema: unit- and basis-explicit fields (taxable vs total income, percent vs fraction, per-year vs per-week), effective-dated rates for mid-year changes.
 - One supported tax-domain public interface (`src/lib/tax/index.ts`); application code stops importing `constants/taxRates` and domain internals directly.
 - Consolidate income-tax band mechanics: rUK and Scottish slicing each have one owner; the display interpreters and the cumulative shadow loop in `payrollPeriodDeductions` remain.
-- Consolidate student-loan mechanics (currently 3 implementations).
 - One tax-code grammar shared by engine, decoder, validation schema and store edit-gate (currently 4).
-- Remove shadow helpers that tests exercise but production never calls (`calculateStudentLoanRepayments`, `payrollPeriodDeductions` as production-adjacent code, `taxRateDescriptions`).
+- Remove shadow helpers that tests exercise but production never calls (`payrollPeriodDeductions` as production-adjacent code, `taxRateDescriptions`).
 - NI pay-date basis: payroll rate selection derives a pay date from the tax period start, so a weekly or four-weekly period straddling a mid-year rate change takes the earlier rate. Accept a real pay date where callers have one.
 - Explicit ownership of pay-period conversion and rounding rules (factors, ceil/floor conventions, period scaling) in one place.
 - Generated projections as the only path for UI band tables, tools, `/api/tax-rates`, structured data and llms.txt facts (Dataset JSON-LD currently projects independently of `crawlableTaxFacts`).
