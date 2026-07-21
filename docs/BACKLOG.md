@@ -42,10 +42,8 @@ Status is `To verify` for every row until a focused audit establishes whether ea
 | One policy selector | A single selector resolves the policy in force for a tax year and effective date; consumers do not re-derive it. | To verify | |
 | One shared pay-basis derivation | Pay-period and annual bases are derived once and shared, not recomputed per consumer. | To verify | |
 | One rule owner for Income Tax | Income Tax mechanics live in one clearly owned rule module. | To verify | |
-| One rule owner for National Insurance | National Insurance mechanics live in one clearly owned rule module. | To verify | |
 | One rule owner for student loans | Student loan mechanics live in one clearly owned rule module. | To verify | |
 | Explicit pension-method handling | Salary-sacrifice, net-pay and relief-at-source are handled explicitly, with the method exposed in the result. | To verify | |
-| Shared tax-code interpretation | One tax-code interpretation is shared by engine, decoder, validation and any edit gate. | To verify | |
 | Shared period-conversion and rounding ownership | Period-conversion factors and rounding conventions are owned in one place and reused. | To verify | |
 | One supported route for each statutory calculation | Each statutory calculation is reachable through one supported route, with no duplicate or test-only calculators. | To verify | |
 | A transparent result that clearly exposes the selected policy, calculation basis, relevant pay bases and individual deductions | One result exposes the policy selected, the calculation basis, the relevant pay bases and each individual deduction, without callers reassembling them. | To verify | |
