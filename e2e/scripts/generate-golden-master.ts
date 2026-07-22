@@ -14,6 +14,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { TAX_RATES } from '../../src/constants/taxRates';
+import { roundToPence } from '../../src/lib/tax/utils';
 import { calculateTax, type TaxCalculationInput } from '../../src/lib/taxCalculator';
 
 const TAX_YEAR = '2025-2026' as const;
@@ -199,11 +200,11 @@ const generated = scenarios.map(({ id, description, input }) => {
         ...(input.isMarried && { partnerGrossWage: input.partnerGrossWage }),
       },
       expected: {
-        incomeTax: Math.round(incomeTax * 100) / 100,
-        employeeNI: Math.round(employeeNI * 100) / 100,
-        ...(studentLoan > 0 && { studentLoanRepayment: Math.round(studentLoan * 100) / 100 }),
-        ...(pension > 0 && { pensionContribution: Math.round(pension * 100) / 100 }),
-        netPay: Math.round(netPay * 100) / 100,
+        incomeTax: roundToPence(incomeTax),
+        employeeNI: roundToPence(employeeNI),
+        ...(studentLoan > 0 && { studentLoanRepayment: roundToPence(studentLoan) }),
+        ...(pension > 0 && { pensionContribution: roundToPence(pension) }),
+        netPay: roundToPence(netPay),
       },
       generatedAt: new Date().toISOString(),
       taxYear: TAX_YEAR,
@@ -247,10 +248,10 @@ generated.push({
       dualLoanInput.studentLoanPlans === 'none' ? [] : [...dualLoanInput.studentLoanPlans],
   },
   expected: {
-    incomeTax: Math.round(dualLoanResults.incomeTax.annually * 100) / 100,
-    employeeNI: Math.round(dualLoanResults.nationalInsurance.annually * 100) / 100,
-    studentLoanRepayment: Math.round((dualLoanResults.studentLoan?.annually ?? 0) * 100) / 100,
-    netPay: Math.round(dualLoanResults.netPay.annually * 100) / 100,
+    incomeTax: roundToPence(dualLoanResults.incomeTax.annually),
+    employeeNI: roundToPence(dualLoanResults.nationalInsurance.annually),
+    studentLoanRepayment: roundToPence(dualLoanResults.studentLoan?.annually ?? 0),
+    netPay: roundToPence(dualLoanResults.netPay.annually),
   },
   generatedAt: new Date().toISOString(),
   taxYear: TAX_YEAR,

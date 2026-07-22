@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react';
 import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
+import { roundToPence } from '@/lib/tax';
 import {
   calculateSalaryScenario,
   calculateStrategyComparison,
@@ -17,8 +18,6 @@ import {
 } from '@/store/directorGuideStore';
 
 const TAX_YEAR = CURRENT_TAX_YEAR;
-
-const roundToPence = (value: number) => Math.round(value * 100) / 100;
 
 type SelectedStrategyKey = 'allSalary' | 'optimalMix' | 'allDividends';
 

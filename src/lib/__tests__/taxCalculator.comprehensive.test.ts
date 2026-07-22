@@ -10,6 +10,7 @@
  * - Invalid inputs and edge cases
  */
 
+import { roundToPence } from '../tax/utils';
 import { calculateTax, type TaxCalculationInput } from '../taxCalculator';
 
 describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
@@ -230,8 +231,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
         );
 
         // Engine rounds monthly repayment to pence before annualizing.
-        const expectedRepayment =
-          Math.round((((salary - threshold) * (rate / 100)) / 12) * 100) / 100;
+        const expectedRepayment = roundToPence(((salary - threshold) * (rate / 100)) / 12);
         expect(result.studentLoan.annually).toBeCloseTo(expectedRepayment * 12, 2);
       });
     });

@@ -77,4 +77,4 @@ export {
   normalizeTaxCode,
   parseTaxCode,
 } from './taxCode';
-export { taxableThresholdToTotalIncome } from './utils';
+export { roundToPence, taxableThresholdToTotalIncome } from './utils';
