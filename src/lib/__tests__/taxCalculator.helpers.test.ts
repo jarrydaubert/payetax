@@ -11,7 +11,6 @@ import { parseTaxCode } from '@/lib/tax';
 import {
   calculateAllowanceReduction,
   calculatePensionAmount,
-  calculateStudentLoanRepayments,
   convertToPeriods,
 } from '../taxCalculator';
 
@@ -80,18 +79,10 @@ describe('taxCalculator helpers', () => {
   // £1,047.50 monthly threshold (annual / 12) had already drifted from the
   // engine's published £1,048. See nationalInsuranceVertical.test.ts.
 
-  describe('calculateStudentLoanRepayments', () => {
-    it('returns zero when no plans selected', () => {
-      expect(calculateStudentLoanRepayments(3000, 'none', {})).toBe(0);
-    });
-
-    it('calculates repayments for plan 2', () => {
-      const loanRates = { plan2: { threshold: 28470, rate: 9 } };
-      const monthly = calculateStudentLoanRepayments(3000, ['plan2'], loanRates);
-
-      expect(monthly).toBeCloseTo(56.48, 2);
-    });
-  });
+  // Student loan coverage moved to the shared mechanic.
+  // `calculateStudentLoanRepayments` was deleted with the student-loan
+  // vertical: it had no production callers and duplicated the engine's
+  // monthly loop. See studentLoan.test.ts.
 
   describe('convertToPeriods', () => {
     const annualValues = {

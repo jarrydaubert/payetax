@@ -49,7 +49,7 @@ import {
   PERIOD_CONVERSION_FACTORS,
   PERIODS,
   SCOTTISH_TAX_RATES,
-  type StudentLoanSelection,
+  type StudentLoanPlan,
   TAX_RATES,
   type TaxYear,
   WEEKS_PER_YEAR,
@@ -65,6 +65,7 @@ import {
 } from './tax/nationalInsurance';
 import { sliceRukTaxableIncome } from './tax/rukIncomeTax';
 import { sliceScottishTaxableIncome } from './tax/scottishIncomeTax';
+import { type StudentLoanPlanPolicy, sliceStudentLoanRepayments } from './tax/studentLoan';
 import { parseTaxCode } from './tax/taxCode';
 import { roundToPence } from './tax/utils';
 
@@ -151,33 +152,6 @@ export function calculatePensionAmount(
   }
   // Fixed amount - convert to monthly equivalent
   return contribution / 12;
-}
-
-/**
- * Calculate student loan repayments for all selected plans
- */
-export function calculateStudentLoanRepayments(
-  monthlyGrossSalary: number,
-  studentLoanPlans: StudentLoanSelection,
-  loanRates: Record<string, { threshold: number; rate: number }>,
-): number {
-  if (!Array.isArray(studentLoanPlans) || studentLoanPlans.length === 0) {
-    return 0;
-  }
-
-  let monthlyRepayment = 0;
-
-  for (const plan of studentLoanPlans) {
-    const rates = loanRates[plan];
-    if (!rates) continue;
-    const monthlyThreshold = rates.threshold / 12;
-
-    if (monthlyGrossSalary > monthlyThreshold) {
-      monthlyRepayment += ((monthlyGrossSalary - monthlyThreshold) * rates.rate) / 100;
-    }
-  }
-
-  return roundToPence(monthlyRepayment);
 }
 
 /**
@@ -828,24 +802,23 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
 
   let monthlyStudentLoan = 0;
 
-  // Calculate repayments for multiple student loans if selected
-  // Each loan is calculated independently and summed (HMRC rules)
   if (Array.isArray(input.studentLoanPlans) && input.studentLoanPlans.length > 0) {
+    // Annual policy thresholds convert to the engine's monthly basis here;
+    // the shared mechanic stays basis-agnostic and unrounded.
+    const monthlyPolicy: Partial<Record<StudentLoanPlan, StudentLoanPlanPolicy>> = {};
     for (const plan of input.studentLoanPlans) {
       const loanRates = standardRates.studentLoan[plan];
-
-      // Convert annual threshold to monthly
-      const monthlyLoanThreshold = loanRates.threshold / 12;
-
-      // SL repayment = 9% (or 6% for PG) of employment income above threshold
-      if (monthlyEmploymentIncome > monthlyLoanThreshold) {
-        monthlyStudentLoan +=
-          ((monthlyEmploymentIncome - monthlyLoanThreshold) * loanRates.rate) / 100;
-      }
+      monthlyPolicy[plan] = { threshold: loanRates.threshold / 12, rate: loanRates.rate };
     }
+
+    monthlyStudentLoan = sliceStudentLoanRepayments(
+      monthlyEmploymentIncome,
+      input.studentLoanPlans,
+      monthlyPolicy,
+    ).total;
   }
 
-  // Round monthly student loan to pence for accuracy
+  // PAYE rounding convention: sum unrounded plan repayments, then round once.
   monthlyStudentLoan = roundToPence(monthlyStudentLoan);
 
   // Calculate annual student loan (for output)
