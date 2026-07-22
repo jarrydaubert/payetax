@@ -42,6 +42,9 @@ describe('tax-domain public interface', () => {
   it('does not expose known internal or shadow calculator helpers', () => {
     expect(taxDomain).not.toHaveProperty('calculateNIContributions');
     expect(taxDomain).not.toHaveProperty('calculateIncomeTaxFromBands');
+    expect(taxDomain).not.toHaveProperty('calculateStudentLoanRepayments');
+    expect(taxDomain).not.toHaveProperty('calculatePayrollPeriodDeductions');
+    expect(taxDomain).not.toHaveProperty('convertToPeriods');
     expect(taxDomain).not.toHaveProperty('calculateDirectorScenario');
     expect(taxDomain).not.toHaveProperty('getAdjustedPersonalAllowance');
   });

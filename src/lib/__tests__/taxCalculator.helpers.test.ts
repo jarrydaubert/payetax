@@ -8,11 +8,7 @@
  */
 
 import { parseTaxCode } from '@/lib/tax';
-import {
-  calculateAllowanceReduction,
-  calculatePensionAmount,
-  convertToPeriods,
-} from '../taxCalculator';
+import { calculateAllowanceReduction, calculatePensionAmount } from '../taxCalculator';
 
 describe('taxCalculator helpers', () => {
   describe('parseTaxCode', () => {
@@ -84,37 +80,9 @@ describe('taxCalculator helpers', () => {
   // vertical: it had no production callers and duplicated the engine's
   // monthly loop. See studentLoan.test.ts.
 
-  describe('convertToPeriods', () => {
-    const annualValues = {
-      gross: 12000,
-      tax: 1200,
-      ni: 600,
-      studentLoan: 0,
-      pension: 0,
-      net: 10200,
-    };
-
-    it('converts annual values to monthly/weekly with rounding', () => {
-      const results = convertToPeriods(annualValues, 40);
-
-      expect(results.monthly.gross).toBe(1000);
-      expect(results.weekly.gross).toBeCloseTo(230.77, 2);
-    });
-
-    it('calculates hourly values when hoursPerWeek is provided', () => {
-      const results = convertToPeriods(annualValues, 40);
-      expect(results.hourly.gross).toBeCloseTo(5.77, 2);
-    });
-
-    it('falls back to default hours when hoursPerWeek is zero', () => {
-      const results = convertToPeriods(annualValues, 0);
-      expect(results.hourly.gross).toBeCloseTo(12000 / (52 * 40), 2);
-    });
-
-    it('returns annual values unchanged for annually', () => {
-      const results = convertToPeriods(annualValues, 40);
-      expect(results.annually.gross).toBe(12000);
-      expect(results.annually.net).toBe(10200);
-    });
-  });
+  // Period-projection coverage lives on the production route. `convertToPeriods`
+  // was deleted as a dead duplicate of the engine's inline projection: the
+  // engine's monthly/weekly/four-weekly/hourly outputs and the zero-hours
+  // fallback are asserted in taxCalculator.test.ts and
+  // taxCalculator.comprehensive.test.ts against calculateTax results.
 });

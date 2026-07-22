@@ -73,6 +73,7 @@ export interface TaxAllowance {
 
 export interface PayrollPeriodThresholds {
   weekly: {
+    /** Reference-only HMRC value: no production path computes weekly free pay. */
     payeFreePay: number;
     niPrimary: number;
     niUpper: number;
