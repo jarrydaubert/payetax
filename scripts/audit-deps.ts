@@ -1,10 +1,19 @@
 #!/usr/bin/env bun
 /**
- * Runs `bun audit --json --audit-level=high` and fails only on non-allowlisted advisories.
+ * Runs `bun audit --json --audit-level=high`, rejects non-allowlisted advisories,
+ * and fails when a temporary allowlist entry is expired, invalid, or no longer matched.
  */
 
 import { spawnSync } from 'node:child_process';
-import { DEPENDENCY_ADVISORY_ALLOWLIST } from './dependency-advisory-allowlist';
+import {
+  DEPENDENCY_ADVISORY_ALLOWLIST,
+  type DependencyAdvisoryAllowlistEntry,
+} from './dependency-advisory-allowlist';
+import {
+  type DependencyAdvisoryAllowlistIssue,
+  dependencyAdvisoryMatchesEntry,
+  findDependencyAdvisoryAllowlistIssues,
+} from './dependency-advisory-policy';
 
 type BunAuditAdvisory = {
   url?: string;
@@ -19,6 +28,14 @@ type Advisory = {
   severity: string;
   raw: BunAuditAdvisory;
 };
+
+type AuditCommandResult = {
+  status: number | null;
+  stdout: string | null;
+  stderr: string | null;
+};
+
+type AuditCommand = () => AuditCommandResult;
 
 function extractAdvisoryId(url?: string): string | null {
   if (!url) return null;
@@ -71,13 +88,12 @@ function isAuditConnectivityFailure(output: string): boolean {
   );
 }
 
-function isAllowlisted(advisory: Advisory): boolean {
+function isAllowlisted(
+  advisory: Advisory,
+  allowlist: readonly DependencyAdvisoryAllowlistEntry[],
+): boolean {
   if (!advisory.id) return false;
-  return DEPENDENCY_ADVISORY_ALLOWLIST.some(
-    (entry) =>
-      advisory.id === entry.id &&
-      advisory.packageName.toLowerCase() === entry.package.toLowerCase(),
-  );
+  return allowlist.some((entry) => dependencyAdvisoryMatchesEntry(advisory, entry));
 }
 
 function parseIsoDate(value: string): Date | null {
@@ -85,15 +101,13 @@ function parseIsoDate(value: string): Date | null {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
-function getDaysSince(date: Date): number {
-  const now = Date.now();
-  const diffMs = now - date.getTime();
+function getDaysSince(date: Date, now: Date): number {
+  const diffMs = now.getTime() - date.getTime();
   return Math.floor(diffMs / (1000 * 60 * 60 * 24));
 }
 
-function getDaysUntil(date: Date): number {
-  const now = Date.now();
-  const diffMs = date.getTime() - now;
+function getDaysUntil(date: Date, now: Date): number {
+  const diffMs = date.getTime() - now.getTime();
   return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
 }
 
@@ -105,7 +119,10 @@ function formatIsoDate(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
-function printAllowlistFreshnessWarnings(): void {
+function printAllowlistFreshnessWarnings(
+  allowlist: readonly DependencyAdvisoryAllowlistEntry[],
+  now: Date,
+): void {
   const staleEntries: Array<{ id: string; packageName: string; days: number; cadence: number }> =
     [];
   const reviewSchedule: Array<{
@@ -115,7 +132,7 @@ function printAllowlistFreshnessWarnings(): void {
     daysUntilReview: number;
   }> = [];
 
-  for (const entry of DEPENDENCY_ADVISORY_ALLOWLIST) {
+  for (const entry of allowlist) {
     const checkedDate = parseIsoDate(entry.lastChecked);
     if (!checkedDate) {
       console.warn(
@@ -129,10 +146,10 @@ function printAllowlistFreshnessWarnings(): void {
       id: entry.id,
       packageName: entry.package,
       nextReviewDate: formatIsoDate(nextReviewDate),
-      daysUntilReview: getDaysUntil(nextReviewDate),
+      daysUntilReview: getDaysUntil(nextReviewDate, now),
     });
 
-    const days = getDaysSince(checkedDate);
+    const days = getDaysSince(checkedDate, now);
     if (days > entry.reviewCadenceDays) {
       staleEntries.push({
         id: entry.id,
@@ -165,10 +182,34 @@ function printAllowlistFreshnessWarnings(): void {
   }
 }
 
-function main(): void {
-  const result = spawnSync('bun', ['audit', '--json', '--audit-level=high'], {
-    encoding: 'utf-8',
-  });
+function printAllowlistPolicyIssues(issues: readonly DependencyAdvisoryAllowlistIssue[]): void {
+  console.error('\n❌ Dependency advisory allowlist contains invalid entries:');
+
+  for (const issue of issues) {
+    const identity = `${issue.entry.package} (${issue.entry.id})`;
+    if (issue.kind === 'expired') {
+      console.error(`   - ${identity} expired after ${issue.entry.removeAfter}`);
+    } else if (issue.kind === 'unmatched') {
+      console.error(`   - ${identity} does not match a current audit advisory`);
+    } else {
+      console.error(`   - ${identity} has invalid removeAfter date: ${issue.entry.removeAfter}`);
+    }
+  }
+
+  console.error(
+    '   Remove resolved entries or refresh still-needed exceptions with current evidence.',
+  );
+}
+
+export function runDependencyAudit(
+  runAudit: AuditCommand = () =>
+    spawnSync('bun', ['audit', '--json', '--audit-level=high'], {
+      encoding: 'utf-8',
+    }),
+  allowlist: readonly DependencyAdvisoryAllowlistEntry[] = DEPENDENCY_ADVISORY_ALLOWLIST,
+  now = new Date(),
+): number {
+  const result = runAudit();
 
   const stdout = result.stdout ?? '';
   const stderr = result.stderr ?? '';
@@ -178,13 +219,7 @@ function main(): void {
   if (stderr) process.stderr.write(stderr);
 
   const advisories = parseBunAuditJson(stdout);
-  if (result.status === 0 && advisories.length === 0) {
-    printAllowlistFreshnessWarnings();
-    console.log('\n✅ Dependency audit passed with no advisories');
-    return;
-  }
-
-  if (advisories.length === 0) {
+  if (result.status !== 0 && advisories.length === 0) {
     if (isAuditConnectivityFailure(combinedOutput)) {
       console.error(
         '\n❌ Dependency audit could not reach the Bun advisory service (network/connectivity issue).',
@@ -192,33 +227,54 @@ function main(): void {
       console.error(
         '   Retry when connectivity is available; this is not a vulnerability finding.',
       );
-      process.exit(1);
+      return 1;
     }
     console.error(
       '\n❌ Dependency audit failed and no machine-readable advisories were parsed (unexpected format/output).',
     );
-    process.exit(result.status ?? 1);
+    return result.status ?? 1;
   }
 
-  const nonAllowlisted = advisories.filter((advisory) => !isAllowlisted(advisory));
+  const nonAllowlisted = advisories.filter((advisory) => !isAllowlisted(advisory, allowlist));
+  const allowlistIssues = findDependencyAdvisoryAllowlistIssues(advisories, allowlist, now);
+
+  if (allowlistIssues.length > 0) {
+    printAllowlistPolicyIssues(allowlistIssues);
+    if (nonAllowlisted.length > 0) {
+      printNonAllowlistedAdvisories(nonAllowlisted);
+    }
+    return 1;
+  }
+
+  if (result.status === 0 && advisories.length === 0) {
+    printAllowlistFreshnessWarnings(allowlist, now);
+    console.log('\n✅ Dependency audit passed with no advisories');
+    return 0;
+  }
 
   if (nonAllowlisted.length === 0) {
     console.log('\n⚠️  Dependency audit contains only allowlisted advisory entries:');
     for (const advisory of advisories) {
       console.log(`   - ${advisory.packageName} (${advisory.id ?? 'no-id'})`);
     }
-    printAllowlistFreshnessWarnings();
+    printAllowlistFreshnessWarnings(allowlist, now);
     console.log('✅ Allowlisted-only dependency audit accepted');
-    return;
+    return 0;
   }
 
+  printNonAllowlistedAdvisories(nonAllowlisted);
+  return 1;
+}
+
+function printNonAllowlistedAdvisories(advisories: readonly Advisory[]): void {
   console.error('\n❌ Non-allowlisted dependency advisories found:');
-  for (const advisory of nonAllowlisted) {
+  for (const advisory of advisories) {
     console.error(
       `   - ${advisory.packageName} (${advisory.id ?? 'no-id'}) [${advisory.severity}]: ${advisory.title}`,
     );
   }
-  process.exit(1);
 }
 
-main();
+if (require.main === module) {
+  process.exitCode = runDependencyAudit();
+}
