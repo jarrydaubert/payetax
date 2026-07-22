@@ -46,16 +46,14 @@ import {
   DEFAULT_TAX_CODE,
   PAYROLL_PERIOD_THRESHOLDS,
   type PayPeriod,
-  PERIOD_CONVERSION_FACTORS,
   PERIODS,
   SCOTTISH_TAX_RATES,
   type StudentLoanPlan,
   TAX_RATES,
   type TaxYear,
-  WEEKS_PER_YEAR,
 } from '@/constants/taxRates';
 import type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
-import { convertPeriodToAnnual } from './periodCalculator';
+import { convertMonthlyToPeriod, convertPeriodToAnnual } from './periodCalculator';
 import {
   getClass1PeriodThresholds,
   getEmployeeClass1MonthSegments,
@@ -70,8 +68,6 @@ import { parseTaxCode } from './tax/taxCode';
 import { roundToPence } from './tax/utils';
 
 export type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
-
-const AVERAGE_WEEKS_PER_MONTH = WEEKS_PER_YEAR / 12;
 
 function getMonthlyPayrollFreePay(
   annualTaxFreeAmount: number,
@@ -789,93 +785,25 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
         netPay[period] = monthlyNetPay;
         break;
 
-      case PERIODS.FOUR_WEEKLY: {
-        // Monthly * factor - averages to four-weekly
-        const fourWeeklyFactor = PERIOD_CONVERSION_FACTORS.FOUR_WEEKLY;
-        grossSalary[period] = roundToPence(monthlyGrossSalary * fourWeeklyFactor);
-        incomeTax[period] = roundToPence(monthlyTax * fourWeeklyFactor);
-        nationalInsuranceByPeriod[period] = roundToPence(
-          monthlyNationalInsurance * fourWeeklyFactor,
-        );
-        studentLoanByPeriod[period] = roundToPence(monthlyStudentLoan * fourWeeklyFactor);
-        pensionContributionByPeriod[period] = roundToPence(
-          monthlyPensionContribution * fourWeeklyFactor,
-        );
-        netPay[period] = roundToPence(monthlyNetPay * fourWeeklyFactor);
-        break;
-      }
-
-      case PERIODS.FORTNIGHTLY: {
-        // Monthly * factor - averages to fortnightly
-        const fortnightlyFactor = PERIOD_CONVERSION_FACTORS.FORTNIGHTLY;
-        grossSalary[period] = roundToPence(monthlyGrossSalary * fortnightlyFactor);
-        incomeTax[period] = roundToPence(monthlyTax * fortnightlyFactor);
-        nationalInsuranceByPeriod[period] = roundToPence(
-          monthlyNationalInsurance * fortnightlyFactor,
-        );
-        studentLoanByPeriod[period] = roundToPence(monthlyStudentLoan * fortnightlyFactor);
-        pensionContributionByPeriod[period] = roundToPence(
-          monthlyPensionContribution * fortnightlyFactor,
-        );
-        netPay[period] = roundToPence(monthlyNetPay * fortnightlyFactor);
-        break;
-      }
-
-      case PERIODS.WEEKLY: {
-        // Monthly * factor - averages to weekly
-        const weeklyFactor = PERIOD_CONVERSION_FACTORS.WEEKLY;
-        grossSalary[period] = roundToPence(monthlyGrossSalary * weeklyFactor);
-        incomeTax[period] = roundToPence(monthlyTax * weeklyFactor);
-        nationalInsuranceByPeriod[period] = roundToPence(monthlyNationalInsurance * weeklyFactor);
-        studentLoanByPeriod[period] = roundToPence(monthlyStudentLoan * weeklyFactor);
-        pensionContributionByPeriod[period] = roundToPence(
-          monthlyPensionContribution * weeklyFactor,
-        );
-        netPay[period] = roundToPence(monthlyNetPay * weeklyFactor);
-        break;
-      }
-
-      case PERIODS.DAILY: {
-        // Monthly * factor - averages to daily (5 working days per week)
-        const dailyFactor = PERIOD_CONVERSION_FACTORS.DAILY;
-        grossSalary[period] = roundToPence(monthlyGrossSalary * dailyFactor);
-        incomeTax[period] = roundToPence(monthlyTax * dailyFactor);
-        nationalInsuranceByPeriod[period] = roundToPence(monthlyNationalInsurance * dailyFactor);
-        studentLoanByPeriod[period] = roundToPence(monthlyStudentLoan * dailyFactor);
-        pensionContributionByPeriod[period] = roundToPence(
-          monthlyPensionContribution * dailyFactor,
-        );
-        netPay[period] = roundToPence(monthlyNetPay * dailyFactor);
-        break;
-      }
-
+      case PERIODS.FOUR_WEEKLY:
+      case PERIODS.FORTNIGHTLY:
+      case PERIODS.WEEKLY:
+      case PERIODS.DAILY:
       case PERIODS.HOURLY:
-        // Special case for hourly rate
-        if (hoursPerWeek > 0) {
-          // Monthly / (hours per week * average weeks per month)
-          const monthlyHours = hoursPerWeek * AVERAGE_WEEKS_PER_MONTH;
-          grossSalary[period] = roundToPence(monthlyGrossSalary / monthlyHours);
-          incomeTax[period] = roundToPence(monthlyTax / monthlyHours);
-          nationalInsuranceByPeriod[period] = roundToPence(monthlyNationalInsurance / monthlyHours);
-          studentLoanByPeriod[period] = roundToPence(monthlyStudentLoan / monthlyHours);
-          pensionContributionByPeriod[period] = roundToPence(
-            monthlyPensionContribution / monthlyHours,
-          );
-          netPay[period] = roundToPence(monthlyNetPay / monthlyHours);
-        } else {
-          // Default to annual / (weeks * default hours) if no hours specified
-          const annualDefaultHours = WEEKS_PER_YEAR * DEFAULT_HOURS_PER_WEEK;
-          grossSalary[period] = roundToPence(annualGrossSalary / annualDefaultHours);
-          incomeTax[period] = roundToPence(annualTax / annualDefaultHours);
-          nationalInsuranceByPeriod[period] = roundToPence(
-            annualNationalInsurance / annualDefaultHours,
-          );
-          studentLoanByPeriod[period] = roundToPence(annualStudentLoan / annualDefaultHours);
-          pensionContributionByPeriod[period] = roundToPence(
-            annualPensionContribution / annualDefaultHours,
-          );
-          netPay[period] = roundToPence(annualNetPay / annualDefaultHours);
-        }
+        grossSalary[period] = roundToPence(
+          convertMonthlyToPeriod(monthlyGrossSalary, period, hoursPerWeek),
+        );
+        incomeTax[period] = roundToPence(convertMonthlyToPeriod(monthlyTax, period, hoursPerWeek));
+        nationalInsuranceByPeriod[period] = roundToPence(
+          convertMonthlyToPeriod(monthlyNationalInsurance, period, hoursPerWeek),
+        );
+        studentLoanByPeriod[period] = roundToPence(
+          convertMonthlyToPeriod(monthlyStudentLoan, period, hoursPerWeek),
+        );
+        pensionContributionByPeriod[period] = roundToPence(
+          convertMonthlyToPeriod(monthlyPensionContribution, period, hoursPerWeek),
+        );
+        netPay[period] = roundToPence(convertMonthlyToPeriod(monthlyNetPay, period, hoursPerWeek));
         break;
     }
   }

@@ -1,14 +1,136 @@
 // src/lib/__tests__/periodCalculator.test.ts
-import { PERIODS } from '@/constants/taxRates';
+import { type PayPeriod, PERIODS } from '@/constants/taxRates';
 import {
   convertAnnualToPeriod,
   convertBetweenPeriods,
+  convertMonthlyToPeriod,
   convertPeriodToAnnual,
   getPercentOfGross,
   getPeriodValues,
+  PERIODS_PER_YEAR,
 } from '../periodCalculator';
 
+const ALL_PERIODS = Object.values(PERIODS);
+const ROUND_TRIP_TOLERANCE = 1e-9;
+
+function legacyPeriodToAnnual(amount: number, period: PayPeriod, hoursPerWeek = 40): number {
+  switch (period) {
+    case PERIODS.ANNUALLY:
+      return amount;
+    case PERIODS.MONTHLY:
+      return amount * 12;
+    case PERIODS.FOUR_WEEKLY:
+      return amount * 13;
+    case PERIODS.FORTNIGHTLY:
+      return amount * 26;
+    case PERIODS.WEEKLY:
+      return amount * 52;
+    case PERIODS.DAILY:
+      return amount * 260;
+    case PERIODS.HOURLY:
+      return amount * hoursPerWeek * 52;
+  }
+}
+
+function legacyAnnualToPeriod(amount: number, period: PayPeriod, hoursPerWeek = 40): number {
+  switch (period) {
+    case PERIODS.ANNUALLY:
+      return amount;
+    case PERIODS.MONTHLY:
+      return amount / 12;
+    case PERIODS.FOUR_WEEKLY:
+      return amount / 13;
+    case PERIODS.FORTNIGHTLY:
+      return amount / 26;
+    case PERIODS.WEEKLY:
+      return amount / 52;
+    case PERIODS.DAILY:
+      return amount / 260;
+    case PERIODS.HOURLY:
+      return amount / (hoursPerWeek * 52);
+  }
+}
+
+function legacyMonthlyToPeriod(amount: number, period: PayPeriod, hoursPerWeek = 40): number {
+  switch (period) {
+    case PERIODS.ANNUALLY:
+      return amount * 12;
+    case PERIODS.MONTHLY:
+      return amount;
+    case PERIODS.FOUR_WEEKLY:
+      return amount * (12 / 13);
+    case PERIODS.FORTNIGHTLY:
+      return amount * (12 / 26);
+    case PERIODS.WEEKLY:
+      return amount * (12 / 52);
+    case PERIODS.DAILY:
+      return amount * (12 / 260);
+    case PERIODS.HOURLY:
+      return amount / (hoursPerWeek * (52 / 12));
+  }
+}
+
 describe('Period Calculator', () => {
+  describe('canonical period ownership', () => {
+    it('owns every fixed mathematical period count in one table', () => {
+      expect(PERIODS_PER_YEAR).toEqual({
+        annually: 1,
+        monthly: 12,
+        fourWeekly: 13,
+        fortnightly: 26,
+        weekly: 52,
+        daily: 260,
+      });
+    });
+
+    it('matches the legacy conversion formulas in both directions for every period', () => {
+      const amounts = [-1234.565, 0, 1, 49131.01];
+
+      for (const amount of amounts) {
+        for (const period of ALL_PERIODS) {
+          expect(convertPeriodToAnnual(amount, period, 37.5)).toBe(
+            legacyPeriodToAnnual(amount, period, 37.5),
+          );
+          expect(convertAnnualToPeriod(amount, period, 37.5)).toBe(
+            legacyAnnualToPeriod(amount, period, 37.5),
+          );
+        }
+      }
+    });
+
+    it('preserves the engine monthly-base formulas for every period', () => {
+      const amounts = [-1234.565, 0, 1, 4094.25];
+
+      for (const amount of amounts) {
+        for (const period of ALL_PERIODS) {
+          expect(convertMonthlyToPeriod(amount, period, 37.5)).toBe(
+            legacyMonthlyToPeriod(amount, period, 37.5),
+          );
+        }
+      }
+    });
+
+    it('keeps direct zero and invalid hourly arguments on their established arithmetic path', () => {
+      expect(convertPeriodToAnnual(25, PERIODS.HOURLY, 0)).toBe(0);
+      expect(convertAnnualToPeriod(52000, PERIODS.HOURLY, 0)).toBe(Number.POSITIVE_INFINITY);
+      expect(convertMonthlyToPeriod(100, PERIODS.HOURLY, 0)).toBe(Number.POSITIVE_INFINITY);
+      expect(convertPeriodToAnnual(25, PERIODS.HOURLY, Number.NaN)).toBeNaN();
+      expect(convertAnnualToPeriod(52000, PERIODS.HOURLY, Number.NaN)).toBeNaN();
+      expect(convertMonthlyToPeriod(100, PERIODS.HOURLY, Number.NaN)).toBeNaN();
+    });
+
+    it('preserves the established annual fallback for an unsupported runtime period', () => {
+      const unsupportedPeriods = ['quarterly', 'constructor', 'toString'] as unknown as PayPeriod[];
+
+      for (const unsupportedPeriod of unsupportedPeriods) {
+        expect(convertPeriodToAnnual(1234.56, unsupportedPeriod)).toBe(1234.56);
+        expect(convertAnnualToPeriod(1234.56, unsupportedPeriod)).toBe(1234.56);
+        expect(convertMonthlyToPeriod(1234.56, unsupportedPeriod)).toBe(1234.56 * 12);
+        expect(convertBetweenPeriods(1234.56, unsupportedPeriod, PERIODS.MONTHLY)).toBe(102.88);
+      }
+    });
+  });
+
   describe('convertPeriodToAnnual', () => {
     it('returns amount unchanged for annual period', () => {
       expect(convertPeriodToAnnual(50000, PERIODS.ANNUALLY)).toBe(50000);
@@ -104,6 +226,21 @@ describe('Period Calculator', () => {
   });
 
   describe('convertBetweenPeriods', () => {
+    it('matches direct legacy period-to-period conversion for every period pair', () => {
+      for (const fromPeriod of ALL_PERIODS) {
+        for (const toPeriod of ALL_PERIODS) {
+          const amount = 1234.56;
+          const expected = legacyAnnualToPeriod(
+            legacyPeriodToAnnual(amount, fromPeriod, 37.5),
+            toPeriod,
+            37.5,
+          );
+
+          expect(convertBetweenPeriods(amount, fromPeriod, toPeriod, 37.5)).toBe(expected);
+        }
+      }
+    });
+
     it('converts monthly to weekly correctly', () => {
       const weekly = convertBetweenPeriods(4000, PERIODS.MONTHLY, PERIODS.WEEKLY);
       expect(weekly).toBeCloseTo(923.08, 2);
@@ -263,10 +400,15 @@ describe('Period Calculator', () => {
     });
 
     it('round-trip conversion maintains accuracy', () => {
-      const original = 50000;
-      const monthly = convertAnnualToPeriod(original, PERIODS.MONTHLY);
-      const backToAnnual = convertPeriodToAnnual(monthly, PERIODS.MONTHLY);
-      expect(backToAnnual).toBe(original);
+      const original = 50000.55;
+
+      for (const period of ALL_PERIODS) {
+        const periodValue = convertAnnualToPeriod(original, period, 37.5);
+        const backToAnnual = convertPeriodToAnnual(periodValue, period, 37.5);
+
+        // Conversion does not round; allow only sub-nanopound floating-point drift.
+        expect(Math.abs(backToAnnual - original)).toBeLessThanOrEqual(ROUND_TRIP_TOLERANCE);
+      }
     });
 
     it('handles fractional hourly rates', () => {

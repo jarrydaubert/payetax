@@ -9,6 +9,32 @@
 
 import { DEFAULT_HOURS_PER_WEEK, type PayPeriod, PERIODS } from '@/constants/taxRates';
 
+type FixedPayPeriod = Exclude<PayPeriod, typeof PERIODS.HOURLY>;
+
+/**
+ * Canonical mathematical count of each fixed pay period in a year.
+ *
+ * Hourly conversion is deliberately excluded because its annual count depends
+ * on the caller's working-hours assumption.
+ */
+export const PERIODS_PER_YEAR: Readonly<Record<FixedPayPeriod, number>> = {
+  [PERIODS.ANNUALLY]: 1,
+  [PERIODS.MONTHLY]: 12,
+  [PERIODS.FOUR_WEEKLY]: 13,
+  [PERIODS.FORTNIGHTLY]: 26,
+  [PERIODS.WEEKLY]: 52,
+  [PERIODS.DAILY]: 260,
+};
+
+function getPeriodsPerYear(period: PayPeriod, hoursPerWeek: number): number {
+  if (period === PERIODS.HOURLY) {
+    return hoursPerWeek * PERIODS_PER_YEAR[PERIODS.WEEKLY];
+  }
+
+  const periodsPerYear: unknown = PERIODS_PER_YEAR[period];
+  return typeof periodsPerYear === 'number' ? periodsPerYear : PERIODS_PER_YEAR[PERIODS.ANNUALLY];
+}
+
 /**
  * Converts a salary amount from any period to annual amount
  *
@@ -22,24 +48,12 @@ export function convertPeriodToAnnual(
   period: PayPeriod,
   hoursPerWeek: number = DEFAULT_HOURS_PER_WEEK,
 ): number {
-  switch (period) {
-    case PERIODS.ANNUALLY:
-      return amount; // Already annual, no conversion needed
-    case PERIODS.MONTHLY:
-      return amount * 12; // 12 months in a year
-    case PERIODS.FOUR_WEEKLY:
-      return amount * 13; // 13 four-week periods in a year
-    case PERIODS.FORTNIGHTLY:
-      return amount * 26; // 26 fortnights in a year
-    case PERIODS.WEEKLY:
-      return amount * 52; // 52 weeks in a year
-    case PERIODS.DAILY:
-      return amount * 260; // Approximately 260 working days in a year (5 days × 52 weeks)
-    case PERIODS.HOURLY:
-      return amount * hoursPerWeek * 52; // Hours per week × 52 weeks
-    default:
-      return amount; // Default to no conversion
+  if (period === PERIODS.HOURLY) {
+    // Preserve the established caller-hours then weeks multiplication order.
+    return amount * hoursPerWeek * PERIODS_PER_YEAR[PERIODS.WEEKLY];
   }
+
+  return amount * getPeriodsPerYear(period, hoursPerWeek);
 }
 
 /**
@@ -55,24 +69,30 @@ export function convertAnnualToPeriod(
   targetPeriod: PayPeriod,
   hoursPerWeek: number = DEFAULT_HOURS_PER_WEEK,
 ): number {
-  switch (targetPeriod) {
-    case PERIODS.ANNUALLY:
-      return annualAmount; // Already annual, no conversion needed
-    case PERIODS.MONTHLY:
-      return annualAmount / 12; // 12 months in a year
-    case PERIODS.FOUR_WEEKLY:
-      return annualAmount / 13; // 13 four-week periods in a year
-    case PERIODS.FORTNIGHTLY:
-      return annualAmount / 26; // 26 fortnights in a year
-    case PERIODS.WEEKLY:
-      return annualAmount / 52; // 52 weeks in a year
-    case PERIODS.DAILY:
-      return annualAmount / 260; // Approximately 260 working days in a year (5 days × 52 weeks)
-    case PERIODS.HOURLY:
-      return annualAmount / (hoursPerWeek * 52); // Hours per week × 52 weeks
-    default:
-      return annualAmount; // Default to no conversion
+  return annualAmount / getPeriodsPerYear(targetPeriod, hoursPerWeek);
+}
+
+/**
+ * Converts the tax engine's monthly calculation base to another pay period.
+ *
+ * Keep the operation order here: fixed periods multiply by the derived
+ * monthly factor, while hourly values divide by average monthly hours. The
+ * engine applies monetary rounding after this conversion.
+ */
+export function convertMonthlyToPeriod(
+  monthlyAmount: number,
+  targetPeriod: PayPeriod,
+  hoursPerWeek: number = DEFAULT_HOURS_PER_WEEK,
+): number {
+  if (targetPeriod === PERIODS.HOURLY) {
+    const averageWeeksPerMonth =
+      PERIODS_PER_YEAR[PERIODS.WEEKLY] / PERIODS_PER_YEAR[PERIODS.MONTHLY];
+    return monthlyAmount / (hoursPerWeek * averageWeeksPerMonth);
   }
+
+  const monthlyToPeriodFactor =
+    PERIODS_PER_YEAR[PERIODS.MONTHLY] / getPeriodsPerYear(targetPeriod, hoursPerWeek);
+  return monthlyAmount * monthlyToPeriodFactor;
 }
 
 /**
@@ -108,15 +128,14 @@ export function getPeriodValues(
   _periods: string[] | string,
   hoursPerWeek: number = DEFAULT_HOURS_PER_WEEK,
 ): Record<string, number> {
-  // Initialize with all required keys for type safety
   return {
-    yearly: annualValue,
-    monthly: annualValue / 12,
-    fourWeekly: annualValue / 13,
-    fortnightly: annualValue / 26,
-    weekly: annualValue / 52,
-    daily: annualValue / 260,
-    hourly: annualValue / (52 * hoursPerWeek),
+    yearly: convertAnnualToPeriod(annualValue, PERIODS.ANNUALLY, hoursPerWeek),
+    monthly: convertAnnualToPeriod(annualValue, PERIODS.MONTHLY, hoursPerWeek),
+    fourWeekly: convertAnnualToPeriod(annualValue, PERIODS.FOUR_WEEKLY, hoursPerWeek),
+    fortnightly: convertAnnualToPeriod(annualValue, PERIODS.FORTNIGHTLY, hoursPerWeek),
+    weekly: convertAnnualToPeriod(annualValue, PERIODS.WEEKLY, hoursPerWeek),
+    daily: convertAnnualToPeriod(annualValue, PERIODS.DAILY, hoursPerWeek),
+    hourly: convertAnnualToPeriod(annualValue, PERIODS.HOURLY, hoursPerWeek),
   };
 }
 
