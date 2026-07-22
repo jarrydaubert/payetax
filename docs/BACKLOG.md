@@ -2,7 +2,7 @@
 
 Backlog for the public R&D version of PayeTax.
 
-Keep this file for active or parked future work only. Closed work belongs in GitHub pull requests, release reports, or commit history. Programme context and evidence live in `docs/reports/paye-tax-domain-ownership-audit-2026-07-19.md` and the production truth audit that preceded PRs #82/#83.
+Keep this file for active or parked future work only. Closed work belongs in GitHub pull requests, release reports, or commit history. Programme context and evidence live in `docs/reports/paye-tax-domain-ownership-audit-2026-07-21.md` and the production truth audit that preceded PRs #82/#83.
 
 ## Working Rules
 
