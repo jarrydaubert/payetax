@@ -188,7 +188,7 @@ Use this layer when the question is "is the tax answer correct?"
 Examples:
 
 - `src/lib/__tests__/taxCalculator.hmrcVerification.test.ts`
-- `src/lib/__tests__/taxCalculator.hmrcPayrollFixtures.test.ts`
+- `src/lib/tax/__tests__/nationalInsurance.hmrcPeriodFixtures.test.ts`
 - `src/lib/tax/__tests__/incomeTax.test.ts`
 - `src/lib/tax/__tests__/employeeNI.test.ts`
 - `src/lib/__tests__/nationalInsuranceVertical.test.ts`

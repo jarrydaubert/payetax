@@ -12,8 +12,9 @@
  * that basis.
  *
  * It is deliberately not the payroll basis. A non-director paid per pay period
- * is assessed period by period at the rate in force on each pay date — see
- * `nationalInsurance.ts` and `payrollPeriodDeductions.ts`. The two bases use
+ * is assessed period by period at the rate in force on each pay date — see the
+ * shared mechanics in `nationalInsurance.ts` and the per-period fixtures in
+ * `__tests__/nationalInsurance.hmrcPeriodFixtures.test.ts`. The two bases use
  * different thresholds and do not produce the same figure.
  *
  * @module lib/tax/employeeNI

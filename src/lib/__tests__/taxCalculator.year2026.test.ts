@@ -11,7 +11,7 @@
  * taxable; higher 40% to £125,140; additional 45% above; employee NI cat A
  * 8% £12,570-£50,270 then 2%). For PAYE on salary these thresholds are frozen
  * and identical to 2025-2026, which is independently checked against HMRC
- * worked examples in `taxCalculator.hmrcVerification` / `hmrcPayrollFixtures`.
+ * worked examples in `taxCalculator.hmrcVerification` / `nationalInsurance.hmrcPeriodFixtures`.
  * The 2026-2027 delta (dividend rates) affects the director tool, not salary.
  * These cases therefore guard engine behaviour for the current year; they do
  * not re-source the thresholds from HMRC.
