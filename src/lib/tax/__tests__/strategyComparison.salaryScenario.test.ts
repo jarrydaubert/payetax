@@ -11,6 +11,7 @@ import { getDividendTax } from '../dividendTax';
 import { getIncomeTax } from '../incomeTax';
 import { calculateSalaryScenario, calculateStrategyComparison } from '../strategyComparison';
 import { getStudentLoanRepayment } from '../studentLoan';
+import { roundToPence } from '../utils';
 
 const TAX_YEAR = '2025-2026' as const;
 const TAX_YEAR_2026 = '2026-2027' as const;
@@ -261,7 +262,7 @@ describe('Strategy Comparison helpers', () => {
     };
 
     const baseline = calculateStrategyComparison(input, TAX_YEAR);
-    const scenarioGrossProfitBeforePension = baseline.grossProfit * 1.25;
+    const scenarioGrossProfitBeforePension = roundToPence(baseline.grossProfit * 1.25);
     const whatIf = calculateStrategyComparison(
       {
         ...input,
@@ -271,6 +272,25 @@ describe('Strategy Comparison helpers', () => {
       TAX_YEAR,
     );
     const optimal = whatIf.strategies.optimalMix;
+
+    expect(optimal).toEqual({
+      name: 'Baseline Mix',
+      salary: 5000,
+      dividends: 70175,
+      pension: 2500,
+      companyCarBIK: 4000,
+      employerNI: 600,
+      employeeNI: 0,
+      incomeTax: 286,
+      corporationTax: 21725,
+      dividendTax: 14572.82,
+      studentLoan: 5229.9,
+      totalPersonalTax: 20088.72,
+      companyCost: 27325,
+      takeHome: 55086.28,
+      effectiveRate: 43.5,
+    });
+
     const scenario = calculateSalaryScenario({
       targetSalary: optimal.salary,
       grossProfit: whatIf.grossProfitAfterPension,

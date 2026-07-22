@@ -5,6 +5,8 @@
  * inputs into annual values and derives a cash-aware monthly draw.
  */
 
+import { roundToPence } from './utils';
+
 export interface MonthlyProjectionInput {
   monthlyIncome: number | undefined;
   monthlyExpenses: number | undefined;
@@ -53,10 +55,6 @@ export interface SafeDrawResult {
 }
 
 const TAX_YEAR_MONTHS = [4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3] as const;
-
-function roundToPence(value: number): number {
-  return Math.round(value * 100) / 100;
-}
 
 function sanitizeNonNegative(value: number | undefined): number {
   const normalized = typeof value === 'number' ? value : 0;

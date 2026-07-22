@@ -22,6 +22,7 @@ import { getEmployeeNI } from './employeeNI';
 import { getEmployerNI } from './employerNI';
 import { getIncomeTax } from './incomeTax';
 import { getStudentLoanRepayment } from './studentLoan';
+import { roundToPence } from './utils';
 
 // ============================================================================
 // TYPES
@@ -252,13 +253,13 @@ export function calculateStrategyComparison(
   const savingsVsAllSalary = maxTakeHome - allSalary.takeHome;
 
   return {
-    grossProfit: round(grossProfitBeforePension),
-    grossProfitAfterPension: round(grossProfit),
-    alreadyTaken: round(alreadyTaken),
-    availableForExtraction: round(availableForExtraction),
+    grossProfit: roundToPence(grossProfitBeforePension),
+    grossProfitAfterPension: roundToPence(grossProfit),
+    alreadyTaken: roundToPence(alreadyTaken),
+    availableForExtraction: roundToPence(availableForExtraction),
     strategies,
     recommended,
-    savingsVsAllSalary: round(savingsVsAllSalary),
+    savingsVsAllSalary: roundToPence(savingsVsAllSalary),
   };
 }
 
@@ -368,20 +369,20 @@ function calculateAllSalaryStrategy(opts: StrategyCalcOptions): StrategyResult {
 
   return {
     name: 'All Salary',
-    salary: round(salary),
+    salary: roundToPence(salary),
     dividends,
-    pension: round(pension),
-    companyCarBIK: round(companyCarBIK),
-    employerNI: round(employerNI),
-    employeeNI: round(employeeNI),
-    incomeTax: round(incomeTax),
+    pension: roundToPence(pension),
+    companyCarBIK: roundToPence(companyCarBIK),
+    employerNI: roundToPence(employerNI),
+    employeeNI: roundToPence(employeeNI),
+    incomeTax: roundToPence(incomeTax),
     corporationTax,
     dividendTax,
-    studentLoan: round(studentLoan),
-    totalPersonalTax: round(totalPersonalTax),
-    companyCost: round(companyCost),
-    takeHome: round(takeHome),
-    effectiveRate: round(effectiveRate),
+    studentLoan: roundToPence(studentLoan),
+    totalPersonalTax: roundToPence(totalPersonalTax),
+    companyCost: roundToPence(companyCost),
+    takeHome: roundToPence(takeHome),
+    effectiveRate: roundToPence(effectiveRate),
   };
 }
 
@@ -467,20 +468,20 @@ export function calculateSalaryScenario(input: SalaryScenarioInput): SalaryScena
   const effectiveRate = grossProfit > 0 ? ((grossProfit - takeHome) / grossProfit) * 100 : 0;
 
   return {
-    salary: round(salary),
-    employerNI: round(employerNI),
-    employeeNI: round(employeeNI),
-    incomeTax: round(incomeTax),
-    corporationTax: round(corporationTax),
-    dividends: round(dividends),
-    dividendTax: round(dividendTax),
-    studentLoan: round(studentLoan),
-    pension: round(pension),
-    companyCarBIK: round(companyCarBIK),
-    totalPersonalTax: round(totalPersonalTax),
-    companyCost: round(companyCost),
-    effectiveRate: round(effectiveRate),
-    takeHome: round(takeHome),
+    salary: roundToPence(salary),
+    employerNI: roundToPence(employerNI),
+    employeeNI: roundToPence(employeeNI),
+    incomeTax: roundToPence(incomeTax),
+    corporationTax: roundToPence(corporationTax),
+    dividends: roundToPence(dividends),
+    dividendTax: roundToPence(dividendTax),
+    studentLoan: roundToPence(studentLoan),
+    pension: roundToPence(pension),
+    companyCarBIK: roundToPence(companyCarBIK),
+    totalPersonalTax: roundToPence(totalPersonalTax),
+    companyCost: roundToPence(companyCost),
+    effectiveRate: roundToPence(effectiveRate),
+    takeHome: roundToPence(takeHome),
   };
 }
 
@@ -676,20 +677,20 @@ function calculateOptimalMixStrategy(opts: StrategyCalcOptions): StrategyResult 
 
   return {
     name,
-    salary: round(salary),
-    dividends: round(dividends),
-    pension: round(pension),
-    companyCarBIK: round(companyCarBIK),
-    employerNI: round(employerNI),
-    employeeNI: round(employeeNI),
-    incomeTax: round(incomeTax),
-    corporationTax: round(corporationTax),
-    dividendTax: round(dividendTax),
-    studentLoan: round(studentLoan),
-    totalPersonalTax: round(totalPersonalTax),
-    companyCost: round(companyCost),
-    takeHome: round(takeHome),
-    effectiveRate: round(effectiveRate),
+    salary: roundToPence(salary),
+    dividends: roundToPence(dividends),
+    pension: roundToPence(pension),
+    companyCarBIK: roundToPence(companyCarBIK),
+    employerNI: roundToPence(employerNI),
+    employeeNI: roundToPence(employeeNI),
+    incomeTax: roundToPence(incomeTax),
+    corporationTax: roundToPence(corporationTax),
+    dividendTax: roundToPence(dividendTax),
+    studentLoan: roundToPence(studentLoan),
+    totalPersonalTax: roundToPence(totalPersonalTax),
+    companyCost: roundToPence(companyCost),
+    takeHome: roundToPence(takeHome),
+    effectiveRate: roundToPence(effectiveRate),
   };
 }
 
@@ -707,20 +708,20 @@ function scenarioToStrategyResult(
 
   return {
     name: 'Baseline Mix',
-    salary: round(scenario.salary),
-    dividends: round(scenario.dividends),
-    pension: round(pension),
-    companyCarBIK: round(companyCarBIK),
-    employerNI: round(scenario.employerNI),
-    employeeNI: round(scenario.employeeNI),
-    incomeTax: round(scenario.incomeTax),
-    corporationTax: round(scenario.corporationTax),
-    dividendTax: round(scenario.dividendTax),
-    studentLoan: round(scenario.studentLoan),
-    totalPersonalTax: round(totalPersonalTax),
-    companyCost: round(companyCost),
-    takeHome: round(scenario.takeHome),
-    effectiveRate: round(effectiveRate),
+    salary: roundToPence(scenario.salary),
+    dividends: roundToPence(scenario.dividends),
+    pension: roundToPence(pension),
+    companyCarBIK: roundToPence(companyCarBIK),
+    employerNI: roundToPence(scenario.employerNI),
+    employeeNI: roundToPence(scenario.employeeNI),
+    incomeTax: roundToPence(scenario.incomeTax),
+    corporationTax: roundToPence(scenario.corporationTax),
+    dividendTax: roundToPence(scenario.dividendTax),
+    studentLoan: roundToPence(scenario.studentLoan),
+    totalPersonalTax: roundToPence(totalPersonalTax),
+    companyCost: roundToPence(companyCost),
+    takeHome: roundToPence(scenario.takeHome),
+    effectiveRate: roundToPence(effectiveRate),
   };
 }
 
@@ -783,19 +784,19 @@ function calculateAllDividendsStrategy(opts: StrategyCalcOptions): StrategyResul
   return {
     name: 'All Dividends',
     salary,
-    dividends: round(dividends),
-    pension: round(pension),
-    companyCarBIK: round(companyCarBIK),
+    dividends: roundToPence(dividends),
+    pension: roundToPence(pension),
+    companyCarBIK: roundToPence(companyCarBIK),
     employerNI,
     employeeNI,
-    incomeTax: round(incomeTax),
-    corporationTax: round(corporationTax),
-    dividendTax: round(dividendTax),
-    studentLoan: round(studentLoan),
-    totalPersonalTax: round(totalPersonalTax),
-    companyCost: round(companyCost),
-    takeHome: round(takeHome),
-    effectiveRate: round(effectiveRate),
+    incomeTax: roundToPence(incomeTax),
+    corporationTax: roundToPence(corporationTax),
+    dividendTax: roundToPence(dividendTax),
+    studentLoan: roundToPence(studentLoan),
+    totalPersonalTax: roundToPence(totalPersonalTax),
+    companyCost: roundToPence(companyCost),
+    takeHome: roundToPence(takeHome),
+    effectiveRate: roundToPence(effectiveRate),
   };
 }
 
@@ -890,21 +891,21 @@ function calculateYourSetupStrategy(
 
   return {
     name: 'Your Setup',
-    salary: round(salary),
-    dividends: round(dividends),
-    pension: round(pension),
-    companyCarBIK: round(companyCarBIK),
-    employerNI: round(employerNI),
-    employeeNI: round(employeeNI),
-    incomeTax: round(incomeTax),
-    corporationTax: round(corporationTax),
-    dividendTax: round(dividendTax),
-    studentLoan: round(studentLoan),
-    totalPersonalTax: round(totalPersonalTax),
-    companyCost: round(companyCost),
-    takeHome: round(takeHome),
-    effectiveRate: round(effectiveRate),
-    deltaVsOptimal: round(deltaVsOptimal),
+    salary: roundToPence(salary),
+    dividends: roundToPence(dividends),
+    pension: roundToPence(pension),
+    companyCarBIK: roundToPence(companyCarBIK),
+    employerNI: roundToPence(employerNI),
+    employeeNI: roundToPence(employeeNI),
+    incomeTax: roundToPence(incomeTax),
+    corporationTax: roundToPence(corporationTax),
+    dividendTax: roundToPence(dividendTax),
+    studentLoan: roundToPence(studentLoan),
+    totalPersonalTax: roundToPence(totalPersonalTax),
+    companyCost: roundToPence(companyCost),
+    takeHome: roundToPence(takeHome),
+    effectiveRate: roundToPence(effectiveRate),
+    deltaVsOptimal: roundToPence(deltaVsOptimal),
     exceedsProfit,
   };
 }
@@ -931,8 +932,4 @@ function createEmptyResult(name: string): StrategyResult {
     takeHome: 0,
     effectiveRate: 0,
   };
-}
-
-function round(value: number): number {
-  return Math.round(value * 100) / 100;
 }

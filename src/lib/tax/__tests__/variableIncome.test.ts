@@ -33,6 +33,17 @@ describe('variableIncome helpers', () => {
       expect(result.projectedRevenue).toBe(18000);
       expect(result.projectedExpenses).toBe(6000);
     });
+
+    it('preserves penny rounding for fractional monthly projections', () => {
+      const result = projectAnnualFromMonthly({
+        monthlyIncome: 0.1875,
+        monthlyExpenses: 0.185,
+        contractStartMonth: 10,
+      });
+
+      expect(result.projectedRevenue).toBe(1.13);
+      expect(result.projectedExpenses).toBe(1.11);
+    });
   });
 
   describe('resolveAnnualFinancials', () => {

@@ -12,16 +12,14 @@
 import type React from 'react';
 import { SITE_CONTACT_EMAIL } from '@/constants/contact';
 import { LOGO_URL, SITE_URL } from '@/lib/metadata';
-import { CURRENT_TAX_YEAR, formatTaxYearDisplay, TAX_RATES, TAX_YEARS } from '@/lib/tax';
+import {
+  CURRENT_TAX_YEAR,
+  formatTaxYearDisplay,
+  roundToPence,
+  TAX_RATES,
+  TAX_YEARS,
+} from '@/lib/tax';
 import { formatCurrency } from '@/lib/utils';
-
-/**
- * Round currency values for schema output to avoid floating-point artifacts
- * (e.g. 51157.35999999999).
- */
-function roundCurrencyValue(amount: number): number {
-  return Math.round(amount * 100) / 100;
-}
 
 interface OrganizationSchema {
   '@context': 'https://schema.org';
@@ -870,26 +868,26 @@ export function StructuredData({
         about: {
           '@type': 'MonetaryAmount',
           currency: 'GBP',
-          value: roundCurrencyValue(salaryData.salary),
+          value: roundToPence(salaryData.salary),
           name: 'Gross Annual Salary',
         },
         mentions: [
           {
             '@type': 'MonetaryAmount',
             currency: 'GBP',
-            value: roundCurrencyValue(salaryData.netPay),
+            value: roundToPence(salaryData.netPay),
             name: 'Annual Take-Home Pay',
           },
           {
             '@type': 'MonetaryAmount',
             currency: 'GBP',
-            value: roundCurrencyValue(salaryData.incomeTax),
+            value: roundToPence(salaryData.incomeTax),
             name: 'Annual Income Tax',
           },
           {
             '@type': 'MonetaryAmount',
             currency: 'GBP',
-            value: roundCurrencyValue(salaryData.nationalInsurance),
+            value: roundToPence(salaryData.nationalInsurance),
             name: 'Annual National Insurance',
           },
         ],

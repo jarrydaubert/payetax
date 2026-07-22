@@ -31,6 +31,7 @@ describe('tax-domain public interface', () => {
       'isValidTaxCode',
       'normalizeTaxCode',
       'parseTaxCode',
+      'roundToPence',
       'sliceClass1EmployeeEarnings',
       'sliceClass1EmployerEarnings',
       'sliceRukTaxableIncome',
