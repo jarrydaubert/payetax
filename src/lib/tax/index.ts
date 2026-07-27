@@ -77,4 +77,6 @@ export {
   normalizeTaxCode,
   parseTaxCode,
 } from './taxCode';
+export type { RukTaxPolicy, ScottishTaxPolicy, SelectedTaxPolicy } from './taxPolicy';
+export { parseSupportedTaxYear, resolveTaxYear, selectTaxPolicy } from './taxPolicy';
 export { roundToPence, taxableThresholdToTotalIncome } from './utils';

@@ -188,11 +188,7 @@ const BASELINE_ENTRIES = [
     '@/constants/taxRates',
     ['CURRENT_TAX_YEAR', 'TAX_YEAR_SOURCES', 'formatTaxYearDisplay'],
   ],
-  [
-    'src/lib/calculatorMarginalTax.ts',
-    '@/constants/taxRates',
-    ['TAX_RATES', 'TAX_YEARS', 'type:TaxYear'],
-  ],
+  ['src/lib/calculatorMarginalTax.ts', '@/constants/taxRates', ['type:TaxYear']],
   ['src/lib/calculatorMarginalTax.ts', '@/lib/taxCalculator', ['calculateTax']],
   ['src/lib/calculatorResultsPresenter.ts', '@/constants/taxRates', ['type:PayPeriod']],
   [
@@ -200,16 +196,11 @@ const BASELINE_ENTRIES = [
     '@/constants/taxRates',
     ['CURRENT_TAX_YEAR', 'SCOTTISH_TAX_RATES', 'TAX_RATES'],
   ],
-  ['src/lib/email/directorResultsEmail.ts', '@/constants/taxRates', ['type:TaxYear']],
-  [
-    'src/lib/email/directorResultsEmail.ts',
-    '@/constants/taxRates',
-    ['CT_RATES', 'CURRENT_TAX_YEAR', 'TAX_RATES'],
-  ],
+  ['src/lib/email/directorResultsEmail.ts', '@/constants/taxRates', ['CT_RATES', 'TAX_RATES']],
   [
     'src/lib/email/outboundResultsDelivery.ts',
     '@/constants/taxRates',
-    ['CURRENT_TAX_YEAR', 'type:PayPeriod', 'type:TaxYear'],
+    ['type:PayPeriod', 'type:TaxYear'],
   ],
   [
     'src/lib/email/outboundResultsDelivery.ts',
@@ -219,11 +210,7 @@ const BASELINE_ENTRIES = [
   ['src/lib/email/outboundResultsDelivery.ts', '@/lib/taxCalculator', ['calculateTax']],
   ['src/lib/email/payeResultsEmail.ts', '@/lib/taxCalculator', ['type:TaxCalculationResults']],
   ['src/lib/metadata.ts', '@/constants/taxRates', ['CURRENT_TAX_YEAR']],
-  [
-    'src/lib/pensionOptimizer.ts',
-    '@/constants/taxRates',
-    ['TAX_RATES', 'TAX_YEARS', 'type:TaxYear'],
-  ],
+  ['src/lib/pensionOptimizer.ts', '@/constants/taxRates', ['type:TaxYear']],
   [
     'src/lib/periodCalculator.ts',
     '@/constants/taxRates',
@@ -258,7 +245,6 @@ const BASELINE_ENTRIES = [
     '@/constants/taxRates',
     [
       'PERIODS',
-      'TAX_RATES',
       'type:NICategory',
       'type:PayPeriod',
       'type:StudentLoanPlan',

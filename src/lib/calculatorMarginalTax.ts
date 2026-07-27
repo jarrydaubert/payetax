@@ -1,5 +1,6 @@
-import { TAX_RATES, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
+import type { TaxYear } from '@/constants/taxRates';
 import { convertAnnualToPeriod } from '@/lib/periodCalculator';
+import { selectTaxPolicy } from '@/lib/tax';
 import { calculateTax } from '@/lib/taxCalculator';
 import type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
 
@@ -11,7 +12,7 @@ interface MarginalTaxRateInput {
 
 export function calculateMarginalTaxRate({
   results,
-  taxYear = TAX_YEARS[0] as TaxYear,
+  taxYear,
   input,
 }: MarginalTaxRateInput): number {
   if (input) {
@@ -37,7 +38,7 @@ export function calculateMarginalTaxRate({
     return Math.min(100, Math.max(0, ((bumpedTax - baseTax) / deltaAnnual) * 100));
   }
 
-  const taxRates = TAX_RATES[taxYear];
+  const taxRates = selectTaxPolicy(taxYear).ruk;
   const basicBandThreshold = taxRates.bands[0]?.threshold ?? 0;
   const higherBandThreshold = taxRates.bands[1]?.threshold ?? basicBandThreshold;
   const personalAllowance = taxRates.personalAllowance;

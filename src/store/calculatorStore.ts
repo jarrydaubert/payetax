@@ -35,7 +35,6 @@ import {
   PERIODS,
   type StudentLoanPlan,
   type StudentLoanSelection,
-  TAX_RATES,
   type TaxYear,
 } from '@/constants/taxRates';
 import { trackCalculatorEvent, trackCalculatorUsage, trackEvent } from '@/lib/analytics';
@@ -52,7 +51,13 @@ import {
   setContext,
   startPerformanceTransaction,
 } from '@/lib/sentry';
-import { calculateTax, isTaxCodeEditCandidate, normalizeTaxCode } from '@/lib/tax';
+import {
+  calculateTax,
+  isTaxCodeEditCandidate,
+  normalizeTaxCode,
+  parseSupportedTaxYear,
+  resolveTaxYear,
+} from '@/lib/tax';
 import {
   INCOME_SOURCE_TYPES,
   INCOME_TYPE_LABELS,
@@ -236,25 +241,22 @@ interface CalculatorState {
   clearWhatIf: () => void;
 }
 
-// Get current tax year
+// Get current tax year from the wall clock, then resolve it through the
+// tax-domain boundary so the result is always a supported canonical year
+// (falls back to the current supported year once the live year moves beyond
+// the supported set).
 const getCurrentTaxYear = (): TaxYear => {
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth(); // 0-indexed (0 = January)
 
-  // If we're between January and April 5th, we're in the previous tax year
-  if (currentMonth < 3 || (currentMonth === 3 && currentDate.getDate() < 6)) {
-    return `${currentYear - 1}-${currentYear}` as TaxYear;
-  }
+  // If we're between January and April 5th, we're in the previous tax year.
+  const candidate =
+    currentMonth < 3 || (currentMonth === 3 && currentDate.getDate() < 6)
+      ? `${currentYear - 1}-${currentYear}`
+      : `${currentYear}-${currentYear + 1}`;
 
-  // Otherwise, we're in the current tax year
-  return `${currentYear}-${currentYear + 1}` as TaxYear;
-};
-
-const normalizeTaxYear = (value: string): TaxYear => {
-  const [start, endRaw] = value.split('-');
-  const end = endRaw?.length === 2 ? `20${endRaw}` : endRaw;
-  return `${start}-${end}` as TaxYear;
+  return resolveTaxYear(candidate);
 };
 
 // Get salary range for privacy-safe analytics
@@ -590,9 +592,9 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          const normalized = normalizeTaxYear(validated.data);
-          if (!TAX_RATES[normalized]) {
-            logCalculatorWarning('[Calculator] Unsupported tax year:', normalized);
+          const normalized = parseSupportedTaxYear(validated.data);
+          if (!normalized) {
+            logCalculatorWarning('[Calculator] Unsupported tax year:', validated.data);
             return;
           }
 
@@ -878,8 +880,8 @@ export const useCalculatorStore = create<CalculatorState>()(
           const { taxYear, ...validatedInput } = validated.data;
           const nextInput: Partial<CalculatorInput> = { ...validatedInput };
           if (taxYear) {
-            const normalizedTaxYear = normalizeTaxYear(taxYear);
-            if (TAX_RATES[normalizedTaxYear]) {
+            const normalizedTaxYear = parseSupportedTaxYear(taxYear);
+            if (normalizedTaxYear) {
               nextInput.taxYear = normalizedTaxYear;
             }
           }
@@ -1055,10 +1057,10 @@ export const useCalculatorStore = create<CalculatorState>()(
 
           // Get previous tax year
           const currentYear = Number.parseInt(input.taxYear.split('-')[0] || '', 10);
-          const previousYear = `${currentYear - 1}-${currentYear}` as TaxYear;
+          const previousYear = parseSupportedTaxYear(`${currentYear - 1}-${currentYear}`);
 
-          // Only calculate if the previous year is a valid tax year
-          if (TAX_RATES[previousYear]) {
+          // Only calculate if the previous year is a supported tax year
+          if (previousYear) {
             const previousYearInput = { ...input, taxYear: previousYear };
             const previousResults = calculateTax(previousYearInput);
             set({ previousYearResults: previousResults });
@@ -1215,10 +1217,8 @@ export const useCalculatorStore = create<CalculatorState>()(
           if (typeof taxYearCandidate === 'string') {
             const validatedTaxYear = TAX_YEAR_INPUT_SCHEMA.safeParse(taxYearCandidate);
             if (validatedTaxYear.success) {
-              const parsedTaxYear = normalizeTaxYear(validatedTaxYear.data);
-              normalizedTaxYear = TAX_RATES[parsedTaxYear]
-                ? parsedTaxYear
-                : currentState.input.taxYear;
+              normalizedTaxYear =
+                parseSupportedTaxYear(validatedTaxYear.data) ?? currentState.input.taxYear;
             }
           }
 

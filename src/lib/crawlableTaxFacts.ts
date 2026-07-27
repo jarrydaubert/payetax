@@ -2,8 +2,7 @@ import {
   CURRENT_TAX_YEAR,
   calculateTax,
   formatTaxYearDisplay,
-  SCOTTISH_TAX_RATES,
-  TAX_RATES,
+  selectTaxPolicy,
   TAX_YEAR_SOURCES,
   type TaxYear,
   taxableThresholdToTotalIncome,
@@ -125,7 +124,7 @@ export function getCrawlableSalaryExamples(
 }
 
 function getRestOfUkIncomeTaxBands(taxYear: TaxYear): CrawlableRateBand[] {
-  const rates = TAX_RATES[taxYear];
+  const rates = selectTaxPolicy(taxYear).ruk;
   const [basicBand, higherBand, additionalBand] = rates.bands;
   const basicUpper = rates.personalAllowance + (basicBand?.threshold ?? 0);
   const higherUpper = higherBand?.threshold ?? basicUpper;
@@ -155,7 +154,7 @@ function getRestOfUkIncomeTaxBands(taxYear: TaxYear): CrawlableRateBand[] {
 }
 
 function getScottishIncomeTaxBands(taxYear: TaxYear): CrawlableRateBand[] {
-  const rates = SCOTTISH_TAX_RATES[taxYear];
+  const rates = selectTaxPolicy(taxYear).scottish;
   let previousUpper = rates.personalAllowance;
 
   const bands: CrawlableRateBand[] = [
@@ -196,7 +195,7 @@ function getScottishIncomeTaxBands(taxYear: TaxYear): CrawlableRateBand[] {
 }
 
 function getEmployeeNiBands(taxYear: TaxYear): CrawlableRateBand[] {
-  const employeeNi = TAX_RATES[taxYear].nationalInsurance.employee.A;
+  const employeeNi = selectTaxPolicy(taxYear).ruk.nationalInsurance.employee.A;
 
   return [
     {
@@ -218,7 +217,7 @@ function getEmployeeNiBands(taxYear: TaxYear): CrawlableRateBand[] {
 }
 
 function getStudentLoanRates(taxYear: TaxYear): CrawlableStudentLoanRate[] {
-  const studentLoans = TAX_RATES[taxYear].studentLoan;
+  const studentLoans = selectTaxPolicy(taxYear).ruk.studentLoan;
 
   return [
     {

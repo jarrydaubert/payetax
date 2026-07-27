@@ -7,8 +7,8 @@
  * - Threshold sourcing from `src/constants/taxRates.ts` (no drift)
  */
 
-import type { TaxYear } from '@/constants/taxRates';
-import { CT_RATES, CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
+import { CT_RATES, TAX_RATES } from '@/constants/taxRates';
+import { resolveTaxYear } from '@/lib/tax';
 import { formatCurrency } from '@/lib/utils';
 import type { DirectorStrategy } from '@/lib/validation/emailValidation';
 
@@ -23,46 +23,20 @@ export function escapeHtml(str: string): string {
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://payetax.co.uk';
 
-function normalizeTaxYear(taxYear?: string): TaxYear {
-  if (!taxYear) return CURRENT_TAX_YEAR;
-
-  // Accept "2026-27" and "2026-2027".
-  const short = /^(\d{4})-(\d{2})$/;
-  const long = /^(\d{4})-(\d{4})$/;
-
-  const mShort = taxYear.match(short);
-  if (mShort) {
-    const start = Number(mShort[1]);
-    const end2 = Number(mShort[2]);
-    const century = Math.floor(start / 100) * 100;
-    const end = century + end2;
-    const normalized = `${start}-${end}` as TaxYear;
-    return TAX_RATES[normalized] ? normalized : CURRENT_TAX_YEAR;
-  }
-
-  const mLong = taxYear.match(long);
-  if (mLong) {
-    const normalized = `${mLong[1]}-${mLong[2]}` as TaxYear;
-    return TAX_RATES[normalized] ? normalized : CURRENT_TAX_YEAR;
-  }
-
-  return CURRENT_TAX_YEAR;
-}
-
 function getSelfAssessmentDeadlineLabel(taxYear?: string): string {
-  const normalized = normalizeTaxYear(taxYear);
+  const normalized = resolveTaxYear(taxYear);
   const startYear = Number.parseInt(normalized.slice(0, 4), 10);
   return `31 January ${startYear + 2}`;
 }
 
 function formatTaxYearLabel(taxYear?: string): string {
-  const normalized = normalizeTaxYear(taxYear);
+  const normalized = resolveTaxYear(taxYear);
   const [start, end] = normalized.split('-');
   return `${start}-${end?.slice(-2) ?? ''}`;
 }
 
 export function getDirectorEmailThresholds(taxYear?: string) {
-  const year = normalizeTaxYear(taxYear);
+  const year = resolveTaxYear(taxYear);
   const rates = TAX_RATES[year];
 
   const personalAllowance = rates.personalAllowance;

@@ -1,5 +1,5 @@
 import { RESULTS_EMAIL_FROM } from '@/constants/contact';
-import { CURRENT_TAX_YEAR, type PayPeriod, type TaxYear } from '@/constants/taxRates';
+import type { PayPeriod, TaxYear } from '@/constants/taxRates';
 import {
   generateDirectorEmailHtml,
   generateDirectorEmailText,
@@ -10,6 +10,7 @@ import {
   generatePayeEmailHtml,
   generatePayeEmailText,
 } from '@/lib/email/payeResultsEmail';
+import { resolveTaxYear } from '@/lib/tax';
 import { calculateStrategyComparison } from '@/lib/tax/strategyComparison';
 import { calculateTax } from '@/lib/taxCalculator';
 import type { TaxCalculationInput } from '@/lib/types/calculator';
@@ -55,7 +56,7 @@ export function sendDirectorResultsEmail(args: {
   input: DirectorEmailInput;
   taxYear?: string;
 }): Promise<OutboundResultsDeliveryResult> {
-  const normalizedTaxYear = (args.taxYear ?? CURRENT_TAX_YEAR) as TaxYear;
+  const normalizedTaxYear = resolveTaxYear(args.taxYear);
   const comparison = calculateStrategyComparison(args.input, normalizedTaxYear);
   const strategies = {
     allSalary: comparison.strategies.allSalary,

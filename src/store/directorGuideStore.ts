@@ -20,6 +20,7 @@ import {
   trackSafeDrawCalculated,
 } from '@/lib/directorGuideAnalytics';
 import { safeStorage } from '@/lib/safeStorage';
+import { resolveTaxYear } from '@/lib/tax';
 import { calculateDirectorScenario } from '@/lib/tax/directorCalculator';
 import { calculateStrategyComparison, type StrategyComparison } from '@/lib/tax/strategyComparison';
 import {
@@ -33,7 +34,6 @@ import {
 } from '@/lib/tax/variableIncome';
 import {
   CurrencyAmountSchema,
-  DIRECTOR_TAX_YEARS,
   type DirectorCalculationResult,
   type DirectorInput,
   type Region,
@@ -45,7 +45,10 @@ import { useShallow } from '@/lib/zustandShallow';
 // CONSTANTS
 // ============================================================================
 
-const CURRENT_TAX_YEAR = DIRECTOR_TAX_YEARS[0];
+// The Director calculator's active tax year is resolved through the tax-domain
+// boundary (the current supported canonical year). `DIRECTOR_TAX_YEARS` remains
+// the intentionally restricted set of years offered in the UI.
+const CURRENT_TAX_YEAR = resolveTaxYear();
 export const DIRECTOR_PROFIT_WHAT_IF_MIN_PERCENT = -50;
 export const DIRECTOR_PROFIT_WHAT_IF_MAX_PERCENT = 100;
 
