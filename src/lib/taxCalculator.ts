@@ -41,15 +41,12 @@
  */
 
 import {
-  CURRENT_TAX_YEAR,
   DEFAULT_HOURS_PER_WEEK,
   DEFAULT_TAX_CODE,
   PAYROLL_PERIOD_THRESHOLDS,
   type PayPeriod,
   PERIODS,
-  SCOTTISH_TAX_RATES,
   type StudentLoanPlan,
-  TAX_RATES,
   type TaxYear,
 } from '@/constants/taxRates';
 import type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
@@ -65,6 +62,7 @@ import { sliceRukTaxableIncome } from './tax/rukIncomeTax';
 import { sliceScottishTaxableIncome } from './tax/scottishIncomeTax';
 import { type StudentLoanPlanPolicy, sliceStudentLoanRepayments } from './tax/studentLoan';
 import { parseTaxCode } from './tax/taxCode';
+import { selectTaxPolicy } from './tax/taxPolicy';
 import { roundToPence } from './tax/utils';
 
 export type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
@@ -93,22 +91,6 @@ function getMonthlyPayrollBandThreshold(annualThreshold: number): number {
   }
 
   return Math.ceil(annualThreshold / 12);
-}
-
-function resolveSupportedTaxYear(taxYear: string | undefined): TaxYear {
-  if (typeof taxYear !== 'string') {
-    return CURRENT_TAX_YEAR;
-  }
-
-  const [start, endRaw] = taxYear.split('-');
-  if (!(start && endRaw)) {
-    return CURRENT_TAX_YEAR;
-  }
-
-  const normalizedEnd = endRaw.length === 2 ? `20${endRaw}` : endRaw;
-  const normalizedTaxYear = `${start}-${normalizedEnd}`;
-
-  return normalizedTaxYear in TAX_RATES ? (normalizedTaxYear as TaxYear) : CURRENT_TAX_YEAR;
 }
 
 // ============================================================================
@@ -323,11 +305,10 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
       ? input.taxCode
       : DEFAULT_TAX_CODE;
 
-  const taxYear = resolveSupportedTaxYear(input.taxYear);
-
-  // Get the tax rates for the selected year
-  const standardRates = TAX_RATES[taxYear];
-  const scottishRates = SCOTTISH_TAX_RATES[taxYear];
+  // Resolve the supported tax year and select both policy records through the
+  // single tax-domain selector (normalises short/long forms, falls back to the
+  // current year for missing/unsupported input).
+  const { taxYear, ruk: standardRates, scottish: scottishRates } = selectTaxPolicy(input.taxYear);
 
   // Prefix classification belongs to the shared tax-code grammar. Welsh C-prefix
   // takes precedence over a region toggle; Scottish S-prefix selects Scottish rates.

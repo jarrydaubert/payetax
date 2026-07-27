@@ -22,7 +22,8 @@
  * @see {@link https://www.gov.uk/guidance/adjusted-net-income} HMRC guidance
  */
 
-import { TAX_RATES, TAX_YEARS, type TaxYear } from '@/constants/taxRates';
+import type { TaxYear } from '@/constants/taxRates';
+import { selectTaxPolicy } from '@/lib/tax';
 
 const shouldLogWarnings = process.env.NODE_ENV !== 'production';
 
@@ -76,7 +77,7 @@ export interface PensionOptimization {
 export function calculateOptimalPension(
   salary: number,
   currentPension = 0,
-  taxYear: TaxYear = (TAX_YEARS[0] ?? '2025-2026') as TaxYear,
+  taxYear?: TaxYear,
 ): PensionOptimization | null {
   if (!isValidSalary(salary)) {
     logPensionWarning(`[pensionOptimizer] Invalid salary input: ${salary}`);
@@ -88,8 +89,9 @@ export function calculateOptimalPension(
     return null;
   }
 
-  // Get tax rates for the specified tax year
-  const taxRates = TAX_RATES[taxYear];
+  // Resolve the tax policy through the single tax-domain selector (falls back to
+  // the current year when omitted).
+  const { ruk: taxRates } = selectTaxPolicy(taxYear);
   const paReductionThreshold = taxRates.personalAllowanceReductionThreshold; // £100,000
   const personalAllowance = taxRates.personalAllowance; // £12,570
   // Calculate point where PA is fully tapered to zero: threshold + (PA × 2)
@@ -181,10 +183,8 @@ export function compareWithOptimization(
   const optimization = calculateOptimalPension(salary);
   if (!optimization) return null;
 
-  // Get tax rates for calculations
-  const currentTaxYear = TAX_YEARS[0] ?? '2025-2026';
-  const taxRates = TAX_RATES[currentTaxYear];
-  if (!taxRates) return null;
+  // Get current-year tax policy through the single tax-domain selector.
+  const { ruk: taxRates } = selectTaxPolicy();
   const paReductionThreshold = taxRates.personalAllowanceReductionThreshold;
 
   // NOTE: Simplified calculation for comparison display only
