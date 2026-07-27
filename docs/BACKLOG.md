@@ -51,7 +51,6 @@ Status is `To verify` for every row until a focused audit establishes whether ea
 | Concern | Desired outcome | Current status | Evidence or completion reference |
 | --- | --- | --- | --- |
 | Effective-dated policy model | Published rates, thresholds and effective dates live in one model that represents mid-year changes as data. | To verify | |
-| One policy selector | A single selector resolves the policy in force for a tax year and effective date; consumers do not re-derive it. | To verify | |
 | One shared pay-basis derivation | Pay-period and annual bases are derived once and shared, not recomputed per consumer. | To verify | |
 | Explicit pension-method handling | Salary-sacrifice, net-pay and relief-at-source are handled explicitly, with the method exposed in the result. | To verify | |
 | A transparent result that clearly exposes the selected policy, calculation basis, relevant pay bases and individual deductions | One result exposes the policy selected, the calculation basis, the relevant pay bases and each individual deduction, without callers reassembling them. | To verify | |
