@@ -79,6 +79,9 @@ export interface WarningInput {
 const VAT_WARNING_PROXIMITY = 5000; // Warn when within £5k of threshold
 const PENSION_ANNUAL_ALLOWANCE = DIRECTOR_GUIDE_BUSINESS_THRESHOLDS.pensionAnnualAllowance;
 const PENSION_TAPER_THRESHOLD = DIRECTOR_GUIDE_BUSINESS_THRESHOLDS.pensionTaperLegislative;
+const PENSION_MINIMUM_TAPERED_ALLOWANCE =
+  DIRECTOR_GUIDE_BUSINESS_THRESHOLDS.pensionMinimumTaperedAllowance;
+const PENSION_TAPER_RATE = DIRECTOR_GUIDE_BUSINESS_THRESHOLDS.pensionTaperRate;
 const SA_LIABILITY_THRESHOLD = DIRECTOR_GUIDE_BUSINESS_THRESHOLDS.paymentsOnAccount;
 const SA_DEDUCTION_THRESHOLD = 0.8; // 80% deducted at source exemption
 const HIGH_COMPLEXITY_THRESHOLD = 10000000; // £10m+ is complex
@@ -295,8 +298,10 @@ export function getWarnings(input: WarningInput): Warning[] {
   const adjustedIncome = salary + dividends + pensionContribution;
   if (adjustedIncome > PENSION_TAPER_THRESHOLD) {
     const reduction = Math.min(
-      PENSION_ANNUAL_ALLOWANCE - 10000, // Can't reduce below £10k
-      (adjustedIncome - PENSION_TAPER_THRESHOLD) / 2,
+      // Maximum reduction: AA can't taper below the statutory minimum tapered allowance.
+      PENSION_ANNUAL_ALLOWANCE - PENSION_MINIMUM_TAPERED_ALLOWANCE,
+      // £1 of allowance lost per £2 of adjusted income over the threshold.
+      (adjustedIncome - PENSION_TAPER_THRESHOLD) * PENSION_TAPER_RATE,
     );
     const taperedAA = PENSION_ANNUAL_ALLOWANCE - reduction;
     warnings.push({

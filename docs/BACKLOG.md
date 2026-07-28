@@ -50,7 +50,7 @@ Status is `To verify` for every row until a focused audit establishes whether ea
 
 | Concern | Desired outcome | Current status | Evidence or completion reference |
 | --- | --- | --- | --- |
-| Effective-dated policy model | Published rates, thresholds and effective dates live in one model that represents mid-year changes as data. | To verify | |
+| Effective-dated policy model | Published rates, thresholds and effective dates live in one model that represents mid-year changes as data. | Substantially delivered | Unit- and basis-explicit typed policy schema; effective-dated NI formalised (`PrimaryRateChange`) with ordering/non-overlap/both-sides invariant tests; Corporation Tax, pension allowances and Payments on Account moved into per-year records. Evidence: `src/constants/__tests__/taxPolicyModel.test.ts`. Residual (deliberately out of scope): the PAYE 50% overriding limit and the 6-April boundary remain as procedural/calendar constants (not published rates or thresholds); the NI straddling pay-date basis and the golden-master generator unit bug stay tracked in the detailed items below. |
 | One shared pay-basis derivation | Pay-period and annual bases are derived once and shared, not recomputed per consumer. | To verify | |
 | Explicit pension-method handling | Salary-sacrifice, net-pay and relief-at-source are handled explicitly, with the method exposed in the result. | To verify | |
 | A transparent result that clearly exposes the selected policy, calculation basis, relevant pay bases and individual deductions | One result exposes the policy selected, the calculation basis, the relevant pay bases and each individual deduction, without callers reassembling them. | To verify | |
@@ -81,7 +81,6 @@ Status is `To verify` for every row until a focused audit establishes whether ea
 
 ### Tax-domain architecture
 
-- [ ] Unambiguous annual-policy schema: unit- and basis-explicit fields (taxable vs total income, percent vs fraction, per-year vs per-week), effective-dated rates for mid-year changes. DoD: policy records carry explicit units/bases and effective dates; consumers compile against the new schema.
 - [ ] One supported tax-domain public interface (`src/lib/tax/index.ts`); application code stops importing `constants/taxRates` and domain internals directly. DoD: the `check:tax-imports` baseline shrinks to zero direct imports.
 - [ ] Display band interpreters still re-derive band presentation outside the owned mechanics (rUK and Scottish slicing each have one owner since #86/#98). DoD: display code consumes owned mechanics or generated projections; no independent band maths remains in display modules.
 - [ ] Shadow helper `taxRateDescriptions` is test-only production-adjacent code. DoD: resolved together with the `taxRateDescriptions.ts` item under Tax correctness; no test-only shadow module remains.

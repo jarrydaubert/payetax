@@ -9,7 +9,8 @@
  * @see src/constants/taxRates.ts
  */
 
-import { CT_RATES } from '@/constants/taxRates';
+import { CORPORATION_TAX_RATES, type TaxYear } from '@/constants/taxRates';
+import { resolveTaxYear } from './taxPolicy';
 import { roundToPence } from './utils';
 
 // ============================================================================
@@ -90,6 +91,7 @@ function normalizeAssociatedCompaniesCount(associatedCompanies = 1): number {
  */
 export function calculateCorporationTax(
   taxableProfit: number,
+  taxYear?: TaxYear | string,
   associatedCompanies = 1,
 ): CorporationTaxResult {
   const {
@@ -98,7 +100,7 @@ export function calculateCorporationTax(
     MAIN_RATE,
     MAIN_RATE_LIMIT,
     MARGINAL_RELIEF_FRACTION,
-  } = CT_RATES;
+  } = CORPORATION_TAX_RATES[resolveTaxYear(taxYear)];
   const associatedCompaniesCount = normalizeAssociatedCompaniesCount(associatedCompanies);
   const adjustedSmallProfitsLimit = SMALL_PROFITS_LIMIT / associatedCompaniesCount;
   const adjustedMainRateLimit = MAIN_RATE_LIMIT / associatedCompaniesCount;
@@ -169,17 +171,18 @@ export function calculateCorporationTax(
  * Use this when you just need the tax amount without the full breakdown.
  *
  * @param taxableProfit - Company's taxable profit
- * @param _taxYear - Tax year (reserved for future use when rates change)
+ * @param taxYear - Tax year whose Corporation Tax policy applies (defaults to the current year)
+ * @param associatedCompanies - Number of associated companies (adjusts the profit limits)
  * @returns Corporation Tax due (rounded to pence)
  */
 export function getCorporationTax(
   taxableProfit: number,
-  _taxYear?: string,
+  taxYear?: TaxYear | string,
   associatedCompanies = 1,
 ): number {
-  // Note: taxYear parameter reserved for future use when CT rates become year-dependent
-  // Currently CT rates are stable since April 2023 reform
-  return calculateCorporationTax(taxableProfit, associatedCompanies).corporationTax;
+  // CT rates are now selected from the per-year model. They have been stable
+  // since the April 2023 reform, so every supported year currently agrees.
+  return calculateCorporationTax(taxableProfit, taxYear, associatedCompanies).corporationTax;
 }
 
 /**
@@ -188,10 +191,16 @@ export function getCorporationTax(
  * Useful for displaying the blended rate in marginal relief cases.
  *
  * @param taxableProfit - Company's taxable profit
+ * @param taxYear - Tax year whose Corporation Tax policy applies (defaults to the current year)
+ * @param associatedCompanies - Number of associated companies (adjusts the profit limits)
  * @returns Effective rate as decimal (e.g., 0.22 for 22%)
  */
-export function getEffectiveCTRate(taxableProfit: number, associatedCompanies = 1): number {
-  return calculateCorporationTax(taxableProfit, associatedCompanies).effectiveRate;
+export function getEffectiveCTRate(
+  taxableProfit: number,
+  taxYear?: TaxYear | string,
+  associatedCompanies = 1,
+): number {
+  return calculateCorporationTax(taxableProfit, taxYear, associatedCompanies).effectiveRate;
 }
 
 // ============================================================================

@@ -25,7 +25,7 @@
  * 6. Return actionable numbers (monthly pay, tax pots)
  */
 
-import { CURRENT_TAX_YEAR, type TaxYear } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR, PAYMENTS_ON_ACCOUNT, type TaxYear } from '@/constants/taxRates';
 import type {
   DirectorCalculationResult,
   DirectorInput,
@@ -52,11 +52,11 @@ export const DEFAULT_SALARY = selectTaxPolicy(CURRENT_TAX_YEAR).ruk.personalAllo
 
 /** VAT standard rate (20%) */
 
-/** Threshold above which Payments on Account apply */
-export const POA_THRESHOLD = 1000;
+/** Threshold above which Payments on Account apply (statutory, from the policy model). */
+export const POA_THRESHOLD = PAYMENTS_ON_ACCOUNT[CURRENT_TAX_YEAR].threshold;
 
-/** POA multiplier (1.5x = bill + 50% advance for year 2) */
-export const POA_MULTIPLIER = 1.5;
+/** POA multiplier (1.5x = bill + 50% advance for year 2), from the policy model. */
+export const POA_MULTIPLIER = PAYMENTS_ON_ACCOUNT[CURRENT_TAX_YEAR].advanceMultiplier;
 
 /** Profit threshold for high complexity warning */
 export const HIGH_COMPLEXITY_THRESHOLD = 250000;
@@ -199,7 +199,7 @@ export function calculateDirectorScenario(
   const taxableProfit = roundToPence(grossProfit - salary - employerNI);
 
   // Step 7: Calculate Corporation Tax
-  const corporationTax = getCorporationTax(taxableProfit);
+  const corporationTax = getCorporationTax(taxableProfit, taxYear);
 
   // Step 8: Calculate dividends available
   const dividendsAvailable = roundToPence(taxableProfit - corporationTax);
