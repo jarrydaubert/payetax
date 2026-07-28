@@ -8,7 +8,7 @@
  */
 
 import { parseTaxCode } from '@/lib/tax';
-import { calculateAllowanceReduction, calculatePensionAmount } from '../taxCalculator';
+import { calculateAllowanceReduction } from '../taxCalculator';
 
 describe('taxCalculator helpers', () => {
   describe('parseTaxCode', () => {
@@ -52,16 +52,6 @@ describe('taxCalculator helpers', () => {
       expect(calculateAllowanceReduction(100003, 12570, 100000, 0.5)).toBe(1);
       expect(calculateAllowanceReduction(125139, 12570, 100000, 0.5)).toBe(12569);
       expect(calculateAllowanceReduction(125140, 12570, 100000, 0.5)).toBe(12570);
-    });
-  });
-
-  describe('calculatePensionAmount', () => {
-    it('calculates percentage contributions', () => {
-      expect(calculatePensionAmount(40000, 5, 'percentage')).toBe(2000);
-    });
-
-    it('calculates fixed amount as monthly equivalent', () => {
-      expect(calculatePensionAmount(40000, 3000, 'amount')).toBe(250);
     });
   });
 

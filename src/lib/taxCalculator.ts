@@ -41,7 +41,6 @@
  */
 
 import {
-  DEFAULT_HOURS_PER_WEEK,
   DEFAULT_TAX_CODE,
   PAYROLL_PERIOD_THRESHOLDS,
   type PayPeriod,
@@ -50,7 +49,7 @@ import {
   type TaxYear,
 } from '@/constants/taxRates';
 import type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
-import { convertMonthlyToPeriod, convertPeriodToAnnual } from './periodCalculator';
+import { convertMonthlyToPeriod } from './periodCalculator';
 import {
   getClass1PeriodThresholds,
   getEmployeeClass1MonthSegments,
@@ -58,6 +57,7 @@ import {
   sliceClass1EmployeeEarnings,
   sliceClass1EmployerEarnings,
 } from './tax/nationalInsurance';
+import { derivePayePayBasis } from './tax/payePayBasis';
 import { sliceRukTaxableIncome } from './tax/rukIncomeTax';
 import { sliceScottishTaxableIncome } from './tax/scottishIncomeTax';
 import { type StudentLoanPlanPolicy, sliceStudentLoanRepayments } from './tax/studentLoan';
@@ -115,21 +115,6 @@ export function calculateAllowanceReduction(
   if (salary <= threshold) return 0;
 
   return Math.min(currentAllowance, Math.floor((salary - threshold) * reductionRate));
-}
-
-/**
- * Calculate pension contribution (handles both percentage and fixed amount)
- */
-export function calculatePensionAmount(
-  salary: number,
-  contribution: number,
-  contributionType: 'percentage' | 'amount',
-): number {
-  if (contributionType === 'percentage') {
-    return (salary * contribution) / 100;
-  }
-  // Fixed amount - convert to monthly equivalent
-  return contribution / 12;
 }
 
 type BandOverrideCode = 'BR' | 'D0' | 'D1' | 'D2' | 'D3' | 'NT';
@@ -293,13 +278,8 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // 1. Prepare input data and tax rates
   // ---------------
 
-  // Defensive normalization for adversarial runtime inputs.
-  // Boundary validation should reject these first, but core math should stay finite.
-  const salaryInput = Number.isFinite(input.salary) && input.salary > 0 ? input.salary : 0;
-  const hoursPerWeek =
-    Number.isFinite(input.hoursPerWeek) && input.hoursPerWeek > 0
-      ? input.hoursPerWeek
-      : DEFAULT_HOURS_PER_WEEK;
+  const payBasis = derivePayePayBasis(input);
+  const { hoursPerWeek } = payBasis;
   const taxCodeInput =
     typeof input.taxCode === 'string' && input.taxCode.trim().length > 0
       ? input.taxCode
@@ -319,87 +299,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   const taxRates = isScottish ? scottishRates : standardRates;
 
   // ---------------
-  // 2. Input normalization - start by converting salary to both annual and monthly
-  // ---------------
-
-  // First convert salary to annual amount based on input period
-  const annualGrossSalary = convertPeriodToAnnual(salaryInput, input.payPeriod, hoursPerWeek);
-
-  // ---------------
-  // 2.5. Calculate additional income from other sources
-  // ---------------
-  //
-  // CRITICAL: We maintain TWO income buckets for HMRC compliance:
-  //
-  // 1. employmentIncome - Subject to:
-  //    - Income Tax (via PAYE bands)
-  //    - Employee National Insurance (Class 1)
-  //    - Employer National Insurance (Class 1)
-  //    - Student Loan deductions via PAYE
-  //
-  // 2. additionalIncome (rental, pensions, investments) - Subject to:
-  //    - Income Tax only (via PAYE bands)
-  //    - NO National Insurance (not employment earnings)
-  //    - NO Student Loan via PAYE (handled via Self Assessment)
-  //
-  // Both contribute to totalGrossIncome for:
-  //    - Personal Allowance £100k taper calculation
-  //    - Tax band threshold determination
-  //    - Marriage Allowance eligibility
-  //
-  let additionalIncome = 0;
-  let employmentIncome = annualGrossSalary; // Primary salary
-
-  if (input.incomeSources && input.incomeSources.length > 0) {
-    for (const source of input.incomeSources) {
-      const sourceAnnual = convertPeriodToAnnual(source.amount, source.period, hoursPerWeek);
-
-      if (source.type === 'employment') {
-        employmentIncome += sourceAnnual;
-      } else {
-        // Rental, pension, investment income - taxable but no NI/SL via PAYE
-        additionalIncome += sourceAnnual;
-      }
-    }
-  }
-
-  // totalGrossIncome: Used for tax band calculations and as the base for adjusted net income
-  // Adjusted net income (for PA taper) is calculated later after pension contributions
-  const totalGrossIncome = employmentIncome + additionalIncome;
-
-  // Monthly equivalents for payslip-style calculations
-  const monthlyGrossSalary = totalGrossIncome / 12;
-  const monthlyEmploymentIncome = employmentIncome / 12;
-
-  // ---------------
-  // 3. Calculate pre-tax deductions (pension and allowances)
-  // ---------------
-
-  // Calculate annual and monthly pension contribution
-  let annualPensionContribution = 0;
-  let monthlyPensionContribution = 0;
-
-  if (input.pensionContribution > 0) {
-    if (input.pensionContributionType === 'percentage') {
-      // Input is validated at the boundary (Zod) to stay within 0-100%.
-      // Percentage of PRIMARY employment salary (not other income sources)
-      // Pension contributions are typically on employment earnings only
-      annualPensionContribution = annualGrossSalary * (input.pensionContribution / 100);
-      monthlyPensionContribution = annualPensionContribution / 12; // Derive from annual for consistency
-    } else {
-      // Fixed amount (normalize from input period to annual and monthly)
-      const requestedAnnualPensionContribution = convertPeriodToAnnual(
-        input.pensionContribution,
-        input.payPeriod,
-        hoursPerWeek,
-      );
-      annualPensionContribution = Math.min(requestedAnnualPensionContribution, annualGrossSalary);
-      monthlyPensionContribution = annualPensionContribution / 12;
-    }
-  }
-
-  // ---------------
-  // 4. Calculate tax-free allowance (annual and monthly)
+  // 2. Calculate tax-free allowance (annual and monthly)
   // ---------------
 
   // Parse tax code using comprehensive parser that handles all HMRC code types
@@ -414,7 +314,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // Above £100,000 ADJUSTED NET income, personal allowance is reduced by £1 for every £2 of income
   // This creates an effective 60% tax rate between £100k-£125k (40% income tax + 20% lost allowance)
   // IMPORTANT: Pension contributions reduce adjusted net income, so they can restore allowance
-  const adjustedNetIncome = Math.max(0, totalGrossIncome - annualPensionContribution);
+  const adjustedNetIncome = payBasis.adjustedNetIncome.annual;
   if (adjustedNetIncome > taxRates.personalAllowanceReductionThreshold) {
     const reduction = calculateAllowanceReduction(
       adjustedNetIncome,
@@ -465,8 +365,8 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     // 3. User must be a basic rate taxpayer (not higher rate) - based on TOTAL income
     if (
       input.partnerGrossWage < taxRates.personalAllowance && // Partner earns LESS than PA
-      totalGrossIncome > taxRates.personalAllowance && // User pays tax (total income)
-      totalGrossIncome <= higherRateThreshold // User is basic rate taxpayer (total income)
+      payBasis.totalGrossIncome.annual > taxRates.personalAllowance && // User pays tax (total income)
+      payBasis.totalGrossIncome.annual <= higherRateThreshold // User is basic rate taxpayer (total income)
     ) {
       // User RECEIVES the marriage allowance from their lower-earning partner
       annualTaxFreeAmount += taxRates.marriageAllowance;
@@ -481,11 +381,11 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   );
 
   // ---------------
-  // 5. Calculate adjusted salary and taxable income (annual and monthly)
+  // 3. Calculate adjusted salary and taxable income (annual and monthly)
   // ---------------
 
   // Adjusted salary (after pre-tax deductions - pension only)
-  const monthlyTaxableAdjustedSalary = monthlyGrossSalary - monthlyPensionContribution;
+  const monthlyTaxableAdjustedSalary = payBasis.payeAdjustedPayment.monthly;
 
   // HMRC manual PAYE tables use whole-pound taxable pay after pay adjustment.
   const monthlyTaxableIncome = Math.floor(
@@ -494,7 +394,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   const annualTaxableIncome = monthlyTaxableIncome * 12;
 
   // ---------------
-  // 6. Calculate income tax using bands (monthly calculation, annual storage)
+  // 4. Calculate income tax using bands (monthly calculation, annual storage)
   // ---------------
 
   let monthlyTax = 0;
@@ -592,14 +492,14 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   const annualTax = monthlyTax * 12;
 
   // ---------------
-  // 7. Calculate National Insurance contributions (monthly calculation)
+  // 5. Calculate National Insurance contributions (monthly calculation)
   // ---------------
   //
   // IMPORTANT: NI is levied on EMPLOYMENT income only, NOT total income.
   // This is a fundamental HMRC rule - rental income, investment income, and
   // pension income are NOT subject to National Insurance contributions.
   //
-  // We use monthlyEmploymentIncome (not monthlyGrossSalary which includes all sources)
+  // We use the NI-able employment basis (not total gross, which includes all sources)
   // to ensure NI is calculated correctly for people with multiple income types.
   //
 
@@ -624,12 +524,9 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     const upperRate = standardRates.nationalInsurance.employee[input.niCategory].upper.rate;
 
     // NI base: Employment income minus pension (salary sacrifice reduces NI liability)
-    const monthlyTaxableAdjustedEmploymentIncome =
-      monthlyEmploymentIncome - monthlyPensionContribution;
-
     for (const segment of getEmployeeClass1MonthSegments(taxYear, input.niCategory)) {
       const segmentMonthlyNI = roundToPence(
-        sliceClass1EmployeeEarnings(monthlyTaxableAdjustedEmploymentIncome, {
+        sliceClass1EmployeeEarnings(payBasis.niableEmploymentEarnings.monthly, {
           primaryThreshold: periodThresholds.primary,
           upperEarningsLimit: periodThresholds.upper,
           primaryRate: segment.rate,
@@ -646,7 +543,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   const monthlyNationalInsurance = roundToPence(annualNationalInsurance / 12);
 
   // ---------------
-  // 8. Calculate Employer's NI (monthly calculation)
+  // 6. Calculate Employer's NI (monthly calculation)
   // ---------------
 
   // Employer NI is charged even when the employee is exempt (e.g. State Pension age).
@@ -654,7 +551,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // the annual threshold divided by 12; both live in the canonical policy record.
   // Employer NI is calculated on employment income only (not rental, pension income, etc.)
   const employerRates = standardRates.nationalInsurance.employer[input.niCategory];
-  const monthlyEmployerNI = sliceClass1EmployerEarnings(monthlyEmploymentIncome, {
+  const monthlyEmployerNI = sliceClass1EmployerEarnings(payBasis.totalEmploymentGross.monthly, {
     secondaryThreshold: getClass1PeriodThresholds(taxYear, input.niCategory, PERIODS.MONTHLY)
       .secondary,
     secondaryRate: employerRates.secondary.rate,
@@ -666,7 +563,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   const annualEmployerNI = roundToPence(roundToPence(monthlyEmployerNI) * 12);
 
   // ---------------
-  // 9. Calculate Student Loan repayments (monthly calculation)
+  // 7. Calculate Student Loan repayments (monthly calculation)
   // ---------------
   //
   // IMPORTANT: Student Loan via PAYE is calculated on EMPLOYMENT income only.
@@ -675,8 +572,8 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // - PAYE deducts SL based on employment earnings only (what we calculate here)
   // - Additional SL on other income is collected via Self Assessment tax return
   //
-  // This is why we use monthlyEmploymentIncome, not monthlyGrossSalary.
-  // If we used total income, we'd double-count income that HMRC handles via SA.
+  // This is why we use the Student Loan employment basis, not total gross.
+  // Using total income would double-count income that HMRC handles via SA.
   //
 
   let monthlyStudentLoan = 0;
@@ -691,7 +588,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     }
 
     monthlyStudentLoan = sliceStudentLoanRepayments(
-      monthlyEmploymentIncome,
+      payBasis.studentLoanEmploymentEarnings.monthly,
       input.studentLoanPlans,
       monthlyPolicy,
     ).total;
@@ -704,7 +601,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   const annualStudentLoan = monthlyStudentLoan * 12;
 
   // ---------------
-  // 10. Calculate Net Pay (monthly calculation)
+  // 8. Calculate Net Pay (monthly calculation)
   // ---------------
 
   // Non-taxable allowances (annual) - add to net pay only, not taxable pay.
@@ -722,7 +619,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   const annualNetPay = monthlyNetPay * 12;
 
   // ---------------
-  // 11. Format results for different pay periods
+  // 9. Format results for different pay periods
   // ---------------
 
   const periodsToCalculate: PayPeriod[] = [
@@ -748,21 +645,21 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     switch (period) {
       case PERIODS.ANNUALLY:
         // Use annual values calculated above
-        grossSalary[period] = annualGrossSalary;
+        grossSalary[period] = payBasis.primaryEmploymentGross.annual;
         incomeTax[period] = annualTax;
         nationalInsuranceByPeriod[period] = annualNationalInsurance;
         studentLoanByPeriod[period] = annualStudentLoan;
-        pensionContributionByPeriod[period] = annualPensionContribution;
+        pensionContributionByPeriod[period] = payBasis.salarySacrificePensionDeduction.annual;
         netPay[period] = annualNetPay;
         break;
 
       case PERIODS.MONTHLY:
         // Use monthly values calculated above
-        grossSalary[period] = monthlyGrossSalary;
+        grossSalary[period] = payBasis.totalGrossIncome.monthly;
         incomeTax[period] = monthlyTax;
         nationalInsuranceByPeriod[period] = monthlyNationalInsurance;
         studentLoanByPeriod[period] = monthlyStudentLoan;
-        pensionContributionByPeriod[period] = monthlyPensionContribution;
+        pensionContributionByPeriod[period] = payBasis.salarySacrificePensionDeduction.monthly;
         netPay[period] = monthlyNetPay;
         break;
 
@@ -772,7 +669,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
       case PERIODS.DAILY:
       case PERIODS.HOURLY:
         grossSalary[period] = roundToPence(
-          convertMonthlyToPeriod(monthlyGrossSalary, period, hoursPerWeek),
+          convertMonthlyToPeriod(payBasis.totalGrossIncome.monthly, period, hoursPerWeek),
         );
         incomeTax[period] = roundToPence(convertMonthlyToPeriod(monthlyTax, period, hoursPerWeek));
         nationalInsuranceByPeriod[period] = roundToPence(
@@ -782,7 +679,11 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
           convertMonthlyToPeriod(monthlyStudentLoan, period, hoursPerWeek),
         );
         pensionContributionByPeriod[period] = roundToPence(
-          convertMonthlyToPeriod(monthlyPensionContribution, period, hoursPerWeek),
+          convertMonthlyToPeriod(
+            payBasis.salarySacrificePensionDeduction.monthly,
+            period,
+            hoursPerWeek,
+          ),
         );
         netPay[period] = roundToPence(convertMonthlyToPeriod(monthlyNetPay, period, hoursPerWeek));
         break;
@@ -790,7 +691,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   }
 
   // ---------------
-  // 12. Return results
+  // 10. Return results
   // ---------------
 
   const results: TaxCalculationResults = {
@@ -812,9 +713,9 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     incomeBreakdown:
       input.incomeSources && input.incomeSources.length > 0
         ? {
-            employment: employmentIncome,
-            nonEmployment: additionalIncome,
-            total: totalGrossIncome,
+            employment: payBasis.totalEmploymentGross.annual,
+            nonEmployment: payBasis.nonEmploymentTaxableIncome.annual,
+            total: payBasis.totalGrossIncome.annual,
           }
         : undefined,
   };
