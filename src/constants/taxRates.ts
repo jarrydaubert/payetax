@@ -37,7 +37,47 @@ export const PERIODS = {
 // Types
 export type PayPeriod = (typeof PERIODS)[keyof typeof PERIODS];
 export type TaxYear = '2023-2024' | '2024-2025' | '2025-2026' | '2026-2027';
-export type TaxBand = { name: string; rate: number; threshold: number };
+
+// ============================================================================
+// UNIT & BASIS VOCABULARY
+// ============================================================================
+//
+// Transparent aliases (each is `number`/`string`) that make the unit and basis
+// of every policy value explicit at the type level, so consumers no longer rely
+// on naming conventions or hidden arithmetic. They document intent and are
+// enforced at runtime by the invariant tests in
+// `src/constants/__tests__/taxPolicyModel.test.ts`.
+
+/** A tax rate expressed as a percentage number, e.g. `20` means 20%. Consumers divide by 100. */
+export type PercentageRate = number;
+/** A tax rate expressed as a fraction, e.g. `0.0875` means 8.75%. Consumers multiply directly. */
+export type FractionRate = number;
+/** A monetary amount in GBP on an ANNUAL basis. */
+export type AnnualAmountGBP = number;
+/**
+ * A monetary amount in GBP on a payroll-PERIOD basis. These are HMRC-published
+ * period figures and are deliberately NOT the annual amount divided by 12 or 52.
+ */
+export type PeriodAmountGBP = number;
+/**
+ * A cumulative TAXABLE-income upper bound in GBP (income after the Personal
+ * Allowance), per ITA 2007 / the Scottish Rate Resolution. `+Infinity` marks an
+ * open-ended top band.
+ */
+export type TaxableIncomeUpperBoundGBP = number;
+/** A TOTAL-income threshold in GBP, measured on gross/adjusted income (not taxable income). */
+export type TotalIncomeThresholdGBP = number;
+/** A dimensionless ratio, e.g. `0.5` for £1 lost per £2. */
+export type Ratio = number;
+/** An effective date for a within-year policy change, ISO `YYYY-MM-DD`. */
+export type EffectiveDateISO = string;
+
+export type TaxBand = {
+  name: string;
+  rate: PercentageRate;
+  /** Cumulative taxable-income upper bound (after PA); `+Infinity` for the top band. */
+  threshold: TaxableIncomeUpperBoundGBP;
+};
 export type StudentLoanPlan = 'plan1' | 'plan2' | 'plan4' | 'plan5' | 'postgrad';
 export type StudentLoanSelection = StudentLoanPlan[] | 'none';
 export type NICategory = 'A' | 'B' | 'C' | 'H' | 'J' | 'M' | 'Z';
@@ -58,17 +98,25 @@ export interface TaxAllowance {
   period: PayPeriod;
 }
 
+/**
+ * HMRC-published payroll-period thresholds. Every value is a `PeriodAmountGBP`:
+ * a published period figure, deliberately not the annual amount divided by 12/52.
+ */
 export interface PayrollPeriodThresholds {
   weekly: {
     /** Reference-only HMRC value: no production path computes weekly free pay. */
-    payeFreePay: number;
-    niPrimary: number;
-    niUpper: number;
+    payeFreePay: PeriodAmountGBP;
+    /** Primary Threshold on a weekly basis. */
+    niPrimary: PeriodAmountGBP;
+    /** Upper Earnings Limit on a weekly basis. */
+    niUpper: PeriodAmountGBP;
   };
   monthly: {
-    payeFreePay: number;
-    niPrimary: number;
-    niUpper: number;
+    payeFreePay: PeriodAmountGBP;
+    /** Primary Threshold on a monthly basis. */
+    niPrimary: PeriodAmountGBP;
+    /** Upper Earnings Limit on a monthly basis. */
+    niUpper: PeriodAmountGBP;
   };
 }
 
@@ -264,76 +312,96 @@ export const PAYROLL_PERIOD_THRESHOLDS: Record<TaxYear, PayrollPeriodThresholds>
   },
 };
 
+/** An effective-dated primary NI rate change within a tax year. */
+export interface PrimaryRateChange {
+  /** ISO date the later rate takes effect. Payroll selects by pay date; never averages. */
+  effectiveFrom: EffectiveDateISO;
+  /** The primary percentage in force from `effectiveFrom` onwards. */
+  rate: PercentageRate;
+}
+
+/** Employee Class 1 NI policy for one NI category. */
+export interface Class1EmployeeRates {
+  /** `rate` is the primary percentage in force on 6 April; mid-year changes live in `primaryRateChanges`. */
+  primary: { threshold: AnnualAmountGBP; rate: PercentageRate };
+  upper: { threshold: AnnualAmountGBP; rate: PercentageRate };
+  /**
+   * Effective-dated primary rate changes within the tax year, ascending by date.
+   * Present only where HMRC changed the rate mid-year. Payroll (pay period)
+   * calculations select a rate by pay date; they never average.
+   */
+  primaryRateChanges?: readonly PrimaryRateChange[];
+  /**
+   * HMRC's published blended primary rate for the annual earnings period
+   * (directors). Present only alongside `primaryRateChanges`. A published
+   * statutory figure, not a value derived from the changes above.
+   */
+  directorsPrimaryRate?: PercentageRate;
+}
+
+/** Employer Class 1 NI policy for one NI category. */
+export interface Class1EmployerRates {
+  /**
+   * `threshold` is the ANNUAL secondary threshold; `weeklyThreshold` and
+   * `monthlyThreshold` are HMRC's published period figures, which are not the
+   * annual value divided by 52 or 12.
+   */
+  secondary: {
+    threshold: AnnualAmountGBP;
+    rate: PercentageRate;
+    weeklyThreshold: PeriodAmountGBP;
+    monthlyThreshold: PeriodAmountGBP;
+  };
+}
+
+/** Income-contingent student loan repayment policy for one plan. */
+export interface StudentLoanPlanRates {
+  threshold: AnnualAmountGBP;
+  rate: PercentageRate;
+}
+
+/** National Insurance policy for a tax year. */
+export interface NationalInsurancePolicy {
+  employee: Record<NICategory, Class1EmployeeRates>;
+  employer: Record<NICategory, Class1EmployerRates>;
+  /** Annual Employment Allowance that can offset employer NI. */
+  employmentAllowance: AnnualAmountGBP;
+  /** Class 1A NI rate on taxable benefits in kind. */
+  class1A: { rate: PercentageRate };
+  /** Lower Earnings Limit — annual minimum for NI credits / State Pension qualification. */
+  lowerEarningsLimit: AnnualAmountGBP;
+}
+
+/** The rest-of-UK (England, Wales, Northern Ireland) statutory policy for a tax year. */
+export interface RukTaxYearPolicy {
+  personalAllowance: AnnualAmountGBP;
+  personalAllowanceReductionThreshold: TotalIncomeThresholdGBP;
+  personalAllowanceReductionRate: Ratio;
+  bands: TaxBand[];
+  marriageAllowance: AnnualAmountGBP;
+  blindPersonsAllowance: AnnualAmountGBP;
+  /** Tax-free dividend allowance. */
+  dividendAllowance: AnnualAmountGBP;
+  /** VAT registration turnover threshold. */
+  vatRegistrationThreshold: AnnualAmountGBP;
+  hicbc: {
+    /** High Income Child Benefit Charge start threshold (total income). */
+    start: TotalIncomeThresholdGBP;
+    /** HICBC full clawback threshold (total income). */
+    end: TotalIncomeThresholdGBP;
+  };
+  nationalInsurance: NationalInsurancePolicy;
+  studentLoan: {
+    plan1: StudentLoanPlanRates;
+    plan2: StudentLoanPlanRates;
+    plan4: StudentLoanPlanRates;
+    plan5: StudentLoanPlanRates;
+    postgrad: StudentLoanPlanRates;
+  };
+}
+
 // Standard UK Tax Rates (England, Wales, NI)
-export const TAX_RATES: Record<
-  TaxYear,
-  {
-    personalAllowance: number;
-    personalAllowanceReductionThreshold: number;
-    personalAllowanceReductionRate: number;
-    bands: TaxBand[];
-    marriageAllowance: number;
-    blindPersonsAllowance: number;
-    dividendAllowance: number; // Tax-free dividend allowance
-    vatRegistrationThreshold: number; // VAT registration threshold
-    hicbc: {
-      start: number; // High Income Child Benefit Charge start threshold
-      end: number; // HICBC full clawback threshold
-    };
-    nationalInsurance: {
-      employee: Record<
-        NICategory,
-        {
-          /**
-           * `rate` is the primary percentage in force on 6 April of the tax year.
-           * Where a rate changed mid-year, `primaryRateChanges` carries the later
-           * values and `primary.rate` stays the opening rate.
-           */
-          primary: { threshold: number; rate: number };
-          upper: { threshold: number; rate: number };
-          /**
-           * Effective-dated primary rate changes within the tax year, ascending by
-           * date. Present only where HMRC changed the rate mid-year. Payroll (pay
-           * period) calculations select a rate by pay date; they never average.
-           */
-          primaryRateChanges?: readonly { effectiveFrom: string; rate: number }[];
-          /**
-           * HMRC's published blended primary rate for the annual earnings period
-           * (directors). Present only alongside `primaryRateChanges`. This is a
-           * published statutory figure, not a value derived from the changes above.
-           */
-          directorsPrimaryRate?: number;
-        }
-      >;
-      employer: Record<
-        NICategory,
-        {
-          /**
-           * `threshold` is the annual secondary threshold. `weeklyThreshold` and
-           * `monthlyThreshold` are HMRC's published period figures, which are not
-           * the annual value divided by 52 or 12.
-           */
-          secondary: {
-            threshold: number;
-            rate: number;
-            weeklyThreshold: number;
-            monthlyThreshold: number;
-          };
-        }
-      >;
-      employmentAllowance: number; // Annual EA that can offset employer NI
-      class1A: { rate: number }; // Class 1A NI rate (%) on taxable benefits in kind
-      lowerEarningsLimit: number; // LEL - minimum for NI credits / State Pension qualification
-    };
-    studentLoan: {
-      plan1: { threshold: number; rate: number };
-      plan2: { threshold: number; rate: number };
-      plan4: { threshold: number; rate: number };
-      plan5: { threshold: number; rate: number };
-      postgrad: { threshold: number; rate: number };
-    };
-  }
-> = {
+export const TAX_RATES: Record<TaxYear, RukTaxYearPolicy> = {
   '2026-2027': {
     personalAllowance: 12570,
     personalAllowanceReductionThreshold: 100000,
@@ -711,18 +779,18 @@ export const TAX_RATES: Record<
   },
 };
 
+/** Scottish statutory income-tax policy for a tax year (different banding from rUK). */
+export interface ScottishTaxYearPolicy {
+  personalAllowance: AnnualAmountGBP;
+  personalAllowanceReductionThreshold: TotalIncomeThresholdGBP;
+  personalAllowanceReductionRate: Ratio;
+  bands: TaxBand[];
+  marriageAllowance: AnnualAmountGBP;
+  blindPersonsAllowance: AnnualAmountGBP;
+}
+
 // Scottish Tax Rates (different banding from rest of UK)
-export const SCOTTISH_TAX_RATES: Record<
-  TaxYear,
-  {
-    personalAllowance: number;
-    personalAllowanceReductionThreshold: number;
-    personalAllowanceReductionRate: number;
-    bands: TaxBand[];
-    marriageAllowance: number;
-    blindPersonsAllowance: number;
-  }
-> = {
+export const SCOTTISH_TAX_RATES: Record<TaxYear, ScottishTaxYearPolicy> = {
   '2026-2027': {
     personalAllowance: 12570,
     personalAllowanceReductionThreshold: 100000,
@@ -819,14 +887,18 @@ export const SCOTTISH_TAX_RATES: Record<
 //
 // @see https://www.gov.uk/tax-on-dividends
 
-export const DIVIDEND_TAX_RATES: Record<
-  TaxYear,
-  {
-    BASIC_RATE: number;
-    HIGHER_RATE: number;
-    ADDITIONAL_RATE: number;
-  }
-> = {
+/**
+ * Dividend tax rates for a tax year. Unlike income-tax/NI rates (percentage
+ * numbers), these are stored as `FractionRate` decimals and consumers multiply
+ * them directly.
+ */
+export interface DividendTaxYearRates {
+  BASIC_RATE: FractionRate;
+  HIGHER_RATE: FractionRate;
+  ADDITIONAL_RATE: FractionRate;
+}
+
+export const DIVIDEND_TAX_RATES: Record<TaxYear, DividendTaxYearRates> = {
   '2023-2024': {
     BASIC_RATE: 0.0875,
     HIGHER_RATE: 0.3375,
@@ -860,30 +932,130 @@ export type DividendRates = (typeof DIVIDEND_TAX_RATES)[TaxYear];
 // Corporation Tax rates for UK limited companies. The rate depends on
 // taxable profits, with marginal relief for profits between £50k-£250k.
 //
+// Now part of the effective-dated model: keyed by tax year so a future rate
+// change is represented as data. Rates have been stable since the April 2023
+// reform, so every supported year currently holds identical values.
+//
 // @see https://www.gov.uk/government/publications/rates-and-allowances-corporation-tax
 
-export const CT_RATES = {
-  /** Small profits rate (19%) - applies to profits ≤ £50,000 */
+/**
+ * Corporation Tax policy for a tax year. Rates are `FractionRate` decimals.
+ *
+ * Field names intentionally stay UPPER_SNAKE (unlike the camelCase used by the
+ * other policy interfaces) to preserve the destructure in `corporationTax.ts`
+ * and the shape consumed by `directorResultsEmail.ts` and existing tests.
+ */
+export interface CorporationTaxYearPolicy {
+  /** Small profits rate (applies to profits ≤ the small-profits limit). */
+  SMALL_PROFITS_RATE: FractionRate;
+  /** Small profits upper profit limit. */
+  SMALL_PROFITS_LIMIT: AnnualAmountGBP;
+  /** Main rate (applies to profits ≥ the main-rate limit). */
+  MAIN_RATE: FractionRate;
+  /** Main rate lower profit limit. */
+  MAIN_RATE_LIMIT: AnnualAmountGBP;
+  /** Marginal relief fraction (3/200 = 0.015), a dimensionless ratio. */
+  MARGINAL_RELIEF_FRACTION: Ratio;
+}
+
+const CORPORATION_TAX_POLICY_2023_ONWARDS: CorporationTaxYearPolicy = {
   SMALL_PROFITS_RATE: 0.19,
-
-  /** Small profits threshold */
   SMALL_PROFITS_LIMIT: 50_000,
-
-  /** Main rate (25%) - applies to profits ≥ £250,000 */
   MAIN_RATE: 0.25,
-
-  /** Main rate threshold */
   MAIN_RATE_LIMIT: 250_000,
-
-  /**
-   * Marginal relief fraction (3/200 = 0.015)
-   *
-   * Used to calculate the smooth transition between small profits rate
-   * and main rate for profits between £50,000 and £250,000.
-   *
-   * Formula: Marginal Relief = (Upper Limit - Profits) × (Profits / Profits) × 3/200
-   */
   MARGINAL_RELIEF_FRACTION: 3 / 200,
-} as const;
+};
 
-export type CorporationTaxRates = typeof CT_RATES;
+// Each year gets its own object (spread from the single stable base) so a future
+// year can diverge by replacing one entry, and an in-place edit can never leak
+// across years.
+export const CORPORATION_TAX_RATES: Record<TaxYear, CorporationTaxYearPolicy> = {
+  '2023-2024': { ...CORPORATION_TAX_POLICY_2023_ONWARDS },
+  '2024-2025': { ...CORPORATION_TAX_POLICY_2023_ONWARDS },
+  '2025-2026': { ...CORPORATION_TAX_POLICY_2023_ONWARDS },
+  '2026-2027': { ...CORPORATION_TAX_POLICY_2023_ONWARDS },
+};
+
+/**
+ * Current-year Corporation Tax rates — a convenience projection of the canonical
+ * per-year {@link CORPORATION_TAX_RATES} (mirrors {@link DIVIDEND_RATES}). Prefer
+ * the per-year record for year-aware calculations.
+ */
+export const CT_RATES = CORPORATION_TAX_RATES[CURRENT_TAX_YEAR];
+
+export type CorporationTaxRates = CorporationTaxYearPolicy;
+
+// ============================================================================
+// PENSION ALLOWANCES (statutory)
+// ============================================================================
+//
+// Pension Annual Allowance and high-income taper. Part of the effective-dated
+// model (keyed by tax year); values have been stable since the April 2023
+// changes (AA £40k→£60k, taper adjusted-income threshold £240k→£260k, minimum
+// tapered AA and MPAA £4k→£10k), so every supported year holds identical values.
+//
+// NOTE: `DIRECTOR_GUIDE_BUSINESS_THRESHOLDS.pensionTaperWarning` (£240k) is a
+// separate, deliberately-lower UX early-warning and is NOT this statutory value.
+//
+// @see https://www.gov.uk/guidance/pension-schemes-rates
+// @see https://www.gov.uk/tax-on-your-private-pension/annual-allowance
+
+/** Statutory pension allowance policy for a tax year. */
+export interface PensionAllowancePolicy {
+  /** Standard pension Annual Allowance. */
+  annualAllowance: AnnualAmountGBP;
+  /** Adjusted-income threshold above which the Annual Allowance tapers. */
+  adjustedIncomeTaperThreshold: TotalIncomeThresholdGBP;
+  /** Minimum tapered Annual Allowance (the taper floor). */
+  minimumTaperedAllowance: AnnualAmountGBP;
+  /** Money Purchase Annual Allowance. Held for model completeness; surfaced in UI copy. */
+  moneyPurchaseAnnualAllowance: AnnualAmountGBP;
+  /** Allowance lost per £1 of adjusted income over the threshold (£1 per £2 = 0.5). */
+  taperRate: Ratio;
+}
+
+const PENSION_ALLOWANCE_POLICY_2023_ONWARDS: PensionAllowancePolicy = {
+  annualAllowance: 60_000,
+  adjustedIncomeTaperThreshold: 260_000,
+  minimumTaperedAllowance: 10_000,
+  moneyPurchaseAnnualAllowance: 10_000,
+  taperRate: 0.5,
+};
+
+export const PENSION_ALLOWANCES: Record<TaxYear, PensionAllowancePolicy> = {
+  '2023-2024': { ...PENSION_ALLOWANCE_POLICY_2023_ONWARDS },
+  '2024-2025': { ...PENSION_ALLOWANCE_POLICY_2023_ONWARDS },
+  '2025-2026': { ...PENSION_ALLOWANCE_POLICY_2023_ONWARDS },
+  '2026-2027': { ...PENSION_ALLOWANCE_POLICY_2023_ONWARDS },
+};
+
+// ============================================================================
+// PAYMENTS ON ACCOUNT (Self Assessment)
+// ============================================================================
+//
+// Statutory Self Assessment Payments on Account rule: where the balancing
+// payment exceeds the threshold, HMRC requires two advance payments of 50% each
+// (bill + 50% advance = 1.5× in the first affected year). Keyed by tax year for
+// consistency with the model; the threshold has been stable at £1,000.
+//
+// @see https://www.gov.uk/understand-self-assessment-bill/payments-on-account
+
+/** Statutory Self Assessment Payments on Account policy for a tax year. */
+export interface PaymentsOnAccountPolicy {
+  /** Balancing-payment threshold above which Payments on Account apply. */
+  threshold: AnnualAmountGBP;
+  /** Advance multiplier (bill + 50% advance = 1.5). */
+  advanceMultiplier: Ratio;
+}
+
+const PAYMENTS_ON_ACCOUNT_POLICY: PaymentsOnAccountPolicy = {
+  threshold: 1_000,
+  advanceMultiplier: 1.5,
+};
+
+export const PAYMENTS_ON_ACCOUNT: Record<TaxYear, PaymentsOnAccountPolicy> = {
+  '2023-2024': { ...PAYMENTS_ON_ACCOUNT_POLICY },
+  '2024-2025': { ...PAYMENTS_ON_ACCOUNT_POLICY },
+  '2025-2026': { ...PAYMENTS_ON_ACCOUNT_POLICY },
+  '2026-2027': { ...PAYMENTS_ON_ACCOUNT_POLICY },
+};
