@@ -124,7 +124,7 @@ describe('Corporation Tax Calculator', () => {
     describe('Associated company threshold adjustments', () => {
       it('should split CT thresholds across associated companies', () => {
         const singleCompany = calculateCorporationTax(40000);
-        const twoAssociatedCompanies = calculateCorporationTax(40000, 2);
+        const twoAssociatedCompanies = calculateCorporationTax(40000, undefined, 2);
 
         expect(singleCompany.rateBand).toBe('small_profits');
         expect(twoAssociatedCompanies.rateBand).toBe('marginal');
@@ -132,7 +132,7 @@ describe('Corporation Tax Calculator', () => {
       });
 
       it('should treat £25,000 as small-profits limit when there are 2 companies', () => {
-        const result = calculateCorporationTax(25000, 2);
+        const result = calculateCorporationTax(25000, undefined, 2);
 
         expect(result.rateBand).toBe('small_profits');
         expect(result.corporationTax).toBe(4750);

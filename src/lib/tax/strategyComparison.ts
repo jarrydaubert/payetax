@@ -432,7 +432,7 @@ export function calculateSalaryScenario(input: SalaryScenarioInput): SalaryScena
   const taxableProfit = Math.max(0, profitAfterSalaryCost - lossesBroughtForward);
   const corporationTax = getCorporationTax(
     taxableProfit,
-    undefined,
+    taxYear,
     normalizeAssociatedCompaniesCount(associatedCompaniesCount),
   );
   const dividends = profitAfterSalaryCost - corporationTax;
@@ -545,7 +545,7 @@ function calculateSalaryScenarioInternal(
   const taxableProfit = Math.max(0, profitAfterSalaryCost - lossesBroughtForward);
   const corporationTax = getCorporationTax(
     taxableProfit,
-    undefined,
+    taxYear,
     normalizeAssociatedCompaniesCount(associatedCompaniesCount),
   );
   // Dividends come from post-CT profit (losses reduce CT, increasing available dividends)
@@ -751,7 +751,7 @@ function calculateAllDividendsStrategy(opts: StrategyCalcOptions): StrategyResul
   const taxableProfit = Math.max(0, grossProfit - lossesBroughtForward);
   const corporationTax = getCorporationTax(
     taxableProfit,
-    undefined,
+    taxYear,
     normalizeAssociatedCompaniesCount(associatedCompaniesCount),
   );
   // Dividends come from post-CT profit, but losses don't create extra cash
@@ -841,7 +841,7 @@ function calculateYourSetupStrategy(
   const taxableProfitAfterSalary = Math.max(0, profitAfterSalary - lossesBroughtForward);
   const ctOnRemaining = getCorporationTax(
     taxableProfitAfterSalary,
-    undefined,
+    taxYear,
     normalizeAssociatedCompaniesCount(associatedCompaniesCount),
   );
   const maxDividends = profitAfterSalary - ctOnRemaining;
@@ -869,7 +869,7 @@ function calculateYourSetupStrategy(
   const taxableProfit = Math.max(0, grossProfit - costOfSalary - lossesBroughtForward);
   const corporationTax = getCorporationTax(
     taxableProfit,
-    undefined,
+    taxYear,
     normalizeAssociatedCompaniesCount(associatedCompaniesCount),
   );
 
