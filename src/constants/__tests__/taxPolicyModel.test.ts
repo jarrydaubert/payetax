@@ -42,6 +42,29 @@ const isPercentRate = (r: number) => Number.isFinite(r) && r >= 0 && r <= 100;
 const isFractionRate = (r: number) => Number.isFinite(r) && r > 0 && r < 1;
 const isNonNegMoney = (m: number) => Number.isFinite(m) && m >= 0;
 
+interface PrimaryRateChangeCase {
+  year: TaxYear;
+  cat: NICategory;
+  effectiveFrom: string;
+  before: number;
+  after: number;
+}
+
+function buildPrimaryRateChangeCases(
+  year: TaxYear,
+  cat: NICategory,
+  openingRate: number,
+  changes: readonly { effectiveFrom: string; rate: number }[],
+): PrimaryRateChangeCase[] {
+  return changes.map((change, index) => ({
+    year,
+    cat,
+    effectiveFrom: change.effectiveFrom,
+    before: index === 0 ? openingRate : (changes[index - 1]?.rate ?? openingRate),
+    after: change.rate,
+  }));
+}
+
 describe('effective-dated tax-policy model', () => {
   describe('every supported year is present in every record', () => {
     it.each(TAX_YEARS)('has a complete rUK + Scottish + ancillary record for %s', (year) => {
@@ -156,30 +179,46 @@ describe('effective-dated tax-policy model', () => {
   describe('both sides of every existing mid-year NI change select correctly', () => {
     // Data-driven: derive the (year, category, change) triples from the model so
     // this stays correct as data evolves.
-    const midYearCases: {
-      year: TaxYear;
-      cat: NICategory;
-      effectiveFrom: string;
-      before: number;
-      after: number;
-    }[] = [];
+    const midYearCases: PrimaryRateChangeCase[] = [];
     for (const year of TAX_YEARS) {
       for (const cat of NI_CATEGORIES) {
         const emp = TAX_RATES[year].nationalInsurance.employee[cat];
-        for (const change of emp.primaryRateChanges ?? []) {
-          midYearCases.push({
-            year,
-            cat,
-            effectiveFrom: change.effectiveFrom,
-            before: emp.primary.rate,
-            after: change.rate,
-          });
-        }
+        midYearCases.push(
+          ...buildPrimaryRateChangeCases(year, cat, emp.primary.rate, emp.primaryRateChanges ?? []),
+        );
       }
     }
 
     it('has at least one mid-year change to exercise (2023-24 NI cut)', () => {
       expect(midYearCases.length).toBeGreaterThan(0);
+    });
+
+    it('uses each previous change rate before later changes without mutating production policy', () => {
+      const syntheticChanges = [
+        { effectiveFrom: '2025-07-01', rate: 10 },
+        { effectiveFrom: '2026-01-01', rate: 8 },
+      ] as const;
+
+      expect(buildPrimaryRateChangeCases('2025-2026', 'A', 12, syntheticChanges)).toEqual([
+        {
+          year: '2025-2026',
+          cat: 'A',
+          effectiveFrom: '2025-07-01',
+          before: 12,
+          after: 10,
+        },
+        {
+          year: '2025-2026',
+          cat: 'A',
+          effectiveFrom: '2026-01-01',
+          before: 10,
+          after: 8,
+        },
+      ]);
+      expect(syntheticChanges).toEqual([
+        { effectiveFrom: '2025-07-01', rate: 10 },
+        { effectiveFrom: '2026-01-01', rate: 8 },
+      ]);
     });
 
     it.each(

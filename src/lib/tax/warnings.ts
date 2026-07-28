@@ -12,8 +12,13 @@
  * @module lib/tax/warnings
  */
 
-import { CURRENT_TAX_YEAR, TAX_RATES, type TaxYear } from '@/constants/taxRates';
-import { DIRECTOR_GUIDE_BUSINESS_THRESHOLDS } from './businessThresholds';
+import {
+  CURRENT_TAX_YEAR,
+  PAYMENTS_ON_ACCOUNT,
+  PENSION_ALLOWANCES,
+  TAX_RATES,
+  type TaxYear,
+} from '@/constants/taxRates';
 import { getDividendTax } from './dividendTax';
 import { getIncomeTax } from './incomeTax';
 
@@ -76,15 +81,14 @@ export interface WarningInput {
 // CONSTANTS
 // ============================================================================
 
+// UX heuristics (intentionally NOT statutory policy).
 const VAT_WARNING_PROXIMITY = 5000; // Warn when within £5k of threshold
-const PENSION_ANNUAL_ALLOWANCE = DIRECTOR_GUIDE_BUSINESS_THRESHOLDS.pensionAnnualAllowance;
-const PENSION_TAPER_THRESHOLD = DIRECTOR_GUIDE_BUSINESS_THRESHOLDS.pensionTaperLegislative;
-const PENSION_MINIMUM_TAPERED_ALLOWANCE =
-  DIRECTOR_GUIDE_BUSINESS_THRESHOLDS.pensionMinimumTaperedAllowance;
-const PENSION_TAPER_RATE = DIRECTOR_GUIDE_BUSINESS_THRESHOLDS.pensionTaperRate;
-const SA_LIABILITY_THRESHOLD = DIRECTOR_GUIDE_BUSINESS_THRESHOLDS.paymentsOnAccount;
 const SA_DEDUCTION_THRESHOLD = 0.8; // 80% deducted at source exemption
 const HIGH_COMPLEXITY_THRESHOLD = 10000000; // £10m+ is complex
+
+// Statutory pension and Payments-on-Account policy is selected for the requested
+// tax year inside getWarnings (see PENSION_ALLOWANCES / PAYMENTS_ON_ACCOUNT),
+// never captured as a current-year module constant.
 
 // ============================================================================
 // MAIN FUNCTION
@@ -100,6 +104,8 @@ export function getWarnings(input: WarningInput): Warning[] {
   const warnings: Warning[] = [];
   const taxYear = input.taxYear ?? CURRENT_TAX_YEAR;
   const rates = TAX_RATES[taxYear];
+  const pension = PENSION_ALLOWANCES[taxYear];
+  const paymentsOnAccount = PAYMENTS_ON_ACCOUNT[taxYear];
   const vatRegistrationThreshold = rates.vatRegistrationThreshold;
   const hicbcStart = rates.hicbc.start;
   const hicbcEnd = rates.hicbc.end;
@@ -200,7 +206,7 @@ export function getWarnings(input: WarningInput): Warning[] {
     const percentDeductedAtSource = totalTaxLiability > 0 ? estimatedPAYE / totalTaxLiability : 1;
 
     if (
-      estimatedSelfAssessmentLiability > SA_LIABILITY_THRESHOLD &&
+      estimatedSelfAssessmentLiability > paymentsOnAccount.threshold &&
       percentDeductedAtSource < SA_DEDUCTION_THRESHOLD
     ) {
       warnings.push({
@@ -285,25 +291,25 @@ export function getWarnings(input: WarningInput): Warning[] {
   }
 
   // Pension Annual Allowance exceeded
-  if (pensionContribution > PENSION_ANNUAL_ALLOWANCE) {
-    const excess = pensionContribution - PENSION_ANNUAL_ALLOWANCE;
+  if (pensionContribution > pension.annualAllowance) {
+    const excess = pensionContribution - pension.annualAllowance;
     warnings.push({
       type: 'PENSION_AA_EXCEEDED',
       severity: 'educational',
-      message: `Pension contribution of £${pensionContribution.toLocaleString()} exceeds the £${PENSION_ANNUAL_ALLOWANCE.toLocaleString()} Annual Allowance by £${excess.toLocaleString()}. The excess may be subject to tax charges.`,
+      message: `Pension contribution of £${pensionContribution.toLocaleString()} exceeds the £${pension.annualAllowance.toLocaleString()} Annual Allowance by £${excess.toLocaleString()}. The excess may be subject to tax charges.`,
     });
   }
 
   // Pension taper for high earners
   const adjustedIncome = salary + dividends + pensionContribution;
-  if (adjustedIncome > PENSION_TAPER_THRESHOLD) {
+  if (adjustedIncome > pension.adjustedIncomeTaperThreshold) {
     const reduction = Math.min(
       // Maximum reduction: AA can't taper below the statutory minimum tapered allowance.
-      PENSION_ANNUAL_ALLOWANCE - PENSION_MINIMUM_TAPERED_ALLOWANCE,
+      pension.annualAllowance - pension.minimumTaperedAllowance,
       // £1 of allowance lost per £2 of adjusted income over the threshold.
-      (adjustedIncome - PENSION_TAPER_THRESHOLD) * PENSION_TAPER_RATE,
+      (adjustedIncome - pension.adjustedIncomeTaperThreshold) * pension.taperRate,
     );
-    const taperedAA = PENSION_ANNUAL_ALLOWANCE - reduction;
+    const taperedAA = pension.annualAllowance - reduction;
     warnings.push({
       type: 'PENSION_TAPER',
       severity: 'educational',

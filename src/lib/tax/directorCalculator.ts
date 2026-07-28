@@ -25,7 +25,12 @@
  * 6. Return actionable numbers (monthly pay, tax pots)
  */
 
-import { CURRENT_TAX_YEAR, PAYMENTS_ON_ACCOUNT, type TaxYear } from '@/constants/taxRates';
+import {
+  CURRENT_TAX_YEAR,
+  PAYMENTS_ON_ACCOUNT,
+  type PaymentsOnAccountPolicy,
+  type TaxYear,
+} from '@/constants/taxRates';
 import type {
   DirectorCalculationResult,
   DirectorInput,
@@ -52,11 +57,36 @@ export const DEFAULT_SALARY = selectTaxPolicy(CURRENT_TAX_YEAR).ruk.personalAllo
 
 /** VAT standard rate (20%) */
 
-/** Threshold above which Payments on Account apply (statutory, from the policy model). */
+/**
+ * Current-year Payments on Account threshold — a convenience projection kept for
+ * backwards compatibility. Year-aware calculations select
+ * `PAYMENTS_ON_ACCOUNT[taxYear]` via {@link resolvePaymentsOnAccount}.
+ */
 export const POA_THRESHOLD = PAYMENTS_ON_ACCOUNT[CURRENT_TAX_YEAR].threshold;
 
-/** POA multiplier (1.5x = bill + 50% advance for year 2), from the policy model. */
+/** Current-year POA multiplier (1.5x = bill + 50% advance for year 2). */
 export const POA_MULTIPLIER = PAYMENTS_ON_ACCOUNT[CURRENT_TAX_YEAR].advanceMultiplier;
+
+/**
+ * Apply a tax year's Payments on Account policy to a Self Assessment liability.
+ *
+ * POA applies when the balancing SA liability exceeds the year's threshold; when
+ * it does, the first affected year budgets the bill plus a 50% advance
+ * (`advanceMultiplier`). Pure and policy-injected so callers pass the requested
+ * year's `PAYMENTS_ON_ACCOUNT[taxYear]` rather than the current-year default.
+ */
+export function resolvePaymentsOnAccount(
+  selfAssessmentLiability: number,
+  policy: PaymentsOnAccountPolicy,
+): { includesPOA: boolean; personalTaxAnnual: number } {
+  const includesPOA = selfAssessmentLiability > policy.threshold;
+  return {
+    includesPOA,
+    personalTaxAnnual: includesPOA
+      ? roundToPence(selfAssessmentLiability * policy.advanceMultiplier)
+      : selfAssessmentLiability,
+  };
+}
 
 /** Profit threshold for high complexity warning */
 export const HIGH_COMPLEXITY_THRESHOLD = 250000;
@@ -227,10 +257,10 @@ export function calculateDirectorScenario(
   // budgeted here because a PA-level payroll may not have collected it.
   // Note: POA doesn't apply if ≥80% of total tax was already collected via PAYE
   const selfAssessmentLiability = incomeTaxOnSalary + dividendTax;
-  const includesPOA = selfAssessmentLiability > POA_THRESHOLD;
-  const personalTaxAnnual = includesPOA
-    ? roundToPence(selfAssessmentLiability * POA_MULTIPLIER)
-    : selfAssessmentLiability;
+  const { includesPOA, personalTaxAnnual } = resolvePaymentsOnAccount(
+    selfAssessmentLiability,
+    PAYMENTS_ON_ACCOUNT[taxYear],
+  );
   const personalTaxMonthly = roundToPence(personalTaxAnnual / 12);
 
   // Step 13: Collect warnings
