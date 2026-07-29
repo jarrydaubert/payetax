@@ -16,6 +16,7 @@ import {
   TAX_RATES,
   type TaxYear,
 } from '@/constants/taxRates';
+import { UNDERGRADUATE_STUDENT_LOAN_PLANS } from './studentLoanPlans';
 import { roundToPence } from './utils';
 
 export interface StudentLoanResult {
@@ -51,7 +52,9 @@ export interface StudentLoanRepaymentCalculation {
  * basis conversion, the employment-vs-total-income decision and all rounding
  * are deliberately owned by callers.
  *
- * Each selected plan is calculated independently and summed (HMRC rules).
+ * Each plan passed to this low-level mechanic is calculated independently.
+ * Callers must first normalize multiple undergraduate plans to the one with
+ * the lowest applicable recovery threshold.
  * Repayments are unrounded, computed as `((income - threshold) * rate) / 100`
  * — the PAYE engine's historical ordering, preserved bit-for-bit for every
  * whole-pound salary. The replaced Self Assessment loop used
@@ -86,6 +89,31 @@ export function sliceStudentLoanRepayments(
 }
 
 /**
+ * HMRC permits one undergraduate deduction at a time, plus an optional
+ * Postgraduate Loan. If more than one undergraduate plan reaches a calculation
+ * boundary, use the plan with the lowest applicable recovery threshold.
+ */
+export function normalizeStudentLoanPlansForCalculation(
+  plans: readonly StudentLoanPlan[],
+  policy: Readonly<Partial<Record<StudentLoanPlan, StudentLoanPlanPolicy>>>,
+): StudentLoanPlan[] {
+  const uniquePlans = [...new Set(plans)];
+  const undergraduatePlans = new Set<StudentLoanPlan>(UNDERGRADUATE_STUDENT_LOAN_PLANS);
+  const undergraduatePlan = uniquePlans
+    .filter((plan) => undergraduatePlans.has(plan))
+    .filter((plan) => policy[plan] !== undefined)
+    .sort((a, b) => {
+      const thresholdDifference = (policy[a]?.threshold ?? 0) - (policy[b]?.threshold ?? 0);
+      return thresholdDifference || a.localeCompare(b);
+    })[0];
+
+  return [
+    ...(undergraduatePlan ? [undergraduatePlan] : []),
+    ...(uniquePlans.includes('postgrad') && policy.postgrad ? (['postgrad'] as const) : []),
+  ];
+}
+
+/**
  * Calculate student loan repayments for a given total income
  *
  * @param totalIncome - Total income (salary + dividends + other income)
@@ -113,9 +141,11 @@ export function getStudentLoanRepayment(
     return result;
   }
 
+  const normalizedPlans = normalizeStudentLoanPlansForCalculation(plans, rates);
+
   // Self Assessment rounding convention: round each plan to pence, then the
   // total of the rounded repayments.
-  for (const { plan, repayment } of sliceStudentLoanRepayments(totalIncome, plans, rates)
+  for (const { plan, repayment } of sliceStudentLoanRepayments(totalIncome, normalizedPlans, rates)
     .repayments) {
     const rounded = roundToPence(repayment);
     result[plan] = rounded;

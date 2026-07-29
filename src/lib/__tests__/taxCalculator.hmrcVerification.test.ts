@@ -418,8 +418,8 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       // Marriage allowance reduces tax
       expect(result.taxFreeAmount).toBe(13830);
 
-      // Student loan Plan 2 annualized output in current engine.
-      expect(result.studentLoan.annually).toBeCloseTo(587.64, 2);
+      // £48 per month after HMRC's whole-pound deduction rounding.
+      expect(result.studentLoan.annually).toBe(576);
     });
 
     it('Multiple plans not allowed (just one plan tested)', () => {
@@ -430,8 +430,8 @@ describe('HMRC Rate Verification & Edge Cases', () => {
         }),
       );
 
-      // Plan 1 annualized from monthly rounding = £1,254.12
-      expect(result.studentLoan.annually).toBeCloseTo(1254.12, 2);
+      // £104 per month after HMRC's whole-pound deduction rounding.
+      expect(result.studentLoan.annually).toBe(1248);
     });
 
     it('Postgraduate loan with high income', () => {
@@ -631,10 +631,9 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       );
 
       // Bug class: CALC-DRIFT / ROUNDING
-      // Expected values derived from current rules and rounding:
-      // Plan 2: 9% above £28,470 + Postgrad: 6% above £21,000 (both via PAYE on employment income).
-      expect(result.studentLoan.annually).toBeCloseTo(3677.76, 2);
-      expect(result.netPay.annually).toBeCloseTo(35845.16, 2);
+      // Each monthly loan-type deduction is rounded down to a whole pound.
+      expect(result.studentLoan.annually).toBe(3672);
+      expect(result.netPay.annually).toBeCloseTo(35850.92, 2);
     });
   });
 

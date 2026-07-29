@@ -195,6 +195,19 @@ describe('Metadata Module', () => {
       // Note: languages property removed to fix hreflang conflicts (monolingual site)
     });
 
+    test('should use a supplied canonical URL and expose SEO keywords', () => {
+      const canonicalUrl = 'https://payetax.co.uk/blog/current-tax-guide';
+      const metadata = generateMetadata({
+        pathname: '/blog/legacy-slug',
+        canonicalUrl,
+        keywords: ['PAYE', '2026/27'],
+      });
+
+      expect(metadata.alternates?.canonical).toBe(canonicalUrl);
+      expect(metadata.openGraph?.url).toBe(canonicalUrl);
+      expect(metadata.keywords).toEqual(['PAYE', '2026/27']);
+    });
+
     test('should set Twitter card type', () => {
       const metadata = generateMetadata({
         twitterCard: 'summary',

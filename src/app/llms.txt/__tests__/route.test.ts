@@ -1,3 +1,4 @@
+import { CURRENT_TAX_GUIDANCE } from '@/constants/currentTaxGuidance';
 import { getBlogCategories, getBlogPosts } from '@/lib/blog';
 import { GET } from '../route';
 
@@ -63,5 +64,40 @@ describe('llms.txt route', () => {
     expect(text).toContain('# PayeTax');
     expect(text).toContain('## Main Pages');
     expect(text).toContain('## Citable PAYE Rates and Take-Home Examples');
+    expect(text).toContain('## Reviewed Current Tax Guidance');
+    expect(text).toContain('No reviewed guidance entries are currently available.');
+  });
+
+  it('highlights every current guide with its dedicated review date', async () => {
+    (getBlogPosts as jest.Mock).mockResolvedValue(
+      CURRENT_TAX_GUIDANCE.map(({ slug }, index) => ({
+        slug,
+        title: `Current guide: ${slug}`,
+        excerpt: 'Current PAYE guidance.',
+        category: 'tax-basics',
+        publishedAt: '2025-01-15',
+        updatedAt: '2026-08-01',
+        canonicalUrl:
+          index === 0 ? 'https://payetax.co.uk/blog/canonical-current-guide' : undefined,
+      })),
+    );
+    (getBlogCategories as jest.Mock).mockResolvedValue([
+      { slug: 'tax-basics', name: 'Tax Basics' },
+    ]);
+
+    const response = await GET();
+    const text = await response.text();
+
+    expect(text).toContain('## Reviewed Current Tax Guidance');
+    for (const [index, { slug, reviewedAt }] of CURRENT_TAX_GUIDANCE.entries()) {
+      const expectedUrl =
+        index === 0
+          ? 'https://payetax.co.uk/blog/canonical-current-guide'
+          : `https://payetax.co.uk/blog/${slug}`;
+      expect(text).toContain(
+        `- [Current guide: ${slug}](${expectedUrl}) (reviewed ${reviewedAt}): Current PAYE guidance.`,
+      );
+    }
+    expect(text).not.toContain('(reviewed 2026-08-01)');
   });
 });

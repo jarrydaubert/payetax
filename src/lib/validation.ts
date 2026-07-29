@@ -163,6 +163,16 @@ export const BlogFrontmatterSchema = z.object({
   image: z.string().optional(), // Allow both URLs and relative paths
   imageAlt: z.string().optional(),
   readTime: fallbackString('5 min read'), // Fallback on missing or invalid input
+  seoTitle: z.string().optional(),
+  seoDescription: z.string().optional(),
+  seoKeywords: fallbackStringArray([]),
+  canonicalUrl: z
+    .url()
+    .refine((value) => {
+      const url = new URL(value);
+      return url.protocol === 'https:' && url.hostname === 'payetax.co.uk';
+    }, 'Canonical URL must use https://payetax.co.uk')
+    .optional(),
 });
 
 export type BlogFrontmatter = z.infer<typeof BlogFrontmatterSchema>;

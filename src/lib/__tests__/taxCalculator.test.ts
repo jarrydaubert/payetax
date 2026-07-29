@@ -451,13 +451,16 @@ describe('Tax Calculator', () => {
 
     it('uses the corrected 2024-25 Plan 4 repayment threshold', () => {
       const atThreshold = createBasicInput(31395, { studentLoanPlans: ['plan4'] });
-      const aboveThreshold = createBasicInput(31396, { studentLoanPlans: ['plan4'] });
+      const firstWholePoundDeduction = createBasicInput(31529, {
+        studentLoanPlans: ['plan4'],
+      });
 
       const atThresholdResult = calculateTax(atThreshold);
-      const aboveThresholdResult = calculateTax(aboveThreshold);
+      const firstDeductionResult = calculateTax(firstWholePoundDeduction);
 
       expect(atThresholdResult.studentLoan.annually).toBe(0);
-      expect(aboveThresholdResult.studentLoan.annually).toBeGreaterThan(0);
+      expect(firstDeductionResult.studentLoan.monthly).toBe(1);
+      expect(firstDeductionResult.studentLoan.annually).toBe(12);
     });
 
     /**
@@ -946,8 +949,8 @@ describe('Tax Calculator', () => {
       });
     });
 
-    // Bug Class: MULTI-INCOME - Additional employment income should affect NI/SL
-    it('treats additional employment income as NI/SL-bearing', () => {
+    // Bug Class: MULTI-INCOME - Student Loan thresholds apply per employment
+    it('does not combine a below-threshold second job into the primary Student Loan basis', () => {
       const baseInput = createBasicInput(30000, { studentLoanPlans: ['plan2'] });
       const baseResult = calculateTax(baseInput);
 
@@ -968,7 +971,7 @@ describe('Tax Calculator', () => {
       expect(secondJobResult.nationalInsurance.annually).toBeGreaterThan(
         baseResult.nationalInsurance.annually,
       );
-      expect(secondJobResult.studentLoan.annually).toBeGreaterThan(baseResult.studentLoan.annually);
+      expect(secondJobResult.studentLoan.annually).toBe(baseResult.studentLoan.annually);
       expect(secondJobResult.incomeBreakdown).toEqual({
         employment: 40000,
         nonEmployment: 0,

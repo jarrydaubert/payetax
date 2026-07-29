@@ -277,17 +277,17 @@ describe('Edge Cases', () => {
     expect(result.strategies.optimalMix.takeHome).toBeGreaterThan(0);
   });
 
-  it('should handle multiple student loan plans stacking', () => {
+  it('uses the lowest-threshold undergraduate plan plus postgrad', () => {
     // Test via getStudentLoanRepayment
     const totalIncome = 80000;
     const result = getStudentLoanRepayment(totalIncome, ['plan1', 'plan2', 'postgrad'], TAX_YEAR);
     // Plan 1: (80000-26065)*0.09 = 4854.15
-    // Plan 2: (80000-28470)*0.09 = 4637.70
+    // Plan 2 is not charged as a second 9% undergraduate deduction.
     // Postgrad: (80000-21000)*0.06 = 3540.00
     expect(result.plan1).toBeCloseTo(4854.15, 2);
-    expect(result.plan2).toBeCloseTo(4637.7, 2);
+    expect(result.plan2).toBe(0);
     expect(result.postgrad).toBeCloseTo(3540, 2);
-    expect(result.total).toBeCloseTo(13031.85, 2);
+    expect(result.total).toBeCloseTo(8394.15, 2);
   });
 });
 

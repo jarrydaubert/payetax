@@ -65,6 +65,14 @@ describe('PayeEmailInputSchema', () => {
     expect(result.success).toBe(false);
   });
 
+  it('rejects two undergraduate student loan plans', () => {
+    const result = PayeEmailInputSchema.safeParse({
+      ...validPayeInput,
+      studentLoanPlans: ['plan1', 'plan2'],
+    });
+    expect(result.success).toBe(false);
+  });
+
   it('rejects invalid tax years and non-finite salary values', () => {
     expect(
       PayeEmailInputSchema.safeParse({

@@ -2,6 +2,7 @@ import { calculateTax, type TaxCalculationInput } from '@/lib/tax';
 import {
   getStudentLoanRepayment,
   getStudentLoanThreshold,
+  normalizeStudentLoanPlansForCalculation,
   sliceStudentLoanRepayments,
 } from '../studentLoan';
 
@@ -212,6 +213,31 @@ describe('sliceStudentLoanRepayments', () => {
   });
 });
 
+describe('normalizeStudentLoanPlansForCalculation', () => {
+  const normalizationPolicy = {
+    plan1: { threshold: 26_065, rate: 9 },
+    plan2: { threshold: 28_470, rate: 9 },
+    plan4: { threshold: 32_745, rate: 9 },
+    plan5: { threshold: 25_000, rate: 9 },
+    postgrad: { threshold: 21_000, rate: 6 },
+  } as const;
+
+  it('keeps the undergraduate plan with the lowest threshold plus postgrad', () => {
+    expect(
+      normalizeStudentLoanPlansForCalculation(['plan2', 'plan5', 'postgrad'], normalizationPolicy),
+    ).toEqual(['plan5', 'postgrad']);
+  });
+
+  it('deduplicates repeated selections', () => {
+    expect(
+      normalizeStudentLoanPlansForCalculation(
+        ['plan2', 'plan2', 'postgrad', 'postgrad'],
+        normalizationPolicy,
+      ),
+    ).toEqual(['plan2', 'postgrad']);
+  });
+});
+
 describe('PAYE engine parity', () => {
   const engineInput = (
     salary: number,
@@ -234,21 +260,59 @@ describe('PAYE engine parity', () => {
     ...overrides,
   });
 
-  it('keeps the monthly sum-then-round PAYE convention pinned', () => {
+  it('rounds each monthly PAYE deduction down to the nearest whole pound', () => {
     // £36,000 salary -> £3,000/month; plan 2 monthly threshold 28,470 / 12.
-    // ((3,000 - 2,372.50) * 9) / 100 = 56.475 -> rounded once to 56.48.
+    // ((3,000 - 2,372.50) * 9) / 100 = 56.475 -> rounded down to £56.
     const result = calculateTax(engineInput(36_000));
-    expect(result.studentLoan.monthly).toBe(56.48);
-    expect(result.studentLoan.annually).toBeCloseTo(56.48 * 12, 10);
+    expect(result.studentLoan.monthly).toBe(56);
+    expect(result.studentLoan.annually).toBe(56 * 12);
   });
 
-  it('sums unrounded plan repayments before rounding, not per plan', () => {
+  it('rounds undergraduate and postgraduate deductions separately before summing', () => {
     // £36,000.84 across plan 2 + postgrad: 56.4813 + 75.0042 per month.
-    // Sum-then-round gives 131.49; round-each-then-sum would give 131.48.
+    // HMRC requires £56 + £75 = £131.
     const result = calculateTax(
       engineInput(36_000.84, { studentLoanPlans: ['plan2', 'postgrad'] }),
     );
-    expect(result.studentLoan.monthly).toBe(131.49);
+    expect(result.studentLoan.monthly).toBe(131);
+  });
+
+  it('uses the 2026/27 weekly threshold and whole-pound deduction for weekly pay', () => {
+    const result = calculateTax(
+      engineInput(692.31, {
+        payPeriod: 'weekly',
+        taxYear: '2026-2027',
+        studentLoanPlans: ['plan2'],
+      }),
+    );
+
+    expect(result.studentLoan.weekly).toBe(11);
+    expect(result.studentLoan.annually).toBe(572);
+  });
+
+  it('preserves the weekly deduction across a four-weekly payroll period', () => {
+    const result = calculateTax(
+      engineInput(2_769.24, {
+        payPeriod: 'fourWeekly',
+        taxYear: '2026-2027',
+        studentLoanPlans: ['plan2'],
+      }),
+    );
+
+    expect(result.studentLoan.fourWeekly).toBe(44);
+    expect(result.studentLoan.annually).toBe(572);
+  });
+
+  it('normalizes multiple undergraduate plans to the lowest threshold', () => {
+    const result = calculateTax(
+      engineInput(50_000, {
+        taxYear: '2026-2027',
+        studentLoanPlans: ['plan2', 'plan5', 'postgrad'],
+      }),
+    );
+
+    expect(result.studentLoan.monthly).toBe(332);
+    expect(result.studentLoan.annually).toBe(3_984);
   });
 
   it('keeps employment income as the PAYE basis when other income exists', () => {

@@ -45,6 +45,8 @@ interface GenerateMetadataProps {
   noIndex?: boolean;
   /** Page pathname (for canonical URLs) */
   pathname?: string;
+  /** Validated absolute canonical URL, when content supplies one */
+  canonicalUrl?: string;
   /** Page locale */
   locale?: string;
   /** OpenGraph content type */
@@ -63,6 +65,8 @@ interface GenerateMetadataProps {
   section?: string;
   /** Article tags */
   tags?: string[];
+  /** Search metadata keywords */
+  keywords?: string[];
 }
 
 /**
@@ -88,6 +92,7 @@ export function generateMetadata({
   ogImage = DEFAULT_OG_IMAGE_PATH,
   noIndex = false,
   pathname = '',
+  canonicalUrl,
   locale = 'en_GB',
   type = 'website',
   publishedTime,
@@ -97,12 +102,13 @@ export function generateMetadata({
   category,
   section,
   tags,
+  keywords,
 }: GenerateMetadataProps): Metadata {
   // Make sure image URL is absolute
   const imageUrl = ogImage.startsWith('http') ? ogImage : `${SITE_URL}${ogImage}`;
 
   // Full URL for canonical and OG links
-  const url = `${SITE_URL}${pathname}`;
+  const url = canonicalUrl || `${SITE_URL}${pathname}`;
 
   // Format title with site name if not already included
   const hasPayeTax = title.includes('PayeTax');
@@ -126,6 +132,7 @@ export function generateMetadata({
     // Basic metadata
     title: formattedTitle,
     description,
+    ...(keywords && keywords.length > 0 ? { keywords } : {}),
     // Authorship and publishing information
     authors: authorDescriptors,
     creator: 'PayeTax',

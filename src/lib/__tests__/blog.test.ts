@@ -183,12 +183,19 @@ describe('blog.ts', () => {
   describe('getBlogPostBySlug', () => {
     it('should return post when found', async () => {
       // getPostBySlug returns the listing shape plus full content.
-      const mockPost = { ...createMockPost({ slug: 'test-slug' }), content: 'Full post content' };
+      const mockPost = {
+        ...createMockPost({
+          slug: 'test-slug',
+          canonicalUrl: 'https://payetax.co.uk/blog/test-slug',
+        }),
+        content: 'Full post content',
+      };
       mockGetPostBySlug.mockReturnValue(mockPost);
 
       const post = await getBlogPostBySlug('test-slug');
       expect(post).not.toBeNull();
       expect(post?.slug).toBe('test-slug');
+      expect(post?.canonicalUrl).toBe('https://payetax.co.uk/blog/test-slug');
     });
 
     it('should return null when post not found', async () => {
