@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, extname, join, relative, resolve } from 'node:path';
 import ts from 'typescript';
+import { CURRENT_TAX_GUIDANCE_PATHS } from '../src/constants/currentTaxGuidance';
 import {
   CT_RATES,
   DIVIDEND_TAX_RATES,
@@ -70,6 +71,7 @@ const CODE_EXTENSIONS = new Set(['.js', '.jsx', '.ts', '.tsx']);
 const TAX_FACT_EXTENSIONS = new Set(['.js', '.jsx', '.json', '.md', '.mdx', '.ts', '.tsx']);
 const TEST_FILE_PATTERN = /(?:^|\/)(?:__tests__|test)(?:\/|$)|\.(?:spec|test)\.[jt]sx?$/;
 const EXPLICIT_RATE_CONTAINERS = new Set(['CT_RATES', 'DIVIDEND_TAX_RATES', 'SCOTTISH_TAX_RATES']);
+const CURRENT_TAX_GUIDANCE_PATH_SET = new Set<string>(CURRENT_TAX_GUIDANCE_PATHS);
 
 export const TAX_FACT_EXCEPTION_RULES = [
   {
@@ -90,9 +92,13 @@ export const TAX_FACT_EXCEPTION_RULES = [
     id: 'tax-fact-control',
     category: 'approved-location',
     description: 'The scanner implementation contains matching vocabulary, not application facts.',
-    matches: 'scripts/tax-domain-controls.ts, scripts/tax-facts-baseline.ts',
+    matches:
+      'scripts/tax-domain-controls.ts, scripts/tax-facts-baseline.ts, scripts/check-current-blog-guidance.ts, src/lib/currentBlogGuidance.ts',
     applies: (path: string) =>
-      path === 'scripts/tax-domain-controls.ts' || path === 'scripts/tax-facts-baseline.ts',
+      path === 'scripts/tax-domain-controls.ts' ||
+      path === 'scripts/tax-facts-baseline.ts' ||
+      path === 'scripts/check-current-blog-guidance.ts' ||
+      path === 'src/lib/currentBlogGuidance.ts',
   },
   {
     id: 'verification-fixtures',
@@ -111,7 +117,9 @@ export const TAX_FACT_EXCEPTION_RULES = [
     description:
       'Dated blog filenames intentionally preserve the tax facts for their named period.',
     matches: 'content/blog/*<year>*.mdx',
-    applies: (path: string) => /^content\/blog\/.*(?:19|20)\d{2}(?:-\d{2})?.*\.mdx$/.test(path),
+    applies: (path: string) =>
+      !CURRENT_TAX_GUIDANCE_PATH_SET.has(path) &&
+      /^content\/blog\/.*(?:19|20)\d{2}(?:-\d{2})?.*\.mdx$/.test(path),
   },
   {
     id: 'official-quotation',

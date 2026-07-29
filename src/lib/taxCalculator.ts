@@ -11,8 +11,9 @@
  * ### Tax Calculation Methodology
  * The calculator uses a **hybrid monthly-annual approach** for payslip-style estimates:
  * 1. **Annual Conversion**: All inputs are normalized to annual amounts for consistency
- * 2. **Monthly Processing**: Tax calculations are performed using monthly payroll thresholds
- * 3. **Period Scaling**: Results are scaled to all requested pay periods from monthly base
+ * 2. **Payroll Processing**: Tax and NI use the month-1 model; Student Loans use
+ *    monthly or weekly-family thresholds according to the input pay period
+ * 3. **Period Scaling**: Results are reconciled through annual/monthly output bases
  *
  * This approach ensures:
  * - Accurate month-1 style PAYE and NI estimates for common employee scenarios
@@ -49,7 +50,7 @@ import {
   type TaxYear,
 } from '@/constants/taxRates';
 import type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
-import { convertMonthlyToPeriod } from './periodCalculator';
+import { convertAnnualToPeriod, convertMonthlyToPeriod } from './periodCalculator';
 import {
   getClass1PeriodThresholds,
   getEmployeeClass1MonthSegments,
@@ -60,7 +61,11 @@ import {
 import { derivePayePayBasis } from './tax/payePayBasis';
 import { sliceRukTaxableIncome } from './tax/rukIncomeTax';
 import { sliceScottishTaxableIncome } from './tax/scottishIncomeTax';
-import { type StudentLoanPlanPolicy, sliceStudentLoanRepayments } from './tax/studentLoan';
+import {
+  normalizeStudentLoanPlansForCalculation,
+  type StudentLoanPlanPolicy,
+  sliceStudentLoanRepayments,
+} from './tax/studentLoan';
 import { parseTaxCode } from './tax/taxCode';
 import { selectTaxPolicy } from './tax/taxPolicy';
 import { roundToPence } from './tax/utils';
@@ -135,6 +140,74 @@ const SCOTTISH_OVERRIDE_BANDS: Partial<
   D2: { bandName: 'Advanced rate', label: 'Scottish Advanced Rate (SD2 code)' },
   D3: { bandName: 'Top rate', label: 'Scottish Top Rate (SD3 code)' },
 };
+
+interface StudentLoanEmployment {
+  earnings: number;
+  payPeriod: PayPeriod;
+}
+
+function calculateAnnualStudentLoanForEmployment(
+  employment: StudentLoanEmployment,
+  hoursPerWeek: number,
+  plans: readonly StudentLoanPlan[],
+  annualPolicy: Readonly<Record<StudentLoanPlan, StudentLoanPlanPolicy>>,
+): number {
+  const payPeriod = Object.values(PERIODS).includes(employment.payPeriod)
+    ? employment.payPeriod
+    : PERIODS.ANNUALLY;
+  const usesMonthlyThreshold = payPeriod === PERIODS.ANNUALLY || payPeriod === PERIODS.MONTHLY;
+  const thresholdPeriodsPerYear = usesMonthlyThreshold ? 12 : 52;
+
+  let calculationEarnings = employment.earnings;
+  let calculationPeriodsPerYear = thresholdPeriodsPerYear;
+
+  switch (payPeriod) {
+    case PERIODS.ANNUALLY:
+      calculationEarnings = employment.earnings / 12;
+      break;
+    case PERIODS.FOUR_WEEKLY:
+      calculationEarnings = employment.earnings / 4;
+      break;
+    case PERIODS.FORTNIGHTLY:
+      calculationEarnings = employment.earnings / 2;
+      break;
+    case PERIODS.DAILY:
+      // HMRC uses the weekly threshold, unchanged, for an NI earnings period
+      // shorter than seven days.
+      calculationPeriodsPerYear = 260;
+      break;
+    case PERIODS.HOURLY:
+      // The hourly input is a wage unit, not an NI earnings period. Model the
+      // user's stated weekly hours as weekly-paid earnings.
+      calculationEarnings = employment.earnings * hoursPerWeek;
+      calculationPeriodsPerYear = 52;
+      break;
+    default:
+      break;
+  }
+
+  const periodPolicy: Partial<Record<StudentLoanPlan, StudentLoanPlanPolicy>> = {};
+  for (const plan of plans) {
+    const loanRates = annualPolicy[plan];
+    periodPolicy[plan] = {
+      threshold: Math.floor((loanRates.threshold / thresholdPeriodsPerYear) * 100) / 100,
+      rate: loanRates.rate,
+    };
+  }
+
+  const normalizedPlans = normalizeStudentLoanPlansForCalculation(plans, periodPolicy);
+  const repayments = sliceStudentLoanRepayments(
+    calculationEarnings,
+    normalizedPlans,
+    periodPolicy,
+  ).repayments;
+  const wholePoundsPerCalculationPeriod = repayments.reduce(
+    (total, repayment) => total + Math.floor(repayment.repayment),
+    0,
+  );
+
+  return wholePoundsPerCalculationPeriod * calculationPeriodsPerYear;
+}
 
 /**
  * Resolve the flat rate for a band-override tax code from the year's band table.
@@ -576,29 +649,46 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // Using total income would double-count income that HMRC handles via SA.
   //
 
-  let monthlyStudentLoan = 0;
+  let annualStudentLoan = 0;
 
   if (Array.isArray(input.studentLoanPlans) && input.studentLoanPlans.length > 0) {
-    // Annual policy thresholds convert to the engine's monthly basis here;
-    // the shared mechanic stays basis-agnostic and unrounded.
-    const monthlyPolicy: Partial<Record<StudentLoanPlan, StudentLoanPlanPolicy>> = {};
-    for (const plan of input.studentLoanPlans) {
-      const loanRates = standardRates.studentLoan[plan];
-      monthlyPolicy[plan] = { threshold: loanRates.threshold / 12, rate: loanRates.rate };
-    }
-
-    monthlyStudentLoan = sliceStudentLoanRepayments(
-      payBasis.studentLoanEmploymentEarnings.monthly,
+    const primaryStudentLoanEarnings = convertAnnualToPeriod(
+      payBasis.studentLoanEmploymentEarnings.annual,
+      input.payPeriod,
+      payBasis.hoursPerWeek,
+    );
+    annualStudentLoan = calculateAnnualStudentLoanForEmployment(
+      {
+        earnings: primaryStudentLoanEarnings,
+        payPeriod: input.payPeriod,
+      },
+      payBasis.hoursPerWeek,
       input.studentLoanPlans,
-      monthlyPolicy,
-    ).total;
+      standardRates.studentLoan,
+    );
+
+    // Employers ordinarily calculate Student Loan deductions independently.
+    // Additional employment sources therefore receive their own threshold
+    // calculation instead of being combined with the primary employment.
+    for (const source of input.incomeSources ?? []) {
+      if (source.type !== 'employment') continue;
+
+      annualStudentLoan += calculateAnnualStudentLoanForEmployment(
+        {
+          earnings: source.amount,
+          payPeriod: source.period,
+        },
+        payBasis.hoursPerWeek,
+        input.studentLoanPlans,
+        standardRates.studentLoan,
+      );
+    }
   }
 
-  // PAYE rounding convention: sum unrounded plan repayments, then round once.
-  monthlyStudentLoan = roundToPence(monthlyStudentLoan);
-
-  // Calculate annual student loan (for output)
-  const annualStudentLoan = monthlyStudentLoan * 12;
+  // The engine's common output basis remains monthly. The annual figure above
+  // preserves whole-pound deductions in each employment's actual pay period
+  // before conversion to the other display periods.
+  const monthlyStudentLoan = annualStudentLoan / 12;
 
   // ---------------
   // 8. Calculate Net Pay (monthly calculation)

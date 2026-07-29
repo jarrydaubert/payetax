@@ -153,6 +153,10 @@ const STUDENT_LOAN_SELECTION_SCHEMA = z.union([
     .refine(
       (plans) => new Set(plans).size === plans.length,
       'Duplicate student loan plans not allowed',
+    )
+    .refine(
+      (plans) => plans.filter((plan) => plan !== 'postgrad').length <= 1,
+      'Select only one undergraduate student loan plan',
     ),
 ]);
 
@@ -819,6 +823,14 @@ export const useCalculatorStore = create<CalculatorState>()(
             // Add plan (max 2)
             if (plansArray.length >= 2) {
               logCalculatorWarning('[Calculator] Maximum 2 student loans allowed');
+              return state;
+            }
+
+            if (
+              planValidated.data !== 'postgrad' &&
+              plansArray.some((existingPlan) => existingPlan !== 'postgrad')
+            ) {
+              logCalculatorWarning('[Calculator] Select only one undergraduate student loan plan');
               return state;
             }
 

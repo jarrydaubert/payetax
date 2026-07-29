@@ -20,10 +20,8 @@ export interface AnnualMonthlyPayBasis {
 /**
  * Canonical income and deduction bases consumed by the PAYE engine.
  *
- * The existing pension input is modelled as salary sacrifice for PAYE and
- * employee NI. Student Loan remains on gross employment earnings to preserve
- * the calculator's established behaviour until pension methods are modelled
- * explicitly.
+ * The existing pension input is modelled as salary sacrifice for PAYE,
+ * employee NI and the primary employment's Student Loan earnings basis.
  */
 export interface PayePayBasis {
   readonly hoursPerWeek: number;
@@ -108,6 +106,10 @@ export function derivePayePayBasis(input: PayBasisInput): PayePayBasis {
     annual: totalEmploymentGross.annual - salarySacrificePensionDeduction.annual,
     monthly: totalEmploymentGross.monthly - salarySacrificePensionDeduction.monthly,
   });
+  const studentLoanEmploymentEarnings = annualMonthly(
+    Math.max(0, primaryEmploymentGross.annual - salarySacrificePensionDeduction.annual),
+    hoursPerWeek,
+  );
 
   return Object.freeze({
     hoursPerWeek,
@@ -119,6 +121,9 @@ export function derivePayePayBasis(input: PayBasisInput): PayePayBasis {
     adjustedNetIncome,
     payeAdjustedPayment,
     niableEmploymentEarnings,
-    studentLoanEmploymentEarnings: totalEmploymentGross,
+    // Student Loan deductions are calculated separately for each employment.
+    // This basis is the primary employment after salary sacrifice; additional
+    // employments are handled independently by the calculator.
+    studentLoanEmploymentEarnings,
   });
 }

@@ -1,0 +1,208 @@
+{
+  "suite": "Student Loan PAYE period thresholds and whole-pound deductions",
+  "source": {
+    "authority": "HMRC",
+    "urls": [
+      "https://www.gov.uk/government/publications/sl3-student-loan-deduction-tables/2026-to-2027-student-and-postgraduate-loan-deduction-tables",
+      "https://www.gov.uk/government/publications/payroll-technical-specifications-student-loans/collection-of-student-loans-from-6-april-2026",
+      "https://www.gov.uk/guidance/special-rules-for-student-loans"
+    ],
+    "taxYear": "2026-2027",
+    "verifiedOn": "2026-07-29"
+  },
+  "tolerancePence": 0,
+  "scenarios": [
+    {
+      "id": "plan2-50k-monthly-whole-pound",
+      "description": "£50,000 paid monthly on Plan 2: (£4,166.6667 - £2,448.75) x 9% = £154.61, rounded down to £154 per month and £1,848 over 12 equal pay periods.",
+      "input": {
+        "salary": 50000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": ["plan2"],
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "studentLoanAnnual": 1848
+      }
+    },
+    {
+      "id": "plan2-50k-monthly-with-5-percent-salary-sacrifice",
+      "description": "£50,000 with a valid 5% salary sacrifice leaves £47,500 of NI-able and student-loanable cash pay. Plan 2 is (£3,958.3333 - £2,448.75) x 9% = £135.86, rounded down to £135 per month and £1,620 annually.",
+      "input": {
+        "salary": 50000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 5,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": ["plan2"],
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "studentLoanAnnual": 1620
+      }
+    },
+    {
+      "id": "plan2-692-31-weekly-whole-pound",
+      "description": "£692.31 paid weekly on Plan 2: (£692.31 - £565.09) x 9% = £11.4498, rounded down to £11 per week and £572 over 52 pay periods.",
+      "input": {
+        "salary": 692.31,
+        "payPeriod": "weekly",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": ["plan2"],
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "studentLoanAnnual": 572
+      }
+    },
+    {
+      "id": "plan2-2769-24-four-weekly",
+      "description": "£2,769.24 paid four-weekly averages £692.31 a week. HMRC's weekly calculation gives £11, multiplied by 4 to £44 per pay period and £572 across 13 periods.",
+      "input": {
+        "salary": 2769.24,
+        "payPeriod": "fourWeekly",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": ["plan2"],
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "studentLoanAnnual": 572
+      }
+    },
+    {
+      "id": "plan2-200-daily-uses-full-weekly-threshold",
+      "description": "For an earnings period shorter than seven days, HMRC uses the full weekly threshold against the actual period earnings. £200 daily is below the Plan 2 weekly threshold of £565.09, so no deduction is due.",
+      "input": {
+        "salary": 200,
+        "payPeriod": "daily",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": ["plan2"],
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "studentLoanAnnual": 0
+      }
+    },
+    {
+      "id": "plan2-30-hourly-converts-wage-to-weekly-earnings",
+      "description": "An hourly wage is not itself an NI earnings period. At £30 an hour for 40 hours, weekly earnings are £1,200. Plan 2 is (£1,200 - £565.09) x 9% = £57.14, rounded down to £57 a week and £2,964 annually.",
+      "input": {
+        "salary": 30,
+        "payPeriod": "hourly",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": ["plan2"],
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "studentLoanAnnual": 2964
+      }
+    },
+    {
+      "id": "plan2-separate-20k-employments-each-use-own-threshold",
+      "description": "Separate employers calculate PAYE Student Loan deductions independently. A primary £20,000 job and a separate £20,000 job are each below the Plan 2 annual equivalent and produce no payroll deduction.",
+      "input": {
+        "salary": 20000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": ["plan2"],
+        "niCategory": "A",
+        "hoursPerWeek": 40,
+        "incomeSources": [
+          {
+            "id": "separate-job",
+            "type": "employment",
+            "amount": 20000,
+            "period": "annually"
+          }
+        ]
+      },
+      "expected": {
+        "studentLoanAnnual": 0
+      }
+    },
+    {
+      "id": "multiple-undergrad-lowest-threshold-plus-postgrad",
+      "description": "If Plan 2 and Plan 5 both reach payroll, HMRC uses the undergraduate plan with the lowest threshold: Plan 5 gives £187 monthly at £50,000, plus £145 Postgraduate Loan, for £332 monthly and £3,984 annually.",
+      "input": {
+        "salary": 50000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": ["plan2", "plan5", "postgrad"],
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "studentLoanAnnual": 3984
+      }
+    }
+  ]
+}

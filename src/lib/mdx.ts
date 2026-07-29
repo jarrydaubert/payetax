@@ -281,7 +281,7 @@ export function extractFAQs(content: string): FAQItem[] {
 
   // Find FAQ section - look for common FAQ header patterns
   const faqSectionRegex =
-    /(?:^#{1,3}\s*(?:FAQ|Frequently Asked Questions|Common Questions)[^\n]*\n)([\s\S]*?)(?=^#{1,2}\s[^#]|$)/gim;
+    /(?:^#{1,3}\s*(?:FAQ|Frequently Asked Questions|Common Questions)[^\n]*\n)([\s\S]*?)(?=^#{1,2}\s[^#]|(?![\s\S]))/gim;
   const faqSections = content.match(faqSectionRegex);
 
   if (faqSections) {
@@ -289,7 +289,7 @@ export function extractFAQs(content: string): FAQItem[] {
       // Pattern 1: ### or #### Question (optional ?) followed by answer
       // Allows optional blank line between heading and answer
       const headingPattern =
-        /^#{3,4}\s*(.+?)\s*\n(?:\n)?([\s\S]*?)(?=\n#{3,4}\s|\n---|\n#{1,2}\s[^#]|$)/gm;
+        /^#{3,4}\s*(.+?)\s*\n(?:\n)?([\s\S]*?)(?=\n#{3,4}\s|\n---|\n#{1,2}\s[^#]|(?![\s\S]))/gm;
       let match = headingPattern.exec(section);
       while (match) {
         const questionMatch = match[1];
@@ -311,7 +311,7 @@ export function extractFAQs(content: string): FAQItem[] {
   // Pattern: **Question** (optional ?) followed by answer
   // Allows optional blank line between question and answer
   const boldQuestionPattern =
-    /^\*\*([^*]+?)\*\*\s*\n(?:\n)?([\s\S]*?)(?=\n\*\*[^*]+\*\*|\n#{2,4}\s|$)/gm;
+    /^\*\*([^*]+?)\*\*\s*\n(?:\n)?([\s\S]*?)(?=\n\*\*[^*]+\*\*|\n#{2,4}\s|(?![\s\S]))/gm;
   let boldMatch = boldQuestionPattern.exec(content);
   while (boldMatch) {
     const questionMatch = boldMatch[1];
@@ -423,8 +423,8 @@ function cleanMarkdownForSchema(text: string, maxLength = FAQ_ANSWER_MAX_LENGTH)
   const cleaned = text
     // Remove code blocks
     .replace(/```[\s\S]*?```/g, '')
-    // Remove inline code
-    .replace(/`[^`]+`/g, '')
+    // Remove inline-code formatting while keeping the value readable
+    .replace(/`([^`]*)`/g, '$1')
     // Remove bold/italic
     .replace(/\*\*([^*]+)\*\*/g, '$1')
     .replace(/\*([^*]+)\*/g, '$1')

@@ -147,12 +147,14 @@ export async function generateMetadata({
     title,
     description,
     pathname,
+    canonicalUrl: post.canonicalUrl,
     type: 'article',
     publishedTime: post.publishedAt,
     modifiedTime: post.updatedAt,
     authors: post.author ? [post.author] : undefined,
     section: post.categoryData?.name || post.category,
     tags: post.tags,
+    keywords: post.seoKeywords,
   });
 
   return {
@@ -239,10 +241,11 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const showUpdatedDate = hasVisibleUpdateDate(post.publishedAt, post.updatedAt);
   const internalToolLinks = getInternalToolLinks(post);
 
+  const canonicalUrl = post.canonicalUrl || `${SITE_URL}/blog/${post.slug}`;
   const articleData = {
     title: post.title,
     description: post.seoDescription || post.excerpt,
-    url: `${SITE_URL}/blog/${post.slug}`,
+    url: canonicalUrl,
     imageUrl,
     publishDate: post.publishedAt,
     modifiedDate: post.updatedAt || post.publishedAt,
@@ -254,7 +257,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   const breadcrumbItems = [
     { name: 'Home', url: SITE_URL },
     { name: 'Blog', url: `${SITE_URL}/blog` },
-    { name: post.title, url: `${SITE_URL}/blog/${post.slug}` },
+    { name: post.title, url: canonicalUrl },
   ];
 
   const howToData =

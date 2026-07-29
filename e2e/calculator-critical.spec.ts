@@ -241,8 +241,9 @@ test.describe('Calculator critical @critical', () => {
     await expect(page.getByTestId('results-table')).toBeVisible();
 
     // Expected from current 2026-2027 rules/rounding:
-    // Plan 2 (9%) + Postgrad (6%) at £50k.
+    // Plan 2 (£154) + Postgrad (£145) per month at £50k, with each
+    // loan-type deduction rounded down to a whole pound before summing.
     const sl = await getYearlyTableValue(page, 'Student Loan');
-    expect(sl).toBeCloseTo(3595.32, 2);
+    expect(sl).toBe(3588);
   });
 });

@@ -71,7 +71,7 @@ describe('derivePayePayBasis', () => {
     expect(basis.nonEmploymentTaxableIncome.annual).toBe(0);
     expect(basis.totalGrossIncome.annual).toBe(36_000);
     expect(basis.niableEmploymentEarnings.annual).toBe(36_000);
-    expect(basis.studentLoanEmploymentEarnings.annual).toBe(36_000);
+    expect(basis.studentLoanEmploymentEarnings.annual).toBe(30_000);
   });
 
   it('adds non-employment income to PAYE totals without adding it to NI or Student Loan bases', () => {
@@ -88,7 +88,7 @@ describe('derivePayePayBasis', () => {
     expect(basis.studentLoanEmploymentEarnings.annual).toBe(30_000);
   });
 
-  it('keeps PAYE on total taxable income and NI and Student Loan on employment income only', () => {
+  it('keeps PAYE on total taxable income and Student Loan on post-sacrifice primary employment only', () => {
     const basis = derivePayePayBasis({
       ...baseInput,
       salary: 4_000,
@@ -109,10 +109,10 @@ describe('derivePayePayBasis', () => {
     expect(basis.adjustedNetIncome.annual).toBe(62_000);
     expect(basis.payeAdjustedPayment.annual).toBe(62_000);
     expect(basis.niableEmploymentEarnings.annual).toBe(56_000);
-    expect(basis.studentLoanEmploymentEarnings.annual).toBe(58_400);
+    expect(basis.studentLoanEmploymentEarnings.annual).toBe(45_600);
   });
 
-  it('preserves the existing salary-sacrifice reductions to PAYE and employee NI bases', () => {
+  it('applies salary-sacrifice reductions to PAYE, employee NI and Student Loan bases', () => {
     const withoutPension = derivePayePayBasis({
       ...baseInput,
       salary: 50_000,
@@ -138,9 +138,10 @@ describe('derivePayePayBasis', () => {
     expect(
       withoutPension.niableEmploymentEarnings.annual - withPension.niableEmploymentEarnings.annual,
     ).toBe(5_000);
-    expect(withPension.studentLoanEmploymentEarnings).toEqual(
-      withoutPension.studentLoanEmploymentEarnings,
-    );
+    expect(
+      withoutPension.studentLoanEmploymentEarnings.annual -
+        withPension.studentLoanEmploymentEarnings.annual,
+    ).toBe(5_000);
   });
 
   it.each([

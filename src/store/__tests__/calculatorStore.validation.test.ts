@@ -438,6 +438,30 @@ describe('Calculator Store Validation', () => {
       expect(consoleSpy).toHaveBeenCalled();
       consoleSpy.mockRestore();
     });
+
+    it('should reject two undergraduate student loan plans', () => {
+      const { setStudentLoanPlans } = useCalculatorStore.getState();
+      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      setStudentLoanPlans(['plan2']);
+
+      setStudentLoanPlans(['plan1', 'plan2']);
+
+      expect(useCalculatorStore.getState().input.studentLoanPlans).toEqual(['plan2']);
+      expect(consoleSpy).toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
+
+    it('should not toggle a second undergraduate plan into state', () => {
+      const { setStudentLoanPlans, toggleStudentLoan } = useCalculatorStore.getState();
+      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      setStudentLoanPlans(['plan2']);
+
+      toggleStudentLoan('plan1');
+
+      expect(useCalculatorStore.getState().input.studentLoanPlans).toEqual(['plan2']);
+      expect(consoleSpy).toHaveBeenCalled();
+      consoleSpy.mockRestore();
+    });
   });
 
   describe('setHoursPerWeek', () => {

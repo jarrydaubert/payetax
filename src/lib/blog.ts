@@ -54,6 +54,7 @@ function convertMDXPost(post: ReturnType<typeof getMDXPosts>[0]): BlogPost {
     seoTitle: post.seoTitle || post.title,
     seoDescription: post.seoDescription || post.excerpt,
     seoKeywords: post.seoKeywords || post.tags || [],
+    canonicalUrl: post.canonicalUrl,
   };
 }
 
@@ -261,6 +262,7 @@ async function getCachedBlogPostBySlug(slug: string): Promise<BlogPost | null> {
     seoTitle: post.seoTitle || post.title,
     seoDescription: post.seoDescription || post.excerpt,
     seoKeywords: post.seoKeywords || post.tags || [],
+    canonicalUrl: post.canonicalUrl,
   };
 }
 

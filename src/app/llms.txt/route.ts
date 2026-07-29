@@ -1,5 +1,6 @@
 // src/app/llms.txt/route.ts
 
+import { CURRENT_TAX_GUIDANCE } from '@/constants/currentTaxGuidance';
 import {
   HMRC_INCOME_TAX_RATES_URL,
   HMRC_NI_RATES_URL,
@@ -56,7 +57,8 @@ export async function GET() {
         .map((post) => {
           const title = sanitize(post.title);
           const excerpt = sanitize(post.excerpt).slice(0, 150);
-          return `- [${title}](${SITE_URL}/blog/${post.slug}): ${excerpt}${post.excerpt.length > 150 ? '...' : ''}`;
+          const canonicalUrl = post.canonicalUrl ?? `${SITE_URL}/blog/${post.slug}`;
+          return `- [${title}](${canonicalUrl}): ${excerpt}${post.excerpt.length > 150 ? '...' : ''}`;
         })
         .join('\n');
 
@@ -64,6 +66,19 @@ export async function GET() {
     })
     .filter(Boolean)
     .join('\n\n');
+
+  const postsBySlug = new Map(posts.map((post) => [post.slug, post]));
+  const reviewedGuidanceLinks = CURRENT_TAX_GUIDANCE.map(({ slug, reviewedAt }) => {
+    const post = postsBySlug.get(slug);
+    if (!post) return null;
+
+    const title = sanitize(post.title);
+    const excerpt = sanitize(post.excerpt).slice(0, 150);
+    const canonicalUrl = post.canonicalUrl ?? `${SITE_URL}/blog/${post.slug}`;
+    return `- [${title}](${canonicalUrl}) (reviewed ${reviewedAt}): ${excerpt}${post.excerpt.length > 150 ? '...' : ''}`;
+  })
+    .filter((line): line is string => Boolean(line))
+    .join('\n');
 
   const lastUpdated = new Date().toISOString().split('T')[0];
   const currentTaxYearDisplay = formatTaxYearDisplay(CURRENT_TAX_YEAR, { separator: '-' });
@@ -106,6 +121,10 @@ Search crawlers and AI crawlers are allowed. Public calculator, tool, blog, and 
 - [Student Loan Repayment Thresholds](${HMRC_STUDENT_LOAN_REPAYMENT_URL})
 
 ${crawlableTaxFacts}
+
+## Reviewed Current Tax Guidance
+
+${reviewedGuidanceLinks || 'No reviewed guidance entries are currently available.'}
 
 ${blogSections}
 

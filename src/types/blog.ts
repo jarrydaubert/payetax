@@ -39,6 +39,7 @@ export interface BlogPostFrontmatter {
   seoTitle?: string;
   seoDescription?: string;
   seoKeywords?: string[];
+  canonicalUrl?: string;
 }
 
 /**

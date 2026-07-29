@@ -94,9 +94,9 @@ describe('CalculatorStore Integration', () => {
       const state = useCalculatorStore.getState();
 
       // Plan 2 threshold: £29,385 (2026-27), 9% above
-      // Store calculations annualize per-period deductions, so expect the live calculator output.
+      // HMRC rounds each monthly deduction down to the nearest whole pound.
       expect(state.results?.studentLoan.annually).toBeGreaterThan(0);
-      expect(state.results?.studentLoan.annually).toBeCloseTo(505.32, 0);
+      expect(state.results?.studentLoan.annually).toBe(504);
     });
 
     it('should calculate previous year comparison', () => {

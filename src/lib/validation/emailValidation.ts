@@ -54,6 +54,10 @@ const StudentLoanSelectionSchema = z
   .refine(
     (value) => value === 'none' || new Set(value).size === value.length,
     'Duplicate student loan plans not allowed',
+  )
+  .refine(
+    (value) => value === 'none' || value.filter((plan) => plan !== 'postgrad').length <= 1,
+    'Select only one undergraduate student loan plan',
   );
 
 const IncomeSourceTypeSchema = z.enum(INCOME_SOURCE_TYPES);

@@ -180,6 +180,10 @@ describe('tax-domain repository controls', () => {
             content: 'Tax allowance: £12,570',
           },
           {
+            path: 'content/blog/how-much-tax-will-i-pay-uk-2025.mdx',
+            content: 'Current tax allowance: £12,570',
+          },
+          {
             path: 'content/blog/evergreen.mdx',
             content: 'Official tax allowance: £12,570 <!-- tax-fact-scan: official-quotation -->',
           },
@@ -202,6 +206,9 @@ describe('tax-domain repository controls', () => {
       expect(occurrences.find((entry) => entry.file.includes('tax-guide'))?.exceptionId).toBe(
         'pinned-historical-content',
       );
+      expect(
+        occurrences.find((entry) => entry.file.includes('how-much-tax-will'))?.exceptionId,
+      ).toBeUndefined();
       expect(occurrences.find((entry) => entry.file.includes('evergreen'))?.exceptionId).toBe(
         'official-quotation',
       );

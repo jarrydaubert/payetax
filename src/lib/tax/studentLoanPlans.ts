@@ -11,6 +11,19 @@ export const DIRECTOR_SUPPORTED_STUDENT_LOAN_PLANS = [
   'postgrad',
 ] as const satisfies readonly StudentLoanPlan[];
 
+export const UNDERGRADUATE_STUDENT_LOAN_PLANS = [
+  'plan1',
+  'plan2',
+  'plan4',
+  'plan5',
+] as const satisfies readonly StudentLoanPlan[];
+
+export function hasAtMostOneUndergraduateStudentLoanPlan(
+  plans: readonly StudentLoanPlan[],
+): boolean {
+  return plans.filter((plan) => plan !== 'postgrad').length <= 1;
+}
+
 /**
  * Director Intelligence availability differs by tax year.
  * Keep this mapping explicit so future tax-year rollovers update here once.
