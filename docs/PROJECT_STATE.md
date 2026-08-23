@@ -161,6 +161,10 @@ The durable conclusions are:
 - the beginner guide has weak deliberate prominence, but no confirmed technical indexing blocker:
   it is canonical, indexable, in the sitemap and linked through listings/related articles; Google
   had not yet stored the 29 July rewrite when the evidence was captured;
+- a small number of deliberate, contextual inbound links to the beginner guide remains justified
+  active work, but another content overhaul stays trigger-gated until Google has recrawled the
+  29 July rewrite and matched page/query evidence supports it; the link slice does not outrank the
+  Scottish and salary correctness sequence below;
 - retired competitor-intent routes have no current internal links and should not change without
   new Search Console evidence;
 - PR #109 closed the highest-risk current-guidance defects; PR #110 closed the deterministic
@@ -188,11 +192,14 @@ In short:
 Resume in this order unless new primary evidence changes the risk:
 
 1. **Scottish calculator and Scottish comparison correctness.** Fix input validation and scope/
-   source transparency in the tool; update and independently verify the comparison article for
-   2026/27; fix the FAQ extraction regression with it.
+   source transparency in the tool; replace the stale ~£28,000 and ~£30,300 crossover copy with
+   the independently derived 2026/27 crossover of approximately £33,493; update and independently
+   verify the comparison article; fix the FAQ extraction regression with it.
 2. **£40k, £60k and £100k salary-page correctness.** Use the £70k page's qualified, answer-first
    pattern; independently verify displayed PAYE/loan figures; remove unsupported lifestyle,
-   prevalence, savings and mortgage claims; state pension method assumptions.
+   prevalence, savings and mortgage claims; verify and correct/remove the £40k median claim against
+   then-current ONS evidence; current-source the £100k childcare eligibility consequences; state
+   pension method assumptions.
 3. **Explicit pension-method Foundation slice.** Represent salary sacrifice, net pay and relief at
    source explicitly, or narrow the product contract visibly and consistently.
 4. **Transparent-result Foundation work.** Expose selected policy, calculation basis, relevant pay

@@ -33,6 +33,9 @@ expected mechanics are checked against the primary sources below.
 - [HMRC: Scottish Income Tax](https://www.gov.uk/scottish-income-tax)
 - [HMRC: workplace pension methods](https://www.gov.uk/workplace-pensions/managing-your-pension)
 - [HMRC: 2026/27 Student Loan deduction tables](https://www.gov.uk/government/publications/sl3-student-loan-deduction-tables/2026-to-2027-student-and-postgraduate-loan-deduction-tables)
+- [ONS: Employee earnings in the UK, 2025](https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/annualsurveyofhoursandearnings/2025)
+- [HMRC: Tax-Free Childcare adjusted-net-income condition](https://www.gov.uk/hmrc-internal-manuals/tax-free-childcare-technical-manual/tfc11050)
+- [GOV.UK: Free Childcare for Working Parents eligibility](https://www.gov.uk/free-childcare-if-working/check-youre-eligible)
 - [HMRC payroll-software specification and tax-code sources](tax-code-correctness-follow-up-2026-08-23.md#primary-evidence)
 
 Search observations and internal-link evidence come from the
@@ -69,14 +72,20 @@ not mean every statement on the page is wrong.
   before calculation.
 - **Trust gap:** current bands are visible, but the page has no direct primary-source/checking path.
   Some rate/threshold prose is static beside the generated table, creating avoidable drift risk.
+- **Static-copy correctness defect:** the FAQ says people earning under roughly £28,000 often pay
+  less Scottish Income Tax. Using the published 2026/27 bands and a full £12,570 Personal
+  Allowance, the annual rUK and Scottish liabilities are equal at approximately £33,493. At
+  £29,526, cumulative Scottish tax is £3,351.53; the 21% Scottish intermediate rate then closes
+  the £39.67 advantage over the 20% rUK rate across the next £3,967.
 - **Optional polish:** the lead repeats “how much”. This is not the reason to change the page.
 
 ### Current status and decision
 
 The calculation owner and current policy are sound, and the 2026/27 £50,000 regression test pins
 Scottish £8,982, rUK £7,486 and the £1,496 difference. Fix input validation and make the income-tax-
-only assumptions/source visible. Preserve the canonical URL, navigation footprint and the
-Scottish-versus-rUK comparison purpose; do not turn it into another full calculator.
+only assumptions/source visible, and correct the static crossover copy to approximately £33,493.
+Preserve the canonical URL, navigation footprint and the Scottish-versus-rUK comparison purpose;
+do not turn it into another full calculator.
 
 ## £40k salary article
 
@@ -92,8 +101,14 @@ Scottish-versus-rUK comparison purpose; do not turn it into another full calcula
 - **Misleading pension explanation:** “standard workplace pension” is treated as one generic
   pre-tax method. Salary sacrifice, net pay and relief at source have different Income Tax, NI and
   payslip effects, and contributions may use qualifying earnings rather than whole salary.
-- **Unsupported claims:** median/percentile, rent, lifestyle, savings targets and mortgage capacity
-  lack a defined dataset or primary citation and are presented too categorically.
+- **Incorrect-source risk, not merely a missing citation:** the article repeatedly says the UK
+  median salary is around £35,000. The latest applicable ONS ASHE evidence reviewed for this audit
+  reports median gross annual earnings of £39,039 for full-time employees who had been in their
+  jobs for at least a year in April 2025. The article's claim therefore appears materially
+  inconsistent with the applicable evidence and should be verified against the then-current ONS
+  definition and value, then corrected or removed rather than merely given a citation.
+- **Unsupported claims:** percentile, rent, lifestyle, savings targets and mortgage capacity lack
+  a defined dataset or primary citation and are presented too categorically.
 - **Structure/search:** title, metadata and H1 fit `40k after tax`, but the opening and first
   extracted FAQs lead with lifestyle/prevalence rather than the qualified answer. “Common
   Questions” and “Frequently Asked Questions” also create duplicated FAQ entities.
@@ -103,7 +118,8 @@ Scottish-versus-rUK comparison purpose; do not turn it into another full calcula
 This page has genuine page-one visibility and should keep its URL. Rebuild its facts from an
 independent 2026/27 calculation basis, state payroll assumptions, put annual/monthly take-home
 first, describe pension methods explicitly, remove unsupported personal-finance/lifestyle claims,
-and make the visible FAQ set the intended schema set.
+verify and correct/remove the median claim against then-current ONS evidence, and make the visible
+FAQ set the intended schema set.
 
 ## £60k salary article
 
@@ -161,6 +177,11 @@ uniformity. Change only a reproduced factual defect or evidence-backed search pr
 - **Misleading pension claims:** the page conflates salary sacrifice, net pay and relief at source;
   says a £10,000 sacrificed employer contribution receives further tax relief; calls the exchange
   a 160% “instant return”; and implies the employee automatically receives employer-NI savings.
+- **Missing high-income childcare consequence:** Tax-Free Childcare eligibility is affected when
+  adjusted net income exceeds £100,000. Free Childcare for Working Parents also has a £100,000
+  adjusted-net-income condition and is England-specific. These are separate eligibility facts to
+  verify against current official sources during repair, not components of the Income Tax marginal
+  rate and not financial advice.
 - **Unsupported claims:** percentile, lifestyle, housing, mortgage and savings-capacity assertions
   lack defined evidence. “The smart strategy: stay at £100k” is financial advice framed as a
   universal answer despite cash-flow, allowance, annual-allowance and scheme differences.
@@ -173,6 +194,8 @@ uniformity. Change only a reproduced factual defect or evidence-backed search pr
 Keep the established URL and taper explainer. Put the qualified £100k answer first, separate
 statutory annual taper examples from payroll projections, make pension method and adjusted-net-
 income assumptions explicit, and remove categorical advice and unsupported lifestyle claims.
+Verify and source the childcare eligibility consequences current at the time of repair, keeping
+their geographic and adjusted-net-income scope separate from the tax-taper explanation.
 
 ## Scottish-vs-English comparison article
 
@@ -184,6 +207,10 @@ income assumptions explicit, and remove categorical advice and unsupported lifes
 - **Worked-figure defect:** even for 2025/26, the £150,000 difference is stated as about £6,340.
   The owned annual mechanics reproduce Scottish tax of £59,666.10 and rUK tax of £53,703, a
   £5,963.10 difference. NI is common and cannot explain the extra £377.
+- **Static crossover defect:** the article repeatedly carries the old roughly £30,300 crossover.
+  The independently derived annual 2026/27 crossover is approximately £33,493 under a full
+  Personal Allowance, using the published Scottish starter/basic/intermediate bands and the rUK
+  20% basic rate.
 - **Misleading claims:** “HMRC-accurate” and “exact” are broader than the article's assumptions and
   unsupported by a public verification output. Pension relief, bonus timing, relocation and
   Marriage Allowance are presented too categorically; the current engine itself still has an open
@@ -201,7 +228,8 @@ income assumptions explicit, and remove categorical advice and unsupported lifes
 This is a current-year correctness priority. Retain the URL and the focused Scottish-versus-rUK
 Income Tax comparison. Rebuild 2026/27 bands and every example from primary sources plus
 independent working, remove unproven advice, label assumptions, add source dates, and fix the FAQ
-extractor with a regression test rather than editing around it.
+extractor with a regression test rather than editing around it. Replace the old crossover copy
+with the independently derived approximately £33,493 figure in the same correctness slice.
 
 ## `/tools/tax-code-decoder`
 
@@ -254,7 +282,8 @@ change URLs, indexability policy or the calculator architecture broadly.
 
 - Search snippets and CTR changes after factual repairs; page-one position does not prove a title
   rewrite will improve CTR.
-- Any beginner-guide prominence change after Google recrawls the 29 July version.
+- Measure the effect of the already justified small contextual-link slice rather than assuming it;
+  gate another beginner-guide content or intent overhaul on recrawl and matched page/query evidence.
 - Query overlap among general guides only with matched query/page exports.
 
 ### Protect
