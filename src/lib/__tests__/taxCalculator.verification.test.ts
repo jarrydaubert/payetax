@@ -11,7 +11,7 @@
  */
 
 import type { PayPeriod } from '@/constants/taxRates';
-import { decodeTaxCode } from '@/lib/tax';
+import { decodeTaxCode } from '@/lib/tax-code-decoder';
 import {
   type FixtureInvariant,
   loadVerificationSuites,
@@ -140,7 +140,7 @@ describe('PAYE verification fixtures', () => {
           if (scenario.decoder) {
             const decoded = decodeTaxCode(scenario.input.taxCode);
             expect(decoded.isValid).toBe(scenario.decoder.isValid);
-            expect(decoded.allowance).toBe(scenario.decoder.allowance);
+            expect(decoded.amount).toBe(scenario.decoder.amount);
             expect(decoded.meaning.toLowerCase()).toContain(
               scenario.decoder.meaningIncludes.toLowerCase(),
             );

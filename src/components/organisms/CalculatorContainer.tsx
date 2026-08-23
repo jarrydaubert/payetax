@@ -3,6 +3,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { Mail, Sparkles } from 'lucide-react';
+import Link from 'next/link';
 import * as React from 'react';
 import { EmailResultsForm } from '@/components/molecules/EmailResultsForm';
 import { Card } from '@/components/ui/card';
@@ -18,7 +19,12 @@ import { ANIMATION_TRANSITIONS, ANIMATION_VARIANTS } from '@/constants/animation
 import { BREAKPOINTS, TIMERS } from '@/constants/ui';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { trackEvent } from '@/lib/analytics';
-import { hasEmergencyTaxCodeSuffix } from '@/lib/tax';
+import {
+  getTaxCodeRegionOverride,
+  hasNonCumulativeTaxCodeMarker,
+  parseTaxCode,
+  TAX_CODE_NON_CUMULATIVE_MARKERS,
+} from '@/lib/tax';
 import { cn } from '@/lib/utils';
 import type { PayeEmailInput } from '@/lib/validation/emailValidation';
 import { useShallow } from '@/lib/zustandShallow';
@@ -58,6 +64,11 @@ export function CalculatorContainer() {
     })),
   );
   const { calculate, calculatePreviousYear, setInput } = useCalculatorActions();
+  const parsedInputTaxCode = React.useMemo(() => parseTaxCode(input.taxCode, 0), [input.taxCode]);
+  const codeRegionOverride = getTaxCodeRegionOverride(parsedInputTaxCode);
+  const effectiveIsScottish =
+    codeRegionOverride === 'Scotland' ||
+    (codeRegionOverride === null && input.region === 'Scotland');
   const [, startTransition] = React.useTransition();
   const [visiblePeriods, setVisiblePeriods] = React.useState<string[]>([
     'Yearly',
@@ -69,6 +80,7 @@ export function CalculatorContainer() {
   const [actionMessage, setActionMessage] = React.useState<{
     tone: 'info' | 'error';
     text: string;
+    taxCodeLink?: boolean;
   } | null>(null);
   const resultsRef = React.useRef<HTMLDivElement>(null);
   const hasTrackedCalculatorStartRef = React.useRef(false);
@@ -128,11 +140,40 @@ export function CalculatorContainer() {
       calculatePreviousYear();
     });
 
-    if (hasEmergencyTaxCodeSuffix(input.taxCode)) {
+    const taxCodeInput = typeof input.taxCode === 'string' ? input.taxCode.trim() : '';
+    const parsedTaxCode = parsedInputTaxCode;
+    if (taxCodeInput && !parsedTaxCode.isValid) {
       setActionMessage({
-        tone: 'info',
-        text: 'Emergency tax code detected. W1, M1, and X codes are non-cumulative and may differ from your final annual tax position.',
+        tone: 'error',
+        text: 'Tax code format not recognized. This estimate used the selected tax year’s standard tax-free amount as its tax-code fallback. Check the complete code against your payslip or HMRC notice.',
+        taxCodeLink: true,
       });
+    } else {
+      const taxCodeNotices: string[] = [];
+      if (hasNonCumulativeTaxCodeMarker(taxCodeInput)) {
+        taxCodeNotices.push(
+          `Emergency tax code detected. ${TAX_CODE_NON_CUMULATIVE_MARKERS.join(', ')} codes use only the current pay period. This calculator shows a steady-pay annual projection, not an exact deduction from a particular emergency-code payslip.`,
+        );
+      }
+      if (parsedTaxCode.isValid && (input.isBlind || input.isMarried)) {
+        taxCodeNotices.push(
+          "The tax code's amount already includes HMRC coding adjustments, so separate Blind Person's and Marriage Allowance controls were not added again.",
+        );
+      }
+      if (parsedTaxCode.requiresHmrcCheck) {
+        taxCodeNotices.push(
+          'This unusually long tax code is a supported HMRC format, but verify it with HMRC before relying on the estimate.',
+        );
+      }
+      const parsedCodeRegion = getTaxCodeRegionOverride(parsedTaxCode);
+      if (parsedCodeRegion && parsedCodeRegion !== input.region) {
+        taxCodeNotices.push(
+          `The ${parsedTaxCode.prefix} prefix assigns ${parsedCodeRegion} tax rates, so it takes precedence over the selected ${input.region} region for this estimate.`,
+        );
+      }
+      if (taxCodeNotices.length > 0) {
+        setActionMessage({ tone: 'info', text: taxCodeNotices.join(' '), taxCodeLink: true });
+      }
     }
 
     // Announce for screen readers (event-driven)
@@ -268,6 +309,31 @@ export function CalculatorContainer() {
             role='region'
             aria-label='Tax calculation results summary'
           >
+            {actionMessage && (
+              <motion.div
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={shouldReduceMotion ? undefined : { opacity: 0, y: 12 }}
+                transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2 }}
+                className={cn(
+                  'mb-3 rounded-md border px-3 py-2 text-sm',
+                  actionMessage.tone === 'error'
+                    ? 'border-destructive/30 bg-destructive/10 text-destructive'
+                    : 'border-primary/30 bg-primary/10 text-primary',
+                )}
+                role={actionMessage.tone === 'error' ? 'alert' : 'status'}
+              >
+                <span>{actionMessage.text}</span>
+                {actionMessage.taxCodeLink && (
+                  <Link
+                    href='/tools/tax-code-decoder'
+                    className='ml-1 inline-flex min-h-11 items-center font-medium underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                  >
+                    Check the code
+                  </Link>
+                )}
+              </motion.div>
+            )}
             <ResultsSummaryCards results={results} taxYear={input.taxYear} input={input} />
           </motion.div>
         )}
@@ -317,26 +383,9 @@ export function CalculatorContainer() {
                 isMarried: input.isMarried,
                 partnerGrossWage: input.partnerGrossWage,
                 taxCode: input.taxCode,
-                isScottish: input.region === 'Scotland',
+                isScottish: effectiveIsScottish,
               }}
             />
-            {actionMessage && (
-              <motion.p
-                initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={shouldReduceMotion ? undefined : { opacity: 0, y: 12 }}
-                transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2 }}
-                className={cn(
-                  'rounded-md border px-3 py-2 text-sm',
-                  actionMessage.tone === 'error'
-                    ? 'border-destructive/30 bg-destructive/10 text-destructive'
-                    : 'border-primary/30 bg-primary/10 text-primary',
-                )}
-                role={actionMessage.tone === 'error' ? 'alert' : 'status'}
-              >
-                {actionMessage.text}
-              </motion.p>
-            )}
           </motion.div>
         ) : (
           <motion.div

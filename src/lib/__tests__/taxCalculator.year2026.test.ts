@@ -29,7 +29,7 @@ import type { TaxCalculationInput } from '../types/calculator';
 const baseInput: Omit<TaxCalculationInput, 'salary'> = {
   payPeriod: 'annually',
   taxYear: '2026-2027',
-  taxCode: '1257L',
+  taxCode: '',
   isScottish: false,
   isMarried: false,
   partnerGrossWage: 0,

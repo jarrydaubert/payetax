@@ -66,7 +66,12 @@ import {
   type StudentLoanPlanPolicy,
   sliceStudentLoanRepayments,
 } from './tax/studentLoan';
-import { parseTaxCode } from './tax/taxCode';
+import {
+  getMonthlyKCodeAdditionalPay,
+  getMonthlyTaxCodeFreePay,
+  getTaxCodeRegionOverride,
+  parseTaxCode,
+} from './tax/taxCode';
 import { selectTaxPolicy } from './tax/taxPolicy';
 import { roundToPence } from './tax/utils';
 
@@ -76,9 +81,26 @@ function getMonthlyPayrollFreePay(
   annualTaxFreeAmount: number,
   standardPersonalAllowance: number,
   taxYear: TaxYear,
+  hasExplicitValidTaxCode: boolean,
 ): number {
-  if (annualTaxFreeAmount <= 0) {
-    return annualTaxFreeAmount / 12;
+  if (annualTaxFreeAmount < 0) {
+    // HMRC Tables A derives K-code additional pay from the code number, not
+    // by simply dividing its public number×10 explanation by 12. The lookup
+    // includes the code-range rounding and treats each complete 500 block
+    // separately. Returning a negative value lets the common subtraction
+    // below add this period-specific amount to taxable pay.
+    return -getMonthlyKCodeAdditionalPay(Math.abs(annualTaxFreeAmount));
+  }
+
+  if (annualTaxFreeAmount === 0) {
+    return 0;
+  }
+
+  if (hasExplicitValidTaxCode) {
+    // Numeric L/M/N/T codes use HMRC Tables A pay adjustment. This is not
+    // equivalent to dividing the public code-number×10 amount by 12 because
+    // Tables A applies a £9 range adjustment and block/remainder rounding.
+    return getMonthlyTaxCodeFreePay(annualTaxFreeAmount);
   }
 
   const thresholds = PAYROLL_PERIOD_THRESHOLDS[taxYear];
@@ -353,20 +375,21 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
 
   const payBasis = derivePayePayBasis(input);
   const { hoursPerWeek } = payBasis;
-  const taxCodeInput =
-    typeof input.taxCode === 'string' && input.taxCode.trim().length > 0
-      ? input.taxCode
-      : DEFAULT_TAX_CODE;
+  const suppliedTaxCode = typeof input.taxCode === 'string' ? input.taxCode.trim() : '';
+  const taxCodeInput = suppliedTaxCode || DEFAULT_TAX_CODE;
 
   // Resolve the supported tax year and select both policy records through the
   // single tax-domain selector (normalises short/long forms, falls back to the
   // current year for missing/unsupported input).
   const { taxYear, ruk: standardRates, scottish: scottishRates } = selectTaxPolicy(input.taxYear);
 
-  // Prefix classification belongs to the shared tax-code grammar. Welsh C-prefix
-  // takes precedence over a region toggle; Scottish S-prefix selects Scottish rates.
+  // Prefix classification belongs to the shared tax-code grammar. A valid Welsh
+  // C-prefix takes precedence over a region toggle; a valid Scottish S-prefix
+  // selects Scottish rates. Malformed partial codes must not change the region.
   const taxCodeResult = parseTaxCode(taxCodeInput, standardRates.personalAllowance);
-  const isScottish = taxCodeResult.isWelsh ? false : input.isScottish || taxCodeResult.isScottish;
+  const codeRegionOverride = getTaxCodeRegionOverride(taxCodeResult);
+  const isScottish =
+    codeRegionOverride === 'Scotland' || (codeRegionOverride === null && input.isScottish);
 
   // Choose appropriate tax rates based on whether the taxpayer is Scottish
   const taxRates = isScottish ? scottishRates : standardRates;
@@ -375,9 +398,10 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // 2. Calculate tax-free allowance (annual and monthly)
   // ---------------
 
-  // Parse tax code using comprehensive parser that handles all HMRC code types
-  // This correctly handles K-codes (negative allowance), BR/D0/D1/NT (band overrides), and emergency codes
+  // Use the shared interpretation for the supported tax-code forms, including
+  // K codes, flat-rate overrides and non-cumulative markers.
   let annualTaxFreeAmount = taxCodeResult.allowance;
+  const hasExplicitValidTaxCode = suppliedTaxCode !== '' && taxCodeResult.isValid;
 
   // Store band override for use in tax calculation section
   // BR = all at basic rate, D0 = all at higher rate, D1 = all at additional rate, NT = no tax
@@ -388,7 +412,11 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // This creates an effective 60% tax rate between £100k-£125k (40% income tax + 20% lost allowance)
   // IMPORTANT: Pension contributions reduce adjusted net income, so they can restore allowance
   const adjustedNetIncome = payBasis.adjustedNetIncome.annual;
-  if (adjustedNetIncome > taxRates.personalAllowanceReductionThreshold) {
+  if (
+    !hasExplicitValidTaxCode &&
+    annualTaxFreeAmount > 0 &&
+    adjustedNetIncome > taxRates.personalAllowanceReductionThreshold
+  ) {
     const reduction = calculateAllowanceReduction(
       adjustedNetIncome,
       annualTaxFreeAmount,
@@ -409,7 +437,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // Blind Person's Allowance (additional allowance for registered blind)
   // This is an additional allowance that's added on top of the Personal Allowance
   // For 2024-25: £2,870, For 2025-26: £3,070
-  if (input.isBlind) {
+  if (!hasExplicitValidTaxCode && input.isBlind) {
     annualTaxFreeAmount += taxRates.blindPersonsAllowance;
   }
 
@@ -424,7 +452,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // - The transferring partner must earn LESS than the Personal Allowance
   // - The receiving partner (user) must be a basic rate taxpayer
   // This saves up to £252/year (£1,260 at 20% basic rate)
-  if (input.isMarried && input.partnerGrossWage >= 0) {
+  if (!hasExplicitValidTaxCode && input.isMarried && input.partnerGrossWage >= 0) {
     // Find the threshold where "Higher rate" (40% or 42%) starts
     const higherRateBandIndex = taxRates.bands.findIndex((band) => band.rate >= 40);
     const prevBand = higherRateBandIndex > 0 ? taxRates.bands[higherRateBandIndex - 1] : null;
@@ -451,6 +479,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     annualTaxFreeAmount,
     taxRates.personalAllowance,
     taxYear,
+    hasExplicitValidTaxCode,
   );
 
   // ---------------

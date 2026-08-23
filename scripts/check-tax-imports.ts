@@ -26,7 +26,7 @@ if (process.argv.includes('--print-baseline')) {
 const comparison = compareTaxImportBaseline(violations, TAX_IMPORT_BOUNDARY_BASELINE);
 
 console.log('🔎 Checking tax-domain import boundary...');
-console.log(`   - supported application import: @/lib/tax`);
+console.log(`   - supported application imports: @/lib/tax, @/lib/tax-code-decoder`);
 console.log(
   `   - existing direct imports baselined: ${violations.length - comparison.newViolations.length}`,
 );
@@ -46,7 +46,7 @@ if (comparison.newViolations.length > 0) {
       `   - ${violation.file}:${violation.line} imports ${violation.specifier} [${violation.imports.join(', ')}]`,
     );
   }
-  console.error('   Application consumers must import through @/lib/tax.');
+  console.error('   Application consumers must import through a supported public tax interface.');
 }
 
 if (comparison.newViolations.length > 0 || comparison.staleBaseline.length > 0) {

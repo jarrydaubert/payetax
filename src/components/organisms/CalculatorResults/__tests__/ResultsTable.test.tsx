@@ -117,6 +117,55 @@ describe('ResultsTable Component', () => {
       expect(screen.getAllByText(/£12,570/).length).toBeGreaterThan(0);
     });
 
+    it('shows a K code as an amount added to taxable pay, not a negative allowance', () => {
+      render(
+        <ResultsTable
+          results={{
+            ...mockResults,
+            taxFreeAmount: -4750,
+            taxFreeAmountByPeriod: { annually: -4750, monthly: -396 },
+          }}
+          marriageAllowance={{ taxCode: 'K475' }}
+        />,
+      );
+
+      expect(screen.getByText('Added to Taxable Pay')).toBeInTheDocument();
+      expect(screen.queryByText('Tax-Free Allowance')).not.toBeInTheDocument();
+      expect(screen.getAllByText(/£4,750/).length).toBeGreaterThan(0);
+    });
+
+    it('does not mistake an M1 payroll marker for a Marriage Allowance M code', () => {
+      render(
+        <ResultsTable
+          results={mockResults}
+          taxYear='2026-2027'
+          marriageAllowance={{
+            isMarried: true,
+            partnerGrossWage: 0,
+            taxCode: '1257L M1',
+          }}
+        />,
+      );
+
+      expect(screen.getByText('You May Qualify for Marriage Allowance')).toBeInTheDocument();
+    });
+
+    it.each(['1383M', '1131N'])('recognizes a transfer already reflected by code %s', (taxCode) => {
+      render(
+        <ResultsTable
+          results={mockResults}
+          taxYear='2026-2027'
+          marriageAllowance={{
+            isMarried: true,
+            partnerGrossWage: 0,
+            taxCode,
+          }}
+        />,
+      );
+
+      expect(screen.queryByText('You May Qualify for Marriage Allowance')).not.toBeInTheDocument();
+    });
+
     it('uses payroll-period tax-free allowance values when annual averaging would not reconcile', () => {
       render(
         <ResultsTable

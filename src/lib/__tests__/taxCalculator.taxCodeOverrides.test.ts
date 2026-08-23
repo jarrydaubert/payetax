@@ -66,7 +66,7 @@ describe('Tax code overrides', () => {
     const result = calculateTax({ ...baseInput, taxCode: 'K100' });
 
     expect(result.taxFreeAmount).toBe(-1000);
-    expect(result.taxableIncome).toBeCloseTo(30996, 2);
+    expect(result.taxableIncome).toBeCloseTo(31008, 2);
   });
 
   describe('Scottish flat-rate codes in years without an Advanced rate band', () => {

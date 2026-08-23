@@ -98,7 +98,7 @@ describe('BasicInputs Component', () => {
     it('should render tax code input', () => {
       render(<BasicInputs />);
       expect(screen.getByText('Tax Code')).toBeInTheDocument();
-      expect(screen.getByDisplayValue('1257L')).toBeInTheDocument();
+      expect(screen.getByDisplayValue('1257L')).toHaveAttribute('maxLength', '20');
     });
 
     it('should render region select', () => {
@@ -185,6 +185,15 @@ describe('BasicInputs Component', () => {
       fireEvent.change(taxCodeInput, { target: { value: 'b' } });
 
       expect(mockSetTaxCode).toHaveBeenCalledWith('B');
+    });
+
+    it('should allow the full NONCUM marker to reach the store', () => {
+      render(<BasicInputs />);
+
+      const taxCodeInput = screen.getByDisplayValue('1257L');
+      fireEvent.change(taxCodeInput, { target: { value: '1257L NONCUM' } });
+
+      expect(mockSetTaxCode).toHaveBeenCalledWith('1257LNONCUM');
     });
 
     it('should call setIsMarried when married checkbox is toggled', () => {

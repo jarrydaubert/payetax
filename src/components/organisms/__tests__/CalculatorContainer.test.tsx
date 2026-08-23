@@ -205,6 +205,138 @@ describe('CalculatorContainer Component', () => {
       expect(mockCalculate).toHaveBeenCalledTimes(1);
     });
 
+    it('warns when a malformed code falls back to the standard tax-free amount', () => {
+      (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
+      (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
+        selector({
+          previousYearResults: null,
+          input: {
+            studentLoanPlans: 'none',
+            allowancesDeductions: 0,
+            taxCode: 'K100ABC',
+          },
+        }),
+      );
+      render(<CalculatorContainer />);
+
+      fireEvent.click(screen.getByRole('button', { name: /Calculate/i }));
+
+      expect(screen.getByRole('alert')).toHaveTextContent(/Tax code format not recognized/);
+      expect(screen.getByRole('alert')).toHaveTextContent(/standard tax-free amount/);
+    });
+
+    it('shows the non-cumulative warning only for a complete valid code', () => {
+      (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
+      (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
+        selector({
+          previousYearResults: null,
+          input: {
+            studentLoanPlans: 'none',
+            allowancesDeductions: 0,
+            taxCode: '1257LNONCUM',
+          },
+        }),
+      );
+      render(<CalculatorContainer />);
+
+      fireEvent.click(screen.getByRole('button', { name: /Calculate/i }));
+
+      expect(screen.getByRole('status')).toHaveTextContent(
+        /NONCUM codes use only the current pay period/,
+      );
+    });
+
+    it('asks the user to verify an unusually long supported code', () => {
+      (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
+      (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
+        selector({
+          previousYearResults: null,
+          input: {
+            studentLoanPlans: 'none',
+            allowancesDeductions: 0,
+            taxCode: '10000L',
+          },
+        }),
+      );
+      render(<CalculatorContainer />);
+
+      fireEvent.click(screen.getByRole('button', { name: /Calculate/i }));
+
+      expect(screen.getByRole('status')).toHaveTextContent(/verify it with HMRC/);
+      expect(screen.getByRole('link', { name: 'Check the code' })).toHaveAttribute(
+        'href',
+        '/tools/tax-code-decoder',
+      );
+    });
+
+    it.each([
+      ['S1257L', 'England', 'S', 'Scotland'],
+      ['C1257L', 'Scotland', 'C', 'Wales'],
+    ])('explains that %s overrides a conflicting %s selection', (taxCode, region, prefix, effectiveRegion) => {
+      (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
+      (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
+        selector({
+          previousYearResults: null,
+          input: {
+            studentLoanPlans: 'none',
+            allowancesDeductions: 0,
+            taxCode,
+            region,
+          },
+        }),
+      );
+      render(<CalculatorContainer />);
+
+      fireEvent.click(screen.getByRole('button', { name: /Calculate/i }));
+
+      expect(screen.getByRole('status')).toHaveTextContent(
+        `The ${prefix} prefix assigns ${effectiveRegion} tax rates`,
+      );
+    });
+
+    it('explains why separate allowance controls are not added to a valid code', () => {
+      (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
+      (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
+        selector({
+          previousYearResults: null,
+          input: {
+            studentLoanPlans: 'none',
+            allowancesDeductions: 0,
+            taxCode: '1383M',
+            isMarried: true,
+            isBlind: false,
+          },
+        }),
+      );
+      render(<CalculatorContainer />);
+
+      fireEvent.click(screen.getByRole('button', { name: /Calculate/i }));
+
+      expect(screen.getByRole('status')).toHaveTextContent(
+        /already includes HMRC coding adjustments/,
+      );
+    });
+
+    it('does not label a bare NONCUM marker as a valid emergency code', () => {
+      (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
+      (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
+        selector({
+          previousYearResults: null,
+          input: {
+            studentLoanPlans: 'none',
+            allowancesDeductions: 0,
+            taxCode: 'NONCUM',
+          },
+        }),
+      );
+      render(<CalculatorContainer />);
+
+      fireEvent.click(screen.getByRole('button', { name: /Calculate/i }));
+
+      expect(screen.getByRole('alert')).toHaveTextContent(/Tax code format not recognized/);
+      expect(screen.queryByText(/Emergency tax code detected/)).not.toBeInTheDocument();
+    });
+
     it('should show results after calculation', async () => {
       (useCalculatorResults as jest.Mock).mockReturnValue(null);
       const { rerender } = render(<CalculatorContainer />);

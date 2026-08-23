@@ -80,19 +80,19 @@ const scenarios: Array<{ id: string; description: string; input: TaxCalculationI
   {
     id: 'pa-taper-110k',
     description: 'Personal allowance taper £110k (60% trap zone)',
-    input: createInput({ salary: 110000 }),
+    input: createInput({ salary: 110000, taxCode: '757T' }),
   },
   {
     id: '60percent-trap-125140',
     description: '60% marginal trap peak £125,140',
-    input: createInput({ salary: 125140 }),
+    input: createInput({ salary: 125140, taxCode: '0T' }),
   },
 
   // Additional rate
   {
     id: 'additional-150k',
     description: 'Additional rate £150k',
-    input: createInput({ salary: 150000 }),
+    input: createInput({ salary: 150000, taxCode: '0T' }),
   },
 
   // Scottish tax
@@ -104,7 +104,7 @@ const scenarios: Array<{ id: string; description: string; input: TaxCalculationI
   {
     id: 'scottish-200k',
     description: 'Scottish £200k (top rate 48%)',
-    input: createInput({ salary: 200000, taxCode: 'S1257L', isScottish: true }),
+    input: createInput({ salary: 200000, taxCode: 'S0T', isScottish: true }),
   },
 
   // Tax codes
@@ -159,12 +159,10 @@ const scenarios: Array<{ id: string; description: string; input: TaxCalculationI
   // Marriage allowance
   {
     id: 'marriage-allowance-15k',
-    description: 'Marriage allowance transfer £15k + £45k partner',
+    description: 'Marriage Allowance receiver code 1383M at £15k',
     input: createInput({
       salary: 15000,
-      taxCode: '1257M',
-      isMarried: true,
-      partnerGrossWage: 45000,
+      taxCode: '1383M',
     }),
   },
 ];

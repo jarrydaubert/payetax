@@ -5,6 +5,7 @@
     "urls": [
       "https://commonslibrary.parliament.uk/research-briefings/sn06158/",
       "https://www.gov.uk/income-tax-rates",
+      "https://www.gov.uk/government/publications/tables-a-pay-adjustment-tables",
       "https://www.gov.uk/national-insurance-when-you-reach-state-pension-age",
       "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027"
     ],
@@ -103,7 +104,7 @@
     },
     {
       "id": "spa-36k-age67",
-      "description": "£36,000 at age 67 — sits inside the abolished allowance's old £34,600 taper zone. Correct law: standard PA, taxable floor(3000-1048)=1952 at 20% = £390.40/mo (£4,684.80/yr). Guards against any taper artifact reappearing.",
+      "description": "£36,000 at age 67 — sits inside the abolished allowance's old £34,600 taper zone. Correct law: standard PA; HMRC Tables A gives £1,048.26 Month 1 free pay, so taxable floor(3000-1048.26)=1951 at 20% = £390.20/mo (£4,682.40/yr). Guards against any taper artifact reappearing.",
       "input": {
         "salary": 36000,
         "payPeriod": "annually",
@@ -123,7 +124,7 @@
       },
       "expected": {
         "taxFreeAmount": 12570,
-        "incomeTaxAnnual": 4684.8,
+        "incomeTaxAnnual": 4682.4,
         "nationalInsuranceAnnual": 0
       },
       "invariants": [

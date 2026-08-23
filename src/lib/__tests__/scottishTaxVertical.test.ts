@@ -117,7 +117,7 @@ const statutoryCases = annualFixtures.flatMap(({ taxYear, expectedTax, expectedE
   })),
 );
 
-function mainEngineInput(salary: number, taxYear: TaxYear, taxCode = 'S1257L') {
+function mainEngineInput(salary: number, taxYear: TaxYear, taxCode = '') {
   return {
     salary,
     payPeriod: 'annually',

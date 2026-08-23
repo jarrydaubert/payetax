@@ -12,7 +12,7 @@ const baseInput: TaxCalculationInput = {
   salary: 90000,
   payPeriod: 'annually',
   taxYear: '2025-2026',
-  taxCode: '1257L',
+  taxCode: '',
   isScottish: false,
   isMarried: false,
   partnerGrossWage: 0,

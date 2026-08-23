@@ -1,9 +1,9 @@
 /**
  * Supported public interface for PayeTax tax-domain consumers.
  *
- * Application code should import tax calculations, decoder behaviour and policy
- * reads from this module. The implementation remains in its existing files while
- * the domain is migrated one vertical at a time.
+ * Application code should import tax calculations, parser behaviour and policy
+ * reads from this module. Decoder-only presentation lives in
+ * `@/lib/tax-code-decoder` so it is not bundled with every calculator route.
  */
 
 export type { NICategory, TaxYear } from '@/constants/taxRates';
@@ -63,19 +63,21 @@ export { sliceScottishTaxableIncome } from './scottishIncomeTax';
 export type {
   TaxCodeBandOverride,
   TaxCodeClassification,
-  TaxCodeDecoded,
-  TaxCodeEmergencySuffix,
+  TaxCodeNonCumulativeMarker,
   TaxCodeParseResult,
   TaxCodePrefix,
+  TaxCodeRegion,
 } from './taxCode';
 export {
-  decodeTaxCode,
-  formatAllowance,
-  hasEmergencyTaxCodeSuffix,
+  getMonthlyKCodeAdditionalPay,
+  getTaxCodeRegionOverride,
+  hasNonCumulativeTaxCodeMarker,
   isTaxCodeEditCandidate,
   isValidTaxCode,
   normalizeTaxCode,
   parseTaxCode,
+  TAX_CODE_MAX_LENGTH,
+  TAX_CODE_NON_CUMULATIVE_MARKERS,
 } from './taxCode';
 export type { RukTaxPolicy, ScottishTaxPolicy, SelectedTaxPolicy } from './taxPolicy';
 export { parseSupportedTaxYear, resolveTaxYear, selectTaxPolicy } from './taxPolicy';

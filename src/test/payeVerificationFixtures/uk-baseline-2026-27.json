@@ -4,6 +4,7 @@
     "authority": "HMRC",
     "urls": [
       "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027",
+      "https://www.gov.uk/government/publications/tables-a-pay-adjustment-tables",
       "https://www.gov.uk/income-tax-rates",
       "https://www.gov.scot/publications/scottish-income-tax-rates-and-bands/pages/2026-to-2027/"
     ],
@@ -41,7 +42,7 @@
     },
     {
       "id": "uk-60k-1257L",
-      "description": "£60,000 rUK, 1257L. Taxable floor(5000-1048)=3952; 3142 at 20% + 810 at 40% = £952.40/mo; NI 251.28+16.22 = £267.50/mo.",
+      "description": "£60,000 rUK, 1257L. HMRC Tables A gives Month 1 free pay of £1,048.26; taxable floor(5000-1048.26)=3951; 3142 at 20% + 809 at 40% = £952.00/mo; NI 251.28+16.22 = £267.50/mo.",
       "input": {
         "salary": 60000,
         "payPeriod": "annually",
@@ -60,20 +61,20 @@
       },
       "expected": {
         "taxFreeAmount": 12570,
-        "incomeTaxAnnual": 11428.8,
+        "incomeTaxAnnual": 11424.0,
         "nationalInsuranceAnnual": 3210.0,
-        "netPayAnnual": 45361.2,
+        "netPayAnnual": 45366.0,
         "taxBandRates": [20, 40]
       }
     },
     {
       "id": "uk-110k-pa-taper",
-      "description": "£110,000 rUK. PA taper: 12570 - floor(10000/2) = £7,570 (free pay ceil(7570/12)=631). Taxable floor(9166.67-631)=8535; 3142 at 20% + 5393 at 40% = £2,785.60/mo; NI 251.28+99.55 = £350.83/mo.",
+      "description": "£110,000 rUK with code 757T, whose £7,570 coded amount reflects the PA taper: 12570 - floor(10000/2). HMRC Tables A gives Month 1 free pay of £631.59; taxable floor(9166.67-631.59)=8535; 3142 at 20% + 5393 at 40% = £2,785.60/mo; NI 251.28+99.55 = £350.83/mo.",
       "input": {
         "salary": 110000,
         "payPeriod": "annually",
         "taxYear": "2026-2027",
-        "taxCode": "1257L",
+        "taxCode": "757T",
         "isScottish": false,
         "isMarried": false,
         "partnerGrossWage": 0,
@@ -95,7 +96,7 @@
     },
     {
       "id": "scot-30k-S1257L",
-      "description": "£30,000 Scottish, S1257L. Taxable floor(2500-1048)=1452; 331 at 19% + 1082 at 20% + 39 at 21% = £287.48/mo (monthly band thresholds ceil(3967/12)=331, ceil(16956/12)=1413).",
+      "description": "£30,000 Scottish, S1257L. HMRC Tables A gives Month 1 free pay of £1,048.26; taxable floor(2500-1048.26)=1451; 331 at 19% + 1082 at 20% + 38 at 21% = £287.27/mo (monthly band thresholds ceil(3967/12)=331, ceil(16956/12)=1413).",
       "input": {
         "salary": 30000,
         "payPeriod": "annually",
@@ -114,10 +115,37 @@
       },
       "expected": {
         "taxFreeAmount": 12570,
-        "incomeTaxAnnual": 3449.76,
+        "incomeTaxAnnual": 3447.24,
         "nationalInsuranceAnnual": 1393.92,
-        "netPayAnnual": 25156.32,
+        "netPayAnnual": 25158.84,
         "taxBandRates": [19, 20, 21]
+      }
+    },
+    {
+      "id": "uk-30k-1000T-tables-a",
+      "description": "£30,000 rUK, 1000T. HMRC Tables A builds code 1000 from one complete 500 block (£416.67) plus the code-500 table amount (£417.42), giving £834.09 Month 1 free pay. Taxable floor(2500-834.09)=1665 at 20% = £333.00/mo (£3,996/yr).",
+      "input": {
+        "salary": 30000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1000T",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 10000,
+        "incomeTaxAnnual": 3996.0,
+        "nationalInsuranceAnnual": 1393.92,
+        "netPayAnnual": 24610.08,
+        "taxBandRates": [20]
       }
     }
   ]

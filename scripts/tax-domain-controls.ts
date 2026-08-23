@@ -173,6 +173,7 @@ function collectFiles(
 function isApplicationSource(path: string): boolean {
   if (TEST_FILE_PATTERN.test(path)) return false;
   if (path.startsWith('src/lib/tax/')) return false;
+  if (path === 'src/lib/tax-code-decoder.ts') return false;
   if (path === 'src/constants/taxRates.ts') return false;
   if (path === 'src/lib/taxCalculator.ts') return false;
   if (path === 'scripts/tax-domain-controls.ts') return false;
@@ -196,6 +197,7 @@ function isTaxInternalTarget(target: string): boolean {
   return (
     target === 'src/constants/taxRates' ||
     target === 'src/lib/taxCalculator' ||
+    target === 'src/lib/tax-code-decoder' ||
     target === 'src/lib/taxCodeDecoder' ||
     target === 'src/lib/tax' ||
     target.startsWith('src/lib/tax/')
@@ -253,7 +255,7 @@ export function findTaxImportViolations(sources: readonly SourceText[]): TaxImpo
     );
 
     function record(node: ts.Node, specifier: string, imports: string[]): void {
-      if (specifier === '@/lib/tax') return;
+      if (specifier === '@/lib/tax' || specifier === '@/lib/tax-code-decoder') return;
       const target = resolveImportTarget(source.path, specifier);
       if (!(target && isTaxInternalTarget(target))) return;
       const { line } = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile));

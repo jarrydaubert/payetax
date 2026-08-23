@@ -28,6 +28,7 @@ describe('calculatorResultsPresenter', () => {
       allowancesDeductions: 312,
       studentLoans: [],
       previousYearLabel: '2025',
+      taxCode: payslipInput.taxCode,
     });
 
     const gross = rows.find((row) => row.kind === 'gross');
@@ -38,7 +39,7 @@ describe('calculatorResultsPresenter', () => {
     const netPay = rows.find((row) => row.kind === 'netPay');
 
     expect(gross?.valuesByPeriod?.hourly).toBeCloseTo(23.62, 2);
-    expect(taxFree?.valuesByPeriod?.monthly).toBe(1048);
+    expect(taxFree?.valuesByPeriod?.monthly).toBe(1048.26);
     expect(incomeTax?.valuesByPeriod?.monthly).toBeCloseTo(568.2, 2);
     expect(incomeTax?.valuesByPeriod?.hourly).toBeCloseTo(3.28, 2);
     expect(nationalInsurance?.valuesByPeriod?.monthly).toBeCloseTo(227.32, 2);
@@ -47,6 +48,22 @@ describe('calculatorResultsPresenter', () => {
     expect(pension?.valuesByPeriod?.hourly).toBeCloseTo(1.18, 2);
     expect(netPay?.valuesByPeriod?.monthly).toBeCloseTo(3120.02, 2);
     expect(netPay?.valuesByPeriod?.hourly).toBeCloseTo(18, 2);
+  });
+
+  it('presents a K code as a positive amount added to taxable pay', () => {
+    const results = calculateTax({ ...payslipInput, taxCode: 'K475' });
+    const rows = buildResultsTableRows({
+      results,
+      previousYearLabel: '2025',
+      taxCode: 'K475',
+    });
+    const adjustment = rows.find((row) => row.kind === 'taxCodeAdjustment');
+
+    expect(adjustment).toEqual(
+      expect.objectContaining({ category: 'Added to Taxable Pay', annual: 4750 }),
+    );
+    expect(adjustment?.valuesByPeriod?.monthly).toBeGreaterThan(0);
+    expect(rows.some((row) => row.category === 'Tax-Free Allowance')).toBe(false);
   });
 
   it('keeps marginal-rate calculation out of presentational components', () => {

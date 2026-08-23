@@ -1,4 +1,5 @@
 import type { PayPeriod } from '@/constants/taxRates';
+import { parseTaxCode } from '@/lib/tax';
 import type { TaxCalculationResults } from '@/lib/types/calculator';
 
 export type ResultsTableRowKind =
@@ -6,6 +7,7 @@ export type ResultsTableRowKind =
   | 'employment'
   | 'otherIncome'
   | 'taxFree'
+  | 'taxCodeAdjustment'
   | 'taxable'
   | 'incomeTax'
   | 'taxBand'
@@ -37,6 +39,7 @@ interface BuildResultsTableRowsInput {
   previousYearResults?: TaxCalculationResults | null;
   whatIfResults?: TaxCalculationResults | null;
   previousYearLabel: string;
+  taxCode?: string;
 }
 
 export const PERIOD_LABEL_TO_PAY_PERIOD: Record<string, PayPeriod> = {
@@ -82,12 +85,35 @@ export function buildResultsTableRows({
   previousYearResults = null,
   whatIfResults = null,
   previousYearLabel,
+  taxCode = '',
 }: BuildResultsTableRowsInput): ResultsTableRowViewModel[] {
   const grossAnnual = getGrossAnnual(results);
   const whatIfGrossAnnual = whatIfResults ? getGrossAnnual(whatIfResults) : undefined;
   const yearChange = previousYearResults
     ? results.netPay.annually - previousYearResults.netPay.annually
     : 0;
+  const parsedTaxCode = parseTaxCode(taxCode, 0);
+  const isKCode = parsedTaxCode.isValid && parsedTaxCode.isKCode;
+  const taxCodeAmount = isKCode ? Math.abs(results.taxFreeAmount) : results.taxFreeAmount;
+  const whatIfTaxCodeAmount =
+    whatIfResults && isKCode ? Math.abs(whatIfResults.taxFreeAmount) : whatIfResults?.taxFreeAmount;
+  const taxCodePeriodValues = isKCode
+    ? Object.fromEntries(
+        Object.entries(results.taxFreeAmountByPeriod ?? {}).map(([period, amount]) => [
+          period,
+          Math.abs(amount),
+        ]),
+      )
+    : results.taxFreeAmountByPeriod;
+  const whatIfTaxCodePeriodValues =
+    whatIfResults && isKCode
+      ? Object.fromEntries(
+          Object.entries(whatIfResults.taxFreeAmountByPeriod ?? {}).map(([period, amount]) => [
+            period,
+            Math.abs(amount),
+          ]),
+        )
+      : whatIfResults?.taxFreeAmountByPeriod;
 
   const rows: ResultsTableRowViewModel[] = [
     {
@@ -128,14 +154,14 @@ export function buildResultsTableRows({
 
   rows.push(
     {
-      id: 'tax-free-allowance',
-      kind: 'taxFree',
-      category: 'Tax-Free Allowance',
-      annual: results.taxFreeAmount,
-      whatIfAnnual: whatIfResults?.taxFreeAmount,
-      valuesByPeriod: results.taxFreeAmountByPeriod,
-      whatIfValuesByPeriod: whatIfResults?.taxFreeAmountByPeriod,
-      percentage: calculatePercentage(results.taxFreeAmount, grossAnnual),
+      id: isKCode ? 'tax-code-adjustment' : 'tax-free-allowance',
+      kind: isKCode ? 'taxCodeAdjustment' : 'taxFree',
+      category: isKCode ? 'Added to Taxable Pay' : 'Tax-Free Allowance',
+      annual: taxCodeAmount,
+      whatIfAnnual: whatIfTaxCodeAmount,
+      valuesByPeriod: taxCodePeriodValues,
+      whatIfValuesByPeriod: whatIfTaxCodePeriodValues,
+      percentage: calculatePercentage(taxCodeAmount, grossAnnual),
     },
     {
       id: 'total-taxable',

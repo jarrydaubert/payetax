@@ -1,361 +1,135 @@
-// src/lib/__tests__/taxCodeDecoder.test.ts
-/**
- * Tax Code Decoder Tests
- *
- * Tests the parsing and interpretation of UK HMRC tax codes including:
- * - Standard codes (1257L)
- * - Scottish/Welsh prefixes (S, C)
- * - Special codes (BR, D0, D1, NT, 0T)
- * - K codes (negative allowance)
- * - Emergency codes (W1, M1, X)
- * - Marriage allowance (M, N)
- * - Invalid/edge cases
- */
+import {
+  decodeTaxCode,
+  formatTaxCodeAmount,
+  TAX_CODE_REFERENCE_ENTRIES,
+} from '@/lib/tax-code-decoder';
 
-import { decodeTaxCode, formatAllowance } from '@/lib/tax';
-
-describe('taxCodeDecoder', () => {
-  describe('Standard Tax Codes', () => {
-    it('should decode 1257L correctly', () => {
-      const result = decodeTaxCode('1257L');
-
-      expect(result.isValid).toBe(true);
-      expect(result.code).toBe('1257L');
-      expect(result.allowance).toBe(12570);
-      expect(result.letter).toBe('L');
-      expect(result.isScottish).toBe(false);
-      expect(result.isWelsh).toBe(false);
-      expect(result.isEmergency).toBe(false);
-      expect(result.meaning).toBe('Standard personal allowance');
-    });
-
-    it('should decode lowercase 1257l correctly', () => {
-      const result = decodeTaxCode('1257l');
-
-      expect(result.isValid).toBe(true);
-      expect(result.code).toBe('1257L');
-      expect(result.allowance).toBe(12570);
-    });
-
-    it('should handle codes with whitespace', () => {
-      const result = decodeTaxCode('  1257L  ');
-
-      expect(result.isValid).toBe(true);
-      expect(result.allowance).toBe(12570);
-    });
-
-    it('should decode 1000L correctly', () => {
-      const result = decodeTaxCode('1000L');
-
-      expect(result.isValid).toBe(true);
-      expect(result.allowance).toBe(10000);
-      expect(result.details.some((d) => d.includes('below the standard amount'))).toBe(true);
-    });
-
-    it('should decode 1500L correctly (higher than standard)', () => {
-      const result = decodeTaxCode('1500L');
-
-      expect(result.isValid).toBe(true);
-      expect(result.allowance).toBe(15000);
-      expect(result.details.some((d) => d.includes('higher than standard'))).toBe(true);
-    });
-
-    it('should decode T suffix correctly', () => {
-      const result = decodeTaxCode('1000T');
-
-      expect(result.isValid).toBe(true);
-      expect(result.letter).toBe('T');
-      expect(result.meaning).toBe('Other calculations required');
-    });
+describe('tax-code decoder semantics', () => {
+  it.each(['', '   '])('handles empty input %j without presenting a result', (code) => {
+    expect(decodeTaxCode(code)).toEqual(
+      expect.objectContaining({
+        isValid: false,
+        meaning: 'No tax code provided',
+        amount: null,
+        isScottish: false,
+        isWelsh: false,
+        isEmergency: false,
+      }),
+    );
   });
 
-  describe('Scottish Tax Codes', () => {
-    it('should decode S1257L correctly', () => {
-      const result = decodeTaxCode('S1257L');
+  it('describes a numeric code as HMRC-assigned tax-free income for this source', () => {
+    const result = decodeTaxCode('1000L');
 
-      expect(result.isValid).toBe(true);
-      expect(result.isScottish).toBe(true);
-      expect(result.prefix).toBe('S');
-      expect(result.allowance).toBe(12570);
-      expect(result.details.some((d) => d.includes('Scottish'))).toBe(true);
-    });
-
-    it('should decode SBR as the Scottish basic rate', () => {
-      const result = decodeTaxCode('SBR');
-
-      expect(result.isValid).toBe(true);
-      expect(result.isScottish).toBe(true);
-      expect(result.letter).toBe('BR');
-      expect(result.allowance).toBe(0);
-      expect(result.meaning).toBe('Scottish basic rate on all income');
-      expect(result.details.some((d) => d.includes('20%'))).toBe(true);
-    });
-
-    it('should decode SD0 as the Scottish intermediate rate (21%, not rUK 40%)', () => {
-      const result = decodeTaxCode('SD0');
-
-      expect(result.isValid).toBe(true);
-      expect(result.isScottish).toBe(true);
-      expect(result.letter).toBe('D0');
-      expect(result.allowance).toBe(0);
-      expect(result.meaning).toBe('Scottish intermediate rate on all income');
-      expect(result.details.some((d) => d.includes('21%'))).toBe(true);
-    });
-
-    it('should decode SD1 as the Scottish higher rate (42%, not rUK 45%)', () => {
-      const result = decodeTaxCode('SD1');
-
-      expect(result.isValid).toBe(true);
-      expect(result.letter).toBe('D1');
-      expect(result.meaning).toBe('Scottish higher rate on all income');
-      expect(result.details.some((d) => d.includes('42%'))).toBe(true);
-    });
-
-    it('should decode SD2 as the Scottish advanced rate', () => {
-      const result = decodeTaxCode('SD2');
-
-      expect(result.isValid).toBe(true);
-      expect(result.letter).toBe('D2');
-      expect(result.allowance).toBe(0);
-      expect(result.meaning).toBe('Scottish advanced rate on all income');
-      expect(result.details.some((d) => d.includes('45%'))).toBe(true);
-    });
-
-    it('should decode SD3 as the Scottish top rate', () => {
-      const result = decodeTaxCode('SD3');
-
-      expect(result.isValid).toBe(true);
-      expect(result.letter).toBe('D3');
-      expect(result.allowance).toBe(0);
-      expect(result.meaning).toBe('Scottish top rate on all income');
-      expect(result.details.some((d) => d.includes('48%'))).toBe(true);
-    });
-
-    it('should reject bare D2/D3 (Scottish-only codes)', () => {
-      expect(decodeTaxCode('D2').isValid).toBe(false);
-      expect(decodeTaxCode('D3').isValid).toBe(false);
-    });
-
-    it('should decode S0T correctly', () => {
-      const result = decodeTaxCode('S0T');
-
-      expect(result.isValid).toBe(true);
-      expect(result.isScottish).toBe(true);
-      expect(result.letter).toBe('0T');
-    });
+    expect(result).toEqual(
+      expect.objectContaining({
+        isValid: true,
+        taxFreeAmount: 10_000,
+        amountLabel: 'Tax-free amount from this source',
+        amount: 10_000,
+      }),
+    );
+    expect(result.details.join(' ')).toContain('tax-free income from this employment or pension');
+    expect(result.details.join(' ')).not.toContain('Your Personal Allowance is');
   });
 
-  describe('Welsh Tax Codes', () => {
-    it('should decode C1257L correctly', () => {
-      const result = decodeTaxCode('C1257L');
+  it.each([
+    ['1383M', 'Marriage Allowance received'],
+    ['1131N', 'Marriage Allowance transferred'],
+  ] as const)('does not apply contradictory arithmetic to %s', (code, meaning) => {
+    const result = decodeTaxCode(code);
 
-      expect(result.isValid).toBe(true);
-      expect(result.isWelsh).toBe(true);
-      expect(result.prefix).toBe('C');
-      expect(result.allowance).toBe(12570);
-      expect(result.details.some((d) => d.includes('Welsh'))).toBe(true);
-    });
-
-    it('should decode CBR correctly', () => {
-      const result = decodeTaxCode('CBR');
-
-      expect(result.isValid).toBe(true);
-      expect(result.isWelsh).toBe(true);
-      expect(result.letter).toBe('BR');
-    });
+    expect(result.meaning).toBe(meaning);
+    expect(result.details.join(' ')).toContain('already reflects HMRC');
+    expect(result.details.join(' ')).not.toContain('£1,260');
   });
 
-  describe('Special Tax Codes', () => {
-    it('should decode BR correctly', () => {
-      const result = decodeTaxCode('BR');
+  it('presents K475 as an amount added to taxable pay with the deduction restriction', () => {
+    const result = decodeTaxCode('K475');
 
-      expect(result.isValid).toBe(true);
-      expect(result.letter).toBe('BR');
-      expect(result.allowance).toBe(0);
-      expect(result.meaning).toBe('Basic rate on all income');
-      expect(result.details.some((d) => d.includes('20%'))).toBe(true);
-    });
-
-    it('should decode D0 correctly', () => {
-      const result = decodeTaxCode('D0');
-
-      expect(result.isValid).toBe(true);
-      expect(result.letter).toBe('D0');
-      expect(result.allowance).toBe(0);
-      expect(result.meaning).toBe('Higher rate on all income');
-      expect(result.details.some((d) => d.includes('40%'))).toBe(true);
-    });
-
-    it('should decode D1 correctly', () => {
-      const result = decodeTaxCode('D1');
-
-      expect(result.isValid).toBe(true);
-      expect(result.letter).toBe('D1');
-      expect(result.allowance).toBe(0);
-      expect(result.meaning).toBe('Additional rate on all income');
-      expect(result.details.some((d) => d.includes('45%'))).toBe(true);
-    });
-
-    it('should decode NT correctly', () => {
-      const result = decodeTaxCode('NT');
-
-      expect(result.isValid).toBe(true);
-      expect(result.letter).toBe('NT');
-      expect(result.allowance).toBe(0);
-      expect(result.meaning).toBe('No tax deducted');
-    });
-
-    it('should decode 0T correctly', () => {
-      const result = decodeTaxCode('0T');
-
-      expect(result.isValid).toBe(true);
-      expect(result.letter).toBe('0T');
-      expect(result.allowance).toBe(0);
-      expect(result.meaning).toBe('No Personal Allowance');
-    });
+    expect(result).toEqual(
+      expect.objectContaining({
+        isValid: true,
+        taxFreeAmount: null,
+        kAdjustment: 4_750,
+        amountLabel: 'Added to taxable pay',
+        amount: 4_750,
+        meaning: 'Amount added to taxable pay',
+      }),
+    );
+    expect(result.details.join(' ')).toContain('£4,750 is added to taxable pay');
+    expect(result.warnings.join(' ')).toContain('cannot exceed 50% of pre-tax pay or pension');
+    expect(result.details.join(' ')).not.toContain('negative Personal Allowance');
   });
 
-  describe('K Codes (Negative Allowance)', () => {
-    it('should decode K100 correctly', () => {
-      const result = decodeTaxCode('K100');
+  it.each([
+    ['1257L W1', 'W1', 'weekly pay'],
+    ['S875L M1', 'M1', 'monthly pay'],
+    ['C663L X', 'X', 'pay dates vary'],
+    ['1257L NONCUM', 'NONCUM', 'payroll software'],
+  ] as const)('explains the %s non-cumulative form', (code, marker, detail) => {
+    const result = decodeTaxCode(code);
 
-      expect(result.isValid).toBe(true);
-      expect(result.letter).toBe('K');
-      expect(result.allowance).toBe(-1000);
-      expect(result.meaning).toBe('Tax code adds to your taxable income');
-      expect(result.warnings.length).toBeGreaterThan(0);
-    });
-
-    it('should decode K475 correctly', () => {
-      const result = decodeTaxCode('K475');
-
-      expect(result.isValid).toBe(true);
-      expect(result.allowance).toBe(-4750);
-      expect(result.details.some((d) => d.includes('4,750'))).toBe(true);
-    });
-
-    it('should decode SK100 (Scottish K code) correctly', () => {
-      const result = decodeTaxCode('SK100');
-
-      expect(result.isValid).toBe(true);
-      expect(result.isScottish).toBe(true);
-      expect(result.letter).toBe('K');
-      expect(result.allowance).toBe(-1000);
-    });
+    expect(result).toEqual(
+      expect.objectContaining({ isValid: true, isEmergency: true, suffix: marker }),
+    );
+    expect(result.details.join(' ')).toContain(detail);
+    expect(result.warnings.join(' ')).toContain('current pay period');
   });
 
-  describe('Emergency Tax Codes', () => {
-    it('should decode 1257L W1 correctly', () => {
-      const result = decodeTaxCode('1257LW1');
+  it.each([
+    ['SBR', 'Scottish basic rate', '20%'],
+    ['SD0', 'Scottish intermediate rate', '21%'],
+    ['SD1', 'Scottish higher rate', '42%'],
+    ['SD2', 'Scottish advanced rate', '45%'],
+    ['SD3', 'Scottish top rate', '48%'],
+    ['CBR', 'Welsh basic rate', '20%'],
+    ['CD0', 'Welsh higher rate', '40%'],
+    ['CD1', 'Welsh additional rate', '45%'],
+  ] as const)('uses region-aware meaning for %s', (code, meaning, rate) => {
+    const result = decodeTaxCode(code);
 
-      expect(result.isValid).toBe(true);
-      expect(result.isEmergency).toBe(true);
-      expect(result.suffix).toBe('W1');
-      expect(result.allowance).toBe(12570);
-      expect(result.warnings.some((w) => w.includes('emergency'))).toBe(true);
-    });
-
-    it('should decode 1257L M1 correctly', () => {
-      const result = decodeTaxCode('1257LM1');
-
-      expect(result.isValid).toBe(true);
-      expect(result.isEmergency).toBe(true);
-      expect(result.suffix).toBe('M1');
-    });
-
-    it('should decode 1257L X correctly', () => {
-      const result = decodeTaxCode('1257LX');
-
-      expect(result.isValid).toBe(true);
-      expect(result.isEmergency).toBe(true);
-      expect(result.suffix).toBe('X');
-      expect(result.warnings.some((w) => w.includes('non-cumulative'))).toBe(true);
-    });
-
-    it('should decode S1257LW1 (Scottish emergency) correctly', () => {
-      const result = decodeTaxCode('S1257LW1');
-
-      expect(result.isValid).toBe(true);
-      expect(result.isScottish).toBe(true);
-      expect(result.isEmergency).toBe(true);
-      expect(result.prefix).toBe('S');
-      expect(result.suffix).toBe('W1');
-    });
+    expect(result.meaning).toContain(meaning);
+    expect(result.details.join(' ')).toContain(rate);
   });
 
-  describe('Marriage Allowance Codes', () => {
-    it('should decode 1257M correctly (receiving)', () => {
-      const result = decodeTaxCode('1257M');
-
-      expect(result.isValid).toBe(true);
-      expect(result.letter).toBe('M');
-      expect(result.allowance).toBe(12570);
-      expect(result.meaning).toBe('Marriage Allowance - receiving');
-      expect(result.details.some((d) => d.includes('1,260'))).toBe(true);
-    });
-
-    it('should decode 1257N correctly (transferring)', () => {
-      const result = decodeTaxCode('1257N');
-
-      expect(result.isValid).toBe(true);
-      expect(result.letter).toBe('N');
-      expect(result.allowance).toBe(12570);
-      expect(result.meaning).toBe('Marriage Allowance - transferring');
-    });
+  it('keeps the visible static reference derived from the same semantic owner', () => {
+    expect(TAX_CODE_REFERENCE_ENTRIES).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: 'SD0–SD3',
+          description: expect.stringContaining('Scottish'),
+        }),
+        expect.objectContaining({
+          code: 'CD0 / CD1',
+          description: expect.stringContaining('Welsh'),
+        }),
+        expect.objectContaining({
+          code: 'W1 / M1 / X / NONCUM',
+          description: expect.stringContaining('non-cumulative'),
+        }),
+      ]),
+    );
   });
 
-  describe('Invalid and Edge Cases', () => {
-    it('should handle empty string', () => {
-      const result = decodeTaxCode('');
+  it.each([
+    '1257',
+    'K0',
+    'K10000',
+    'CD2',
+    'SNT',
+    '1257L W1 M1',
+  ])('does not confidently decode malformed input %j', (code) => {
+    const result = decodeTaxCode(code);
 
-      expect(result.isValid).toBe(false);
-      expect(result.meaning).toBe('No tax code provided');
-    });
-
-    it('should handle whitespace only', () => {
-      const result = decodeTaxCode('   ');
-
-      expect(result.isValid).toBe(false);
-    });
-
-    it('should handle invalid format', () => {
-      const result = decodeTaxCode('INVALID');
-
-      expect(result.isValid).toBe(false);
-      expect(result.warnings.length).toBeGreaterThan(0);
-      expect(result.meaning).toBe('Unrecognized tax code format');
-    });
-
-    it('should handle numbers only (no letter)', () => {
-      const result = decodeTaxCode('1257');
-
-      // Numbers without letter should still be valid (implied L)
-      expect(result.isValid).toBe(true);
-      expect(result.allowance).toBe(12570);
-    });
-
-    it('should handle code with special characters', () => {
-      const result = decodeTaxCode('1257L!');
-
-      expect(result.isValid).toBe(false);
-    });
+    expect(result.isValid).toBe(false);
+    expect(result.meaning).toBe('Unrecognized or unsupported tax code');
+    expect(result.warnings).not.toHaveLength(0);
   });
 
-  describe('formatAllowance', () => {
-    it('should format positive allowance', () => {
-      expect(formatAllowance(12570)).toBe('£12,570');
-    });
-
-    it('should format zero allowance', () => {
-      expect(formatAllowance(0)).toBe('£0');
-    });
-
-    it('should format negative allowance (K codes)', () => {
-      expect(formatAllowance(-4750)).toBe('-£4,750');
-    });
-
-    it('should handle null', () => {
-      expect(formatAllowance(null)).toBe('N/A');
-    });
+  it('formats only non-negative user-visible code amounts', () => {
+    expect(formatTaxCodeAmount(12_570)).toBe('£12,570');
+    expect(formatTaxCodeAmount(0)).toBe('£0');
+    expect(formatTaxCodeAmount(null)).toBe('N/A');
   });
 });
