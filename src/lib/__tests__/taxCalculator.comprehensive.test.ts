@@ -17,7 +17,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
     salary: 30000,
     payPeriod: 'annually',
     taxYear: '2025-2026',
-    taxCode: '1257L',
+    taxCode: '',
     isScottish: false,
     isMarried: false,
     partnerGrossWage: 0,
@@ -485,9 +485,9 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
 
       // Should apply Scottish tax rates (may have same number of bands stored)
       expect(result.taxBands.length).toBeGreaterThanOrEqual(3); // At least 3 bands
-      // Age allowance should be partially tapered
-      expect(result.taxFreeAmount).toBeGreaterThan(12570);
-      expect(result.taxFreeAmount).toBeLessThan(20920); // Not full allowances due to tapering
+      // The explicit code is the single owner of the coded tax-free amount;
+      // separate marriage and blind controls must not be added again.
+      expect(result.taxFreeAmount).toBe(12570);
     });
 
     it('apprentice under 21 with student loan', () => {

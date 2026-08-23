@@ -21,17 +21,6 @@ jest.mock('@/lib/sentry', () => ({
   })),
 }));
 
-// Mock taxCalculator
-jest.mock('@/lib/taxCalculator', () => ({
-  calculateTax: jest.fn(() => ({
-    netPay: { annually: 40000, monthly: 3333, weekly: 769, daily: 154 },
-    incomeTax: { annually: 8000, monthly: 667, weekly: 154, daily: 31 },
-    nationalInsurance: { annually: 4000, monthly: 333, weekly: 77, daily: 15 },
-    studentLoan: { annually: 0, monthly: 0, weekly: 0, daily: 0 },
-    pension: { annually: 0, monthly: 0, weekly: 0, daily: 0 },
-  })),
-}));
-
 import { setNodeEnv } from '@/test/env';
 import { useCalculatorStore } from '../calculatorStore';
 
@@ -182,12 +171,13 @@ describe('Calculator Store Validation', () => {
         'SD1',
         'SD2',
         'SD3',
-        'SNT',
         'CBR',
         'C0T',
         'SD0W1',
         'SD2M1',
         '1257LX',
+        '1257LNONCUM',
+        'K475W1',
       ];
 
       for (const code of validCodes) {
@@ -239,13 +229,31 @@ describe('Calculator Store Validation', () => {
       expect(useCalculatorStore.getState().input.taxCode).toBe('');
     });
 
+    it('preserves a blank code through calculation so it is not treated as explicit 1257L', () => {
+      useCalculatorStore.getState().reset();
+      useCalculatorStore.getState().setInput({
+        salary: 110000,
+        payPeriod: 'annually',
+        taxYear: '2026-2027',
+        taxCode: '',
+        isBlind: true,
+      });
+
+      useCalculatorStore.getState().calculate();
+
+      // £12,570 tapered by £5,000, then the independent £3,250 blind allowance.
+      expect(useCalculatorStore.getState().results?.taxFreeAmount).toBe(10820);
+    });
+
     it('should reject invalid tax code', () => {
       const { setTaxCode } = useCalculatorStore.getState();
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
 
       setTaxCode('INVALID123');
+      setTaxCode('SNT');
+      setTaxCode('K10000');
 
-      expect(consoleSpy).toHaveBeenCalled();
+      expect(consoleSpy).toHaveBeenCalledTimes(3);
       consoleSpy.mockRestore();
     });
   });

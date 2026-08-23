@@ -1,4 +1,5 @@
 import * as taxDomain from '@/lib/tax';
+import * as taxCodeDecoder from '@/lib/tax-code-decoder';
 
 describe('tax-domain public interface', () => {
   it('keeps the runtime surface narrow and intentional', () => {
@@ -6,6 +7,8 @@ describe('tax-domain public interface', () => {
       'CURRENT_TAX_YEAR',
       'SCOTTISH_TAX_RATES',
       'STATE_PENSION_AGE_NI_EXEMPTION',
+      'TAX_CODE_MAX_LENGTH',
+      'TAX_CODE_NON_CUMULATIVE_MARKERS',
       'TAX_RATES',
       'TAX_YEARS',
       'TAX_YEAR_SOURCES',
@@ -13,8 +16,6 @@ describe('tax-domain public interface', () => {
       'calculateEmployerNI',
       'calculateIncomeTax',
       'calculateTax',
-      'decodeTaxCode',
-      'formatAllowance',
       'formatTaxYearDisplay',
       'getClass1PeriodThresholds',
       'getDirectorsAnnualPrimaryRate',
@@ -24,8 +25,10 @@ describe('tax-domain public interface', () => {
       'getEmployerNI',
       'getEmployerNIRate',
       'getEmployerNIThreshold',
+      'getMonthlyKCodeAdditionalPay',
       'getPayDateForTaxPeriod',
-      'hasEmergencyTaxCodeSuffix',
+      'getTaxCodeRegionOverride',
+      'hasNonCumulativeTaxCodeMarker',
       'isEmployeeNIExempt',
       'isTaxCodeEditCandidate',
       'isValidTaxCode',
@@ -40,6 +43,17 @@ describe('tax-domain public interface', () => {
       'sliceRukTaxableIncome',
       'sliceScottishTaxableIncome',
       'taxableThresholdToTotalIncome',
+    ]);
+  });
+
+  it('keeps decoder prose on its decoder-only public interface', () => {
+    expect(Object.keys(taxCodeDecoder).sort()).toEqual([
+      'CURRENT_TAX_YEAR_DISPLAY',
+      'TAX_CODE_MAX_LENGTH',
+      'TAX_CODE_REFERENCE_ENTRIES',
+      'decodeTaxCode',
+      'formatTaxCodeAmount',
+      'normalizeTaxCode',
     ]);
   });
 

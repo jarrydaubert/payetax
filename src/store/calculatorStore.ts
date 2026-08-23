@@ -57,6 +57,7 @@ import {
   normalizeTaxCode,
   parseSupportedTaxYear,
   resolveTaxYear,
+  TAX_CODE_MAX_LENGTH,
 } from '@/lib/tax';
 import {
   INCOME_SOURCE_TYPES,
@@ -505,7 +506,7 @@ const CalculatorInputPartialSchema = z
     salary: SALARY_INPUT_SCHEMA.optional(),
     payPeriod: PAY_PERIOD_INPUT_SCHEMA.optional(),
     taxYear: TAX_YEAR_INPUT_SCHEMA.optional(),
-    taxCode: z.string().max(20).optional(),
+    taxCode: z.string().max(TAX_CODE_MAX_LENGTH).optional(),
     region: REGION_INPUT_SCHEMA.optional(),
     isScottish: z.boolean().optional(),
     isMarried: z.boolean().optional(),
@@ -994,17 +995,16 @@ export const useCalculatorStore = create<CalculatorState>()(
               throw new Error('Salary cannot be negative');
             }
 
-            // Default tax code if not provided
-            const taxCodeToUse =
-              input.taxCode.trim() || (input.region === 'Scotland' ? 'S1257L' : '1257L');
-            const inputWithDefaults = {
+            // Preserve an empty code so the engine can distinguish its standard
+            // scenario allowance from an explicit HMRC coding instruction.
+            const inputWithNormalizedTaxCode = {
               ...input,
-              taxCode: taxCodeToUse,
+              taxCode: input.taxCode.trim(),
             };
 
-            const results = calculateTax(inputWithDefaults);
+            const results = calculateTax(inputWithNormalizedTaxCode);
             set({ results });
-            reportCalculationAnomalies(results, inputWithDefaults, 'primary');
+            reportCalculationAnomalies(results, inputWithNormalizedTaxCode, 'primary');
 
             // Track successful calculation
             addBreadcrumb('calculator', {

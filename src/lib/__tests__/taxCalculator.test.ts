@@ -51,7 +51,7 @@ import { calculateTax, type TaxCalculationInput } from '../taxCalculator';
  *
  * ### Default Values:
  * - Tax Year: 2024-2025 (current HMRC rates)
- * - Tax Code: 1257L (standard personal allowance)
+ * - Tax Code: blank (derive statutory allowances from scenario inputs)
  * - Location: England/Wales (non-Scottish rates)
  * - NI Category: A (standard employee)
  * - Hours: 37.5/week (standard full-time)
@@ -80,7 +80,7 @@ const createBasicInput = (
   salary,
   payPeriod: 'annually',
   taxYear: '2024-2025',
-  taxCode: '1257L',
+  taxCode: '',
   isScottish: false,
   isMarried: false,
   partnerGrossWage: 0,
@@ -1031,17 +1031,15 @@ describe('Tax Calculator', () => {
       }
     });
 
-    it('falls back to default tax code for empty or undefined taxCode input', () => {
+    it('uses the same policy fallback for empty or undefined taxCode input', () => {
       const emptyCode = calculateTax(createBasicInput(30000, { taxCode: '' }));
       const undefinedCode = calculateTax(
         createBasicInput(30000, { taxCode: undefined as unknown as string }),
       );
-      const baseline = calculateTax(createBasicInput(30000, { taxCode: '1257L' }));
 
-      expect(emptyCode.taxFreeAmount).toBe(baseline.taxFreeAmount);
-      expect(undefinedCode.taxFreeAmount).toBe(baseline.taxFreeAmount);
-      expect(emptyCode.incomeTax.annually).toBeCloseTo(baseline.incomeTax.annually, 2);
-      expect(undefinedCode.incomeTax.annually).toBeCloseTo(baseline.incomeTax.annually, 2);
+      expect(emptyCode.taxFreeAmount).toBe(12570);
+      expect(undefinedCode.taxFreeAmount).toBe(emptyCode.taxFreeAmount);
+      expect(undefinedCode.incomeTax.annually).toBeCloseTo(emptyCode.incomeTax.annually, 2);
     });
 
     it('handles very high salary', () => {

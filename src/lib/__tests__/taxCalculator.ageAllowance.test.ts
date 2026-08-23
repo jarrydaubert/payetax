@@ -19,7 +19,7 @@ describe('Age and State Pension age', () => {
     salary,
     payPeriod: 'annually',
     taxYear: '2024-2025',
-    taxCode: '1257L',
+    taxCode: '',
     isScottish: false,
     isMarried: false,
     partnerGrossWage: 0,

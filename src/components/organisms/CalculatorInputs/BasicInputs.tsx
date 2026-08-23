@@ -20,14 +20,12 @@ import {
 } from '@/components/ui/select';
 import { PERIODS, type StudentLoanPlan } from '@/constants/taxRates';
 import { trackFormInteraction } from '@/lib/analytics';
+import { normalizeTaxCode, TAX_CODE_MAX_LENGTH } from '@/lib/tax';
 import { cn } from '@/lib/utils';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
 
 /** State Pension Age threshold - employees over SPA don't pay NI */
 const STATE_PENSION_AGE = 66;
-
-/** Tax code validation: letters, numbers, optional K prefix, max 10 chars */
-const TAX_CODE_REGEX = /^[A-Z0-9]{0,10}$/;
 
 export function BasicInputs() {
   const trackedFieldFocusesRef = useRef<Set<string>>(new Set());
@@ -181,15 +179,10 @@ export function BasicInputs() {
    * Normalize tax code input:
    * - Uppercase
    * - Remove spaces
-   * - Strip invalid characters
-   * - Cap at 10 characters
+   * - Leave semantic validation to the shared tax-code model in the store
    */
   const handleTaxCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value.toUpperCase().replace(/\s+/g, '');
-    // Only allow valid tax code characters
-    if (TAX_CODE_REGEX.test(raw)) {
-      setTaxCode(raw);
-    }
+    setTaxCode(normalizeTaxCode(e.target.value, 'edit'));
   };
 
   return (
@@ -287,8 +280,8 @@ export function BasicInputs() {
           onChange={handleTaxCodeChange}
           onFocus={() => trackCalculatorFieldFocus('tax_code')}
           placeholder={input.region === 'Scotland' ? 'S1257L' : '1257L'}
-          className={cn(fieldControlClass, 'w-28 max-w-full uppercase')}
-          maxLength={10}
+          className={cn(fieldControlClass, 'w-full max-w-full font-mono uppercase sm:w-52')}
+          maxLength={TAX_CODE_MAX_LENGTH}
           data-testid='tax-code-input'
         />
       </div>

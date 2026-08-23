@@ -276,8 +276,8 @@ test.describe('HMRC Golden Master 2025/26 – Regression Suite', () => {
         await selectTaxYear(page, scenario.taxYear);
       }
 
-      // 3. Tax Code (if not default)
-      if (input.taxCode && input.taxCode !== '1257L') {
+      // 3. Tax Code (every declared code is deliberate; the UI starts blank)
+      if (input.taxCode) {
         const taxCodeInput = page.getByTestId('tax-code-input');
         const exists = await taxCodeInput.isVisible({ timeout: 2000 }).catch(() => false);
         if (exists) {
@@ -348,7 +348,7 @@ test.describe('HMRC Golden Master 2025/26 – Regression Suite', () => {
         }
       }
 
-      // Marriage allowance scenarios are driven via the tax code (e.g. 1257M),
+      // Marriage Allowance scenarios are driven via an HMRC-issued code (e.g. 1383M),
       // so no checkbox interaction is needed; partnerGrossWage documents the
       // scenario in the fixture but the M/N code carries the calculation.
 

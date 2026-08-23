@@ -16,7 +16,7 @@ describe('Marriage Allowance - Comprehensive Tests', () => {
     salary,
     payPeriod: 'annually',
     taxYear: '2024-2025',
-    taxCode: '1257L',
+    taxCode: '',
     isScottish: false,
     isMarried: true,
     partnerGrossWage: partnerWage,

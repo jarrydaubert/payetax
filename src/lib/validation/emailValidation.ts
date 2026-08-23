@@ -8,6 +8,7 @@
 
 import { z } from 'zod';
 import { PERIODS, TAX_YEARS } from '@/constants/taxRates';
+import { isValidTaxCode, TAX_CODE_MAX_LENGTH } from '@/lib/tax';
 import { INCOME_SOURCE_TYPES } from '@/lib/types/calculator';
 import { CurrencyAmountSchema, DirectorTaxYearSchema, RegionSchema } from './directorValidation';
 
@@ -106,7 +107,12 @@ export const PayeEmailInputSchema = z.object({
   salary: payeMoneyField,
   payPeriod: z.enum(payePeriods),
   taxYear: z.enum(payeTaxYears),
-  taxCode: z.string().max(20),
+  taxCode: z
+    .string()
+    .max(TAX_CODE_MAX_LENGTH)
+    .refine((value) => value.trim() === '' || isValidTaxCode(value), {
+      message: 'Enter a complete supported HMRC tax code or leave it blank',
+    }),
   isScottish: z.boolean(),
   isMarried: z.boolean(),
   partnerGrossWage: payeMoneyField,

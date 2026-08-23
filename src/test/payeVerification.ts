@@ -52,8 +52,8 @@ export type FixtureInvariant =
 /** Expected `decodeTaxCode` behaviour for the scenario's tax code. */
 export interface FixtureDecoderExpectation {
   isValid: boolean;
-  /** Expected decoded allowance (null when the decoder reports none). */
-  allowance: number | null;
+  /** Expected amount displayed by the decoder (null for flat-rate codes). */
+  amount: number | null;
   /** Case-insensitive substring the decoder meaning must contain. */
   meaningIncludes: string;
 }
@@ -116,6 +116,14 @@ function assertSuiteShape(fileName: string, raw: unknown): VerificationSuite {
     }
     if (!(scenario.expected || scenario.invariants?.length || scenario.decoder)) {
       fail(`scenario "${scenario.id}" asserts nothing`);
+    }
+    if (
+      scenario.decoder &&
+      (typeof scenario.decoder.isValid !== 'boolean' ||
+        !(typeof scenario.decoder.amount === 'number' || scenario.decoder.amount === null) ||
+        typeof scenario.decoder.meaningIncludes !== 'string')
+    ) {
+      fail(`scenario "${scenario.id}" has an incomplete decoder expectation`);
     }
     for (const invariant of scenario.invariants ?? []) {
       if (!KNOWN_INVARIANTS.includes(invariant)) {

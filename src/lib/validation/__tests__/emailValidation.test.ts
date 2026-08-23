@@ -47,6 +47,13 @@ describe('TaxYearStringSchema', () => {
 describe('PayeEmailInputSchema', () => {
   it('accepts valid PAYE input payloads', () => {
     expect(PayeEmailInputSchema.safeParse(validPayeInput).success).toBe(true);
+    expect(PayeEmailInputSchema.safeParse({ ...validPayeInput, taxCode: '' }).success).toBe(true);
+  });
+
+  it('rejects incomplete or malformed tax codes before recalculating an email', () => {
+    for (const taxCode of ['K', 'K100ABC', '1257', '100000L']) {
+      expect(PayeEmailInputSchema.safeParse({ ...validPayeInput, taxCode }).success).toBe(false);
+    }
   });
 
   it('rejects duplicate student loan plans', () => {

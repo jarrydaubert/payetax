@@ -1,12 +1,8 @@
-import {
-  CURRENT_TAX_YEAR,
-  formatTaxYearDisplay,
-  SCOTTISH_TAX_RATES,
-  TAX_RATES,
-} from '@/constants/taxRates';
-
 export type TaxCodePrefix = 'S' | 'C' | null;
-export type TaxCodeEmergencySuffix = 'W1' | 'M1' | 'X' | null;
+export type TaxCodeRegion = 'Scotland' | 'Wales' | null;
+export const TAX_CODE_NON_CUMULATIVE_MARKERS = ['W1', 'M1', 'X', 'NONCUM'] as const;
+export type TaxCodeNonCumulativeMarker = (typeof TAX_CODE_NON_CUMULATIVE_MARKERS)[number] | null;
+export const TAX_CODE_MAX_LENGTH = 20;
 export type TaxCodeBandOverride = 'BR' | 'D0' | 'D1' | 'D2' | 'D3' | 'NT' | null;
 export type TaxCodeClassification =
   | 'empty'
@@ -23,8 +19,13 @@ export interface TaxCodeParseResult {
   classification: TaxCodeClassification;
   isValid: boolean;
   prefix: TaxCodePrefix;
-  suffix: TaxCodeEmergencySuffix;
+  suffix: TaxCodeNonCumulativeMarker;
   letter: string | null;
+  /**
+   * Code-derived tax-free amount used by the calculator. K codes retain the
+   * engine's negative calculation convention; decoder copy must use
+   * `kAdjustment` instead of presenting this as a negative Personal Allowance.
+   */
   allowance: number;
   kAdjustment: number;
   bandOverride: TaxCodeBandOverride;
@@ -32,119 +33,18 @@ export interface TaxCodeParseResult {
   isScottish: boolean;
   isWelsh: boolean;
   isEmergency: boolean;
+  requiresHmrcCheck: boolean;
+  validationMessage: string | null;
 }
 
-export interface TaxCodeDecoded {
-  code: string;
-  isValid: boolean;
-  allowance: number | null;
-  letter: string | null;
-  prefix: string | null;
-  suffix: string | null;
-  meaning: string;
-  details: string[];
-  warnings: string[];
-  isScottish: boolean;
-  isWelsh: boolean;
-  isEmergency: boolean;
-}
-
-interface LetterInfo {
-  meaning: string;
-  details: string;
-}
-
-const STANDARD_PERSONAL_ALLOWANCE = TAX_RATES[CURRENT_TAX_YEAR].personalAllowance;
-const TAX_YEAR_DISPLAY = formatTaxYearDisplay(CURRENT_TAX_YEAR, {
-  separator: '-',
-  shortEndYear: true,
-});
-
-const LETTER_MEANINGS: Record<string, LetterInfo> = {
-  L: {
-    meaning: 'Standard personal allowance',
-    details: 'You are entitled to the standard tax-free Personal Allowance.',
-  },
-  M: {
-    meaning: 'Marriage Allowance - receiving',
-    details:
-      "You have received a transfer of 10% of your partner's Personal Allowance. Your allowance is increased by £1,260.",
-  },
-  N: {
-    meaning: 'Marriage Allowance - transferring',
-    details:
-      'You have transferred 10% of your Personal Allowance to your partner. Your allowance is reduced by £1,260.',
-  },
-  T: {
-    meaning: 'Other calculations required',
-    details:
-      'Your tax code includes other calculations to work out your Personal Allowance, for example it has been reduced because your estimated annual income is more than £100,000.',
-  },
-  '0T': {
-    meaning: 'No Personal Allowance',
-    details:
-      'Your Personal Allowance has been used up, or you have started a new job and your employer does not have the details needed to give you a tax code. All your income is taxed.',
-  },
-  BR: {
-    meaning: 'Basic rate on all income',
-    details:
-      'All your income from this job or pension is taxed at the basic rate (20%). This is usually used for a second job.',
-  },
-  D0: {
-    meaning: 'Higher rate on all income',
-    details:
-      'All your income from this job or pension is taxed at the higher rate (40%). This is usually used for a second job.',
-  },
-  D1: {
-    meaning: 'Additional rate on all income',
-    details:
-      'All your income from this job or pension is taxed at the additional rate (45%). This is usually used for a second job.',
-  },
-  NT: {
-    meaning: 'No tax deducted',
-    details:
-      'You are not paying any tax on this income. This might be because you are a non-resident or have specific tax relief.',
-  },
-  K: {
-    meaning: 'Tax code adds to income',
-    details:
-      'You have income that is not being taxed another way and it is worth more than your tax-free allowance. This is often used for company benefits.',
-  },
-};
-
-const SCOTTISH_BANDS = SCOTTISH_TAX_RATES[CURRENT_TAX_YEAR].bands;
-
-function scottishBandRate(bandName: string): number {
-  return SCOTTISH_BANDS.find((band) => band.name === bandName)?.rate ?? 0;
-}
-
-const SCOTTISH_FLAT_RATE_CODES: Record<string, LetterInfo> = {
-  BR: {
-    meaning: 'Scottish basic rate on all income',
-    details: `All your income from this job or pension is taxed at the Scottish basic rate (${scottishBandRate('Basic rate')}%). This is usually used for a second job.`,
-  },
-  D0: {
-    meaning: 'Scottish intermediate rate on all income',
-    details: `All your income from this job or pension is taxed at the Scottish intermediate rate (${scottishBandRate('Intermediate rate')}%). This is usually used for a second job.`,
-  },
-  D1: {
-    meaning: 'Scottish higher rate on all income',
-    details: `All your income from this job or pension is taxed at the Scottish higher rate (${scottishBandRate('Higher rate')}%). This is usually used for a second job.`,
-  },
-  D2: {
-    meaning: 'Scottish advanced rate on all income',
-    details: `All your income from this job or pension is taxed at the Scottish advanced rate (${scottishBandRate('Advanced rate')}%). This is usually used for a second job or pension.`,
-  },
-  D3: {
-    meaning: 'Scottish top rate on all income',
-    details: `All your income from this job or pension is taxed at the Scottish top rate (${scottishBandRate('Top rate')}%). This is usually used for a second job or pension.`,
-  },
-};
+const NON_CUMULATIVE_MARKER_PATTERN = TAX_CODE_NON_CUMULATIVE_MARKERS.join('|');
+const NON_CUMULATIVE_SUFFIX_PATTERN = new RegExp(`\\s+(?=(?:${NON_CUMULATIVE_MARKER_PATTERN})$)`);
+const NON_CUMULATIVE_DISPLAY_PATTERN = new RegExp(`^(.+?)(${NON_CUMULATIVE_MARKER_PATTERN})$`);
 
 /**
  * Canonicalise tax-code input. Canonical mode removes only the documented
- * separator before an emergency suffix. Display mode retains that separator,
- * while edit mode preserves the store's historical all-whitespace compaction.
+ * separator before a non-cumulative marker. Display mode adds one separator,
+ * while edit mode preserves the calculator store's compact edit value.
  */
 export function normalizeTaxCode(
   rawCode: string,
@@ -152,38 +52,69 @@ export function normalizeTaxCode(
 ): string {
   if (typeof rawCode !== 'string') return '';
 
-  const normalized = rawCode.trim().toUpperCase();
+  const normalized = rawCode.trim().toUpperCase().replace(/\s+/g, ' ');
   if (mode === 'edit') return normalized.replace(/\s+/g, '');
-  if (mode === 'display') return normalized.replace(/\s+/g, ' ');
-  return normalized.replace(/\s+(?=(?:W1|M1|X)$)/, '');
+
+  const canonical = normalized.replace(NON_CUMULATIVE_SUFFIX_PATTERN, '');
+  if (mode === 'canonical') return canonical;
+
+  const displayMatch = canonical.match(NON_CUMULATIVE_DISPLAY_PATTERN);
+  return displayMatch ? `${displayMatch[1]} ${displayMatch[2]}` : canonical;
 }
 
 function taxCodeParts(normalizedCode: string): {
   baseCode: string;
   prefix: TaxCodePrefix;
-  suffix: TaxCodeEmergencySuffix;
+  suffix: TaxCodeNonCumulativeMarker;
 } {
   let remaining = normalizedCode;
   let prefix: TaxCodePrefix = null;
-  let suffix: TaxCodeEmergencySuffix = null;
+  let suffix: TaxCodeNonCumulativeMarker = null;
 
   if (remaining.startsWith('S') || remaining.startsWith('C')) {
     prefix = remaining[0] as Exclude<TaxCodePrefix, null>;
     remaining = remaining.slice(1);
   }
 
-  if (remaining.endsWith('W1') || remaining.endsWith('M1')) {
-    suffix = remaining.slice(-2) as Exclude<TaxCodeEmergencySuffix, 'X' | null>;
-    remaining = remaining.slice(0, -2);
-  } else if (remaining.endsWith('X')) {
-    suffix = 'X';
-    remaining = remaining.slice(0, -1);
+  const marker = [...TAX_CODE_NON_CUMULATIVE_MARKERS]
+    .sort((left, right) => right.length - left.length)
+    .find((candidate) => remaining.endsWith(candidate));
+  if (marker) {
+    suffix = marker;
+    remaining = remaining.slice(0, -marker.length);
   }
 
   return { baseCode: remaining, prefix, suffix };
 }
 
-/** Parse and interpret one supported PayeTax tax code. */
+function invalidMessage(
+  normalizedCode: string,
+  baseCode: string,
+  prefix: TaxCodePrefix,
+  suffix: TaxCodeNonCumulativeMarker,
+): string {
+  if (!baseCode && suffix) {
+    return 'A non-cumulative marker must follow a complete tax code, such as 1257L W1.';
+  }
+  if (/^\d+$/.test(baseCode)) {
+    return 'A numeric tax code needs an HMRC letter, such as 1257L.';
+  }
+  if (/^K\d+$/.test(baseCode)) {
+    return 'K codes use K followed by a number from 1 to 9999.';
+  }
+  if (prefix === 'S' && /^D[4-8]$/.test(baseCode)) {
+    return 'HMRC reserves Scottish D4 to D8 formats, but they do not map to a current 2026/27 Scottish rate and cannot be estimated here. Check the code with HMRC.';
+  }
+  if (/^\d+[LMNT]$/.test(baseCode)) {
+    return 'HMRC tax-code numbers use no more than 5 digits.';
+  }
+  if (/^(?:S|C)?NT/.test(normalizedCode) && normalizedCode !== 'NT') {
+    return 'HMRC does not use a Scottish or Welsh prefix with code NT.';
+  }
+  return 'This is not a supported HMRC tax-code format. Check every letter and number against your payslip or HMRC notice.';
+}
+
+/** Parse one supported HMRC tax-code form for every calculator and decoder consumer. */
 export function parseTaxCode(taxCode: string, defaultAllowance: number): TaxCodeParseResult {
   const normalizedCode = normalizeTaxCode(taxCode);
   const { baseCode, prefix, suffix } = taxCodeParts(normalizedCode);
@@ -202,11 +133,15 @@ export function parseTaxCode(taxCode: string, defaultAllowance: number): TaxCode
     isScottish: prefix === 'S',
     isWelsh: prefix === 'C',
     isEmergency: suffix !== null,
+    requiresHmrcCheck: false,
+    validationMessage: normalizedCode
+      ? invalidMessage(normalizedCode, baseCode, prefix, suffix)
+      : null,
   };
 
-  if (!normalizedCode) return baseResult;
+  if (!(normalizedCode && baseCode)) return baseResult;
 
-  if (baseCode === 'NT') {
+  if (baseCode === 'NT' && prefix === null) {
     return {
       ...baseResult,
       classification: 'no-tax',
@@ -214,6 +149,7 @@ export function parseTaxCode(taxCode: string, defaultAllowance: number): TaxCode
       letter: 'NT',
       allowance: 0,
       bandOverride: 'NT',
+      validationMessage: null,
     };
   }
 
@@ -224,6 +160,7 @@ export function parseTaxCode(taxCode: string, defaultAllowance: number): TaxCode
       isValid: true,
       letter: '0T',
       allowance: 0,
+      validationMessage: null,
     };
   }
 
@@ -235,6 +172,7 @@ export function parseTaxCode(taxCode: string, defaultAllowance: number): TaxCode
       letter: baseCode,
       allowance: 0,
       bandOverride: baseCode,
+      validationMessage: null,
     };
   }
 
@@ -246,10 +184,11 @@ export function parseTaxCode(taxCode: string, defaultAllowance: number): TaxCode
       letter: baseCode,
       allowance: 0,
       bandOverride: baseCode,
+      validationMessage: null,
     };
   }
 
-  const kCodeMatch = baseCode.match(/^K(\d+)$/);
+  const kCodeMatch = baseCode.match(/^K([1-9]\d{0,3})$/);
   if (kCodeMatch?.[1]) {
     const kAdjustment = Number.parseInt(kCodeMatch[1], 10) * 10;
     return {
@@ -260,32 +199,23 @@ export function parseTaxCode(taxCode: string, defaultAllowance: number): TaxCode
       allowance: -kAdjustment,
       kAdjustment,
       isKCode: true,
+      validationMessage: null,
     };
   }
 
-  const standardMatch = baseCode.match(/^(\d+)([KLMNT])?$/);
-  if (standardMatch?.[1]) {
-    return {
-      ...baseResult,
-      classification: 'standard',
-      isValid: true,
-      letter: standardMatch[2] ?? null,
-      allowance: Number.parseInt(standardMatch[1], 10) * 10,
-    };
-  }
-
-  // Preserve the calculator's historical defensive fallback for malformed
-  // K-prefixed runtime input. It remains invalid to the validator and decoder,
-  // but calculation semantics keep the numeric K adjustment parsed previously.
-  if (baseCode.startsWith('K')) {
-    const numericPrefix = Number.parseInt(baseCode.slice(1), 10);
-    if (!Number.isNaN(numericPrefix)) {
-      const kAdjustment = numericPrefix * 10;
+  const standardMatch = baseCode.match(/^([1-9]\d{0,4})([LMNT])$/);
+  if (standardMatch?.[1] && standardMatch[2]) {
+    const codeNumber = Number.parseInt(standardMatch[1], 10);
+    const taxFreeAmount = codeNumber * 10;
+    if (Number.isSafeInteger(taxFreeAmount)) {
       return {
         ...baseResult,
-        allowance: -kAdjustment,
-        kAdjustment,
-        isKCode: true,
+        classification: 'standard',
+        isValid: true,
+        letter: standardMatch[2],
+        allowance: taxFreeAmount,
+        requiresHmrcCheck: standardMatch[1].length > 4,
+        validationMessage: null,
       };
     }
   }
@@ -297,131 +227,58 @@ export function isValidTaxCode(taxCode: string): boolean {
   return parseTaxCode(taxCode, 0).isValid;
 }
 
-// This is deliberately an edit grammar: partial states such as "K" and "S12"
-// must remain enterable even though they are not complete, valid tax codes yet.
-const TAX_CODE_EDIT_PATTERN =
-  /^(?:[SC]?|SD[0-3]?(?:W1?|M1?|X)?|[SC]?(?:K\d*|BR?|D[01]?|NT?|0T?|\d+[LMNPTX]?)(?:W1?|M1?|X)?)$/;
+/** Return the tax regime explicitly assigned by a valid S or C prefix. */
+export function getTaxCodeRegionOverride(parsed: TaxCodeParseResult): TaxCodeRegion {
+  if (!parsed.isValid) return null;
+  if (parsed.isScottish) return 'Scotland';
+  if (parsed.isWelsh) return 'Wales';
+  return null;
+}
+
+function getMonthlyTablesAPayAdjustment(codeNumber: number): number {
+  const completeBlocks = Math.floor(codeNumber / 500);
+  const remainder = codeNumber % 500;
+  const blockAdjustment = Math.ceil((5000 / 12) * 100) / 100;
+  const tableAdjustment = (number: number) => Math.ceil(((number * 10 + 9) / 12) * 100) / 100;
+
+  return remainder === 0
+    ? tableAdjustment(500) + Math.max(0, completeBlocks - 1) * blockAdjustment
+    : tableAdjustment(remainder) + completeBlocks * blockAdjustment;
+}
+
+/** HMRC Tables A Month 1 free-pay lookup for a parsed numeric L/M/N/T code. */
+export function getMonthlyTaxCodeFreePay(taxFreeAmount: number): number {
+  if (taxFreeAmount <= 0) return 0;
+  return getMonthlyTablesAPayAdjustment(taxFreeAmount / 10);
+}
+
+/** HMRC Tables A Month 1 additional-pay lookup for a parsed K-code adjustment. */
+export function getMonthlyKCodeAdditionalPay(kAdjustment: number): number {
+  if (kAdjustment <= 0) return 0;
+  return getMonthlyTablesAPayAdjustment(kAdjustment / 10);
+}
+
+// Partial states remain enterable in the main calculator, but impossible final
+// forms (bare numbers, P codes, Welsh D2/D3 and over-range K codes) do not decode.
+function partialLiteralPattern(value: string): string {
+  return [...value].reduceRight(
+    (pattern, character) => (pattern ? `${character}(?:${pattern})?` : character),
+    '',
+  );
+}
+
+const NON_CUMULATIVE_EDIT_PATTERN =
+  TAX_CODE_NON_CUMULATIVE_MARKERS.map(partialLiteralPattern).join('|');
+const TAX_CODE_EDIT_PATTERN = new RegExp(
+  `^(?:[SC]?|[SC]?K\\d{0,4}|[SC]?BR?|D[01]?|SD[0-8]?|CD[01]?|NT?|[SC]?0T?|[SC]?[1-9]\\d{0,4}[LMNT]?)(?:${NON_CUMULATIVE_EDIT_PATTERN})?$`,
+);
 
 export function isTaxCodeEditCandidate(taxCode: string): boolean {
-  return TAX_CODE_EDIT_PATTERN.test(normalizeTaxCode(taxCode, 'edit'));
+  const normalized = normalizeTaxCode(taxCode, 'edit');
+  return normalized.length <= TAX_CODE_MAX_LENGTH && TAX_CODE_EDIT_PATTERN.test(normalized);
 }
 
-export function hasEmergencyTaxCodeSuffix(taxCode: string): boolean {
-  return taxCodeParts(normalizeTaxCode(taxCode)).suffix !== null;
-}
-
-export function decodeTaxCode(rawCode: string): TaxCodeDecoded {
-  const parsed = parseTaxCode(rawCode, STANDARD_PERSONAL_ALLOWANCE);
-  const result: TaxCodeDecoded = {
-    code: typeof rawCode === 'string' ? rawCode.toUpperCase() : '',
-    isValid: parsed.isValid,
-    allowance: parsed.isValid ? parsed.allowance : null,
-    letter: parsed.letter,
-    prefix: parsed.prefix,
-    suffix: parsed.suffix,
-    meaning: '',
-    details: [],
-    warnings: [],
-    isScottish: parsed.isScottish,
-    isWelsh: parsed.isWelsh,
-    isEmergency: parsed.isEmergency,
-  };
-
-  if (!parsed.normalizedCode) {
-    result.meaning = 'No tax code provided';
-    return result;
-  }
-
-  if (parsed.isScottish) {
-    result.details.push(
-      'Scottish tax rates apply. You pay Scottish Income Tax instead of UK rates.',
-    );
-  } else if (parsed.isWelsh) {
-    result.details.push('Welsh tax rates apply (currently same as England/NI rates).');
-  }
-
-  if (parsed.suffix === 'W1' || parsed.suffix === 'M1') {
-    result.warnings.push(
-      'This is an emergency tax code. Your tax may not be calculated correctly until HMRC provides your correct code.',
-    );
-  } else if (parsed.suffix === 'X') {
-    result.warnings.push(
-      'This is a non-cumulative tax code. Contact HMRC if you think this is wrong.',
-    );
-  }
-
-  if (!parsed.isValid) {
-    result.meaning = 'Unrecognized tax code format';
-    result.warnings.push(
-      'This tax code format is not recognized. Please check it is correct or contact HMRC for clarification.',
-    );
-    return result;
-  }
-
-  if (parsed.classification === 'flat-rate') {
-    const info = parsed.isScottish
-      ? SCOTTISH_FLAT_RATE_CODES[parsed.baseCode]
-      : LETTER_MEANINGS[parsed.baseCode];
-    if (info) {
-      result.meaning = info.meaning;
-      result.details.push(info.details);
-    }
-    return result;
-  }
-
-  if (parsed.classification === 'no-tax' || parsed.classification === 'zero-allowance') {
-    const info = LETTER_MEANINGS[parsed.baseCode];
-    if (info) {
-      result.meaning = info.meaning;
-      result.details.push(info.details);
-    }
-    return result;
-  }
-
-  if (parsed.classification === 'k-code') {
-    result.meaning = 'Tax code adds to your taxable income';
-    result.details.push(
-      `Your employer adds £${parsed.kAdjustment.toLocaleString()} to your taxable income because you have benefits or owe tax from previous years.`,
-    );
-    result.warnings.push(
-      'K codes are used when your benefits or tax owed exceed your Personal Allowance.',
-    );
-    return result;
-  }
-
-  result.meaning = 'Standard tax code';
-  if (parsed.letter) {
-    const info = LETTER_MEANINGS[parsed.letter];
-    if (info) {
-      result.meaning = info.meaning;
-      result.details.push(info.details);
-    }
-  }
-
-  result.details.unshift(
-    `Your tax-free Personal Allowance is £${parsed.allowance.toLocaleString()} per year.`,
-  );
-
-  if (parsed.allowance === STANDARD_PERSONAL_ALLOWANCE) {
-    result.details.push(
-      `This is the standard Personal Allowance (£${STANDARD_PERSONAL_ALLOWANCE.toLocaleString()}) for ${TAX_YEAR_DISPLAY}.`,
-    );
-  } else if (parsed.allowance > STANDARD_PERSONAL_ALLOWANCE) {
-    result.details.push(
-      "Your allowance is higher than standard, possibly due to Blind Person's Allowance or Marriage Allowance received.",
-    );
-  } else if (parsed.allowance > 0) {
-    result.details.push(
-      'Your allowance is below the standard amount. This may be due to high income (over £100k) or Marriage Allowance transferred.',
-    );
-  }
-
-  return result;
-}
-
-export function formatAllowance(allowance: number | null): string {
-  if (allowance === null) return 'N/A';
-  if (allowance === 0) return '£0';
-  if (allowance < 0) return `-£${Math.abs(allowance).toLocaleString()}`;
-  return `£${allowance.toLocaleString()}`;
+export function hasNonCumulativeTaxCodeMarker(taxCode: string): boolean {
+  const parsed = parseTaxCode(taxCode, 0);
+  return parsed.isValid && parsed.suffix !== null;
 }

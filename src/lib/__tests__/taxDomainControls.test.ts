@@ -28,6 +28,10 @@ describe('tax-domain repository controls', () => {
         content: "import { calculateTax } from '@/lib/tax';",
       },
       {
+        path: 'src/app/public-decoder.ts',
+        content: "import { decodeTaxCode } from '@/lib/tax-code-decoder';",
+      },
+      {
         path: 'src/app/public-index.ts',
         content: "import { calculateTax } from '@/lib/tax/index';",
       },
@@ -128,7 +132,9 @@ describe('tax-domain repository controls', () => {
         });
 
         expect(result.status).toBe(1);
-        expect(result.stderr).toContain('Application consumers must import through @/lib/tax.');
+        expect(result.stderr).toContain(
+          'Application consumers must import through a supported public tax interface.',
+        );
         expect(result.stderr).toContain('src/app/new-consumer.ts');
       } finally {
         rmSync(fixtureRoot, { recursive: true, force: true });

@@ -79,6 +79,7 @@ const rowPresentation: Record<ResultsTableRowKind, RowPresentation> = {
   employment: { icon: Building, color: 'text-muted-foreground' },
   otherIncome: { icon: Coins, color: 'text-muted-foreground' },
   taxFree: { icon: Shield, color: 'text-foreground' },
+  taxCodeAdjustment: { icon: Scale, color: 'text-warning' },
   taxable: { icon: Scale, color: 'text-foreground' },
   incomeTax: { icon: Calculator, color: 'text-destructive' },
   taxBand: { icon: Percent, color: 'text-destructive' },
@@ -143,10 +144,10 @@ export function ResultsTable({
     if (!isMarried) return false;
     if (partnerGrossWage == null) return false;
 
-    // Preserve the existing M/M1 UI gate while deriving both markers from the
-    // shared grammar instead of reinterpreting the raw code locally.
+    // M and N both mean the code already reflects a Marriage Allowance transfer.
+    // M1 is an unrelated non-cumulative marker and must not suppress this UI.
     const parsedTaxCode = parseTaxCode(taxCode, 0);
-    const hasMarriageCode = parsedTaxCode.letter === 'M' || parsedTaxCode.suffix === 'M1';
+    const hasMarriageCode = parsedTaxCode.letter === 'M' || parsedTaxCode.letter === 'N';
     if (hasMarriageCode) return false;
 
     // Get tax constants for the current year
@@ -214,6 +215,7 @@ export function ResultsTable({
     previousYearResults,
     whatIfResults,
     previousYearLabel: String(previousYearLabel),
+    taxCode,
   });
 
   return (

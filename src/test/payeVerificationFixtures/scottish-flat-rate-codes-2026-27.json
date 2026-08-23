@@ -39,7 +39,7 @@
       },
       "decoder": {
         "isValid": true,
-        "allowance": 0,
+        "amount": null,
         "meaningIncludes": "basic"
       }
     },
@@ -70,7 +70,7 @@
       },
       "decoder": {
         "isValid": true,
-        "allowance": 0,
+        "amount": null,
         "meaningIncludes": "intermediate"
       }
     },
@@ -101,7 +101,7 @@
       },
       "decoder": {
         "isValid": true,
-        "allowance": 0,
+        "amount": null,
         "meaningIncludes": "higher"
       }
     },
@@ -132,7 +132,7 @@
       },
       "decoder": {
         "isValid": true,
-        "allowance": 0,
+        "amount": null,
         "meaningIncludes": "advanced"
       }
     },
@@ -163,7 +163,7 @@
       },
       "decoder": {
         "isValid": true,
-        "allowance": 0,
+        "amount": null,
         "meaningIncludes": "top"
       }
     },
@@ -193,7 +193,7 @@
       },
       "decoder": {
         "isValid": true,
-        "allowance": 0,
+        "amount": null,
         "meaningIncludes": "basic"
       }
     },
@@ -223,7 +223,7 @@
       },
       "decoder": {
         "isValid": true,
-        "allowance": 0,
+        "amount": null,
         "meaningIncludes": "higher"
       }
     },
@@ -253,7 +253,7 @@
       },
       "decoder": {
         "isValid": true,
-        "allowance": 0,
+        "amount": null,
         "meaningIncludes": "additional"
       }
     }
