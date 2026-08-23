@@ -10,4 +10,8 @@ Use `AGENTS.md` as the canonical repo contract for:
 - testing standard
 - ops/runbook expectations
 
+Begin with `docs/PROJECT_STATE.md`, use `docs/BACKLOG.md` only for unresolved work, follow dated
+reports and pull requests for evidence, and verify statutory claims against canonical policy plus
+current primary official sources.
+
 Keep this file minimal so the contract only needs maintaining in one place.

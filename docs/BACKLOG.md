@@ -1,8 +1,11 @@
 # PayeTax Backlog
 
-Backlog for the public R&D version of PayeTax.
+Backlog for the public R&D version of PayeTax. Read [`PROJECT_STATE.md`](PROJECT_STATE.md) first
+for the current product, architecture, verification and search handover.
 
-Keep this file for active or parked future work only. Closed work belongs in GitHub pull requests, release reports, or commit history. Programme context and evidence live in `docs/reports/paye-tax-domain-ownership-audit-2026-07-21.md` and the production truth audit that preceded PRs #82/#83.
+Keep this file for active or parked future work only. Closed work belongs in GitHub pull requests,
+dated reports or commit history. Statutory truth belongs in canonical policy and current primary
+sources, not in backlog prose.
 
 ## Working Rules
 
@@ -17,6 +20,14 @@ Keep this file for active or parked future work only. Closed work belongs in Git
 - Prefer small independently reviewable slices over generic frameworks, big-bang rewrites or cosmetic restructuring.
 
 ## Active
+
+Current correctness sequence:
+
+1. Scottish calculator and Scottish-vs-English comparison.
+2. £40k, £60k and £100k salary articles; protect the verified £70k article.
+3. Explicit pension-method handling.
+4. Transparent calculation results.
+5. Independent fixture/test-portfolio completion and Foundation reconciliation.
 
 ### Foundation
 
@@ -46,16 +57,17 @@ Permanent architectural and testing direction for the tax domain. This is a veri
 
 **Verification burn-down**
 
-Status is `To verify` for every row until a focused audit establishes whether each outcome is complete, partial or requires work. An item is not assumed incomplete merely because it also appears in the detailed backlog below.
+Rows are `Open` or `Partial` after reconciliation against current code and evidence. An item is not
+assumed wholly incomplete merely because its residual work also appears in the detailed backlog
+below.
 
 | Concern | Desired outcome | Current status | Evidence or completion reference |
 | --- | --- | --- | --- |
-| Effective-dated policy model | Published rates, thresholds and effective dates live in one model that represents mid-year changes as data. | Substantially delivered | Unit- and basis-explicit typed policy schema; effective-dated NI formalised (`PrimaryRateChange`) with ordering/non-overlap/both-sides invariant tests; Corporation Tax, pension allowances and Payments on Account moved into per-year records. Evidence: `src/constants/__tests__/taxPolicyModel.test.ts`. Residual (deliberately out of scope): the PAYE 50% overriding limit and the 6-April boundary remain as procedural/calendar constants (not published rates or thresholds); the NI straddling pay-date basis and the golden-master generator unit bug stay tracked in the detailed items below. |
-| Explicit pension-method handling | Salary-sacrifice, net-pay and relief-at-source are handled explicitly, with the method exposed in the result. | To verify | |
-| A transparent result that clearly exposes the selected policy, calculation basis, relevant pay bases and individual deductions | One result exposes the policy selected, the calculation basis, the relevant pay bases and each individual deduction, without callers reassembling them. | To verify | |
-| Compact independent full-calculation fixture set | A small set of JSON fixtures, derived independently of production code, covers representative full-calculation interactions. | To verify | |
-| Balanced test portfolio and updated `TESTING.md` | JSON fixtures, TypeScript rule and boundary tests, and Playwright journeys are balanced, with `TESTING.md` describing the split. | To verify | |
-| Final backlog reconciliation | After the foundation audit, the detailed backlog items are reconciled against verified outcomes. | To verify | |
+| Explicit pension-method handling | Salary-sacrifice, net-pay and relief-at-source are handled explicitly, with the method exposed in the result. | Open | The shared pay-basis owner currently models the pension input as salary sacrifice. |
+| A transparent result that clearly exposes the selected policy, calculation basis, relevant pay bases and individual deductions | One result exposes the policy selected, the calculation basis, the relevant pay bases and each individual deduction, without callers reassembling them. | Partial | Tax-code basis is exposed after PRs #111/#112. Selected policy, relevant pay bases and pension method remain incomplete. |
+| Compact independent full-calculation fixture set | A small set of JSON fixtures, derived independently of production code, covers representative full-calculation interactions. | Partial | Representative PAYE and tax-code fixtures exist. Supported-year, boundary and per-scenario provenance gaps remain below. |
+| Balanced test portfolio and updated `TESTING.md` | JSON fixtures, TypeScript rule and boundary tests, and Playwright journeys are balanced, with `TESTING.md` describing the split. | Partial | The three-layer split exists; the final coverage balance and documentation reconciliation remain open. |
+| Final backlog reconciliation | After the foundation audit, the detailed backlog items are reconciled against verified outcomes. | Open | Remove the remaining Foundation rows as focused slices close them. |
 
 **Burn-down rule**
 
@@ -70,7 +82,6 @@ Status is `To verify` for every row until a focused audit establishes whether ea
 
 - [ ] K-code overriding limit base: the 50% cap uses gross-minus-pension including non-employment income the engine also PAYE-taxes monthly. DoD: documented decision on the payment base for mixed-income users, engine behaviour matching it, and mixed-income K-code fixtures.
 - [ ] Pension method semantics: the engine treats every pension input as salary sacrifice (reduces NI). DoD: explicit salary-sacrifice / net-pay / relief-at-source handling, or the assumption disclosed at the input and in results; tests assert whichever is chosen.
-- [ ] Emergency codes W1/M1/X: parsed and flagged internally but silently computed cumulatively. DoD: non-cumulative basis modelled, or a visible caveat in main calculator results; tests cover the chosen behaviour.
 - [ ] State Pension age transition: engine and `BasicInputs` hardcode 66 while SPA moves to 67 during 2026–2028. DoD: date-of-birth-aware rule or clearly framed self-declaration replaces the fixed age, with tests at the transition boundary.
 - [ ] Marriage Allowance treatment: modelled as +£1,260 allowance rather than a 20% tax reducer; deviates for Scottish taxpayers and edge cases. DoD: documented decision, implementation matching it, and fixtures including Scottish cases.
 - [ ] Personal Allowance taper parameterisation: `taxableThresholdToTotalIncome` hardcodes the £1-per-£2 taper shape instead of consuming `personalAllowanceReductionRate` (PR #83 review note). DoD: the function consumes the policy rate; a test pins behaviour for a non-default rate.
@@ -89,7 +100,7 @@ Status is `To verify` for every row until a focused audit establishes whether ea
 - [ ] Generated MDX tax facts: server components for band tables, threshold facts, worked examples, current-year labels, source links and last-verified dates. DoD: evergreen posts consume the components; historical posts stay pinned to their stated year; no hardcoded current-year values in evergreen MDX.
 - [ ] Annual Budget workflow: value-only updates touch only policy/sources/fixtures. DoD: hardcoded years removed from `e2e/scripts/generate-golden-master.ts` and `scripts/audit-blog-content.ts`; the compile-forced `studentLoanPlans` per-year map folds into the policy records; a dry-run year update touches no other files.
 - [ ] Golden-master generator rate-unit bug: `generate-golden-master.ts` filters bands with decimal rates (`0.2/0.4/0.45`) against percent-stored values, so fixture threshold metadata is silently `undefined`. DoD: filter matches stored units, metadata populated, regression test; fix alongside the unit-explicit policy schema.
-- [ ] CI drift guards: import-boundary lint; a `check:tax-facts` scan for hardcoded policy values outside the domain, fixtures and pinned content; extend `audit-blog-content --strict` to reject literal rates in evergreen posts. DoD: all three guards run in `check:repo` or CI and fail on seeded violations.
+- [ ] Evergreen-content policy-value guard: extend `audit-blog-content --strict` to reject literal rates in evergreen posts. Import-boundary and tax-fact guards already run in `check:repo`; do not recreate them. DoD: the residual blog guard fails on a seeded violation.
 
 Implementation sequencing for these items remains documented in the ownership audit report §6, beginning with its recommended Scottish vertical.
 
@@ -97,12 +108,12 @@ Implementation sequencing for these items remains documented in the ownership au
 
 - [ ] Fixture coverage for every supported year and every band boundary (current suites concentrate on 2026-27 plus Scottish top-rate history). DoD: each supported year has independent fixtures at each band edge.
 - [ ] Statutory-boundary scenarios independent of stored thresholds for each band edge (extend the `progressive-120k-no-top-rate` pattern). DoD: each band edge has a fixture whose expected values are derived from statutory numbers, not repo thresholds.
-- [ ] Cross-tool consistency tests: Scottish tool vs main engine, NI tool vs main engine, director annual method vs engine. DoD: comparisons exist with documented tolerance and pass.
+- [ ] Director annual-method consistency test: Scottish-tool/main-engine and NI-tool/main-engine comparisons exist. DoD: the remaining Director annual-method comparison has a documented tolerance and passes.
 - [ ] Article-to-engine verification for every published figure in evergreen posts. DoD: a check maps each evergreen figure to verified engine output and fails on drift.
 - [ ] Fixture provenance controls: per-scenario official-figure citations; derivations start from statutory numbers, never from repo thresholds; reviewer instructions verify against sources (the PR #83 lesson). DoD: every fixture carries a source citation and the review rule is written into `TESTING.md`.
 - [ ] Public human-readable calculator verification report generated from the fixture suites, replacing hand-written accuracy claims. DoD: the report generates from fixtures and the public claims cite it.
 - [ ] Machine-readable verification output (extend `/api/tax-rates` or a dedicated route). DoD: the route serves generated verification data and is covered by a test.
-- [ ] Documented modelling assumptions and limitations (month-1 method, emergency-code handling, NI year model, pension method). DoD: assumptions published where users see results and kept in sync with the engine.
+- [ ] Documented modelling assumptions and limitations (month-1 projection, NI year model and pension method). Non-cumulative tax-code limitations are now visible. DoD: the remaining assumptions are published where users see results and kept in sync with the engine.
 
 ### Trust and sourcing
 
@@ -114,11 +125,12 @@ Implementation sequencing for these items remains documented in the ownership au
 
 ### Content accuracy
 
-- [ ] Featured Scottish comparison article still presents 2025-26 bands as the live comparison months into 2026-27. DoD: the article shows current-year bands, via the first generated MDX band table where possible.
+- [ ] Scottish calculator input and trust contract: malformed or decimal salary input is silently transformed into a different integer; assumptions and primary-source path are not visible before calculation. DoD: invalid input is rejected rather than rewritten, the Income-Tax-only scope and assumptions are explicit, an official source is visible, and focused tests pin the behaviour.
+- [ ] Featured Scottish comparison article: rebuild the stale 2025-26 live comparison for 2026/27, independently re-derive every worked figure, narrow overconfident pension/bonus/relocation claims and expose dated primary sources. Keep its URL and differentiated comparison purpose. DoD: current bands and examples match independent working, assumptions are explicit, and factual/schema regression tests pass.
 - [ ] Tax-code guide: add the statutory 50% overriding limit; fix the "K500 = you owe £5,000" conflation; refresh stale 2025-26 titles/meta; cover Scottish SD codes. DoD: all four corrections published and consistent with the engine.
-- [ ] Salary-page figures (£40k–£100k series): hand-computed values drift by £2–£6. DoD: tables generate from verified engine output; drift check passes.
-- [ ] Unsupported percentile/median/average salary claims across salary pages (internally inconsistent; uncited). DoD: sourced from ONS ASHE or removed.
-- [ ] Unsupported lifestyle, rent and mortgage claims. DoD: sourced, softened or removed.
+- [ ] £40k, £60k and £100k salary articles: independently rebuild current PAYE and Student Loan figures, put the qualified annual/monthly answer first, state calculation and pension-method assumptions, and remove contradictory FAQ outputs and unsupported lifestyle, prevalence, savings, housing and accountant-value claims. Keep the existing URLs. DoD: displayed figures reproduce from independent working, visible copy/metadata/schema agree, and focused drift tests pass.
+- [ ] Remaining salary-page unsupported-claim audit: after the priority repair, inspect the retained series for uncited percentile/median, lifestyle, rent, savings and mortgage claims. The verified £70k article is the reference pattern and should not be rewritten without a reproduced defect. DoD: each remaining claim is sourced from an appropriate primary dataset, qualified or removed.
+- [ ] FAQ extraction boundary: `extractFAQs` treats bold labels outside a genuine FAQ section as questions, producing malformed FAQ schema. DoD: extraction is constrained to deliberate FAQ content and a regression test rejects label/list artefacts from the Scottish comparison article.
 - [ ] Evergreen vs historical article policy: frontmatter declares the mode. DoD: evergreen posts contain no hardcoded rate values; historical posts stay pinned and labelled; the blog audit enforces the split.
 - [ ] Blog visual refresh: regenerate legacy post images into the Ledger editorial style and retire stale tax-year content in small verified batches. DoD: each batch lands with refreshed imagery and verified figures.
 
@@ -127,8 +139,6 @@ Implementation sequencing for these items remains documented in the ownership au
 Work here completes only against deployed behaviour, external services or recorded external evidence — not local tests.
 
 - [ ] Production verification of analytics consent withdrawal behaviour (post-PR #78). DoD: dashboard and behaviour evidence recorded in a dated report.
-- [ ] Obtain and record Search Console page-performance evidence in-repo so content prioritisation stops relying on assumptions; do not treat Vercel traffic as popularity evidence. DoD: GSC evidence committed as a dated report.
-- [ ] Search Console-led prioritisation of which pages get corrected first (blocked on the GSC evidence above). DoD: a recorded priority order derived from GSC data drives the content-accuracy batches.
 - [ ] Periodic external oracle cross-check (HMRC test data or an independent calculator sample). DoD: a dated report records the sample, source and outcome.
 
 ## Parked / Triggered work
@@ -136,6 +146,8 @@ Work here completes only against deployed behaviour, external services or record
 These are not active for the R&D app unless traffic evidence or an explicit product decision makes them worthwhile.
 
 - Retired intent-route redirects and index remnants. Trigger: Search Console shows material impressions or confusing snippets for retired routes. DoD: affected routes redirected or cleaned, with the GSC evidence and outcome recorded.
+- Beginner-guide discovery follow-up. Trigger: Google has recrawled the 29 July rewrite and matched page/query evidence still shows no discovery. DoD: diagnose the post-recrawl evidence before changing content or internal prominence.
+- Local Search Console CSV analyser. Trigger: redacted page/query exports are available and another manual reconciliation would otherwise be required. DoD: a small credential-free script produces reproducible summaries without storing personal or sensitive exports.
 - New calculator variants such as reverse salary, two-job, pro-rata, bonus/overtime, or salary comparison. Trigger: an explicit product decision that one variant is genuinely useful, evaluated one at a time. DoD: the chosen variant ships tested and verified, not as growth-page coverage.
 - Separate FAQ/HowTo/`llms.txt` expectation docs. Trigger: evidence that the existing static HTML, visible citations, Dataset JSON-LD and crawlable tax facts stop serving AEO/GEO needs. DoD: a documented decision either adds the docs with owners or confirms the current assets suffice.
 

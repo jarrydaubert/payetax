@@ -8,6 +8,13 @@ PayeTax is Jarryd Aubert's UK tax-calculator R&D project. It exists to exercise 
 
 It is not a commercial growth site. Keep the product useful, accurate, and simple.
 
+## Read First
+
+1. Read `docs/PROJECT_STATE.md` for the current product, architecture, verification and search handover.
+2. Read `docs/BACKLOG.md` for unresolved work only.
+3. Follow dated reports and pull requests for supporting evidence and completed-work history.
+4. For statutory truth, verify canonical policy data against current primary official sources.
+
 ## Scope Guardrails
 
 - Keep the main calculator, tools, Director Intelligence, blog, email-results, PWA, GA4, Sentry, Brevo API email, and Upstash-backed rate limiting.

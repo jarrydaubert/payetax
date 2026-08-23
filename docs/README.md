@@ -4,7 +4,12 @@ PayeTax docs should help a contributor make a correct decision quickly.
 
 ## Source Order
 
-When docs overlap, prefer sources in this order:
+Start with [`PROJECT_STATE.md`](PROJECT_STATE.md) for the current handover, then
+[`BACKLOG.md`](BACKLOG.md) for unresolved work. Follow their links into `docs/reports/*` and pull
+requests for dated evidence. For statutory truth, use canonical policy data and current primary
+official sources rather than a summary document.
+
+When sources disagree about implemented behaviour, prefer them in this order:
 
 1. Code and tests for implemented behaviour.
 2. `.env.template`, `package.json`, and workflow files for commands and environment names.
@@ -12,7 +17,9 @@ When docs overlap, prefer sources in this order:
 4. `docs/business/PRODUCT_DIRECTION.md` for product scope decisions.
 5. `docs/blog/*` for public blog content, image, and refresh guidance.
 6. `docs/guides/*` for operational and engineering guidance.
-7. `docs/reports/*` for dated historical evidence.
+7. `docs/PROJECT_STATE.md` for the current cross-domain handover.
+8. `docs/BACKLOG.md` for unresolved work only.
+9. `docs/reports/*` and pull requests for dated historical evidence.
 
 ## Evergreen Rules
 
@@ -44,6 +51,7 @@ Retire or merge docs that only repeat another source, record old status without 
 ## Doc Types
 
 - **Evergreen guides:** `README.md`, `AGENTS.md`, `docs/business/*`, `docs/blog/*`, and the canonical guides in `docs/guides/*`.
+- **Current handover:** `docs/PROJECT_STATE.md`, maintained as a concise map to current state and evidence rather than a second policy or architecture implementation.
 - **Working queue:** `docs/BACKLOG.md`, only for active or parked future work.
 - **Historical evidence:** `docs/reports/*`; do not rewrite old reports to match new commands except to correct factual errors.
 - **Public content:** `content/blog/*`; review for tax-year accuracy and reader usefulness separately from engineering docs.
