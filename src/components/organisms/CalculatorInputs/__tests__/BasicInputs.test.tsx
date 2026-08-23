@@ -237,6 +237,11 @@ describe('BasicInputs Component', () => {
       render(<BasicInputs />);
       const taxCodeInput = screen.getByPlaceholderText('1257L');
       expect(taxCodeInput).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          /Leave blank to estimate from the selected year, income and allowance answers/,
+        ),
+      ).toBeInTheDocument();
     });
 
     it('should show S1257L placeholder for Scotland', () => {

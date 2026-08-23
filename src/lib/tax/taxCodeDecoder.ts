@@ -31,7 +31,6 @@ export interface TaxCodeDecoded {
   isScottish: boolean;
   isWelsh: boolean;
   isEmergency: boolean;
-  requiresHmrcCheck: boolean;
 }
 
 export interface TaxCodeReferenceEntry {
@@ -242,7 +241,6 @@ export function decodeTaxCode(rawCode: string): TaxCodeDecoded {
     isScottish: parsed.isValid && parsed.isScottish,
     isWelsh: parsed.isValid && parsed.isWelsh,
     isEmergency: parsed.isValid && parsed.isEmergency,
-    requiresHmrcCheck: parsed.requiresHmrcCheck,
   };
 
   if (!parsed.normalizedCode) {
@@ -263,12 +261,6 @@ export function decodeTaxCode(rawCode: string): TaxCodeDecoded {
     result.details.push(nonCumulativeDetail(parsed.suffix));
     result.warnings.push(
       'This is an emergency, non-cumulative basis. PAYE uses only the current pay period rather than your year-to-date pay and tax, so the result can differ from your final annual position.',
-    );
-  }
-
-  if (parsed.requiresHmrcCheck) {
-    result.warnings.push(
-      'HMRC can issue long tax codes manually. This format is recognized, but use HMRC’s checker or coding notice to verify the unusually long number.',
     );
   }
 

@@ -38,9 +38,9 @@ describe('CalculatorStore Integration', () => {
 
       const state = useCalculatorStore.getState();
 
-      expect(state.results?.incomeTax.annually).toBeCloseTo(3484.8, 0);
+      expect(state.results?.incomeTax.annually).toBeCloseTo(3482.4, 0);
       expect(state.results?.nationalInsurance.annually).toBeCloseTo(1393.92, 0);
-      expect(state.results?.netPay.annually).toBeCloseTo(25121.28, 0);
+      expect(state.results?.netPay.annually).toBeCloseTo(25123.68, 0);
     });
 
     it('should handle higher rate taxpayer at £60k', () => {
@@ -51,7 +51,7 @@ describe('CalculatorStore Integration', () => {
 
       const state = useCalculatorStore.getState();
 
-      expect(state.results?.incomeTax.annually).toBeCloseTo(11428.8, 0);
+      expect(state.results?.incomeTax.annually).toBeCloseTo(11424, 0);
       expect(state.results?.nationalInsurance.annually).toBeCloseTo(3210, 0);
     });
 

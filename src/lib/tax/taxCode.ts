@@ -33,7 +33,6 @@ export interface TaxCodeParseResult {
   isScottish: boolean;
   isWelsh: boolean;
   isEmergency: boolean;
-  requiresHmrcCheck: boolean;
   validationMessage: string | null;
 }
 
@@ -103,10 +102,10 @@ function invalidMessage(
     return 'K codes use K followed by a number from 1 to 9999.';
   }
   if (prefix === 'S' && /^D[4-8]$/.test(baseCode)) {
-    return 'HMRC reserves Scottish D4 to D8 formats, but they do not map to a current 2026/27 Scottish rate and cannot be estimated here. Check the code with HMRC.';
+    return 'Scottish D4 to D8 do not map to a current 2026/27 Scottish Income Tax rate. Check the complete code with HMRC.';
   }
   if (/^\d+[LMNT]$/.test(baseCode)) {
-    return 'HMRC tax-code numbers use no more than 5 digits.';
+    return 'A complete HMRC tax code can contain up to 7 characters, excluding a non-cumulative marker.';
   }
   if (/^(?:S|C)?NT/.test(normalizedCode) && normalizedCode !== 'NT') {
     return 'HMRC does not use a Scottish or Welsh prefix with code NT.';
@@ -133,7 +132,6 @@ export function parseTaxCode(taxCode: string, defaultAllowance: number): TaxCode
     isScottish: prefix === 'S',
     isWelsh: prefix === 'C',
     isEmergency: suffix !== null,
-    requiresHmrcCheck: false,
     validationMessage: normalizedCode
       ? invalidMessage(normalizedCode, baseCode, prefix, suffix)
       : null,
@@ -203,18 +201,18 @@ export function parseTaxCode(taxCode: string, defaultAllowance: number): TaxCode
     };
   }
 
-  const standardMatch = baseCode.match(/^([1-9]\d{0,4})([LMNT])$/);
+  const standardMatch = baseCode.match(/^([1-9]\d{0,5})([LMNT])$/);
   if (standardMatch?.[1] && standardMatch[2]) {
+    const codeLength = baseCode.length + (prefix ? 1 : 0);
     const codeNumber = Number.parseInt(standardMatch[1], 10);
     const taxFreeAmount = codeNumber * 10;
-    if (Number.isSafeInteger(taxFreeAmount)) {
+    if (codeLength <= 7 && Number.isSafeInteger(taxFreeAmount)) {
       return {
         ...baseResult,
         classification: 'standard',
         isValid: true,
         letter: standardMatch[2],
         allowance: taxFreeAmount,
-        requiresHmrcCheck: standardMatch[1].length > 4,
         validationMessage: null,
       };
     }
@@ -249,7 +247,12 @@ function getMonthlyTablesAPayAdjustment(codeNumber: number): number {
 /** HMRC Tables A Month 1 free-pay lookup for a parsed numeric L/M/N/T code. */
 export function getMonthlyTaxCodeFreePay(taxFreeAmount: number): number {
   if (taxFreeAmount <= 0) return 0;
-  return getMonthlyTablesAPayAdjustment(taxFreeAmount / 10);
+  // A policy-derived amount is converted to the same whole-number code basis
+  // HMRC uses when creating a code: drop the final digit, then apply Tables A.
+  // HMRC assigns code 1 to every positive annual allowance from £1 to £19;
+  // code 0 alone represents no free pay.
+  const codeNumber = Math.max(1, Math.floor(taxFreeAmount / 10));
+  return getMonthlyTablesAPayAdjustment(codeNumber);
 }
 
 /** HMRC Tables A Month 1 additional-pay lookup for a parsed K-code adjustment. */
@@ -270,7 +273,7 @@ function partialLiteralPattern(value: string): string {
 const NON_CUMULATIVE_EDIT_PATTERN =
   TAX_CODE_NON_CUMULATIVE_MARKERS.map(partialLiteralPattern).join('|');
 const TAX_CODE_EDIT_PATTERN = new RegExp(
-  `^(?:[SC]?|[SC]?K\\d{0,4}|[SC]?BR?|D[01]?|SD[0-8]?|CD[01]?|NT?|[SC]?0T?|[SC]?[1-9]\\d{0,4}[LMNT]?)(?:${NON_CUMULATIVE_EDIT_PATTERN})?$`,
+  `^(?:[SC]?|[SC]?K\\d{0,4}|[SC]?BR?|D[01]?|SD[0-8]?|CD[01]?|NT?|[SC]?0T?|[1-9]\\d{0,5}[LMNT]?|[SC][1-9]\\d{0,4}[LMNT]?)(?:${NON_CUMULATIVE_EDIT_PATTERN})?$`,
 );
 
 export function isTaxCodeEditCandidate(taxCode: string): boolean {

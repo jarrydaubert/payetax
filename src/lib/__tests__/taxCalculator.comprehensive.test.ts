@@ -546,12 +546,12 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
 
     it('exactly at higher rate threshold', () => {
       const result = calculateTax(createInput({ salary: 50270 }));
-      expect(result.incomeTax.annually).toBeCloseTo(7538.4, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(7536, 2);
     });
 
     it('£1 into higher rate', () => {
       const result = calculateTax(createInput({ salary: 50271 }));
-      expect(result.incomeTax.annually).toBeCloseTo(7538.4, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(7536, 2);
     });
 
     it('exactly at additional rate threshold', () => {

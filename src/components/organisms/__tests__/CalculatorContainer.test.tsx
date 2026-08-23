@@ -222,7 +222,7 @@ describe('CalculatorContainer Component', () => {
       fireEvent.click(screen.getByRole('button', { name: /Calculate/i }));
 
       expect(screen.getByRole('alert')).toHaveTextContent(/Tax code format not recognized/);
-      expect(screen.getByRole('alert')).toHaveTextContent(/standard tax-free amount/);
+      expect(screen.getByRole('alert')).toHaveTextContent(/policy-derived tax-free amount/);
     });
 
     it('shows the non-cumulative warning only for a complete valid code', () => {
@@ -246,7 +246,7 @@ describe('CalculatorContainer Component', () => {
       );
     });
 
-    it('asks the user to verify an unusually long supported code', () => {
+    it('accepts HMRC’s seven-character example without an invented warning', () => {
       (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
         selector({
@@ -254,7 +254,7 @@ describe('CalculatorContainer Component', () => {
           input: {
             studentLoanPlans: 'none',
             allowancesDeductions: 0,
-            taxCode: '10000L',
+            taxCode: '999999T',
           },
         }),
       );
@@ -262,11 +262,7 @@ describe('CalculatorContainer Component', () => {
 
       fireEvent.click(screen.getByRole('button', { name: /Calculate/i }));
 
-      expect(screen.getByRole('status')).toHaveTextContent(/verify it with HMRC/);
-      expect(screen.getByRole('link', { name: 'Check the code' })).toHaveAttribute(
-        'href',
-        '/tools/tax-code-decoder',
-      );
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
     });
 
     it.each([
@@ -295,7 +291,17 @@ describe('CalculatorContainer Component', () => {
     });
 
     it('explains why separate allowance controls are not added to a valid code', () => {
-      (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
+      (useCalculatorResults as jest.Mock).mockReturnValue({
+        ...mockResults,
+        taxCodeBasis: {
+          kind: 'supplied-code',
+          appliedCode: '1383M',
+          suppliedTaxFreeAmount: 13_830,
+          policyDerivedTaxFreeAmount: 13_830,
+          periodAdjustment: 'free-pay',
+          ignoredAdjustments: ['marriage-allowance'],
+        },
+      });
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
         selector({
           previousYearResults: null,
@@ -312,9 +318,7 @@ describe('CalculatorContainer Component', () => {
 
       fireEvent.click(screen.getByRole('button', { name: /Calculate/i }));
 
-      expect(screen.getByRole('status')).toHaveTextContent(
-        /already includes HMRC coding adjustments/,
-      );
+      expect(screen.getByRole('note')).toHaveTextContent(/not added again/);
     });
 
     it('does not label a bare NONCUM marker as a valid emergency code', () => {

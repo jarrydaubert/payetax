@@ -55,6 +55,7 @@ export function BasicInputs() {
   const payPeriodLabelId = `${payPeriodId}-label`;
   const taxYearId = useId();
   const taxCodeId = useId();
+  const taxCodeHelpId = `${taxCodeId}-help`;
   const regionId = useId();
   const regionLabelId = `${regionId}-label`;
   const marriedId = useId();
@@ -273,17 +274,27 @@ export function BasicInputs() {
             Tax Code
           </Label>
         </div>
-        <Input
-          id={taxCodeId}
-          type='text'
-          value={input.taxCode}
-          onChange={handleTaxCodeChange}
-          onFocus={() => trackCalculatorFieldFocus('tax_code')}
-          placeholder={input.region === 'Scotland' ? 'S1257L' : '1257L'}
-          className={cn(fieldControlClass, 'w-full max-w-full font-mono uppercase sm:w-52')}
-          maxLength={TAX_CODE_MAX_LENGTH}
-          data-testid='tax-code-input'
-        />
+        <div className='w-full'>
+          <Input
+            id={taxCodeId}
+            type='text'
+            value={input.taxCode}
+            onChange={handleTaxCodeChange}
+            onFocus={() => trackCalculatorFieldFocus('tax_code')}
+            placeholder={input.region === 'Scotland' ? 'S1257L' : '1257L'}
+            className={cn(fieldControlClass, 'w-full max-w-full font-mono uppercase sm:w-52')}
+            maxLength={TAX_CODE_MAX_LENGTH}
+            aria-describedby={taxCodeHelpId}
+            data-testid='tax-code-input'
+          />
+          <p
+            id={taxCodeHelpId}
+            className='mt-1 max-w-sm text-muted-foreground text-xs leading-snug'
+          >
+            Leave blank to estimate from the selected year, income and allowance answers. Enter a
+            complete HMRC code to use that code instead.
+          </p>
+        </div>
       </div>
 
       {/* Region Select with Tooltip */}

@@ -165,7 +165,7 @@ describe('Tax Calculator', () => {
       expect(result.grossSalary.annually).toBe(30000);
 
       // PAYE is annualized from whole-pound monthly taxable pay.
-      expect(result.incomeTax.annually).toBeCloseTo(3484.8, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(3482.4, 2);
 
       expect(result.nationalInsurance.annually).toBeCloseTo(1393.92, 2);
 
@@ -203,7 +203,7 @@ describe('Tax Calculator', () => {
       expect(result.grossSalary.annually).toBe(60000);
 
       // Annualized from monthly HMRC-style rounding.
-      expect(result.incomeTax.annually).toBeCloseTo(11428.8, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(11424, 2);
 
       expect(result.nationalInsurance.annually).toBeCloseTo(3210, 2);
 

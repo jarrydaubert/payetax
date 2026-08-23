@@ -66,15 +66,16 @@ describe('TaxCodeDecoderClient', () => {
     expect(screen.getByText(/needs an HMRC letter/)).toBeInTheDocument();
   });
 
-  it('does not present an implausibly long recognized code as confidently checked', async () => {
+  it('accepts HMRC v24.0’s documented seven-character example', async () => {
     const user = userEvent.setup();
     render(<TaxCodeDecoderClient />);
 
-    await user.type(screen.getByRole('textbox', { name: 'Tax code' }), '10000L');
+    await user.type(screen.getByRole('textbox', { name: 'Tax code' }), '999999T');
     await user.click(screen.getByRole('button', { name: 'Decode' }));
 
-    expect(await screen.findByText('Check with HMRC')).toBeInTheDocument();
-    expect(screen.getByText(/issue long tax codes manually/)).toBeInTheDocument();
+    expect(await screen.findByText('HMRC needs to review some items')).toBeInTheDocument();
+    expect(screen.getByText('£9,999,990')).toBeInTheDocument();
+    expect(screen.queryByText('Check with HMRC')).not.toBeInTheDocument();
   });
 
   it('does not label a bare NONCUM marker as an emergency code', async () => {

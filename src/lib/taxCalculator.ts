@@ -43,11 +43,9 @@
 
 import {
   DEFAULT_TAX_CODE,
-  PAYROLL_PERIOD_THRESHOLDS,
   type PayPeriod,
   PERIODS,
   type StudentLoanPlan,
-  type TaxYear,
 } from '@/constants/taxRates';
 import type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
 import { convertAnnualToPeriod, convertMonthlyToPeriod } from './periodCalculator';
@@ -77,12 +75,7 @@ import { roundToPence } from './tax/utils';
 
 export type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
 
-function getMonthlyPayrollFreePay(
-  annualTaxFreeAmount: number,
-  standardPersonalAllowance: number,
-  taxYear: TaxYear,
-  hasExplicitValidTaxCode: boolean,
-): number {
+function getMonthlyPayrollFreePay(annualTaxFreeAmount: number): number {
   if (annualTaxFreeAmount < 0) {
     // HMRC Tables A derives K-code additional pay from the code number, not
     // by simply dividing its public number×10 explanation by 12. The lookup
@@ -96,20 +89,10 @@ function getMonthlyPayrollFreePay(
     return 0;
   }
 
-  if (hasExplicitValidTaxCode) {
-    // Numeric L/M/N/T codes use HMRC Tables A pay adjustment. This is not
-    // equivalent to dividing the public code-number×10 amount by 12 because
-    // Tables A applies a £9 range adjustment and block/remainder rounding.
-    return getMonthlyTaxCodeFreePay(annualTaxFreeAmount);
-  }
-
-  const thresholds = PAYROLL_PERIOD_THRESHOLDS[taxYear];
-
-  if (annualTaxFreeAmount === standardPersonalAllowance) {
-    return thresholds.monthly.payeFreePay;
-  }
-
-  return Math.ceil(annualTaxFreeAmount / 12);
+  // Both an explicit numeric code and a policy-derived amount use one HMRC
+  // Tables A basis. Policy amounts first become a whole-number code by dropping
+  // the final digit, matching HMRC's published code-construction rule.
+  return getMonthlyTaxCodeFreePay(annualTaxFreeAmount);
 }
 
 function getMonthlyPayrollBandThreshold(annualThreshold: number): number {
@@ -398,10 +381,12 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // 2. Calculate tax-free allowance (annual and monthly)
   // ---------------
 
-  // Use the shared interpretation for the supported tax-code forms, including
-  // K codes, flat-rate overrides and non-cumulative markers.
-  let annualTaxFreeAmount = taxCodeResult.allowance;
   const hasExplicitValidTaxCode = suppliedTaxCode !== '' && taxCodeResult.isValid;
+
+  // Independently derive the policy-only amount even when a valid code is
+  // supplied. An explicit HMRC code owns source-specific coding adjustments;
+  // the policy amount is retained only to disclose the basis and any divergence.
+  let policyDerivedTaxFreeAmount = taxRates.personalAllowance;
 
   // Store band override for use in tax calculation section
   // BR = all at basic rate, D0 = all at higher rate, D1 = all at additional rate, NT = no tax
@@ -413,19 +398,18 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // IMPORTANT: Pension contributions reduce adjusted net income, so they can restore allowance
   const adjustedNetIncome = payBasis.adjustedNetIncome.annual;
   if (
-    !hasExplicitValidTaxCode &&
-    annualTaxFreeAmount > 0 &&
+    policyDerivedTaxFreeAmount > 0 &&
     adjustedNetIncome > taxRates.personalAllowanceReductionThreshold
   ) {
     const reduction = calculateAllowanceReduction(
       adjustedNetIncome,
-      annualTaxFreeAmount,
+      policyDerivedTaxFreeAmount,
       taxRates.personalAllowanceReductionThreshold,
       taxRates.personalAllowanceReductionRate,
     );
 
     // Apply the reduction - personal allowance can be reduced to zero but not negative
-    annualTaxFreeAmount -= reduction;
+    policyDerivedTaxFreeAmount -= reduction;
 
     // Example: £120,000 salary
     // Excess over £100,000 = £20,000
@@ -437,8 +421,8 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // Blind Person's Allowance (additional allowance for registered blind)
   // This is an additional allowance that's added on top of the Personal Allowance
   // For 2024-25: £2,870, For 2025-26: £3,070
-  if (!hasExplicitValidTaxCode && input.isBlind) {
-    annualTaxFreeAmount += taxRates.blindPersonsAllowance;
+  if (input.isBlind) {
+    policyDerivedTaxFreeAmount += taxRates.blindPersonsAllowance;
   }
 
   // NOTE: Age does NOT change the Personal Allowance. Age-related allowances were
@@ -452,7 +436,8 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // - The transferring partner must earn LESS than the Personal Allowance
   // - The receiving partner (user) must be a basic rate taxpayer
   // This saves up to £252/year (£1,260 at 20% basic rate)
-  if (!hasExplicitValidTaxCode && input.isMarried && input.partnerGrossWage >= 0) {
+  let policyIncludesMarriageAllowance = false;
+  if (input.isMarried && input.partnerGrossWage >= 0) {
     // Find the threshold where "Higher rate" (40% or 42%) starts
     const higherRateBandIndex = taxRates.bands.findIndex((band) => band.rate >= 40);
     const prevBand = higherRateBandIndex > 0 ? taxRates.bands[higherRateBandIndex - 1] : null;
@@ -470,17 +455,20 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
       payBasis.totalGrossIncome.annual <= higherRateThreshold // User is basic rate taxpayer (total income)
     ) {
       // User RECEIVES the marriage allowance from their lower-earning partner
-      annualTaxFreeAmount += taxRates.marriageAllowance;
+      policyDerivedTaxFreeAmount += taxRates.marriageAllowance;
+      policyIncludesMarriageAllowance = true;
     }
   }
 
+  // Use the shared interpretation for supported explicit tax-code forms,
+  // including K codes and flat-rate overrides. With no usable explicit code,
+  // use the independently derived policy amount above.
+  const annualTaxFreeAmount = hasExplicitValidTaxCode
+    ? taxCodeResult.allowance
+    : policyDerivedTaxFreeAmount;
+
   // Calculate monthly tax-free amount for payslip calculation.
-  const monthlyTaxFreeAmount = getMonthlyPayrollFreePay(
-    annualTaxFreeAmount,
-    taxRates.personalAllowance,
-    taxYear,
-    hasExplicitValidTaxCode,
-  );
+  const monthlyTaxFreeAmount = getMonthlyPayrollFreePay(annualTaxFreeAmount);
 
   // ---------------
   // 3. Calculate adjusted salary and taxable income (annual and monthly)
@@ -819,6 +807,36 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     taxFreeAmountByPeriod: {
       annually: annualTaxFreeAmount,
       monthly: monthlyTaxFreeAmount,
+    },
+    taxCodeBasis: {
+      kind: hasExplicitValidTaxCode
+        ? 'supplied-code'
+        : suppliedTaxCode
+          ? 'invalid-code-fallback'
+          : 'policy-derived',
+      appliedCode: hasExplicitValidTaxCode ? taxCodeResult.normalizedCode : null,
+      policyDerivedTaxFreeAmount,
+      suppliedTaxFreeAmount:
+        hasExplicitValidTaxCode &&
+        (taxCodeResult.classification === 'standard' ||
+          taxCodeResult.classification === 'zero-allowance')
+          ? Math.max(0, taxCodeResult.allowance)
+          : undefined,
+      periodAdjustment:
+        taxCodeResult.classification === 'k-code'
+          ? 'additional-pay'
+          : hasExplicitValidTaxCode &&
+              (taxCodeResult.classification === 'flat-rate' ||
+                taxCodeResult.classification === 'no-tax' ||
+                taxCodeResult.classification === 'zero-allowance')
+            ? 'none'
+            : 'free-pay',
+      ignoredAdjustments: hasExplicitValidTaxCode
+        ? [
+            ...(input.isBlind ? (['blind-persons-allowance'] as const) : []),
+            ...(policyIncludesMarriageAllowance ? (['marriage-allowance'] as const) : []),
+          ]
+        : [],
     },
     taxableIncome: annualTaxableIncome,
     incomeTax: incomeTax,

@@ -2,8 +2,9 @@
  * Scottish vertical verification.
  *
  * Annual tool results use statutory annual bands. The main calculator models
- * month-1 PAYE with whole-pound monthly free pay and thresholds, so the public
- * comparison intentionally allows the pre-existing maximum £10 annual variance.
+ * month-1 PAYE with Tables A free pay and thresholds. In particular, HMRC code
+ * 1 covers annual allowances from £1 to £19 and supplies £1.59 Month 1 free pay,
+ * so annualising payroll can differ from statutory annual tax by up to £13 here.
  */
 
 import {
@@ -17,7 +18,7 @@ import {
 } from '@/lib/tax';
 
 const STATUTORY_TOP_BOUNDARY = 125_140;
-const TOOL_ENGINE_TOLERANCE = 10;
+const TOOL_ENGINE_TOLERANCE = 13;
 
 const annualFixtures: Array<{
   taxYear: TaxYear;
@@ -35,7 +36,7 @@ const annualFixtures: Array<{
     },
     expectedEngineTax: {
       100000: 30034.08,
-      125139: 45869.76,
+      125139: 45864.72,
       125140: 45874.8,
       125141: 45874.8,
       150000: 57560.28,
@@ -52,7 +53,7 @@ const annualFixtures: Array<{
     },
     expectedEngineTax: {
       100000: 30773.52,
-      125139: 47740.32,
+      125139: 47734.92,
       125140: 47745.72,
       125141: 47745.72,
       150000: 59680.08,
@@ -69,7 +70,7 @@ const annualFixtures: Array<{
     },
     expectedEngineTax: {
       100000: 30759,
-      125139: 47725.8,
+      125139: 47720.4,
       125140: 47731.2,
       125141: 47731.2,
       150000: 59665.56,
@@ -86,7 +87,7 @@ const annualFixtures: Array<{
     },
     expectedEngineTax: {
       100000: 30727.32,
-      125139: 47694.12,
+      125139: 47688.72,
       125140: 47699.52,
       125141: 47699.52,
       150000: 59633.88,
@@ -97,10 +98,10 @@ const annualFixtures: Array<{
 const boundarySalaries = [100_000, 125_139, 125_140, 125_141, 150_000] as const;
 
 const taperEntryCases = [
-  { taxYear: '2023-2024', salary: 100_175, expectedToolTax: 30_149, expectedEngineTax: 30_139.92 },
-  { taxYear: '2024-2025', salary: 100_103, expectedToolTax: 30_848, expectedEngineTax: 30_838.32 },
-  { taxYear: '2025-2026', salary: 100_031, expectedToolTax: 30_785, expectedEngineTax: 30_775.2 },
-  { taxYear: '2026-2027', salary: 100_007, expectedToolTax: 30_737, expectedEngineTax: 30_727.32 },
+  { taxYear: '2023-2024', salary: 100_175, expectedToolTax: 30_149, expectedEngineTax: 30_144.96 },
+  { taxYear: '2024-2025', salary: 100_103, expectedToolTax: 30_848, expectedEngineTax: 30_843.72 },
+  { taxYear: '2025-2026', salary: 100_031, expectedToolTax: 30_785, expectedEngineTax: 30_780.6 },
+  { taxYear: '2026-2027', salary: 100_007, expectedToolTax: 30_737, expectedEngineTax: 30_732.72 },
 ] as const satisfies ReadonlyArray<{
   taxYear: TaxYear;
   salary: number;

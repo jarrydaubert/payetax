@@ -4,7 +4,28 @@ import {
   generatePayeEmailHtml,
   generatePayeEmailText,
 } from '@/lib/email/payeResultsEmail';
-import type { TaxCalculationResults } from '@/lib/taxCalculator';
+import {
+  calculateTax,
+  type TaxCalculationInput,
+  type TaxCalculationResults,
+} from '@/lib/taxCalculator';
+
+const calculationInput: TaxCalculationInput = {
+  salary: 110_000,
+  payPeriod: 'annually',
+  taxYear: '2026-2027',
+  taxCode: '',
+  isScottish: false,
+  isMarried: false,
+  partnerGrossWage: 0,
+  isBlind: false,
+  payNoNI: false,
+  pensionContribution: 0,
+  pensionContributionType: 'percentage',
+  studentLoanPlans: 'none',
+  niCategory: 'A',
+  hoursPerWeek: 37.5,
+};
 
 const sampleResults: TaxCalculationResults = {
   grossSalary: {
@@ -104,5 +125,36 @@ describe('payeResultsEmail', () => {
     expect(text).not.toContain('Pension:');
     expect(text).not.toContain('Student Loan:');
     expect(text).toContain('TAKE-HOME PAY:');
+  });
+
+  test('text and HTML emails disclose an explicit code that differs from the policy amount', () => {
+    const results = calculateTax({ ...calculationInput, taxCode: '1257L' });
+    const text = generatePayeEmailText(results, '2026-27');
+    const html = generatePayeEmailHtml(results, '2026-27');
+
+    for (const output of [text, html]) {
+      expect(output).toContain('supplied HMRC code 1257L');
+      expect(output).toContain('£12,570');
+      expect(output).toContain('£7,570');
+      expect(output).toContain('HMRC Tables A');
+    }
+  });
+
+  test('emails disclose a blank-code policy estimate', () => {
+    const results = calculateTax(calculationInput);
+
+    expect(generatePayeEmailText(results, '2026-27')).toContain(
+      'No code was supplied, so PayeTax estimated the tax-free amount',
+    );
+    expect(generatePayeEmailHtml(results, '2026-27')).toContain(
+      'No code was supplied, so PayeTax estimated the tax-free amount',
+    );
+  });
+
+  test('emails disclose an invalid-code policy fallback', () => {
+    const results = calculateTax({ ...calculationInput, taxCode: 'INVALID' });
+
+    expect(generatePayeEmailText(results, '2026-27')).toContain('policy-derived fallback');
+    expect(generatePayeEmailHtml(results, '2026-27')).toContain('policy-derived fallback');
   });
 });
