@@ -127,33 +127,42 @@ describe('shared tax-code grammar', () => {
   });
 
   it.each([
+    [1, 1.59],
+    [9, 1.59],
+    [10, 1.59],
+    [19, 1.59],
+    [20, 2.42],
     [1000, 84.09],
     [5000, 417.42],
     [10000, 834.09],
+    [12569, 1047.43],
     [12570, 1048.26],
   ])('reproduces the HMRC Tables A Month 1 free pay for £%i', (amount, monthly) => {
     expect(getMonthlyTaxCodeFreePay(amount)).toBe(monthly);
   });
 
-  it.each([
-    ['9999L', false],
-    ['10000L', true],
-    ['99999L', true],
-  ] as const)('applies the manual-check warning boundary to %s', (code, requiresHmrcCheck) => {
-    const parsed = parseTaxCode(code, DEFAULT_ALLOWANCE);
-    const decoded = decodeTaxCode(code);
+  it('accepts HMRC v24.0’s seven-character example and rejects longer base codes', () => {
+    expect(parseTaxCode('999999T', DEFAULT_ALLOWANCE)).toEqual(
+      expect.objectContaining({ isValid: true, allowance: 9_999_990 }),
+    );
+    expect(isTaxCodeEditCandidate('999999T')).toBe(true);
 
-    expect(parsed.requiresHmrcCheck).toBe(requiresHmrcCheck);
-    expect(decoded.requiresHmrcCheck).toBe(requiresHmrcCheck);
-    expect(decoded.warnings.join(' ').includes('long tax codes manually')).toBe(requiresHmrcCheck);
+    const tooLong = parseTaxCode('1000000L', DEFAULT_ALLOWANCE);
+    expect(tooLong.isValid).toBe(false);
+    expect(tooLong.validationMessage).toContain('up to 7 characters');
+    expect(isTaxCodeEditCandidate('1000000L')).toBe(false);
+    expect(isTaxCodeEditCandidate('S999999T')).toBe(false);
   });
 
-  it("rejects a standard code with more than HMRC's 5 numerical digits", () => {
-    const parsed = parseTaxCode('100000L', DEFAULT_ALLOWANCE);
-
-    expect(parsed.isValid).toBe(false);
-    expect(parsed.validationMessage).toContain('no more than 5 digits');
-    expect(isTaxCodeEditCandidate('100000L')).toBe(false);
+  it.each([
+    ['S99999T', 'S', null],
+    ['C99999T', 'C', null],
+    ['999999T NONCUM', null, 'NONCUM'],
+  ] as const)('applies the seven-character base-code boundary to %s', (code, prefix, suffix) => {
+    expect(parseTaxCode(code, DEFAULT_ALLOWANCE)).toEqual(
+      expect.objectContaining({ isValid: true, prefix, suffix }),
+    );
+    expect(isTaxCodeEditCandidate(code)).toBe(true);
   });
 
   it.each([
@@ -215,6 +224,81 @@ describe('calculator and decoder consistency', () => {
     });
 
     expect(calculated.taxFreeAmount).toBe(amount);
+  });
+
+  it('keeps an explicit code authoritative while exposing the policy-only taper comparison', () => {
+    const calculated = calculateTax({ ...baseInput, salary: 110_000, taxCode: '1257L' });
+
+    expect(calculated.taxFreeAmount).toBe(12_570);
+    expect(calculated.taxCodeBasis).toEqual({
+      kind: 'supplied-code',
+      appliedCode: '1257L',
+      policyDerivedTaxFreeAmount: 7_570,
+      suppliedTaxFreeAmount: 12_570,
+      periodAdjustment: 'free-pay',
+      ignoredAdjustments: [],
+    });
+  });
+
+  it('uses the blank-code policy taper and the same Tables A period basis as 757T', () => {
+    const policyDerived = calculateTax({ ...baseInput, salary: 110_000, taxCode: '' });
+    const explicit = calculateTax({ ...baseInput, salary: 110_000, taxCode: '757T' });
+
+    expect(policyDerived.taxCodeBasis).toEqual(
+      expect.objectContaining({
+        kind: 'policy-derived',
+        appliedCode: null,
+        policyDerivedTaxFreeAmount: 7_570,
+      }),
+    );
+    expect(policyDerived.taxFreeAmount).toBe(7_570);
+    expect(policyDerived.taxFreeAmountByPeriod?.monthly).toBe(631.59);
+    expect(policyDerived.incomeTax.annually).toBe(explicit.incomeTax.annually);
+  });
+
+  it('maps every positive policy amount from £1 to £19 to HMRC code 1', () => {
+    const ninePounds = calculateTax({ ...baseInput, salary: 125_122, taxCode: '' });
+    const onePound = calculateTax({ ...baseInput, salary: 125_139, taxCode: '' });
+
+    expect(ninePounds.taxFreeAmount).toBe(9);
+    expect(ninePounds.taxFreeAmountByPeriod?.monthly).toBe(1.59);
+    expect(onePound.taxFreeAmount).toBe(1);
+    expect(onePound.taxFreeAmountByPeriod?.monthly).toBe(1.59);
+  });
+
+  it('does not double count separate allowance answers under an explicit code', () => {
+    const calculated = calculateTax({
+      ...baseInput,
+      taxCode: '1257L',
+      isBlind: true,
+      isMarried: true,
+      partnerGrossWage: 0,
+    });
+
+    expect(calculated.taxFreeAmount).toBe(12_570);
+    expect(calculated.taxCodeBasis).toEqual(
+      expect.objectContaining({
+        policyDerivedTaxFreeAmount: 17_080,
+        ignoredAdjustments: ['blind-persons-allowance', 'marriage-allowance'],
+      }),
+    );
+  });
+
+  it('does not describe an ineligible Marriage Allowance answer as an ignored adjustment', () => {
+    const calculated = calculateTax({
+      ...baseInput,
+      salary: 60_000,
+      taxCode: '1257L',
+      isMarried: true,
+      partnerGrossWage: 8_000,
+    });
+
+    expect(calculated.taxCodeBasis).toEqual(
+      expect.objectContaining({
+        policyDerivedTaxFreeAmount: 12_570,
+        ignoredAdjustments: [],
+      }),
+    );
   });
 
   it.each([
@@ -333,11 +417,13 @@ describe('calculator and decoder consistency', () => {
     expect(welshOverride.taxBands[0]?.rate).toBe(40);
   });
 
-  it('identifies reserved Scottish D-code formats that have no current rate mapping', () => {
+  it('identifies Scottish D-code formats that have no current rate mapping', () => {
     const parsed = parseTaxCode('SD4', DEFAULT_ALLOWANCE);
 
     expect(isTaxCodeEditCandidate('SD4')).toBe(true);
     expect(parsed.isValid).toBe(false);
-    expect(parsed.validationMessage).toContain('do not map to a current 2026/27 Scottish rate');
+    expect(parsed.validationMessage).toContain(
+      'do not map to a current 2026/27 Scottish Income Tax rate',
+    );
   });
 });

@@ -126,16 +126,33 @@ export interface TaxBandBreakdown {
   amount: number;
 }
 
+export interface TaxCodeCalculationBasis {
+  /** Whether PAYE used a supplied code or a policy estimate because no usable code was supplied. */
+  kind: 'supplied-code' | 'policy-derived' | 'invalid-code-fallback';
+  /** Canonical supplied code when one was accepted. */
+  appliedCode: string | null;
+  /** Tax-free amount estimated from tax-year policy and the entered circumstances. */
+  policyDerivedTaxFreeAmount: number;
+  /** Source-specific tax-free amount encoded by an accepted L/M/N/T or 0T code. */
+  suppliedTaxFreeAmount?: number;
+  /** Which HMRC Tables A adjustment, if any, the accepted/derived basis applies. */
+  periodAdjustment: 'free-pay' | 'additional-pay' | 'none';
+  /** Eligible separate adjustments deliberately not added because a supplied code owns HMRC coding. */
+  ignoredAdjustments: Array<'blind-persons-allowance' | 'marriage-allowance'>;
+}
+
 /**
  * Shared output contract for PAYE calculator results.
  */
 export interface TaxCalculationResults {
   /** Gross salary across different periods */
   grossSalary: Record<PayPeriod, number>;
-  /** Tax-free allowance amount */
+  /** Tax-free/code amount used by the PAYE calculation. */
   taxFreeAmount: number;
   /** Tax-free allowance amounts for payroll display periods when they differ from annual averaging */
   taxFreeAmountByPeriod?: Partial<Record<PayPeriod, number>>;
+  /** Explains which tax-code/allowance basis produced the PAYE estimate. */
+  taxCodeBasis?: TaxCodeCalculationBasis;
   /** Taxable income after allowances and deductions */
   taxableIncome: number;
 

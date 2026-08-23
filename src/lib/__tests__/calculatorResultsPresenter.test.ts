@@ -40,6 +40,7 @@ describe('calculatorResultsPresenter', () => {
 
     expect(gross?.valuesByPeriod?.hourly).toBeCloseTo(23.62, 2);
     expect(taxFree?.valuesByPeriod?.monthly).toBe(1048.26);
+    expect(taxFree?.category).toBe('Code Tax-Free Amount');
     expect(incomeTax?.valuesByPeriod?.monthly).toBeCloseTo(568.2, 2);
     expect(incomeTax?.valuesByPeriod?.hourly).toBeCloseTo(3.28, 2);
     expect(nationalInsurance?.valuesByPeriod?.monthly).toBeCloseTo(227.32, 2);
@@ -48,6 +49,17 @@ describe('calculatorResultsPresenter', () => {
     expect(pension?.valuesByPeriod?.hourly).toBeCloseTo(1.18, 2);
     expect(netPay?.valuesByPeriod?.monthly).toBeCloseTo(3120.02, 2);
     expect(netPay?.valuesByPeriod?.hourly).toBeCloseTo(18, 2);
+  });
+
+  it('labels a blank-code amount as an estimate rather than a statutory allowance', () => {
+    const results = calculateTax({ ...payslipInput, taxCode: '' });
+    const rows = buildResultsTableRows({
+      results,
+      previousYearLabel: '2025',
+      taxCode: '',
+    });
+
+    expect(rows.find((row) => row.kind === 'taxFree')?.category).toBe('Estimated Tax-Free Amount');
   });
 
   it('presents a K code as a positive amount added to taxable pay', () => {
@@ -64,6 +76,19 @@ describe('calculatorResultsPresenter', () => {
     );
     expect(adjustment?.valuesByPeriod?.monthly).toBeGreaterThan(0);
     expect(rows.some((row) => row.category === 'Tax-Free Allowance')).toBe(false);
+  });
+
+  it('keeps the calculated code basis authoritative if the input is edited before recalculation', () => {
+    const results = calculateTax({ ...payslipInput, taxCode: 'K475' });
+    const rows = buildResultsTableRows({
+      results,
+      previousYearLabel: '2025',
+      taxCode: '1257L',
+    });
+
+    expect(rows.find((row) => row.kind === 'taxCodeAdjustment')).toEqual(
+      expect.objectContaining({ category: 'Added to Taxable Pay', annual: 4_750 }),
+    );
   });
 
   it('keeps marginal-rate calculation out of presentational components', () => {

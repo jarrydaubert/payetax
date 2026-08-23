@@ -1,4 +1,5 @@
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
+import { getTaxCodeBasisExplanation } from '@/lib/taxCodeBasisPresenter';
 import { formatCurrency } from '@/lib/utils';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://payetax.co.uk';
@@ -53,6 +54,14 @@ Pension:           -${formatCurrency(results.pensionContribution.annually)}  (-$
 Student Loan:      -${formatCurrency(results.studentLoan.annually)}  (-${formatCurrency(results.studentLoan.monthly)}/mo)`;
   }
 
+  if (results.taxCodeBasis) {
+    text += `
+
+CALCULATION BASIS
+-----------------
+${getTaxCodeBasisExplanation(results.taxCodeBasis)}`;
+  }
+
   text += `
 ---------
 Take-Home Pay:      ${formatCurrency(results.netPay.annually)}  (${formatCurrency(results.netPay.monthly)}/mo)
@@ -71,6 +80,9 @@ Calculate again: ${BASE_URL}
 
 export function generatePayeEmailHtml(results: TaxCalculationResults, taxYear?: string): string {
   const safeTaxYear = escapeHtml(taxYear || '2025-26');
+  const safeTaxCodeBasis = results.taxCodeBasis
+    ? escapeHtml(getTaxCodeBasisExplanation(results.taxCodeBasis))
+    : null;
   const effectiveRate =
     results.grossSalary.annually > 0
       ? (
@@ -134,6 +146,15 @@ export function generatePayeEmailHtml(results: TaxCalculationResults, taxYear?: 
 
               <h2 class="email-title" style="margin: 0 0 12px; color: #07111f; font-family: Georgia, 'Times New Roman', serif; font-size: 42px; font-weight: 700; line-height: 1.02;">Your tax results are in</h2>
               <p style="margin: 0 0 24px; color: #465468; font-size: 16px; line-height: 1.55;">Below is your annual and monthly PAYE breakdown using HMRC rates${safeTaxYear ? ` for ${safeTaxYear}` : ''}.</p>
+
+              ${
+                safeTaxCodeBasis
+                  ? `<div style="border: 1px solid #cec6b7; background-color: #f8f5ed; padding: 14px 16px; margin-bottom: 24px;">
+                <p style="margin: 0 0 6px; color: #123a66; font-family: Menlo, Consolas, monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700;">Calculation basis</p>
+                <p style="margin: 0; color: #465468; font-size: 13px; line-height: 1.55;">${safeTaxCodeBasis}</p>
+              </div>`
+                  : ''
+              }
 
               <div style="border: 1px solid #123a66; border-left: 4px solid #123a66; background-color: #f2eee4; padding: 20px 22px; margin-bottom: 24px;">
                 <p style="margin: 0 0 8px; color: #123a66; font-family: Menlo, Consolas, monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700;">Take-home pay</p>

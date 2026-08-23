@@ -16,6 +16,7 @@ export const HMRC_TAX_CODE_FIXTURE_SOURCES = {
     'https://www.gov.uk/hmrc-internal-manuals/paye-manual/paye11015',
     'https://www.gov.uk/hmrc-internal-manuals/paye-manual/paye11050',
     'https://www.gov.uk/hmrc-internal-manuals/paye-manual/paye11090',
+    'https://www.gov.uk/government/publications/payroll-technical-specifications-income-tax',
   ],
 } as const;
 
@@ -111,6 +112,21 @@ export const VALID_TAX_CODE_FIXTURES: readonly TaxCodeVerificationFixture[] = [
     detailIncludes: 'tax-free income from this employment or pension',
     amountLabel: 'Tax-free amount from this source',
     amount: 10_000,
+  },
+  {
+    // HMRC PAYE Tax Table Routines v24.0 section 3.3.2 gives 999999T as
+    // the explicit seven-character example software must accept.
+    code: '999999T',
+    classification: 'standard',
+    prefix: null,
+    letter: 'T',
+    allowance: 9_999_990,
+    kAdjustment: 0,
+    marker: null,
+    meaningIncludes: 'HMRC needs to review some items',
+    detailIncludes: 'tax-free income from this employment or pension',
+    amountLabel: 'Tax-free amount from this source',
+    amount: 9_999_990,
   },
   {
     code: '0T',
@@ -340,6 +356,7 @@ export const INVALID_TAX_CODE_FIXTURES = [
   '1257L W1 M1',
   'NONCUM',
   '0L',
-  '100000L',
+  '1000000L',
+  'S999999T',
   '9999999999999999L',
 ] as const;

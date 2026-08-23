@@ -93,7 +93,15 @@ export function buildResultsTableRows({
     ? results.netPay.annually - previousYearResults.netPay.annually
     : 0;
   const parsedTaxCode = parseTaxCode(taxCode, 0);
-  const isKCode = parsedTaxCode.isValid && parsedTaxCode.isKCode;
+  const isKCode = results.taxCodeBasis
+    ? results.taxCodeBasis.periodAdjustment === 'additional-pay'
+    : parsedTaxCode.isValid && parsedTaxCode.isKCode;
+  const taxFreeLabel =
+    results.taxCodeBasis?.kind === 'supplied-code'
+      ? 'Code Tax-Free Amount'
+      : results.taxCodeBasis
+        ? 'Estimated Tax-Free Amount'
+        : 'Tax-Free Allowance';
   const taxCodeAmount = isKCode ? Math.abs(results.taxFreeAmount) : results.taxFreeAmount;
   const whatIfTaxCodeAmount =
     whatIfResults && isKCode ? Math.abs(whatIfResults.taxFreeAmount) : whatIfResults?.taxFreeAmount;
@@ -156,7 +164,7 @@ export function buildResultsTableRows({
     {
       id: isKCode ? 'tax-code-adjustment' : 'tax-free-allowance',
       kind: isKCode ? 'taxCodeAdjustment' : 'taxFree',
-      category: isKCode ? 'Added to Taxable Pay' : 'Tax-Free Allowance',
+      category: isKCode ? 'Added to Taxable Pay' : taxFreeLabel,
       annual: taxCodeAmount,
       whatIfAnnual: whatIfTaxCodeAmount,
       valuesByPeriod: taxCodePeriodValues,

@@ -36,6 +36,7 @@ import {
 import { CalculatorInputsSection } from './CalculatorInputs/CalculatorInputsSection';
 import { ResultsSummaryCards } from './CalculatorResults/ResultsSummaryCards';
 import { ResultsTable } from './CalculatorResults/ResultsTable';
+import { TaxCodeBasisNotice } from './CalculatorResults/TaxCodeBasisNotice';
 
 export function CalculatorContainer() {
   // Use optimized selectors to prevent unnecessary re-renders
@@ -145,7 +146,7 @@ export function CalculatorContainer() {
     if (taxCodeInput && !parsedTaxCode.isValid) {
       setActionMessage({
         tone: 'error',
-        text: 'Tax code format not recognized. This estimate used the selected tax year’s standard tax-free amount as its tax-code fallback. Check the complete code against your payslip or HMRC notice.',
+        text: 'Tax code format not recognized. This estimate used a policy-derived tax-free amount based on the selected year, adjusted net income and allowance answers. Check the complete code against your payslip or HMRC notice.',
         taxCodeLink: true,
       });
     } else {
@@ -153,16 +154,6 @@ export function CalculatorContainer() {
       if (hasNonCumulativeTaxCodeMarker(taxCodeInput)) {
         taxCodeNotices.push(
           `Emergency tax code detected. ${TAX_CODE_NON_CUMULATIVE_MARKERS.join(', ')} codes use only the current pay period. This calculator shows a steady-pay annual projection, not an exact deduction from a particular emergency-code payslip.`,
-        );
-      }
-      if (parsedTaxCode.isValid && (input.isBlind || input.isMarried)) {
-        taxCodeNotices.push(
-          "The tax code's amount already includes HMRC coding adjustments, so separate Blind Person's and Marriage Allowance controls were not added again.",
-        );
-      }
-      if (parsedTaxCode.requiresHmrcCheck) {
-        taxCodeNotices.push(
-          'This unusually long tax code is a supported HMRC format, but verify it with HMRC before relying on the estimate.',
         );
       }
       const parsedCodeRegion = getTaxCodeRegionOverride(parsedTaxCode);
@@ -334,6 +325,7 @@ export function CalculatorContainer() {
                 )}
               </motion.div>
             )}
+            <TaxCodeBasisNotice basis={results.taxCodeBasis} />
             <ResultsSummaryCards results={results} taxYear={input.taxYear} input={input} />
           </motion.div>
         )}

@@ -18,6 +18,9 @@ import { roundToPence } from '../../src/lib/tax/utils';
 import { calculateTax, type TaxCalculationInput } from '../../src/lib/taxCalculator';
 
 const TAX_YEAR = '2025-2026' as const;
+const TAPER_ZERO_SALARY =
+  TAX_RATES[TAX_YEAR].personalAllowanceReductionThreshold +
+  TAX_RATES[TAX_YEAR].personalAllowance / TAX_RATES[TAX_YEAR].personalAllowanceReductionRate;
 
 // Helper to create input with defaults
 function createInput(overrides: Partial<TaxCalculationInput>): TaxCalculationInput {
@@ -74,18 +77,18 @@ const scenarios: Array<{ id: string; description: string; input: TaxCalculationI
   // PA taper scenarios (60% tax trap)
   {
     id: 'pa-taper-100k',
-    description: 'Personal allowance taper starts £100k',
-    input: createInput({ salary: 100000 }),
+    description: 'Policy-derived allowance taper starts at £100k (blank code)',
+    input: createInput({ salary: 100000, taxCode: '' }),
   },
   {
     id: 'pa-taper-110k',
-    description: 'Personal allowance taper £110k (60% trap zone)',
-    input: createInput({ salary: 110000, taxCode: '757T' }),
+    description: 'Policy-derived allowance at £110k (blank code, taper zone)',
+    input: createInput({ salary: 110000, taxCode: '' }),
   },
   {
     id: '60percent-trap-125140',
-    description: '60% marginal trap peak £125,140',
-    input: createInput({ salary: 125140, taxCode: '0T' }),
+    description: `Policy-derived allowance reaches zero at £${TAPER_ZERO_SALARY.toLocaleString('en-GB')} (blank code)`,
+    input: createInput({ salary: TAPER_ZERO_SALARY, taxCode: '' }),
   },
 
   // Additional rate

@@ -127,25 +127,16 @@ export function TaxCodeDecoderClient() {
       {/* Results */}
       {result && (
         <Card
-          className={cn(
-            'mb-8',
-            !result.isValid
-              ? 'border-destructive/30'
-              : result.requiresHmrcCheck
-                ? 'border-warning/30'
-                : 'border-success/30',
-          )}
+          className={cn('mb-8', !result.isValid ? 'border-destructive/30' : 'border-success/30')}
         >
           <CardHeader>
             <div className='flex flex-col items-start gap-4 sm:flex-row sm:justify-between'>
               <div>
                 <CardTitle className='flex items-center gap-2'>
-                  {result.isValid && !result.requiresHmrcCheck ? (
+                  {result.isValid ? (
                     <CheckCircle className={cn('size-5', 'text-success')} />
                   ) : (
-                    <AlertCircle
-                      className={cn('size-5', result.isValid ? 'text-warning' : 'text-destructive')}
-                    />
+                    <AlertCircle className={cn('size-5', 'text-destructive')} />
                   )}
                   <span className='font-mono text-2xl'>{result.code}</span>
                 </CardTitle>
@@ -163,10 +154,7 @@ export function TaxCodeDecoderClient() {
           </CardHeader>
           <CardContent className='space-y-4'>
             {/* Region Badges */}
-            {(result.isScottish ||
-              result.isWelsh ||
-              result.isEmergency ||
-              result.requiresHmrcCheck) && (
+            {(result.isScottish || result.isWelsh || result.isEmergency) && (
               <div className='flex flex-wrap gap-2'>
                 {result.isScottish && (
                   <span className='rounded-full bg-primary/15 px-3 py-1 font-medium text-primary text-sm'>
@@ -181,11 +169,6 @@ export function TaxCodeDecoderClient() {
                 {result.isEmergency && (
                   <span className='rounded-full bg-warning/15 px-3 py-1 font-medium text-foreground text-sm'>
                     Emergency Code
-                  </span>
-                )}
-                {result.requiresHmrcCheck && (
-                  <span className='rounded-full bg-warning/15 px-3 py-1 font-medium text-foreground text-sm'>
-                    Check with HMRC
                   </span>
                 )}
               </div>

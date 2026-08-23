@@ -98,7 +98,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
     it('£50,270 salary - top of basic rate', () => {
       const result = calculateTax(createInput({ salary: 50270 }));
 
-      expect(result.incomeTax.annually).toBeCloseTo(7538.4, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(7536, 2);
 
       expect(result.nationalInsurance.annually).toBeCloseTo(3015.36, 2);
     });
@@ -106,7 +106,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
     it('£60,000 salary - higher rate taxpayer', () => {
       const result = calculateTax(createInput({ salary: 60000 }));
 
-      expect(result.incomeTax.annually).toBeCloseTo(11428.8, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(11424, 2);
 
       expect(result.nationalInsurance.annually).toBeCloseTo(3210, 2);
     });
@@ -510,9 +510,9 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       // £4,000 pension contribution
       expect(result.pensionContribution.annually).toBe(4000);
 
-      expect(result.taxableIncome).toBe(23424);
+      expect(result.taxableIncome).toBe(23412);
 
-      expect(result.incomeTax.annually).toBeCloseTo(4684.8, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(4682.4, 2);
     });
 
     it('Fixed £5,000 pension contribution', () => {
@@ -526,7 +526,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
 
       expect(result.pensionContribution.annually).toBe(5000);
 
-      expect(result.taxableIncome).toBeCloseTo(32424, 2);
+      expect(result.taxableIncome).toBeCloseTo(32412, 2);
     });
   });
 
@@ -584,7 +584,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
 
       expect(higherBand).toBeDefined();
       if ((higherBand?.amount ?? 0) > 5000) {
-        expect(higherBand?.amount).toBeCloseTo(9720, 2); // Taxable income in band
+        expect(higherBand?.amount).toBeCloseTo(9708, 2); // Taxable income in band
       } else {
         expect(higherBand?.amount).toBeCloseTo(3892, 2); // Tax amount
       }

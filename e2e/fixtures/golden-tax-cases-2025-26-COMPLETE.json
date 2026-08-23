@@ -1,6 +1,6 @@
 {
   "version": "2025-2026",
-  "generatedAt": "2026-08-23T13:00:16.076Z",
+  "generatedAt": "2026-08-23T19:10:24.158Z",
   "description": "AUTO-GENERATED golden master from taxRates.ts + calculateTax() logic. This is the source of truth for E2E regression tests.",
   "metadata": {
     "personalAllowance": 12570,
@@ -21,7 +21,7 @@
         "employeeNI": 1393.92,
         "netPay": 25123.68
       },
-      "generatedAt": "2026-08-23T13:00:16.076Z",
+      "generatedAt": "2026-08-23T19:10:24.156Z",
       "taxYear": "2025-2026"
     },
     {
@@ -37,7 +37,7 @@
         "employeeNI": 2593.92,
         "netPay": 35923.68
       },
-      "generatedAt": "2026-08-23T13:00:16.076Z",
+      "generatedAt": "2026-08-23T19:10:24.157Z",
       "taxYear": "2025-2026"
     },
     {
@@ -53,7 +53,7 @@
         "employeeNI": 3110.04,
         "netPay": 42462.76
       },
-      "generatedAt": "2026-08-23T13:00:16.076Z",
+      "generatedAt": "2026-08-23T19:10:24.157Z",
       "taxYear": "2025-2026"
     },
     {
@@ -69,7 +69,7 @@
         "employeeNI": 0,
         "netPay": 12570
       },
-      "generatedAt": "2026-08-23T13:00:16.076Z",
+      "generatedAt": "2026-08-23T19:10:24.157Z",
       "taxYear": "2025-2026"
     },
     {
@@ -85,55 +85,55 @@
         "employeeNI": 3015.36,
         "netPay": 39718.64
       },
-      "generatedAt": "2026-08-23T13:00:16.076Z",
+      "generatedAt": "2026-08-23T19:10:24.157Z",
       "taxYear": "2025-2026"
     },
     {
       "id": "pa-taper-100k",
-      "description": "Personal allowance taper starts £100k",
+      "description": "Policy-derived allowance taper starts at £100k (blank code)",
       "input": {
         "salary": 100000,
         "region": "England",
-        "taxCode": "1257L"
+        "taxCode": ""
       },
       "expected": {
         "incomeTax": 27427.2,
         "employeeNI": 4010.04,
         "netPay": 68562.76
       },
-      "generatedAt": "2026-08-23T13:00:16.076Z",
+      "generatedAt": "2026-08-23T19:10:24.157Z",
       "taxYear": "2025-2026"
     },
     {
       "id": "pa-taper-110k",
-      "description": "Personal allowance taper £110k (60% trap zone)",
+      "description": "Policy-derived allowance at £110k (blank code, taper zone)",
       "input": {
         "salary": 110000,
         "region": "England",
-        "taxCode": "757T"
+        "taxCode": ""
       },
       "expected": {
         "incomeTax": 33427.2,
         "employeeNI": 4209.96,
         "netPay": 72362.84
       },
-      "generatedAt": "2026-08-23T13:00:16.076Z",
+      "generatedAt": "2026-08-23T19:10:24.157Z",
       "taxYear": "2025-2026"
     },
     {
       "id": "60percent-trap-125140",
-      "description": "60% marginal trap peak £125,140",
+      "description": "Policy-derived allowance reaches zero at £125,140 (blank code)",
       "input": {
         "salary": 125140,
         "region": "England",
-        "taxCode": "0T"
+        "taxCode": ""
       },
       "expected": {
         "incomeTax": 42513.6,
         "employeeNI": 4512.84,
         "netPay": 78113.56
       },
-      "generatedAt": "2026-08-23T13:00:16.076Z",
+      "generatedAt": "2026-08-23T19:10:24.157Z",
       "taxYear": "2025-2026"
     },
     {
@@ -149,7 +149,7 @@
         "employeeNI": 5010,
         "netPay": 91288.2
       },
-      "generatedAt": "2026-08-23T13:00:16.076Z",
+      "generatedAt": "2026-08-23T19:10:24.157Z",
       "taxYear": "2025-2026"
     },
     {
@@ -165,7 +165,7 @@
         "employeeNI": 2593.92,
         "netPay": 35499.96
       },
-      "generatedAt": "2026-08-23T13:00:16.076Z",
+      "generatedAt": "2026-08-23T19:10:24.157Z",
       "taxYear": "2025-2026"
     },
     {
@@ -181,7 +181,7 @@
         "employeeNI": 6009.96,
         "netPay": 110328.32
       },
-      "generatedAt": "2026-08-23T13:00:16.076Z",
+      "generatedAt": "2026-08-23T19:10:24.158Z",
       "taxYear": "2025-2026"
     },
     {
@@ -197,7 +197,7 @@
         "employeeNI": 993.96,
         "netPay": 19006.84
       },
-      "generatedAt": "2026-08-23T13:00:16.076Z",
+      "generatedAt": "2026-08-23T19:10:24.158Z",
       "taxYear": "2025-2026"
     },
     {
@@ -213,7 +213,7 @@
         "employeeNI": 2193.96,
         "netPay": 28945.24
       },
-      "generatedAt": "2026-08-23T13:00:16.076Z",
+      "generatedAt": "2026-08-23T19:10:24.158Z",
       "taxYear": "2025-2026"
     },
     {
@@ -229,7 +229,7 @@
         "employeeNI": 1873.92,
         "netPay": 29443.68
       },
-      "generatedAt": "2026-08-23T13:00:16.076Z",
+      "generatedAt": "2026-08-23T19:10:24.158Z",
       "taxYear": "2025-2026"
     },
     {
@@ -246,7 +246,7 @@
         "employeeNI": 993.96,
         "netPay": 21522.04
       },
-      "generatedAt": "2026-08-23T13:00:16.076Z",
+      "generatedAt": "2026-08-23T19:10:24.158Z",
       "taxYear": "2025-2026"
     },
     {
@@ -264,7 +264,7 @@
         "studentLoanRepayment": 1032,
         "netPay": 31290.04
       },
-      "generatedAt": "2026-08-23T13:00:16.076Z",
+      "generatedAt": "2026-08-23T19:10:24.158Z",
       "taxYear": "2025-2026"
     },
     {
@@ -282,7 +282,7 @@
         "pensionContribution": 5000,
         "netPay": 35923.68
       },
-      "generatedAt": "2026-08-23T13:00:16.076Z",
+      "generatedAt": "2026-08-23T19:10:24.158Z",
       "taxYear": "2025-2026"
     },
     {
@@ -300,7 +300,7 @@
         "pensionContribution": 24000,
         "netPay": 29443.68
       },
-      "generatedAt": "2026-08-23T13:00:16.076Z",
+      "generatedAt": "2026-08-23T19:10:24.158Z",
       "taxYear": "2025-2026"
     },
     {
@@ -316,7 +316,7 @@
         "employeeNI": 193.92,
         "netPay": 14575.68
       },
-      "generatedAt": "2026-08-23T13:00:16.076Z",
+      "generatedAt": "2026-08-23T19:10:24.158Z",
       "taxYear": "2025-2026"
     },
     {
@@ -334,7 +334,7 @@
         "studentLoanRepayment": 3672,
         "netPay": 35850.92
       },
-      "generatedAt": "2026-08-23T13:00:16.077Z",
+      "generatedAt": "2026-08-23T19:10:24.158Z",
       "taxYear": "2025-2026"
     }
   ]
