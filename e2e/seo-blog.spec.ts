@@ -92,6 +92,33 @@ test.describe('Essential SEO Tests', () => {
     });
   });
 
+  test.describe('Missing Page Meta Data', () => {
+    test('should not inherit homepage discovery metadata', async ({ page }) => {
+      const response = await page.goto('/definitely-not-a-published-page', {
+        waitUntil: 'domcontentloaded',
+      });
+
+      expect(response?.status()).toBe(404);
+      await expect(page).toHaveTitle('Page Not Found | PayeTax');
+      await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+        'content',
+        'The requested PayeTax page could not be found.',
+      );
+      const robotsMeta = page.locator('meta[name="robots"]');
+      const robotsDirectives = await robotsMeta.evaluateAll((elements) =>
+        elements.map((element) => element.getAttribute('content') ?? ''),
+      );
+      expect(robotsDirectives.length).toBeGreaterThan(0);
+      expect(robotsDirectives.every((directive) => directive.includes('noindex'))).toBe(true);
+      await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
+      await expect(page.locator('meta[property="og:title"]')).toHaveCount(0);
+      await expect(page.locator('meta[property="og:description"]')).toHaveCount(0);
+      await expect(page.locator('meta[property="og:url"]')).toHaveCount(0);
+      await expect(page.locator('meta[name="twitter:title"]')).toHaveCount(0);
+      await expect(page.locator('meta[name="twitter:description"]')).toHaveCount(0);
+    });
+  });
+
   test.describe('Blog Navigation', () => {
     test.beforeEach(async ({ page }) => {
       // Navigate to blog
@@ -113,10 +140,12 @@ test.describe('Essential SEO Tests', () => {
       // biome-ignore lint/suspicious/noConsole: Test debugging output
       console.log('🔍 Checking blog page heading...');
 
-      // Blog heading copy can evolve; assert a stable, intent-aligned H1.
-      const heading = page.locator('main h1').first();
+      const heading = page.getByRole('heading', {
+        level: 1,
+        name: 'UK Tax Guides & PAYE Insights',
+        exact: true,
+      });
       await expect(heading).toBeVisible({ timeout: 10000 });
-      await expect(heading).toContainText(/TaxInsights|UK Tax Guides|PAYE Insights/i);
 
       // biome-ignore lint/suspicious/noConsole: Test debugging output
       console.log('✅ Blog heading found');
@@ -156,9 +185,11 @@ test.describe('Essential SEO Tests', () => {
 
       // Should arrive at calculator page
       await expect(
-        page
-          .getByRole('heading', { name: /free uk paye tax calculator|uk tax calculator/i })
-          .first(),
+        page.getByRole('heading', {
+          level: 1,
+          name: 'UK PAYE tax calculator See your take-home pay',
+          exact: true,
+        }),
       ).toBeVisible({ timeout: 10000 });
 
       const currentURL = page.url();

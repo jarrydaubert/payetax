@@ -1,6 +1,7 @@
 // src/app/llms.txt/route.ts
 
 import { CURRENT_TAX_GUIDANCE } from '@/constants/currentTaxGuidance';
+import { RATES_LAST_VERIFIED } from '@/constants/freshness';
 import {
   HMRC_INCOME_TAX_RATES_URL,
   HMRC_NI_RATES_URL,
@@ -9,6 +10,7 @@ import {
 } from '@/constants/sources';
 import { CURRENT_TAX_YEAR, formatTaxYearDisplay } from '@/constants/taxRates';
 import { getBlogCategories, getBlogPosts } from '@/lib/blog';
+import { getLatestContentDate } from '@/lib/contentDates';
 import { getCrawlableTaxFactsMarkdown } from '@/lib/crawlableTaxFacts';
 import { SITE_URL } from '@/lib/metadata';
 import type { BlogCategory, BlogPost } from '@/types/blog';
@@ -23,6 +25,16 @@ function sanitize(text: string): string {
     .replace(/\[/g, '\\[')
     .replace(/\]/g, '\\]')
     .trim();
+}
+
+function getContentLastUpdated(posts: BlogPost[]): string {
+  const contentDates = [
+    RATES_LAST_VERIFIED,
+    ...CURRENT_TAX_GUIDANCE.map(({ reviewedAt }) => reviewedAt),
+    ...posts.flatMap((post) => [post.publishedAt, post.updatedAt]),
+  ];
+
+  return getLatestContentDate(contentDates) ?? RATES_LAST_VERIFIED;
 }
 
 export async function GET() {
@@ -80,7 +92,7 @@ export async function GET() {
     .filter((line): line is string => Boolean(line))
     .join('\n');
 
-  const lastUpdated = new Date().toISOString().split('T')[0];
+  const lastUpdated = getContentLastUpdated(posts);
   const currentTaxYearDisplay = formatTaxYearDisplay(CURRENT_TAX_YEAR, { separator: '-' });
   const crawlableTaxFacts = getCrawlableTaxFactsMarkdown();
 
