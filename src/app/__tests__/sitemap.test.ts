@@ -18,7 +18,6 @@ describe('sitemap', () => {
 
   afterEach(() => {
     process.env.NEXT_PUBLIC_SITE_URL = originalSiteUrl;
-    jest.resetModules();
     jest.clearAllMocks();
   });
 
@@ -28,6 +27,7 @@ describe('sitemap', () => {
     getBlogPosts.mockResolvedValue([
       {
         slug: 'salary-guide',
+        category: 'tax-basics',
         updatedAt: '2026-01-02',
         publishedAt: '2026-01-01',
         featured: true,
@@ -79,6 +79,54 @@ describe('sitemap', () => {
         }),
       ]),
     );
+  });
+
+  it('uses each category own latest post date and omits unsupported category dates', async () => {
+    process.env.NEXT_PUBLIC_SITE_URL = 'https://example.com';
+
+    getBlogPosts.mockResolvedValue([
+      {
+        slug: 'older-tax-basics',
+        category: 'tax-basics',
+        updatedAt: '2026-02-01',
+        publishedAt: '2026-04-03',
+      },
+      {
+        slug: 'newer-tax-basics',
+        category: 'tax-basics',
+        updatedAt: 'not-a-date',
+        publishedAt: '2026-03-01',
+      },
+      {
+        slug: 'national-insurance-guide',
+        category: 'national-insurance',
+        updatedAt: '2026-03-02T12:00:00Z',
+        publishedAt: '2026-02-15',
+      },
+    ]);
+    getBlogCategories.mockResolvedValue([
+      { slug: 'tax-basics', count: 2 },
+      { slug: 'national-insurance', count: 1 },
+      { slug: 'unsupported-date', count: 1 },
+    ]);
+
+    const { default: sitemap } = await import('../sitemap');
+    const entries = (await sitemap()) as MetadataRoute.Sitemap;
+    const categoryEntries = new Map(
+      entries
+        .filter((entry) => entry.url.includes('/blog/category/'))
+        .map((entry) => [entry.url, entry]),
+    );
+
+    expect(categoryEntries.get('https://example.com/blog/category/tax-basics')).toEqual(
+      expect.objectContaining({ lastModified: '2026-04-03T00:00:00.000Z' }),
+    );
+    expect(categoryEntries.get('https://example.com/blog/category/national-insurance')).toEqual(
+      expect.objectContaining({ lastModified: '2026-03-02T00:00:00.000Z' }),
+    );
+    expect(
+      categoryEntries.get('https://example.com/blog/category/unsupported-date'),
+    ).not.toHaveProperty('lastModified');
   });
 
   it('emits rounded sitemap priorities', async () => {

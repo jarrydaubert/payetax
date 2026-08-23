@@ -1,5 +1,7 @@
 import { CURRENT_TAX_GUIDANCE } from '@/constants/currentTaxGuidance';
+import { RATES_LAST_VERIFIED } from '@/constants/freshness';
 import { getBlogCategories, getBlogPosts } from '@/lib/blog';
+import { getLatestContentDate } from '@/lib/contentDates';
 import { GET } from '../route';
 
 jest.mock('@/lib/blog', () => ({
@@ -27,6 +29,8 @@ describe('llms.txt route', () => {
         title: '[Tax] Basics',
         excerpt: longExcerpt,
         category: 'tax-basics',
+        publishedAt: '2026-01-15',
+        updatedAt: '2026-08-01T12:00:00Z',
       },
     ]);
 
@@ -39,7 +43,7 @@ describe('llms.txt route', () => {
     const text = await response.text();
 
     expect(response.headers.get('Content-Type')).toBe('text/plain; charset=utf-8');
-    expect(text).toContain('Last updated: 2026-06-11');
+    expect(text).toContain('Last updated: 2026-08-01');
     expect(text).toContain('## Crawler Policy');
     expect(text).toContain('Search crawlers and AI crawlers are allowed.');
     expect(text).toContain('/_vercel/ remain disallowed in robots.txt');
@@ -53,15 +57,22 @@ describe('llms.txt route', () => {
   });
 
   it('returns a valid response when blog data fetch fails', async () => {
+    jest.setSystemTime(new Date('2035-12-31T23:59:59Z'));
     (getBlogPosts as jest.Mock).mockRejectedValue(new Error('blog fail'));
     (getBlogCategories as jest.Mock).mockRejectedValue(new Error('category fail'));
 
     const response = await GET();
     const text = await response.text();
+    const expectedContentDate = getLatestContentDate([
+      RATES_LAST_VERIFIED,
+      ...CURRENT_TAX_GUIDANCE.map(({ reviewedAt }) => reviewedAt),
+    ]);
 
     expect(response.status).toBe(200);
     expect(response.headers.get('Content-Type')).toBe('text/plain; charset=utf-8');
     expect(text).toContain('# PayeTax');
+    expect(text).toContain(`Last updated: ${expectedContentDate}`);
+    expect(text).not.toContain('Last updated: 2035-12-31');
     expect(text).toContain('## Main Pages');
     expect(text).toContain('## Citable PAYE Rates and Take-Home Examples');
     expect(text).toContain('## Reviewed Current Tax Guidance');

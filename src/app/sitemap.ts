@@ -4,7 +4,9 @@ import type { MetadataRoute } from 'next';
 import { RATES_LAST_VERIFIED } from '@/constants/freshness';
 import { PRIVACY_LAST_UPDATED_ISO } from '@/constants/pages/privacyPageData';
 import { getBlogCategories, getBlogPosts } from '@/lib/blog';
+import { getLatestContentDate } from '@/lib/contentDates';
 import { SITE_URL } from '@/lib/metadata';
+import type { BlogPost } from '@/types/blog';
 
 export const revalidate = 86400;
 
@@ -12,7 +14,7 @@ type SitemapFrequency = 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | '
 
 interface SitemapEntry {
   url: string;
-  lastModified: string;
+  lastModified?: string;
   changeFrequency: SitemapFrequency;
   priority: number;
 }
@@ -33,30 +35,6 @@ function toUtcSitemapDate(value: string): string {
   return parsed.toISOString();
 }
 
-function getLatestSitemapDate(values: Array<string | undefined>, fallback: string): string {
-  let latestDate: string | null = null;
-
-  for (const value of values) {
-    if (!value) continue;
-
-    const candidate = toUtcSitemapDate(value);
-    const candidateTime = Date.parse(candidate);
-
-    if (Number.isNaN(candidateTime)) continue;
-    if (!latestDate) {
-      latestDate = candidate;
-      continue;
-    }
-
-    const latestTime = Date.parse(latestDate);
-    if (Number.isNaN(latestTime)) return candidate;
-
-    latestDate = candidateTime > latestTime ? candidate : latestDate;
-  }
-
-  return latestDate ?? fallback;
-}
-
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = SITE_URL;
   const taxContentLastModified = toUtcSitemapDate(RATES_LAST_VERIFIED);
@@ -65,19 +43,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const privacyLastModified = toUtcSitemapDate(PRIVACY_LAST_UPDATED_ISO);
 
   let blogPosts: SitemapEntry[] = [];
+  let posts: BlogPost[] = [];
   let blogContentLastModified = taxContentLastModified;
   try {
-    const posts = await getBlogPosts({ pageSize: 1000 });
-    blogContentLastModified = getLatestSitemapDate(
-      posts.map((post) => post.updatedAt || post.publishedAt),
-      taxContentLastModified,
+    posts = await getBlogPosts({ pageSize: 1000 });
+    const latestBlogDate = getLatestContentDate(
+      posts.flatMap((post) => [post.publishedAt, post.updatedAt]),
     );
-    blogPosts = posts.map((post) => ({
-      url: `${baseUrl}/blog/${post.slug}`,
-      lastModified: toUtcSitemapDate(post.updatedAt || post.publishedAt),
-      changeFrequency: 'monthly',
-      priority: post.featured ? 0.85 : 0.7,
-    }));
+    blogContentLastModified = latestBlogDate
+      ? toUtcSitemapDate(latestBlogDate)
+      : taxContentLastModified;
+    blogPosts = posts.map((post) => {
+      const postLastModified = getLatestContentDate([post.publishedAt, post.updatedAt]);
+
+      return {
+        url: `${baseUrl}/blog/${post.slug}`,
+        ...(postLastModified ? { lastModified: toUtcSitemapDate(postLastModified) } : {}),
+        changeFrequency: 'monthly',
+        priority: post.featured ? 0.85 : 0.7,
+      };
+    });
   } catch {
     blogPosts = [];
   }
@@ -162,12 +147,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const categories = await getBlogCategories();
     categoryPages = categories
       .filter((category) => (typeof category.count === 'number' ? category.count > 0 : true))
-      .map((category) => ({
-        url: `${baseUrl}/blog/category/${category.slug}`,
-        lastModified: blogContentLastModified,
-        changeFrequency: 'weekly',
-        priority: 0.55,
-      }));
+      .map((category) => {
+        const categoryLastModified = getLatestContentDate(
+          posts
+            .filter((post) => post.category === category.slug)
+            .flatMap((post) => [post.publishedAt, post.updatedAt]),
+        );
+
+        return {
+          url: `${baseUrl}/blog/category/${category.slug}`,
+          ...(categoryLastModified ? { lastModified: toUtcSitemapDate(categoryLastModified) } : {}),
+          changeFrequency: 'weekly',
+          priority: 0.55,
+        };
+      });
   } catch {
     categoryPages = [];
   }
