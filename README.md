@@ -85,6 +85,8 @@ Other production controls:
 
 ## Docs
 
+- Read-first project handover: [docs/PROJECT_STATE.md](docs/PROJECT_STATE.md)
+- Unresolved work: [docs/BACKLOG.md](docs/BACKLOG.md)
 - Agent contract: [AGENTS.md](AGENTS.md)
 - Product direction: [docs/business/PRODUCT_DIRECTION.md](docs/business/PRODUCT_DIRECTION.md)
 - Docs policy: [docs/README.md](docs/README.md)
