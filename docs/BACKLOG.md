@@ -23,11 +23,10 @@ sources, not in backlog prose.
 
 Current correctness sequence:
 
-1. Scottish-vs-English comparison.
-2. £40k, £60k and £100k salary articles; protect the verified £70k article.
-3. Explicit pension-method handling.
-4. Transparent calculation results.
-5. Independent fixture/test-portfolio completion and Foundation reconciliation.
+1. £40k, £60k and £100k salary articles; protect the verified £70k article.
+2. Explicit pension-method handling.
+3. Transparent calculation results.
+4. Independent fixture/test-portfolio completion and Foundation reconciliation.
 
 ### Foundation
 
