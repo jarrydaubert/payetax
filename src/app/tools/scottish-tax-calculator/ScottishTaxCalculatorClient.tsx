@@ -20,6 +20,7 @@ import {
   type AnnualIncomeTaxComparison,
   CURRENT_SCOTTISH_TAX_CROSSOVER,
   calculateAnnualIncomeTaxComparison,
+  formatAnnualSalaryInput,
   parseAnnualSalaryInput,
 } from './scottishTaxComparison';
 
@@ -43,6 +44,7 @@ export function ScottishTaxCalculatorClient() {
 
   const runComparison = (salaryValue: number) => {
     setSalaryError(null);
+    setSalary(formatAnnualSalaryInput(salaryValue));
     setComparison(calculateAnnualIncomeTaxComparison(salaryValue));
   };
 
@@ -65,8 +67,14 @@ export function ScottishTaxCalculatorClient() {
     setComparison(null);
   };
 
+  const handleSalaryBlur = () => {
+    const parsedSalary = parseAnnualSalaryInput(salary);
+    if (parsedSalary.success) {
+      setSalary(formatAnnualSalaryInput(parsedSalary.salary));
+    }
+  };
+
   const handleQuickCalculate = (salaryValue: number) => {
-    setSalary(salaryValue.toLocaleString('en-GB'));
     runComparison(salaryValue);
   };
 
@@ -102,7 +110,7 @@ export function ScottishTaxCalculatorClient() {
             Quick Comparison
           </CardTitle>
           <CardDescription>
-            Enter a positive annual salary in whole pounds to compare Scotland with England, Wales
+            Enter an annual salary from £0 to £10,000,000 to compare Scotland with England, Wales
             and Northern Ireland.
           </CardDescription>
         </CardHeader>
@@ -127,10 +135,11 @@ export function ScottishTaxCalculatorClient() {
               <Input
                 id={inputId}
                 type='text'
-                inputMode='numeric'
-                placeholder='50,000'
+                inputMode='decimal'
+                placeholder='50,000.00'
                 value={salary}
                 onChange={(e) => handleSalaryChange(e.target.value)}
+                onBlur={handleSalaryBlur}
                 className='pl-7 font-mono text-lg'
                 autoComplete='off'
                 spellCheck={false}
@@ -143,7 +152,8 @@ export function ScottishTaxCalculatorClient() {
             </Button>
           </form>
           <p id={helpId} className='mt-2 text-muted-foreground text-sm'>
-            Whole pounds only. Use digits with optional commas, for example 50000 or 50,000.
+            Use digits, optional commas and up to 2 decimal places, for example 50000.50 or
+            50,000.50.
           </p>
           {salaryError && (
             <p id={errorId} className='mt-2 text-destructive text-sm' role='alert'>

@@ -9,22 +9,23 @@ import {
 export const MAX_ANNUAL_SALARY = 10_000_000;
 
 const SALARY_FORMAT_ERROR =
-  'Enter a positive annual salary in whole pounds, using digits and optional commas (for example, 50,000).';
+  'Enter an annual salary from £0 to £10,000,000, using digits, optional commas and up to 2 decimal places (for example, 50,000.50).';
 
 export type AnnualSalaryParseResult =
   | { success: true; salary: number }
   | { success: false; error: string };
 
 /**
- * Accept a positive whole-pound salary written as plain digits or correctly
- * grouped thousands. The pound sign is already rendered beside the input, so
- * signs, currency symbols, decimals, spaces and partial comma groups are
- * rejected rather than silently stripped or rounded.
+ * Accept a salary from zero to the main calculator maximum, written as plain
+ * digits or correctly grouped thousands with up to two decimal places. The
+ * pound sign is already rendered beside the input, so signs, currency symbols,
+ * embedded spaces, partial comma groups and excess precision are rejected
+ * rather than silently stripped, clamped or rounded.
  */
 export function parseAnnualSalaryInput(value: string): AnnualSalaryParseResult {
   const normalized = value.trim();
-  const isPlainDigits = /^\d+$/.test(normalized);
-  const isGroupedDigits = /^\d{1,3}(?:,\d{3})+$/.test(normalized);
+  const isPlainDigits = /^\d+(?:\.\d{1,2})?$/.test(normalized);
+  const isGroupedDigits = /^\d{1,3}(?:,\d{3})+(?:\.\d{1,2})?$/.test(normalized);
 
   if (!(isPlainDigits || isGroupedDigits)) {
     return { success: false, error: SALARY_FORMAT_ERROR };
@@ -32,7 +33,7 @@ export function parseAnnualSalaryInput(value: string): AnnualSalaryParseResult {
 
   const salary = Number(normalized.replaceAll(',', ''));
 
-  if (!Number.isSafeInteger(salary) || salary <= 0) {
+  if (!Number.isFinite(salary) || salary < 0) {
     return { success: false, error: SALARY_FORMAT_ERROR };
   }
 
@@ -44,6 +45,13 @@ export function parseAnnualSalaryInput(value: string): AnnualSalaryParseResult {
   }
 
   return { success: true, salary };
+}
+
+export function formatAnnualSalaryInput(salary: number): string {
+  return salary.toLocaleString('en-GB', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 
 export interface AnnualIncomeTaxComparison {

@@ -1,6 +1,7 @@
 import {
   CURRENT_SCOTTISH_TAX_CROSSOVER,
   calculateAnnualIncomeTaxComparison,
+  formatAnnualSalaryInput,
   MAX_ANNUAL_SALARY,
   parseAnnualSalaryInput,
 } from '../scottishTaxComparison';
@@ -9,27 +10,42 @@ describe('Scottish annual Income Tax comparison', () => {
   it.each([
     ['50000', 50_000],
     ['50,000', 50_000],
+    ['50000.50', 50_000.5],
+    ['50,000.50', 50_000.5],
+    ['50000.5', 50_000.5],
     [' 50,000 ', 50_000],
+    ['0', 0],
+    ['0.00', 0],
     ['1', 1],
+    ['0.01', 0.01],
     ['10,000,000', MAX_ANNUAL_SALARY],
-  ])('accepts the documented whole-pound salary format %s', (input, expected) => {
+    ['10,000,000.00', MAX_ANNUAL_SALARY],
+  ])('accepts the documented salary format %s', (input, expected) => {
     expect(parseAnnualSalaryInput(input)).toEqual({ success: true, salary: expected });
   });
 
   it.each([
     '-50000',
     '+50000',
-    '50000.50',
+    '50000.500',
+    '50000.',
     'salary',
     '£50,000',
+    '£50,000.50',
     '50 000',
     '50,00',
+    '50,00.50',
     '5,0000',
-    '0',
     '',
     '10,000,001',
-  ])('rejects malformed, non-positive or out-of-range input %s', (input) => {
+    '10,000,000.01',
+  ])('rejects malformed, signed or out-of-range input %s', (input) => {
     expect(parseAnnualSalaryInput(input).success).toBe(false);
+  });
+
+  it('formats accepted salaries like the main calculator when committed', () => {
+    expect(formatAnnualSalaryInput(50_000)).toBe('50,000.00');
+    expect(formatAnnualSalaryInput(50_000.5)).toBe('50,000.50');
   });
 
   it('reproduces the independently worked £50,000 comparison', () => {
