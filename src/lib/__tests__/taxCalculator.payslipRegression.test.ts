@@ -60,7 +60,7 @@ describe('Tax Calculator payslip regression', () => {
     expect(result.netPay.monthly).toBeCloseTo(3120.02, 2);
   });
 
-  it('uses whole-pound monthly payroll band thresholds for higher-rate PAYE', () => {
+  it('uses exact accrued monthly payroll band thresholds for higher-rate PAYE', () => {
     const result = calculateTax({
       ...baseInput,
       salary: 80000,
@@ -69,7 +69,7 @@ describe('Tax Calculator payslip regression', () => {
       allowancesDeductions: 0,
     });
 
-    expect(result.incomeTax.monthly).toBeCloseTo(1618.8, 2);
+    expect(result.incomeTax.monthly).toBeCloseTo(1618.86, 2);
     expect(result.nationalInsurance.monthly).toBeCloseTo(300.83, 2);
   });
 });

@@ -31,13 +31,19 @@ export interface FixtureSource {
   verifiedOn: string;
 }
 
-/** Exact-value assertions. All monetary values are annual pounds. */
+/** Exact-value assertions in pounds for the named output period. */
 export interface FixtureExpected {
   taxFreeAmount?: number;
   incomeTaxAnnual?: number;
+  incomeTaxMonthly?: number;
   nationalInsuranceAnnual?: number;
+  nationalInsuranceMonthly?: number;
   studentLoanAnnual?: number;
+  studentLoanMonthly?: number;
+  pensionContributionAnnual?: number;
+  pensionContributionMonthly?: number;
   netPayAnnual?: number;
+  netPayMonthly?: number;
   /** Ordered list of band rates expected in the result breakdown. */
   taxBandRates?: number[];
 }
@@ -65,6 +71,23 @@ export interface VerificationScenario {
   /** Complete calculator input (JSON cannot express undefined — omit optionals). */
   input: TaxCalculationInput;
   expected?: FixtureExpected;
+  /**
+   * Direct annual-threshold illustration used in explanatory copy. This is
+   * deliberately separate from PAYE output, which is calculated by pay period.
+   */
+  annualIllustration?: {
+    incomeTax: number;
+    nationalInsurance: number;
+    netPay: number;
+  };
+  /** Independently derived annual-threshold rows used in a published table. */
+  annualIllustrationRows?: Array<{
+    income: number;
+    personalAllowance: number;
+    incomeTax: number;
+    nationalInsurance: number;
+    netPay: number;
+  }>;
   invariants?: FixtureInvariant[];
   decoder?: FixtureDecoderExpectation;
 }
@@ -149,7 +172,22 @@ export function loadVerificationSuites(
     throw new Error(`No verification fixtures found in ${dir}`);
   }
 
-  return files.map((name) =>
+  const suites = files.map((name) =>
     assertSuiteShape(name, JSON.parse(readFileSync(join(dir, name), 'utf8'))),
   );
+
+  const scenarioOwners = new Map<string, string>();
+  for (const suite of suites) {
+    for (const scenario of suite.scenarios) {
+      const existingSuite = scenarioOwners.get(scenario.id);
+      if (existingSuite) {
+        throw new Error(
+          `Invalid verification fixtures: duplicate scenario id "${scenario.id}" in "${existingSuite}" and "${suite.suite}"`,
+        );
+      }
+      scenarioOwners.set(scenario.id, suite.suite);
+    }
+  }
+
+  return suites;
 }

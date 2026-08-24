@@ -23,10 +23,9 @@ sources, not in backlog prose.
 
 Current correctness sequence:
 
-1. £40k, £60k and £100k salary articles; protect the verified £70k article.
-2. Explicit pension-method handling.
-3. Transparent calculation results.
-4. Independent fixture/test-portfolio completion and Foundation reconciliation.
+1. Explicit pension-method handling.
+2. Transparent calculation results.
+3. Independent fixture/test-portfolio completion and Foundation reconciliation.
 
 ### Foundation
 
@@ -64,7 +63,7 @@ below.
 | --- | --- | --- | --- |
 | Explicit pension-method handling | Salary-sacrifice, net-pay and relief-at-source are handled explicitly, with the method exposed in the result. | Open | The shared pay-basis owner currently models the pension input as salary sacrifice. |
 | A transparent result that clearly exposes the selected policy, calculation basis, relevant pay bases and individual deductions | One result exposes the policy selected, the calculation basis, the relevant pay bases and each individual deduction, without callers reassembling them. | Partial | Tax-code basis is exposed after PRs #111/#112. Selected policy, relevant pay bases and pension method remain incomplete. |
-| Compact independent full-calculation fixture set | A small set of JSON fixtures, derived independently of production code, covers representative full-calculation interactions. | Partial | Representative PAYE and tax-code fixtures exist. Supported-year, boundary and per-scenario provenance gaps remain below. |
+| Compact independent full-calculation fixture set | A small set of JSON fixtures, derived independently of production code, covers representative full-calculation interactions. | Partial | Representative PAYE and tax-code fixtures now include Month 1 Cvalue/exact-threshold and final-penny cases. Supported-year, wider boundary and per-scenario provenance gaps remain below. |
 | Balanced test portfolio and updated `TESTING.md` | JSON fixtures, TypeScript rule and boundary tests, and Playwright journeys are balanced, with `TESTING.md` describing the split. | Partial | The three-layer split exists; the final coverage balance and documentation reconciliation remain open. |
 | Final backlog reconciliation | After the foundation audit, the detailed backlog items are reconciled against verified outcomes. | Open | Remove the remaining Foundation rows as focused slices close them. |
 
@@ -94,7 +93,7 @@ below.
 - [ ] Display band interpreters still re-derive band presentation outside the owned mechanics (rUK and Scottish slicing each have one owner since #86/#98). DoD: display code consumes owned mechanics or generated projections; no independent band maths remains in display modules.
 - [ ] Shadow helper `taxRateDescriptions` is test-only production-adjacent code. DoD: resolved together with the `taxRateDescriptions.ts` item under Tax correctness; no test-only shadow module remains.
 - [ ] NI pay-date basis: payroll rate selection derives a pay date from the tax period start, so a weekly or four-weekly period straddling a mid-year rate change takes the earlier rate. DoD: callers pass a real pay date where they have one; a straddling-period test takes the later rate when the pay date does.
-- [ ] Explicit ownership of deliberate statutory and payroll rounding rules (ceil/floor conventions) in one place. DoD: threshold ceilings and whole-pound taxable-pay floors have named owners; consumers do not duplicate them.
+- [ ] Complete ownership of deliberate statutory rounding rules outside Month 1 Income Tax. `month1IncomeTax.ts` now owns U/T, Cvalue/SCvalue, exact-threshold and final-penny rules. DoD: remaining statutory ceil/floor conventions have named owners and consumers do not duplicate them.
 - [ ] Generated projections as the only path for UI band tables, tools, `/api/tax-rates`, structured data and llms.txt facts (Dataset JSON-LD currently projects independently of `crawlableTaxFacts`). DoD: all listed surfaces read one projection source; the independent JSON-LD projection is gone.
 - [ ] Generated MDX tax facts: server components for band tables, threshold facts, worked examples, current-year labels, source links and last-verified dates. DoD: evergreen posts consume the components; historical posts stay pinned to their stated year; no hardcoded current-year values in evergreen MDX.
 - [ ] Annual Budget workflow: value-only updates touch only policy/sources/fixtures. DoD: hardcoded years removed from `e2e/scripts/generate-golden-master.ts` and `scripts/audit-blog-content.ts`; the compile-forced `studentLoanPlans` per-year map folds into the policy records; a dry-run year update touches no other files.
@@ -125,7 +124,6 @@ Implementation sequencing for these items remains documented in the ownership au
 ### Content accuracy
 
 - [ ] Tax-code guide: add the statutory 50% overriding limit; fix the "K500 = you owe £5,000" conflation; refresh stale 2025-26 titles/meta; cover Scottish SD codes. DoD: all four corrections published and consistent with the engine.
-- [ ] £40k, £60k and £100k salary articles: independently rebuild current PAYE and Student Loan figures, put the qualified annual/monthly answer first, state calculation and pension-method assumptions, and remove contradictory FAQ outputs and unsupported lifestyle, prevalence, savings, housing and accountant-value claims. The £40k “UK median around £35,000” claim appears materially inconsistent with the latest applicable ONS ASHE full-time annual earnings evidence reviewed for this audit; verify against the then-current ONS source and correct or remove it rather than merely adding a citation. For £100k, verify and current-source the adjusted-net-income eligibility conditions for Tax-Free Childcare and England-only Free Childcare for Working Parents, keeping them separate from Income Tax marginal-rate claims and financial advice. Keep the existing URLs. DoD: displayed figures reproduce from independent working, visible copy/metadata/schema agree, the median and childcare statements are accurate and scoped, and focused drift tests pass.
 - [ ] Remaining salary-page unsupported-claim audit: after the priority repair, inspect the retained series for uncited percentile/median, lifestyle, rent, savings and mortgage claims. The verified £70k article is the reference pattern and should not be rewritten without a reproduced defect. DoD: each remaining claim is sourced from an appropriate primary dataset, qualified or removed.
 - [ ] Evergreen vs historical article policy: frontmatter declares the mode. DoD: evergreen posts contain no hardcoded rate values; historical posts stay pinned and labelled; the blog audit enforces the split.
 - [ ] Blog visual refresh: regenerate legacy post images into the Ledger editorial style and retire stale tax-year content in small verified batches. DoD: each batch lands with refreshed imagery and verified figures.
@@ -139,7 +137,7 @@ Work here completes only against deployed behaviour, external services or record
 
 ### Search and discoverability
 
-- [ ] Beginner-guide contextual inbound links: add a small number of genuinely relevant inline anchors from retained guides that already discuss PAYE basics, tax codes or employee deductions. Do not add site-wide boilerplate or rewrite the beginner article in this slice, and do not prioritise it above the current Scottish/salary correctness sequence. DoD: the source graph records the deliberate links and each anchor is contextually useful.
+- [ ] Beginner-guide contextual inbound links: add a small number of genuinely relevant inline anchors from retained guides that already discuss PAYE basics, tax codes or employee deductions. Do not add site-wide boilerplate or rewrite the beginner article in this slice, and do not prioritise it above the active correctness sequence. DoD: the source graph records the deliberate links and each anchor is contextually useful.
 
 ## Parked / Triggered work
 

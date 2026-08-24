@@ -1,0 +1,350 @@
+{
+  "suite": "Published salary-guide payroll estimates",
+  "source": {
+    "authority": "HMRC",
+    "urls": [
+      "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027",
+      "https://www.gov.uk/government/publications/payroll-technical-specifications-income-tax",
+      "https://www.gov.uk/government/publications/tables-a-pay-adjustment-tables",
+      "https://www.gov.uk/government/publications/sl3-student-loan-deduction-tables/2026-to-2027-student-and-postgraduate-loan-deduction-tables",
+      "https://www.gov.uk/guidance/special-rules-for-student-loans",
+      "https://www.gov.uk/guidance/salary-sacrifice-and-the-effects-on-paye"
+    ],
+    "taxYear": "2026-2027",
+    "verifiedOn": "2026-08-24"
+  },
+  "tolerancePence": 2,
+  "scenarios": [
+    {
+      "id": "salary-guide-40k-base",
+      "description": "£40,000 paid in 12 equal months. HMRC Tables A Month 1 free pay is £1,048.26; floor(£3,333.33 - £1,048.26) gives £2,285 taxable at 20%, or £457 tax. Category A NI is 8% of £2,285.33, rounded to £182.83. The separate annual illustration is £5,486 tax plus £2,194.40 NI.",
+      "input": {
+        "salary": 40000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": [],
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 12570,
+        "incomeTaxAnnual": 5484,
+        "incomeTaxMonthly": 457,
+        "nationalInsuranceAnnual": 2193.96,
+        "nationalInsuranceMonthly": 182.83,
+        "netPayAnnual": 32322.04,
+        "netPayMonthly": 2693.5033333333336,
+        "taxBandRates": [20]
+      },
+      "annualIllustration": {
+        "incomeTax": 5486,
+        "nationalInsurance": 2194.4,
+        "netPay": 32319.6
+      }
+    },
+    {
+      "id": "salary-guide-40k-plan2",
+      "description": "£40,000 paid monthly on Plan 2. (£3,333.33 - £2,448.75) x 9% is £79.61, rounded down to £79 per month and £948 over 12 equal periods.",
+      "input": {
+        "salary": 40000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": ["plan2"],
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "studentLoanAnnual": 948,
+        "studentLoanMonthly": 79,
+        "netPayAnnual": 31374.04,
+        "netPayMonthly": 2614.5033333333336
+      }
+    },
+    {
+      "id": "salary-guide-40k-sacrifice",
+      "description": "A valid 5% whole-salary sacrifice contributes £2,000 and leaves £38,000 cash pay. Monthly PAYE on £3,166.67 is £423.60 and category A NI is £169.49, giving £2,573.58 cash take-home.",
+      "input": {
+        "salary": 40000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 5,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": [],
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "incomeTaxAnnual": 5083.2,
+        "incomeTaxMonthly": 423.6,
+        "nationalInsuranceAnnual": 2033.88,
+        "nationalInsuranceMonthly": 169.49,
+        "pensionContributionAnnual": 2000,
+        "pensionContributionMonthly": 166.66666666666666,
+        "netPayAnnual": 30882.92,
+        "netPayMonthly": 2573.576666666667
+      }
+    },
+    {
+      "id": "salary-guide-60k-base",
+      "description": "£60,000 paid in 12 equal months. HMRC PAYE routine v24.0 applies the exact Month 1 accrued basic-rate boundary: £628.3333 threshold tax plus 40% of taxable pay above £3,141.6666, rounded down, gives £952.06 monthly tax. Category A NI is £267.50. The separate annual illustration is £11,432 tax plus £3,210.60 NI.",
+      "input": {
+        "salary": 60000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": [],
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 12570,
+        "incomeTaxAnnual": 11424.72,
+        "incomeTaxMonthly": 952.06,
+        "nationalInsuranceAnnual": 3210,
+        "nationalInsuranceMonthly": 267.5,
+        "netPayAnnual": 45365.28,
+        "netPayMonthly": 3780.44,
+        "taxBandRates": [20, 40]
+      },
+      "annualIllustration": {
+        "incomeTax": 11432,
+        "nationalInsurance": 3210.6,
+        "netPay": 45357.4
+      }
+    },
+    {
+      "id": "salary-guide-60k-plan2",
+      "description": "£60,000 paid monthly on Plan 2. (£5,000 - £2,448.75) x 9% is £229.61, rounded down to £229 per month and £2,748 over 12 equal periods.",
+      "input": {
+        "salary": 60000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": ["plan2"],
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "studentLoanAnnual": 2748,
+        "studentLoanMonthly": 229,
+        "netPayAnnual": 42617.28,
+        "netPayMonthly": 3551.44
+      }
+    },
+    {
+      "id": "salary-guide-60k-sacrifice",
+      "description": "A valid 5% whole-salary sacrifice contributes £3,000 and leaves £57,000 cash pay. PAYE routine v24.0 gives £852.06 monthly tax on the exact accrued band boundary and category A NI is £262.50, giving £3,635.44 cash take-home.",
+      "input": {
+        "salary": 60000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 5,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": [],
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "incomeTaxAnnual": 10224.72,
+        "incomeTaxMonthly": 852.06,
+        "nationalInsuranceAnnual": 3150,
+        "nationalInsuranceMonthly": 262.5,
+        "pensionContributionAnnual": 3000,
+        "pensionContributionMonthly": 250,
+        "netPayAnnual": 43625.28,
+        "netPayMonthly": 3635.44
+      }
+    },
+    {
+      "id": "salary-guide-100k-base",
+      "description": "£100,000 paid in 12 equal months with 1257L. HMRC PAYE routine v24.0 applies the exact Month 1 accrued basic-rate boundary and final-penny round-down, giving £2,285.66 monthly tax. Category A NI is £334.17. The separate annual illustration is £27,432 tax plus £4,010.60 NI.",
+      "input": {
+        "salary": 100000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": [],
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 12570,
+        "incomeTaxAnnual": 27427.92,
+        "incomeTaxMonthly": 2285.66,
+        "nationalInsuranceAnnual": 4010.04,
+        "nationalInsuranceMonthly": 334.17,
+        "netPayAnnual": 68562.04,
+        "netPayMonthly": 5713.503333333334,
+        "taxBandRates": [20, 40]
+      },
+      "annualIllustration": {
+        "incomeTax": 27432,
+        "nationalInsurance": 4010.6,
+        "netPay": 68557.4
+      },
+      "annualIllustrationRows": [
+        {
+          "income": 100000,
+          "personalAllowance": 12570,
+          "incomeTax": 27432,
+          "nationalInsurance": 4010.6,
+          "netPay": 68557.4
+        },
+        {
+          "income": 105000,
+          "personalAllowance": 10070,
+          "incomeTax": 30432,
+          "nationalInsurance": 4110.6,
+          "netPay": 70457.4
+        },
+        {
+          "income": 110000,
+          "personalAllowance": 7570,
+          "incomeTax": 33432,
+          "nationalInsurance": 4210.6,
+          "netPay": 72357.4
+        },
+        {
+          "income": 115000,
+          "personalAllowance": 5070,
+          "incomeTax": 36432,
+          "nationalInsurance": 4310.6,
+          "netPay": 74257.4
+        },
+        {
+          "income": 120000,
+          "personalAllowance": 2570,
+          "incomeTax": 39432,
+          "nationalInsurance": 4410.6,
+          "netPay": 76157.4
+        },
+        {
+          "income": 125000,
+          "personalAllowance": 70,
+          "incomeTax": 42432,
+          "nationalInsurance": 4510.6,
+          "netPay": 78057.4
+        },
+        {
+          "income": 125140,
+          "personalAllowance": 0,
+          "incomeTax": 42516,
+          "nationalInsurance": 4513.4,
+          "netPay": 78110.6
+        },
+        {
+          "income": 130000,
+          "personalAllowance": 0,
+          "incomeTax": 44703,
+          "nationalInsurance": 4610.6,
+          "netPay": 80686.4
+        }
+      ]
+    },
+    {
+      "id": "salary-guide-100k-plan2",
+      "description": "£100,000 paid monthly on Plan 2. (£8,333.33 - £2,448.75) x 9% is £529.61, rounded down to £529 per month and £6,348 over 12 equal periods.",
+      "input": {
+        "salary": 100000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": ["plan2"],
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "studentLoanAnnual": 6348,
+        "studentLoanMonthly": 529,
+        "netPayAnnual": 62214.04,
+        "netPayMonthly": 5184.503333333334
+      }
+    },
+    {
+      "id": "salary-guide-100k-sacrifice",
+      "description": "A valid 5% whole-salary sacrifice contributes £5,000 and leaves £95,000 cash pay. PAYE routine v24.0 gives £2,118.86 monthly tax on the exact accrued band boundary and category A NI is £325.83, giving £5,471.98 cash take-home.",
+      "input": {
+        "salary": 100000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 5,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": [],
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "incomeTaxAnnual": 25426.32,
+        "incomeTaxMonthly": 2118.86,
+        "nationalInsuranceAnnual": 3909.96,
+        "nationalInsuranceMonthly": 325.83,
+        "pensionContributionAnnual": 5000,
+        "pensionContributionMonthly": 416.6666666666667,
+        "netPayAnnual": 65663.72,
+        "netPayMonthly": 5471.976666666666
+      }
+    }
+  ]
+}

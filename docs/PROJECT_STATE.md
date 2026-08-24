@@ -44,15 +44,16 @@ The established ownership direction is:
 | Published policy | `src/constants/taxRates.ts` holds typed annual rUK, Scottish and ancillary policy. Mid-year employee-NI changes are effective-dated data. Do not copy these tables into this document. |
 | Policy selection | `selectTaxPolicy()` in `src/lib/tax/taxPolicy.ts` selects the supported year and hands consumers the rUK and Scottish records together. |
 | Pay basis | `derivePayePayBasis()` in `src/lib/tax/payePayBasis.ts` owns annual/monthly employment, non-employment, adjusted-net-income, NI and Student Loan bases. The current pension input is explicitly modelled there as salary sacrifice; other pension methods remain open work. |
-| Income Tax | Shared rUK and Scottish band slicers own progressive band allocation. The main PAYE and Director Intelligence routes may orchestrate different statutory bases, but consumers must not reimplement band maths. |
+| Income Tax | Shared rUK and Scottish band slicers own annual progressive band allocation. `src/lib/tax/month1IncomeTax.ts` owns HMRC Month 1 formula selection, exact accrued thresholds, threshold tax and final-penny truncation. The main PAYE and Director Intelligence routes may orchestrate different statutory bases, but consumers must not reimplement either mechanic. |
 | Tax codes and Tables A | `src/lib/tax/taxCode.ts` owns accepted formats, regional prefixes, non-cumulative markers, code-derived amounts, K adjustments and Tables A period adjustments. `src/lib/tax/taxCodeDecoder.ts` derives explanations from that model. |
 | National Insurance | `src/lib/tax/nationalInsurance.ts` owns Class 1 slicing and effective-date selection. Payroll uses pay-period mechanics; `employeeNI.ts` deliberately exposes the separate annual earnings-period basis used for directors. |
 | Student Loans | `src/lib/tax/studentLoan.ts` is the shared repayment mechanic, with employment-specific pay bases supplied by the PAYE orchestration. |
-| Periods and money | `src/lib/periodCalculator.ts` owns period conversion; `src/lib/tax/utils.ts` owns penny rounding and shared threshold conversion. Statutory ceil/floor ownership still needs a final focused pass. |
+| Periods and money | `src/lib/periodCalculator.ts` owns general period conversion and `src/lib/tax/utils.ts` owns general penny rounding and shared threshold conversion. Month 1 Income Tax's distinct whole-pound, four-decimal and final-penny rules live with that statutory routine. |
 | Public tax-domain boundary | Application code should consume `@/lib/tax`. `check:tax-imports` prevents new direct-import debt while the existing baseline is reduced. |
 | Result assembly | `TaxCalculationResults` exposes deductions and tax-code calculation basis. Selected-policy, pay-basis and pension-method transparency are not yet complete. |
 
 Material Foundation work already delivered includes shared Scottish and rUK band mechanics,
+one regional Month 1 PAYE Income Tax routine,
 unified NI and Student Loan mechanics, one tax-code grammar, retirement of shadow calculation
 routes, shared period conversion and rounding, the policy selector, the effective-dated policy
 model, year-correct Director policy selection, and shared PAYE pay-basis derivation. Preserve
@@ -91,6 +92,26 @@ against HMRC primary sources. The durable claim-by-claim evidence, including acc
 review findings, is in the
 [23 August tax-code correctness report](reports/tax-code-correctness-follow-up-2026-08-23.md).
 The separate public tax-code article is not covered by that resolution and remains in the backlog.
+
+## PAYE projection state
+
+The employee calculator is a steady-pay Month 1 projection, not a reconstruction of an employee's
+cumulative payroll history. Its Income Tax path now follows HMRC's computerised PAYE routines
+v24.0 consistently for rUK, Welsh and Scottish codes:
+
+- `taxCode.ts` supplies the Month 1 Tables A free-pay or K-code additional-pay amount;
+- taxable pay `U` retains pence for the Cvalue/SCvalue income test;
+- after formula selection, taxable pay is rounded down to whole-pound `T`;
+- Cvalue/SCvalue is used only to select the formula; the formula uses the exact accrued threshold
+  and exact accrued threshold tax, each carried to four decimal places without correction;
+- the calculated tax is carried to four decimal places and finally rounded down to the penny for
+  every regional regime.
+
+The primary specification is HMRC
+[PAYE tax table routines v24.0](https://www.gov.uk/government/publications/payroll-technical-specifications-income-tax),
+especially definitions 9–11.1 and paragraphs 4.4.3–4.4.4. Independent tests pin the rounded-up
+selection boundary, exact-threshold calculation, Scottish final penny and a binary floating-point
+case whose exact £4.60 result must remain £4.60.
 
 ## Verification model
 
@@ -164,7 +185,7 @@ The durable conclusions are:
 - a small number of deliberate, contextual inbound links to the beginner guide remains justified
   active work, but another content overhaul stays trigger-gated until Google has recrawled the
   29 July rewrite and matched page/query evidence supports it; the link slice does not outrank the
-  Scottish and salary correctness sequence below;
+  active correctness sequence below;
 - retired competitor-intent routes have no current internal links and should not change without
   new Search Console evidence;
 - PR #109 closed the highest-risk current-guidance defects; PR #110 closed the deterministic
@@ -184,7 +205,9 @@ In short:
 - the Scottish calculator and Scottish-vs-English comparison article now share the canonical
   annual Income Tax comparison model; the article presents current 2026/27 bands, the independently
   verified £33,493 crossover, reproduced examples and dated primary sources;
-- the £40k, £60k and £100k pages need evidence-first factual repair while keeping their URLs;
+- the £40k, £60k and £100k pages now use qualified 2026/27 PAYE estimates, independently derived
+  payroll fixtures, current primary sources and explicit salary-sacrifice assumptions; their URLs
+  remain unchanged;
 - FAQ extraction is constrained to deliberate FAQ sections, so bold labels elsewhere no longer
   become malformed FAQ schema.
 
@@ -192,16 +215,11 @@ In short:
 
 Resume in this order unless new primary evidence changes the risk:
 
-1. **£40k, £60k and £100k salary-page correctness.** Use the £70k page's qualified, answer-first
-   pattern; independently verify displayed PAYE/loan figures; remove unsupported lifestyle,
-   prevalence, savings and mortgage claims; verify and correct/remove the £40k median claim against
-   then-current ONS evidence; current-source the £100k childcare eligibility consequences; state
-   pension method assumptions.
-2. **Explicit pension-method Foundation slice.** Represent salary sacrifice, net pay and relief at
+1. **Explicit pension-method Foundation slice.** Represent salary sacrifice, net pay and relief at
    source explicitly, or narrow the product contract visibly and consistently.
-3. **Transparent-result Foundation work.** Expose selected policy, calculation basis, relevant pay
+2. **Transparent-result Foundation work.** Expose selected policy, calculation basis, relevant pay
    bases, pension method and deductions without making consumers reconstruct them.
-4. **Independent fixture/test-portfolio completion and Foundation reconciliation.** Widen year and
+3. **Independent fixture/test-portfolio completion and Foundation reconciliation.** Widen year and
    boundary coverage, strengthen per-scenario provenance, finish the documented portfolio split,
    then remove completed Foundation rows from the backlog.
 

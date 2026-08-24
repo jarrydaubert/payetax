@@ -35,11 +35,11 @@ const annualFixtures: Array<{
       150000: 57560.88,
     },
     expectedEngineTax: {
-      100000: 30034.08,
-      125139: 45864.72,
-      125140: 45874.8,
-      125141: 45874.8,
-      150000: 57560.28,
+      100000: 30034.2,
+      125139: 45864.84,
+      125140: 45874.92,
+      125141: 45874.92,
+      150000: 57560.76,
     },
   },
   {
@@ -52,11 +52,11 @@ const annualFixtures: Array<{
       150000: 59680.61,
     },
     expectedEngineTax: {
-      100000: 30773.52,
-      125139: 47734.92,
-      125140: 47745.72,
-      125141: 47745.72,
-      150000: 59680.08,
+      100000: 30773.76,
+      125139: 47735.16,
+      125140: 47745.96,
+      125141: 47745.96,
+      150000: 59680.56,
     },
   },
   {
@@ -69,11 +69,11 @@ const annualFixtures: Array<{
       150000: 59666.1,
     },
     expectedEngineTax: {
-      100000: 30759,
-      125139: 47720.4,
-      125140: 47731.2,
-      125141: 47731.2,
-      150000: 59665.56,
+      100000: 30759.24,
+      125139: 47720.64,
+      125140: 47731.44,
+      125141: 47731.44,
+      150000: 59666.04,
     },
   },
   {
@@ -86,11 +86,11 @@ const annualFixtures: Array<{
       150000: 59634.35,
     },
     expectedEngineTax: {
-      100000: 30727.32,
-      125139: 47688.72,
-      125140: 47699.52,
-      125141: 47699.52,
-      150000: 59633.88,
+      100000: 30727.44,
+      125139: 47688.84,
+      125140: 47699.64,
+      125141: 47699.64,
+      150000: 59634.24,
     },
   },
 ];
@@ -98,10 +98,10 @@ const annualFixtures: Array<{
 const boundarySalaries = [100_000, 125_139, 125_140, 125_141, 150_000] as const;
 
 const taperEntryCases = [
-  { taxYear: '2023-2024', salary: 100_175, expectedToolTax: 30_149, expectedEngineTax: 30_144.96 },
-  { taxYear: '2024-2025', salary: 100_103, expectedToolTax: 30_848, expectedEngineTax: 30_843.72 },
-  { taxYear: '2025-2026', salary: 100_031, expectedToolTax: 30_785, expectedEngineTax: 30_780.6 },
-  { taxYear: '2026-2027', salary: 100_007, expectedToolTax: 30_737, expectedEngineTax: 30_732.72 },
+  { taxYear: '2023-2024', salary: 100_175, expectedToolTax: 30_149, expectedEngineTax: 30_145.08 },
+  { taxYear: '2024-2025', salary: 100_103, expectedToolTax: 30_848, expectedEngineTax: 30_843.96 },
+  { taxYear: '2025-2026', salary: 100_031, expectedToolTax: 30_785, expectedEngineTax: 30_780.84 },
+  { taxYear: '2026-2027', salary: 100_007, expectedToolTax: 30_737, expectedEngineTax: 30_732.84 },
 ] as const satisfies ReadonlyArray<{
   taxYear: TaxYear;
   salary: number;

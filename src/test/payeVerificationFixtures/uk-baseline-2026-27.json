@@ -4,13 +4,14 @@
     "authority": "HMRC",
     "urls": [
       "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027",
+      "https://www.gov.uk/government/publications/payroll-technical-specifications-income-tax",
       "https://www.gov.uk/government/publications/tables-a-pay-adjustment-tables",
       "https://www.gov.uk/income-tax-rates",
       "https://www.gov.uk/tax-codes/what-your-tax-code-means",
       "https://www.gov.scot/publications/scottish-income-tax-rates-and-bands/pages/2026-to-2027/"
     ],
     "taxYear": "2026-2027",
-    "verifiedOn": "2026-08-23"
+    "verifiedOn": "2026-08-24"
   },
   "tolerancePence": 2,
   "scenarios": [
@@ -42,8 +43,34 @@
       }
     },
     {
+      "id": "uk-12856-1257L-exact-460-penny",
+      "description": "£12,856 rUK, 1257L. HMRC Tables A gives Month 1 free pay of £1,048.26, so U is £23.0733 and whole-pound T is £23. Formula 1 gives exactly £4.60 at 20%; final-penny round-down must preserve £4.60 rather than lose a penny to binary floating-point representation.",
+      "input": {
+        "salary": 12856,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 12570,
+        "incomeTaxAnnual": 55.2,
+        "incomeTaxMonthly": 4.6,
+        "taxBandRates": [20]
+      }
+    },
+    {
       "id": "uk-60k-1257L",
-      "description": "£60,000 rUK, 1257L. HMRC Tables A gives Month 1 free pay of £1,048.26; taxable floor(5000-1048.26)=3951; 3142 at 20% + 809 at 40% = £952.00/mo; NI 251.28+16.22 = £267.50/mo.",
+      "description": "£60,000 rUK, 1257L. HMRC Tables A gives Month 1 free pay of £1,048.26 and taxable pay floor(5000-1048.26)=3951. PAYE routine v24.0 uses exact accrued threshold 37700/12=3141.6666 and threshold tax 7540/12=628.3333: 628.3333 + (3951-3141.6666) x 40%, rounded down, is £952.06/mo. NI is £267.50/mo.",
       "input": {
         "salary": 60000,
         "payPeriod": "annually",
@@ -62,15 +89,15 @@
       },
       "expected": {
         "taxFreeAmount": 12570,
-        "incomeTaxAnnual": 11424.0,
+        "incomeTaxAnnual": 11424.72,
         "nationalInsuranceAnnual": 3210.0,
-        "netPayAnnual": 45366.0,
+        "netPayAnnual": 45365.28,
         "taxBandRates": [20, 40]
       }
     },
     {
       "id": "uk-110k-757T-coded-amount",
-      "description": "£110,000 rUK with explicit code 757T. The code assigns £7,570 to this source; this fixture verifies code handling, not PayeTax's income-based taper policy. HMRC Tables A gives Month 1 free pay of £631.59; taxable floor(9166.67-631.59)=8535; 3142 at 20% + 5393 at 40% = £2,785.60/mo; NI 251.28+99.55 = £350.83/mo.",
+      "description": "£110,000 rUK with explicit code 757T. The code assigns £7,570 to this source; this fixture verifies code handling, not PayeTax's income-based taper policy. HMRC Tables A gives Month 1 free pay of £631.59 and taxable pay 8535. PAYE routine v24.0 uses the exact accrued £3,141.6666 boundary, giving £2,785.66/mo after final-penny round-down; NI is £350.83/mo.",
       "input": {
         "salary": 110000,
         "payPeriod": "annually",
@@ -89,9 +116,9 @@
       },
       "expected": {
         "taxFreeAmount": 7570,
-        "incomeTaxAnnual": 33427.2,
+        "incomeTaxAnnual": 33427.92,
         "nationalInsuranceAnnual": 4209.96,
-        "netPayAnnual": 72362.84,
+        "netPayAnnual": 72362.12,
         "taxBandRates": [20, 40]
       }
     },
@@ -116,15 +143,15 @@
       },
       "expected": {
         "taxFreeAmount": 7570,
-        "incomeTaxAnnual": 33427.2,
+        "incomeTaxAnnual": 33427.92,
         "nationalInsuranceAnnual": 4209.96,
-        "netPayAnnual": 72362.84,
+        "netPayAnnual": 72362.12,
         "taxBandRates": [20, 40]
       }
     },
     {
       "id": "uk-125140-blank-code-policy-taper-zero",
-      "description": "£125,140 rUK with no supplied code. The policy Personal Allowance is fully tapered to zero. Month 1 taxable pay is floor(10428.33)=10428; 3142 at 20% plus 7286 at 40% gives £3,542.80 monthly tax. Monthly NI is £251.28 plus £124.79, rounded to £376.07.",
+      "description": "£125,140 rUK with no supplied code. The policy Personal Allowance is fully tapered to zero and Month 1 taxable pay is 10428. PAYE routine v24.0 uses the exact accrued £3,141.6666 boundary, giving £3,542.86 monthly tax after final-penny round-down. Monthly NI is £376.07.",
       "input": {
         "salary": 125140,
         "payPeriod": "annually",
@@ -143,15 +170,15 @@
       },
       "expected": {
         "taxFreeAmount": 0,
-        "incomeTaxAnnual": 42513.6,
+        "incomeTaxAnnual": 42514.32,
         "nationalInsuranceAnnual": 4512.84,
-        "netPayAnnual": 78113.56,
+        "netPayAnnual": 78112.84,
         "taxBandRates": [20, 40]
       }
     },
     {
       "id": "scot-30k-S1257L",
-      "description": "£30,000 Scottish, S1257L. HMRC Tables A gives Month 1 free pay of £1,048.26; taxable floor(2500-1048.26)=1451; 331 at 19% + 1082 at 20% + 38 at 21% = £287.27/mo (monthly band thresholds ceil(3967/12)=331, ceil(16956/12)=1413).",
+      "description": "£30,000 Scottish, S1257L. HMRC Tables A gives Month 1 free pay of £1,048.26, U £1,451.74 and whole-pound T £1,451. PAYE routines v24.0 selects formula 3 because U exceeds SCvalue £1,413, then uses exact threshold £1,413 and exact threshold tax £279.2941: £279.2941 + (£1,451 - £1,413) x 21% = £287.2741, rounded down to £287.27/mo.",
       "input": {
         "salary": 30000,
         "payPeriod": "annually",

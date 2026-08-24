@@ -1,6 +1,6 @@
 {
   "version": "2025-2026",
-  "generatedAt": "2026-08-23T19:10:24.158Z",
+  "generatedAt": "2026-08-24T19:25:03.938Z",
   "description": "AUTO-GENERATED golden master from taxRates.ts + calculateTax() logic. This is the source of truth for E2E regression tests.",
   "metadata": {
     "personalAllowance": 12570,
@@ -21,7 +21,7 @@
         "employeeNI": 1393.92,
         "netPay": 25123.68
       },
-      "generatedAt": "2026-08-23T19:10:24.156Z",
+      "generatedAt": "2026-08-24T19:25:03.936Z",
       "taxYear": "2025-2026"
     },
     {
@@ -37,7 +37,7 @@
         "employeeNI": 2593.92,
         "netPay": 35923.68
       },
-      "generatedAt": "2026-08-23T19:10:24.157Z",
+      "generatedAt": "2026-08-24T19:25:03.937Z",
       "taxYear": "2025-2026"
     },
     {
@@ -49,11 +49,11 @@
         "taxCode": "1257L"
       },
       "expected": {
-        "incomeTax": 9427.2,
+        "incomeTax": 9427.92,
         "employeeNI": 3110.04,
-        "netPay": 42462.76
+        "netPay": 42462.04
       },
-      "generatedAt": "2026-08-23T19:10:24.157Z",
+      "generatedAt": "2026-08-24T19:25:03.937Z",
       "taxYear": "2025-2026"
     },
     {
@@ -69,7 +69,7 @@
         "employeeNI": 0,
         "netPay": 12570
       },
-      "generatedAt": "2026-08-23T19:10:24.157Z",
+      "generatedAt": "2026-08-24T19:25:03.937Z",
       "taxYear": "2025-2026"
     },
     {
@@ -85,7 +85,7 @@
         "employeeNI": 3015.36,
         "netPay": 39718.64
       },
-      "generatedAt": "2026-08-23T19:10:24.157Z",
+      "generatedAt": "2026-08-24T19:25:03.937Z",
       "taxYear": "2025-2026"
     },
     {
@@ -97,11 +97,11 @@
         "taxCode": ""
       },
       "expected": {
-        "incomeTax": 27427.2,
+        "incomeTax": 27427.92,
         "employeeNI": 4010.04,
-        "netPay": 68562.76
+        "netPay": 68562.04
       },
-      "generatedAt": "2026-08-23T19:10:24.157Z",
+      "generatedAt": "2026-08-24T19:25:03.937Z",
       "taxYear": "2025-2026"
     },
     {
@@ -113,11 +113,11 @@
         "taxCode": ""
       },
       "expected": {
-        "incomeTax": 33427.2,
+        "incomeTax": 33427.92,
         "employeeNI": 4209.96,
-        "netPay": 72362.84
+        "netPay": 72362.12
       },
-      "generatedAt": "2026-08-23T19:10:24.157Z",
+      "generatedAt": "2026-08-24T19:25:03.937Z",
       "taxYear": "2025-2026"
     },
     {
@@ -129,11 +129,11 @@
         "taxCode": ""
       },
       "expected": {
-        "incomeTax": 42513.6,
+        "incomeTax": 42514.32,
         "employeeNI": 4512.84,
-        "netPay": 78113.56
+        "netPay": 78112.84
       },
-      "generatedAt": "2026-08-23T19:10:24.157Z",
+      "generatedAt": "2026-08-24T19:25:03.937Z",
       "taxYear": "2025-2026"
     },
     {
@@ -145,11 +145,11 @@
         "taxCode": "0T"
       },
       "expected": {
-        "incomeTax": 53701.8,
+        "incomeTax": 53703,
         "employeeNI": 5010,
-        "netPay": 91288.2
+        "netPay": 91287
       },
-      "generatedAt": "2026-08-23T19:10:24.157Z",
+      "generatedAt": "2026-08-24T19:25:03.937Z",
       "taxYear": "2025-2026"
     },
     {
@@ -161,11 +161,11 @@
         "taxCode": "S1257L"
       },
       "expected": {
-        "incomeTax": 6906.12,
+        "incomeTax": 6906.24,
         "employeeNI": 2593.92,
-        "netPay": 35499.96
+        "netPay": 35499.84
       },
-      "generatedAt": "2026-08-23T19:10:24.157Z",
+      "generatedAt": "2026-08-24T19:25:03.937Z",
       "taxYear": "2025-2026"
     },
     {
@@ -177,11 +177,11 @@
         "taxCode": "S0T"
       },
       "expected": {
-        "incomeTax": 83661.72,
+        "incomeTax": 83662.2,
         "employeeNI": 6009.96,
-        "netPay": 110328.32
+        "netPay": 110327.84
       },
-      "generatedAt": "2026-08-23T19:10:24.158Z",
+      "generatedAt": "2026-08-24T19:25:03.937Z",
       "taxYear": "2025-2026"
     },
     {
@@ -197,7 +197,7 @@
         "employeeNI": 993.96,
         "netPay": 19006.84
       },
-      "generatedAt": "2026-08-23T19:10:24.158Z",
+      "generatedAt": "2026-08-24T19:25:03.937Z",
       "taxYear": "2025-2026"
     },
     {
@@ -209,11 +209,11 @@
         "taxCode": "K100"
       },
       "expected": {
-        "incomeTax": 8860.8,
+        "incomeTax": 8861.52,
         "employeeNI": 2193.96,
-        "netPay": 28945.24
+        "netPay": 28944.52
       },
-      "generatedAt": "2026-08-23T19:10:24.158Z",
+      "generatedAt": "2026-08-24T19:25:03.937Z",
       "taxYear": "2025-2026"
     },
     {
@@ -229,7 +229,7 @@
         "employeeNI": 1873.92,
         "netPay": 29443.68
       },
-      "generatedAt": "2026-08-23T19:10:24.158Z",
+      "generatedAt": "2026-08-24T19:25:03.937Z",
       "taxYear": "2025-2026"
     },
     {
@@ -246,7 +246,7 @@
         "employeeNI": 993.96,
         "netPay": 21522.04
       },
-      "generatedAt": "2026-08-23T19:10:24.158Z",
+      "generatedAt": "2026-08-24T19:25:03.938Z",
       "taxYear": "2025-2026"
     },
     {
@@ -264,7 +264,7 @@
         "studentLoanRepayment": 1032,
         "netPay": 31290.04
       },
-      "generatedAt": "2026-08-23T19:10:24.158Z",
+      "generatedAt": "2026-08-24T19:25:03.938Z",
       "taxYear": "2025-2026"
     },
     {
@@ -282,7 +282,7 @@
         "pensionContribution": 5000,
         "netPay": 35923.68
       },
-      "generatedAt": "2026-08-23T19:10:24.158Z",
+      "generatedAt": "2026-08-24T19:25:03.938Z",
       "taxYear": "2025-2026"
     },
     {
@@ -300,7 +300,7 @@
         "pensionContribution": 24000,
         "netPay": 29443.68
       },
-      "generatedAt": "2026-08-23T19:10:24.158Z",
+      "generatedAt": "2026-08-24T19:25:03.938Z",
       "taxYear": "2025-2026"
     },
     {
@@ -316,7 +316,7 @@
         "employeeNI": 193.92,
         "netPay": 14575.68
       },
-      "generatedAt": "2026-08-23T19:10:24.158Z",
+      "generatedAt": "2026-08-24T19:25:03.938Z",
       "taxYear": "2025-2026"
     },
     {
@@ -334,7 +334,7 @@
         "studentLoanRepayment": 3672,
         "netPay": 35850.92
       },
-      "generatedAt": "2026-08-23T19:10:24.158Z",
+      "generatedAt": "2026-08-24T19:25:03.938Z",
       "taxYear": "2025-2026"
     }
   ]

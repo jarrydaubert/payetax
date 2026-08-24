@@ -203,7 +203,7 @@ describe('Tax Calculator', () => {
       expect(result.grossSalary.annually).toBe(60000);
 
       // Annualized from monthly HMRC-style rounding.
-      expect(result.incomeTax.annually).toBeCloseTo(11424, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(11424.72, 2);
 
       expect(result.nationalInsurance.annually).toBeCloseTo(3210, 2);
 
@@ -846,8 +846,10 @@ describe('Tax Calculator', () => {
       expect(advancedBand?.name).toBe('Advanced rate');
 
       // With £80,000 income:
-      // Taxable: £80,000 - £12,570 = £67,430
-      expect(advancedBand?.amount).toBeCloseTo(4980, 2);
+      // Month 1 Tables A gives £1,048.26 free pay. Whole-pound taxable pay is
+      // £5,618 and the exact accrued advanced-rate boundary is £5,202.50,
+      // leaving £415.50/mo (£4,986 annualised) in the displayed band.
+      expect(advancedBand?.amount).toBeCloseTo(4986, 2);
     });
 
     it('does not apply Advanced rate for income below £75,000', () => {
@@ -875,9 +877,9 @@ describe('Tax Calculator', () => {
 
       // With £150,000 income:
       // Personal allowance is fully tapered (income > £125,140)
-      // Top rate applies to taxable income above £125,140 (SRR boundary):
-      // monthly taxable 12,500 - ceil(125,140/12)=10,429 -> 2,071/mo = £24,852/yr
-      expect(topBand?.amount).toBeCloseTo(24852, 2);
+      // Top rate applies above the exact accrued £125,140 taxable-income
+      // boundary: £12,500 - £10,428.3333 = £2,071.6667/mo, or £24,860/yr.
+      expect(topBand?.amount).toBeCloseTo(24860, 2);
     });
   });
 

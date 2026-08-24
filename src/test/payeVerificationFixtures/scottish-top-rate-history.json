@@ -8,10 +8,11 @@
       "https://www.gov.scot/publications/scottish-rate-resolution-2024-25-draft-motion-explanatory-note/",
       "https://www.mygov.scot/scottish-income-tax/current-income-tax-rates",
       "https://www.gov.scot/publications/scottish-income-tax-rates-and-bands/pages/2026-to-2027/",
-      "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2023-to-2024"
+      "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2023-to-2024",
+      "https://www.gov.uk/government/publications/payroll-technical-specifications-income-tax"
     ],
     "taxYear": "2023-2027",
-    "verifiedOn": "2026-07-20"
+    "verifiedOn": "2026-08-24"
   },
   "tolerancePence": 2,
   "scenarios": [
@@ -48,7 +49,7 @@
     },
     {
       "id": "progressive-150k-2024-25",
-      "description": "S0T £150,000 in 2024-25 reflects the fully tapered allowance and reaches the 48% top band, which per the Scottish Rate Resolution starts at £125,140 of TAXABLE income. Month-1 derivation: no coded free pay; taxable 12,500/mo; monthly boundaries ceil(2306/12)=193, 1166, 2591, 5203, ceil(125140/12)=10429; tax = 193x19% + 973x20% + 1425x21% + 2612x42% + 5226x45% + 2071x48% = 36.67+194.60+299.25+1097.04+2351.70+994.08 = 4,973.34/mo (59,680.08/yr).",
+      "description": "S0T £150,000 in 2024-25 reaches the 48% top band, which per the Scottish Rate Resolution starts above £125,140 of taxable income. PAYE routines v24.0 formula 6 uses T £12,500, exact threshold £10,428.3333 and exact threshold tax £3,978.9841: £3,978.9841 + (£12,500 - £10,428.3333) x 48% = £4,973.3841, rounded down to £4,973.38/mo (£59,680.56/yr).",
       "input": {
         "salary": 150000,
         "payPeriod": "annually",
@@ -67,14 +68,14 @@
       },
       "expected": {
         "taxFreeAmount": 0,
-        "incomeTaxAnnual": 59680.08,
+        "incomeTaxAnnual": 59680.56,
         "nationalInsuranceAnnual": 5010.0,
         "taxBandRates": [19, 20, 21, 42, 45, 48]
       }
     },
     {
       "id": "progressive-120k-2026-27-no-top-rate",
-      "description": "S257T £120,000 in 2026-27 reflects the £2,570 amount remaining after taper: taxable income is 9,785/mo (free pay ceil(2570/12)=215), which is BELOW the top-rate boundary ceil(125140/12)=10429 — the advanced 45% band must be the last band applied. Guards against the top band re-starting at taxable 112,570 (the pre-correction defect, which overtaxed total incomes from ~£116,760). Tax = 331x19% + 1082x20% + 1178x21% + 2612x42% + 4582x45% = 62.89+216.40+247.38+1097.04+2061.90 = 3,685.61/mo (44,227.32/yr).",
+      "description": "S257T £120,000 in 2026-27 reflects the £2,570 amount remaining after taper: HMRC Tables A gives £214.92 Month 1 free pay, so U is £9,785.08 and whole-pound T is £9,785. This remains below top-rate SCvalue £10,429. Formula 5 uses exact threshold £5,202.5000 and exact threshold tax £1,623.5041: £1,623.5041 + (£9,785 - £5,202.5) x 45% = £3,685.6291, rounded down to £3,685.62/mo (£44,227.44/yr).",
       "input": {
         "salary": 120000,
         "payPeriod": "annually",
@@ -93,8 +94,34 @@
       },
       "expected": {
         "taxFreeAmount": 2570,
-        "incomeTaxAnnual": 44227.32,
+        "incomeTaxAnnual": 44227.44,
         "nationalInsuranceAnnual": 4410.0,
+        "taxBandRates": [19, 20, 21, 42, 45]
+      }
+    },
+    {
+      "id": "progressive-scvalue-selection-boundary-2026-27",
+      "description": "S0T £62,442 in 2026-27 gives U £5,203.50 and whole-pound T £5,203. U exceeds higher-rate SCvalue £5,203, so PAYE routines v24.0 requires formula 5 even though T equals SCvalue. Exact threshold £5,202.5000 and exact threshold tax £1,623.5041 give £1,623.7291, rounded down to £1,623.72/mo.",
+      "input": {
+        "salary": 62442,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "S0T",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 0,
+        "incomeTaxAnnual": 19484.64,
+        "incomeTaxMonthly": 1623.72,
         "taxBandRates": [19, 20, 21, 42, 45]
       }
     },

@@ -63,19 +63,19 @@ describe('HMRC Rate Verification & Edge Cases', () => {
     },
     {
       salary: 43662,
-      expectedIncomeTax: 6349.2,
+      expectedIncomeTax: 6349.32,
       expectedNI: 2486.88,
       note: 'Intermediate rate boundary (21%)',
     },
     {
       salary: 75000,
-      expectedIncomeTax: 19506.12,
+      expectedIncomeTax: 19506.24,
       expectedNI: 3510,
       note: 'Higher rate boundary (42%)',
     },
     {
       salary: 90000,
-      expectedIncomeTax: 26255.4,
+      expectedIncomeTax: 26255.64,
       expectedNI: 3810,
       note: 'Advanced rate in-range (45%)',
     },
@@ -106,7 +106,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
     it('£60,000 salary - higher rate taxpayer', () => {
       const result = calculateTax(createInput({ salary: 60000 }));
 
-      expect(result.incomeTax.annually).toBeCloseTo(11424, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(11424.72, 2);
 
       expect(result.nationalInsurance.annually).toBeCloseTo(3210, 2);
     });
@@ -117,7 +117,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       // Personal allowance unchanged at £100k
       expect(result.taxFreeAmount).toBe(12570);
 
-      expect(result.incomeTax.annually).toBeCloseTo(27427.2, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(27427.92, 2);
     });
 
     it('£125,140 salary - personal allowance fully removed', () => {
@@ -126,7 +126,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       // PA reduced to zero: (£125,140 - £100,000) ÷ 2 = £12,570 reduction
       expect(result.taxFreeAmount).toBe(0);
 
-      expect(result.incomeTax.annually).toBeCloseTo(42513.6, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(42514.32, 2);
     });
 
     it('£150,000 salary - additional rate taxpayer', () => {
@@ -135,7 +135,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       // No personal allowance
       expect(result.taxFreeAmount).toBe(0);
 
-      expect(result.incomeTax.annually).toBeCloseTo(53701.8, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(53703, 2);
     });
 
     it('should add non-taxable allowances to net pay (without changing tax/NI)', () => {
@@ -574,17 +574,16 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       );
 
       expect(basicBand).toBeDefined();
-      // Band amount is the taxable income in that band: £37,700
-      // Or it might store the tax amount: £7,540
+      // Band amount is the projected annual taxable income allocated to that band.
       if ((basicBand?.amount ?? 0) > 10000) {
-        expect(basicBand?.amount).toBeCloseTo(37704, 2); // Taxable income in band
+        expect(basicBand?.amount).toBeCloseTo(37700, 2);
       } else {
         expect(basicBand?.amount).toBeCloseTo(7540, 2); // Tax amount
       }
 
       expect(higherBand).toBeDefined();
       if ((higherBand?.amount ?? 0) > 5000) {
-        expect(higherBand?.amount).toBeCloseTo(9708, 2); // Taxable income in band
+        expect(higherBand?.amount).toBeCloseTo(9712, 2);
       } else {
         expect(higherBand?.amount).toBeCloseTo(3892, 2); // Tax amount
       }
@@ -609,9 +608,9 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       // Bug class: TAX-CODE-OVERRIDES
       // K100 means -£1,000 allowance, so taxable income increases.
       expect(result.taxFreeAmount).toBe(-1000);
-      expect(result.incomeTax.annually).toBeCloseTo(8860.8, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(8861.52, 2);
       expect(result.nationalInsurance.annually).toBeCloseTo(2193.96, 2);
-      expect(result.netPay.annually).toBeCloseTo(28945.24, 2);
+      expect(result.netPay.annually).toBeCloseTo(28944.52, 2);
     });
 
     it('D0: taxes all income at 40% with no personal allowance', () => {

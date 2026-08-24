@@ -50,6 +50,12 @@ import {
 import type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
 import { convertAnnualToPeriod, convertMonthlyToPeriod } from './periodCalculator';
 import {
+  calculateMonth1ProgressiveIncomeTax,
+  getExactMonth1Threshold,
+  getWholePoundMonth1TaxablePay,
+  roundDownPayeTaxToPence,
+} from './tax/month1IncomeTax';
+import {
   getClass1PeriodThresholds,
   getEmployeeClass1MonthSegments,
   isEmployeeNIExempt,
@@ -93,14 +99,6 @@ function getMonthlyPayrollFreePay(annualTaxFreeAmount: number): number {
   // Tables A basis. Policy amounts first become a whole-number code by dropping
   // the final digit, matching HMRC's published code-construction rule.
   return getMonthlyTaxCodeFreePay(annualTaxFreeAmount);
-}
-
-function getMonthlyPayrollBandThreshold(annualThreshold: number): number {
-  if (!Number.isFinite(annualThreshold)) {
-    return Number.POSITIVE_INFINITY;
-  }
-
-  return Math.ceil(annualThreshold / 12);
 }
 
 // ============================================================================
@@ -477,10 +475,13 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // Adjusted salary (after pre-tax deductions - pension only)
   const monthlyTaxableAdjustedSalary = payBasis.payeAdjustedPayment.monthly;
 
-  // HMRC manual PAYE tables use whole-pound taxable pay after pay adjustment.
-  const monthlyTaxableIncome = Math.floor(
-    Math.max(0, monthlyTaxableAdjustedSalary - monthlyTaxFreeAmount),
+  // HMRC first retains taxable pay U (including pence) to select a formula via
+  // Cvalue/SCvalue, then rounds U down to whole-pound T inside that formula.
+  const unroundedMonthlyTaxableIncome = Math.max(
+    0,
+    monthlyTaxableAdjustedSalary - monthlyTaxFreeAmount,
   );
+  const monthlyTaxableIncome = getWholePoundMonth1TaxablePay(unroundedMonthlyTaxableIncome);
   const annualTaxableIncome = monthlyTaxableIncome * 12;
 
   // ---------------
@@ -511,7 +512,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
         taxCodeResult.isScottish,
         taxCodeResult.isScottish ? scottishRates.bands : standardRates.bands,
       );
-      monthlyTax = roundToPence((monthlyTaxableIncome * override.rate) / 100);
+      monthlyTax = (monthlyTaxableIncome * override.rate) / 100;
       taxBands.push({
         name: override.name,
         rate: override.rate,
@@ -520,52 +521,60 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     }
     // Normal progressive tax calculation (only if no band override)
     else {
+      const month1Calculation = calculateMonth1ProgressiveIncomeTax(
+        unroundedMonthlyTaxableIncome,
+        taxRates.bands.map((band) => ({
+          rate: band.rate,
+          taxableIncomeUpperBound: band.threshold,
+        })),
+      );
+      monthlyTax = month1Calculation.incomeTaxAtFourDecimals;
+
       if (isScottish) {
-        // Canonical policy thresholds are annual taxable-income upper bounds.
-        // Period conversion and PAYE rounding stay outside the shared slicer.
+        // The shared slicer supplies result-band allocation only. The PAYE tax
+        // amount above comes from HMRC's separate formula-selection routine.
         const calculation = sliceScottishTaxableIncome(
           monthlyTaxableIncome,
           taxRates.bands.map((band) => ({
             name: band.name,
             rate: band.rate,
-            taxableIncomeUpperBound: getMonthlyPayrollBandThreshold(band.threshold),
+            taxableIncomeUpperBound: getExactMonth1Threshold(band.threshold),
           })),
         );
-        monthlyTax = calculation.incomeTax;
 
         for (const slice of calculation.slices) {
           taxBands.push({
             name: slice.name,
             rate: slice.rate,
-            amount: slice.taxableAmount * 12,
+            amount: roundToPence(slice.taxableAmount * 12),
           });
         }
       } else {
-        // Canonical policy thresholds are annual taxable-income upper bounds.
-        // Period conversion and PAYE rounding stay outside the shared slicer.
+        // The shared slicer supplies result-band allocation only. The PAYE tax
+        // amount above comes from HMRC's separate formula-selection routine.
         const calculation = sliceRukTaxableIncome(
           monthlyTaxableIncome,
           taxRates.bands.map((band) => ({
             name: band.name,
             rate: band.rate,
-            taxableIncomeUpperBound: getMonthlyPayrollBandThreshold(band.threshold),
+            taxableIncomeUpperBound: getExactMonth1Threshold(band.threshold),
           })),
         );
-        monthlyTax = calculation.incomeTax;
 
         for (const slice of calculation.slices) {
           taxBands.push({
             name: slice.name,
             rate: slice.rate,
-            amount: slice.taxableAmount * 12,
+            amount: roundToPence(slice.taxableAmount * 12),
           });
         }
       }
     } // Close the else block for taxCodeBandOverride check
   }
 
-  // Round monthly tax to pence for accuracy
-  monthlyTax = roundToPence(monthlyTax);
+  // HMRC's computerised PAYE routine rounds tax due down to the penny for
+  // rUK, Welsh and Scottish calculations alike.
+  monthlyTax = roundDownPayeTaxToPence(monthlyTax);
 
   // Overriding limit: PAYE Regulations 2003 (SI 2003/2682) reg 2 caps the tax
   // deducted from a relevant payment at 50% of that payment. Originally a K-code
