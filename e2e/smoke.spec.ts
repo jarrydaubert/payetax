@@ -67,6 +67,23 @@ test.describe('Smoke Tests', () => {
     await expect(page.getByTestId('tools-link-tax-code-decoder')).toBeVisible();
   });
 
+  test('Scottish calculator CTA opens the main calculator with Scotland selected @smoke', async ({
+    page,
+  }) => {
+    await page.goto('/tools/scottish-tax-calculator');
+    await page.evaluate(() => window.localStorage.removeItem('tax-calculator-storage'));
+    await page.reload();
+
+    const ctaButton = page.getByRole('button', { name: 'Open Full Scottish Calculator' });
+    const ctaLink = ctaButton.locator('xpath=ancestor::a');
+
+    await expect(ctaLink).toHaveAttribute('href', '/#tax-calculator');
+    await ctaButton.click();
+
+    await expect(page).toHaveURL(/\/#tax-calculator$/);
+    await expect(page.getByTestId('region-select')).toContainText('Scotland');
+  });
+
   test('About page loads @smoke', async ({ page }) => {
     await page.goto('/about');
     await expect(page.locator('h1')).toBeVisible();

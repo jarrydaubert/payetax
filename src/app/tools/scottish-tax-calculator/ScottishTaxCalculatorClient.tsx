@@ -16,6 +16,7 @@ import {
   taxableThresholdToTotalIncome,
 } from '@/lib/tax';
 import { cn, formatCurrency } from '@/lib/utils';
+import { useCalculatorActions } from '@/store/calculatorStore';
 import {
   type AnnualIncomeTaxComparison,
   CURRENT_SCOTTISH_TAX_CROSSOVER,
@@ -41,6 +42,7 @@ export function ScottishTaxCalculatorClient() {
   const [salary, setSalary] = useState<string>('');
   const [salaryError, setSalaryError] = useState<string | null>(null);
   const [comparison, setComparison] = useState<AnnualIncomeTaxComparison | null>(null);
+  const { setRegion } = useCalculatorActions();
 
   const runComparison = (salaryValue: number) => {
     setSalaryError(null);
@@ -358,8 +360,9 @@ export function ScottishTaxCalculatorClient() {
           <div>
             <h3 className='mb-2 font-semibold'>How do I know if I pay Scottish tax?</h3>
             <p className='text-muted-foreground'>
-              You pay Scottish income tax if Scotland is your main residence. Your tax code will
-              start with &quot;S&quot; (e.g., S1257L). Check your payslip or P60.
+              You pay Scottish Income Tax if Scotland is your main residence. If you&apos;re
+              employed or receive a pension under PAYE, your tax code will usually start with
+              &quot;S&quot; (for example, S1257L). Check your payslip or P60.
             </p>
           </div>
           <div>
@@ -424,7 +427,7 @@ export function ScottishTaxCalculatorClient() {
         <p className={cn('mb-4 text-muted-foreground', 'text-lg')}>
           Get a full breakdown with NI, pension, and student loan calculations.
         </p>
-        <Link href='/?scottish=true'>
+        <Link href='/#tax-calculator' onClick={() => setRegion('Scotland')}>
           <Button size='lg' variant='outline'>
             Open Full Scottish Calculator
             <ArrowRight className={cn('ml-2', 'size-4')} />

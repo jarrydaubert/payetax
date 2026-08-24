@@ -76,6 +76,9 @@ describe('ScottishTaxCalculatorClient', () => {
       screen.getByText(/National Insurance, Student Loans and take-home pay are excluded/),
     ).toBeInTheDocument();
     expect(screen.getByText(/approximately £33,493/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/If you're employed or receive a pension under PAYE/),
+    ).toBeInTheDocument();
     expect(screen.getAllByText(/2026-27/).length).toBeGreaterThan(0);
     expect(screen.getByRole('link', { name: /Scottish Government/ })).toHaveAttribute(
       'href',
