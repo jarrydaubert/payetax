@@ -23,11 +23,10 @@ sources, not in backlog prose.
 
 Current correctness sequence:
 
-1. Scottish-vs-English comparison.
-2. £40k, £60k and £100k salary articles; protect the verified £70k article.
-3. Explicit pension-method handling.
-4. Transparent calculation results.
-5. Independent fixture/test-portfolio completion and Foundation reconciliation.
+1. £40k, £60k and £100k salary articles; protect the verified £70k article.
+2. Explicit pension-method handling.
+3. Transparent calculation results.
+4. Independent fixture/test-portfolio completion and Foundation reconciliation.
 
 ### Foundation
 
@@ -125,11 +124,9 @@ Implementation sequencing for these items remains documented in the ownership au
 
 ### Content accuracy
 
-- [ ] Featured Scottish comparison article: rebuild the stale 2025-26 live comparison for 2026/27, replace its old ~£30,300 crossover with the independently derived 2026/27 crossover of approximately £33,493, independently re-derive every worked figure, narrow overconfident pension/bonus/relocation claims and expose dated primary sources. Keep its URL and differentiated comparison purpose. DoD: current bands, crossover and examples match independent working, assumptions are explicit, and factual/schema regression tests pass.
 - [ ] Tax-code guide: add the statutory 50% overriding limit; fix the "K500 = you owe £5,000" conflation; refresh stale 2025-26 titles/meta; cover Scottish SD codes. DoD: all four corrections published and consistent with the engine.
 - [ ] £40k, £60k and £100k salary articles: independently rebuild current PAYE and Student Loan figures, put the qualified annual/monthly answer first, state calculation and pension-method assumptions, and remove contradictory FAQ outputs and unsupported lifestyle, prevalence, savings, housing and accountant-value claims. The £40k “UK median around £35,000” claim appears materially inconsistent with the latest applicable ONS ASHE full-time annual earnings evidence reviewed for this audit; verify against the then-current ONS source and correct or remove it rather than merely adding a citation. For £100k, verify and current-source the adjusted-net-income eligibility conditions for Tax-Free Childcare and England-only Free Childcare for Working Parents, keeping them separate from Income Tax marginal-rate claims and financial advice. Keep the existing URLs. DoD: displayed figures reproduce from independent working, visible copy/metadata/schema agree, the median and childcare statements are accurate and scoped, and focused drift tests pass.
 - [ ] Remaining salary-page unsupported-claim audit: after the priority repair, inspect the retained series for uncited percentile/median, lifestyle, rent, savings and mortgage claims. The verified £70k article is the reference pattern and should not be rewritten without a reproduced defect. DoD: each remaining claim is sourced from an appropriate primary dataset, qualified or removed.
-- [ ] FAQ extraction boundary: `extractFAQs` treats bold labels outside a genuine FAQ section as questions, producing malformed FAQ schema. DoD: extraction is constrained to deliberate FAQ content and a regression test rejects label/list artefacts from the Scottish comparison article.
 - [ ] Evergreen vs historical article policy: frontmatter declares the mode. DoD: evergreen posts contain no hardcoded rate values; historical posts stay pinned and labelled; the blog audit enforces the split.
 - [ ] Blog visual refresh: regenerate legacy post images into the Ledger editorial style and retire stale tax-year content in small verified batches. DoD: each batch lands with refreshed imagery and verified figures.
 

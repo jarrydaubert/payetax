@@ -448,12 +448,15 @@ describe('mdx-components', () => {
       expect(mdxComponents).toHaveProperty('td');
       expect(mdxComponents).toHaveProperty('hr');
       expect(mdxComponents).toHaveProperty('img');
+      expect(mdxComponents).toHaveProperty('ScottishTaxBandsTable');
+      expect(mdxComponents).toHaveProperty('ScottishTaxExamplesTable');
     });
 
-    it('should have 25 components total', () => {
-      // 25 components: h1-h6, p, ul, ol, li, a, strong, em, code, blockquote,
-      // Callout, table, thead, tbody, tr, th, td, hr, img, caption
-      expect(Object.keys(mdxComponents)).toHaveLength(25);
+    it('should have 27 components total', () => {
+      // 27 components: h1-h6, p, ul, ol, li, a, strong, em, code, blockquote,
+      // Callout, table, thead, tbody, tr, th, td, hr, img, caption, and the two
+      // policy-backed Scottish comparison tables.
+      expect(Object.keys(mdxComponents)).toHaveLength(27);
     });
   });
 });

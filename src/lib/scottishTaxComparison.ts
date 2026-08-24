@@ -3,6 +3,7 @@ import {
   calculateIncomeTax,
   roundToPence,
   selectTaxPolicy,
+  type TaxYear,
   taxableThresholdToTotalIncome,
 } from '@/lib/tax';
 
@@ -60,11 +61,12 @@ export interface AnnualIncomeTaxComparison {
   difference: number;
 }
 
-export function calculateAnnualIncomeTaxComparison(salary: number): AnnualIncomeTaxComparison {
-  const scottishTax = Math.round(
-    calculateIncomeTax(salary, 'scotland', CURRENT_TAX_YEAR).incomeTax,
-  );
-  const rukTax = Math.round(calculateIncomeTax(salary, 'rUK', CURRENT_TAX_YEAR).incomeTax);
+export function calculateAnnualIncomeTaxComparison(
+  salary: number,
+  taxYear: TaxYear = CURRENT_TAX_YEAR,
+): AnnualIncomeTaxComparison {
+  const scottishTax = Math.round(calculateIncomeTax(salary, 'scotland', taxYear).incomeTax);
+  const rukTax = Math.round(calculateIncomeTax(salary, 'rUK', taxYear).incomeTax);
 
   return {
     scottishTax,

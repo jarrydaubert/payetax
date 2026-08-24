@@ -271,13 +271,34 @@ export interface HowToStepItem {
  *
  * Supported patterns:
  * - ### or #### Question (with or without ?)
- * - **Question** (with or without ?)
+ * - **Question** inside a deliberate FAQ section when marked with `Q:`, `?`,
+ *   or punctuation-optional interrogative wording
  * - FAQ sections with headers like "Frequently Asked Questions"
  * - Optional blank line between question and answer
  */
 export function extractFAQs(content: string): FAQItem[] {
   const faqs: FAQItem[] = [];
   const seenQuestions = new Set<string>();
+
+  const addFAQ = (questionSource: string, answerSource: string) => {
+    const question = questionSource.replace(/^Q:\s*/i, '').trim();
+    const answer = cleanMarkdownForSchema(answerSource.trim()).replace(/^A:\s*/i, '');
+    const dedupeKey = question.toLowerCase();
+
+    if (question && answer && !seenQuestions.has(dedupeKey)) {
+      seenQuestions.add(dedupeKey);
+      faqs.push({ question, answer });
+    }
+  };
+
+  const isDeliberateBoldQuestion = (source: string) => {
+    const candidate = source.trim();
+    if (/^Q:\s*\S/i.test(candidate) || candidate.endsWith('?')) return true;
+    if (/[:.!]$/.test(candidate)) return false;
+    return /^(?:what|why|how|when|where|who|which|does|do|did|is|are|can|could|should|will|would|has|have|was|were)\b/i.test(
+      candidate,
+    );
+  };
 
   // Find FAQ section - look for common FAQ header patterns
   const faqSectionRegex =
@@ -295,36 +316,32 @@ export function extractFAQs(content: string): FAQItem[] {
         const questionMatch = match[1];
         const answerMatch = match[2];
         if (questionMatch && answerMatch) {
-          const question = questionMatch.trim();
-          const answer = cleanMarkdownForSchema(answerMatch.trim());
-          if (question && answer && !seenQuestions.has(question.toLowerCase())) {
-            seenQuestions.add(question.toLowerCase());
-            faqs.push({ question, answer });
-          }
+          addFAQ(questionMatch, answerMatch);
         }
         match = headingPattern.exec(section);
       }
-    }
-  }
 
-  // Also look for bold question patterns throughout the document
-  // Pattern: **Question** (optional ?) followed by answer
-  // Allows optional blank line between question and answer
-  const boldQuestionPattern =
-    /^\*\*([^*]+?)\*\*\s*\n(?:\n)?([\s\S]*?)(?=\n\*\*[^*]+\*\*|\n#{2,4}\s|(?![\s\S]))/gm;
-  let boldMatch = boldQuestionPattern.exec(content);
-  while (boldMatch) {
-    const questionMatch = boldMatch[1];
-    const answerMatch = boldMatch[2];
-    if (questionMatch && answerMatch) {
-      const question = questionMatch.trim();
-      const answer = cleanMarkdownForSchema(answerMatch.trim());
-      if (question && answer && !seenQuestions.has(question.toLowerCase())) {
-        seenQuestions.add(question.toLowerCase());
-        faqs.push({ question, answer });
+      // Find question-like bold lines first so bold labels inside an answer do
+      // not split that answer or become extra FAQPage entities.
+      const boldLinePattern = /^\*\*([^*\n]+?)\*\*\s*$/gm;
+      const boldQuestions = Array.from(section.matchAll(boldLinePattern)).filter(
+        (candidate) => candidate[1] && isDeliberateBoldQuestion(candidate[1]),
+      );
+
+      for (const [index, boldQuestion] of boldQuestions.entries()) {
+        const questionMatch = boldQuestion[1];
+        const answerStart = (boldQuestion.index ?? 0) + boldQuestion[0].length;
+        const nextQuestionStart = boldQuestions[index + 1]?.index ?? section.length;
+        const answerWindow = section.slice(answerStart, nextQuestionStart);
+        const nextHeadingOffset = answerWindow.search(/^#{2,4}\s/m);
+        const answerEnd =
+          nextHeadingOffset >= 0 ? answerStart + nextHeadingOffset : nextQuestionStart;
+
+        if (questionMatch) {
+          addFAQ(questionMatch, section.slice(answerStart, answerEnd));
+        }
       }
     }
-    boldMatch = boldQuestionPattern.exec(content);
   }
 
   return faqs;

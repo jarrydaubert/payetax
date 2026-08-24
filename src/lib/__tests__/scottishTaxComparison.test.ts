@@ -48,14 +48,23 @@ describe('Scottish annual Income Tax comparison', () => {
     expect(formatAnnualSalaryInput(50_000.5)).toBe('50,000.50');
   });
 
-  it('reproduces the independently worked £50,000 comparison', () => {
-    // 2026/27 official bands, before rounding:
-    // Scotland = 3,967×19% + 12,989×20% + 14,136×21% + 6,338×42% = £8,982.05.
-    // rUK = 37,430×20% = £7,486.00.
-    expect(calculateAnnualIncomeTaxComparison(50_000)).toEqual({
-      scottishTax: 8_982,
-      rukTax: 7_486,
-      difference: 1_496,
+  it.each([
+    [25_000, 2_446, 2_486, -40],
+    [35_000, 4_501, 4_486, 15],
+    [50_000, 8_982, 7_486, 1_496],
+    [75_000, 19_482, 17_432, 2_050],
+    [100_000, 30_732, 27_432, 3_300],
+    [150_000, 59_634, 53_703, 5_931],
+  ])('reproduces the independently worked 2026/27 comparison at £%i', (salary, scottishTax, rukTax, difference) => {
+    // Independent fixtures use the published Scottish and rUK taxable-band widths.
+    // At £150k, for example:
+    // Scotland = 3,967×19% + 12,989×20% + 14,136×21% + 31,338×42%
+    //          + 62,710×45% + 24,860×48% = £59,634.35.
+    // rUK = 37,700×20% + 87,440×40% + 24,860×45% = £53,703.00.
+    expect(calculateAnnualIncomeTaxComparison(salary, '2026-2027')).toEqual({
+      scottishTax,
+      rukTax,
+      difference,
     });
   });
 

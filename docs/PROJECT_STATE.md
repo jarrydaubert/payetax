@@ -181,30 +181,27 @@ In short:
 
 - tax-code decoder correctness is materially resolved by PRs #111/#112;
 - protect the £70k article unless new evidence identifies a concrete defect;
-- the Scottish calculator now rejects unsupported salary formats, presents its annual Income Tax
-  scope and primary sources, and derives the 2026/27 crossover from canonical policy; the
-  Scottish-vs-English comparison article is the next current-year correctness slice;
+- the Scottish calculator and Scottish-vs-English comparison article now share the canonical
+  annual Income Tax comparison model; the article presents current 2026/27 bands, the independently
+  verified £33,493 crossover, reproduced examples and dated primary sources;
 - the £40k, £60k and £100k pages need evidence-first factual repair while keeping their URLs;
-- FAQ extraction can still emit malformed schema by treating bold labels outside the real FAQ
-  section as questions.
+- FAQ extraction is constrained to deliberate FAQ sections, so bold labels elsewhere no longer
+  become malformed FAQ schema.
 
 ## Where to resume
 
 Resume in this order unless new primary evidence changes the risk:
 
-1. **Scottish comparison correctness.** Replace the stale ~£30,300 crossover copy with the
-   independently derived 2026/27 crossover of approximately £33,493; update and independently
-   verify the comparison article; fix the FAQ extraction regression with it.
-2. **£40k, £60k and £100k salary-page correctness.** Use the £70k page's qualified, answer-first
+1. **£40k, £60k and £100k salary-page correctness.** Use the £70k page's qualified, answer-first
    pattern; independently verify displayed PAYE/loan figures; remove unsupported lifestyle,
    prevalence, savings and mortgage claims; verify and correct/remove the £40k median claim against
    then-current ONS evidence; current-source the £100k childcare eligibility consequences; state
    pension method assumptions.
-3. **Explicit pension-method Foundation slice.** Represent salary sacrifice, net pay and relief at
+2. **Explicit pension-method Foundation slice.** Represent salary sacrifice, net pay and relief at
    source explicitly, or narrow the product contract visibly and consistently.
-4. **Transparent-result Foundation work.** Expose selected policy, calculation basis, relevant pay
+3. **Transparent-result Foundation work.** Expose selected policy, calculation basis, relevant pay
    bases, pension method and deductions without making consumers reconstruct them.
-5. **Independent fixture/test-portfolio completion and Foundation reconciliation.** Widen year and
+4. **Independent fixture/test-portfolio completion and Foundation reconciliation.** Widen year and
    boundary coverage, strengthen per-scenario provenance, finish the documented portfolio split,
    then remove completed Foundation rows from the backlog.
 
