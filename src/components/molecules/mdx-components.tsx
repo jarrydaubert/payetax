@@ -10,6 +10,7 @@ import Image from 'next/image';
 import type React from 'react';
 import { isValidElement, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { ScottishTaxBandsTable, ScottishTaxExamplesTable } from './ScottishTaxComparisonTables';
 
 // Per-render slugger for unique IDs across a document
 // Note: If rendering multiple MDX docs in one request, reset between docs
@@ -55,6 +56,9 @@ const ANCHOR_LINK_CLASSES = cn(
 );
 
 export const mdxComponents = {
+  ScottishTaxBandsTable,
+  ScottishTaxExamplesTable,
+
   // Enhanced headings with anchor links
   h1: ({ children, id: explicitId, ...props }: React.ComponentPropsWithoutRef<'h1'>) => {
     const id = makeHeadingId(children, explicitId);

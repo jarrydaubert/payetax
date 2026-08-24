@@ -9,6 +9,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
 import {
+  type AnnualIncomeTaxComparison,
+  CURRENT_SCOTTISH_TAX_CROSSOVER,
+  calculateAnnualIncomeTaxComparison,
+  formatAnnualSalaryInput,
+  parseAnnualSalaryInput,
+} from '@/lib/scottishTaxComparison';
+import {
   CURRENT_TAX_YEAR,
   SCOTTISH_TAX_RATES,
   TAX_RATES,
@@ -17,13 +24,6 @@ import {
 } from '@/lib/tax';
 import { cn, formatCurrency } from '@/lib/utils';
 import { useCalculatorActions } from '@/store/calculatorStore';
-import {
-  type AnnualIncomeTaxComparison,
-  CURRENT_SCOTTISH_TAX_CROSSOVER,
-  calculateAnnualIncomeTaxComparison,
-  formatAnnualSalaryInput,
-  parseAnnualSalaryInput,
-} from './scottishTaxComparison';
 
 const TAX_YEAR = CURRENT_TAX_YEAR;
 const scottishRates = SCOTTISH_TAX_RATES[TAX_YEAR];
