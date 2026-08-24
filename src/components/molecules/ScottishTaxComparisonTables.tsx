@@ -1,6 +1,5 @@
 import { type CrawlableRateBand, getCrawlableTaxFacts } from '@/lib/crawlableTaxFacts';
 import { calculateAnnualIncomeTaxComparison } from '@/lib/scottishTaxComparison';
-import type { TaxYear } from '@/lib/tax';
 import { CURRENT_TAX_YEAR, formatTaxYearDisplay, selectTaxPolicy } from '@/lib/tax';
 import { cn, formatCurrency } from '@/lib/utils';
 
@@ -9,7 +8,7 @@ export const SCOTTISH_COMPARISON_EXAMPLE_SALARIES = [
 ] as const;
 
 interface ComparisonTableProps {
-  taxYear?: TaxYear;
+  taxYear?: string;
 }
 
 function PolicyTable({ label, rows }: { label: string; rows: CrawlableRateBand[] }) {
@@ -74,7 +73,8 @@ function describeDifference(difference: number): string {
 }
 
 export function ScottishTaxExamplesTable({ taxYear = CURRENT_TAX_YEAR }: ComparisonTableProps) {
-  const taxYearDisplay = formatTaxYearDisplay(taxYear, { shortEndYear: true });
+  const policy = selectTaxPolicy(taxYear);
+  const taxYearDisplay = formatTaxYearDisplay(policy.taxYear, { shortEndYear: true });
 
   return (
     <div
@@ -102,7 +102,7 @@ export function ScottishTaxExamplesTable({ taxYear = CURRENT_TAX_YEAR }: Compari
         </thead>
         <tbody className='divide-y divide-border'>
           {SCOTTISH_COMPARISON_EXAMPLE_SALARIES.map((salary) => {
-            const comparison = calculateAnnualIncomeTaxComparison(salary, taxYear);
+            const comparison = calculateAnnualIncomeTaxComparison(salary, policy.taxYear);
             return (
               <tr key={salary}>
                 <th className='px-4 py-3 text-left font-medium text-foreground tabular-nums'>

@@ -154,6 +154,8 @@ describe('Scottish comparison article contract', () => {
     expect(post?.content).toContain(
       'https://www.gov.scot/publications/scottish-income-tax-technical-factsheet/',
     );
+    expect(post?.content).toContain('Scottish Government: 2026/27 technical factsheet');
+    expect(post?.content).not.toContain('technical factsheet and rest-of-UK comparison');
     expect(post?.content).toContain(
       'https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027',
     );
