@@ -1,7 +1,7 @@
 // src/app/tools/scottish-tax-calculator/ScottishTaxCalculatorClient.tsx
 'use client';
 
-import { ArrowRight, Calculator, Info, MapPin, TrendingUp } from 'lucide-react';
+import { ArrowRight, Calculator, ExternalLink, Info, MapPin, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
 import { useId, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -10,48 +10,73 @@ import { Input } from '@/components/ui/input';
 import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
 import {
   CURRENT_TAX_YEAR,
-  calculateIncomeTax,
   SCOTTISH_TAX_RATES,
+  TAX_RATES,
+  TAX_YEAR_SOURCES,
   taxableThresholdToTotalIncome,
 } from '@/lib/tax';
 import { cn, formatCurrency } from '@/lib/utils';
+import { useCalculatorActions } from '@/store/calculatorStore';
+import {
+  type AnnualIncomeTaxComparison,
+  CURRENT_SCOTTISH_TAX_CROSSOVER,
+  calculateAnnualIncomeTaxComparison,
+  formatAnnualSalaryInput,
+  parseAnnualSalaryInput,
+} from './scottishTaxComparison';
 
 const TAX_YEAR = CURRENT_TAX_YEAR;
 const scottishRates = SCOTTISH_TAX_RATES[TAX_YEAR];
+const rukRates = TAX_RATES[TAX_YEAR];
+const taxYearSources = TAX_YEAR_SOURCES[TAX_YEAR];
+const scottishSourceUrl = taxYearSources.incomeTax.scotlandBands[0];
+const rukSourceUrl = taxYearSources.incomeTax.ukMainBands[0];
 
 // Quick salary examples for comparison
 const EXAMPLE_SALARIES = [30000, 50000, 70000, 100000, 150000];
 
 export function ScottishTaxCalculatorClient() {
   const inputId = useId();
+  const helpId = `${inputId}-help`;
+  const errorId = `${inputId}-error`;
   const [salary, setSalary] = useState<string>('');
-  const [comparison, setComparison] = useState<{
-    scottishTax: number;
-    englishTax: number;
-    difference: number;
-  } | null>(null);
+  const [salaryError, setSalaryError] = useState<string | null>(null);
+  const [comparison, setComparison] = useState<AnnualIncomeTaxComparison | null>(null);
+  const { setRegion } = useCalculatorActions();
 
-  // Shared comparison logic
   const runComparison = (salaryValue: number) => {
-    const scottishTax = Math.round(calculateIncomeTax(salaryValue, 'scotland', TAX_YEAR).incomeTax);
-    const englishTax = Math.round(calculateIncomeTax(salaryValue, 'rUK', TAX_YEAR).incomeTax);
-    setComparison({
-      scottishTax,
-      englishTax,
-      difference: scottishTax - englishTax,
-    });
+    setSalaryError(null);
+    setSalary(formatAnnualSalaryInput(salaryValue));
+    setComparison(calculateAnnualIncomeTaxComparison(salaryValue));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Normalize: strip everything except digits
-    const salaryNum = Number(salary.replace(/[^\d]/g, ''));
-    if (Number.isNaN(salaryNum) || salaryNum < 0) return;
-    runComparison(salaryNum);
+    const parsedSalary = parseAnnualSalaryInput(salary);
+
+    if (!parsedSalary.success) {
+      setComparison(null);
+      setSalaryError(parsedSalary.error);
+      return;
+    }
+
+    runComparison(parsedSalary.salary);
+  };
+
+  const handleSalaryChange = (value: string) => {
+    setSalary(value);
+    setSalaryError(null);
+    setComparison(null);
+  };
+
+  const handleSalaryBlur = () => {
+    const parsedSalary = parseAnnualSalaryInput(salary);
+    if (parsedSalary.success) {
+      setSalary(formatAnnualSalaryInput(parsedSalary.salary));
+    }
   };
 
   const handleQuickCalculate = (salaryValue: number) => {
-    setSalary(salaryValue.toLocaleString());
     runComparison(salaryValue);
   };
 
@@ -74,8 +99,8 @@ export function ScottishTaxCalculatorClient() {
           Scottish Tax Calculator {CURRENT_TAX_YEAR_DISPLAY_SHORT}
         </h1>
         <p className={cn('mx-auto max-w-2xl text-muted-foreground', 'text-lg')}>
-          Scotland has 6 income tax bands with different rates to the rest of the UK. See how much
-          how much tax you&apos;ll pay and compare with English rates.
+          Compare annual Scottish Income Tax with rest-of-UK Income Tax on the same salary. This
+          tool does not calculate take-home pay.
         </p>
       </div>
 
@@ -87,10 +112,20 @@ export function ScottishTaxCalculatorClient() {
             Quick Comparison
           </CardTitle>
           <CardDescription>
-            Enter your salary to see the tax difference between Scotland and England.
+            Enter an annual salary from £0 to £10,000,000 to compare Scotland with England, Wales
+            and Northern Ireland.
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <div className='mb-5 rounded-lg border border-primary/30 bg-primary/10 p-4 text-sm'>
+            <p className='font-semibold text-foreground'>Annual Income Tax only</p>
+            <p className='mt-1 text-muted-foreground'>
+              Assumes salary is your only income and applies the standard Personal Allowance,
+              tapered from salary where applicable. It does not apply your tax code, other income,
+              benefits, pension contributions, allowances or reliefs. National Insurance, Student
+              Loans and take-home pay are excluded.
+            </p>
+          </div>
           <form onSubmit={handleSubmit} className='flex gap-3'>
             <label htmlFor={inputId} className='sr-only'>
               Annual salary
@@ -102,18 +137,31 @@ export function ScottishTaxCalculatorClient() {
               <Input
                 id={inputId}
                 type='text'
-                placeholder='50,000'
+                inputMode='decimal'
+                placeholder='50,000.00'
                 value={salary}
-                onChange={(e) => setSalary(e.target.value)}
+                onChange={(e) => handleSalaryChange(e.target.value)}
+                onBlur={handleSalaryBlur}
                 className='pl-7 font-mono text-lg'
                 autoComplete='off'
                 spellCheck={false}
+                aria-invalid={salaryError ? 'true' : undefined}
+                aria-describedby={salaryError ? `${helpId} ${errorId}` : helpId}
               />
             </div>
             <Button type='submit' size='lg' disabled={!salary.trim()}>
               Compare
             </Button>
           </form>
+          <p id={helpId} className='mt-2 text-muted-foreground text-sm'>
+            Use digits, optional commas and up to 2 decimal places, for example 50000.50 or
+            50,000.50.
+          </p>
+          {salaryError && (
+            <p id={errorId} className='mt-2 text-destructive text-sm' role='alert'>
+              {salaryError}
+            </p>
+          )}
 
           {/* Quick Examples */}
           <div className='mt-4'>
@@ -150,8 +198,8 @@ export function ScottishTaxCalculatorClient() {
                 </p>
               </div>
               <div className='rounded-lg border border-border/50 bg-card p-4'>
-                <p className='mb-1 font-medium text-muted-foreground text-sm'>English Tax</p>
-                <p className='font-bold text-2xl'>{formatCurrency(comparison.englishTax, 0)}</p>
+                <p className='mb-1 font-medium text-muted-foreground text-sm'>Rest of UK Tax</p>
+                <p className='font-bold text-2xl'>{formatCurrency(comparison.rukTax, 0)}</p>
               </div>
               <div
                 className={cn(
@@ -190,9 +238,9 @@ export function ScottishTaxCalculatorClient() {
               <div className='flex items-start gap-2'>
                 <Info className={cn('size-4', 'mt-0.5 flex-shrink-0 text-primary')} />
                 <p className='text-primary text-sm'>
-                  This comparison shows income tax only. National Insurance is the same across the
-                  UK. Scottish taxpayers have an &quot;S&quot; prefix in their tax code (e.g.,
-                  S1257L).
+                  This is an annual Income Tax comparison, not a payslip or take-home calculation.
+                  Scottish taxpayers usually have an &quot;S&quot; prefix in their tax code (for
+                  example, S1257L).
                 </p>
               </div>
             </div>
@@ -208,7 +256,8 @@ export function ScottishTaxCalculatorClient() {
             Scottish Tax Bands {CURRENT_TAX_YEAR_DISPLAY_SHORT}
           </CardTitle>
           <CardDescription>
-            Scotland has 6 income tax bands compared to England&apos;s 3 bands.
+            Scotland has {scottishRates.bands.length} Income Tax bands compared with{' '}
+            {rukRates.bands.length} across the rest of the UK.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -225,7 +274,9 @@ export function ScottishTaxCalculatorClient() {
                 <tr className='border-border/50 border-b'>
                   <td className='px-4 py-3'>Personal Allowance</td>
                   <td className='px-4 py-3 font-mono'>0%</td>
-                  <td className='px-4 py-3 text-muted-foreground'>Up to £12,570</td>
+                  <td className='px-4 py-3 text-muted-foreground'>
+                    Up to £{scottishRates.personalAllowance.toLocaleString('en-GB')}
+                  </td>
                 </tr>
                 {scottishRates.bands.map((band, index) => {
                   const prevThreshold =
@@ -277,23 +328,23 @@ export function ScottishTaxCalculatorClient() {
         <CardContent>
           <div className='grid gap-4 md:grid-cols-2'>
             <div className='space-y-3'>
-              <h3 className='font-semibold'>Scotland (6 bands)</h3>
+              <h3 className='font-semibold'>Scotland ({scottishRates.bands.length} bands)</h3>
               <ul className='space-y-2 text-muted-foreground text-sm'>
-                <li>• Starter rate: 19% (unique to Scotland)</li>
-                <li>• Intermediate rate: 21% (unique to Scotland)</li>
-                <li>• Higher rate: 42% (vs 40% in England)</li>
-                <li>• Advanced rate: 45% (unique to Scotland)</li>
-                <li>• Top rate: 48% (vs 45% in England)</li>
+                {scottishRates.bands.map((band) => (
+                  <li key={band.name}>
+                    • {band.name}: {band.rate}%
+                  </li>
+                ))}
               </ul>
             </div>
             <div className='space-y-3'>
-              <h3 className='font-semibold'>England, Wales, NI (3 bands)</h3>
+              <h3 className='font-semibold'>Rest of UK ({rukRates.bands.length} bands)</h3>
               <ul className='space-y-2 text-muted-foreground text-sm'>
-                <li>• Basic rate: 20% (£12,571 - £50,270)</li>
-                <li>• Higher rate: 40% (£50,271 - £125,140)</li>
-                <li>• Additional rate: 45% (over £125,140)</li>
-                <li>• Simpler structure with fewer bands</li>
-                <li>• Same personal allowance (£12,570)</li>
+                {rukRates.bands.map((band) => (
+                  <li key={band.name}>
+                    • {band.name}: {band.rate}%
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
@@ -309,15 +360,19 @@ export function ScottishTaxCalculatorClient() {
           <div>
             <h3 className='mb-2 font-semibold'>How do I know if I pay Scottish tax?</h3>
             <p className='text-muted-foreground'>
-              You pay Scottish income tax if Scotland is your main residence. Your tax code will
-              start with &quot;S&quot; (e.g., S1257L). Check your payslip or P60.
+              You pay Scottish Income Tax if Scotland is your main residence. If you&apos;re
+              employed or receive a pension under PAYE, your tax code will usually start with
+              &quot;S&quot; (for example, S1257L). Check your payslip or P60.
             </p>
           </div>
           <div>
             <h3 className='mb-2 font-semibold'>Is Scottish tax always higher?</h3>
             <p className='text-muted-foreground'>
-              Not always. Lower earners (under ~£28,000) often pay slightly less due to the starter
-              rate. Higher earners typically pay more due to the higher rates at 42% and 48%.
+              Not always. With the standard Personal Allowance and salary as your only income,
+              annual Scottish and rest-of-UK Income Tax are the same at approximately £
+              {CURRENT_SCOTTISH_TAX_CROSSOVER.toLocaleString('en-GB')}. Scottish tax is slightly
+              lower between the Personal Allowance and that crossover, then generally higher above
+              it.
             </p>
           </div>
           <div>
@@ -329,12 +384,50 @@ export function ScottishTaxCalculatorClient() {
           </div>
         </CardContent>
       </Card>
+
+      <Card className='mb-8'>
+        <CardHeader>
+          <CardTitle>Official sources and checks</CardTitle>
+          <CardDescription>
+            Check the current rates and whether Scottish Income Tax applies to you.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className='space-y-3 text-sm'>
+          <a
+            href={scottishSourceUrl}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='flex items-center gap-2 text-primary hover:underline'
+          >
+            Scottish Government: {CURRENT_TAX_YEAR_DISPLAY_SHORT} rates and bands
+            <ExternalLink className='size-4' aria-hidden='true' />
+          </a>
+          <a
+            href={rukSourceUrl}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='flex items-center gap-2 text-primary hover:underline'
+          >
+            HMRC: {CURRENT_TAX_YEAR_DISPLAY_SHORT} rates and thresholds
+            <ExternalLink className='size-4' aria-hidden='true' />
+          </a>
+          <a
+            href='https://www.gov.uk/scottish-income-tax'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='flex items-center gap-2 text-primary hover:underline'
+          >
+            GOV.UK: check whether you pay Scottish Income Tax
+            <ExternalLink className='size-4' aria-hidden='true' />
+          </a>
+        </CardContent>
+      </Card>
       {/* CTA */}
       <div className='mt-12 text-center'>
         <p className={cn('mb-4 text-muted-foreground', 'text-lg')}>
           Get a full breakdown with NI, pension, and student loan calculations.
         </p>
-        <Link href='/?scottish=true'>
+        <Link href='/#tax-calculator' onClick={() => setRegion('Scotland')}>
           <Button size='lg' variant='outline'>
             Open Full Scottish Calculator
             <ArrowRight className={cn('ml-2', 'size-4')} />

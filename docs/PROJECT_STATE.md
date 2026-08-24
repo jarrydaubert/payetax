@@ -181,8 +181,9 @@ In short:
 
 - tax-code decoder correctness is materially resolved by PRs #111/#112;
 - protect the £70k article unless new evidence identifies a concrete defect;
-- the Scottish calculator and Scottish-vs-English comparison are the first current-year
-  correctness slice;
+- the Scottish calculator now rejects unsupported salary formats, presents its annual Income Tax
+  scope and primary sources, and derives the 2026/27 crossover from canonical policy; the
+  Scottish-vs-English comparison article is the next current-year correctness slice;
 - the £40k, £60k and £100k pages need evidence-first factual repair while keeping their URLs;
 - FAQ extraction can still emit malformed schema by treating bold labels outside the real FAQ
   section as questions.
@@ -191,9 +192,8 @@ In short:
 
 Resume in this order unless new primary evidence changes the risk:
 
-1. **Scottish calculator and Scottish comparison correctness.** Fix input validation and scope/
-   source transparency in the tool; replace the stale ~£28,000 and ~£30,300 crossover copy with
-   the independently derived 2026/27 crossover of approximately £33,493; update and independently
+1. **Scottish comparison correctness.** Replace the stale ~£30,300 crossover copy with the
+   independently derived 2026/27 crossover of approximately £33,493; update and independently
    verify the comparison article; fix the FAQ extraction regression with it.
 2. **£40k, £60k and £100k salary-page correctness.** Use the £70k page's qualified, answer-first
    pattern; independently verify displayed PAYE/loan figures; remove unsupported lifestyle,
