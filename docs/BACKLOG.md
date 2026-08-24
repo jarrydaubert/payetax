@@ -23,7 +23,7 @@ sources, not in backlog prose.
 
 Current correctness sequence:
 
-1. Scottish calculator and Scottish-vs-English comparison.
+1. Scottish-vs-English comparison.
 2. £40k, £60k and £100k salary articles; protect the verified £70k article.
 3. Explicit pension-method handling.
 4. Transparent calculation results.
@@ -125,7 +125,6 @@ Implementation sequencing for these items remains documented in the ownership au
 
 ### Content accuracy
 
-- [ ] Scottish calculator input and trust contract: malformed or decimal salary input is silently transformed into a different integer; assumptions and primary-source path are not visible before calculation; its FAQ still says users under ~£28,000 generally pay less Scottish tax instead of the independently derived 2026/27 crossover of approximately £33,493. DoD: invalid input is rejected rather than rewritten, the Income-Tax-only scope and assumptions are explicit, an official source is visible, the crossover copy is corrected, and focused tests pin the behaviour.
 - [ ] Featured Scottish comparison article: rebuild the stale 2025-26 live comparison for 2026/27, replace its old ~£30,300 crossover with the independently derived 2026/27 crossover of approximately £33,493, independently re-derive every worked figure, narrow overconfident pension/bonus/relocation claims and expose dated primary sources. Keep its URL and differentiated comparison purpose. DoD: current bands, crossover and examples match independent working, assumptions are explicit, and factual/schema regression tests pass.
 - [ ] Tax-code guide: add the statutory 50% overriding limit; fix the "K500 = you owe £5,000" conflation; refresh stale 2025-26 titles/meta; cover Scottish SD codes. DoD: all four corrections published and consistent with the engine.
 - [ ] £40k, £60k and £100k salary articles: independently rebuild current PAYE and Student Loan figures, put the qualified annual/monthly answer first, state calculation and pension-method assumptions, and remove contradictory FAQ outputs and unsupported lifestyle, prevalence, savings, housing and accountant-value claims. The £40k “UK median around £35,000” claim appears materially inconsistent with the latest applicable ONS ASHE full-time annual earnings evidence reviewed for this audit; verify against the then-current ONS source and correct or remove it rather than merely adding a citation. For £100k, verify and current-source the adjusted-net-income eligibility conditions for Tax-Free Childcare and England-only Free Childcare for Working Parents, keeping them separate from Income Tax marginal-rate claims and financial advice. Keep the existing URLs. DoD: displayed figures reproduce from independent working, visible copy/metadata/schema agree, the median and childcare statements are accurate and scoped, and focused drift tests pass.
