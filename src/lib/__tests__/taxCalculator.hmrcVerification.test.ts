@@ -63,19 +63,19 @@ describe('HMRC Rate Verification & Edge Cases', () => {
     },
     {
       salary: 43662,
-      expectedIncomeTax: 6349.2,
+      expectedIncomeTax: 6349.32,
       expectedNI: 2486.88,
       note: 'Intermediate rate boundary (21%)',
     },
     {
       salary: 75000,
-      expectedIncomeTax: 19506.12,
+      expectedIncomeTax: 19506.24,
       expectedNI: 3510,
       note: 'Higher rate boundary (42%)',
     },
     {
       salary: 90000,
-      expectedIncomeTax: 26255.4,
+      expectedIncomeTax: 26255.64,
       expectedNI: 3810,
       note: 'Advanced rate in-range (45%)',
     },

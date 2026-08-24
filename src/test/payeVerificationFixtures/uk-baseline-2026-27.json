@@ -43,6 +43,32 @@
       }
     },
     {
+      "id": "uk-12856-1257L-exact-460-penny",
+      "description": "£12,856 rUK, 1257L. HMRC Tables A gives Month 1 free pay of £1,048.26, so U is £23.0733 and whole-pound T is £23. Formula 1 gives exactly £4.60 at 20%; final-penny round-down must preserve £4.60 rather than lose a penny to binary floating-point representation.",
+      "input": {
+        "salary": 12856,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 12570,
+        "incomeTaxAnnual": 55.2,
+        "incomeTaxMonthly": 4.6,
+        "taxBandRates": [20]
+      }
+    },
+    {
       "id": "uk-60k-1257L",
       "description": "£60,000 rUK, 1257L. HMRC Tables A gives Month 1 free pay of £1,048.26 and taxable pay floor(5000-1048.26)=3951. PAYE routine v24.0 uses exact accrued threshold 37700/12=3141.6666 and threshold tax 7540/12=628.3333: 628.3333 + (3951-3141.6666) x 40%, rounded down, is £952.06/mo. NI is £267.50/mo.",
       "input": {
@@ -152,7 +178,7 @@
     },
     {
       "id": "scot-30k-S1257L",
-      "description": "£30,000 Scottish, S1257L. HMRC Tables A gives Month 1 free pay of £1,048.26; taxable floor(2500-1048.26)=1451; 331 at 19% + 1082 at 20% + 38 at 21% = £287.27/mo (monthly band thresholds ceil(3967/12)=331, ceil(16956/12)=1413).",
+      "description": "£30,000 Scottish, S1257L. HMRC Tables A gives Month 1 free pay of £1,048.26, U £1,451.74 and whole-pound T £1,451. PAYE routines v24.0 selects formula 3 because U exceeds SCvalue £1,413, then uses exact threshold £1,413 and exact threshold tax £279.2941: £279.2941 + (£1,451 - £1,413) x 21% = £287.2741, rounded down to £287.27/mo.",
       "input": {
         "salary": 30000,
         "payPeriod": "annually",
