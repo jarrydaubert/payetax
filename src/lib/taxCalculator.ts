@@ -95,12 +95,30 @@ function getMonthlyPayrollFreePay(annualTaxFreeAmount: number): number {
   return getMonthlyTaxCodeFreePay(annualTaxFreeAmount);
 }
 
-function getMonthlyPayrollBandThreshold(annualThreshold: number): number {
+function getRukMonthlyPayrollBandThreshold(annualThreshold: number): number {
+  if (!Number.isFinite(annualThreshold)) {
+    return Number.POSITIVE_INFINITY;
+  }
+
+  // HMRC's computerised PAYE routine derives the Month 1 threshold from the
+  // exact accrued annual bandwidth, carried to 4 decimal places without
+  // correcting the final digit. The rounded-up whole-pound Cvalue exists for
+  // the manual table's income test, but tax itself is calculated from the exact
+  // threshold. See definitions 9 to 11 and paragraph 4.4.4 in PAYE tax table
+  // routines v24.0.
+  return Math.floor((annualThreshold / 12) * 10_000) / 10_000;
+}
+
+function getScottishMonthlyPayrollBandCvalue(annualThreshold: number): number {
   if (!Number.isFinite(annualThreshold)) {
     return Number.POSITIVE_INFINITY;
   }
 
   return Math.ceil(annualThreshold / 12);
+}
+
+function finalizeMonthlyPayeTax(monthlyTax: number, isScottish: boolean): number {
+  return isScottish ? roundToPence(monthlyTax) : Math.floor(monthlyTax * 100) / 100;
 }
 
 // ============================================================================
@@ -511,7 +529,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
         taxCodeResult.isScottish,
         taxCodeResult.isScottish ? scottishRates.bands : standardRates.bands,
       );
-      monthlyTax = roundToPence((monthlyTaxableIncome * override.rate) / 100);
+      monthlyTax = (monthlyTaxableIncome * override.rate) / 100;
       taxBands.push({
         name: override.name,
         rate: override.rate,
@@ -528,7 +546,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
           taxRates.bands.map((band) => ({
             name: band.name,
             rate: band.rate,
-            taxableIncomeUpperBound: getMonthlyPayrollBandThreshold(band.threshold),
+            taxableIncomeUpperBound: getScottishMonthlyPayrollBandCvalue(band.threshold),
           })),
         );
         monthlyTax = calculation.incomeTax;
@@ -548,7 +566,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
           taxRates.bands.map((band) => ({
             name: band.name,
             rate: band.rate,
-            taxableIncomeUpperBound: getMonthlyPayrollBandThreshold(band.threshold),
+            taxableIncomeUpperBound: getRukMonthlyPayrollBandThreshold(band.threshold),
           })),
         );
         monthlyTax = calculation.incomeTax;
@@ -557,15 +575,17 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
           taxBands.push({
             name: slice.name,
             rate: slice.rate,
-            amount: slice.taxableAmount * 12,
+            amount: roundToPence(slice.taxableAmount * 12),
           });
         }
       }
     } // Close the else block for taxCodeBandOverride check
   }
 
-  // Round monthly tax to pence for accuracy
-  monthlyTax = roundToPence(monthlyTax);
+  // HMRC's rUK/Welsh computerised PAYE routine rounds tax due down to the
+  // penny; it does not use ordinary nearest-penny rounding. Scottish PAYE
+  // retains this calculator's established manual-table projection.
+  monthlyTax = finalizeMonthlyPayeTax(monthlyTax, isScottish);
 
   // Overriding limit: PAYE Regulations 2003 (SI 2003/2682) reg 2 caps the tax
   // deducted from a relevant payment at 50% of that payment. Originally a K-code

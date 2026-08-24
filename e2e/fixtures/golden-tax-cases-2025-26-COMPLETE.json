@@ -49,9 +49,9 @@
         "taxCode": "1257L"
       },
       "expected": {
-        "incomeTax": 9427.2,
+        "incomeTax": 9427.92,
         "employeeNI": 3110.04,
-        "netPay": 42462.76
+        "netPay": 42462.04
       },
       "generatedAt": "2026-08-23T19:10:24.157Z",
       "taxYear": "2025-2026"
@@ -97,9 +97,9 @@
         "taxCode": ""
       },
       "expected": {
-        "incomeTax": 27427.2,
+        "incomeTax": 27427.92,
         "employeeNI": 4010.04,
-        "netPay": 68562.76
+        "netPay": 68562.04
       },
       "generatedAt": "2026-08-23T19:10:24.157Z",
       "taxYear": "2025-2026"
@@ -113,9 +113,9 @@
         "taxCode": ""
       },
       "expected": {
-        "incomeTax": 33427.2,
+        "incomeTax": 33427.92,
         "employeeNI": 4209.96,
-        "netPay": 72362.84
+        "netPay": 72362.12
       },
       "generatedAt": "2026-08-23T19:10:24.157Z",
       "taxYear": "2025-2026"
@@ -129,9 +129,9 @@
         "taxCode": ""
       },
       "expected": {
-        "incomeTax": 42513.6,
+        "incomeTax": 42514.32,
         "employeeNI": 4512.84,
-        "netPay": 78113.56
+        "netPay": 78112.84
       },
       "generatedAt": "2026-08-23T19:10:24.157Z",
       "taxYear": "2025-2026"
@@ -145,9 +145,9 @@
         "taxCode": "0T"
       },
       "expected": {
-        "incomeTax": 53701.8,
+        "incomeTax": 53703,
         "employeeNI": 5010,
-        "netPay": 91288.2
+        "netPay": 91287
       },
       "generatedAt": "2026-08-23T19:10:24.157Z",
       "taxYear": "2025-2026"
@@ -209,9 +209,9 @@
         "taxCode": "K100"
       },
       "expected": {
-        "incomeTax": 8860.8,
+        "incomeTax": 8861.52,
         "employeeNI": 2193.96,
-        "netPay": 28945.24
+        "netPay": 28944.52
       },
       "generatedAt": "2026-08-23T19:10:24.158Z",
       "taxYear": "2025-2026"

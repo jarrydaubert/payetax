@@ -203,7 +203,7 @@ describe('Tax Calculator', () => {
       expect(result.grossSalary.annually).toBe(60000);
 
       // Annualized from monthly HMRC-style rounding.
-      expect(result.incomeTax.annually).toBeCloseTo(11424, 2);
+      expect(result.incomeTax.annually).toBeCloseTo(11424.72, 2);
 
       expect(result.nationalInsurance.annually).toBeCloseTo(3210, 2);
 

@@ -104,12 +104,28 @@ describe('PAYE verification fixtures', () => {
                 `${scenario.id} incomeTax.annually`,
               );
             }
+            if (expected.incomeTaxMonthly !== undefined) {
+              expectWithinTolerance(
+                result.incomeTax.monthly,
+                expected.incomeTaxMonthly,
+                suite.tolerancePence,
+                `${scenario.id} incomeTax.monthly`,
+              );
+            }
             if (expected.nationalInsuranceAnnual !== undefined) {
               expectWithinTolerance(
                 result.nationalInsurance.annually,
                 expected.nationalInsuranceAnnual,
                 suite.tolerancePence,
                 `${scenario.id} nationalInsurance.annually`,
+              );
+            }
+            if (expected.nationalInsuranceMonthly !== undefined) {
+              expectWithinTolerance(
+                result.nationalInsurance.monthly,
+                expected.nationalInsuranceMonthly,
+                suite.tolerancePence,
+                `${scenario.id} nationalInsurance.monthly`,
               );
             }
             if (expected.studentLoanAnnual !== undefined) {
@@ -120,12 +136,44 @@ describe('PAYE verification fixtures', () => {
                 `${scenario.id} studentLoan.annually`,
               );
             }
+            if (expected.studentLoanMonthly !== undefined) {
+              expectWithinTolerance(
+                result.studentLoan.monthly,
+                expected.studentLoanMonthly,
+                suite.tolerancePence,
+                `${scenario.id} studentLoan.monthly`,
+              );
+            }
+            if (expected.pensionContributionAnnual !== undefined) {
+              expectWithinTolerance(
+                result.pensionContribution.annually,
+                expected.pensionContributionAnnual,
+                suite.tolerancePence,
+                `${scenario.id} pensionContribution.annually`,
+              );
+            }
+            if (expected.pensionContributionMonthly !== undefined) {
+              expectWithinTolerance(
+                result.pensionContribution.monthly,
+                expected.pensionContributionMonthly,
+                suite.tolerancePence,
+                `${scenario.id} pensionContribution.monthly`,
+              );
+            }
             if (expected.netPayAnnual !== undefined) {
               expectWithinTolerance(
                 result.netPay.annually,
                 expected.netPayAnnual,
                 suite.tolerancePence,
                 `${scenario.id} netPay.annually`,
+              );
+            }
+            if (expected.netPayMonthly !== undefined) {
+              expectWithinTolerance(
+                result.netPay.monthly,
+                expected.netPayMonthly,
+                suite.tolerancePence,
+                `${scenario.id} netPay.monthly`,
               );
             }
             if (expected.taxBandRates !== undefined) {

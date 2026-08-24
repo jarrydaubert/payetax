@@ -51,7 +51,7 @@ describe('CalculatorStore Integration', () => {
 
       const state = useCalculatorStore.getState();
 
-      expect(state.results?.incomeTax.annually).toBeCloseTo(11424, 0);
+      expect(state.results?.incomeTax.annually).toBeCloseTo(11424.72, 0);
       expect(state.results?.nationalInsurance.annually).toBeCloseTo(3210, 0);
     });
 
