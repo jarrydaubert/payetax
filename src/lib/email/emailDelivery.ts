@@ -16,7 +16,60 @@ interface BrevoEmailIdentity {
   name?: string;
 }
 
+type BrevoFailureCategory =
+  | 'unauthorized_ip'
+  | 'authorization'
+  | 'rate_limit'
+  | 'request_rejected'
+  | 'provider_error';
+
 const BREVO_TRANSACTIONAL_EMAIL_ENDPOINT = 'https://api.brevo.com/v3/smtp/email';
+
+interface BrevoErrorDetails {
+  code?: string;
+  message?: string;
+}
+
+function getBrevoErrorDetails(body: string): BrevoErrorDetails {
+  try {
+    const parsed = JSON.parse(body) as unknown;
+    if (typeof parsed !== 'object' || parsed === null) return {};
+
+    const details: BrevoErrorDetails = {};
+    if (
+      'code' in parsed &&
+      typeof parsed.code === 'string' &&
+      /^[a-z0-9_-]{1,64}$/iu.test(parsed.code)
+    ) {
+      details.code = parsed.code;
+    }
+
+    if ('message' in parsed && typeof parsed.message === 'string') details.message = parsed.message;
+    return details;
+  } catch {
+    // Brevo can return non-JSON responses. Status and category remain diagnostic.
+  }
+
+  return {};
+}
+
+function classifyBrevoFailure(status: number, message?: string): BrevoFailureCategory {
+  const normalizedMessage = message?.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ') ?? '';
+  const describesBlockedIp =
+    /\b(?:unknown|unrecogni[sz]ed|unauthori[sz]ed) ip(?: address)?\b/u.test(normalizedMessage) ||
+    /\bip(?: address)? (?:(?:is|was|has) )?(?:not (?:been )?(?:authori[sz]ed|verified)|unknown|unrecogni[sz]ed|unauthori[sz]ed)\b/u.test(
+      normalizedMessage,
+    );
+
+  if ((status === 401 || status === 403) && describesBlockedIp) {
+    return 'unauthorized_ip';
+  }
+
+  if (status === 401 || status === 403) return 'authorization';
+  if (status === 429) return 'rate_limit';
+  if (status >= 400 && status < 500) return 'request_rejected';
+  return 'provider_error';
+}
 
 function formatErrorForLog(error: unknown): { name?: string; message?: string } {
   if (error instanceof Error) {
@@ -86,9 +139,11 @@ export async function sendOutboundEmail(
 
     if (!response.ok) {
       const body = await response.text();
+      const { code, message: providerMessage } = getBrevoErrorDetails(body);
       console.error(`[${logPrefix}] Brevo API error:`, {
         status: response.status,
-        body: body.slice(0, 500),
+        category: classifyBrevoFailure(response.status, providerMessage),
+        ...(code ? { code } : {}),
       });
       return { ok: false, reason: 'delivery_failed' };
     }
