@@ -54,6 +54,14 @@ Use `.env.template` as the source of required names. Set production and preview 
 
 Inbound support mail for `support@payetax.co.uk` should be routed in Cloudflare Email Routing. That is DNS/routing infrastructure, not a Vercel env var.
 
+Brevo's API-key IP blocking must remain disabled while PayeTax uses Vercel's default dynamic
+outbound IP pool. Brevo can automatically enable blocking after its learning period; when that
+happens, a new Vercel egress IP is rejected with `401 unauthorized` and result emails are not
+accepted for delivery. Authorizing one blocked address is temporary because the egress address can
+change. Only enable Brevo IP blocking after configuring [Vercel Static
+IPs](https://vercel.com/kb/guide/how-to-allowlist-deployment-ip-address) and authorizing every
+assigned address in [Brevo](https://help.brevo.com/hc/en-us/articles/5740111683858-Authorize-and-block-IP-addresses-for-API-and-SMTP-security).
+
 PayeTax uses the Upstash REST URL/token pair, not the Redis TCP URL/password. A Redis CLI `PING` proves the database exists, but the deployed app still needs the REST env vars in Vercel.
 
 Run this after the intended Vercel project is linked or production env values change:

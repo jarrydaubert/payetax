@@ -109,14 +109,77 @@ describe('emailDelivery', () => {
       expect(payload.replyTo).toEqual({ name: 'Support', email: 'reply@payetax.co.uk' });
     });
 
-    it('returns delivery_failed on a Brevo error response', async () => {
+    it('logs a safe diagnostic for a Brevo unauthorized-IP response', async () => {
       fetchMock.mockResolvedValue(
-        new Response('{"code":"unauthorized","message":"Key not found"}', { status: 401 }),
+        new Response(
+          JSON.stringify({
+            code: 'unauthorized',
+            message: 'We have detected you are using an unrecognised IP address 203.0.113.10.',
+          }),
+          { status: 401 },
+        ),
       );
 
       const result = await sendOutboundEmail(MESSAGE, 'test');
 
       expect(result).toEqual({ ok: false, reason: 'delivery_failed' });
+      expect(consoleErrorMock).toHaveBeenCalledWith('[test] Brevo API error:', {
+        status: 401,
+        category: 'unauthorized_ip',
+        code: 'unauthorized',
+      });
+      expect(JSON.stringify(consoleErrorMock.mock.calls)).not.toContain('203.0.113.10');
+    });
+
+    it.each([
+      'Requests from an unknown IP address are blocked.',
+      'This IP is not authorized to use the API.',
+      'The calling IP has not been verified.',
+    ])('classifies Brevo IP authorization wording: %s', async (message) => {
+      fetchMock.mockResolvedValue(
+        new Response(JSON.stringify({ code: 'unauthorized', message }), { status: 403 }),
+      );
+
+      await sendOutboundEmail(MESSAGE, 'test');
+
+      expect(consoleErrorMock).toHaveBeenCalledWith('[test] Brevo API error:', {
+        status: 403,
+        category: 'unauthorized_ip',
+        code: 'unauthorized',
+      });
+    });
+
+    it('keeps a generic invalid-key response in the authorization category', async () => {
+      fetchMock.mockResolvedValue(
+        new Response(JSON.stringify({ code: 'unauthorized', message: 'Key not found' }), {
+          status: 401,
+        }),
+      );
+
+      await sendOutboundEmail(MESSAGE, 'test');
+
+      expect(consoleErrorMock).toHaveBeenCalledWith('[test] Brevo API error:', {
+        status: 401,
+        category: 'authorization',
+        code: 'unauthorized',
+      });
+    });
+
+    it.each([
+      'Unauthorized API key; request received from IP address 203.0.113.10.',
+      'Sender is not verified; source IP address was 203.0.113.10.',
+    ])('does not treat incidental IP details as an IP authorization failure: %s', async (message) => {
+      fetchMock.mockResolvedValue(
+        new Response(JSON.stringify({ code: 'unauthorized', message }), { status: 401 }),
+      );
+
+      await sendOutboundEmail(MESSAGE, 'test');
+
+      expect(consoleErrorMock).toHaveBeenCalledWith('[test] Brevo API error:', {
+        status: 401,
+        category: 'authorization',
+        code: 'unauthorized',
+      });
     });
 
     it('returns delivery_failed when the network request throws', async () => {
