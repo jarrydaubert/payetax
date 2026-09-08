@@ -27,6 +27,7 @@ import { Card } from '@/components/ui/card';
 import { TableBody } from '@/components/ui/table';
 import { CURRENT_TAX_YEAR, TAX_RATES, type TaxYear } from '@/constants/taxRates';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
+import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { useMouseDragScroll } from '@/hooks/useMouseDragScroll';
 import { trackEvent } from '@/lib/analytics';
 import {
@@ -122,6 +123,7 @@ export function ResultsTable({
   } = marriageAllowance ?? {};
   // Generate unique ID for accessibility
   const scrollHintId = React.useId();
+  const shouldReduceMotion = useMotionPreference();
 
   // Scroll indicators - recheck when periods change
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -217,7 +219,7 @@ export function ResultsTable({
     const direction = event.key === 'ArrowRight' ? 1 : -1;
     event.currentTarget.scrollBy({
       left: direction * Math.max(80, event.currentTarget.clientWidth * 0.25),
-      behavior: 'smooth',
+      behavior: shouldReduceMotion ? 'instant' : 'smooth',
     });
   };
 

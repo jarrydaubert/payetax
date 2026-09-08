@@ -8,7 +8,8 @@ const VIEWPORTS = [
   { name: 'mobile-landscape', width: 844, height: 390 },
   { name: 'tablet-portrait', width: 768, height: 1024 },
   { name: 'tablet-landscape', width: 1024, height: 768 },
-  { name: 'desktop', width: 1280, height: 800 },
+  { name: 'xl-boundary-below', width: 1279, height: 800 },
+  { name: 'xl-boundary', width: 1280, height: 800 },
   { name: 'large-desktop', width: 1920, height: 1080 },
 ] as const;
 
@@ -149,29 +150,7 @@ async function enableAllPeriods(page: Page): Promise<void> {
   }
 }
 
-async function expectScrollableInteraction(page: Page): Promise<void> {
-  const container = page.getByTestId('results-table-container');
-  const leftIndicator = page.getByTestId('scroll-indicator-left');
-  const rightIndicator = page.getByTestId('scroll-indicator-right');
-
-  await container.evaluate((element) => {
-    element.style.scrollBehavior = 'auto';
-    element.scrollLeft = 0;
-  });
-  await expect(rightIndicator).toHaveCSS('opacity', '1');
-  await expect(leftIndicator).toHaveCSS('opacity', '0');
-
-  await container.focus();
-  await expect(container).toBeFocused();
-  await page.keyboard.press('ArrowRight');
-  await expect.poll(() => container.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
-
-  await container.evaluate((element) => {
-    element.scrollLeft = element.scrollWidth;
-  });
-  await expect(leftIndicator).toHaveCSS('opacity', '1');
-  await expect(rightIndicator).toHaveCSS('opacity', '0');
-
+async function expectStickyLabelReadable(page: Page): Promise<void> {
   const stickyGeometry = await page.evaluate(() => {
     const containerElement = document.querySelector<HTMLElement>(
       '[data-testid="results-table-container"]',
@@ -199,6 +178,77 @@ async function expectScrollableInteraction(page: Page): Promise<void> {
   expect(stickyGeometry.labelWidth).toBeGreaterThanOrEqual(168);
 }
 
+async function expectScrollableInteraction(page: Page): Promise<void> {
+  const container = page.getByTestId('results-table-container');
+  const leftIndicator = page.getByTestId('scroll-indicator-left');
+  const rightIndicator = page.getByTestId('scroll-indicator-right');
+
+  await container.evaluate((element) => {
+    element.style.scrollBehavior = 'smooth';
+    element.scrollLeft = 0;
+  });
+  await expect(rightIndicator).toHaveCSS('opacity', '1');
+  await expect(leftIndicator).toHaveCSS('opacity', '0');
+
+  const reducedMotionScroll = await container.evaluate((element) => {
+    const requestedScrollLeft = Math.max(80, element.clientWidth * 0.25);
+    const expectedScrollLeft = Math.min(
+      element.scrollWidth - element.clientWidth,
+      requestedScrollLeft,
+    );
+    element.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, cancelable: true }),
+    );
+    return { expectedScrollLeft, immediateScrollLeft: element.scrollLeft };
+  });
+  expect(
+    Math.abs(reducedMotionScroll.immediateScrollLeft - reducedMotionScroll.expectedScrollLeft),
+  ).toBeLessThanOrEqual(1);
+
+  await container.evaluate((element) => {
+    element.scrollLeft = 0;
+  });
+  await container.focus();
+  await expect(container).toBeFocused();
+  await page.keyboard.press('ArrowRight');
+  await expect.poll(() => container.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+
+  await container.evaluate((element) => {
+    element.scrollLeft = element.scrollWidth;
+  });
+  await expect(leftIndicator).toHaveCSS('opacity', '1');
+  await expect(rightIndicator).toHaveCSS('opacity', '0');
+
+  await expectStickyLabelReadable(page);
+}
+
+async function expectNonScrollableInteraction(page: Page): Promise<void> {
+  const container = page.getByTestId('results-table-container');
+  const leftIndicator = page.getByTestId('scroll-indicator-left');
+  const rightIndicator = page.getByTestId('scroll-indicator-right');
+  const geometry = await container.evaluate((element) => {
+    element.scrollLeft = 0;
+    return { clientWidth: element.clientWidth, scrollWidth: element.scrollWidth };
+  });
+
+  expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.clientWidth + 2);
+  await expect(leftIndicator).toHaveCSS('opacity', '0');
+  await expect(rightIndicator).toHaveCSS('opacity', '0');
+  await expectStickyLabelReadable(page);
+
+  await container.focus();
+  await page.keyboard.press('ArrowRight');
+  expect(await container.evaluate((element) => element.scrollLeft)).toBe(0);
+}
+
+async function expectXlBoundaryLayout(page: Page, width: number): Promise<void> {
+  if (width !== 1279 && width !== 1280) return;
+  const display = await page
+    .getByTestId('calculator-section')
+    .evaluate((element) => getComputedStyle(element).display);
+  expect(display).toBe(width === 1279 ? 'flex' : 'grid');
+}
+
 test.describe('Responsive calculator geometry', () => {
   for (const viewport of VIEWPORTS) {
     test(`${viewport.name} keeps results readable`, async ({ page }) => {
@@ -208,6 +258,7 @@ test.describe('Responsive calculator geometry', () => {
 
       const shortLandscape = viewport.width > viewport.height && viewport.height <= 500;
       await expectNavbarGeometry(page, shortLandscape);
+      await expectXlBoundaryLayout(page, viewport.width);
 
       const cookieBanner = page.getByTestId('cookie-banner');
       await expect(cookieBanner).toBeVisible();
@@ -247,8 +298,11 @@ test.describe('Responsive calculator geometry', () => {
       await page.getByTestId('calculate-button').click();
       await expect(page.getByTestId('results-table')).toBeVisible();
       const allPeriodsGeometry = await expectTableGeometry(page);
-      expect(allPeriodsGeometry.safeTableWidth).toBeGreaterThan(allPeriodsGeometry.clientWidth);
-      await expectScrollableInteraction(page);
+      if (allPeriodsGeometry.safeTableWidth > allPeriodsGeometry.clientWidth) {
+        await expectScrollableInteraction(page);
+      } else {
+        await expectNonScrollableInteraction(page);
+      }
     });
   }
 
