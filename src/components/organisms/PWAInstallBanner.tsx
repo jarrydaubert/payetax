@@ -88,7 +88,7 @@ export default function PWAInstallBanner() {
   if (!(visible && deferredPrompt)) return null;
 
   return (
-    <div className='fixed top-24 right-4 left-4 z-40 sm:left-auto'>
+    <div className='fixed top-[calc(var(--navbar-height)+1rem)] right-4 left-4 z-40 sm:left-auto'>
       <Card className='w-full max-w-sm border-border bg-card'>
         <CardContent className='p-4'>
           <h2 className='font-semibold text-foreground text-sm'>Install PayeTax</h2>

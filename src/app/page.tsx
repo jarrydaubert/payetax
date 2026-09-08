@@ -53,7 +53,7 @@ export default function HomePage() {
       <section
         id='tax-calculator'
         data-testid='homepage-calculator'
-        className='relative z-[1] scroll-mt-20 bg-background sm:scroll-mt-24'
+        className='relative z-[1] scroll-mt-[calc(var(--navbar-height)+1rem)] bg-background'
       >
         <HomePageContent />
       </section>

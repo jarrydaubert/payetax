@@ -92,7 +92,7 @@ if (typeof window !== 'undefined') {
     writable: true,
     value: jest.fn().mockImplementation((query) => {
       // Basic, dynamic-ish matchMedia mock for common queries used in this codebase.
-      // Keeps unit tests closer to real behavior (e.g., LandscapePrompt).
+      // Keeps unit tests closer to real matchMedia behavior.
       const maxWidth = /\(max-width:\s*(\d+)px\)/i.exec(query)?.[1];
       const minWidth = /\(min-width:\s*(\d+)px\)/i.exec(query)?.[1];
 

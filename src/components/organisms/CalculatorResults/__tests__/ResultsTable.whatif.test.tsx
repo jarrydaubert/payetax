@@ -241,6 +241,11 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
     const whatIfHeaders = screen.getAllByText('What If');
     expect(whatIfHeaders).toHaveLength(allPeriods.length);
 
+    // 15rem fixed columns + 7 periods × 2 scenario columns × 8.5rem.
+    const resultsTable = screen.getByTestId('results-table');
+    expect(resultsTable).toHaveStyle({ minWidth: '134rem' });
+    expect(screen.getByTestId('results-table-container')).toHaveAttribute('tabindex', '0');
+
     // Verify pension values across all periods
     // Current: £3,000 annually
     // Monthly: £3,000 / 12 = £250

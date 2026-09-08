@@ -253,7 +253,7 @@ export function CalculatorContainer() {
   return (
     <div
       className={cn(
-        'mx-auto flex w-full max-w-screen-2xl flex-col sm:px-4 md:py-8 lg:grid lg:grid-cols-[400px_minmax(0,1fr)] xl:grid-cols-[390px_minmax(0,1fr)] xl:px-8 2xl:grid-cols-[380px_minmax(0,1fr)]',
+        'mx-auto flex w-full max-w-screen-2xl flex-col sm:px-4 md:py-8 xl:grid xl:grid-cols-[390px_minmax(0,1fr)] xl:px-8 2xl:grid-cols-[380px_minmax(0,1fr)]',
         'gap-3',
         'px-4',
         'py-4',
@@ -296,7 +296,7 @@ export function CalculatorContainer() {
             animate={shouldReduceMotion ? {} : 'animate'}
             exit={shouldReduceMotion ? {} : 'exit'}
             transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.default}
-            className='order-4 scroll-mt-6 lg:order-2 lg:col-span-2'
+            className='order-4 scroll-mt-[calc(var(--navbar-height)+1rem)] xl:order-2 xl:col-span-2'
             role='region'
             aria-label='Tax calculation results summary'
           >
@@ -339,7 +339,7 @@ export function CalculatorContainer() {
       {/* Inputs Section - order-2 on mobile, left column on desktop (sticky) */}
       <Card
         className={cn(
-          'order-2 mx-auto w-full max-w-xl lg:sticky lg:top-4 lg:order-3 lg:mx-0 lg:max-w-none lg:self-start',
+          'order-2 mx-auto w-full max-w-xl xl:sticky xl:top-[calc(var(--navbar-height)+1rem)] xl:order-3 xl:mx-0 xl:max-w-none xl:self-start',
           'p-3',
           'sm:p-4 md:p-6',
         )}
@@ -359,7 +359,7 @@ export function CalculatorContainer() {
             animate={shouldReduceMotion ? {} : 'animate'}
             exit={shouldReduceMotion ? {} : 'exit'}
             transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.default}
-            className={cn('order-6 flex flex-col', 'gap-4', 'lg:order-3 lg:min-w-0 lg:self-start')}
+            className={cn('order-6 flex flex-col', 'gap-4', 'xl:order-3 xl:min-w-0 xl:self-start')}
             data-testid='tax-results'
           >
             <ResultsTable
@@ -386,7 +386,7 @@ export function CalculatorContainer() {
             exit={shouldReduceMotion ? undefined : { opacity: 0 }}
             transition={shouldReduceMotion ? { duration: 0 } : undefined}
             className={cn(
-              'order-6 flex min-h-[28rem] items-center justify-center rounded-sm border border-dashed bg-card/70 text-center lg:order-3',
+              'order-6 flex min-h-[28rem] items-center justify-center rounded-sm border border-dashed bg-card/70 text-center xl:order-3',
               'p-12',
             )}
           >

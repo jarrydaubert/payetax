@@ -162,12 +162,12 @@ const CookieBanner: React.FC = () => {
         <aside
           aria-label='Cookie preferences'
           data-testid='cookie-banner'
-          className='safe-bottom fixed right-4 bottom-4 left-4 z-40 sm:right-auto sm:w-[24rem]'
+          className='cookie-banner safe-bottom fixed right-4 bottom-4 left-4 z-40 sm:right-auto sm:w-[24rem]'
         >
-          <Card className='border-border bg-card'>
-            <CardContent className='p-4'>
-              <div className='mb-3 flex items-start gap-3'>
-                <div className='mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/12'>
+          <Card className='cookie-banner-card border-border bg-card'>
+            <CardContent className='cookie-banner-content p-4'>
+              <div className='cookie-banner-copy mb-3 flex items-start gap-3'>
+                <div className='cookie-banner-icon mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-primary/12'>
                   <Cookie className='size-4 text-primary' aria-hidden='true' />
                 </div>
                 <div className='min-w-0'>
@@ -186,8 +186,8 @@ const CookieBanner: React.FC = () => {
                 </div>
               </div>
             </CardContent>
-            <CardFooter className='flex flex-col gap-2 px-4 pt-0 pb-4'>
-              <div className='grid w-full grid-cols-2 gap-2'>
+            <CardFooter className='cookie-banner-actions flex flex-col gap-2 px-4 pt-0 pb-4'>
+              <div className='cookie-banner-primary-actions grid w-full grid-cols-2 gap-2'>
                 <Button
                   onClick={handleRejectAll}
                   variant='outline'
@@ -211,7 +211,7 @@ const CookieBanner: React.FC = () => {
                 onClick={handleManageFromBanner}
                 variant='ghost'
                 size='sm'
-                className='min-h-6 px-2 py-1 text-xs'
+                className='cookie-banner-manage min-h-6 px-2 py-1 text-xs'
                 data-testid='cookie-manage-preferences'
               >
                 Manage Preferences

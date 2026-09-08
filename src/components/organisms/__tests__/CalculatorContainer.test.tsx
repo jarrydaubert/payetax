@@ -475,9 +475,8 @@ describe('CalculatorContainer Component', () => {
       render(<CalculatorContainer />);
 
       const section = screen.getByTestId('calculator-section');
-      expect(section).toHaveClass('lg:grid');
-      // Updated to match responsive grid columns
-      expect(section).toHaveClass('lg:grid-cols-[400px_minmax(0,1fr)]');
+      expect(section).toHaveClass('xl:grid');
+      expect(section).not.toHaveClass('lg:grid');
       expect(section).toHaveClass('xl:grid-cols-[390px_minmax(0,1fr)]');
       expect(section).toHaveClass('2xl:grid-cols-[380px_minmax(0,1fr)]');
     });
@@ -503,7 +502,7 @@ describe('CalculatorContainer Component', () => {
       (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
       render(<CalculatorContainer />);
 
-      expect(screen.getByTestId('tax-results')).toHaveClass('lg:self-start');
+      expect(screen.getByTestId('tax-results')).toHaveClass('xl:self-start');
     });
   });
 

@@ -93,14 +93,15 @@
   top: 0;
 }
 
-.navbar-safe-spacer {
-  height: calc(4rem + var(--pwa-safe-area-top, 0px));
+.navbar-shell {
+  height: var(--navbar-height);
+  padding-top: var(--navbar-safe-area-top);
+  padding-right: max(var(--navbar-inline-padding), env(safe-area-inset-right, 0px));
+  padding-left: max(var(--navbar-inline-padding), env(safe-area-inset-left, 0px));
 }
 
-@media (min-width: 640px) {
-  .navbar-safe-spacer {
-    height: 5rem;
-  }
+.navbar-safe-spacer {
+  height: var(--navbar-height);
 }
 
 /* Dark Mode Theme */
@@ -178,12 +179,22 @@
 
 @layer base {
   :root {
-    --pwa-safe-area-top: 0px;
+    --navbar-safe-area-top: env(safe-area-inset-top, 0px);
+    --navbar-content-height: 4rem;
+    --navbar-height: calc(var(--navbar-content-height) + var(--navbar-safe-area-top));
+    --navbar-inline-padding: 1rem;
   }
 
-  @media (display-mode: standalone), (display-mode: fullscreen) {
+  @media (min-width: 640px) {
     :root {
-      --pwa-safe-area-top: env(safe-area-inset-top, 0px);
+      --navbar-content-height: 5rem;
+      --navbar-inline-padding: 2rem;
+    }
+  }
+
+  @media (orientation: landscape) and (max-height: 500px) {
+    :root {
+      --navbar-content-height: 3.5rem;
     }
   }
 
@@ -382,6 +393,43 @@
   .touch-pan-x {
     touch-action: pan-x pan-y pinch-zoom;
     overscroll-behavior-x: contain;
+  }
+}
+
+/* Keep consent actionable without covering most of a short landscape viewport. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .cookie-banner {
+    right: max(0.5rem, env(safe-area-inset-right, 0px));
+    bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
+    left: max(0.5rem, env(safe-area-inset-left, 0px));
+    width: auto;
+  }
+
+  .cookie-banner-content {
+    padding: 0.75rem;
+  }
+
+  .cookie-banner-copy {
+    margin-bottom: 0;
+  }
+
+  .cookie-banner-icon {
+    display: none;
+  }
+
+  .cookie-banner-actions {
+    flex-direction: row;
+    gap: 0.5rem;
+    padding: 0 0.75rem 0.75rem;
+  }
+
+  .cookie-banner-primary-actions {
+    flex: 1;
+  }
+
+  .cookie-banner-manage {
+    min-height: 2.75rem;
+    flex-shrink: 0;
   }
 }
 

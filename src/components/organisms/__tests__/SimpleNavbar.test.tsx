@@ -237,10 +237,10 @@ describe('SimpleNavbar Component', () => {
       expect(nav).toHaveClass('bg-background');
     });
 
-    it('should include safe-area top padding on mobile nav', () => {
+    it('should use the shared navbar geometry class', () => {
       const { container } = render(<SimpleNavbar />);
       const nav = container.querySelector('nav');
-      expect(nav).toHaveClass('pt-[calc(var(--pwa-safe-area-top,0px)+1rem)]');
+      expect(nav).toHaveClass('navbar-shell');
     });
   });
 
