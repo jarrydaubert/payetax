@@ -108,8 +108,7 @@ export function NavbarMobileMenu({
         aria-modal='true'
         className={cn(
           'fixed right-0 left-0 z-50 md:hidden',
-          'top-16',
-          'top-[calc(4rem+var(--pwa-safe-area-top,0px))]',
+          'top-[var(--navbar-height)]',
           'border-border/60 border-b bg-card px-4 py-6',
         )}
         aria-label='Mobile navigation menu'

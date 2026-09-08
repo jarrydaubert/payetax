@@ -82,9 +82,8 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
 
       <nav
         className={cn(
-          'nav-safe-top fixed right-0 left-0 z-50',
+          'navbar-shell nav-safe-top fixed right-0 left-0 z-50',
           'grid grid-cols-[1fr_auto_1fr] items-center',
-          'px-4 pt-[calc(var(--pwa-safe-area-top,0px)+1rem)] pb-4 sm:px-8 sm:py-6',
           'border-border border-b bg-background',
           className,
         )}
@@ -93,7 +92,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
         {/* Logo - Home button */}
         <Link
           href='/'
-          className='group'
+          className='group inline-flex min-h-11 items-center'
           data-testid='nav-logo'
           onClick={(e) => {
             if (pathname === '/') {
@@ -115,7 +114,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
               key={link.href}
               href={link.href}
               onClick={link.label === 'Calculator' ? handleCalculatorClick : undefined}
-              className='font-medium text-muted-foreground text-sm transition-colors duration-200 hover:text-primary'
+              className='inline-flex min-h-11 items-center font-medium text-muted-foreground text-sm transition-colors duration-200 hover:text-primary'
             >
               {link.label}
             </Link>
@@ -134,7 +133,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
         {/* Mobile Menu Button */}
         <Button
           variant='ghost'
-          size='icon'
+          size='icon-touch'
           className='col-start-3 justify-self-end text-foreground md:hidden'
           onClick={() => {
             setIsMobileMenuOpen(!isMobileMenuOpen);

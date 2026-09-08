@@ -70,7 +70,7 @@ export function ResultTableRow({
         className={cn(
           color,
           isHighlight && 'font-bold',
-          'sticky left-0 z-10 border-border/80 border-r bg-card px-2 py-2.5 text-left font-normal',
+          'sticky left-0 z-10 min-w-[10.5rem] border-border/80 border-r bg-card px-2 py-2.5 text-left font-normal xl:min-w-[11.5rem]',
         )}
       >
         <div className={cn('flex items-start', 'gap-1.5', isSubRow && 'pl-3 sm:pl-4')}>
@@ -105,7 +105,7 @@ export function ResultTableRow({
             <React.Fragment key={period}>
               <TableCell
                 className={cn(
-                  'min-w-28 whitespace-nowrap bg-primary/10 px-2 py-2.5 text-right font-mono tabular-nums',
+                  'min-w-[8.5rem] whitespace-nowrap bg-primary/10 px-2 py-2.5 text-right font-mono tabular-nums',
                   'text-[0.8125rem] xl:text-sm',
                   color,
                   isHighlight && 'font-bold',
@@ -115,7 +115,7 @@ export function ResultTableRow({
               </TableCell>
               <TableCell
                 className={cn(
-                  'min-w-28 whitespace-nowrap bg-success/10 px-2 py-2.5 text-right font-mono tabular-nums',
+                  'min-w-[8.5rem] whitespace-nowrap bg-success/10 px-2 py-2.5 text-right font-mono tabular-nums',
                   'text-[0.8125rem] xl:text-sm',
                   color,
                   isHighlight && 'font-bold',
@@ -132,7 +132,7 @@ export function ResultTableRow({
           <TableCell
             key={period}
             className={cn(
-              'whitespace-nowrap px-1.5 py-2.5 text-right font-mono tabular-nums xl:px-2',
+              'min-w-[8.5rem] whitespace-nowrap px-1.5 py-2.5 text-right font-mono tabular-nums xl:px-2',
               'text-[0.8125rem] xl:text-sm',
               color,
               isHighlight && 'font-bold',

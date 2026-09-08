@@ -24,7 +24,7 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
             This maintains consistent visual hierarchy across all main sections */}
         <TableHead
           className={cn(
-            'sticky left-0 z-20 whitespace-nowrap border-border border-r bg-card font-semibold text-foreground',
+            'sticky left-0 z-20 min-w-[10.5rem] whitespace-nowrap border-border border-r bg-card font-semibold text-foreground xl:min-w-[11.5rem]',
             'px-2',
             'py-2.5',
             'text-base',
@@ -49,7 +49,7 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
               <TableHead
                 key={period}
                 className={cn(
-                  'min-w-56 border-border border-r text-center font-semibold text-muted-foreground',
+                  'min-w-[17rem] border-border border-r text-center font-semibold text-muted-foreground',
                   'px-2',
                   'py-2.5',
                   'text-xs xl:text-sm',
@@ -64,7 +64,7 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
               <TableHead
                 key={period}
                 className={cn(
-                  'whitespace-nowrap text-right font-semibold text-muted-foreground',
+                  'min-w-[8.5rem] whitespace-nowrap text-right font-semibold text-muted-foreground',
                   'px-1.5 xl:px-2',
                   'py-2.5',
                   'text-xs xl:text-sm',
@@ -84,7 +84,7 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
             <React.Fragment key={period}>
               <TableHead
                 className={cn(
-                  'min-w-28 whitespace-nowrap bg-primary/10 text-center font-medium text-muted-foreground',
+                  'min-w-[8.5rem] whitespace-nowrap bg-primary/10 text-center font-medium text-muted-foreground',
                   'px-2',
                   'py-2',
                   'text-sm',
@@ -95,7 +95,7 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
               </TableHead>
               <TableHead
                 className={cn(
-                  'min-w-28 whitespace-nowrap bg-accent/10 text-center font-medium text-muted-foreground',
+                  'min-w-[8.5rem] whitespace-nowrap bg-accent/10 text-center font-medium text-muted-foreground',
                   'px-2',
                   'py-2',
                   'text-sm',

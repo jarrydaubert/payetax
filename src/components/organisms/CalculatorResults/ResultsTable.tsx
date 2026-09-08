@@ -18,7 +18,6 @@ import {
 } from 'lucide-react';
 import * as React from 'react';
 import { ScrollIndicator } from '@/components/atoms/ScrollIndicator';
-import { LandscapePrompt } from '@/components/molecules/LandscapePrompt';
 import { MarriageAllowanceAlert } from '@/components/molecules/MarriageAllowanceAlert';
 import { PeriodSelectorCard } from '@/components/molecules/PeriodSelectorCard';
 import { ResultsTableHeader } from '@/components/molecules/ResultsTableHeader';
@@ -73,6 +72,9 @@ const periodOptions: Record<string, number> = {
   Daily: 260,
   Hourly: 1950,
 };
+
+const TABLE_FIXED_COLUMNS_WIDTH_REM = 15;
+const TABLE_PERIOD_COLUMN_WIDTH_REM = 8.5;
 
 const rowPresentation: Record<ResultsTableRowKind, RowPresentation> = {
   gross: { icon: PoundSterling, color: 'text-foreground' },
@@ -208,6 +210,17 @@ export function ResultsTable({
     onVisiblePeriodsChange(newPeriods);
   };
 
+  const handleTableKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+
+    event.preventDefault();
+    const direction = event.key === 'ArrowRight' ? 1 : -1;
+    event.currentTarget.scrollBy({
+      left: direction * Math.max(80, event.currentTarget.clientWidth * 0.25),
+      behavior: 'smooth',
+    });
+  };
+
   const tableRows = buildResultsTableRows({
     results,
     allowancesDeductions,
@@ -217,6 +230,10 @@ export function ResultsTable({
     previousYearLabel: String(previousYearLabel),
     taxCode,
   });
+  const valuesPerPeriod = whatIfResults ? 2 : 1;
+  const tableMinWidthRem =
+    TABLE_FIXED_COLUMNS_WIDTH_REM +
+    visiblePeriods.length * valuesPerPeriod * TABLE_PERIOD_COLUMN_WIDTH_REM;
 
   return (
     <motion.div
@@ -225,9 +242,6 @@ export function ResultsTable({
       transition={{ duration: 0.3, delay: 0.2 }}
       className={cn('w-full', 'space-y-4')}
     >
-      {/* Landscape Prompt - Shows on mobile portrait to encourage rotation for better table viewing */}
-      <LandscapePrompt />
-
       {/* Period Selection */}
       <PeriodSelectorCard
         periods={Object.keys(periodOptions)}
@@ -238,14 +252,19 @@ export function ResultsTable({
       {/* Results Table with Scroll Indicators */}
       <div className='relative -mx-4 w-[calc(100%+2rem)] sm:mx-0 sm:w-full'>
         {/* Scroll Indicators - must be positioned absolutely to overlay the card */}
-        <ScrollIndicator direction='left' visible={showLeftIndicator} />
+        <ScrollIndicator
+          direction='left'
+          visible={showLeftIndicator}
+          className='left-[calc(10.5rem+0.5rem)] xl:left-[calc(11.5rem+0.5rem)]'
+        />
         <ScrollIndicator direction='right' visible={showRightIndicator} />
 
         <Card className='relative w-full overflow-hidden rounded-sm border-border bg-card shadow-none'>
           {/* Screen reader hint for scrollable region */}
           <div id={scrollHintId} className='sr-only'>
-            Use horizontal scroll, swipe, or click and drag to view all pay periods. Navigate
-            through the table to see yearly, monthly, weekly, and other breakdowns.
+            Use the Left and Right Arrow keys, horizontal scroll, swipe, or click and drag to view
+            all pay periods. Navigate through the table to see yearly, monthly, weekly, and other
+            breakdowns.
           </div>
 
           {/* 
@@ -260,14 +279,14 @@ export function ResultsTable({
             aria-label='Tax calculation results table - scrollable'
             aria-describedby={scrollHintId}
             data-testid='results-table-container'
+            // biome-ignore lint/a11y/noNoninteractiveTabindex: A focusable overflow region lets keyboard users scroll the financial table.
+            tabIndex={0}
+            onKeyDown={handleTableKeyDown}
           >
             <table
               data-testid='results-table'
-              className={cn(
-                'w-full min-w-[42rem] table-fixed caption-bottom sm:min-w-full',
-                whatIfResults && 'min-w-[64rem]',
-                'text-[0.8125rem] xl:text-sm',
-              )}
+              className={cn('w-full caption-bottom', 'text-[0.8125rem] xl:text-sm')}
+              style={{ minWidth: `${tableMinWidthRem}rem` }}
             >
               <colgroup>
                 <col className='w-[10.5rem] xl:w-[11.5rem]' />
@@ -275,11 +294,11 @@ export function ResultsTable({
                 {visiblePeriods.map((period) =>
                   whatIfResults ? (
                     <React.Fragment key={period}>
-                      <col />
-                      <col />
+                      <col className='w-[8.5rem]' />
+                      <col className='w-[8.5rem]' />
                     </React.Fragment>
                   ) : (
-                    <col key={period} />
+                    <col key={period} className='w-[8.5rem]' />
                   ),
                 )}
               </colgroup>

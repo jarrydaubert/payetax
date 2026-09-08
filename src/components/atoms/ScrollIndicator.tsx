@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 interface ScrollIndicatorProps {
   direction: 'left' | 'right';
   visible: boolean;
+  className?: string;
 }
 
 /**
@@ -20,6 +21,7 @@ interface ScrollIndicatorProps {
 export const ScrollIndicator = memo(function ScrollIndicator({
   direction,
   visible,
+  className,
 }: ScrollIndicatorProps) {
   const Icon = direction === 'left' ? ChevronLeft : ChevronRight;
   const positionClass = direction === 'left' ? 'left-0 justify-start' : 'right-0 justify-end';
@@ -31,8 +33,10 @@ export const ScrollIndicator = memo(function ScrollIndicator({
         positionClass,
         'bg-background/95',
         visible ? 'opacity-100' : 'opacity-0',
+        className,
       )}
       aria-hidden='true'
+      data-testid={`scroll-indicator-${direction}`}
     >
       <div className='flex size-8 items-center justify-center rounded-sm border border-border bg-card md:size-10'>
         <Icon className='size-5 text-primary md:size-6' strokeWidth={2.5} />
