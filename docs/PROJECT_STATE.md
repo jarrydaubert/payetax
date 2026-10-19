@@ -230,9 +230,9 @@ are listed under the backlog's
 working rule, they may be fixed as small independent slices between the items above, starting with
 currency-input preservation and minimal stale-result protection. Two browser-verified
 [main-calculator input-integrity defects](BACKLOG.md#main-calculator-input-integrity) follow
-immediately, then the interim Director email guard and Corporation Tax deadline arithmetic; the
-backlog records the agreed order. They do not reorder items 1–3, they must reuse existing
-tax-domain owners, and any exception that needs a Foundation change waits for, or is folded into, that item. Director design and
+immediately, then the interim Director email guard and Corporation Tax deadline arithmetic. The
+backlog records the agreed order, under which these first slices come before item 1. They do not
+reorder items 1–3, they must reuse existing tax-domain owners, and any exception that needs a Foundation change waits for, or is folded into, that item. Director design and
 refactoring proposals are parked.
 
 Optional polish does not outrank these correctness items.
