@@ -27,7 +27,7 @@ Current correctness sequence:
 2. Transparent calculation results.
 3. Independent fixture/test-portfolio completion and Foundation reconciliation.
 
-Verified Director Intelligence correctness exceptions (see [Urgent correctness exceptions](#urgent-correctness-exceptions)) may be taken as small independent slices between these items; they do not reorder them.
+Verified Director Intelligence correctness exceptions (see [Urgent correctness exceptions](#urgent-correctness-exceptions)) may be taken as small independent slices between these items; they do not reorder them. The verified [main-calculator input-integrity defects](#main-calculator-input-integrity) are taken the same way, immediately after DI-01, whose parser they reuse.
 
 ### Foundation
 
@@ -65,7 +65,7 @@ below.
 | --- | --- | --- | --- |
 | Explicit pension-method handling | Salary-sacrifice, net-pay and relief-at-source are handled explicitly, with the method exposed in the result. | Open | The shared pay-basis owner currently models the pension input as salary sacrifice. |
 | A transparent result that clearly exposes the selected policy, calculation basis, relevant pay bases and individual deductions | One result exposes the policy selected, the calculation basis, the relevant pay bases and each individual deduction, without callers reassembling them. | Partial | Tax-code basis is exposed after PRs #111/#112. Selected policy, relevant pay bases and pension method remain incomplete. |
-| Compact independent full-calculation fixture set | A small set of JSON fixtures, derived independently of production code, covers representative full-calculation interactions. | Partial | Representative PAYE and tax-code fixtures now include Month 1 Cvalue/exact-threshold and final-penny cases. Supported-year, wider boundary and per-scenario provenance gaps remain below. |
+| Compact independent full-calculation fixture set | A small set of JSON fixtures, derived independently of production code, covers representative full-calculation interactions. | Partial | Representative PAYE and tax-code fixtures now include Month 1 Cvalue/exact-threshold and final-penny cases. Supported-year, wider boundary and per-scenario provenance gaps remain below. Director extraction calculations have no independent fixtures yet; DI-19 introduces the first minimal set. |
 | Balanced test portfolio and updated `TESTING.md` | JSON fixtures, TypeScript rule and boundary tests, and Playwright journeys are balanced, with `TESTING.md` describing the split. | Partial | The three-layer split exists; the final coverage balance and documentation reconciliation remain open. |
 | Final backlog reconciliation | After the foundation audit, the detailed backlog items are reconciled against verified outcomes. | Open | Remove the remaining Foundation rows as focused slices close them. |
 
@@ -77,6 +77,18 @@ below.
 - If an audit confirms that no work is required, remove the row and cite the audit reference in the related pull request.
 - Keep slices small and independently reviewable.
 - The permanent north star and flow descriptions remain after the burn-down rows have been removed.
+
+### Main calculator input integrity
+
+Both defects start in the shared `NumberInput` atom, and the second also leaves stale results on screen. They are recorded separately from the Director items and scheduled immediately after DI-01, as separate PRs that reuse its parser (see the [agreed order](#urgent-correctness-exceptions)). Browser evidence: [PR #123](https://github.com/jarrydaubert/payetax/pull/123).
+
+- [ ] **P1 — Currency fields silently change amounts.** Additional income source amounts (`IncomeSourceList`, `NumberInput decimals={0}`) drop the decimal point: typing or pasting `1234.56` or `£1,234.56` displays `123,456`, and the calculation uses £123,456 (Gross Pay £153,456 on a £30,000 salary). In every `NumberInput` (parsing via `parseFormattedValue` in `src/lib/utils.ts`), a minus sign is silently dropped (`-500` becomes £500) and malformed text becomes 0 (`abc`, and `1.2.3` in two-decimal fields). Salary and other two-decimal fields keep pence correctly.
+
+  **DoD:** Amounts with pence are preserved or rejected with a specific error, never scaled. Negative and malformed text produce a specific error rather than another amount. Parsing reuses DI-01's parser rather than a second implementation. Regression coverage runs on the mounted main-calculator fields, including the income-source journey in `e2e/calculator-critical.spec.ts`.
+
+- [ ] **P1 — Focusing a filled field and leaving it erases the value while the old result stays visible.** `NumberInput` clears its display on focus by default, and blur parses the empty text as 0. With a £30,000 salary already calculated, clicking into Salary and tabbing away sets the salary to £0.00. After Calculate, the validation message appears, but the £30,000 results remain on screen.
+
+  **DoD:** Focusing a field without editing it never changes its value. A field the user genuinely clears is treated as empty, not zero. A result whose inputs are no longer valid is cleared or marked not current. Browser regression covers focus-and-leave, clearing and recovery.
 
 ### Tax correctness and product semantics
 
@@ -118,20 +130,45 @@ existing test pins the defective behaviour (DI-03, DI-08), replace its expectati
 independently derived one; do not edit it merely to pass.
 For UI changes, follow `.claude/skills/verify-frontend-change/SKILL.md`, inspect the affected
 route and states, and include Director critical-flow coverage. Preserve dated completion
-evidence in the implementing PR or a report; remove completed items from this queue.
+evidence in the implementing PR or a report; remove completed items from this queue. When a PR
+completes only part of an item, keep the item and narrow its text to the remaining scope.
+
+Director calculation fixtures stay minimal, independently derived and alongside the existing
+verification infrastructure rather than in a large separate harness. The current loader reads
+every JSON file in `src/test/payeVerificationFixtures/` as a PAYE suite, so Director cases need
+their own directory or a suite-type discriminator. The first engine PR (DI-19) introduces them
+and updates `TESTING.md`, in line with the compact independent fixture set in the Foundation
+burn-down.
 
 #### Urgent correctness exceptions
 
 These items silently alter inputs or show wrong money figures, deadlines or statutory rates. Under
 the first working rule they may be taken as small independent slices between the Foundation items
 in the current correctness sequence; they do not reorder that sequence, and an exception that needs
-a Foundation change waits for, or is folded into, that Foundation item. Start with DI-01; the
-minimal invalid/stale-result state from DI-02 may land with it. DI-08, DI-20, DI-24 and DI-25 share
-`strategyComparison.ts` income attribution and should be designed together.
+a Foundation change waits for, or is folded into, that Foundation item. DI-05, DI-06, DI-26 and
+DI-27 are exceptions because they show or send wrong money figures (decision: PR #123).
+
+Agreed order, with one small PR per item unless stated otherwise (DI-01 lands with the minimal
+part of DI-02, and DI-08 with DI-24):
+
+1. DI-01 with the minimal part of DI-02: an empty or invalid required input clears the result or
+   marks it not current, and disables email.
+2. Both [main-calculator input-integrity fixes](#main-calculator-input-integrity), as separate PRs
+   reusing DI-01's parser: currency parsing first, then focus-and-leave with stale results.
+3. The interim email guard from DI-05.
+4. DI-07, then DI-26, DI-23, DI-06 and DI-27.
+5. Company budget: DI-19, then DI-21.
+6. Personal tax: DI-08 with DI-24, then DI-20, then DI-25. DI-08, DI-20, DI-24 and DI-25 share
+   `strategyComparison.ts` income attribution; the DI-08/DI-24 PR settles the shared helper's
+   design.
+7. DI-04, the rest of DI-02, DI-05, then DI-03.
+
+In the current correctness sequence, explicit pension-method handling is planned after step 4
+and before step 5, and transparent calculation results after step 6.
 
 - [ ] **DI-01 · P1 — Preserve currency amounts and editing behaviour.** `InputsPanel` removes decimal points and signs; entering `1234.56` becomes `£123,456` across the live currency-field path.
 
-  **DoD:** One shared currency field separates editable text from the parsed amount; `1234.56`, `1,234.56`, and `£1,234.56` all resolve to £1,234.56; unsupported negative or malformed values produce a specific error instead of another amount. Empty and zero remain distinct, formatting does not move the caret during mid-string editing, and mobile fields expose a decimal input mode. Regression coverage exercises pasted pence, commas, symbols, clearing, invalid signs, and mid-string edits on the mounted input panel.
+  **DoD:** One shared currency field separates editable text from the parsed amount; `1234.56`, `1,234.56`, and `£1,234.56` all resolve to £1,234.56; unsupported negative or malformed values produce a specific error instead of another amount. Empty and zero remain distinct, formatting does not move the caret during mid-string editing, and mobile fields expose a decimal input mode. Regression coverage exercises pasted pence, commas, symbols, clearing, invalid signs, and mid-string edits on the mounted input panel, plus one end-to-end case with a pence amount whose expected result is independently derived. That case is asserted in a test with its derivation recorded in the PR; it does not create the Director fixture suite, which starts with DI-19.
 
 - [ ] **DI-02 · P1 — Invalidate stale results and expose validation state.** Clearing a required field leaves the previous recommendation visible because the auto-calculation effect returns without invalidating its comparison; dashboard errors and calculating state are not surfaced.
 
@@ -143,11 +180,21 @@ minimal invalid/stale-result state from DI-02 may land with it. DI-08, DI-20, DI
 
 - [ ] **DI-04 · P1 — Keep selected strategy, objective, slider, and results aligned.** Selecting All Salary can retain its selected card while the salary slider clamps its amount to the NI upper earnings limit and produces a mixed result; the hero and objective can describe another strategy.
 
-  **DoD:** Named strategies consume their exact calculated results and are never silently changed by a slider effect. Salary-slider affordability uses the shared company-cost calculation, including applicable allowances and benefits, rather than an NI threshold cap. Every selected card agrees with summary, breakdowns, reserves, warnings, and export; moving a what-if salary control exposes a Custom selection. The visible recommendation explicitly follows the chosen objective or is clearly identified as a different reference. Named-strategy parity, affordability boundaries, input changes, objective changes, and custom/reset transitions have browser regression coverage.
+  **DoD:** Named strategies consume their exact calculated results and are never silently changed by a slider effect. Salary-slider affordability reuses DI-21's shared company-cost calculation, including applicable allowances and benefits, rather than an NI threshold cap. Every selected card agrees with summary, breakdowns, reserves, warnings, and export; moving a what-if salary control exposes a Custom selection. The visible recommendation explicitly follows the chosen objective or is clearly identified as a different reference. Named-strategy parity, affordability boundaries, input changes, objective changes, and custom/reset transitions have browser regression coverage.
+
+- [ ] **DI-05 · P1 — Export the displayed scenario and fulfil the email promise.** Profit/salary what-if state, selected strategy, objective, and accounting-period settings are absent from the email snapshot; the server regenerates the original comparison and the dialog promises key dates that are not generated.
+
+  **Interim guard (lands straight after DI-01 and the main-calculator input fixes):** until the full fix, email is unavailable, with a visible reason, whenever the displayed scenario differs from what the email would contain. This includes at least a what-if salary or profit, a selected strategy other than the one the email reports, and a chosen objective, none of which the email payload currently carries. The dialog does not promise key dates or other content the email lacks. Mocked-request browser tests show email disabled, with its reason, for each divergence and enabled when the displayed scenario matches; a dialog copy test confirms key dates are no longer promised.
+
+  **DoD:** Display and export share a validated scenario snapshot containing all inputs needed to reproduce the active result; the server recalculates from that snapshot rather than trusting client-supplied tax totals. Reports clearly distinguish current scenario, original inputs, and comparison alternatives. Salary/profit what-if values and annual/monthly modes reproduce on-screen figures in generated HTML and text; year-end settings and key dates are included if promised, otherwise the promise is corrected. Mocked browser requests and generated-email assertions prove parity without sending real email. Follows DI-04 and the rest of DI-02, which define the active scenario and the validated snapshot it exports.
+
+- [ ] **DI-06 · P1 — Use resolved monthly financials in every breakdown and survival result.** `DetailCards` and `SurvivalModePanel` read annual-mode revenue/expenses while the active calculation uses monthly projections, allowing contradictory company figures or a £0 loss for a loss-making monthly case.
+
+  **DoD:** Both components consume the shared resolved active financials and projection period, with no fallback to retained annual inputs in monthly mode. The visible revenue, expenses, pension, payroll costs, taxable profit, tax, and survival-loss example reconcile with that same scenario. Tests cover a fresh monthly-only session, annual-to-monthly and monthly-to-annual switches, positive/zero/negative projected profit, and changes to projection start month and pension.
 
 - [ ] **DI-07 · P1 — Correct deadline arithmetic and validate accounting-period dates.** Adding nine months then one day gets 7 of 12 month-end due dates wrong against [HMRC CTM01800](https://www.gov.uk/hmrc-internal-manuals/company-taxation-manual/ctm01800) (first day of the tenth month): 31 May, 31 July and 31 December are late (4 Mar, 2 May, 2 Oct); 28 February, 30 April, 30 June and 30 November are a day early; impossible custom dates silently roll into another month and the calendar guesses the next year-end occurrence.
 
-  **DoD:** A complete, valid accounting-period end is selected explicitly; impossible dates are rejected with an associated error and cannot produce an ICS export. One date helper generates visible dates and all-day calendar events without month overflow, including 31 December 2026 → 1 October 2027, non-month-end ends whose ninth month lacks the corresponding day (30 May → 1 March), and every month-end case in the [19 October addendum](reports/director-intelligence-audit-addendum-2026-10-19.md#corporation-tax-deadline-arithmetic-extends-di-07) for the ordinary payment rule. Company accounting periods and personal tax years remain distinct, unknown dates are handled explicitly, and instalment-payment exceptions are qualified. Independent cases cover December, leap years, month ends, invalid days/months, previous periods, and unknown dates; events retain stable identifiers and correct exclusive end dates. [HMRC deadline guidance](https://www.gov.uk/pay-corporation-tax) is linked beside the schedule.
+  **DoD:** A complete, valid accounting-period end is selected explicitly; impossible dates are rejected with an associated error and cannot produce an ICS export. One date helper generates visible dates and all-day calendar events without month overflow, including 31 December 2026 → 1 October 2027, non-month-end ends whose ninth month lacks the corresponding day (30 May → 1 March), and every month-end case in the [19 October addendum](reports/director-intelligence-audit-addendum-2026-10-19.md#corporation-tax-deadline-arithmetic-extends-di-07) for the ordinary payment rule. The company tax return filing date comes from the same helper rather than by adding a year to a `Date` (which rolls a 29 February period end into March). Its expected values are derived from the filing rule, "12 months after the end of the accounting period" ([HMRC Company Tax Returns](https://www.gov.uk/company-tax-returns)), and independently tested. Company accounting periods and personal tax years remain distinct, unknown dates are handled explicitly, and instalment-payment exceptions are qualified. Independent cases cover December, leap years, month ends, invalid days/months, previous periods, and unknown dates; events retain stable identifiers and correct exclusive end dates. [HMRC deadline guidance](https://www.gov.uk/pay-corporation-tax) is linked beside the schedule.
 
 - [ ] **DI-08 · P1 — Correct other-PAYE National Insurance treatment.** `getEmployeeNIWithNoThreshold` removes this employment's primary threshold solely because the user has another PAYE job, and Learn repeats that assumption.
 
@@ -167,7 +214,7 @@ minimal invalid/stale-result state from DI-02 may land with it. DI-08, DI-20, DI
 
 - [ ] **DI-23 · P1 — Correct the Section 455 rate.** The Learn warning states 33.75%; [CTM61505](https://www.gov.uk/hmrc-internal-manuals/company-taxation-manual/ctm61505) gives 35.75% for loans made on or after 6 April 2026.
 
-  **DoD:** The warning states the rate by loan date from a sourced, year-aware value rather than a literal, links CTM61505, and a content test fails if the text diverges from the cited rate for the selected tax year. Any new rate value enters canonical policy data with its official source and independent verification. The `33.75` EducationPanel entry in `scripts/tax-facts-baseline.ts` is removed in the same PR, under the shrink-only rule.
+  **DoD:** The rate is derived from the canonical dividend upper-rate policy (`DIVIDEND_TAX_RATES[year].HIGHER_RATE`, the ITA 2007 s8(2) dividend upper rate) for the tax year in which the loan is made, consumed through the `@/lib/tax` interface rather than a new direct import, and not stored as a separate value. [CTA 2010 s455(2)](https://www.legislation.gov.uk/ukpga/2010/4/section/455) charges "such percentage of the amount of the loan or advance as corresponds to the dividend upper rate specified in section 8(2) of ITA 2007 for the tax year in which the loan or advance is made". There is no loan-date input, so the warning states which tax year's loans it describes. Years outside the supported policy range are handled explicitly, never by silent fallback. The warning links CTM61505, and a content test fails if the text diverges from the derived rate. The `33.75` EducationPanel entry in `scripts/tax-facts-baseline.ts` is removed in the same PR, under the shrink-only rule.
 
 - [ ] **DI-24 · P1 — Use one National Insurance basis for Your Setup and every other path.** With other PAYE employment flagged, Your Setup reports £0 employee NI at £12,570 while the slider reports £1,005.60 for the same salary, so its comparison delta uses a different basis.
 
@@ -177,17 +224,13 @@ minimal invalid/stale-result state from DI-02 may land with it. DI-08, DI-20, DI
 
   **DoD:** Attributed repayment equals the total liability less the amount attributable to the other income, consistent with income-tax attribution (DI-20). Plans, postgraduate loans and the Self Assessment treatment of unearned income are confirmed against current GOV.UK/Student Loans Company guidance before fixtures are written. Independent fixtures cover each supported plan with and without other income.
 
-#### Result consistency (P1, not exceptions)
+- [ ] **DI-26 · P1 — Align the empty-state instructions with the input contract.** The empty state asks for "company profit" and then expenses, while the fields are Annual Revenue and Business Expenses (excluding the salary being compared); following the instructions can deduct expenses twice. Verified from PR #120.
 
-Schedule DI-05 after DI-04 and DI-02, which define the active scenario and the valid-result state it must export, and after DI-07 if the report keeps its key-dates promise. DI-06 can follow DI-01.
+  **DoD:** Empty-state steps, field labels, hints and tooltips describe the same revenue-minus-expenses contract and state which payroll costs to exclude. A component test pins the wording against the mounted fields. No new input mode is added without a product decision.
 
-- [ ] **DI-05 · P1 — Export the displayed scenario and fulfil the email promise.** Profit/salary what-if state, selected strategy, objective, and accounting-period settings are absent from the email snapshot; the server regenerates the original comparison and the dialog promises key dates that are not generated.
+- [ ] **DI-27 · P1 — Disclose that amounts already paid do not constrain annual strategies.** Entering £20,000 salary and £5,000 dividends already paid leaves every strategy unchanged, including a £12,570 Baseline Mix salary below the salary already paid. A director part-way through the year can therefore be shown a strategy they can no longer follow, with figures that do not describe their real year. Verified from PR #120.
 
-  **DoD:** Display and export share a validated scenario snapshot containing all inputs needed to reproduce the active result; the server recalculates from that snapshot rather than trusting client-supplied tax totals. Reports clearly distinguish current scenario, original inputs, and comparison alternatives. Salary/profit what-if values and annual/monthly modes reproduce on-screen figures in generated HTML and text; year-end settings and key dates are included if promised, otherwise the promise is corrected. Mocked browser requests and generated-email assertions prove parity without sending real email.
-
-- [ ] **DI-06 · P1 — Use resolved monthly financials in every breakdown and survival result.** `DetailCards` and `SurvivalModePanel` read annual-mode revenue/expenses while the active calculation uses monthly projections, allowing contradictory company figures or a £0 loss for a loss-making monthly case.
-
-  **DoD:** Both components consume the shared resolved active financials and projection period, with no fallback to retained annual inputs in monthly mode. The visible revenue, expenses, pension, payroll costs, taxable profit, tax, and survival-loss example reconcile with that same scenario. Tests cover a fresh monthly-only session, annual-to-monthly and monthly-to-annual switches, positive/zero/negative projected profit, and changes to projection start month and pension.
+  **DoD:** Results state that comparisons are full-year totals not adjusted for amounts already paid, and warn when a strategy's salary or dividends fall below amounts already paid. A remaining-year planning contract (paid-to date, director NI method, payroll history) requires an explicit product decision before implementation and is not part of this item.
 
 #### Verified explanation, accessibility, layout and output defects (P2)
 
@@ -201,7 +244,7 @@ Schedule DI-05 after DI-04 and DI-02, which define the active scenario and the v
 
 - [ ] **DI-11 · P2 — Correct and qualify Director financial explanations.** Learn and survival/pension messaging overstate dividend timing, VAT registration, NI-record certainty, taper rates, contract-end risk, and distributable-profit conclusions; the Child Benefit warning disappears above its upper threshold.
 
-  **DoD:** Each of these corrections is independently verified against relevant primary sources and asserted in focused content/condition tests: dividend timing distinguishes due-and-payable treatment and interim/final dividends; VAT prompts use taxable-turnover registration tests and correct notification timing rather than annual forecasts; pension messaging describes this salary's potential contribution and allows other qualifying contributions/credits; taper wording reflects region and income composition; Child Benefit guidance remains useful above the full-charge threshold; contract-end wording requires actual contract-end evidence or is renamed to describe the projection/runway condition; a current-year loss is not presented as proof that historic distributable reserves are unavailable; the Employment Allowance tooltip states HMRC's test (ineligible where the sole director is the only employee liable for secondary Class 1; an extra employee paid below the Secondary Threshold does not qualify) instead of "only director/employee in most cases". Relevant HMRC/DWP links accompany explanations; no new tax assumptions are invented. See the audit's primary-source references.
+  **DoD:** Each of these corrections is independently verified against relevant primary sources and asserted in focused content/condition tests: dividend timing distinguishes due-and-payable treatment and interim/final dividends; VAT prompts use taxable-turnover registration tests and correct notification timing rather than annual forecasts; pension messaging describes this salary's potential contribution and allows other qualifying contributions/credits; taper wording reflects region and income composition; Child Benefit guidance remains useful above the full-charge threshold; contract-end wording requires actual contract-end evidence or is renamed to describe the projection/runway condition; a current-year loss is not presented as proof that historic distributable reserves are unavailable; the Employment Allowance tooltip states HMRC's test (ineligible where the sole director is the only employee liable for secondary Class 1; an extra employee paid below the Secondary Threshold does not qualify) instead of "only director/employee in most cases". Relevant HMRC/DWP links accompany explanations; no new tax assumptions are invented. See the audit's primary-source references. Wording tied to a calculation fix lands with that fix, so the explanation always matches the behaviour: NI-record and other-employment wording with DI-08, the Employment Allowance tooltip with DI-21, and taper wording with DI-20.
 
 - [ ] **DI-12 · P2 — Repair control semantics, contrast, announcements, and landmarks.** The audit found unnamed salary/profit sliders and chart progressbars, failing hint/warning contrast, nested/duplicate main landmarks, visual-only strategy selection, and no deliberate calculation-completion announcement.
 
@@ -222,14 +265,6 @@ Schedule DI-05 after DI-04 and DI-02, which define the active scenario and the v
 - [ ] **DI-22 · P2 — Retire or correct the unrendered legacy Director route.** `calculateDirectorScenario` is computed by the store but never rendered, and returns dividends of −£705.50 for £13,000 profit; its tests anchor a route users do not see.
 
   **DoD:** Either the route is removed and its useful assertions are re-pointed at the rendered strategy path, or it is corrected so dividends cannot be negative and its relationship to the rendered path is documented. Aligns with the Foundation principle of one supported route to each statutory calculation; no new calculator is introduced.
-
-- [ ] **DI-26 · P2 — Align the empty-state instructions with the input contract.** The empty state asks for "company profit" and then expenses, while the fields are Annual Revenue and Business Expenses (excluding the salary being compared); following the instructions can deduct expenses twice. Verified from PR #120.
-
-  **DoD:** Empty-state steps, field labels, hints and tooltips describe the same revenue-minus-expenses contract and state which payroll costs to exclude. A component test pins the wording against the mounted fields. No new input mode is added without a product decision.
-
-- [ ] **DI-27 · P2 — Disclose that amounts already paid do not constrain annual strategies.** Entering £20,000 salary and £5,000 dividends already paid leaves every strategy unchanged, including a £12,570 Baseline Mix salary below the salary already paid. Verified from PR #120.
-
-  **DoD:** Results state that comparisons are full-year totals not adjusted for amounts already paid, and warn when a strategy's salary or dividends fall below amounts already paid. A remaining-year planning contract (paid-to date, director NI method, payroll history) requires an explicit product decision before implementation and is not part of this item.
 
 
 ### Verification
