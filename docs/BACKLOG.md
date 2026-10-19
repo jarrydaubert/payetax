@@ -27,6 +27,8 @@ Current correctness sequence:
 2. Transparent calculation results.
 3. Independent fixture/test-portfolio completion and Foundation reconciliation.
 
+Verified Director Intelligence correctness exceptions (see [Urgent correctness exceptions](#urgent-correctness-exceptions)) may be taken as small independent slices between these items; they do not reorder them.
+
 ### Foundation
 
 Permanent architectural and testing direction for the tax domain. This is a verification burn-down, not a new architecture programme: it records the agreed end state and tracks what still needs checking. It does not duplicate the detailed items below or prescribe implementation before a focused audit.
@@ -104,20 +106,28 @@ Implementation sequencing for these items remains documented in the ownership au
 
 ### Director Intelligence audit follow-up
 
-The [18 October 2026 audit](reports/director-intelligence-audit-2026-10-18.md)
-records reproductions, component coverage, primary sources, and the design recommendations
-behind these items. DI-01–DI-18 map to audit findings F01–F18. P1 items protect financial
-inputs and results; P2 items address explanation, accessibility, layout, and maintainability.
-Keep fixes small and preserve the Ledger visual identity and existing tax-domain owners.
-Coordinate shared tax-domain changes with the Foundation work above; do not duplicate its
-policy owners or independent-verification tasks. Address DI-01–DI-08 before visual polish.
+Evidence: the [18 October 2026 audit](reports/director-intelligence-audit-2026-10-18.md) (F01–F18 map
+to DI-01–DI-18) and the [19 October verification addendum](reports/director-intelligence-audit-addendum-2026-10-19.md) (DI-19–DI-27 and the
+extended DI-07 and DI-11, and the corrected DI-14). Keep fixes small, preserve the Ledger visual identity and existing
+tax-domain owners, and do not duplicate Foundation policy owners or independent-verification tasks.
 
 For calculation changes, completion also requires independently derived fixtures, the
 repository's full `bun run test:no-coverage` command, and the required browser regression
-slice. Passing generated golden masters alone does not establish statutory correctness.
+slice. Passing generated golden masters alone does not establish statutory correctness. Where an
+existing test pins the defective behaviour (DI-03, DI-08), replace its expectation with an
+independently derived one; do not edit it merely to pass.
 For UI changes, follow `.claude/skills/verify-frontend-change/SKILL.md`, inspect the affected
 route and states, and include Director critical-flow coverage. Preserve dated completion
 evidence in the implementing PR or a report; remove completed items from this queue.
+
+#### Urgent correctness exceptions
+
+These items silently alter inputs or show wrong money figures, deadlines or statutory rates. Under
+the first working rule they may be taken as small independent slices between the Foundation items
+in the current correctness sequence; they do not reorder that sequence, and an exception that needs
+a Foundation change waits for, or is folded into, that Foundation item. Start with DI-01; the
+minimal invalid/stale-result state from DI-02 may land with it. DI-08, DI-20, DI-24 and DI-25 share
+`strategyComparison.ts` income attribution and should be designed together.
 
 - [ ] **DI-01 · P1 — Preserve currency amounts and editing behaviour.** `InputsPanel` removes decimal points and signs; entering `1234.56` becomes `£123,456` across the live currency-field path.
 
@@ -135,6 +145,42 @@ evidence in the implementing PR or a report; remove completed items from this qu
 
   **DoD:** Named strategies consume their exact calculated results and are never silently changed by a slider effect. Salary-slider affordability uses the shared company-cost calculation, including applicable allowances and benefits, rather than an NI threshold cap. Every selected card agrees with summary, breakdowns, reserves, warnings, and export; moving a what-if salary control exposes a Custom selection. The visible recommendation explicitly follows the chosen objective or is clearly identified as a different reference. Named-strategy parity, affordability boundaries, input changes, objective changes, and custom/reset transitions have browser regression coverage.
 
+- [ ] **DI-07 · P1 — Correct deadline arithmetic and validate accounting-period dates.** Adding nine months then one day gets 7 of 12 month-end due dates wrong against [HMRC CTM01800](https://www.gov.uk/hmrc-internal-manuals/company-taxation-manual/ctm01800) (first day of the tenth month): 31 May, 31 July and 31 December are late (4 Mar, 2 May, 2 Oct); 28 February, 30 April, 30 June and 30 November are a day early; impossible custom dates silently roll into another month and the calendar guesses the next year-end occurrence.
+
+  **DoD:** A complete, valid accounting-period end is selected explicitly; impossible dates are rejected with an associated error and cannot produce an ICS export. One date helper generates visible dates and all-day calendar events without month overflow, including 31 December 2026 → 1 October 2027, non-month-end ends whose ninth month lacks the corresponding day (30 May → 1 March), and every month-end case in the [19 October addendum](reports/director-intelligence-audit-addendum-2026-10-19.md#corporation-tax-deadline-arithmetic-extends-di-07) for the ordinary payment rule. Company accounting periods and personal tax years remain distinct, unknown dates are handled explicitly, and instalment-payment exceptions are qualified. Independent cases cover December, leap years, month ends, invalid days/months, previous periods, and unknown dates; events retain stable identifiers and correct exclusive end dates. [HMRC deadline guidance](https://www.gov.uk/pay-corporation-tax) is linked beside the schedule.
+
+- [ ] **DI-08 · P1 — Correct other-PAYE National Insurance treatment.** `getEmployeeNIWithNoThreshold` removes this employment's primary threshold solely because the user has another PAYE job, and Learn repeats that assumption.
+
+  **DoD:** Ordinary separate-employer cases calculate NICs normally on this employer's earnings; any supported aggregation case is distinguished using the necessary facts, or explicitly excluded from the supported model. Independent fixtures and tests pin separate employment, aggregation boundaries, and resulting strategy comparisons; explanatory and pension-related wording agrees with the implemented basis. The implementation is reconciled against [HMRC's employer guide, section 3.4.1](https://www.gov.uk/government/publications/cwg2-further-guide-to-paye-and-national-insurance-contributions/2026-to-2027-employer-further-guide-to-paye-and-national-insurance-contributions#para341), without treating another job as automatic threshold consumption.
+
+- [ ] **DI-19 · P1 — Keep All Dividends within the company's budget when Class 1A applies.** With £80,000 profit and a £10,000 benefit in kind, All Dividends reports Class 1A £1,500, CT £17,450 and dividends £62,550: £81,500 of outflow. Class 1A is deductible ([BIM42523](https://www.gov.uk/hmrc-internal-manuals/business-income-manual/bim42523)), so the independent result is CT £17,052.50 and dividends £61,447.50.
+
+  **DoD:** Every strategy and the slider satisfy salary + secondary Class 1 + Class 1A + CT + dividends + retained = profit after employer pension; Your Setup reports any excess over the same funds through its existing overdraw flag. Class 1A reduces both available funds and CT profit. Independent fixtures cover benefit-in-kind cases for All Dividends, mixed and custom salaries, with expected values derived from statutory rates rather than engine output.
+
+- [ ] **DI-20 · P1 — Attribute the Personal Allowance taper caused by extraction.** With £100,000 of other non-dividend income and a £40,000 pool, All Dividends reports £0 income tax although the £32,400 dividends remove the allowance and add £5,028 tax on the other income; mixed and slider paths cancel the same increment by subtracting a baseline that already uses the reduced allowance.
+
+  **DoD:** Attributed income tax equals tax with the extraction minus tax on the other income alone, where the baseline uses the adjusted net income *without* the extraction, consistently in every strategy, the slider and Your Setup. Independent rUK and Scottish fixtures cover other income below, inside and above the taper band with dividend, salary and mixed extraction. Designed together with DI-08, DI-24 and DI-25 because they share `strategyComparison.ts` income attribution.
+
+- [ ] **DI-21 · P1 — Honour Employment Allowance affordability and feasible minimum salaries.** With an eligible allowance the All Salary card shows £79,347, but the same target through the slider becomes £70,217.39 plus dividends because affordability ignores the allowance. A £60,000 minimum salary (total cost £68,250 against £200,000 profit) returns £50,270 because the search bound replaces the constraint.
+
+  **DoD:** One company-cost affordability calculation, including a declared allowance and Class 1A, serves strategies, slider and custom salaries. A feasible minimum salary is always honoured; an infeasible one is reported rather than silently replaced. Search bounds never override user constraints. Boundary tests cover allowance exhaustion, the Secondary Threshold, the Upper Earnings Limit and minimums above it. Overlaps DI-04's affordability requirement; implement once.
+
+- [ ] **DI-23 · P1 — Correct the Section 455 rate.** The Learn warning states 33.75%; [CTM61505](https://www.gov.uk/hmrc-internal-manuals/company-taxation-manual/ctm61505) gives 35.75% for loans made on or after 6 April 2026.
+
+  **DoD:** The warning states the rate by loan date from a sourced, year-aware value rather than a literal, links CTM61505, and a content test fails if the text diverges from the cited rate for the selected tax year. Any new rate value enters canonical policy data with its official source and independent verification. The `33.75` EducationPanel entry in `scripts/tax-facts-baseline.ts` is removed in the same PR, under the shrink-only rule.
+
+- [ ] **DI-24 · P1 — Use one National Insurance basis for Your Setup and every other path.** With other PAYE employment flagged, Your Setup reports £0 employee NI at £12,570 while the slider reports £1,005.60 for the same salary, so its comparison delta uses a different basis.
+
+  **DoD:** Your Setup, strategies and slider obtain employee NI from the same owner and inputs; after DI-08 that is the separate-employer statutory basis. A cross-path test asserts equal NI for equal salary and flags. Land with DI-08.
+
+- [ ] **DI-25 · P1 — Do not deduct another employer's student-loan collection from director take-home.** With £40,000 other employment income on Plan 2, the full £5,461.52 repayment is deducted from the director scenario although about £955.35 is already collected through the other employer's PAYE.
+
+  **DoD:** Attributed repayment equals the total liability less the amount attributable to the other income, consistent with income-tax attribution (DI-20). Plans, postgraduate loans and the Self Assessment treatment of unearned income are confirmed against current GOV.UK/Student Loans Company guidance before fixtures are written. Independent fixtures cover each supported plan with and without other income.
+
+#### Result consistency (P1, not exceptions)
+
+Schedule DI-05 after DI-04 and DI-02, which define the active scenario and the valid-result state it must export, and after DI-07 if the report keeps its key-dates promise. DI-06 can follow DI-01.
+
 - [ ] **DI-05 · P1 — Export the displayed scenario and fulfil the email promise.** Profit/salary what-if state, selected strategy, objective, and accounting-period settings are absent from the email snapshot; the server regenerates the original comparison and the dialog promises key dates that are not generated.
 
   **DoD:** Display and export share a validated scenario snapshot containing all inputs needed to reproduce the active result; the server recalculates from that snapshot rather than trusting client-supplied tax totals. Reports clearly distinguish current scenario, original inputs, and comparison alternatives. Salary/profit what-if values and annual/monthly modes reproduce on-screen figures in generated HTML and text; year-end settings and key dates are included if promised, otherwise the promise is corrected. Mocked browser requests and generated-email assertions prove parity without sending real email.
@@ -143,13 +189,7 @@ evidence in the implementing PR or a report; remove completed items from this qu
 
   **DoD:** Both components consume the shared resolved active financials and projection period, with no fallback to retained annual inputs in monthly mode. The visible revenue, expenses, pension, payroll costs, taxable profit, tax, and survival-loss example reconcile with that same scenario. Tests cover a fresh monthly-only session, annual-to-monthly and monthly-to-annual switches, positive/zero/negative projected profit, and changes to projection start month and pension.
 
-- [ ] **DI-07 · P1 — Correct deadline arithmetic and validate accounting-period dates.** Month overflow makes a December year-end's ordinary Corporation Tax payment date one day late; impossible custom dates silently roll into another month and the calendar guesses the next year-end occurrence.
-
-  **DoD:** A complete, valid accounting-period end is selected explicitly; impossible dates are rejected with an associated error and cannot produce an ICS export. One date helper generates visible dates and all-day calendar events without month overflow, including 31 December 2026 → 1 October 2027 for the ordinary payment rule. Company accounting periods and personal tax years remain distinct, unknown dates are handled explicitly, and instalment-payment exceptions are qualified. Independent cases cover December, leap years, month ends, invalid days/months, previous periods, and unknown dates; events retain stable identifiers and correct exclusive end dates. [HMRC deadline guidance](https://www.gov.uk/pay-corporation-tax) is linked beside the schedule.
-
-- [ ] **DI-08 · P1 — Correct other-PAYE National Insurance treatment.** `getEmployeeNIWithNoThreshold` removes this employment's primary threshold solely because the user has another PAYE job, and Learn repeats that assumption.
-
-  **DoD:** Ordinary separate-employer cases calculate NICs normally on this employer's earnings; any supported aggregation case is distinguished using the necessary facts, or explicitly excluded from the supported model. Independent fixtures and tests pin separate employment, aggregation boundaries, and resulting strategy comparisons; explanatory and pension-related wording agrees with the implemented basis. The implementation is reconciled against [HMRC's employer guide, section 3.4.1](https://www.gov.uk/government/publications/cwg2-further-guide-to-paye-and-national-insurance-contributions/2026-to-2027-employer-further-guide-to-paye-and-national-insurance-contributions#341-an-employee-has-2-or-more-jobs-with-different-employers-and-each-one-pays-the-employee), without treating another job as automatic threshold consumption.
+#### Verified explanation, accessibility, layout and output defects (P2)
 
 - [ ] **DI-09 · P2 — Reconcile every financial total and allocation.** Headline deductions include student loans while the detailed total omits them; displayed taxable profit omits loss relief/pension workings; the dividend taxable amount ignores unused Personal Allowance; Money Flow omits personal deductions and subtracts pension again from an already reduced profit basis.
 
@@ -161,7 +201,7 @@ evidence in the implementing PR or a report; remove completed items from this qu
 
 - [ ] **DI-11 · P2 — Correct and qualify Director financial explanations.** Learn and survival/pension messaging overstate dividend timing, VAT registration, NI-record certainty, taper rates, contract-end risk, and distributable-profit conclusions; the Child Benefit warning disappears above its upper threshold.
 
-  **DoD:** Each of these corrections is independently verified against relevant primary sources and asserted in focused content/condition tests: dividend timing distinguishes due-and-payable treatment and interim/final dividends; VAT prompts use taxable-turnover registration tests and correct notification timing rather than annual forecasts; pension messaging describes this salary's potential contribution and allows other qualifying contributions/credits; taper wording reflects region and income composition; Child Benefit guidance remains useful above the full-charge threshold; contract-end wording requires actual contract-end evidence or is renamed to describe the projection/runway condition; a current-year loss is not presented as proof that historic distributable reserves are unavailable. Relevant HMRC/DWP links accompany explanations; no new tax assumptions are invented. See the audit's primary-source references.
+  **DoD:** Each of these corrections is independently verified against relevant primary sources and asserted in focused content/condition tests: dividend timing distinguishes due-and-payable treatment and interim/final dividends; VAT prompts use taxable-turnover registration tests and correct notification timing rather than annual forecasts; pension messaging describes this salary's potential contribution and allows other qualifying contributions/credits; taper wording reflects region and income composition; Child Benefit guidance remains useful above the full-charge threshold; contract-end wording requires actual contract-end evidence or is renamed to describe the projection/runway condition; a current-year loss is not presented as proof that historic distributable reserves are unavailable; the Employment Allowance tooltip states HMRC's test (ineligible where the sole director is the only employee liable for secondary Class 1; an extra employee paid below the Secondary Threshold does not qualify) instead of "only director/employee in most cases". Relevant HMRC/DWP links accompany explanations; no new tax assumptions are invented. See the audit's primary-source references.
 
 - [ ] **DI-12 · P2 — Repair control semantics, contrast, announcements, and landmarks.** The audit found unnamed salary/profit sliders and chart progressbars, failing hint/warning contrast, nested/duplicate main landmarks, visual-only strategy selection, and no deliberate calculation-completion announcement.
 
@@ -171,25 +211,26 @@ evidence in the implementing PR or a report; remove completed items from this qu
 
   **DoD:** Drawers use the existing accessible dialog foundation or equivalent verified behaviour: focus enters appropriately, Tab/Shift+Tab stay inside, all background content is inert, Escape/close works, scrolling is restored, and closing returns focus to the invoking control. View Results requires current valid results and announces readiness. Tests cover both drawers, first/last focus boundaries, the sibling FAQ/skip link, opening/closing with the keyboard, and focus return after editing. Follow the [W3C modal dialog pattern](https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/).
 
-- [ ] **DI-14 · P2 — Make panel layouts respond to usable workspace width.** At a 1024px viewport, fixed inputs/navigation/Learn panels leave a 360px result workspace whose content overflows and whose headline figures overlap.
+- [ ] **DI-14 · P2 — Make panel layouts respond to usable workspace width.** At a 1024px viewport, fixed inputs/navigation/Learn panels leave a result workspace of at most about 360px (295–360px depending on the element measured and timing) whose content overflows and whose headline figures overlap.
 
   **DoD:** Result components respond to their container width, retain a documented useful minimum width, and stack headline side metrics when necessary. Learn/inputs switch to drawers or overlays when simultaneous panels would squeeze results, while preserving the current input state and controls. Direct browser checks cover 320, 390, 768, 1024, 1280, and 1440 CSS pixels with applicable panels expanded/collapsed, large financial values, and 200% zoom; headings, figures, controls, and focus remain usable without accidental horizontal overflow or overlap.
-
-- [ ] **DI-15 · P2 — Simplify the mobile journey and visual hierarchy.** The empty state delays the main entry action; repeated summary cards and expanded workings make results long; sliders lack precise entry, Your Setup requires hunting through Full Inputs, and normal tax costs use error-like colour.
-
-  **DoD:** The first mobile viewport offers an obvious Enter company figures action and concise task explanation; any example mode is explicitly distinguished from real inputs. One primary take-home result, selected salary/dividend split, reserves, and important checks lead the page, with repeated metrics compacted and detailed workings/education available on demand. Sliders also offer exact numeric entry, a visible current value, and reset; Your Setup has a direct edit route with explicit apply/cancel/reset/clear semantics. Major touch actions are comfortable to target, mobile text/keyboard behaviour is checked on iOS, jargon such as YTD is explained, scripted navigation respects reduced-motion settings, and navigation prioritises the current workflow with labelled major actions rather than competing icon-only menus. Normal deductions use neutral styling; error/success colour has a consistent meaning and shared radius/spacing/border tokens retain the Ledger identity. Before/after desktop/mobile captures demonstrate the revised journey without removing required detail.
 
 - [ ] **DI-16 · P2 — Make print, copy, and email outputs useful and accessible.** Print CSS retains fixed-height scrolling, hides strategy cards because they are buttons, and relies on brittle panel class-name matching; email success is not deliberately announced.
 
   **DoD:** Explicit print hooks remove containing height/overflow constraints and non-report panels/actions; printable static strategy summaries remain visible. A copy/print action sits beside email, and saved output includes the selected inputs/scenario, tax year, assumptions, complete deductions, relevant sources, generated date, and supported dates. Multi-page print/PDF inspection confirms readable pagination and complete output. Email retains autocomplete and associated errors, announces success, and has verified focus behaviour after success/retry/close. Snapshot parity is shared with DI-05 rather than implemented twice.
 
-- [ ] **DI-17 · P2 — Consolidate live input components and scenario ownership.** The large mounted `InputsPanel` duplicates seven standalone input modules; those modules and `TaxBreakdownTable` have no live consumer beyond exports, while repeated active-scenario hooks can repeat calculation work.
+- [ ] **DI-22 · P2 — Retire or correct the unrendered legacy Director route.** `calculateDirectorScenario` is computed by the store but never rendered, and returns dividends of −£705.50 for £13,000 profit; its tests anchor a route users do not see.
 
-  **DoD:** An import/consumer audit identifies the production owner of every field and breakdown; unused paths are retired or deliberately integrated after checking consumers, with stale examples/help corrected. Coherent input groups share parsing, validation, labels, and help; tests exercise the mounted production paths instead of treating dormant-module tests as live coverage. Objective, strategy/custom salary, profit adjustment, validated inputs, resolved financials, and result provenance have one coherent ownership path; repeated scenario work is centralised where profiling justifies it. Existing tax-domain owners are preserved, no duplicate calculator/generic rules framework is introduced, and interaction performance is measured before/after any optimisation.
+  **DoD:** Either the route is removed and its useful assertions are re-pointed at the rendered strategy path, or it is corrected so dividends cannot be negative and its relationship to the rendered path is documented. Aligns with the Foundation principle of one supported route to each statutory calculation; no new calculator is introduced.
 
-- [ ] **DI-18 · P2 — Make assumptions, sources, naming, and remembered state visible.** Essential context lives in optional Learn, product/strategy names vary across the route and metadata, and device persistence/reset behaviour is not clear at the decision point.
+- [ ] **DI-26 · P2 — Align the empty-state instructions with the input contract.** The empty state asks for "company profit" and then expenses, while the fields are Annual Revenue and Business Expenses (excluding the salary being compared); following the instructions can deduct expenses twice. Verified from PR #120.
 
-  **DoD:** A visible context strip states tax year, region, projection period, and selected scenario, with accessible links to calculation basis and relevant primary sources. Route title, heading, navigation, metadata, FAQ placement, and strategy labels use consistent task language; qualified estimates replace unbounded recommendation/optimal claims. Users are told figures are remembered on this device, can clearly erase them, and can undo an accidental reset or recover equivalently. Expiry/tax-year restoration and the existing hidden-detail notice remain correct and tested; Quick Start reveals active saved details rather than concealing their effect. The dated audit remains evidence, and evergreen guidance reflects the final verified behaviour.
+  **DoD:** Empty-state steps, field labels, hints and tooltips describe the same revenue-minus-expenses contract and state which payroll costs to exclude. A component test pins the wording against the mounted fields. No new input mode is added without a product decision.
+
+- [ ] **DI-27 · P2 — Disclose that amounts already paid do not constrain annual strategies.** Entering £20,000 salary and £5,000 dividends already paid leaves every strategy unchanged, including a £12,570 Baseline Mix salary below the salary already paid. Verified from PR #120.
+
+  **DoD:** Results state that comparisons are full-year totals not adjusted for amounts already paid, and warn when a strategy's salary or dividends fall below amounts already paid. A remaining-year planning contract (paid-to date, director NI method, payroll history) requires an explicit product decision before implementation and is not part of this item.
+
 
 ### Verification
 
@@ -237,5 +278,18 @@ These are not active for the R&D app unless traffic evidence or an explicit prod
 - Local Search Console CSV analyser. Trigger: redacted page/query exports are available and another manual reconciliation would otherwise be required. DoD: a small credential-free script produces reproducible summaries without storing personal or sensitive exports.
 - New calculator variants such as reverse salary, two-job, pro-rata, bonus/overtime, or salary comparison. Trigger: an explicit product decision that one variant is genuinely useful, evaluated one at a time. DoD: the chosen variant ships tested and verified, not as growth-page coverage.
 - Separate FAQ/HowTo/`llms.txt` expectation docs. Trigger: evidence that the existing static HTML, visible citations, Dataset JSON-LD and crawlable tax facts stop serving AEO/GEO needs. DoD: a documented decision either adds the docs with owners or confirms the current assets suffice.
+- Director Intelligence design and refactoring proposals DI-15, DI-17 and DI-18 (from the [18 October audit](reports/director-intelligence-audit-2026-10-18.md)). These are not defects: they propose a mobile hierarchy, input-component consolidation and context/naming/persistence changes. Trigger: an explicit product decision. Verified facts inside them (dormant input modules with stale help, inconsistent page naming) stay true; their stated DoDs are retained below for reference.
+
+  - **DI-15 · Proposal — Simplify the mobile journey and visual hierarchy.** The empty state delays the main entry action; repeated summary cards and expanded workings make results long; sliders lack precise entry, Your Setup requires hunting through Full Inputs, and normal tax costs use error-like colour.
+
+    **DoD:** The first mobile viewport offers an obvious Enter company figures action and concise task explanation; any example mode is explicitly distinguished from real inputs. One primary take-home result, selected salary/dividend split, reserves, and important checks lead the page, with repeated metrics compacted and detailed workings/education available on demand. Sliders also offer exact numeric entry, a visible current value, and reset; Your Setup has a direct edit route with explicit apply/cancel/reset/clear semantics. Major touch actions are comfortable to target, mobile text/keyboard behaviour is checked on iOS, jargon such as YTD is explained, scripted navigation respects reduced-motion settings, and navigation prioritises the current workflow with labelled major actions rather than competing icon-only menus. Normal deductions use neutral styling; error/success colour has a consistent meaning and shared radius/spacing/border tokens retain the Ledger identity. Before/after desktop/mobile captures demonstrate the revised journey without removing required detail.
+
+  - **DI-17 · Proposal — Consolidate live input components and scenario ownership.** The large mounted `InputsPanel` duplicates seven standalone input modules; those modules and `TaxBreakdownTable` have no live consumer beyond exports, while repeated active-scenario hooks can repeat calculation work.
+
+    **DoD:** An import/consumer audit identifies the production owner of every field and breakdown; unused paths are retired or deliberately integrated after checking consumers, with stale examples/help corrected. Coherent input groups share parsing, validation, labels, and help; tests exercise the mounted production paths instead of treating dormant-module tests as live coverage. Objective, strategy/custom salary, profit adjustment, validated inputs, resolved financials, and result provenance have one coherent ownership path; repeated scenario work is centralised where profiling justifies it. Existing tax-domain owners are preserved, no duplicate calculator/generic rules framework is introduced, and interaction performance is measured before/after any optimisation.
+
+  - **DI-18 · Proposal — Make assumptions, sources, naming, and remembered state visible.** Essential context lives in optional Learn, product/strategy names vary across the route and metadata, and device persistence/reset behaviour is not clear at the decision point.
+
+    **DoD:** A visible context strip states tax year, region, projection period, and selected scenario, with accessible links to calculation basis and relevant primary sources. Route title, heading, navigation, metadata, FAQ placement, and strategy labels use consistent task language; qualified estimates replace unbounded recommendation/optimal claims. Users are told figures are remembered on this device, can clearly erase them, and can undo an accidental reset or recover equivalently. Expiry/tax-year restoration and the existing hidden-detail notice remain correct and tested; Quick Start reveals active saved details rather than concealing their effect. The dated audit remains evidence, and evergreen guidance reflects the final verified behaviour.
 
 New work should add a small, concrete item here only when it is not going straight into an issue or pull request.
