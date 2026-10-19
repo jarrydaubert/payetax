@@ -27,7 +27,7 @@ Current correctness sequence:
 2. Transparent calculation results.
 3. Independent fixture/test-portfolio completion and Foundation reconciliation.
 
-Verified Director Intelligence correctness exceptions (see [Urgent correctness exceptions](#urgent-correctness-exceptions)) may be taken as small independent slices between these items; they do not reorder them. The verified [main-calculator input-integrity defects](#main-calculator-input-integrity) are taken the same way, after DI-01, whose parser they reuse.
+Verified Director Intelligence correctness exceptions (see [Urgent correctness exceptions](#urgent-correctness-exceptions)) may be taken as small independent slices between these items; they do not reorder them. The verified [main-calculator input-integrity defects](#main-calculator-input-integrity) are taken the same way, immediately after DI-01, whose parser they reuse.
 
 ### Foundation
 
@@ -80,7 +80,7 @@ below.
 
 ### Main calculator input integrity
 
-Browser-verified on 19 October 2026 in Chromium and WebKit against a local server at `9c72f88a`. Both start in the shared `NumberInput` atom, and the second also leaves stale results on screen. They are recorded separately from the Director items.
+Both defects start in the shared `NumberInput` atom, and the second also leaves stale results on screen. They are recorded separately from the Director items and scheduled immediately after DI-01, as separate PRs that reuse its parser (see the [agreed order](#urgent-correctness-exceptions)). Browser evidence: [PR #123](https://github.com/jarrydaubert/payetax/pull/123).
 
 - [ ] **P1 — Currency fields silently change amounts.** Additional income source amounts (`IncomeSourceList`, `NumberInput decimals={0}`) drop the decimal point: typing or pasting `1234.56` or `£1,234.56` displays `123,456`, and the calculation uses £123,456 (Gross Pay £153,456 on a £30,000 salary). In every `NumberInput`, a minus sign is silently dropped (`-500` becomes £500) and malformed text becomes 0 (`abc`, and `1.2.3` in two-decimal fields). Salary and other two-decimal fields keep pence correctly.
 
@@ -145,22 +145,23 @@ These items silently alter inputs or show wrong money figures, deadlines or stat
 the first working rule they may be taken as small independent slices between the Foundation items
 in the current correctness sequence; they do not reorder that sequence, and an exception that needs
 a Foundation change waits for, or is folded into, that Foundation item. DI-05, DI-06, DI-26 and
-DI-27 were reclassified as exceptions on 19 October 2026 because they show or send wrong money
-figures.
+DI-27 are exceptions because they show or send wrong money figures.
 
 Agreed order, one small PR per step unless stated:
 
 1. DI-01 with the minimal part of DI-02: an empty or invalid required input clears the result or
    marks it not current, and disables email.
-2. The interim email guard from DI-05.
-3. DI-07, then DI-26, DI-23, DI-06 and DI-27.
-4. Company budget: DI-19, then DI-21, as separate PRs.
-5. Personal tax: DI-08 with DI-24, then DI-20, then DI-25, as separate PRs. DI-08, DI-20, DI-24 and
+2. Both [main-calculator input-integrity fixes](#main-calculator-input-integrity), as separate PRs
+   reusing DI-01's parser: currency parsing first, then focus-and-leave with stale results.
+3. The interim email guard from DI-05.
+4. DI-07, then DI-26, DI-23, DI-06 and DI-27.
+5. Company budget: DI-19, then DI-21, as separate PRs.
+6. Personal tax: DI-08 with DI-24, then DI-20, then DI-25, as separate PRs. DI-08, DI-20, DI-24 and
    DI-25 share `strategyComparison.ts` income attribution; the DI-08/DI-24 PR settles the shared
    helper's design.
-6. DI-04, the rest of DI-02, DI-05, then DI-03.
+7. DI-04, the rest of DI-02, DI-05, then DI-03.
 
-Foundation item 1 is planned between steps 3 and 4, and Foundation item 2 after step 5.
+Foundation item 1 is planned between steps 4 and 5, and Foundation item 2 after step 6.
 
 - [ ] **DI-01 · P1 — Preserve currency amounts and editing behaviour.** `InputsPanel` removes decimal points and signs; entering `1234.56` becomes `£123,456` across the live currency-field path.
 
@@ -180,7 +181,7 @@ Foundation item 1 is planned between steps 3 and 4, and Foundation item 2 after 
 
 - [ ] **DI-05 · P1 — Export the displayed scenario and fulfil the email promise.** Profit/salary what-if state, selected strategy, objective, and accounting-period settings are absent from the email snapshot; the server regenerates the original comparison and the dialog promises key dates that are not generated.
 
-  **Interim guard (lands straight after DI-01):** until the full fix, email is unavailable, with a visible reason, whenever the displayed scenario differs from what the email would contain. That covers a what-if salary or profit, or a selected strategy other than the one the email reports. The dialog does not promise key dates or other content the email lacks.
+  **Interim guard (lands straight after DI-01 and the main-calculator input fixes):** until the full fix, email is unavailable, with a visible reason, whenever the displayed scenario differs from what the email would contain. That covers a what-if salary or profit, or a selected strategy other than the one the email reports. The dialog does not promise key dates or other content the email lacks.
 
   **DoD:** Display and export share a validated scenario snapshot containing all inputs needed to reproduce the active result; the server recalculates from that snapshot rather than trusting client-supplied tax totals. Reports clearly distinguish current scenario, original inputs, and comparison alternatives. Salary/profit what-if values and annual/monthly modes reproduce on-screen figures in generated HTML and text; year-end settings and key dates are included if promised, otherwise the promise is corrected. Mocked browser requests and generated-email assertions prove parity without sending real email. Follows DI-04 and the rest of DI-02, which define the active scenario and the validated snapshot it exports.
 

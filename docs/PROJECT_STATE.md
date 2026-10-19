@@ -228,11 +228,11 @@ defects that silently alter inputs or show wrong money figures, deadlines or sta
 are listed under the backlog's
 [urgent correctness exceptions](BACKLOG.md#urgent-correctness-exceptions). Under the backlog's first
 working rule, they may be fixed as small independent slices between the items above, starting with
-currency-input preservation and minimal stale-result protection, followed promptly by Corporation
-Tax deadline arithmetic; the backlog records the agreed order. Two
-[main-calculator input-integrity defects](BACKLOG.md#main-calculator-input-integrity), verified on
-19 October 2026, are taken the same way after the Director currency fix. They do not reorder
-items 1–3, they must reuse existing tax-domain owners, and any exception that needs a Foundation change waits for, or is folded into, that item. Director design and
+currency-input preservation and minimal stale-result protection. Two browser-verified
+[main-calculator input-integrity defects](BACKLOG.md#main-calculator-input-integrity) follow
+immediately, then the interim Director email guard and Corporation Tax deadline arithmetic; the
+backlog records the agreed order. They do not reorder items 1–3, they must reuse existing
+tax-domain owners, and any exception that needs a Foundation change waits for, or is folded into, that item. Director design and
 refactoring proposals are parked.
 
 Optional polish does not outrank these correctness items.
