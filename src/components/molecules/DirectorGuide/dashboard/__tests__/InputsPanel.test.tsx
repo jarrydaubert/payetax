@@ -1,5 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
+import { CURRENCY_INPUT_ERRORS } from '@/lib/currencyInput';
 import { useDirectorGuideStore } from '@/store/directorGuideStore';
 import { InputsPanel } from '../InputsPanel';
 
@@ -294,5 +296,251 @@ describe('DirectorGuide InputsPanel', () => {
     form = useDirectorGuideStore.getState().formData;
     expect(form.yourSetupSalary).toBeUndefined();
     expect(form.yourSetupDividends).toBeUndefined();
+  });
+
+  describe('currency fields (DI-01)', () => {
+    const revenueInput = () => screen.getByLabelText('Annual Revenue') as HTMLInputElement;
+    const expensesInput = () => screen.getByLabelText('Business Expenses') as HTMLInputElement;
+    const formData = () => useDirectorGuideStore.getState().formData;
+
+    it('preserves pence typed into the live annual revenue field', async () => {
+      const user = userEvent.setup();
+      render(<InputsPanel />);
+
+      await user.type(revenueInput(), '1234.56');
+      expect(formData().revenue).toBe(1234.56);
+      // Not reformatted while editing.
+      expect(revenueInput()).toHaveValue('1234.56');
+
+      await user.tab();
+      expect(revenueInput()).toHaveValue('£1,234.56');
+      expect(formData().revenue).toBe(1234.56);
+    });
+
+    it.each([
+      ['1234.56'],
+      ['1,234.56'],
+      ['£1,234.56'],
+    ])('resolves pasted %j to £1,234.56', async (pasted) => {
+      const user = userEvent.setup();
+      render(<InputsPanel />);
+
+      await user.click(expensesInput());
+      await user.paste(pasted);
+      expect(formData().expenses).toBe(1234.56);
+
+      await user.tab();
+      expect(expensesInput()).toHaveValue('£1,234.56');
+    });
+
+    it('rejects an unsupported negative amount with a specific, associated error', async () => {
+      const user = userEvent.setup();
+      useDirectorGuideStore.getState().setRevenue(5000);
+      render(<InputsPanel />);
+
+      const input = revenueInput();
+      await user.type(input, '-500', { initialSelectionStart: 0, initialSelectionEnd: 6 });
+
+      // Never converted into another amount: the store keeps its last valid value and the field
+      // is flagged invalid so results are invalidated.
+      expect(formData().revenue).toBe(5000);
+      expect(useDirectorGuideStore.getState().inputErrors.revenue).toBe(
+        CURRENCY_INPUT_ERRORS.negative,
+      );
+
+      await user.tab();
+      expect(input).toHaveValue('-500');
+      expect(input).toHaveAttribute('aria-invalid', 'true');
+      const error = screen.getByText(CURRENCY_INPUT_ERRORS.negative);
+      expect(input.getAttribute('aria-describedby')?.split(' ')).toEqual(
+        expect.arrayContaining([error.id, `${input.id}-hint`]),
+      );
+    });
+
+    it.each([
+      ['12a', CURRENCY_INPUT_ERRORS.malformed],
+      ['1,23', CURRENCY_INPUT_ERRORS.commas],
+      ['10.999', CURRENCY_INPUT_ERRORS.decimals],
+    ])('explains malformed input %j instead of transforming it', async (text, message) => {
+      const user = userEvent.setup();
+      render(<InputsPanel />);
+
+      await user.click(expensesInput());
+      await user.paste(text);
+      await user.tab();
+
+      expect(screen.getByText(message)).toBeInTheDocument();
+      expect(expensesInput()).toHaveValue(text);
+      // No amount is derived from the text; the field is flagged so results are invalidated.
+      expect(formData().expenses).toBeUndefined();
+      expect(useDirectorGuideStore.getState().inputErrors.expenses).toBe(message);
+    });
+
+    it('recovers when invalid text is corrected', async () => {
+      const user = userEvent.setup();
+      render(<InputsPanel />);
+
+      await user.type(revenueInput(), '-1');
+      await user.tab();
+      expect(screen.getByText(CURRENCY_INPUT_ERRORS.negative)).toBeInTheDocument();
+
+      await user.clear(revenueInput());
+      await user.type(revenueInput(), '750.5');
+      await user.tab();
+
+      expect(screen.queryByText(CURRENCY_INPUT_ERRORS.negative)).not.toBeInTheDocument();
+      expect(revenueInput()).not.toHaveAttribute('aria-invalid');
+      expect(revenueInput()).toHaveValue('£750.50');
+      expect(formData().revenue).toBe(750.5);
+      expect(useDirectorGuideStore.getState().inputErrors).toEqual({});
+    });
+
+    it('keeps an empty field distinct from zero', async () => {
+      const user = userEvent.setup();
+      render(<InputsPanel />);
+
+      await user.type(revenueInput(), '0');
+      await user.tab();
+      expect(formData().revenue).toBe(0);
+      expect(revenueInput()).toHaveValue('£0');
+
+      await user.clear(revenueInput());
+      await user.tab();
+      expect(formData().revenue).toBeUndefined();
+      expect(revenueInput()).toHaveValue('');
+    });
+
+    it('does not move the caret or rewrite text during a mid-string edit', async () => {
+      const user = userEvent.setup();
+      render(<InputsPanel />);
+      const input = revenueInput();
+
+      await user.type(input, '1234.56');
+      await user.type(input, '9', { initialSelectionStart: 2, initialSelectionEnd: 2 });
+
+      expect(input).toHaveValue('12934.56');
+      expect(input.selectionStart).toBe(3);
+      expect(formData().revenue).toBe(12934.56);
+    });
+
+    it('edits a formatted amount in place', async () => {
+      const user = userEvent.setup();
+      useDirectorGuideStore.getState().setRevenue(1000);
+      render(<InputsPanel />);
+      const input = revenueInput();
+      expect(input).toHaveValue('£1,000');
+
+      await user.type(input, '2', { initialSelectionStart: 2, initialSelectionEnd: 2 });
+
+      expect(input).toHaveValue('£12,000');
+      expect(input.selectionStart).toBe(3);
+      expect(formData().revenue).toBe(12000);
+    });
+
+    it('exposes a decimal keypad on every currency field', () => {
+      render(<InputsPanel />);
+      fireEvent.click(screen.getByRole('button', { name: 'Full Inputs' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Advanced Options' }));
+
+      for (const label of [
+        'Annual Revenue',
+        'Business Expenses',
+        'YTD Salary',
+        'YTD Dividends',
+        'Other Drawings',
+        'Other Personal Income',
+        'Employer Pension',
+        'Company Car BIK',
+        'Losses Brought Forward',
+        'Minimum Salary',
+        'Your Current Salary',
+        'Your Current Dividends',
+      ]) {
+        expect(screen.getByLabelText(label)).toHaveAttribute('inputmode', 'decimal');
+      }
+    });
+
+    it('preserves pence in optional amounts and treats a cleared optional amount as £0', async () => {
+      const user = userEvent.setup();
+      render(<InputsPanel />);
+      await user.click(screen.getByRole('button', { name: 'Full Inputs' }));
+
+      const ytdSalary = screen.getByLabelText('YTD Salary');
+      await user.clear(ytdSalary);
+      await user.paste('£1,500.25');
+      expect(formData().ytdSalary).toBe(1500.25);
+
+      await user.clear(ytdSalary);
+      expect(formData().ytdSalary).toBe(0);
+    });
+
+    it('preserves pence in monthly mode fields', async () => {
+      const user = userEvent.setup();
+      useDirectorGuideStore.getState().setMode('monthly');
+      render(<InputsPanel />);
+
+      await user.type(screen.getByLabelText('Monthly Contract Income'), '3,250.75');
+      await user.type(screen.getByLabelText('Monthly Business Expenses'), '1200.10');
+      const cash = screen.getByLabelText('Cash In Bank');
+      await user.clear(cash);
+      await user.type(cash, '5000.99');
+
+      expect(formData().monthlyIncome).toBe(3250.75);
+      expect(formData().monthlyExpenses).toBe(1200.1);
+      expect(formData().cashInBank).toBe(5000.99);
+    });
+
+    it('releases a field error when the field is no longer shown', async () => {
+      const user = userEvent.setup();
+      render(<InputsPanel />);
+
+      await user.type(revenueInput(), '-1');
+      expect(useDirectorGuideStore.getState().inputErrors.revenue).toBeDefined();
+
+      await user.click(screen.getByRole('button', { name: 'Monthly' }));
+      expect(useDirectorGuideStore.getState().inputErrors).toEqual({});
+      // The monthly field in the same position must not inherit the annual field's text.
+      expect(screen.getByLabelText('Monthly Contract Income')).toHaveValue('');
+      expect(screen.queryByText(CURRENCY_INPUT_ERRORS.negative)).not.toBeInTheDocument();
+    });
+
+    it('discards unparsed text on reset', async () => {
+      const user = userEvent.setup();
+      render(<InputsPanel />);
+
+      await user.type(revenueInput(), 'abc');
+      await user.tab();
+      expect(screen.getByText(CURRENCY_INPUT_ERRORS.malformed)).toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'Reset' }));
+
+      expect(revenueInput()).toHaveValue('');
+      expect(screen.queryByText(CURRENCY_INPUT_ERRORS.malformed)).not.toBeInTheDocument();
+      expect(useDirectorGuideStore.getState().inputErrors).toEqual({});
+    });
+
+    it('disables Apply in Compare My Setup while a draft amount is invalid', async () => {
+      const user = userEvent.setup();
+      render(<InputsPanel />);
+      await user.click(screen.getByRole('button', { name: 'Full Inputs' }));
+
+      const salary = screen.getByLabelText('Your Current Salary');
+      await user.type(salary, '12,570.50');
+      expect(screen.getByRole('button', { name: 'Apply' })).toBeEnabled();
+
+      await user.clear(salary);
+      await user.type(salary, '-12');
+      await user.tab();
+      expect(screen.getByRole('button', { name: 'Apply' })).toBeDisabled();
+      expect(screen.getByText(CURRENCY_INPUT_ERRORS.negative)).toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'Reset Draft' }));
+      expect(screen.getByLabelText('Your Current Salary')).toHaveValue('');
+      expect(screen.queryByText(CURRENCY_INPUT_ERRORS.negative)).not.toBeInTheDocument();
+
+      await user.type(screen.getByLabelText('Your Current Salary'), '12570.5');
+      await user.click(screen.getByRole('button', { name: 'Apply' }));
+      expect(formData().yourSetupSalary).toBe(12570.5);
+    });
   });
 });

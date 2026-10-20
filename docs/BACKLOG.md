@@ -27,7 +27,7 @@ Current correctness sequence:
 2. Transparent calculation results.
 3. Independent fixture/test-portfolio completion and Foundation reconciliation.
 
-Verified Director Intelligence correctness exceptions (see [Urgent correctness exceptions](#urgent-correctness-exceptions)) may be taken as small independent slices between these items; they do not reorder them. The verified [main-calculator input-integrity defects](#main-calculator-input-integrity) are taken the same way, immediately after DI-01, whose parser they reuse.
+Verified Director Intelligence correctness exceptions (see [Urgent correctness exceptions](#urgent-correctness-exceptions)) may be taken as small independent slices between these items; they do not reorder them. The verified [main-calculator input-integrity defects](#main-calculator-input-integrity) are taken the same way, next, reusing the shared currency parser DI-01 introduced (`src/lib/currencyInput.ts`).
 
 ### Foundation
 
@@ -80,11 +80,11 @@ below.
 
 ### Main calculator input integrity
 
-Both defects start in the shared `NumberInput` atom, and the second also leaves stale results on screen. They are recorded separately from the Director items and scheduled immediately after DI-01, as separate PRs that reuse its parser (see the [agreed order](#urgent-correctness-exceptions)). Browser evidence: [PR #123](https://github.com/jarrydaubert/payetax/pull/123).
+Both defects start in the shared `NumberInput` atom, and the second also leaves stale results on screen. They are recorded separately from the Director items and scheduled next, as separate PRs that reuse the shared currency parser in `src/lib/currencyInput.ts` (see the [agreed order](#urgent-correctness-exceptions)). Browser evidence: [PR #123](https://github.com/jarrydaubert/payetax/pull/123).
 
 - [ ] **P1 — Currency fields silently change amounts.** Additional income source amounts (`IncomeSourceList`, `NumberInput decimals={0}`) drop the decimal point: typing or pasting `1234.56` or `£1,234.56` displays `123,456`, and the calculation uses £123,456 (Gross Pay £153,456 on a £30,000 salary). In every `NumberInput` (parsing via `parseFormattedValue` in `src/lib/utils.ts`), a minus sign is silently dropped (`-500` becomes £500) and malformed text becomes 0 (`abc`, and `1.2.3` in two-decimal fields). Salary and other two-decimal fields keep pence correctly.
 
-  **DoD:** Amounts with pence are preserved or rejected with a specific error, never scaled. Negative and malformed text produce a specific error rather than another amount. Parsing reuses DI-01's parser rather than a second implementation. Regression coverage runs on the mounted main-calculator fields, including the income-source journey in `e2e/calculator-critical.spec.ts`.
+  **DoD:** Amounts with pence are preserved or rejected with a specific error, never scaled. Negative and malformed text produce a specific error rather than another amount. Parsing reuses `parseCurrencyInput` (`src/lib/currencyInput.ts`) rather than a second implementation. Regression coverage runs on the mounted main-calculator fields, including the income-source journey in `e2e/calculator-critical.spec.ts`.
 
 - [ ] **P1 — Focusing a filled field and leaving it erases the value while the old result stays visible.** `NumberInput` clears its display on focus by default, and blur parses the empty text as 0. With a £30,000 salary already calculated, clicking into Salary and tabbing away sets the salary to £0.00. After Calculate, the validation message appears, but the £30,000 results remain on screen.
 
@@ -148,31 +148,26 @@ in the current correctness sequence; they do not reorder that sequence, and an e
 a Foundation change waits for, or is folded into, that Foundation item. DI-05, DI-06, DI-26 and
 DI-27 are exceptions because they show or send wrong money figures (decision: PR #123).
 
-Agreed order, with one small PR per item unless stated otherwise (DI-01 lands with the minimal
-part of DI-02, and DI-08 with DI-24):
+Agreed order, with one small PR per item unless stated otherwise (DI-08 lands with DI-24). DI-01
+and the minimal part of DI-02 have landed:
 
-1. DI-01 with the minimal part of DI-02: an empty or invalid required input clears the result or
-   marks it not current, and disables email.
-2. Both [main-calculator input-integrity fixes](#main-calculator-input-integrity), as separate PRs
-   reusing DI-01's parser: currency parsing first, then focus-and-leave with stale results.
-3. The interim email guard from DI-05.
-4. DI-07, then DI-26, DI-23, DI-06 and DI-27.
-5. Company budget: DI-19, then DI-21.
-6. Personal tax: DI-08 with DI-24, then DI-20, then DI-25. DI-08, DI-20, DI-24 and DI-25 share
+1. Both [main-calculator input-integrity fixes](#main-calculator-input-integrity), as separate PRs
+   reusing the shared currency parser: currency parsing first, then focus-and-leave with stale
+   results.
+2. The interim email guard from DI-05.
+3. DI-07, then DI-26, DI-23, DI-06 and DI-27.
+4. Company budget: DI-19, then DI-21.
+5. Personal tax: DI-08 with DI-24, then DI-20, then DI-25. DI-08, DI-20, DI-24 and DI-25 share
    `strategyComparison.ts` income attribution; the DI-08/DI-24 PR settles the shared helper's
    design.
-7. DI-04, the rest of DI-02, DI-05, then DI-03.
+6. DI-04, the rest of DI-02, DI-05, then DI-03.
 
-In the current correctness sequence, explicit pension-method handling is planned after step 4
-and before step 5, and transparent calculation results after step 6.
+In the current correctness sequence, explicit pension-method handling is planned after step 3
+and before step 4, and transparent calculation results after step 5.
 
-- [ ] **DI-01 · P1 — Preserve currency amounts and editing behaviour.** `InputsPanel` removes decimal points and signs; entering `1234.56` becomes `£123,456` across the live currency-field path.
+- [ ] **DI-02 · P1 — Expose validation and updating state (remaining scope).** An empty or invalid required input, or any invalid amount, now removes the previous result and disables email (minimal slice, landed with DI-01). Still open: the debounced recalculation leaves the previous result on screen, looking current, until the new one arrives; the store's `error` and `isCalculating` are not surfaced; there is no summary when several fields need attention; and email and save do not yet share one validated input snapshot with the display.
 
-  **DoD:** One shared currency field separates editable text from the parsed amount; `1234.56`, `1,234.56`, and `£1,234.56` all resolve to £1,234.56; unsupported negative or malformed values produce a specific error instead of another amount. Empty and zero remain distinct, formatting does not move the caret during mid-string editing, and mobile fields expose a decimal input mode. Regression coverage exercises pasted pence, commas, symbols, clearing, invalid signs, and mid-string edits on the mounted input panel, plus one end-to-end case with a pence amount whose expected result is independently derived. That case is asserted in a test with its derivation recorded in the PR; it does not create the Director fixture suite, which starts with DI-19.
-
-- [ ] **DI-02 · P1 — Invalidate stale results and expose validation state.** Clearing a required field leaves the previous recommendation visible because the auto-calculation effect returns without invalidating its comparison; dashboard errors and calculating state are not surfaced.
-
-  **DoD:** Incomplete, invalid, updating, and current-result states are explicit and visible; clearing revenue/expenses or switching to an incomplete monthly form removes or clearly marks the previous result. Field errors are associated with their controls, multi-field failures have an actionable summary, and email/save actions require the same current validated input snapshot used by the display. Browser regressions cover invalidation, recovery, mode changes, and export gating.
+  **DoD:** Incomplete, invalid, updating, and current-result states are explicit and visible. Field errors stay associated with their controls (currency fields already are), multi-field failures have an actionable summary, and email/save actions require the same current validated input snapshot used by the display. Browser regressions cover the updating state, recovery, mode changes, and export gating against that snapshot.
 
 - [ ] **DI-03 · P1 — Separate affordable monthly draw from desired spending.** The safe-draw helper returns the requested minimum when its cash ceiling is zero, while monthly outputs use the baseline mixed strategy rather than the active what-if scenario.
 
@@ -184,7 +179,7 @@ and before step 5, and transparent calculation results after step 6.
 
 - [ ] **DI-05 · P1 — Export the displayed scenario and fulfil the email promise.** Profit/salary what-if state, selected strategy, objective, and accounting-period settings are absent from the email snapshot; the server regenerates the original comparison and the dialog promises key dates that are not generated.
 
-  **Interim guard (lands straight after DI-01 and the main-calculator input fixes):** until the full fix, email is unavailable, with a visible reason, whenever the displayed scenario differs from what the email would contain. This includes at least a what-if salary or profit, a selected strategy other than the one the email reports, and a chosen objective, none of which the email payload currently carries. The dialog does not promise key dates or other content the email lacks. Mocked-request browser tests show email disabled, with its reason, for each divergence and enabled when the displayed scenario matches; a dialog copy test confirms key dates are no longer promised.
+  **Interim guard (lands straight after the main-calculator input fixes):** until the full fix, email is unavailable, with a visible reason, whenever the displayed scenario differs from what the email would contain. This includes at least a what-if salary or profit, a selected strategy other than the one the email reports, and a chosen objective, none of which the email payload currently carries. The dialog does not promise key dates or other content the email lacks. Mocked-request browser tests show email disabled, with its reason, for each divergence and enabled when the displayed scenario matches; a dialog copy test confirms key dates are no longer promised.
 
   **DoD:** Display and export share a validated scenario snapshot containing all inputs needed to reproduce the active result; the server recalculates from that snapshot rather than trusting client-supplied tax totals. Reports clearly distinguish current scenario, original inputs, and comparison alternatives. Salary/profit what-if values and annual/monthly modes reproduce on-screen figures in generated HTML and text; year-end settings and key dates are included if promised, otherwise the promise is corrected. Mocked browser requests and generated-email assertions prove parity without sending real email. Follows DI-04 and the rest of DI-02, which define the active scenario and the validated snapshot it exports.
 
@@ -276,6 +271,7 @@ and before step 5, and transparent calculation results after step 6.
 - [ ] Fixture provenance controls: per-scenario official-figure citations; derivations start from statutory numbers, never from repo thresholds; reviewer instructions verify against sources (the PR #83 lesson). DoD: every fixture carries a source citation and the review rule is written into `TESTING.md`.
 - [ ] Public human-readable calculator verification report generated from the fixture suites, replacing hand-written accuracy claims. DoD: the report generates from fixtures and the public claims cite it.
 - [ ] Machine-readable verification output (extend `/api/tax-rates` or a dedicated route). DoD: the route serves generated verification data and is covered by a test.
+- [ ] Director critical E2E on mobile viewports. `e2e/director-guide-critical.spec.ts` fails on `Mobile Chrome` on `main` as well as on the DI-01 branch: closing the Your Numbers drawer intermittently leaves it open, and the results assertions query a page that is inert while the drawer is open. The CI critical slice runs desktop Chromium only, so this is not gated. DoD: the Director critical spec passes on the `Mobile Chrome` project without retries, or the mobile drawer journey has its own stable spec.
 - [ ] Documented modelling assumptions and limitations (month-1 projection, NI year model and pension method). Non-cumulative tax-code limitations are now visible. DoD: the remaining assumptions are published where users see results and kept in sync with the engine.
 
 ### Trust and sourcing

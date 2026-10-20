@@ -20,6 +20,7 @@ jest.mock('@/lib/directorGuideAnalytics', () => ({
 }));
 
 jest.mock('@/store/directorGuideStore', () => ({
+  useHasDirectorInputErrors: jest.fn(() => false),
   useDirectorFormSlice: jest.fn(),
   useStrategyComparison: jest.fn(),
   useMonthlyModeOutput: jest.fn(),
@@ -126,6 +127,7 @@ describe('DirectorDashboard analytics', () => {
 
     (useDirectorGuideActions as unknown as jest.Mock).mockReturnValue({
       calculate: mockCalculate,
+      invalidateResults: jest.fn(),
       reset: jest.fn(),
     });
 
@@ -165,6 +167,7 @@ describe('DirectorDashboard analytics', () => {
 
     (useDirectorGuideActions as unknown as jest.Mock).mockReturnValue({
       calculate: mockCalculate,
+      invalidateResults: jest.fn(),
       reset: jest.fn(),
     });
 

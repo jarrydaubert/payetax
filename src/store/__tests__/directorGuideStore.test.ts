@@ -491,6 +491,105 @@ describe('DirectorGuideStore', () => {
     });
   });
 
+  describe('Result invalidation (DI-02)', () => {
+    function calculateCompleteResult() {
+      const store = useDirectorGuideStore.getState();
+      store.setRegion('rUK');
+      store.setRevenue(100000);
+      store.setExpenses(20000);
+      useDirectorGuideStore.getState().calculate();
+      expect(useDirectorGuideStore.getState().strategyComparison).not.toBeNull();
+    }
+
+    it('keeps revenue with pence exactly', () => {
+      useDirectorGuideStore.getState().setRevenue(1234.56);
+      expect(useDirectorGuideStore.getState().formData.revenue).toBe(1234.56);
+    });
+
+    it('tracks and clears per-field input errors', () => {
+      const store = useDirectorGuideStore.getState();
+      store.setInputError('revenue', 'Enter an amount');
+      store.setInputError('cashInBank', 'Enter an amount');
+      expect(useDirectorGuideStore.getState().inputErrors).toEqual({
+        revenue: 'Enter an amount',
+        cashInBank: 'Enter an amount',
+      });
+
+      useDirectorGuideStore.getState().setInputError('revenue', null);
+      expect(useDirectorGuideStore.getState().inputErrors).toEqual({
+        cashInBank: 'Enter an amount',
+      });
+    });
+
+    it('clears the previous result when a required input becomes empty', () => {
+      calculateCompleteResult();
+
+      useDirectorGuideStore.getState().setRevenue(undefined);
+      useDirectorGuideStore.getState().calculate();
+
+      const state = useDirectorGuideStore.getState();
+      expect(state.strategyComparison).toBeNull();
+      expect(state.results).toBeNull();
+      expect(state.error).toBe('Please fill in revenue, expenses, and region');
+    });
+
+    it('clears the previous result and refuses to calculate while any amount is invalid', () => {
+      calculateCompleteResult();
+      mockCalculateStrategyComparison.mockClear();
+
+      useDirectorGuideStore.getState().setInputError('ytdSalary', 'Enter an amount');
+      useDirectorGuideStore.getState().calculate();
+
+      const state = useDirectorGuideStore.getState();
+      expect(mockCalculateStrategyComparison).not.toHaveBeenCalled();
+      expect(state.strategyComparison).toBeNull();
+      expect(state.error).toBe('Please correct the highlighted amounts');
+    });
+
+    it('clears the previous result when switching to an incomplete monthly form', () => {
+      calculateCompleteResult();
+
+      useDirectorGuideStore.getState().setMode('monthly');
+      useDirectorGuideStore.getState().calculate();
+
+      expect(useDirectorGuideStore.getState().strategyComparison).toBeNull();
+      expect(useDirectorGuideStore.getState().monthlyModeOutput).toBeNull();
+    });
+
+    it('invalidateResults removes every derived result', () => {
+      calculateCompleteResult();
+      useDirectorGuideStore.getState().setSliderSalary(20000);
+
+      useDirectorGuideStore.getState().invalidateResults();
+
+      const state = useDirectorGuideStore.getState();
+      expect(state.results).toBeNull();
+      expect(state.strategyComparison).toBeNull();
+      expect(state.monthlyModeOutput).toBeNull();
+      expect(state.sliderSalary).toBeNull();
+      // Inputs are untouched; only derived results are removed.
+      expect(state.formData.revenue).toBe(100000);
+    });
+
+    it('reset clears input errors and advances the input revision', () => {
+      const before = useDirectorGuideStore.getState().inputRevision;
+      useDirectorGuideStore.getState().setInputError('revenue', 'Enter an amount');
+
+      useDirectorGuideStore.getState().reset();
+
+      const state = useDirectorGuideStore.getState();
+      expect(state.inputErrors).toEqual({});
+      expect(state.inputRevision).toBe(before + 1);
+    });
+
+    it('does not persist input errors', () => {
+      useDirectorGuideStore.getState().setInputError('revenue', 'Enter an amount');
+      const persisted = JSON.parse(localStorage.getItem(DIRECTOR_STORAGE_KEY) ?? '{}');
+      expect(persisted.state).toBeDefined();
+      expect(persisted.state.inputErrors).toBeUndefined();
+    });
+  });
+
   describe('Strategy Selection', () => {
     it('should set selected strategy', () => {
       useDirectorGuideStore.getState().setSelectedStrategy('allDividends');

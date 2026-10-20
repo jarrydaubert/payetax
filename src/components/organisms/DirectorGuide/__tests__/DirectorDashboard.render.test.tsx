@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { trackGuideReset } from '@/lib/directorGuideAnalytics';
 import { useDirectorGuideStore } from '@/store/directorGuideStore';
@@ -60,7 +60,14 @@ jest.mock('@/components/molecules/DirectorGuide/dashboard', () => ({
   ),
   MoneyFlowChart: () => <div>Money Flow</div>,
   RecommendationHero: () => <div>Recommendation Hero</div>,
-  SidebarNav: () => <div>Sidebar</div>,
+  SidebarNav: ({ onEmailResults }: { onEmailResults?: () => void }) => (
+    <div>
+      Sidebar
+      <button type='button' onClick={onEmailResults} disabled={!onEmailResults}>
+        Sidebar Email Results
+      </button>
+    </div>
+  ),
   SummaryCards: () => <div>Summary Cards</div>,
   SurvivalModePanel: () => <div data-testid='director-survival-mode'>Survival Mode</div>,
 }));
@@ -103,8 +110,31 @@ function createComparison(grossProfit: number) {
   };
 }
 
+/**
+ * A displayed result must come from complete, valid inputs: the dashboard invalidates any result
+ * whose inputs are incomplete (DI-02), so fixtures pair a comparison with the inputs behind it.
+ */
+function setCurrentResult(
+  grossProfit: number,
+  formData: Partial<ReturnType<typeof useDirectorGuideStore.getState>['formData']> = {},
+) {
+  const current = useDirectorGuideStore.getState();
+  useDirectorGuideStore.setState({
+    formData: {
+      ...current.formData,
+      region: 'rUK',
+      revenue: grossProfit + 20000,
+      expenses: 20000,
+      ...formData,
+    },
+    strategyComparison: createComparison(grossProfit) as never,
+  } as never);
+}
+
 describe('DirectorDashboard (normal mode)', () => {
   beforeEach(() => {
+    // Start every test from default inputs (mode, monthly fields, input errors) without tracking.
+    useDirectorGuideStore.getState().clearStaleState();
     jest.clearAllMocks();
     localStorage.clear();
     const current = useDirectorGuideStore.getState();
@@ -123,9 +153,7 @@ describe('DirectorDashboard (normal mode)', () => {
   });
 
   it('renders the main flow when comparison is available', () => {
-    useDirectorGuideStore.setState({
-      strategyComparison: createComparison(80000) as never,
-    } as never);
+    setCurrentResult(80000);
 
     render(<DirectorDashboard />);
 
@@ -135,10 +163,8 @@ describe('DirectorDashboard (normal mode)', () => {
   });
 
   it('shows monthly safe draw callout in monthly mode', () => {
-    const current = useDirectorGuideStore.getState();
+    setCurrentResult(80000, { mode: 'monthly', monthlyIncome: 3000, monthlyExpenses: 1000 });
     useDirectorGuideStore.setState({
-      formData: { ...current.formData, mode: 'monthly' } as never,
-      strategyComparison: createComparison(80000) as never,
       monthlyModeOutput: {
         monthsRemaining: 6,
         projectedRevenue: 18000,
@@ -159,14 +185,74 @@ describe('DirectorDashboard (normal mode)', () => {
   });
 
   it('opens the email dialog when CTA is clicked', () => {
-    useDirectorGuideStore.setState({
-      strategyComparison: createComparison(80000) as never,
-    } as never);
+    setCurrentResult(80000);
 
     render(<DirectorDashboard />);
     fireEvent.click(screen.getByText('Email My Results'));
 
     expect(screen.getByText('Results Dialog')).toBeInTheDocument();
+  });
+
+  describe('stale results (DI-02)', () => {
+    const expectResultAndEmailAvailable = () => {
+      expect(screen.getByText('Summary Cards')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Email My Results' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Sidebar Email Results' })).toBeEnabled();
+    };
+    const expectResultAndEmailRemoved = () => {
+      expect(screen.queryByText('Summary Cards')).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'Email My Results' })).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Sidebar Email Results' })).toBeDisabled();
+      expect(useDirectorGuideStore.getState().strategyComparison).toBeNull();
+    };
+
+    it.each([
+      ['revenue', () => useDirectorGuideStore.getState().setRevenue(undefined)],
+      ['expenses', () => useDirectorGuideStore.getState().setExpenses(undefined)],
+    ])('removes the result and disables email when %s is cleared', (_field, clear) => {
+      setCurrentResult(80000);
+      render(<DirectorDashboard />);
+      expectResultAndEmailAvailable();
+
+      act(() => clear());
+
+      expectResultAndEmailRemoved();
+      expect(screen.getByText(/Enter your numbers to compare director pay options/i)).toBeVisible();
+    });
+
+    it('removes the result when switching to an incomplete monthly form', () => {
+      setCurrentResult(80000);
+      render(<DirectorDashboard />);
+      expectResultAndEmailAvailable();
+
+      act(() => useDirectorGuideStore.getState().setMode('monthly'));
+
+      expectResultAndEmailRemoved();
+    });
+
+    it('pauses results and disables email while any amount is invalid', () => {
+      setCurrentResult(80000);
+      render(<DirectorDashboard />);
+      expectResultAndEmailAvailable();
+
+      act(() => useDirectorGuideStore.getState().setInputError('cashInBank', 'Enter an amount'));
+
+      expectResultAndEmailRemoved();
+      expect(screen.getByRole('status')).toHaveTextContent(
+        /Results are paused until every amount is valid/,
+      );
+    });
+
+    it('closes an open email dialog when its result is invalidated', () => {
+      setCurrentResult(80000);
+      render(<DirectorDashboard />);
+      fireEvent.click(screen.getByRole('button', { name: 'Email My Results' }));
+      expect(screen.getByText('Results Dialog')).toBeInTheDocument();
+
+      act(() => useDirectorGuideStore.getState().setRevenue(undefined));
+
+      expect(screen.queryByText('Results Dialog')).not.toBeInTheDocument();
+    });
   });
 
   it('shows the empty state when no comparison exists', () => {
