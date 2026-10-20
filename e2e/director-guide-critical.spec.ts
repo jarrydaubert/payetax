@@ -323,6 +323,17 @@ test.describe('Director Intelligence currency inputs @critical', () => {
 
     await revenueInput.blur();
     await expect(revenueInput).toHaveValue('£12,934.56');
+
+    // Editing the formatted amount again: focus shows plain edit text, so adding a digit cannot
+    // leave misplaced commas.
+    await revenueInput.click();
+    await expect(revenueInput).toHaveValue('12934.56');
+    await revenueInput.press('Home');
+    await page.keyboard.type('1');
+    await expect(revenueInput).toHaveValue('112934.56');
+    await revenueInput.blur();
+    await expect(revenueInput).toHaveValue('£112,934.56');
+    await expect(revenueInput).not.toHaveAttribute('aria-invalid', 'true');
   });
 
   test('invalid or empty required inputs remove the result and disable email @critical', async ({

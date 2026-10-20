@@ -122,6 +122,29 @@ export interface DirectorFormData {
 /** Form fields that can hold unparsed, invalid text. */
 export type DirectorInputField = keyof DirectorFormData;
 
+/** Text a person entered that is not a valid amount, with the reason. */
+export interface DirectorInvalidInput {
+  text: string;
+  error: string;
+}
+
+/** Fields each mode does not calculate from, so their invalid text cannot block that mode. */
+const FIELDS_UNUSED_BY_MODE: Record<DirectorGuideMode, ReadonlySet<DirectorInputField>> = {
+  annual: new Set<DirectorInputField>([
+    'monthlyIncome',
+    'monthlyExpenses',
+    'cashInBank',
+    'minimumMonthlyDraw',
+  ]),
+  monthly: new Set<DirectorInputField>(['revenue', 'expenses']),
+};
+
+/** Whether any field the current mode calculates from holds invalid text. */
+function hasBlockingInputErrors(state: Pick<DirectorGuideState, 'formData' | 'inputErrors'>) {
+  const unused = FIELDS_UNUSED_BY_MODE[state.formData.mode];
+  return Object.keys(state.inputErrors).some((field) => !unused.has(field as DirectorInputField));
+}
+
 /** Clears every derived result so nothing calculated from earlier inputs stays on screen. */
 const CLEARED_RESULTS = {
   results: null,
@@ -143,8 +166,9 @@ interface DirectorGuideState {
   monthlyModeOutput: MonthlyModeOutput | null;
   error: string | null;
 
-  // Input validity (not persisted): field key → message for text that is not a valid amount.
-  inputErrors: Partial<Record<DirectorInputField, string>>;
+  // Input validity (not persisted): field key → unparsed text that is not a valid amount, kept
+  // while the field is hidden or unmounted so it is never silently replaced by an older amount.
+  inputErrors: Partial<Record<DirectorInputField, DirectorInvalidInput>>;
   /** Incremented on reset so input fields discard any unparsed text. */
   inputRevision: number;
 
@@ -206,7 +230,7 @@ interface DirectorGuideActions {
   setProfitWhatIfPercent: (percent: number) => void;
 
   // Input validity
-  setInputError: (field: DirectorInputField, error: string | null) => void;
+  setInputError: (field: DirectorInputField, invalid: DirectorInvalidInput | null) => void;
 
   // Calculation
   calculate: () => void;
@@ -651,16 +675,16 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         // INPUT VALIDITY
         // ====================================================================
 
-        setInputError: (field, error) => {
+        setInputError: (field, invalid) => {
           set((state) => {
             const current = state.inputErrors[field];
-            if (error === null) {
+            if (invalid === null) {
               if (current === undefined) return state;
               const { [field]: _removed, ...rest } = state.inputErrors;
               return { inputErrors: rest };
             }
-            if (current === error) return state;
-            return { inputErrors: { ...state.inputErrors, [field]: error } };
+            if (current?.text === invalid.text && current.error === invalid.error) return state;
+            return { inputErrors: { ...state.inputErrors, [field]: { ...invalid } } };
           });
         },
 
@@ -677,9 +701,9 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         },
 
         calculate: () => {
-          const { formData, inputErrors } = get();
+          const { formData } = get();
 
-          if (Object.keys(inputErrors).length > 0) {
+          if (hasBlockingInputErrors(get())) {
             set({ ...CLEARED_RESULTS, error: 'Please correct the highlighted amounts' });
             return;
           }
@@ -961,10 +985,17 @@ export function useDirectorError() {
 }
 
 /**
- * Hook for whether any input holds text that is not a valid amount
+ * Hook for whether any input the current mode uses holds text that is not a valid amount
  */
 export function useHasDirectorInputErrors() {
-  return useDirectorGuideStore((state) => Object.keys(state.inputErrors).length > 0);
+  return useDirectorGuideStore(hasBlockingInputErrors);
+}
+
+/**
+ * Hook for every field's invalid text (including fields the current mode does not use)
+ */
+export function useDirectorInputErrors() {
+  return useDirectorGuideStore((state) => state.inputErrors);
 }
 
 /**

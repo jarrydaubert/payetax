@@ -8,7 +8,7 @@
 
 import { ChevronDown, ChevronUp, RotateCcw } from 'lucide-react';
 import { useEffect, useId, useState } from 'react';
-import { CurrencyInput } from '@/components/atoms/CurrencyInput';
+import { CurrencyInput, type CurrencyInputInvalidDraft } from '@/components/atoms/CurrencyInput';
 import { LabelTooltip } from '@/components/atoms/LabelTooltip';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -30,6 +30,7 @@ import {
   type DirectorInputField,
   useDirectorFormSlice,
   useDirectorGuideActions,
+  useDirectorInputErrors,
   useDirectorInputRevision,
   type YearEndMonth,
 } from '@/store/directorGuideStore';
@@ -47,6 +48,22 @@ const SECTION_HEADING_CLASS =
   'mb-4 font-semibold text-muted-foreground text-xs uppercase tracking-[0.08em]';
 
 const getHintId = (id?: string) => (id ? `${id}-hint` : undefined);
+
+/** Currency fields inside Advanced Options. */
+const ADVANCED_CURRENCY_FIELDS: readonly DirectorInputField[] = [
+  'pensionContribution',
+  'companyCarBIK',
+  'lossesBroughtForward',
+  'minimumSalaryRequirement',
+];
+/** Currency fields Quick Start hides (all still used in the calculation). */
+const DETAIL_CURRENCY_FIELDS: readonly DirectorInputField[] = [
+  'ytdSalary',
+  'ytdDividends',
+  'ytdDrawings',
+  'otherIncome',
+  ...ADVANCED_CURRENCY_FIELDS,
+];
 
 interface InputsPanelProps {
   onReset?: () => void;
@@ -66,14 +83,15 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [quickStartMode, setQuickStartMode] = useState(true);
   const inputRevision = useDirectorInputRevision();
+  const inputErrors = useDirectorInputErrors();
   const [yourSetupDraftSalary, setYourSetupDraftSalary] = useState<number | undefined>(undefined);
   const [yourSetupDraftDividends, setYourSetupDraftDividends] = useState<number | undefined>(
     undefined,
   );
-  const [yourSetupDraftErrors, setYourSetupDraftErrors] = useState({
-    salary: false,
-    dividends: false,
-  });
+  const [yourSetupDraftErrors, setYourSetupDraftErrors] = useState<{
+    salary?: CurrencyInputInvalidDraft;
+    dividends?: CurrencyInputInvalidDraft;
+  }>({});
   // Remounts the draft fields so Reset Draft/Clear also discard unparsed text.
   const [yourSetupDraftRevision, setYourSetupDraftRevision] = useState(0);
 
@@ -111,15 +129,19 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
   const isMonthlyMode = formData.mode === 'monthly';
   const selectedRegion = formData.region ?? '';
 
-  const validityFor = (field: DirectorInputField) => (error: string | null) =>
-    actions.setInputError(field, error);
+  const validityFor = (field: DirectorInputField) => (invalid: CurrencyInputInvalidDraft | null) =>
+    actions.setInputError(field, invalid);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: a reset (inputRevision) must also discard drafts
   useEffect(() => {
     setYourSetupDraftSalary(formData.yourSetupSalary);
     setYourSetupDraftDividends(formData.yourSetupDividends);
-  }, [formData.yourSetupSalary, formData.yourSetupDividends]);
+    setYourSetupDraftErrors({});
+  }, [formData.yourSetupSalary, formData.yourSetupDividends, inputRevision]);
 
-  const hasYourSetupDraftErrors = yourSetupDraftErrors.salary || yourSetupDraftErrors.dividends;
+  const hasYourSetupDraftErrors = Boolean(
+    yourSetupDraftErrors.salary || yourSetupDraftErrors.dividends,
+  );
   const hasYourSetupDraftChanges =
     hasYourSetupDraftErrors ||
     yourSetupDraftSalary !== formData.yourSetupSalary ||
@@ -133,7 +155,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
     formData.yourSetupDividends !== undefined;
 
   const discardYourSetupDraftText = () => {
-    setYourSetupDraftErrors({ salary: false, dividends: false });
+    setYourSetupDraftErrors({});
     setYourSetupDraftRevision((revision) => revision + 1);
   };
 
@@ -157,19 +179,30 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
     actions.setYourSetupDividends(undefined);
   };
 
+  // Detailed amounts hidden by Quick Start or a collapsed Advanced panel still feed the result, so
+  // invalid text in them must stay visible somewhere and keep results paused.
+  const advancedHasErrors = ADVANCED_CURRENCY_FIELDS.some((field) => inputErrors[field]);
+  const hasHiddenInputErrors =
+    quickStartMode && DETAIL_CURRENCY_FIELDS.some((field) => inputErrors[field]);
+  const isAdvancedOpen = advancedOpen || advancedHasErrors;
+
   const hiddenDetailLabels = [
-    formData.ytdSalary > 0 ? 'YTD salary' : null,
-    formData.ytdDividends > 0 ? 'YTD dividends' : null,
-    formData.ytdDrawings > 0 ? 'other drawings' : null,
-    formData.otherIncome > 0 ? 'other income' : null,
+    formData.ytdSalary > 0 || inputErrors.ytdSalary ? 'YTD salary' : null,
+    formData.ytdDividends > 0 || inputErrors.ytdDividends ? 'YTD dividends' : null,
+    formData.ytdDrawings > 0 || inputErrors.ytdDrawings ? 'other drawings' : null,
+    formData.otherIncome > 0 || inputErrors.otherIncome ? 'other income' : null,
     formData.hasOtherPAYEEmployment ? 'other PAYE employment' : null,
     formData.studentLoanPlans.length > 0 ? 'student loans' : null,
-    formData.pensionContribution > 0 ? 'pension' : null,
-    formData.companyCarBIK > 0 ? 'company car BIK' : null,
+    formData.pensionContribution > 0 || inputErrors.pensionContribution ? 'pension' : null,
+    formData.companyCarBIK > 0 || inputErrors.companyCarBIK ? 'company car BIK' : null,
     formData.associatedCompaniesCount !== 1 ? 'associated companies' : null,
     formData.hasEmploymentAllowance ? 'Employment Allowance' : null,
-    formData.lossesBroughtForward > 0 ? 'losses brought forward' : null,
-    formData.minimumSalaryRequirement !== undefined ? 'minimum salary' : null,
+    formData.lossesBroughtForward > 0 || inputErrors.lossesBroughtForward
+      ? 'losses brought forward'
+      : null,
+    formData.minimumSalaryRequirement !== undefined || inputErrors.minimumSalaryRequirement
+      ? 'minimum salary'
+      : null,
     formData.yourSetupSalary !== undefined || formData.yourSetupDividends !== undefined
       ? 'your setup comparison'
       : null,
@@ -196,6 +229,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
     actions.setHasEmploymentAllowance(false);
     actions.setLossesBroughtForward(0);
     actions.setMinimumSalaryRequirement(undefined);
+    for (const field of DETAIL_CURRENCY_FIELDS) actions.setInputError(field, null);
     handleClearYourSetup();
   };
 
@@ -335,6 +369,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 value={formData.monthlyIncome}
                 onValueChange={actions.setMonthlyIncome}
                 onValidityChange={validityFor('monthlyIncome')}
+                invalidDraft={inputErrors.monthlyIncome}
                 placeholder='£0'
                 className={INPUT_CLASS}
                 aria-describedby={getHintId(ids.monthlyIncome)}
@@ -353,6 +388,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 value={formData.monthlyExpenses}
                 onValueChange={actions.setMonthlyExpenses}
                 onValidityChange={validityFor('monthlyExpenses')}
+                invalidDraft={inputErrors.monthlyExpenses}
                 placeholder='£0'
                 className={INPUT_CLASS}
                 aria-describedby={getHintId(ids.monthlyExpenses)}
@@ -405,6 +441,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 value={formData.cashInBank}
                 onValueChange={(value) => actions.setCashInBank(value ?? 0)}
                 onValidityChange={validityFor('cashInBank')}
+                invalidDraft={inputErrors.cashInBank}
                 placeholder='£0'
                 className={INPUT_CLASS}
                 aria-describedby={getHintId(ids.cashInBank)}
@@ -423,6 +460,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 value={formData.minimumMonthlyDraw}
                 onValueChange={(value) => actions.setMinimumMonthlyDraw(value ?? 0)}
                 onValidityChange={validityFor('minimumMonthlyDraw')}
+                invalidDraft={inputErrors.minimumMonthlyDraw}
                 placeholder='£0'
                 className={INPUT_CLASS}
                 aria-describedby={getHintId(ids.minimumMonthlyDraw)}
@@ -463,6 +501,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 value={formData.revenue}
                 onValueChange={actions.setRevenue}
                 onValidityChange={validityFor('revenue')}
+                invalidDraft={inputErrors.revenue}
                 placeholder='£0'
                 className={INPUT_CLASS}
                 aria-describedby={getHintId(ids.revenue)}
@@ -482,6 +521,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 value={formData.expenses}
                 onValueChange={actions.setExpenses}
                 onValidityChange={validityFor('expenses')}
+                invalidDraft={inputErrors.expenses}
                 placeholder='£0'
                 className={INPUT_CLASS}
                 aria-describedby={getHintId(ids.expenses)}
@@ -594,6 +634,15 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           </button>
           {hasHiddenDetails ? (
             <div className='mt-4 border-primary/20 border-t pt-4'>
+              {hasHiddenInputErrors ? (
+                <p
+                  className='mb-2 text-destructive text-xs'
+                  data-testid='director-hidden-input-error'
+                >
+                  A hidden detailed amount is not valid, so results are paused. Review Details to
+                  correct it.
+                </p>
+              ) : null}
               <p className='text-primary text-xs'>
                 Saved detailed inputs are still active while hidden:{' '}
                 <span className='font-medium'>
@@ -639,6 +688,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 value={formData.ytdSalary}
                 onValueChange={(value) => actions.setYtdSalary(value ?? 0)}
                 onValidityChange={validityFor('ytdSalary')}
+                invalidDraft={inputErrors.ytdSalary}
                 placeholder='£0'
                 className={INPUT_CLASS}
                 aria-describedby={getHintId(ids.ytdSalary)}
@@ -657,6 +707,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 value={formData.ytdDividends}
                 onValueChange={(value) => actions.setYtdDividends(value ?? 0)}
                 onValidityChange={validityFor('ytdDividends')}
+                invalidDraft={inputErrors.ytdDividends}
                 placeholder='£0'
                 className={INPUT_CLASS}
                 aria-describedby={getHintId(ids.ytdDividends)}
@@ -675,6 +726,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 value={formData.ytdDrawings}
                 onValueChange={(value) => actions.setYtdDrawings(value ?? 0)}
                 onValidityChange={validityFor('ytdDrawings')}
+                invalidDraft={inputErrors.ytdDrawings}
                 placeholder='£0'
                 className={INPUT_CLASS}
                 aria-describedby={getHintId(ids.ytdDrawings)}
@@ -696,6 +748,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 value={formData.otherIncome}
                 onValueChange={(value) => actions.setOtherIncome(value ?? 0)}
                 onValidityChange={validityFor('otherIncome')}
+                invalidDraft={inputErrors.otherIncome}
                 placeholder='£0'
                 className={INPUT_CLASS}
                 aria-describedby={getHintId(ids.otherIncome)}
@@ -723,16 +776,21 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           <div className='mt-4'>
             <button
               type='button'
-              onClick={() => setAdvancedOpen(!advancedOpen)}
-              aria-expanded={advancedOpen}
+              onClick={() => setAdvancedOpen(!isAdvancedOpen)}
+              disabled={advancedHasErrors}
+              aria-expanded={isAdvancedOpen}
               aria-controls={ids.advancedPanel}
               className='flex w-full items-center justify-between rounded-sm border border-border/40 bg-card px-4 py-3 text-left text-muted-foreground text-sm transition-colors hover:border-border/40 hover:bg-accent/30'
             >
               <span className='font-medium'>Advanced Options</span>
-              {advancedOpen ? <ChevronUp className='size-4' /> : <ChevronDown className='size-4' />}
+              {isAdvancedOpen ? (
+                <ChevronUp className='size-4' />
+              ) : (
+                <ChevronDown className='size-4' />
+              )}
             </button>
 
-            {advancedOpen && (
+            {isAdvancedOpen && (
               <div
                 id={ids.advancedPanel}
                 className='mt-3 space-y-4 rounded-sm border border-border/40 bg-background p-4'
@@ -798,6 +856,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                     value={formData.pensionContribution}
                     onValueChange={(value) => actions.setPensionContribution(value ?? 0)}
                     onValidityChange={validityFor('pensionContribution')}
+                    invalidDraft={inputErrors.pensionContribution}
                     placeholder='£0'
                     className={INPUT_CLASS}
                     aria-describedby={getHintId(ids.pension)}
@@ -836,6 +895,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                     value={formData.companyCarBIK}
                     onValueChange={(value) => actions.setCompanyCarBIK(value ?? 0)}
                     onValidityChange={validityFor('companyCarBIK')}
+                    invalidDraft={inputErrors.companyCarBIK}
                     placeholder='£0'
                     className={INPUT_CLASS}
                     aria-describedby={getHintId(ids.carBik)}
@@ -873,6 +933,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                     value={formData.lossesBroughtForward}
                     onValueChange={(value) => actions.setLossesBroughtForward(value ?? 0)}
                     onValidityChange={validityFor('lossesBroughtForward')}
+                    invalidDraft={inputErrors.lossesBroughtForward}
                     placeholder='£0'
                     className={INPUT_CLASS}
                     aria-describedby={getHintId(ids.losses)}
@@ -894,6 +955,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                       actions.setMinimumSalaryRequirement(value === 0 ? undefined : value)
                     }
                     onValidityChange={validityFor('minimumSalaryRequirement')}
+                    invalidDraft={inputErrors.minimumSalaryRequirement}
                     placeholder='£0'
                     className={INPUT_CLASS}
                     aria-describedby={getHintId(ids.minSalary)}
@@ -919,9 +981,10 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 id={ids.yourSalary}
                 value={yourSetupDraftSalary}
                 onValueChange={setYourSetupDraftSalary}
-                onValidityChange={(error) =>
-                  setYourSetupDraftErrors((prev) => ({ ...prev, salary: error !== null }))
+                onValidityChange={(invalid) =>
+                  setYourSetupDraftErrors((prev) => ({ ...prev, salary: invalid ?? undefined }))
                 }
+                invalidDraft={yourSetupDraftErrors.salary}
                 placeholder='£0'
                 className={INPUT_CLASS}
                 aria-describedby={getHintId(ids.yourSalary)}
@@ -938,9 +1001,10 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 id={ids.yourDividends}
                 value={yourSetupDraftDividends}
                 onValueChange={setYourSetupDraftDividends}
-                onValidityChange={(error) =>
-                  setYourSetupDraftErrors((prev) => ({ ...prev, dividends: error !== null }))
+                onValidityChange={(invalid) =>
+                  setYourSetupDraftErrors((prev) => ({ ...prev, dividends: invalid ?? undefined }))
                 }
+                invalidDraft={yourSetupDraftErrors.dividends}
                 placeholder='£0'
                 className={INPUT_CLASS}
                 aria-describedby={getHintId(ids.yourDividends)}

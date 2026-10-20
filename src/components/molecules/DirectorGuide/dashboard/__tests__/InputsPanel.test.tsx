@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { CURRENCY_INPUT_ERRORS } from '@/lib/currencyInput';
@@ -95,6 +95,7 @@ describe('DirectorGuide InputsPanel', () => {
     const current = useDirectorGuideStore.getState();
     setStoreState({
       ...current,
+      inputErrors: {},
       formData: {
         ...current.formData,
         mode: 'annual',
@@ -344,9 +345,10 @@ describe('DirectorGuide InputsPanel', () => {
       // Never converted into another amount: the store keeps its last valid value and the field
       // is flagged invalid so results are invalidated.
       expect(formData().revenue).toBe(5000);
-      expect(useDirectorGuideStore.getState().inputErrors.revenue).toBe(
-        CURRENCY_INPUT_ERRORS.negative,
-      );
+      expect(useDirectorGuideStore.getState().inputErrors.revenue).toEqual({
+        text: '-500',
+        error: CURRENCY_INPUT_ERRORS.negative,
+      });
 
       await user.tab();
       expect(input).toHaveValue('-500');
@@ -373,7 +375,10 @@ describe('DirectorGuide InputsPanel', () => {
       expect(expensesInput()).toHaveValue(text);
       // No amount is derived from the text; the field is flagged so results are invalidated.
       expect(formData().expenses).toBeUndefined();
-      expect(useDirectorGuideStore.getState().inputErrors.expenses).toBe(message);
+      expect(useDirectorGuideStore.getState().inputErrors.expenses).toEqual({
+        text,
+        error: message,
+      });
     });
 
     it('recovers when invalid text is corrected', async () => {
@@ -423,18 +428,29 @@ describe('DirectorGuide InputsPanel', () => {
       expect(formData().revenue).toBe(12934.56);
     });
 
-    it('edits a formatted amount in place', async () => {
+    it('keeps the caret on the same digit when focus switches to edit text', async () => {
       const user = userEvent.setup();
-      useDirectorGuideStore.getState().setRevenue(1000);
+      useDirectorGuideStore.getState().setRevenue(1234.5);
       render(<InputsPanel />);
       const input = revenueInput();
-      expect(input).toHaveValue('£1,000');
+      expect(input).toHaveValue('£1,234.50');
 
-      await user.type(input, '2', { initialSelectionStart: 2, initialSelectionEnd: 2 });
+      // Caret after "£1,2" (position 4) maps to after "12" in the edit text.
+      act(() => {
+        input.focus();
+        input.setSelectionRange(4, 4);
+      });
+      await waitFor(() => expect(input).toHaveValue('1234.50'));
+      expect(input.selectionStart).toBe(2);
 
-      expect(input).toHaveValue('£12,000');
+      await user.type(input, '9', {
+        skipClick: true,
+        initialSelectionStart: 2,
+        initialSelectionEnd: 2,
+      });
+      expect(input).toHaveValue('12934.50');
       expect(input.selectionStart).toBe(3);
-      expect(formData().revenue).toBe(12000);
+      expect(formData().revenue).toBe(12934.5);
     });
 
     it('exposes a decimal keypad on every currency field', () => {
@@ -490,18 +506,107 @@ describe('DirectorGuide InputsPanel', () => {
       expect(formData().cashInBank).toBe(5000.99);
     });
 
-    it('releases a field error when the field is no longer shown', async () => {
+    it('keeps invalid text when the field is unmounted, e.g. by closing the mobile drawer', async () => {
+      const user = userEvent.setup();
+      useDirectorGuideStore.getState().setRevenue(30000);
+      const { unmount } = render(<InputsPanel />);
+
+      await user.type(revenueInput(), '-500', { initialSelectionStart: 0, initialSelectionEnd: 7 });
+      unmount();
+
+      // The rejected text must not be replaced by the last valid amount behind the person's back.
+      expect(useDirectorGuideStore.getState().inputErrors.revenue).toEqual({
+        text: '-500',
+        error: CURRENCY_INPUT_ERRORS.negative,
+      });
+
+      render(<InputsPanel />);
+      expect(revenueInput()).toHaveValue('-500');
+      expect(revenueInput()).toHaveAttribute('aria-invalid', 'true');
+      expect(screen.getByText(CURRENCY_INPUT_ERRORS.negative)).toBeInTheDocument();
+    });
+
+    it('keeps annual text across a mode switch without sharing it with monthly fields', async () => {
       const user = userEvent.setup();
       render(<InputsPanel />);
 
       await user.type(revenueInput(), '-1');
-      expect(useDirectorGuideStore.getState().inputErrors.revenue).toBeDefined();
-
       await user.click(screen.getByRole('button', { name: 'Monthly' }));
-      expect(useDirectorGuideStore.getState().inputErrors).toEqual({});
+
       // The monthly field in the same position must not inherit the annual field's text.
       expect(screen.getByLabelText('Monthly Contract Income')).toHaveValue('');
       expect(screen.queryByText(CURRENCY_INPUT_ERRORS.negative)).not.toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'Annual' }));
+      expect(revenueInput()).toHaveValue('-1');
+      expect(screen.getByText(CURRENCY_INPUT_ERRORS.negative)).toBeInTheDocument();
+    });
+
+    it('keeps invalid hidden detail amounts visible from Quick Start', async () => {
+      const user = userEvent.setup();
+      render(<InputsPanel />);
+      await user.click(screen.getByRole('button', { name: 'Full Inputs' }));
+
+      await user.type(screen.getByLabelText('YTD Salary'), '-250', {
+        initialSelectionStart: 0,
+        initialSelectionEnd: 2,
+      });
+      await user.click(screen.getByRole('button', { name: 'Quick Start' }));
+
+      expect(useDirectorGuideStore.getState().inputErrors.ytdSalary?.text).toBe('-250');
+      expect(screen.getByTestId('director-hidden-input-error')).toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: 'Review Details' }));
+      expect(screen.getByLabelText('YTD Salary')).toHaveValue('-250');
+      expect(screen.getByText(CURRENCY_INPUT_ERRORS.negative)).toBeInTheDocument();
+    });
+
+    it('keeps Advanced Options open while one of its amounts is invalid', async () => {
+      const user = userEvent.setup();
+      render(<InputsPanel />);
+      await user.click(screen.getByRole('button', { name: 'Full Inputs' }));
+      await user.click(screen.getByRole('button', { name: 'Advanced Options' }));
+
+      await user.type(screen.getByLabelText('Losses Brought Forward'), 'abc', {
+        initialSelectionStart: 0,
+        initialSelectionEnd: 2,
+      });
+
+      const toggle = screen.getByRole('button', { name: 'Advanced Options' });
+      expect(toggle).toBeDisabled();
+      expect(toggle).toHaveAttribute('aria-expanded', 'true');
+      expect(screen.getByLabelText('Losses Brought Forward')).toHaveValue('abc');
+    });
+
+    it('switches a formatted amount to plain edit text on focus so digits can be added or removed', async () => {
+      const user = userEvent.setup();
+      useDirectorGuideStore.getState().setRevenue(30000);
+      render(<InputsPanel />);
+      const input = revenueInput();
+      expect(input).toHaveValue('£30,000');
+
+      await user.click(input);
+      await waitFor(() => expect(input).toHaveValue('30000'));
+
+      await user.type(input, '0', {
+        skipClick: true,
+        initialSelectionStart: 5,
+        initialSelectionEnd: 5,
+      });
+      expect(input).toHaveValue('300000');
+      expect(formData().revenue).toBe(300000);
+
+      await user.type(input, '{Backspace}{Backspace}', {
+        skipClick: true,
+        initialSelectionStart: 6,
+        initialSelectionEnd: 6,
+      });
+      expect(input).toHaveValue('3000');
+      expect(formData().revenue).toBe(3000);
+      expect(useDirectorGuideStore.getState().inputErrors).toEqual({});
+
+      await user.tab();
+      expect(input).toHaveValue('£3,000');
     });
 
     it('discards unparsed text on reset', async () => {

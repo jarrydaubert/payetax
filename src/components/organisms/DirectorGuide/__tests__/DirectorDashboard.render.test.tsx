@@ -235,7 +235,11 @@ describe('DirectorDashboard (normal mode)', () => {
       render(<DirectorDashboard />);
       expectResultAndEmailAvailable();
 
-      act(() => useDirectorGuideStore.getState().setInputError('cashInBank', 'Enter an amount'));
+      act(() =>
+        useDirectorGuideStore
+          .getState()
+          .setInputError('expenses', { text: 'abc', error: 'Enter an amount' }),
+      );
 
       expectResultAndEmailRemoved();
       expect(screen.getByRole('status')).toHaveTextContent(

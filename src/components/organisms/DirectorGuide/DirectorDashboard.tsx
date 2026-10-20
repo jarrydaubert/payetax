@@ -422,8 +422,8 @@ export function DirectorDashboard() {
                       data-testid='director-results-paused'
                       className='mb-6 rounded-sm border border-warning/40 bg-card p-4 text-left text-foreground text-sm'
                     >
-                      Results are paused until every amount is valid. Check the highlighted fields
-                      in Your Numbers.
+                      Results are paused until every amount is valid. Check the amounts in Your
+                      Numbers.
                     </p>
                   ) : null}
                   <p className='mb-3 font-semibold text-primary/90 text-xs uppercase tracking-[0.28em]'>

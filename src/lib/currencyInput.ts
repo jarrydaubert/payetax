@@ -101,3 +101,21 @@ export function formatCurrencyInputValue(value: number | undefined): string {
     maximumFractionDigits: 2,
   })}`;
 }
+
+/**
+ * Format an amount as plain editable text for a focused field: no `£`, no thousands commas
+ * (`£30,000` → `30000`, `£1,234.50` → `1234.50`). Adding or deleting digits in this text can never
+ * produce misplaced commas.
+ */
+export function formatCurrencyInputEditText(value: number | undefined): string {
+  if (value === undefined) return '';
+  return Number.isInteger(value) ? String(value) : value.toFixed(2);
+}
+
+/**
+ * Map a caret position in display text (`£1,234.50`) to the same place in its edit text
+ * (`1234.50`): the caret stays after the same number of digits and decimal points.
+ */
+export function mapCaretToEditText(displayText: string, caret: number): number {
+  return displayText.slice(0, caret).replace(/[^\d.]/g, '').length;
+}
