@@ -6,9 +6,13 @@
  * - Survival Mode regressions (profit <= 0 should show Survival panel and hide strategy UI)
  * - VAT warning gating regressions (VAT warnings must show based on revenue even in Survival Mode)
  * - Email flow regressions (dialog opens and POST succeeds)
+ * - Currency-input regressions (DI-01): pence scaled or dropped, pasted/formatted amounts
+ *   misread, negative/malformed text silently converted, caret jumping during edits
+ * - Stale-result regressions (DI-02 minimal): empty or invalid inputs leaving a current-looking
+ *   result or an email action on screen
  */
 
-import { expect, type Locator, type Page, test } from '@playwright/test';
+import { type BrowserContext, expect, type Locator, type Page, test } from '@playwright/test';
 
 const DIRECTOR_WELCOME_DISMISS_KEY = 'directorGuideWelcome:dismissed:v1';
 
@@ -213,5 +217,171 @@ test.describe('Director Intelligence critical @critical', () => {
 
     // VAT warning text should still be present for high-revenue survival cases.
     await ensureLearnPanelIsVisible(page);
+  });
+});
+
+async function openDirectorGuide(page: Page): Promise<void> {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await suppressWelcomeDialog(page);
+  await page.goto('/tools/director-guide', { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await dismissWelcomeDialogIfPresent(page);
+  await ensureInputsPanelIsVisible(page);
+}
+
+async function replaceText(input: Locator, text: string): Promise<void> {
+  await expect(input).toBeEditable();
+  await input.click();
+  await input.press('ControlOrMeta+A');
+  await input.page().keyboard.insertText(text);
+}
+
+/**
+ * Pastes through the real clipboard where the browser allows granting clipboard permissions
+ * (Chromium); elsewhere inserts the whole string in one input event, as a paste does.
+ */
+async function pasteInto(
+  input: Locator,
+  text: string,
+  { context, browserName }: { context: BrowserContext; browserName: string },
+): Promise<void> {
+  await input.click();
+  await input.press('ControlOrMeta+A');
+  if (browserName === 'chromium') {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await input.page().evaluate((value) => navigator.clipboard.writeText(value), text);
+    await input.press('ControlOrMeta+V');
+    return;
+  }
+  await input.page().keyboard.insertText(text);
+}
+
+async function selectEngland(page: Page): Promise<void> {
+  await selectDropdownOption(
+    page,
+    page.locator('[data-testid="director-region-select"]:visible').first(),
+    'England',
+  );
+}
+
+function detailRowValue(page: Page, cardTitle: string, rowLabel: string): Locator {
+  return page
+    .locator('[data-director-section="director-details"] div.rounded-sm')
+    .filter({ has: page.getByText(cardTitle, { exact: true }) })
+    .getByText(rowLabel, { exact: true })
+    .locator('xpath=following-sibling::span[1]');
+}
+
+test.describe('Director Intelligence currency inputs @critical', () => {
+  test('pasted and typed pence give an independently derived taxable profit @critical', async ({
+    page,
+    context,
+    browserName,
+  }) => {
+    await openDirectorGuide(page);
+
+    const revenueInput = visibleInputByTestId(page, 'director-revenue-input');
+    const expensesInput = visibleInputByTestId(page, 'director-expenses-input');
+
+    // Pasted, formatted amount with a pound sign, comma and pence.
+    await pasteInto(revenueInput, '£30,000.80', { context, browserName });
+    await expect(revenueInput).toHaveValue('£30,000.80');
+
+    // Typed plain amount with pence: left as typed while editing, formatted on blur.
+    await expensesInput.click();
+    await expensesInput.pressSequentially('10000.10');
+    await expect(expensesInput).toHaveValue('10000.10');
+    await expensesInput.blur();
+    await expect(expensesInput).toHaveValue('£10,000.10');
+    await expect(revenueInput).toHaveValue('£30,000.80');
+
+    await selectEngland(page);
+    await closeInputsPanelIfOpen(page);
+
+    await page
+      .locator('[data-director-section="director-strategy"]')
+      .getByRole('button', { name: /All Dividends/ })
+      .click();
+
+    // Independent derivation (recorded in the PR): with no salary, employer NI, pension, losses,
+    // BIK or VAT, taxable profit = revenue - expenses = £30,000.80 - £10,000.10 = £20,000.70,
+    // displayed to the nearest pound as £20,001. Digit-stripping parsing gives £2,000,070;
+    // dropping pence gives £20,000.
+    await expect(detailRowValue(page, 'Corporation Tax', 'Salary + Employer NI')).toHaveText('-£0');
+    await expect(detailRowValue(page, 'Corporation Tax', 'Taxable Profit')).toHaveText('£20,001');
+  });
+
+  test('a mid-string edit keeps the caret and the amount @critical', async ({ page }) => {
+    await openDirectorGuide(page);
+    const revenueInput = visibleInputByTestId(page, 'director-revenue-input');
+
+    await replaceText(revenueInput, '1234.56');
+    await revenueInput.evaluate((el: HTMLInputElement) => el.setSelectionRange(2, 2));
+    await page.keyboard.type('9');
+
+    await expect(revenueInput).toHaveValue('12934.56');
+    expect(await revenueInput.evaluate((el: HTMLInputElement) => el.selectionStart)).toBe(3);
+
+    await revenueInput.blur();
+    await expect(revenueInput).toHaveValue('£12,934.56');
+
+    // Editing the formatted amount again: focus shows plain edit text, so adding a digit cannot
+    // leave misplaced commas.
+    await revenueInput.click();
+    await expect(revenueInput).toHaveValue('12934.56');
+    await revenueInput.press('Home');
+    await page.keyboard.type('1');
+    await expect(revenueInput).toHaveValue('112934.56');
+    await revenueInput.blur();
+    await expect(revenueInput).toHaveValue('£112,934.56');
+    await expect(revenueInput).not.toHaveAttribute('aria-invalid', 'true');
+  });
+
+  test('invalid or empty required inputs remove the result and disable email @critical', async ({
+    page,
+  }) => {
+    await openDirectorGuide(page);
+    const revenueInput = visibleInputByTestId(page, 'director-revenue-input');
+    const expensesInput = visibleInputByTestId(page, 'director-expenses-input');
+    const emailCta = page.getByRole('button', { name: 'Email My Results' });
+    const recommendation = page.locator('[data-director-section="director-recommendation"]');
+    const sidebarEmail = page.getByRole('button', { name: 'Email Results', exact: true }).first();
+
+    await fillCurrencyInput(revenueInput, 100000);
+    await fillCurrencyInput(expensesInput, 20000);
+    await selectEngland(page);
+    await expect(recommendation).toBeVisible();
+    await expect(emailCta).toBeVisible();
+    await expect(sidebarEmail).toBeEnabled();
+
+    // Unsupported negative amount: explained, never converted into another amount.
+    await ensureInputsPanelIsVisible(page);
+    await replaceText(revenueInput, '-500');
+    await revenueInput.blur();
+    await expect(revenueInput).toHaveValue('-500');
+    await expect(revenueInput).toHaveAttribute('aria-invalid', 'true');
+    await expect(
+      page.getByText('Enter an amount of £0 or more. Negative amounts are not supported.'),
+    ).toBeVisible();
+    await expect(page.getByTestId('director-results-paused')).toBeVisible();
+    await expect(recommendation).toHaveCount(0);
+    await expect(emailCta).toHaveCount(0);
+    await expect(sidebarEmail).toBeDisabled();
+
+    // Correcting the amount restores a current result and email.
+    await replaceText(revenueInput, '100000');
+    await revenueInput.blur();
+    await expect(recommendation).toBeVisible();
+    await expect(emailCta).toBeVisible();
+    await expect(sidebarEmail).toBeEnabled();
+
+    // Clearing a required input removes the result; empty is not treated as £0.
+    await expensesInput.click();
+    await expensesInput.press('ControlOrMeta+A');
+    await expensesInput.press('Backspace');
+    await expensesInput.blur();
+    await expect(expensesInput).toHaveValue('');
+    await expect(recommendation).toHaveCount(0);
+    await expect(emailCta).toHaveCount(0);
+    await expect(sidebarEmail).toBeDisabled();
   });
 });
