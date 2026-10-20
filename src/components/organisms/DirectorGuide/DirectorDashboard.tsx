@@ -46,6 +46,7 @@ import type { DirectorEmailInput } from '@/lib/validation/emailValidation';
 import {
   useDirectorFormSlice,
   useDirectorGuideActions,
+  useHasDirectorInputErrors,
   useMonthlyModeOutput,
   useStrategyComparison,
 } from '@/store/directorGuideStore';
@@ -93,7 +94,8 @@ export function DirectorDashboard() {
   }));
   const comparison = useStrategyComparison();
   const monthlyModeOutput = useMonthlyModeOutput();
-  const { calculate, reset } = useDirectorGuideActions();
+  const hasInputErrors = useHasDirectorInputErrors();
+  const { calculate, invalidateResults, reset } = useDirectorGuideActions();
   const isMonthlyMode = formData.mode === 'monthly';
 
   const annualizedFromInputs = resolveAnnualFinancials({
@@ -173,10 +175,13 @@ export function DirectorDashboard() {
     safeSetItem(DIRECTOR_EDUCATION_COLLAPSED_STORAGE_KEY, String(educationCollapsed));
   }, [educationCollapsed, hasLoadedEducationPreference]);
 
-  // Auto-calculate when inputs change (debounced to avoid keystroke thrash)
+  // Auto-calculate when inputs change (debounced to avoid keystroke thrash).
+  // Every early return invalidates the previous result immediately: a result must never outlive
+  // the valid, complete inputs it was calculated from.
   useEffect(() => {
     const { region, includesVat } = formData;
-    if (region === undefined) {
+    if (hasInputErrors || region === undefined) {
+      invalidateResults();
       return;
     }
 
@@ -192,13 +197,14 @@ export function DirectorDashboard() {
     const revenue = annualizedFinancials.revenue;
     const expenses = annualizedFinancials.expenses;
 
-    if (revenue === undefined || expenses === undefined) {
-      return;
-    }
-    if (revenue < 0 || expenses < 0) {
-      return;
-    }
-    if (annualizedFinancials.hasInvalidContractStartMonth) {
+    if (
+      revenue === undefined ||
+      expenses === undefined ||
+      revenue < 0 ||
+      expenses < 0 ||
+      annualizedFinancials.hasInvalidContractStartMonth
+    ) {
+      invalidateResults();
       return;
     }
 
@@ -216,7 +222,7 @@ export function DirectorDashboard() {
 
     const timer = window.setTimeout(() => calculate(), CALCULATE_DEBOUNCE_MS);
     return () => window.clearTimeout(timer);
-  }, [formData, calculate]);
+  }, [formData, hasInputErrors, calculate, invalidateResults]);
 
   // Track results shown (once per session, when comparison first becomes available)
   useEffect(() => {
@@ -239,6 +245,12 @@ export function DirectorDashboard() {
   const hasComparison = Boolean(comparison);
   const isSurvivalMode = Boolean(comparison && comparison.grossProfit <= 0);
 
+  // Email needs a current result; close the dialog if its result is invalidated.
+  useEffect(() => {
+    if (!hasComparison) setEmailDialogOpen(false);
+  }, [hasComparison]);
+  const openEmailDialog = useCallback(() => setEmailDialogOpen(true), []);
+
   return (
     <TooltipProvider>
       <DashboardLayout
@@ -246,7 +258,7 @@ export function DirectorDashboard() {
           <SidebarNav
             collapsed={sidebarCollapsed}
             onToggle={() => setSidebarCollapsed((prev) => !prev)}
-            onEmailResults={() => setEmailDialogOpen(true)}
+            onEmailResults={hasComparison ? openEmailDialog : undefined}
             onReset={handleReset}
             dashboardVariant={hasComparison ? (isSurvivalMode ? 'survival' : 'normal') : undefined}
           />
@@ -390,7 +402,7 @@ export function DirectorDashboard() {
                       </p>
                     </div>
                     <Button
-                      onClick={() => setEmailDialogOpen(true)}
+                      onClick={openEmailDialog}
                       variant='outline'
                       className='flex shrink-0 items-center gap-2 px-6 py-3 font-semibold'
                     >
@@ -404,6 +416,16 @@ export function DirectorDashboard() {
               /* Empty State */
               <div className='flex min-h-[calc(100dvh-11rem)] flex-col items-center justify-center rounded-sm border border-border/70 border-dashed bg-background px-5 py-8 sm:min-h-[calc(100dvh-9rem)] sm:px-8 lg:min-h-screen'>
                 <div className='mx-auto max-w-xl text-center'>
+                  {hasInputErrors ? (
+                    <p
+                      role='status'
+                      data-testid='director-results-paused'
+                      className='mb-6 rounded-sm border border-warning/40 bg-card p-4 text-left text-foreground text-sm'
+                    >
+                      Results are paused until every amount is valid. Check the amounts in Your
+                      Numbers.
+                    </p>
+                  ) : null}
                   <p className='mb-3 font-semibold text-primary/90 text-xs uppercase tracking-[0.28em]'>
                     Start Here
                   </p>

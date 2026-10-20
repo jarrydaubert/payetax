@@ -6,6 +6,8 @@ jest.mock('@/lib/directorGuideAnalytics', () => ({
   trackGuideReset: jest.fn(),
   trackGuideStarted: jest.fn(),
   trackResultsShown: jest.fn(),
+  trackCalculationRun: jest.fn(),
+  trackWarningShown: jest.fn(),
   trackModeChanged: jest.fn(),
   trackSafeDrawCalculated: jest.fn(),
   trackBufferShortfallShown: jest.fn(),
@@ -49,7 +51,6 @@ describe('DirectorDashboard (Survival Mode)', () => {
   beforeEach(() => {
     const current = useDirectorGuideStore.getState();
     useDirectorGuideStore.setState({
-      // Avoid auto-calculate side effects by keeping required inputs undefined.
       formData: {
         ...current.formData,
         region: undefined,
@@ -63,7 +64,10 @@ describe('DirectorDashboard (Survival Mode)', () => {
   });
 
   test('renders Survival Mode state and hides strategy UI when profit <= 0', () => {
+    // A displayed result must come from complete inputs, or the dashboard invalidates it.
+    const current = useDirectorGuideStore.getState();
     useDirectorGuideStore.setState({
+      formData: { ...current.formData, region: 'rUK', revenue: 90000, expenses: 90000 },
       strategyComparison: createEmptyComparison(0) as never,
     } as never);
 

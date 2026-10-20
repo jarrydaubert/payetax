@@ -227,10 +227,11 @@ Resume in this order unless new primary evidence changes the risk:
 defects that silently alter inputs or show wrong money figures, deadlines or statutory rates. They
 are listed under the backlog's
 [urgent correctness exceptions](BACKLOG.md#urgent-correctness-exceptions). Under the backlog's first
-working rule, they may be fixed as small independent slices between the items above, starting with
-currency-input preservation and minimal stale-result protection. Two browser-verified
-[main-calculator input-integrity defects](BACKLOG.md#main-calculator-input-integrity) follow
-immediately, then the interim Director email guard and Corporation Tax deadline arithmetic. The
+working rule, they may be fixed as small independent slices between the items above. Director
+currency-input preservation and minimal stale-result protection have landed, with one shared
+currency parser in `src/lib/currencyInput.ts`. Two browser-verified
+[main-calculator input-integrity defects](BACKLOG.md#main-calculator-input-integrity) follow next,
+reusing that parser, then the interim Director email guard and Corporation Tax deadline arithmetic. The
 backlog records the agreed order, under which these first slices come before item 1. They do not
 reorder items 1–3, they must reuse existing tax-domain owners, and any exception that needs a Foundation change waits for, or is folded into, that item. Director design and
 refactoring proposals are parked.

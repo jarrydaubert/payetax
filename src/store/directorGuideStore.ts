@@ -119,6 +119,40 @@ export interface DirectorFormData {
   runwayMonths: number;
 }
 
+/** Form fields that can hold unparsed, invalid text. */
+export type DirectorInputField = keyof DirectorFormData;
+
+/** Text a person entered that is not a valid amount, with the reason. */
+export interface DirectorInvalidInput {
+  text: string;
+  error: string;
+}
+
+/** Fields each mode does not calculate from, so their invalid text cannot block that mode. */
+const FIELDS_UNUSED_BY_MODE: Record<DirectorGuideMode, ReadonlySet<DirectorInputField>> = {
+  annual: new Set<DirectorInputField>([
+    'monthlyIncome',
+    'monthlyExpenses',
+    'cashInBank',
+    'minimumMonthlyDraw',
+  ]),
+  monthly: new Set<DirectorInputField>(['revenue', 'expenses']),
+};
+
+/** Whether any field the current mode calculates from holds invalid text. */
+function hasBlockingInputErrors(state: Pick<DirectorGuideState, 'formData' | 'inputErrors'>) {
+  const unused = FIELDS_UNUSED_BY_MODE[state.formData.mode];
+  return Object.keys(state.inputErrors).some((field) => !unused.has(field as DirectorInputField));
+}
+
+/** Clears every derived result so nothing calculated from earlier inputs stays on screen. */
+const CLEARED_RESULTS = {
+  results: null,
+  strategyComparison: null,
+  monthlyModeOutput: null,
+  sliderSalary: null,
+} as const;
+
 /**
  * Store state interface
  */
@@ -131,6 +165,12 @@ interface DirectorGuideState {
   strategyComparison: StrategyComparison | null;
   monthlyModeOutput: MonthlyModeOutput | null;
   error: string | null;
+
+  // Input validity (not persisted): field key → unparsed text that is not a valid amount, kept
+  // while the field is hidden or unmounted so it is never silently replaced by an older amount.
+  inputErrors: Partial<Record<DirectorInputField, DirectorInvalidInput>>;
+  /** Incremented on reset so input fields discard any unparsed text. */
+  inputRevision: number;
 
   // UI state
   isCalculating: boolean;
@@ -189,8 +229,13 @@ interface DirectorGuideActions {
   setSliderSalary: (salary: number | null) => void;
   setProfitWhatIfPercent: (percent: number) => void;
 
+  // Input validity
+  setInputError: (field: DirectorInputField, invalid: DirectorInvalidInput | null) => void;
+
   // Calculation
   calculate: () => void;
+  /** Removes results that no longer match valid, complete inputs. */
+  invalidateResults: () => void;
 
   // Reset
   reset: () => void;
@@ -240,6 +285,8 @@ const defaultState: DirectorGuideState = {
   strategyComparison: null,
   monthlyModeOutput: null,
   error: null,
+  inputErrors: {},
+  inputRevision: 0,
   isCalculating: false,
   selectedStrategy: 'optimalMix',
   sliderSalary: null,
@@ -625,14 +672,44 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         },
 
         // ====================================================================
+        // INPUT VALIDITY
+        // ====================================================================
+
+        setInputError: (field, invalid) => {
+          set((state) => {
+            const current = state.inputErrors[field];
+            if (invalid === null) {
+              if (current === undefined) return state;
+              const { [field]: _removed, ...rest } = state.inputErrors;
+              return { inputErrors: rest };
+            }
+            if (current?.text === invalid.text && current.error === invalid.error) return state;
+            return { inputErrors: { ...state.inputErrors, [field]: { ...invalid } } };
+          });
+        },
+
+        // ====================================================================
         // CALCULATION
         // ====================================================================
+
+        invalidateResults: () => {
+          const { results, strategyComparison, monthlyModeOutput } = get();
+          if (results === null && strategyComparison === null && monthlyModeOutput === null) {
+            return;
+          }
+          set({ ...CLEARED_RESULTS });
+        },
 
         calculate: () => {
           const { formData } = get();
 
+          if (hasBlockingInputErrors(get())) {
+            set({ ...CLEARED_RESULTS, error: 'Please correct the highlighted amounts' });
+            return;
+          }
+
           if (!formData.region) {
-            set({ error: 'Please select your region' });
+            set({ ...CLEARED_RESULTS, error: 'Please select your region' });
             return;
           }
 
@@ -648,7 +725,7 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
           const monthlyProjection = annualizedFinancials.monthlyProjection;
 
           if (annualizedFinancials.hasInvalidContractStartMonth) {
-            set({ error: 'Please select a valid contract start month' });
+            set({ ...CLEARED_RESULTS, error: 'Please select a valid contract start month' });
             return;
           }
 
@@ -656,7 +733,7 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
           const effectiveExpenses = annualizedFinancials.expenses;
 
           if (effectiveRevenue === undefined || effectiveExpenses === undefined) {
-            set({ error: 'Please fill in revenue, expenses, and region' });
+            set({ ...CLEARED_RESULTS, error: 'Please fill in revenue, expenses, and region' });
             return;
           }
 
@@ -767,10 +844,10 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
           if (typeof window !== 'undefined') {
             trackGuideReset();
           }
-          set({ ...defaultState });
+          set({ ...defaultState, inputRevision: get().inputRevision + 1 });
         },
         clearStaleState: () => {
-          set({ ...defaultState });
+          set({ ...defaultState, inputRevision: get().inputRevision + 1 });
         },
       }),
       {
@@ -908,6 +985,27 @@ export function useDirectorError() {
 }
 
 /**
+ * Hook for whether any input the current mode uses holds text that is not a valid amount
+ */
+export function useHasDirectorInputErrors() {
+  return useDirectorGuideStore(hasBlockingInputErrors);
+}
+
+/**
+ * Hook for every field's invalid text (including fields the current mode does not use)
+ */
+export function useDirectorInputErrors() {
+  return useDirectorGuideStore((state) => state.inputErrors);
+}
+
+/**
+ * Hook for the input revision, which changes when the form is reset
+ */
+export function useDirectorInputRevision() {
+  return useDirectorGuideStore((state) => state.inputRevision);
+}
+
+/**
  * Hook for accessing calculation state
  */
 export function useIsCalculating() {
@@ -959,8 +1057,11 @@ export function useDirectorGuideActions() {
       setSelectedStrategy: state.setSelectedStrategy,
       setSliderSalary: state.setSliderSalary,
       setProfitWhatIfPercent: state.setProfitWhatIfPercent,
+      // Input validity
+      setInputError: state.setInputError,
       // Calculation
       calculate: state.calculate,
+      invalidateResults: state.invalidateResults,
       reset: state.reset,
     })),
   );
