@@ -184,7 +184,12 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
   const advancedHasErrors = ADVANCED_CURRENCY_FIELDS.some((field) => inputErrors[field]);
   const hasHiddenInputErrors =
     quickStartMode && DETAIL_CURRENCY_FIELDS.some((field) => inputErrors[field]);
-  const isAdvancedOpen = advancedOpen || advancedHasErrors;
+
+  // Open Advanced Options when one of its amounts is invalid, and leave it open: closing it again
+  // the moment the amount becomes valid would unmount the field being typed in.
+  useEffect(() => {
+    if (advancedHasErrors) setAdvancedOpen(true);
+  }, [advancedHasErrors]);
 
   const hiddenDetailLabels = [
     formData.ytdSalary > 0 || inputErrors.ytdSalary ? 'YTD salary' : null,
@@ -776,21 +781,16 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           <div className='mt-4'>
             <button
               type='button'
-              onClick={() => setAdvancedOpen(!isAdvancedOpen)}
-              disabled={advancedHasErrors}
-              aria-expanded={isAdvancedOpen}
+              onClick={() => setAdvancedOpen(!advancedOpen)}
+              aria-expanded={advancedOpen}
               aria-controls={ids.advancedPanel}
               className='flex w-full items-center justify-between rounded-sm border border-border/40 bg-card px-4 py-3 text-left text-muted-foreground text-sm transition-colors hover:border-border/40 hover:bg-accent/30'
             >
               <span className='font-medium'>Advanced Options</span>
-              {isAdvancedOpen ? (
-                <ChevronUp className='size-4' />
-              ) : (
-                <ChevronDown className='size-4' />
-              )}
+              {advancedOpen ? <ChevronUp className='size-4' /> : <ChevronDown className='size-4' />}
             </button>
 
-            {isAdvancedOpen && (
+            {advancedOpen && (
               <div
                 id={ids.advancedPanel}
                 className='mt-3 space-y-4 rounded-sm border border-border/40 bg-background p-4'

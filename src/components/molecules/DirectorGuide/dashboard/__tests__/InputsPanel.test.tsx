@@ -561,21 +561,54 @@ describe('DirectorGuide InputsPanel', () => {
       expect(screen.getByText(CURRENCY_INPUT_ERRORS.negative)).toBeInTheDocument();
     });
 
-    it('keeps Advanced Options open while one of its amounts is invalid', async () => {
+    it('opens Advanced Options for a held invalid amount and keeps it open once corrected', async () => {
       const user = userEvent.setup();
+      // As after closing and reopening the mobile drawer: held text, fresh panel state.
+      useDirectorGuideStore.getState().setInputError('pensionContribution', {
+        text: '5000x',
+        error: CURRENCY_INPUT_ERRORS.malformed,
+      });
       render(<InputsPanel />);
       await user.click(screen.getByRole('button', { name: 'Full Inputs' }));
-      await user.click(screen.getByRole('button', { name: 'Advanced Options' }));
-
-      await user.type(screen.getByLabelText('Losses Brought Forward'), 'abc', {
-        initialSelectionStart: 0,
-        initialSelectionEnd: 2,
-      });
 
       const toggle = screen.getByRole('button', { name: 'Advanced Options' });
-      expect(toggle).toBeDisabled();
       expect(toggle).toHaveAttribute('aria-expanded', 'true');
-      expect(screen.getByLabelText('Losses Brought Forward')).toHaveValue('abc');
+      const pension = screen.getByLabelText('Employer Pension');
+      expect(pension).toHaveValue('5000x');
+
+      await user.type(pension, '{Backspace}', { initialSelectionStart: 5, initialSelectionEnd: 5 });
+
+      expect(useDirectorGuideStore.getState().formData.pensionContribution).toBe(5000);
+      expect(toggle).toHaveAttribute('aria-expanded', 'true');
+      expect(screen.getByLabelText('Employer Pension')).toHaveFocus();
+    });
+
+    it('keeps two mounted panels (desktop and mobile drawer) in sync', async () => {
+      const user = userEvent.setup();
+      useDirectorGuideStore.getState().setRevenue(30000);
+      render(
+        <>
+          <div data-testid='desktop'>
+            <InputsPanel />
+          </div>
+          <div data-testid='drawer'>
+            <InputsPanel />
+          </div>
+        </>,
+      );
+      const [desktop, drawer] = screen.getAllByLabelText('Annual Revenue') as HTMLInputElement[];
+
+      await user.type(drawer, 'abc', { initialSelectionStart: 0, initialSelectionEnd: 7 });
+      await user.tab();
+      expect(desktop).toHaveValue('abc');
+      expect(desktop).toHaveAttribute('aria-invalid', 'true');
+
+      await user.type(drawer, '{Backspace}{Backspace}{Backspace}45000');
+      await user.tab();
+      expect(formData().revenue).toBe(45000);
+      expect(desktop).toHaveValue('£45,000');
+      expect(desktop).not.toHaveAttribute('aria-invalid');
+      expect(useDirectorGuideStore.getState().inputErrors).toEqual({});
     });
 
     it('switches a formatted amount to plain edit text on focus so digits can be added or removed', async () => {
