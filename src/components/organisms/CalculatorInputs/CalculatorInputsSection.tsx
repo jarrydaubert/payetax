@@ -8,8 +8,24 @@ import { Button } from '@/components/ui/button';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { convertPeriodToAnnual } from '@/lib/periodCalculator';
 import { cn } from '@/lib/utils';
+import { type CalculatorAmountField, getBlockingInputErrors } from '@/store/calculatorInputErrors';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
 import { BasicInputs } from './BasicInputs';
+
+const AMOUNT_FIELD_LABELS: Record<
+  Exclude<CalculatorAmountField, `incomeSource:${string}`>,
+  string
+> = {
+  salary: 'Salary',
+  partnerGrossWage: "Partner's Gross Wage",
+  allowancesDeductions: 'Non-taxable allowance(s)',
+  pensionContribution: 'Pension',
+};
+
+const amountFieldLabel = (field: CalculatorAmountField): string =>
+  field.startsWith('incomeSource:')
+    ? 'Additional Income Sources'
+    : AMOUNT_FIELD_LABELS[field as keyof typeof AMOUNT_FIELD_LABELS];
 
 interface CalculatorInputsSectionProps {
   onCalculate: () => void;
@@ -28,9 +44,35 @@ export function CalculatorInputsSection({
   const [formMessage, setFormMessage] = React.useState<{
     tone: 'error' | 'warning';
     text: string;
+    /** Set when the message reports rejected amounts, so it clears once they are corrected. */
+    rejectedAmounts?: boolean;
   } | null>(null);
 
+  // A rejected amount in a field the calculation uses blocks calculating from its old amount.
+  const blockingFields = useCalculatorStore((state) =>
+    getBlockingInputErrors(state)
+      .map(([field]) => amountFieldLabel(field))
+      .filter((label, index, labels) => labels.indexOf(label) === index)
+      .join(', '),
+  );
+  const blockingFieldCount = blockingFields === '' ? 0 : blockingFields.split(', ').length;
+
+  React.useEffect(() => {
+    if (blockingFields === '') {
+      setFormMessage((message) => (message?.rejectedAmounts ? null : message));
+    }
+  }, [blockingFields]);
+
   const handleCalculate = () => {
+    if (blockingFields !== '') {
+      setFormMessage({
+        tone: 'error',
+        text: `Correct the invalid ${blockingFieldCount === 1 ? 'amount' : 'amounts'} in ${blockingFields} before calculating.`,
+        rejectedAmounts: true,
+      });
+      return;
+    }
+
     // Validate salary is entered and reasonable
     if (salary <= 0) {
       setFormMessage({

@@ -229,9 +229,11 @@ are listed under the backlog's
 [urgent correctness exceptions](BACKLOG.md#urgent-correctness-exceptions). Under the backlog's first
 working rule, they may be fixed as small independent slices between the items above. Director
 currency-input preservation and minimal stale-result protection have landed, with one shared
-currency parser in `src/lib/currencyInput.ts`. Two browser-verified
-[main-calculator input-integrity defects](BACKLOG.md#main-calculator-input-integrity) follow next,
-reusing that parser, then the interim Director email guard and Corporation Tax deadline arithmetic. The
+currency parser in `src/lib/currencyInput.ts`. The main calculator's amount fields now reuse that
+parser: pence are kept, rejected text is shown with its error and clears results until corrected.
+The remaining [main-calculator input-integrity defects](BACKLOG.md#main-calculator-input-integrity)
+(focus-and-leave erasing a value, and pension type switching reinterpreting an amount) follow next,
+then the interim Director email guard and Corporation Tax deadline arithmetic. The
 backlog records the agreed order, under which these first slices come before item 1. They do not
 reorder items 1–3, they must reuse existing tax-domain owners, and any exception that needs a Foundation change waits for, or is folded into, that item. Director design and
 refactoring proposals are parked.

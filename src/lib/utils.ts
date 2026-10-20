@@ -91,22 +91,6 @@ export function formatInputValue(value: string): string {
 }
 
 /**
- * Parses a formatted input value back to a number.
- * Handles comma-separated numbers and returns a numeric value.
- *
- * @param value - The formatted string to parse
- * @returns Parsed number value (or 0 if invalid)
- */
-export function parseFormattedValue(value: string): number {
-  // Remove thousand separators (commas) first
-  // Then remove all non-numeric characters except decimal point
-  const numericValue = value.replace(/,/g, '').replace(/[^\d.]/g, '');
-  const num = Number.parseFloat(numericValue);
-
-  return Number.isNaN(num) ? 0 : num;
-}
-
-/**
  * Parses a money input string to an integer (whole pounds).
  * Handles various formats: "£50,000", "50000", "50 000", "$50,000.00", etc.
  * Use this for salary/income inputs where decimals aren't meaningful.

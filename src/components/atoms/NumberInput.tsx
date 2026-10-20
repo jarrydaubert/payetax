@@ -1,19 +1,30 @@
 /**
- * Enhanced number input component with formatting and controls
+ * Number input for money and percentage amounts, with formatting and optional controls
  *
- * Provides a customizable input field for numeric values with support for:
- * - Currency formatting with prefix/suffix
- * - Decimal precision control
- * - Increment/decrement controls (spinbutton semantics)
- * - Focus behavior customization
- * - Full accessibility support including reduced motion
+ * - Typed or pasted text is parsed by the shared currency parser (`@/lib/currencyInput`), so pence
+ *   are kept, never scaled. Text is never rewritten while focused; it is formatted on blur.
+ * - Negative, malformed and out-of-range text is not converted into another amount: the text is
+ *   kept, a specific error is shown and associated with the input, the committed value is left
+ *   unchanged, and the invalid text is reported through `onValidityChange` so the owner can stop
+ *   calculating from (and showing results for) the previous amount.
+ * - Optional increment/decrement controls (spinbutton semantics) and reduced-motion-safe styling.
  *
  * @module components/atoms/NumberInput
  */
 
 import type { ChangeEvent, FocusEvent, InputHTMLAttributes, KeyboardEvent } from 'react';
-import { forwardRef, memo, useCallback, useEffect, useId, useState } from 'react';
-import { cn, formatNumber, parseFormattedValue } from '@/lib/utils';
+import { forwardRef, memo, useCallback, useEffect, useId, useRef, useState } from 'react';
+import type { CurrencyInputInvalidDraft } from '@/components/atoms/CurrencyInput';
+import {
+  type CurrencyInputParseResult,
+  type CurrencyInputUnit,
+  formatCurrencyInputValue,
+  parseCurrencyInput,
+} from '@/lib/currencyInput';
+import { cn, formatNumber } from '@/lib/utils';
+
+/** Invalid text held for a field, with its error message. */
+export type NumberInputInvalidDraft = CurrencyInputInvalidDraft;
 
 /**
  * Props for the NumberInput component
@@ -23,27 +34,39 @@ interface NumberInputProps
   /** Current numeric value */
   value: number;
   /**
-   * Callback when value is committed (on blur, Enter, or control click)
-   * Note: This fires on commit, not every keystroke. For live updates, use onValueChange
+   * Callback when a valid value is committed (on blur, Enter, or control click).
+   * Never called for invalid text.
    */
   onChange: (value: number) => void;
-  /** Optional callback for live value changes during typing */
-  onValueChange?: (value: number) => void;
-  /** Number of decimal places to display */
-  decimals?: number;
+  /**
+   * Called on commit with the invalid text and its error when the text is not a valid amount, and
+   * with `null` when a previously reported field becomes valid again.
+   */
+  onValidityChange?: (invalid: NumberInputInvalidDraft | null) => void;
+  /** Invalid text held by the owner (e.g. while this field was unmounted); shown with its error. */
+  invalidDraft?: NumberInputInvalidDraft;
+  /**
+   * Decimal places accepted and displayed: 2 for pounds and pence, 0 for whole units only.
+   * Text with more significant decimal places is rejected, never rounded.
+   */
+  decimals?: 0 | 2;
+  /** What the amount measures; controls accepted symbols and error wording (default: pounds). */
+  unit?: CurrencyInputUnit;
   /** Optional prefix (e.g., currency symbol) */
   prefix?: string;
   /** Optional suffix (e.g., percentage symbol) */
   suffix?: string;
-  /** Whether to clear on focus for easier entry */
+  /** Whether to clear on focus for easier entry (invalid text is kept so it can be corrected) */
   clearOnFocus?: boolean;
   /** Whether to show increment/decrement controls */
   showControls?: boolean;
   /** Optional class for the outer wrapper when the input needs to size as a flex/grid item */
   wrapperClassName?: string;
-  /** Minimum allowed value (default: 0) */
+  /** Optional class for the error message */
+  errorClassName?: string;
+  /** Minimum allowed value (default: 0). Negative amounts are never accepted. */
   min?: number;
-  /** Maximum allowed value */
+  /** Maximum allowed value; larger typed amounts are rejected with an error */
   max?: number;
   /** Step size for controls/arrow keys (default: 1, or 10^-decimals for decimals) */
   step?: number;
@@ -58,10 +81,13 @@ const NumberInput = memo(
     {
       value,
       onChange,
-      onValueChange,
+      onValidityChange,
+      invalidDraft,
       decimals = 0,
+      unit = 'pounds',
       className,
       wrapperClassName,
+      errorClassName,
       prefix,
       suffix,
       clearOnFocus = true,
@@ -74,52 +100,183 @@ const NumberInput = memo(
       onFocus,
       onBlur,
       onKeyDown,
+      'aria-describedby': ariaDescribedBy,
       ...props
     },
     ref,
   ) {
-    // Internal state for the displayed value
-    const [displayValue, setDisplayValue] = useState<string>('');
+    // Displayed text, and the error for that text when it is not a valid amount.
+    const [displayValue, setDisplayValue] = useState<string>(
+      () => invalidDraft?.text ?? formatNumber(value, decimals),
+    );
+    const [error, setError] = useState<string | null>(() => invalidDraft?.error ?? null);
+    const [errorVisible, setErrorVisible] = useState<boolean>(() => invalidDraft !== undefined);
     const [isFocused, setIsFocused] = useState<boolean>(false);
+
+    const isFocusedRef = useRef(false);
+    const displayValueRef = useRef(displayValue);
+    displayValueRef.current = displayValue;
+    const errorRef = useRef(error);
+    errorRef.current = error;
+    // Text of the invalid draft last reported to the owner (null when reported valid).
+    const reportedRef = useRef<string | null>(
+      invalidDraft ? `${invalidDraft.text}\u0000${invalidDraft.error}` : null,
+    );
+    const onValidityChangeRef = useRef(onValidityChange);
+    onValidityChangeRef.current = onValidityChange;
 
     // SSR-safe ID generation
     const reactId = useId();
     const inputId = id ?? `number-input-${reactId}`;
     const controlsId = `${inputId}-controls`;
+    const errorId = `${inputId}-error`;
 
     // Calculate default step based on decimals
     const effectiveStep = step ?? (decimals > 0 ? 10 ** -decimals : 1);
 
-    // Format the initial value
+    const reportValidity = useCallback((invalid: NumberInputInvalidDraft | null) => {
+      const key = invalid ? `${invalid.text}\u0000${invalid.error}` : null;
+      if (reportedRef.current === key) return;
+      reportedRef.current = key;
+      onValidityChangeRef.current?.(invalid);
+    }, []);
+
+    const parseText = useCallback(
+      (text: string): CurrencyInputParseResult => {
+        const result = parseCurrencyInput(
+          text,
+          max === undefined ? { unit, decimals } : { max, unit, decimals },
+        );
+        if (result.status === 'valid' && result.value < min) {
+          const minimum =
+            unit === 'percent' ? `${min.toLocaleString('en-GB')}%` : formatCurrencyInputValue(min);
+          return { status: 'invalid', error: `Enter ${minimum} or more.` };
+        }
+        return result;
+      },
+      [decimals, max, min, unit],
+    );
+
+    /** Show a committed amount, discarding any invalid text and its error. */
+    const showValue = useCallback(
+      (amount: number) => {
+        setDisplayValue(formatNumber(amount, decimals));
+        setError(null);
+        setErrorVisible(false);
+      },
+      [decimals],
+    );
+
+    // Resync from an external value change (reset, applied suggestion), unless being edited.
+    const previousValueRef = useRef(value);
     useEffect(() => {
-      // Only update display value when not focused to prevent cursor jumping
-      if (!isFocused) {
-        setDisplayValue(formatNumber(value, decimals));
+      if (Object.is(previousValueRef.current, value)) return;
+      previousValueRef.current = value;
+      if (isFocusedRef.current) return;
+      showValue(value);
+      reportValidity(null);
+    }, [value, showValue, reportValidity]);
+
+    // Re-format valid text when the display precision changes.
+    useEffect(() => {
+      if (isFocusedRef.current || errorRef.current !== null) return;
+      setDisplayValue(formatNumber(previousValueRef.current, decimals));
+    }, [decimals]);
+
+    // Follow invalid text held by the owner (a remount, or the owner clearing it on reset).
+    // Runs only when the held draft changes, so an owner that does not hold drafts is unaffected.
+    const draftText = invalidDraft?.text;
+    const draftError = invalidDraft?.error;
+    useEffect(() => {
+      if (isFocusedRef.current) return;
+      if (draftText !== undefined && draftError !== undefined) {
+        reportedRef.current = `${draftText}\u0000${draftError}`;
+        if (displayValueRef.current === draftText && errorRef.current === draftError) return;
+        setDisplayValue(draftText);
+        setError(draftError);
+        setErrorVisible(true);
+      } else if (errorRef.current !== null) {
+        reportedRef.current = null;
+        showValue(previousValueRef.current);
       }
-    }, [value, decimals, isFocused]);
+    }, [draftText, draftError, showValue]);
 
     /**
-     * Clamp value to min/max bounds
+     * Commit text: a valid amount is formatted and passed on; empty text commits 0 (the amount
+     * the calculator uses for an empty field); invalid text is kept with a visible error and the
+     * committed value is left unchanged.
+     */
+    const commit = useCallback(
+      (text: string) => {
+        const result = parseText(text);
+        if (result.status === 'invalid') {
+          setError(result.error);
+          setErrorVisible(true);
+          reportValidity({ text, error: result.error });
+          return;
+        }
+        const amount = result.status === 'valid' ? result.value : 0;
+        showValue(amount);
+        reportValidity(null);
+        if (amount !== value) {
+          previousValueRef.current = amount;
+          onChange(amount);
+        }
+      },
+      [onChange, parseText, reportValidity, showValue, value],
+    );
+    const commitRef = useRef(commit);
+    commitRef.current = commit;
+
+    // Re-check held invalid text when the field's rules change (e.g. pension £ ↔ %), so the
+    // message, the owner's record and the committed value always match the rules shown.
+    useEffect(() => {
+      if (errorRef.current === null) return;
+      const text = displayValueRef.current;
+      if (!isFocusedRef.current) {
+        commitRef.current(text);
+        return;
+      }
+      const result = parseText(text);
+      setError(result.status === 'invalid' ? result.error : null);
+    }, [parseText]);
+
+    /**
+     * Clamp value to min/max bounds (controls only; typed text is validated, not clamped)
      */
     const clampValue = useCallback(
       (val: number): number => {
-        let clamped = val;
-        if (min !== undefined) clamped = Math.max(min, clamped);
+        let clamped = Math.max(min, val);
         if (max !== undefined) clamped = Math.min(max, clamped);
         return clamped;
       },
       [min, max],
     );
 
+    /** Step from the valid displayed amount, or the committed value when the text is not valid. */
+    const stepBy = useCallback(
+      (delta: number) => {
+        const current = parseText(displayValue);
+        const base = current.status === 'valid' ? current.value : value;
+        const newValue = clampValue(base + delta);
+        showValue(newValue);
+        reportValidity(null);
+        previousValueRef.current = newValue;
+        onChange(newValue);
+      },
+      [clampValue, displayValue, onChange, parseText, reportValidity, showValue, value],
+    );
+
     /**
-     * Handle focus event - clear field for better UX if configured
+     * Handle focus event - clear field for easier entry if configured
      */
     const handleFocus = useCallback(
       (e: FocusEvent<HTMLInputElement>) => {
+        isFocusedRef.current = true;
         setIsFocused(true);
 
-        if (clearOnFocus) {
-          // Use state only, don't mutate DOM directly
+        // Keep invalid text so the person can correct it.
+        if (clearOnFocus && errorRef.current === null) {
           setDisplayValue('');
         }
 
@@ -129,98 +286,35 @@ const NumberInput = memo(
     );
 
     /**
-     * Handle blur event - parse and format the current input value
+     * Handle blur event - commit the current text
      */
     const handleBlur = useCallback(
       (e: FocusEvent<HTMLInputElement>) => {
+        isFocusedRef.current = false;
         setIsFocused(false);
-
-        const parsed = parseFormattedValue(e.target.value);
-        const clamped = clampValue(parsed);
-
-        setDisplayValue(formatNumber(clamped, decimals));
-
-        // Only notify if value actually changed
-        if (clamped !== value) {
-          onChange(clamped);
-        }
-
+        commit(e.target.value);
         onBlur?.(e);
       },
-      [decimals, onChange, onBlur, clampValue, value],
+      [commit, onBlur],
     );
 
     /**
-     * Handle input change - format with thousand separators while typing
+     * Handle input change - keep the text exactly as typed; once an error is showing, keep its
+     * message in step with the text.
      */
     const handleChange = useCallback(
       (e: ChangeEvent<HTMLInputElement>) => {
-        const inputValue = e.target.value;
-
-        if (inputValue === '') {
-          setDisplayValue('');
-          onValueChange?.(0);
-          return;
-        }
-
-        // Allow negative sign at start if min < 0
-        const allowNegative = min < 0;
-
-        if (decimals > 0) {
-          // Remove all non-numeric characters except decimal point (and minus if allowed)
-          const cleanPattern = allowNegative ? /[^\d.-]/g : /[^\d.]/g;
-          let cleaned = inputValue.replace(cleanPattern, '');
-
-          // Only allow one minus at the start
-          if (allowNegative && cleaned.includes('-')) {
-            const isNegative = cleaned.startsWith('-');
-            cleaned = cleaned.replace(/-/g, '');
-            if (isNegative) cleaned = `-${cleaned}`;
-          }
-
-          // Prevent multiple decimal points
-          const parts = cleaned.split('.');
-          if (parts.length > 2) return;
-
-          // Clamp decimal digits
-          const decimalPart = parts[1];
-          if (parts.length === 2 && decimalPart && decimalPart.length > decimals) {
-            parts[1] = decimalPart.slice(0, decimals);
-          }
-
-          // Format integer part with commas
-          const integerPart = parts[0] || '';
-          const isNegative = integerPart.startsWith('-');
-          const absInteger = isNegative ? integerPart.slice(1) : integerPart;
-          const formattedInteger = absInteger.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-          const finalInteger = isNegative ? `-${formattedInteger}` : formattedInteger;
-
-          const formatted = parts.length === 2 ? `${finalInteger}.${parts[1] ?? ''}` : finalInteger;
-
-          setDisplayValue(formatted);
-          onValueChange?.(parseFormattedValue(formatted));
+        const text = e.target.value;
+        setDisplayValue(text);
+        const result = parseText(text);
+        if (result.status === 'invalid') {
+          setError(result.error);
         } else {
-          // For integers
-          const cleanPattern = allowNegative ? /[^\d-]/g : /[^\d]/g;
-          let cleaned = inputValue.replace(cleanPattern, '');
-
-          // Only allow one minus at the start
-          if (allowNegative && cleaned.includes('-')) {
-            const isNegative = cleaned.startsWith('-');
-            cleaned = cleaned.replace(/-/g, '');
-            if (isNegative) cleaned = `-${cleaned}`;
-          }
-
-          const isNegative = cleaned.startsWith('-');
-          const absValue = isNegative ? cleaned.slice(1) : cleaned;
-          const formattedValue = absValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-          const formatted = isNegative ? `-${formattedValue}` : formattedValue;
-
-          setDisplayValue(formatted);
-          onValueChange?.(parseFormattedValue(formatted));
+          setError(null);
+          setErrorVisible(false);
         }
       },
-      [decimals, min, onValueChange],
+      [parseText],
     );
 
     /**
@@ -234,24 +328,19 @@ const NumberInput = memo(
 
         if (showControls) {
           const multiplier = e.shiftKey ? 10 : 1;
-          const currentValue = parseFormattedValue(displayValue);
 
           if (e.key === 'ArrowUp') {
             e.preventDefault();
-            const newValue = clampValue(currentValue + effectiveStep * multiplier);
-            setDisplayValue(formatNumber(newValue, decimals));
-            onChange(newValue);
+            stepBy(effectiveStep * multiplier);
           } else if (e.key === 'ArrowDown') {
             e.preventDefault();
-            const newValue = clampValue(currentValue - effectiveStep * multiplier);
-            setDisplayValue(formatNumber(newValue, decimals));
-            onChange(newValue);
+            stepBy(-effectiveStep * multiplier);
           }
         }
 
         onKeyDown?.(e);
       },
-      [displayValue, onChange, onKeyDown, showControls, clampValue, effectiveStep, decimals],
+      [effectiveStep, onKeyDown, showControls, stepBy],
     );
 
     /**
@@ -259,148 +348,161 @@ const NumberInput = memo(
      */
     const handleIncrement = useCallback(() => {
       if (disabled) return;
-      const currentValue = parseFormattedValue(displayValue);
-      const newValue = clampValue(currentValue + effectiveStep);
-      setDisplayValue(formatNumber(newValue, decimals));
-      onChange(newValue);
-    }, [disabled, displayValue, onChange, clampValue, effectiveStep, decimals]);
+      stepBy(effectiveStep);
+    }, [disabled, effectiveStep, stepBy]);
 
     /**
      * Handle decrement button click
      */
     const handleDecrement = useCallback(() => {
       if (disabled) return;
-      const currentValue = parseFormattedValue(displayValue);
-      const newValue = clampValue(currentValue - effectiveStep);
-      setDisplayValue(formatNumber(newValue, decimals));
-      onChange(newValue);
-    }, [disabled, displayValue, onChange, clampValue, effectiveStep, decimals]);
+      stepBy(-effectiveStep);
+    }, [disabled, effectiveStep, stepBy]);
+
+    const showError = errorVisible && error !== null;
+    const describedBy =
+      [ariaDescribedBy, showError ? errorId : null].filter(Boolean).join(' ') || undefined;
 
     return (
-      <div className={cn('relative flex items-center', disabled && 'opacity-60', wrapperClassName)}>
-        {prefix && (
-          <span
-            className='pointer-events-none absolute left-3 z-10 text-foreground/70'
-            aria-hidden='true'
-          >
-            {prefix}
-          </span>
-        )}
-
-        <input
-          ref={ref}
-          type='text'
-          inputMode='decimal'
-          role='spinbutton'
-          id={inputId}
-          value={displayValue}
-          onChange={handleChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          onKeyDown={handleKeyDown}
-          disabled={disabled}
-          aria-valuenow={value}
-          aria-valuemin={min}
-          aria-valuemax={max}
-          aria-valuetext={
-            prefix || suffix
-              ? `${prefix ?? ''}${formatNumber(value, decimals)}${suffix ?? ''}`
-              : undefined
-          }
-          className={cn(
-            'flex h-9 w-full rounded-sm border border-input bg-background px-3 py-1 shadow-none',
-            'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-            'disabled:cursor-not-allowed disabled:opacity-50',
-            'placeholder:text-muted-foreground',
-            'transition-all duration-200',
-            'text-foreground',
-            'text-sm',
-            prefix && 'pl-7',
-            suffix && 'pr-7',
-            showControls && 'pr-16',
-            isFocused && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
-            className,
+      <div className={cn('min-w-0', wrapperClassName)}>
+        <div className={cn('relative flex items-center', disabled && 'opacity-60')}>
+          {prefix && (
+            <span
+              className='pointer-events-none absolute left-3 z-10 text-foreground/70'
+              aria-hidden='true'
+            >
+              {prefix}
+            </span>
           )}
-          {...props}
-        />
 
-        {suffix && (
-          <span
-            className='pointer-events-none absolute right-3 z-10 text-foreground/70'
-            aria-hidden='true'
-          >
-            {suffix}
-          </span>
-        )}
-
-        {showControls && (
-          <fieldset
-            id={controlsId}
-            aria-label='Value controls'
+          <input
+            ref={ref}
+            type='text'
+            inputMode='decimal'
+            role='spinbutton'
+            autoComplete='off'
+            spellCheck={false}
+            id={inputId}
+            value={displayValue}
+            onChange={handleChange}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
+            disabled={disabled}
+            aria-valuenow={showError ? undefined : value}
+            aria-valuemin={min}
+            aria-valuemax={max}
+            aria-valuetext={
+              !showError && (prefix || suffix)
+                ? `${prefix ?? ''}${formatNumber(value, decimals)}${suffix ?? ''}`
+                : undefined
+            }
+            aria-invalid={showError || undefined}
+            aria-describedby={describedBy}
             className={cn(
-              'absolute inset-y-1 right-1 flex flex-col border-l',
-              'border-input bg-background',
-              'overflow-hidden rounded-r-sm',
-              'shadow-none',
-              disabled ? 'opacity-30' : 'opacity-70 hover:opacity-100',
+              'flex h-9 w-full rounded-sm border border-input bg-background px-3 py-1 shadow-none',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+              'disabled:cursor-not-allowed disabled:opacity-50',
+              'placeholder:text-muted-foreground',
+              'transition-all duration-200',
+              'text-foreground',
+              'text-sm',
+              prefix && 'pl-7',
+              suffix && 'pr-7',
+              showControls && 'pr-16',
+              isFocused && 'ring-2 ring-ring ring-offset-2 ring-offset-background',
+              showError && 'border-destructive',
+              className,
             )}
+            {...props}
+          />
+
+          {suffix && (
+            <span
+              className='pointer-events-none absolute right-3 z-10 text-foreground/70'
+              aria-hidden='true'
+            >
+              {suffix}
+            </span>
+          )}
+
+          {showControls && (
+            <fieldset
+              id={controlsId}
+              aria-label='Value controls'
+              className={cn(
+                'absolute inset-y-1 right-1 flex flex-col border-l',
+                'border-input bg-background',
+                'overflow-hidden rounded-r-sm',
+                'shadow-none',
+                disabled ? 'opacity-30' : 'opacity-70 hover:opacity-100',
+              )}
+            >
+              <button
+                type='button'
+                onClick={handleIncrement}
+                disabled={disabled}
+                className={cn(
+                  'flex flex-1 items-center justify-center px-2',
+                  'text-foreground transition-colors hover:bg-accent',
+                  'focus:bg-accent focus:outline-none disabled:pointer-events-none',
+                )}
+                aria-label='Increment value'
+                aria-controls={inputId}
+              >
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  width='12'
+                  height='12'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  stroke='currentColor'
+                  strokeWidth='2.5'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  aria-hidden='true'
+                >
+                  <path d='M18 15l-6-6-6 6' />
+                </svg>
+              </button>
+              <button
+                type='button'
+                onClick={handleDecrement}
+                disabled={disabled}
+                className={cn(
+                  'flex flex-1 items-center justify-center px-2',
+                  'text-foreground transition-colors hover:bg-accent',
+                  'focus:bg-accent focus:outline-none disabled:pointer-events-none',
+                )}
+                aria-label='Decrement value'
+                aria-controls={inputId}
+              >
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  width='12'
+                  height='12'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  stroke='currentColor'
+                  strokeWidth='2.5'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  aria-hidden='true'
+                >
+                  <path d='M6 9l6 6 6-6' />
+                </svg>
+              </button>
+            </fieldset>
+          )}
+        </div>
+        {showError ? (
+          <p
+            id={errorId}
+            className={cn('mt-1 text-destructive text-xs leading-relaxed', errorClassName)}
           >
-            <button
-              type='button'
-              onClick={handleIncrement}
-              disabled={disabled}
-              className={cn(
-                'flex flex-1 items-center justify-center px-2',
-                'text-foreground transition-colors hover:bg-accent',
-                'focus:bg-accent focus:outline-none disabled:pointer-events-none',
-              )}
-              aria-label='Increment value'
-              aria-controls={inputId}
-            >
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                width='12'
-                height='12'
-                viewBox='0 0 24 24'
-                fill='none'
-                stroke='currentColor'
-                strokeWidth='2.5'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                aria-hidden='true'
-              >
-                <path d='M18 15l-6-6-6 6' />
-              </svg>
-            </button>
-            <button
-              type='button'
-              onClick={handleDecrement}
-              disabled={disabled}
-              className={cn(
-                'flex flex-1 items-center justify-center px-2',
-                'text-foreground transition-colors hover:bg-accent',
-                'focus:bg-accent focus:outline-none disabled:pointer-events-none',
-              )}
-              aria-label='Decrement value'
-              aria-controls={inputId}
-            >
-              <svg
-                xmlns='http://www.w3.org/2000/svg'
-                width='12'
-                height='12'
-                viewBox='0 0 24 24'
-                fill='none'
-                stroke='currentColor'
-                strokeWidth='2.5'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                aria-hidden='true'
-              >
-                <path d='M6 9l6 6 6-6' />
-              </svg>
-            </button>
-          </fieldset>
-        )}
+            {error}
+          </p>
+        ) : null}
       </div>
     );
   }),

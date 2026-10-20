@@ -68,6 +68,13 @@ import {
   type TaxCalculationResults,
 } from '@/lib/types/calculator';
 import { useShallow } from '@/lib/zustandShallow';
+import {
+  type CalculatorAmountField,
+  type CalculatorInputErrors,
+  type CalculatorInvalidAmount,
+  getBlockingInputErrors,
+  incomeSourceAmountField,
+} from '@/store/calculatorInputErrors';
 
 const shouldLogWarnings = process.env.NODE_ENV !== 'production';
 
@@ -198,6 +205,12 @@ interface CalculatorState {
   // Input values
   input: CalculatorInput;
 
+  /**
+   * Rejected amount text by field (not persisted). While a field the calculation uses holds
+   * rejected text, results are cleared and calculation is refused.
+   */
+  inputErrors: CalculatorInputErrors;
+
   // Calculation results
   results: CalculationResults;
   previousYearResults: CalculationResults;
@@ -226,6 +239,8 @@ interface CalculatorState {
   setHoursPerWeek: (hours: number) => void;
   setAllowancesDeductions: (amount: number) => void;
   setInput: (partial: Partial<CalculatorInput>) => void;
+  /** Record (or, with `null`, clear) rejected text for an amount field. */
+  setInputError: (field: CalculatorAmountField, invalid: CalculatorInvalidAmount | null) => void;
 
   // Income Sources Management
   addIncomeSource: () => void;
@@ -539,6 +554,7 @@ export const useCalculatorStore = create<CalculatorState>()(
       (set, get) => ({
         // Initial state
         input: { ...defaultInput },
+        inputErrors: {},
         results: null,
         previousYearResults: null,
 
@@ -904,6 +920,24 @@ export const useCalculatorStore = create<CalculatorState>()(
           }));
         },
 
+        setInputError: (field, invalid) => {
+          if (invalid) {
+            // Results for the previously committed amount must not stay on screen looking current.
+            set((state) => ({
+              inputErrors: { ...state.inputErrors, [field]: invalid },
+              results: null,
+              previousYearResults: null,
+              whatIfResults: null,
+            }));
+            return;
+          }
+          set((state) => {
+            if (!(field in state.inputErrors)) return state;
+            const { [field]: _cleared, ...rest } = state.inputErrors;
+            return { inputErrors: rest };
+          });
+        },
+
         // Income Sources Management
         addIncomeSource: () => {
           // Guard: crypto.randomUUID is only available client-side
@@ -950,18 +984,28 @@ export const useCalculatorStore = create<CalculatorState>()(
         },
 
         removeIncomeSource: (id) => {
-          set((state) => ({
-            input: {
-              ...state.input,
-              incomeSources: state.input.incomeSources.filter(
-                (source: IncomeSource) => source.id !== id,
-              ),
-            },
-          }));
+          set((state) => {
+            const { [incomeSourceAmountField(id)]: _removed, ...inputErrors } = state.inputErrors;
+            return {
+              inputErrors,
+              input: {
+                ...state.input,
+                incomeSources: state.input.incomeSources.filter(
+                  (source: IncomeSource) => source.id !== id,
+                ),
+              },
+            };
+          });
         },
 
         // Calculation actions
         calculate: () => {
+          // Never calculate from a previous amount while a field it uses holds rejected text.
+          if (getBlockingInputErrors(get()).length > 0) {
+            set({ results: null, previousYearResults: null, whatIfResults: null });
+            return;
+          }
+
           const transaction = startPerformanceTransaction('calculate-tax', {
             operation: 'tax_calculation',
           });
@@ -1065,6 +1109,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           }
         },
         calculatePreviousYear: () => {
+          if (getBlockingInputErrors(get()).length > 0) return;
           const { input } = get();
 
           // Get previous tax year
@@ -1082,6 +1127,7 @@ export const useCalculatorStore = create<CalculatorState>()(
         reset: () => {
           set({
             input: { ...defaultInput },
+            inputErrors: {},
             results: null,
             previousYearResults: null,
             whatIf: {
@@ -1150,6 +1196,7 @@ export const useCalculatorStore = create<CalculatorState>()(
         },
 
         calculateWhatIf: () => {
+          if (getBlockingInputErrors(get()).length > 0) return;
           const { input, whatIf } = get();
 
           const currentSalary = input.salary;
@@ -1292,6 +1339,7 @@ export const useCalculatorActions = () =>
       setHoursPerWeek: state.setHoursPerWeek,
       setAllowancesDeductions: state.setAllowancesDeductions,
       setInput: state.setInput,
+      setInputError: state.setInputError,
       addIncomeSource: state.addIncomeSource,
       updateIncomeSource: state.updateIncomeSource,
       removeIncomeSource: state.removeIncomeSource,

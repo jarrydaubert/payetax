@@ -6,6 +6,8 @@
  * - Regression where "non-taxable allowances" stop affecting net pay correctly
  * - Regression where marginal rate stops reflecting selected options (e.g. student loan)
  * - Regression where additional income sources stop showing/being included in totals
+ * - Regression where amount fields scale pence, drop minus signs or turn malformed text into £0,
+ *   or leave results for a rejected amount on screen
  */
 
 import { expect, type Locator, type Page, test } from '@playwright/test';
@@ -224,6 +226,89 @@ test.describe('Calculator critical @critical', () => {
 
     const newGross = await getYearlyTableValue(page, 'Gross Pay');
     expect(newGross).toBeCloseTo(baseGross + 1000, 1);
+  });
+
+  test('Additional income keeps its pence instead of being scaled up @critical', async ({
+    page,
+  }) => {
+    await setLandscapeViewportIfPortrait(page);
+    await gotoCalculator(page);
+
+    await page.getByTestId('salary-input').fill('30000');
+    await page.getByTestId('calculate-button').click();
+    await expect(page.getByTestId('results-table')).toBeVisible();
+    const baseGross = await getYearlyTableValue(page, 'Gross Pay');
+
+    await page.getByText('Additional Income Sources').click();
+    await page.getByTestId('add-income-source').click();
+    const amount = page.getByTestId('income-source-0-amount');
+
+    // Typed with a decimal point, then pasted with £ and a thousands comma: both are £1,234.56.
+    for (const text of ['1234.56', '£1,234.56']) {
+      await amount.fill(text);
+      await page.getByTestId('calculate-button').click();
+      await expect(amount).toHaveValue('1,234.56');
+      await expect(page.getByTestId('results-table')).toBeVisible();
+      const gross = await getYearlyTableValue(page, 'Gross Pay');
+      expect(gross).toBeCloseTo(baseGross + 1234.56, 2);
+    }
+  });
+
+  test('Rejected amounts show an error, remove old results and are never calculated @critical', async ({
+    page,
+  }) => {
+    await setLandscapeViewportIfPortrait(page);
+    await gotoCalculator(page);
+
+    const salary = page.getByTestId('salary-input');
+    const results = page.getByTestId('results-table');
+    const calculate = page.getByTestId('calculate-button');
+
+    await salary.fill('30000');
+    await calculate.click();
+    await expect(results).toBeVisible();
+
+    // A negative salary is not turned into a positive one.
+    await salary.fill('-500');
+    await salary.press('Tab');
+    await expect(salary).toHaveValue('-500');
+    await expect(salary).toHaveAttribute('aria-invalid', 'true');
+    await expect(
+      page.getByText('Enter an amount of £0 or more. Negative amounts are not supported.'),
+    ).toBeVisible();
+    await expect(results).toBeHidden();
+    await calculate.click();
+    await expect(
+      page.getByRole('alert').filter({ hasText: 'Correct the invalid amount in Salary' }),
+    ).toBeVisible();
+    await expect(results).toBeHidden();
+
+    // Correcting it recovers normally.
+    await salary.fill('30000');
+    await calculate.click();
+    await expect(results).toBeVisible();
+    await expect(salary).not.toHaveAttribute('aria-invalid');
+    const baseGross = await getYearlyTableValue(page, 'Gross Pay');
+
+    // Malformed income text is not treated as £0, and stays visible until dealt with.
+    await page.getByText('Additional Income Sources').click();
+    await page.getByTestId('add-income-source').click();
+    const amount = page.getByTestId('income-source-0-amount');
+    await amount.fill('1.2.3');
+    await amount.press('Tab');
+    await expect(
+      page.getByText('Enter an amount in pounds and pence, like 1,234.56.'),
+    ).toBeVisible();
+    await expect(results).toBeHidden();
+    await page.getByText('Additional Income Sources').click();
+    await expect(amount).toBeVisible();
+    await calculate.click();
+    await expect(results).toBeHidden();
+
+    await page.getByRole('button', { name: 'Remove income source 1' }).click();
+    await calculate.click();
+    await expect(results).toBeVisible();
+    expect(await getYearlyTableValue(page, 'Gross Pay')).toBeCloseTo(baseGross, 2);
   });
 
   test('Plan 2 + Postgrad UI applies both loans @critical', async ({ page }) => {

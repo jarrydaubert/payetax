@@ -22,16 +22,25 @@ import { PERIODS, type StudentLoanPlan } from '@/constants/taxRates';
 import { trackFormInteraction } from '@/lib/analytics';
 import { normalizeTaxCode, TAX_CODE_MAX_LENGTH } from '@/lib/tax';
 import { cn } from '@/lib/utils';
+import type { CalculatorAmountField, CalculatorInvalidAmount } from '@/store/calculatorInputErrors';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
 
 /** State Pension Age threshold - employees over SPA don't pay NI */
 const STATE_PENSION_AGE = 66;
+
+/** Field limits, matching the calculator store's input schemas so no accepted amount is dropped. */
+const SALARY_MAX = 10_000_000;
+const PARTNER_WAGE_MAX = 10_000_000;
+const ALLOWANCES_MAX = 1_000_000;
+const PENSION_AMOUNT_MAX = 10_000_000;
+const PENSION_PERCENT_MAX = 100;
 
 export function BasicInputs() {
   const trackedFieldFocusesRef = useRef<Set<string>>(new Set());
 
   // Use optimized selectors - extract only input state and actions
   const input = useCalculatorStore((state) => state.input);
+  const inputErrors = useCalculatorStore((state) => state.inputErrors);
   const {
     setSalary,
     setPayPeriod,
@@ -47,7 +56,10 @@ export function BasicInputs() {
     setPensionContribution,
     setPensionContributionType,
     setAllowancesDeductions,
+    setInputError,
   } = useCalculatorActions();
+  const validityFor = (field: CalculatorAmountField) => (invalid: CalculatorInvalidAmount | null) =>
+    setInputError(field, invalid);
 
   // Generate unique IDs for accessibility
   const salaryId = useId();
@@ -209,7 +221,7 @@ export function BasicInputs() {
         <div
           className={cn(
             fieldControlClass,
-            'grid w-full max-w-full grid-cols-[minmax(0,1fr)_7.5rem] sm:w-[17rem]',
+            'grid w-full max-w-full grid-cols-[minmax(0,1fr)_7.5rem] items-start sm:w-[17rem]',
             'gap-2',
           )}
         >
@@ -219,12 +231,14 @@ export function BasicInputs() {
             onChange={(value) => {
               setSalary(value);
             }}
+            onValidityChange={validityFor('salary')}
+            invalidDraft={inputErrors.salary}
             onFocus={() => trackCalculatorFieldFocus('salary')}
             prefix='£'
             decimals={2}
             placeholder='0.00'
             min={0}
-            max={10000000}
+            max={SALARY_MAX}
             wrapperClassName='min-w-0 flex-1'
             className={cn(fullWidthInputClass, 'text-right tabular-nums')}
             data-testid='salary-input'
@@ -383,10 +397,13 @@ export function BasicInputs() {
             id={partnerWageId}
             value={input.partnerGrossWage}
             onChange={setPartnerGrossWage}
+            onValidityChange={validityFor('partnerGrossWage')}
+            invalidDraft={inputErrors.partnerGrossWage}
             prefix='£'
             decimals={2}
             placeholder='0.00'
             min={0}
+            max={PARTNER_WAGE_MAX}
             wrapperClassName={flexInputWrapperClass}
             className={fullWidthInputClass}
             data-testid='partner-salary-input'
@@ -490,10 +507,13 @@ export function BasicInputs() {
           id={allowancesId}
           value={input.allowancesDeductions}
           onChange={setAllowancesDeductions}
+          onValidityChange={validityFor('allowancesDeductions')}
+          invalidDraft={inputErrors.allowancesDeductions}
           prefix='£'
           decimals={2}
           placeholder='0.00'
           min={0}
+          max={ALLOWANCES_MAX}
           wrapperClassName={flexInputWrapperClass}
           className={fullWidthInputClass}
           data-testid='non-taxable-allowances-input'
@@ -511,7 +531,7 @@ export function BasicInputs() {
         <div
           className={cn(
             fieldControlClass,
-            'grid w-full max-w-[15rem] grid-cols-[4.75rem_minmax(0,1fr)] sm:grid-cols-[5rem_minmax(0,1fr)]',
+            'grid w-full max-w-[15rem] grid-cols-[4.75rem_minmax(0,1fr)] items-start sm:grid-cols-[5rem_minmax(0,1fr)]',
             'gap-1.5',
           )}
         >
@@ -561,13 +581,20 @@ export function BasicInputs() {
             id={pensionId}
             value={input.pensionContribution}
             onChange={setPensionContribution}
+            onValidityChange={validityFor('pensionContribution')}
+            invalidDraft={inputErrors.pensionContribution}
             onFocus={() => trackCalculatorFieldFocus('pension')}
             prefix={input.pensionContributionType === 'amount' ? '£' : undefined}
             suffix={input.pensionContributionType === 'percentage' ? '%' : undefined}
+            unit={input.pensionContributionType === 'percentage' ? 'percent' : 'pounds'}
             decimals={2}
             placeholder={input.pensionContributionType === 'percentage' ? '5.00' : '0.00'}
             min={0}
-            max={input.pensionContributionType === 'percentage' ? 100 : undefined}
+            max={
+              input.pensionContributionType === 'percentage'
+                ? PENSION_PERCENT_MAX
+                : PENSION_AMOUNT_MAX
+            }
             wrapperClassName='min-w-0 flex-1'
             className={fullWidthInputClass}
             data-testid='pension-input'
