@@ -60,6 +60,7 @@ export function IncomeSourceList() {
   const { addIncomeSource, updateIncomeSource, removeIncomeSource, setInputError } =
     useCalculatorActions();
   const inputErrors = useCalculatorStore((state) => state.inputErrors);
+  const inputRevision = useCalculatorStore((state) => state.inputRevision);
   const [isOpen, setIsOpen] = React.useState(false);
   // Keep the list open while an amount in it is rejected, so the error stays visible.
   const hasRejectedAmount = incomeSources.some(
@@ -190,6 +191,7 @@ export function IncomeSourceList() {
                     setInputError(incomeSourceAmountField(source.id), invalid)
                   }
                   invalidDraft={inputErrors[incomeSourceAmountField(source.id)]}
+                  resetKey={inputRevision}
                   aria-label={`Income source ${index + 1} amount`}
                   prefix='£'
                   decimals={2}

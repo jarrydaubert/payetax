@@ -319,6 +319,19 @@ test.describe('Calculator critical @critical', () => {
     await calculate.click();
     await expect(results).toBeVisible();
     expect(await getYearlyTableValue(page, 'Gross Pay')).toBeCloseTo(baseGross, 2);
+
+    // Reset activated without moving focus discards rejected text being typed, so it cannot
+    // silently stop blocking while still on screen.
+    const pension = page.getByTestId('pension-input');
+    await pension.fill('abc');
+    await page.getByRole('button', { name: /Reset/ }).dispatchEvent('click');
+    await expect(pension).toHaveValue('0.00');
+    await expect(pension).not.toHaveAttribute('aria-invalid');
+    await salary.fill('30000');
+    await calculate.click();
+    await expect(results).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Email tax calculation results' })).toBeVisible();
+    await expect(pension).not.toHaveAttribute('aria-invalid');
   });
 
   test('Plan 2 + Postgrad UI applies both loans @critical', async ({ page }) => {

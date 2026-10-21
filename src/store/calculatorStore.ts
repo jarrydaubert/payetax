@@ -211,6 +211,12 @@ interface CalculatorState {
    */
   inputErrors: CalculatorInputErrors;
 
+  /**
+   * Incremented by Reset (not persisted). Amount fields discard any draft text, error and
+   * reported state when it changes, including a field that is focused mid-edit.
+   */
+  inputRevision: number;
+
   // Calculation results
   results: CalculationResults;
   previousYearResults: CalculationResults;
@@ -555,6 +561,7 @@ export const useCalculatorStore = create<CalculatorState>()(
         // Initial state
         input: { ...defaultInput },
         inputErrors: {},
+        inputRevision: 0,
         results: null,
         previousYearResults: null,
 
@@ -1134,6 +1141,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           set({
             input: { ...defaultInput },
             inputErrors: {},
+            inputRevision: get().inputRevision + 1,
             results: null,
             previousYearResults: null,
             whatIf: {

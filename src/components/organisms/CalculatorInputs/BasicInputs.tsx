@@ -41,6 +41,7 @@ export function BasicInputs() {
   // Use optimized selectors - extract only input state and actions
   const input = useCalculatorStore((state) => state.input);
   const inputErrors = useCalculatorStore((state) => state.inputErrors);
+  const inputRevision = useCalculatorStore((state) => state.inputRevision);
   const {
     setSalary,
     setPayPeriod,
@@ -233,6 +234,7 @@ export function BasicInputs() {
             }}
             onValidityChange={validityFor('salary')}
             invalidDraft={inputErrors.salary}
+            resetKey={inputRevision}
             onFocus={() => trackCalculatorFieldFocus('salary')}
             prefix='£'
             decimals={2}
@@ -399,6 +401,7 @@ export function BasicInputs() {
             onChange={setPartnerGrossWage}
             onValidityChange={validityFor('partnerGrossWage')}
             invalidDraft={inputErrors.partnerGrossWage}
+            resetKey={inputRevision}
             prefix='£'
             decimals={2}
             placeholder='0.00'
@@ -509,6 +512,7 @@ export function BasicInputs() {
           onChange={setAllowancesDeductions}
           onValidityChange={validityFor('allowancesDeductions')}
           invalidDraft={inputErrors.allowancesDeductions}
+          resetKey={inputRevision}
           prefix='£'
           decimals={2}
           placeholder='0.00'
@@ -583,6 +587,7 @@ export function BasicInputs() {
             onChange={setPensionContribution}
             onValidityChange={validityFor('pensionContribution')}
             invalidDraft={inputErrors.pensionContribution}
+            resetKey={inputRevision}
             onFocus={() => trackCalculatorFieldFocus('pension')}
             prefix={input.pensionContributionType === 'amount' ? '£' : undefined}
             suffix={input.pensionContributionType === 'percentage' ? '%' : undefined}

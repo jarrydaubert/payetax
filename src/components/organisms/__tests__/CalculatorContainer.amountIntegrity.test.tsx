@@ -356,6 +356,87 @@ describe('Main calculator amount integrity (mounted)', () => {
     expect(useCalculatorStore.getState().input.salary).toBe(0);
   });
 
+  describe('Reset while a field is focused with rejected text (no blur)', () => {
+    const emailAction = () =>
+      screen.queryByRole('button', { name: 'Email tax calculation results' });
+
+    it.each([
+      ['pension-input', '0.00'],
+      ['non-taxable-allowances-input', '0.00'],
+      ['salary-input', '0.00'],
+    ])('discards %s text, so later calculations and email work normally', async (testId, resetText) => {
+      const user = userEvent.setup();
+      render(<CalculatorContainer />);
+      await typeInto(user, screen.getByTestId('salary-input'), '30000');
+      await calculate(user);
+      await waitFor(() => expect(resultsShown()).toBe(true));
+
+      const field = screen.getByTestId(testId);
+      await user.click(field);
+      await user.clear(field);
+      await user.keyboard('abc');
+      expect(useCalculatorStore.getState().inputErrors).not.toEqual({});
+
+      // Activate Reset without moving focus, so the field receives no blur first.
+      fireEvent.click(screen.getByRole('button', { name: /Reset/i }));
+
+      // Displayed draft, committed value, validation and store all agree on the reset state.
+      expect(field).toHaveValue(resetText);
+      expect(field).not.toHaveAttribute('aria-invalid');
+      expect(field).not.toHaveAccessibleDescription(/./);
+      expect(useCalculatorStore.getState().inputErrors).toEqual({});
+      expect(useCalculatorStore.getState().input.pensionContribution).toBe(0);
+      expect(useCalculatorStore.getState().input.allowancesDeductions).toBe(0);
+      expect(useCalculatorStore.getState().input.salary).toBe(0);
+
+      // Leaving the field afterwards must not resurrect the discarded text.
+      await user.click(field);
+      await user.tab();
+      expect(field).not.toHaveAttribute('aria-invalid');
+      expect(useCalculatorStore.getState().inputErrors).toEqual({});
+
+      // A fresh calculation works and is not blocked by an invisible rejection.
+      await typeInto(user, screen.getByTestId('salary-input'), '30000');
+      await calculate(user);
+      await waitFor(() => expect(resultsShown()).toBe(true));
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+      expect(emailAction()).toBeInTheDocument();
+      expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(30000);
+    });
+
+    it('discards valid text still being typed, so a later blur cannot undo Reset', async () => {
+      const user = userEvent.setup();
+      render(<CalculatorContainer />);
+      const allowances = screen.getByTestId('non-taxable-allowances-input');
+      await user.click(allowances);
+      await user.keyboard('1200');
+      fireEvent.click(screen.getByRole('button', { name: /Reset/i }));
+
+      expect(allowances).toHaveValue('0.00');
+      await user.tab();
+      expect(useCalculatorStore.getState().input.allowancesDeductions).toBe(0);
+      expect(allowances).toHaveValue('0.00');
+    });
+
+    it('keeps blocking when invalid text is typed again after Reset', async () => {
+      const user = userEvent.setup();
+      render(<CalculatorContainer />);
+      const pension = screen.getByTestId('pension-input');
+      await user.click(pension);
+      await user.keyboard('abc');
+      fireEvent.click(screen.getByRole('button', { name: /Reset/i }));
+
+      // The same text again must be reported, not deduplicated against the discarded report.
+      await typeInto(user, screen.getByTestId('salary-input'), '30000');
+      await typeInto(user, pension, 'abc');
+      expect(pension).toHaveAttribute('aria-invalid', 'true');
+      expect(useCalculatorStore.getState().inputErrors.pensionContribution?.text).toBe('abc');
+      await calculate(user);
+      expect(resultsShown()).toBe(false);
+      expect(screen.getByRole('alert')).toHaveTextContent('Pension');
+    });
+  });
+
   it('Reset clears rejected text and its error', async () => {
     const user = userEvent.setup();
     render(<CalculatorContainer />);

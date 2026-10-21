@@ -79,6 +79,15 @@ describe('calculatorStore rejected amount text', () => {
     expect(useCalculatorStore.getState().inputErrors).toEqual({});
   });
 
+  it('Reset advances the input revision so fields discard their drafts', () => {
+    const before = useCalculatorStore.getState().inputRevision;
+    useCalculatorStore.getState().reset();
+    expect(useCalculatorStore.getState().inputRevision).toBe(before + 1);
+    expect(window.localStorage.getItem('tax-calculator-storage') ?? '').not.toContain(
+      'inputRevision',
+    );
+  });
+
   it('does not persist rejected text', () => {
     useCalculatorStore.getState().setInputError('salary', rejected);
     const persisted = window.localStorage.getItem('tax-calculator-storage') ?? '';

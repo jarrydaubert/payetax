@@ -47,6 +47,11 @@ interface NumberInputProps
   /** Invalid text held by the owner (e.g. while this field was unmounted); shown with its error. */
   invalidDraft?: NumberInputInvalidDraft;
   /**
+   * Changing this discards any text being edited, its error and what was last reported, and
+   * shows `value`, even while the field is focused (e.g. the owner's Reset).
+   */
+  resetKey?: number;
+  /**
    * Decimal places accepted and displayed: 2 for pounds and pence, 0 for whole units only.
    * Text with more significant decimal places is rejected, never rounded.
    */
@@ -84,6 +89,7 @@ const NumberInput = memo(
       onChange,
       onValidityChange,
       invalidDraft,
+      resetKey,
       decimals = 0,
       unit = 'pounds',
       className,
@@ -177,6 +183,20 @@ const NumberInput = memo(
       showValue(value);
       reportValidity(null);
     }, [value, showValue, reportValidity]);
+
+    // The owner reset its inputs: discard everything this field holds, focused or not, so the
+    // text shown, the committed value, the error and the reporting state all agree. A later
+    // blur then commits the reset value, and the same invalid text is reported again if retyped.
+    const valueRef = useRef(value);
+    valueRef.current = value;
+    const previousResetKeyRef = useRef(resetKey);
+    useEffect(() => {
+      if (previousResetKeyRef.current === resetKey) return;
+      previousResetKeyRef.current = resetKey;
+      previousValueRef.current = valueRef.current;
+      reportedRef.current = null;
+      showValue(valueRef.current);
+    }, [resetKey, showValue]);
 
     // Re-format valid text when the display precision changes.
     useEffect(() => {

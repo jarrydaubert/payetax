@@ -346,6 +346,63 @@ describe('NumberInput Component', () => {
       expect(onValidityChange).toHaveBeenLastCalledWith(null);
     });
 
+    describe('resetKey (owner reset)', () => {
+      const setup = () => {
+        const onValidityChange = jest.fn();
+        const props = { value: 0, onChange: mockOnChange, onValidityChange, decimals: 2 as const };
+        const view = render(<NumberInput {...props} resetKey={0} />);
+        const input = screen.getByRole('spinbutton');
+        return { ...view, input, onValidityChange, props };
+      };
+
+      it('discards focused rejected text, its error and its reported state', () => {
+        const { input, onValidityChange, props, rerender } = setup();
+        fireEvent.focus(input);
+        fireEvent.change(input, { target: { value: 'abc' } });
+        expect(onValidityChange).toHaveBeenCalledTimes(1);
+
+        rerender(<NumberInput {...props} resetKey={1} />);
+        expect(input).toHaveValue('0.00');
+        expect(input).not.toHaveAttribute('aria-invalid');
+
+        // Leaving does not resurrect it; retyping the same text is reported again.
+        fireEvent.blur(input);
+        expect(onValidityChange).toHaveBeenCalledTimes(1);
+        expect(mockOnChange).not.toHaveBeenCalled();
+        fireEvent.focus(input);
+        fireEvent.change(input, { target: { value: 'abc' } });
+        expect(onValidityChange).toHaveBeenLastCalledWith({
+          text: 'abc',
+          error: CURRENCY_INPUT_ERRORS.malformed,
+        });
+        expect(onValidityChange).toHaveBeenCalledTimes(2);
+      });
+
+      it('discards focused valid text so a later blur commits nothing', () => {
+        const { input, props, rerender } = setup();
+        fireEvent.focus(input);
+        fireEvent.change(input, { target: { value: '1200' } });
+
+        rerender(<NumberInput {...props} resetKey={1} />);
+        fireEvent.blur(input);
+
+        expect(mockOnChange).not.toHaveBeenCalled();
+        expect(input).toHaveValue('0.00');
+      });
+
+      it('discards a committed rejection and shows the reset value', () => {
+        const { input, props, rerender } = setup();
+        fireEvent.focus(input);
+        fireEvent.change(input, { target: { value: '-5' } });
+        fireEvent.blur(input);
+        expect(input).toHaveAttribute('aria-invalid', 'true');
+
+        rerender(<NumberInput {...props} value={0} resetKey={1} />);
+        expect(input).toHaveValue('0.00');
+        expect(input).not.toHaveAttribute('aria-invalid');
+      });
+    });
+
     describe('percentage unit', () => {
       it('accepts a trailing % and commits the percentage', () => {
         render(
