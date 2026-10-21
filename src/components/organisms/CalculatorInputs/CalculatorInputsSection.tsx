@@ -8,8 +8,25 @@ import { Button } from '@/components/ui/button';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { convertPeriodToAnnual } from '@/lib/periodCalculator';
 import { cn } from '@/lib/utils';
+import { type CalculatorAmountField, getBlockingInputErrors } from '@/store/calculatorInputErrors';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
 import { BasicInputs } from './BasicInputs';
+import { commitFocusedField } from './commitFocusedField';
+
+const AMOUNT_FIELD_LABELS: Record<
+  Exclude<CalculatorAmountField, `incomeSource:${string}`>,
+  string
+> = {
+  salary: 'Salary',
+  partnerGrossWage: "Partner's Gross Wage",
+  allowancesDeductions: 'Non-taxable allowance(s)',
+  pensionContribution: 'Pension',
+};
+
+const amountFieldLabel = (field: CalculatorAmountField): string =>
+  field.startsWith('incomeSource:')
+    ? 'Additional Income Sources'
+    : AMOUNT_FIELD_LABELS[field as keyof typeof AMOUNT_FIELD_LABELS];
 
 interface CalculatorInputsSectionProps {
   onCalculate: () => void;
@@ -21,16 +38,46 @@ export function CalculatorInputsSection({
   resultAction,
 }: CalculatorInputsSectionProps) {
   const { reset } = useCalculatorActions();
-  const salary = useCalculatorStore((state) => state.input.salary);
-  const payPeriod = useCalculatorStore((state) => state.input.payPeriod);
-  const hoursPerWeek = useCalculatorStore((state) => state.input.hoursPerWeek);
+  const inputsRef = React.useRef<HTMLDivElement>(null);
   const [isCalculating, setIsCalculating] = React.useState(false);
   const [formMessage, setFormMessage] = React.useState<{
     tone: 'error' | 'warning';
     text: string;
+    /** Set when the message reports rejected amounts, so it clears once they are corrected. */
+    rejectedAmounts?: boolean;
   } | null>(null);
 
+  // A rejected amount in a field the calculation uses blocks calculating from its old amount.
+  const hasBlockingAmounts = useCalculatorStore(
+    (state) => getBlockingInputErrors(state).length > 0,
+  );
+
+  // Once every rejected amount is corrected, the message asking for that correction is stale.
+  React.useEffect(() => {
+    if (!hasBlockingAmounts) {
+      setFormMessage((message) => (message?.rejectedAmounts ? null : message));
+    }
+  }, [hasBlockingAmounts]);
+
   const handleCalculate = () => {
+    // Calculate must never use a previous amount while a field shows different text.
+    commitFocusedField(inputsRef.current);
+
+    // Read the store after that commit, not the values captured at the last render.
+    const state = useCalculatorStore.getState();
+    const blocking = getBlockingInputErrors(state);
+    if (blocking.length > 0) {
+      const labels = [...new Set(blocking.map(([field]) => amountFieldLabel(field)))].join(', ');
+      setFormMessage({
+        tone: 'error',
+        text: `Correct the invalid ${blocking.length === 1 ? 'amount' : 'amounts'} in ${labels} before calculating.`,
+        rejectedAmounts: true,
+      });
+      return;
+    }
+
+    const { salary, payPeriod, hoursPerWeek } = state.input;
+
     // Validate salary is entered and reasonable
     if (salary <= 0) {
       setFormMessage({
@@ -73,7 +120,9 @@ export function CalculatorInputsSection({
   return (
     <TooltipProvider delayDuration={200}>
       <div className={'space-y-4'}>
-        <BasicInputs />
+        <div ref={inputsRef}>
+          <BasicInputs />
+        </div>
 
         {/* Calculate and Reset buttons */}
         <div className={cn('flex', 'gap-2')}>

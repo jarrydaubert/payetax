@@ -2,6 +2,7 @@ import {
   CURRENCY_INPUT_ERRORS,
   CURRENCY_INPUT_MAX,
   formatCurrencyInputValue,
+  PERCENTAGE_INPUT_ERRORS,
   parseCurrencyInput,
 } from '@/lib/currencyInput';
 
@@ -108,6 +109,74 @@ describe('parseCurrencyInput', () => {
     expect(parseCurrencyInput('5,000.01', { max: 5000 })).toEqual({
       status: 'invalid',
       error: 'Enter an amount no more than £5,000.',
+    });
+  });
+
+  describe('whole-pound fields (decimals: 0)', () => {
+    it.each([
+      ['1234', 1234],
+      ['£1,234', 1234],
+      ['1234.', 1234],
+      ['1234.00', 1234],
+    ])('accepts %j as %d', (text, expected) => {
+      expect(parseCurrencyInput(text, { decimals: 0 })).toEqual({
+        status: 'valid',
+        value: expected,
+      });
+    });
+
+    it.each([
+      '1234.56',
+      '1234.5',
+      '0.01',
+    ])('rejects pence in %j instead of dropping or rounding them', (text) => {
+      expect(parseCurrencyInput(text, { decimals: 0 })).toEqual({
+        status: 'invalid',
+        error: CURRENCY_INPUT_ERRORS.wholePounds,
+      });
+    });
+  });
+
+  describe('percentage fields (unit: percent)', () => {
+    const percent = { unit: 'percent', max: 100 } as const;
+
+    it.each([
+      ['5', 5],
+      ['5.25', 5.25],
+      ['5%', 5],
+      [' 12.5 % ', 12.5],
+      ['100', 100],
+      ['0', 0],
+    ])('accepts %j as %d', (text, expected) => {
+      expect(parseCurrencyInput(text, percent)).toEqual({ status: 'valid', value: expected });
+    });
+
+    it.each([
+      ['-5', PERCENTAGE_INPUT_ERRORS.negative],
+      ['−5%', PERCENTAGE_INPUT_ERRORS.negative],
+      ['5.255', PERCENTAGE_INPUT_ERRORS.decimals],
+      ['abc', PERCENTAGE_INPUT_ERRORS.malformed],
+      ['1.2.3', PERCENTAGE_INPUT_ERRORS.malformed],
+      ['£5', PERCENTAGE_INPUT_ERRORS.malformed],
+      ['%', PERCENTAGE_INPUT_ERRORS.malformed],
+      ['5%%', PERCENTAGE_INPUT_ERRORS.malformed],
+      ['100.01', 'Enter a percentage no more than 100%.'],
+    ])('rejects %j with a percentage message', (text, error) => {
+      expect(parseCurrencyInput(text, percent)).toEqual({ status: 'invalid', error });
+    });
+
+    it('rejects a fractional percentage in a whole-percentage field', () => {
+      expect(parseCurrencyInput('5.5', { ...percent, decimals: 0 })).toEqual({
+        status: 'invalid',
+        error: PERCENTAGE_INPUT_ERRORS.wholePercent,
+      });
+    });
+
+    it('rejects % in a pounds field', () => {
+      expect(parseCurrencyInput('5%')).toEqual({
+        status: 'invalid',
+        error: CURRENCY_INPUT_ERRORS.malformed,
+      });
     });
   });
 });

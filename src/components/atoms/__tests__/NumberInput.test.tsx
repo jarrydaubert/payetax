@@ -1,6 +1,7 @@
 // src/components/atoms/__tests__/NumberInput.test.tsx
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { CURRENCY_INPUT_ERRORS, PERCENTAGE_INPUT_ERRORS } from '@/lib/currencyInput';
 import NumberInput from '../NumberInput';
 
 describe('NumberInput Component', () => {
@@ -18,21 +19,7 @@ describe('NumberInput Component', () => {
       expect(input.value).toBe('123.45');
     });
 
-    it('should show thousand separators (commas) as user types', async () => {
-      const user = userEvent.setup();
-      const mockOnChange = jest.fn();
-
-      render(<NumberInput value={0} onChange={mockOnChange} decimals={0} />);
-
-      const input = screen.getByRole('spinbutton') as HTMLInputElement;
-      await user.clear(input);
-      await user.type(input, '1234567');
-
-      // Should format as 1,234,567
-      expect(input.value).toBe('1,234,567');
-    });
-
-    it('should show commas with decimals', async () => {
+    it('should keep typed text unchanged while focused and add separators on blur', async () => {
       const user = userEvent.setup();
       const mockOnChange = jest.fn();
 
@@ -41,9 +28,11 @@ describe('NumberInput Component', () => {
       const input = screen.getByRole('spinbutton') as HTMLInputElement;
       await user.clear(input);
       await user.type(input, '12345.67');
+      expect(input.value).toBe('12345.67');
 
-      // Should format as 12,345.67
+      await user.tab();
       expect(input.value).toBe('12,345.67');
+      expect(mockOnChange).toHaveBeenCalledWith(12345.67);
     });
 
     it('should preserve decimal point while typing', async () => {
@@ -126,7 +115,7 @@ describe('NumberInput Component', () => {
       expect(mockOnChange).toHaveBeenCalledWith(1000);
     });
 
-    it('should handle invalid input gracefully', () => {
+    it('should reject invalid input visibly instead of committing another amount', () => {
       render(<NumberInput value={100} onChange={mockOnChange} />);
       const input = screen.getByRole('spinbutton');
 
@@ -134,8 +123,355 @@ describe('NumberInput Component', () => {
       fireEvent.change(input, { target: { value: 'abc' } });
       fireEvent.blur(input);
 
-      // Should call onChange with 0 for invalid input
-      expect(mockOnChange).toHaveBeenCalledWith(0);
+      expect(mockOnChange).not.toHaveBeenCalled();
+      expect(input).toHaveValue('abc');
+      expect(input).toHaveAttribute('aria-invalid', 'true');
+      expect(screen.getByText(CURRENCY_INPUT_ERRORS.malformed)).toBeInTheDocument();
+    });
+  });
+
+  describe('Amount integrity (shared currency parser)', () => {
+    const commit = (input: HTMLElement, text: string) => {
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: text } });
+      fireEvent.blur(input);
+    };
+
+    it.each([
+      ['1234.56', 1234.56],
+      ['£1,234.56', 1234.56],
+      ['1,234', 1234],
+      ['0.5', 0.5],
+    ])('keeps pence in %j as %d, never scaling the amount', (text, expected) => {
+      render(<NumberInput value={0} onChange={mockOnChange} decimals={2} prefix='£' />);
+      commit(screen.getByRole('spinbutton'), text);
+
+      expect(mockOnChange).toHaveBeenCalledTimes(1);
+      expect(mockOnChange).toHaveBeenCalledWith(expected);
+    });
+
+    it.each([
+      ['-500', CURRENCY_INPUT_ERRORS.negative],
+      ['−500', CURRENCY_INPUT_ERRORS.negative],
+      ['abc', CURRENCY_INPUT_ERRORS.malformed],
+      ['1.2.3', CURRENCY_INPUT_ERRORS.malformed],
+      ['1234.567', CURRENCY_INPUT_ERRORS.decimals],
+      ['12,34', CURRENCY_INPUT_ERRORS.commas],
+    ])('rejects %j with a specific, associated error', (text, error) => {
+      const onValidityChange = jest.fn();
+      render(
+        // biome-ignore lint/correctness/useUniqueElementIds: Testing the error id derived from a fixed id
+        <NumberInput
+          id='amount'
+          value={30000}
+          onChange={mockOnChange}
+          onValidityChange={onValidityChange}
+          decimals={2}
+        />,
+      );
+      const input = screen.getByRole('spinbutton');
+      commit(input, text);
+
+      expect(mockOnChange).not.toHaveBeenCalled();
+      expect(input).toHaveValue(text);
+      expect(input).toHaveAttribute('aria-invalid', 'true');
+      expect(input).toHaveAttribute('aria-describedby', 'amount-error');
+      expect(input).not.toHaveAttribute('aria-valuenow');
+      expect(screen.getByText(error)).toHaveAttribute('id', 'amount-error');
+      expect(onValidityChange).toHaveBeenLastCalledWith({ text, error });
+    });
+
+    it('rejects pence in a whole-units field rather than dropping the decimal point', () => {
+      render(<NumberInput value={0} onChange={mockOnChange} decimals={0} />);
+      const input = screen.getByRole('spinbutton');
+      commit(input, '1234.56');
+
+      expect(mockOnChange).not.toHaveBeenCalled();
+      expect(screen.getByText(CURRENCY_INPUT_ERRORS.wholePounds)).toBeInTheDocument();
+    });
+
+    it('rejects amounts above max instead of clamping them', () => {
+      render(<NumberInput value={0} onChange={mockOnChange} decimals={2} max={10_000_000} />);
+      commit(screen.getByRole('spinbutton'), '20000000');
+
+      expect(mockOnChange).not.toHaveBeenCalled();
+      expect(screen.getByText('Enter an amount no more than £10,000,000.')).toBeInTheDocument();
+    });
+
+    it('does not report empty text as invalid', () => {
+      const onValidityChange = jest.fn();
+      render(
+        <NumberInput
+          value={0}
+          onChange={mockOnChange}
+          onValidityChange={onValidityChange}
+          decimals={2}
+        />,
+      );
+      commit(screen.getByRole('spinbutton'), '');
+
+      expect(onValidityChange).not.toHaveBeenCalled();
+      expect(screen.getByRole('spinbutton')).not.toHaveAttribute('aria-invalid');
+    });
+
+    it('recovers when invalid text is corrected', () => {
+      const onValidityChange = jest.fn();
+      render(
+        <NumberInput
+          value={100}
+          onChange={mockOnChange}
+          onValidityChange={onValidityChange}
+          decimals={2}
+        />,
+      );
+      const input = screen.getByRole('spinbutton');
+      commit(input, '-5');
+      expect(onValidityChange).toHaveBeenLastCalledWith({
+        text: '-5',
+        error: CURRENCY_INPUT_ERRORS.negative,
+      });
+
+      commit(input, '5');
+      expect(onValidityChange).toHaveBeenLastCalledWith(null);
+      expect(mockOnChange).toHaveBeenCalledWith(5);
+      expect(input).toHaveValue('5.00');
+      expect(input).not.toHaveAttribute('aria-invalid');
+      expect(screen.queryByText(CURRENCY_INPUT_ERRORS.negative)).not.toBeInTheDocument();
+    });
+
+    it('reports invalid text while typing, before the field is left', () => {
+      const onValidityChange = jest.fn();
+      render(
+        <NumberInput
+          value={30000}
+          onChange={mockOnChange}
+          onValidityChange={onValidityChange}
+          decimals={2}
+        />,
+      );
+      const input = screen.getByRole('spinbutton');
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: '-500' } });
+
+      expect(onValidityChange).toHaveBeenLastCalledWith({
+        text: '-500',
+        error: CURRENCY_INPUT_ERRORS.negative,
+      });
+      expect(mockOnChange).not.toHaveBeenCalled();
+    });
+
+    it('reports recovery only when the valid text is committed', () => {
+      const onValidityChange = jest.fn();
+      render(
+        <NumberInput
+          value={30000}
+          onChange={mockOnChange}
+          onValidityChange={onValidityChange}
+          decimals={2}
+        />,
+      );
+      const input = screen.getByRole('spinbutton');
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: 'abc' } });
+      fireEvent.change(input, { target: { value: '40000' } });
+
+      // Valid but uncommitted: the owner still holds the rejection, so the previous amount
+      // cannot be used.
+      expect(onValidityChange).toHaveBeenCalledTimes(1);
+      expect(input).not.toHaveAttribute('aria-invalid');
+
+      fireEvent.blur(input);
+      expect(onValidityChange).toHaveBeenLastCalledWith(null);
+      expect(mockOnChange).toHaveBeenCalledWith(40000);
+    });
+
+    it('keeps invalid text on focus so it can be corrected', () => {
+      render(<NumberInput value={100} onChange={mockOnChange} decimals={2} />);
+      const input = screen.getByRole('spinbutton');
+      commit(input, 'abc');
+
+      fireEvent.focus(input);
+      expect(input).toHaveValue('abc');
+    });
+
+    it('updates the visible error live once shown', () => {
+      render(<NumberInput value={100} onChange={mockOnChange} decimals={2} />);
+      const input = screen.getByRole('spinbutton');
+      commit(input, 'abc');
+      fireEvent.focus(input);
+
+      fireEvent.change(input, { target: { value: '-1' } });
+      expect(screen.getByText(CURRENCY_INPUT_ERRORS.negative)).toBeInTheDocument();
+
+      fireEvent.change(input, { target: { value: '1' } });
+      expect(input).not.toHaveAttribute('aria-invalid');
+    });
+
+    it('shows invalid text held by the owner on mount, and drops it when the owner clears it', () => {
+      const draft = { text: '1.2.3', error: CURRENCY_INPUT_ERRORS.malformed };
+      const { rerender } = render(
+        <NumberInput value={250} onChange={mockOnChange} decimals={2} invalidDraft={draft} />,
+      );
+      const input = screen.getByRole('spinbutton');
+      expect(input).toHaveValue('1.2.3');
+      expect(screen.getByText(CURRENCY_INPUT_ERRORS.malformed)).toBeInTheDocument();
+
+      rerender(<NumberInput value={250} onChange={mockOnChange} decimals={2} />);
+      expect(input).toHaveValue('250.00');
+      expect(input).not.toHaveAttribute('aria-invalid');
+    });
+
+    it('drops invalid text when the value changes externally (reset or applied suggestion)', () => {
+      const onValidityChange = jest.fn();
+      const { rerender } = render(
+        <NumberInput
+          value={100}
+          onChange={mockOnChange}
+          onValidityChange={onValidityChange}
+          decimals={2}
+        />,
+      );
+      const input = screen.getByRole('spinbutton');
+      commit(input, 'abc');
+
+      rerender(
+        <NumberInput
+          value={200}
+          onChange={mockOnChange}
+          onValidityChange={onValidityChange}
+          decimals={2}
+        />,
+      );
+      expect(input).toHaveValue('200.00');
+      expect(onValidityChange).toHaveBeenLastCalledWith(null);
+    });
+
+    describe('resetKey (owner reset)', () => {
+      const setup = () => {
+        const onValidityChange = jest.fn();
+        const props = { value: 0, onChange: mockOnChange, onValidityChange, decimals: 2 as const };
+        const view = render(<NumberInput {...props} resetKey={0} />);
+        const input = screen.getByRole('spinbutton');
+        return { ...view, input, onValidityChange, props };
+      };
+
+      it('discards focused rejected text, its error and its reported state', () => {
+        const { input, onValidityChange, props, rerender } = setup();
+        fireEvent.focus(input);
+        fireEvent.change(input, { target: { value: 'abc' } });
+        expect(onValidityChange).toHaveBeenCalledTimes(1);
+
+        rerender(<NumberInput {...props} resetKey={1} />);
+        // Still focused: emptied as a fresh focus would be, ready for new typing.
+        expect(input).toHaveValue('');
+        expect(input).not.toHaveAttribute('aria-invalid');
+
+        // Leaving does not resurrect it; retyping the same text is reported again.
+        fireEvent.blur(input);
+        expect(onValidityChange).toHaveBeenCalledTimes(1);
+        expect(mockOnChange).not.toHaveBeenCalled();
+        fireEvent.focus(input);
+        fireEvent.change(input, { target: { value: 'abc' } });
+        expect(onValidityChange).toHaveBeenLastCalledWith({
+          text: 'abc',
+          error: CURRENCY_INPUT_ERRORS.malformed,
+        });
+        expect(onValidityChange).toHaveBeenCalledTimes(2);
+      });
+
+      it('discards focused valid text so a later blur commits nothing', () => {
+        const { input, props, rerender } = setup();
+        fireEvent.focus(input);
+        fireEvent.change(input, { target: { value: '1200' } });
+
+        rerender(<NumberInput {...props} resetKey={1} />);
+        fireEvent.blur(input);
+
+        expect(mockOnChange).not.toHaveBeenCalled();
+        expect(input).toHaveValue('0.00');
+      });
+
+      it('lets typing start afresh in a field still focused after reset', () => {
+        const { input, props, rerender } = setup();
+        fireEvent.focus(input);
+        fireEvent.change(input, { target: { value: 'abc' } });
+        rerender(<NumberInput {...props} resetKey={1} />);
+
+        fireEvent.change(input, { target: { value: '30000' } });
+        fireEvent.blur(input);
+
+        expect(mockOnChange).toHaveBeenCalledWith(30000);
+        expect(input).toHaveValue('30,000.00');
+      });
+
+      it('discards a committed rejection and shows the reset value', () => {
+        const { input, props, rerender } = setup();
+        fireEvent.focus(input);
+        fireEvent.change(input, { target: { value: '-5' } });
+        fireEvent.blur(input);
+        expect(input).toHaveAttribute('aria-invalid', 'true');
+
+        rerender(<NumberInput {...props} value={0} resetKey={1} />);
+        expect(input).toHaveValue('0.00');
+        expect(input).not.toHaveAttribute('aria-invalid');
+      });
+    });
+
+    describe('percentage unit', () => {
+      it('accepts a trailing % and commits the percentage', () => {
+        render(
+          <NumberInput
+            value={0}
+            onChange={mockOnChange}
+            decimals={2}
+            unit='percent'
+            suffix='%'
+            max={100}
+          />,
+        );
+        commit(screen.getByRole('spinbutton'), '5.5%');
+        expect(mockOnChange).toHaveBeenCalledWith(5.5);
+      });
+
+      it.each([
+        ['-5', PERCENTAGE_INPUT_ERRORS.negative],
+        ['abc', PERCENTAGE_INPUT_ERRORS.malformed],
+        ['£5', PERCENTAGE_INPUT_ERRORS.malformed],
+        ['150', 'Enter a percentage no more than 100%.'],
+      ])('rejects %j with a percentage message', (text, error) => {
+        render(
+          <NumberInput
+            value={5}
+            onChange={mockOnChange}
+            decimals={2}
+            unit='percent'
+            suffix='%'
+            max={100}
+          />,
+        );
+        commit(screen.getByRole('spinbutton'), text);
+        expect(mockOnChange).not.toHaveBeenCalled();
+        expect(screen.getByText(error)).toBeInTheDocument();
+      });
+
+      it('re-checks held text when the unit changes, committing it once it is valid', () => {
+        const onValidityChange = jest.fn();
+        const props = {
+          value: 5,
+          onChange: mockOnChange,
+          onValidityChange,
+          decimals: 2 as const,
+        };
+        const { rerender } = render(<NumberInput {...props} unit='percent' suffix='%' max={100} />);
+        const input = screen.getByRole('spinbutton');
+        commit(input, '150');
+        expect(screen.getByText('Enter a percentage no more than 100%.')).toBeInTheDocument();
+
+        rerender(<NumberInput {...props} unit='pounds' prefix='£' max={10_000_000} />);
+        expect(mockOnChange).toHaveBeenCalledWith(150);
+        expect(onValidityChange).toHaveBeenLastCalledWith(null);
+        expect(input).toHaveValue('150.00');
+      });
     });
   });
 

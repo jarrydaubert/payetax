@@ -7,7 +7,6 @@ import {
   formatInputValue,
   formatNumber,
   formatPercent,
-  parseFormattedValue,
 } from '../utils';
 
 describe('Utils', () => {
@@ -248,40 +247,6 @@ describe('Utils', () => {
     it('formats integers without decimals', () => {
       expect(formatInputValue('5000')).toBe('5,000');
       expect(formatInputValue('42')).toBe('42');
-    });
-  });
-
-  describe('parseFormattedValue', () => {
-    it('parses formatted currency strings', () => {
-      expect(parseFormattedValue('£1,000.00')).toBe(1000);
-      expect(parseFormattedValue('£1,234,567.89')).toBe(1234567.89);
-    });
-
-    it('parses plain number strings', () => {
-      expect(parseFormattedValue('1000')).toBe(1000);
-      expect(parseFormattedValue('500.50')).toBe(500.5);
-    });
-
-    it('handles comma-separated numbers', () => {
-      expect(parseFormattedValue('1,000')).toBe(1000);
-      expect(parseFormattedValue('1,234,567')).toBe(1234567);
-    });
-
-    it('returns 0 for invalid input', () => {
-      expect(parseFormattedValue('')).toBe(0);
-      expect(parseFormattedValue('abc')).toBe(0);
-      expect(parseFormattedValue('!@#$')).toBe(0);
-    });
-
-    it('handles zero', () => {
-      expect(parseFormattedValue('0')).toBe(0);
-      expect(parseFormattedValue('£0.00')).toBe(0);
-    });
-
-    it('strips negative signs (extracts absolute value)', () => {
-      // Note: parseFormattedValue removes ALL non-numeric characters except decimal
-      expect(parseFormattedValue('-1000')).toBe(1000);
-      expect(parseFormattedValue('-£500.50')).toBe(500.5);
     });
   });
 

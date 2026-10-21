@@ -19,12 +19,16 @@ import { ANIMATION_TRANSITIONS } from '@/constants/animationTokens';
 import { PERIODS } from '@/constants/taxRates';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { cn } from '@/lib/utils';
+import { incomeSourceAmountField } from '@/store/calculatorInputErrors';
 import {
   INCOME_TYPE_LABELS,
   type IncomeSource,
   useCalculatorActions,
   useCalculatorStore,
 } from '@/store/calculatorStore';
+
+/** Matches the persisted income-source schema, so no accepted amount is later discarded. */
+const INCOME_SOURCE_AMOUNT_MAX = 10_000_000;
 
 // Type-safe income types derived from INCOME_TYPE_LABELS
 const INCOME_TYPES = Object.keys(INCOME_TYPE_LABELS) as IncomeSource['type'][];
@@ -53,8 +57,15 @@ function isValidPeriod(value: string): value is IncomeSource['period'] {
 
 export function IncomeSourceList() {
   const incomeSources = useCalculatorStore((state) => state.input.incomeSources || []);
-  const { addIncomeSource, updateIncomeSource, removeIncomeSource } = useCalculatorActions();
+  const { addIncomeSource, updateIncomeSource, removeIncomeSource, setInputError } =
+    useCalculatorActions();
+  const inputErrors = useCalculatorStore((state) => state.inputErrors);
+  const inputRevision = useCalculatorStore((state) => state.inputRevision);
   const [isOpen, setIsOpen] = React.useState(false);
+  // Keep the list open while an amount in it is rejected, so the error stays visible.
+  const hasRejectedAmount = incomeSources.some(
+    (source) => inputErrors[incomeSourceAmountField(source.id)] !== undefined,
+  );
   const shouldReduceMotion = useMotionPreference();
 
   // Close the collapsible when income sources are cleared (e.g., on reset)
@@ -65,7 +76,10 @@ export function IncomeSourceList() {
   }, [incomeSources.length]);
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+    <Collapsible
+      open={isOpen || hasRejectedAmount}
+      onOpenChange={(open) => setIsOpen(open || hasRejectedAmount)}
+    >
       <div className='flex items-center justify-between'>
         <CollapsibleTrigger
           className={cn(
@@ -169,15 +183,23 @@ export function IncomeSourceList() {
               </div>
 
               {/* Amount and Period Row */}
-              <div className={cn('flex items-center', 'gap-2')}>
+              <div className={cn('flex items-start', 'gap-2')}>
                 <NumberInput
                   value={source.amount}
                   onChange={(amount) => updateIncomeSource(source.id, { amount })}
+                  onValidityChange={(invalid) =>
+                    setInputError(incomeSourceAmountField(source.id), invalid)
+                  }
+                  invalidDraft={inputErrors[incomeSourceAmountField(source.id)]}
+                  resetKey={inputRevision}
+                  aria-label={`Income source ${index + 1} amount`}
                   prefix='£'
-                  decimals={0}
-                  placeholder='0'
+                  decimals={2}
+                  placeholder='0.00'
                   min={0}
-                  className={cn('h-9 flex-1', 'text-sm')}
+                  max={INCOME_SOURCE_AMOUNT_MAX}
+                  wrapperClassName='flex-1'
+                  className={cn('h-9', 'text-sm')}
                   data-testid={`income-source-${index}-amount`}
                 />
 

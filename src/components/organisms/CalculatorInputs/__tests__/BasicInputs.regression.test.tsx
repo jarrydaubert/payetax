@@ -38,7 +38,7 @@ describe('BasicInputs - Regression Tests', () => {
     jest.clearAllMocks();
 
     (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-      selector({ input: defaultInput }),
+      selector({ inputErrors: {}, input: defaultInput }),
     );
 
     (useCalculatorActions as jest.Mock).mockReturnValue({
@@ -114,16 +114,19 @@ describe('BasicInputs - Regression Tests', () => {
   });
 
   describe('REGRESSION: Thousand Separator in Inputs', () => {
-    it('should show commas in salary input as user types', async () => {
+    // Text is kept exactly as typed while focused (rewriting it while typing is what dropped
+    // decimal points and minus signs) and shown with thousand separators once committed.
+    it('should show commas in salary input once the amount is committed', async () => {
       const user = userEvent.setup();
       render(<BasicInputs />);
 
       const salaryInput = screen.getByTestId('salary-input');
       await user.clear(salaryInput);
       await user.type(salaryInput, '50000');
+      expect(salaryInput).toHaveValue('50000');
 
-      // Should format with comma: 50,000
-      expect(salaryInput).toHaveValue('50,000');
+      await user.tab();
+      expect(salaryInput).toHaveValue('50,000.00');
     });
 
     it('should show commas with decimals in salary', async () => {
@@ -133,8 +136,8 @@ describe('BasicInputs - Regression Tests', () => {
       const salaryInput = screen.getByTestId('salary-input');
       await user.clear(salaryInput);
       await user.type(salaryInput, '75000.50');
+      await user.tab();
 
-      // Should format as 75,000.50
       expect(salaryInput).toHaveValue('75,000.50');
     });
   });

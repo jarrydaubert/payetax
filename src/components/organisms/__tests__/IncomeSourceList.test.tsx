@@ -20,7 +20,7 @@ describe('IncomeSourceList Component', () => {
     jest.clearAllMocks();
 
     (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-      selector({ input: defaultInput }),
+      selector({ inputErrors: {}, input: defaultInput }),
     );
 
     (useCalculatorActions as jest.Mock).mockReturnValue({
@@ -145,7 +145,7 @@ describe('IncomeSourceList Component', () => {
 
     beforeEach(() => {
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({ input: { incomeSources: mockIncomeSources } }),
+        selector({ inputErrors: {}, input: { incomeSources: mockIncomeSources } }),
       );
     });
 
@@ -230,7 +230,7 @@ describe('IncomeSourceList Component', () => {
 
     beforeEach(() => {
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({ input: { incomeSources: [mockIncomeSource] } }),
+        selector({ inputErrors: {}, input: { incomeSources: [mockIncomeSource] } }),
       );
     });
 
@@ -253,6 +253,7 @@ describe('IncomeSourceList Component', () => {
     it('should display remove button for each income source', async () => {
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
         selector({
+          inputErrors: {},
           input: {
             incomeSources: [
               mockIncomeSource,
@@ -283,7 +284,7 @@ describe('IncomeSourceList Component', () => {
       }));
 
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({ input: { incomeSources: maxIncomeSources } }),
+        selector({ inputErrors: {}, input: { incomeSources: maxIncomeSources } }),
       );
 
       const user = userEvent.setup();
@@ -305,7 +306,7 @@ describe('IncomeSourceList Component', () => {
       }));
 
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({ input: { incomeSources: maxIncomeSources } }),
+        selector({ inputErrors: {}, input: { incomeSources: maxIncomeSources } }),
       );
 
       const user = userEvent.setup();
@@ -330,6 +331,7 @@ describe('IncomeSourceList Component', () => {
     it('should enable "Add Income Source" button when under limit', async () => {
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
         selector({
+          inputErrors: {},
           input: {
             incomeSources: [
               {
@@ -366,7 +368,7 @@ describe('IncomeSourceList Component', () => {
       // Initial render with income sources
       const { rerender } = render(<IncomeSourceList />);
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({ input: { incomeSources: [mockIncomeSource] } }),
+        selector({ inputErrors: {}, input: { incomeSources: [mockIncomeSource] } }),
       );
 
       // Re-render to simulate sources being added
@@ -374,7 +376,7 @@ describe('IncomeSourceList Component', () => {
 
       // Clear income sources
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({ input: { incomeSources: [] } }),
+        selector({ inputErrors: {}, input: { incomeSources: [] } }),
       );
 
       // Re-render to simulate reset
@@ -397,7 +399,7 @@ describe('IncomeSourceList Component', () => {
       };
 
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({ input: { incomeSources: [mockIncomeSource] } }),
+        selector({ inputErrors: {}, input: { incomeSources: [mockIncomeSource] } }),
       );
 
       const user = userEvent.setup();
@@ -420,7 +422,7 @@ describe('IncomeSourceList Component', () => {
       };
 
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({ input: { incomeSources: [mockIncomeSource] } }),
+        selector({ inputErrors: {}, input: { incomeSources: [mockIncomeSource] } }),
       );
 
       const user = userEvent.setup();
@@ -443,7 +445,7 @@ describe('IncomeSourceList Component', () => {
       };
 
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({ input: { incomeSources: [mockIncomeSource] } }),
+        selector({ inputErrors: {}, input: { incomeSources: [mockIncomeSource] } }),
       );
 
       const user = userEvent.setup();

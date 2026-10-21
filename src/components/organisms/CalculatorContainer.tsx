@@ -28,12 +28,14 @@ import {
 import { cn } from '@/lib/utils';
 import type { PayeEmailInput } from '@/lib/validation/emailValidation';
 import { useShallow } from '@/lib/zustandShallow';
+import { getBlockingInputErrors } from '@/store/calculatorInputErrors';
 import {
   useCalculatorActions,
   useCalculatorResults,
   useCalculatorStore,
 } from '@/store/calculatorStore';
 import { CalculatorInputsSection } from './CalculatorInputs/CalculatorInputsSection';
+import { commitFocusedField } from './CalculatorInputs/commitFocusedField';
 import { ResultsSummaryCards } from './CalculatorResults/ResultsSummaryCards';
 import { ResultsTable } from './CalculatorResults/ResultsTable';
 import { TaxCodeBasisNotice } from './CalculatorResults/TaxCodeBasisNotice';
@@ -84,6 +86,7 @@ export function CalculatorContainer() {
     taxCodeLink?: boolean;
   } | null>(null);
   const resultsRef = React.useRef<HTMLDivElement>(null);
+  const sectionRef = React.useRef<HTMLDivElement>(null);
   const hasTrackedCalculatorStartRef = React.useRef(false);
   const calcScrollTimeoutRef = React.useRef<number | null>(null);
   const shouldReduceMotion = useMotionPreference();
@@ -190,6 +193,11 @@ export function CalculatorContainer() {
 
   const handleApplyPensionOptimization = (pensionAmount: number) => {
     setActionMessage(null);
+    // Commit any field being edited first, so the applied pension is not overwritten by a later
+    // blur and the recalculation uses the amounts shown. Rejected text clears the results this
+    // action belongs to; then there is nothing to apply to.
+    commitFocusedField(sectionRef.current);
+    if (getBlockingInputErrors(useCalculatorStore.getState()).length > 0) return;
     try {
       // Validate pension amount
       if (typeof pensionAmount !== 'number' || Number.isNaN(pensionAmount) || pensionAmount < 0) {
@@ -260,6 +268,7 @@ export function CalculatorContainer() {
         'md:gap-6 lg:gap-4 xl:gap-6',
       )}
       data-testid='calculator-section'
+      ref={sectionRef}
     >
       {/* Header - CSS animation for better mobile LCP (no JS blocking) */}
       <div

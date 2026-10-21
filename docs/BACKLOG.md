@@ -27,7 +27,7 @@ Current correctness sequence:
 2. Transparent calculation results.
 3. Independent fixture/test-portfolio completion and Foundation reconciliation.
 
-Verified Director Intelligence correctness exceptions (see [Urgent correctness exceptions](#urgent-correctness-exceptions)) may be taken as small independent slices between these items; they do not reorder them. The verified [main-calculator input-integrity defects](#main-calculator-input-integrity) are taken the same way, next, reusing the shared currency parser DI-01 introduced (`src/lib/currencyInput.ts`).
+Verified Director Intelligence correctness exceptions (see [Urgent correctness exceptions](#urgent-correctness-exceptions)) may be taken as small independent slices between these items; they do not reorder them. The verified [main-calculator input-integrity defects](#main-calculator-input-integrity) are taken the same way, next, reusing the shared currency parser DI-01 introduced (`src/lib/currencyInput.ts`); currency parsing has landed and the focus-and-leave fix follows.
 
 ### Foundation
 
@@ -80,15 +80,17 @@ below.
 
 ### Main calculator input integrity
 
-Both defects start in the shared `NumberInput` atom, and the second also leaves stale results on screen. They are recorded separately from the Director items and scheduled next, as separate PRs that reuse the shared currency parser in `src/lib/currencyInput.ts` (see the [agreed order](#urgent-correctness-exceptions)). Browser evidence: [PR #123](https://github.com/jarrydaubert/payetax/pull/123).
+Currency parsing in the shared `NumberInput` atom now uses `parseCurrencyInput` (`src/lib/currencyInput.ts`): pence are kept, negative, malformed and over-limit text is rejected with a visible, associated error, and while a field the calculation uses holds rejected text the results are cleared and Calculate is refused. Remaining work is recorded below as separate PRs (see the [agreed order](#urgent-correctness-exceptions)). Browser evidence for the original defects: [PR #123](https://github.com/jarrydaubert/payetax/pull/123).
 
-- [ ] **P1 — Currency fields silently change amounts.** Additional income source amounts (`IncomeSourceList`, `NumberInput decimals={0}`) drop the decimal point: typing or pasting `1234.56` or `£1,234.56` displays `123,456`, and the calculation uses £123,456 (Gross Pay £153,456 on a £30,000 salary). In every `NumberInput` (parsing via `parseFormattedValue` in `src/lib/utils.ts`), a minus sign is silently dropped (`-500` becomes £500) and malformed text becomes 0 (`abc`, and `1.2.3` in two-decimal fields). Salary and other two-decimal fields keep pence correctly.
+- [ ] **P1 — Focusing a filled field and leaving it erases the value while the old result stays visible.** `NumberInput` clears its display on focus by default, and blur commits empty text as 0. With a £30,000 salary already calculated, clicking into Salary and tabbing away sets the salary to £0.00. After Calculate, the validation message appears, but the £30,000 results remain on screen. (Rejected text is no longer cleared on focus, and rejected text already clears results; the empty-commits-0 rule is deliberately unchanged until this fix.)
 
-  **DoD:** Amounts with pence are preserved or rejected with a specific error, never scaled. Negative and malformed text produce a specific error rather than another amount. Parsing reuses `parseCurrencyInput` (`src/lib/currencyInput.ts`) rather than a second implementation. Regression coverage runs on the mounted main-calculator fields, including the income-source journey in `e2e/calculator-critical.spec.ts`.
+  Related stale-result gap (found in PR #125 review, not changed there): a *valid* edit leaves the previous result on screen. With £30,000 calculated, committing 40,000 keeps the £30,000 results and the email action, and the email recalculates from the new inputs, so it sends a £40,000 breakdown while the screen shows £30,000. Likewise the tax-trap pension suggestion computed for the shown result can be applied after a valid edit to another field. Rejected text, including half-typed text such as `30,0`, already clears results immediately; valid edits should be equally explicit.
 
-- [ ] **P1 — Focusing a filled field and leaving it erases the value while the old result stays visible.** `NumberInput` clears its display on focus by default, and blur parses the empty text as 0. With a £30,000 salary already calculated, clicking into Salary and tabbing away sets the salary to £0.00. After Calculate, the validation message appears, but the £30,000 results remain on screen.
+  **DoD:** Focusing a field without editing it never changes its value. A field the user genuinely clears is treated as empty, not zero. A result whose inputs are no longer valid, or no longer match the committed inputs, is cleared or marked not current, and email is unavailable until the shown result matches its inputs. Browser regression covers focus-and-leave, clearing, a valid edit after calculating and recovery.
 
-  **DoD:** Focusing a field without editing it never changes its value. A field the user genuinely clears is treated as empty, not zero. A result whose inputs are no longer valid is cleared or marked not current. Browser regression covers focus-and-leave, clearing and recovery.
+- [ ] **P1 — Switching the pension type reinterprets the amount.** Changing Pension from £ to % keeps the number, so a committed £5,000 becomes 5,000%: the percentage path is uncapped and a £30,000 salary calculates a £1,500,000 pension and −£1,470,000 net pay. `setPensionContributionType` does not revalidate the stored contribution. Found while fixing currency parsing; not changed there.
+
+  **DoD:** Changing the pension type never silently reinterprets an amount: the contribution is converted with a visible explanation, cleared, or rejected against the new type's limits before any calculation, and results for the old meaning are cleared. Store and browser regressions cover £→% and %→£ switches above and within the other type's limits.
 
 ### Tax correctness and product semantics
 
@@ -152,8 +154,9 @@ Agreed order, with one small PR per item unless stated otherwise (DI-08 lands wi
 and the minimal part of DI-02 have landed:
 
 1. Both [main-calculator input-integrity fixes](#main-calculator-input-integrity), as separate PRs
-   reusing the shared currency parser: currency parsing first, then focus-and-leave with stale
-   results.
+   reusing the shared currency parser: currency parsing first (landed), then focus-and-leave with
+   stale results. The pension type-switch defect found during the parsing fix is scheduled with
+   them, as its own PR.
 2. The interim email guard from DI-05.
 3. DI-07, then DI-26, DI-23, DI-06 and DI-27.
 4. Company budget: DI-19, then DI-21.
@@ -272,6 +275,8 @@ and before step 4, and transparent calculation results after step 5.
 - [ ] Public human-readable calculator verification report generated from the fixture suites, replacing hand-written accuracy claims. DoD: the report generates from fixtures and the public claims cite it.
 - [ ] Machine-readable verification output (extend `/api/tax-rates` or a dedicated route). DoD: the route serves generated verification data and is covered by a test.
 - [ ] Director critical E2E on mobile viewports. `e2e/director-guide-critical.spec.ts` fails on `Mobile Chrome` on `main` as well as on the DI-01 branch: closing the Your Numbers drawer intermittently leaves it open, and the results assertions query a page that is inert while the drawer is open. The CI critical slice runs desktop Chromium only, so this is not gated. DoD: the Director critical spec passes on the `Mobile Chrome` project without retries, or the mobile drawer journey has its own stable spec.
+- [ ] Non-gated E2E specs failing on `main`. On desktop Chromium, `e2e/hicbc-comprehensive.spec.ts` (1 child at £60k), `e2e/pension-limits.spec.ts` (£50k with £20k sacrifice: £3,482.40 against an expected £3,484.80) and three `e2e/accessibility-wcag22.spec.ts` checks (privacy page in dark mode, desktop and mobile; 24×24px touch targets) fail identically on `main` and on the currency-parsing branch. None is in the CI critical slice. DoD: each expectation is reconciled against primary evidence or the UI is fixed, and the specs pass, or a spec that no longer earns its place is removed.
+- [ ] Intermittent critical-slice E2E failures under CPU load. While verifying PR #125, single failures appeared that did not reproduce: golden-master `emergency-m1` (results never appeared), `pension-sacrifice-10pct` (a filled and blurred pension of 10 shown as 0.00) and the Director pasted-pence test (field empty). Targeted repeats passed (12/12, 75/75) and the slice passed at `--workers=1`. The golden-master `beforeEach` waits only for `networkidle` and a visible server-rendered salary input, with no hydration signal, so input before hydration is the likely cause (inferred, not proven). DoD: specs wait for an explicit hydration marker before typing and commit each field explicitly, and the critical slice passes repeated runs under parallel load.
 - [ ] Documented modelling assumptions and limitations (month-1 projection, NI year model and pension method). Non-cumulative tax-code limitations are now visible. DoD: the remaining assumptions are published where users see results and kept in sync with the engine.
 
 ### Trust and sourcing

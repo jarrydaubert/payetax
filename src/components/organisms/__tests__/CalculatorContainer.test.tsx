@@ -129,15 +129,20 @@ describe('CalculatorContainer Component', () => {
       setInput: mockSetInput,
     });
     (useCalculatorResults as jest.Mock).mockReturnValue(null);
+    const storeState = {
+      previousYearResults: null,
+      inputErrors: {},
+      input: {
+        studentLoanPlans: 'none',
+        allowancesDeductions: 0,
+        isMarried: false,
+        incomeSources: [],
+      },
+    };
     (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-      selector({
-        previousYearResults: null,
-        input: {
-          studentLoanPlans: 'none',
-          allowancesDeductions: 0,
-        },
-      }),
+      selector(storeState),
     );
+    Object.assign(useCalculatorStore, { getState: () => storeState });
   });
 
   describe('Initial Rendering', () => {
