@@ -31,6 +31,25 @@ the retained blog, email results, PWA, analytics and operational controls. Do no
 families, competitor-intent content or generic articles merely to capture queries. Published
 content must earn its place through user value, evidence and maintainable accuracy.
 
+## Main calculator experience
+
+The calculator presents one selected pay period as a payslip-style statement with an annual
+reference. A separate comparison opens in one action: all seven columns on wide screens, or any
+two selected periods on smaller screens. The comparison uses the full calculator width rather
+than sharing the input rail. Mobile results expose an explicit Edit inputs action.
+
+`PayStatement` and `ResultsTable` share `calculatorResultsPresenter.ts` and preserve the engine's
+period-specific amounts. The presenter only converts annual-only explanatory values, using the
+selected working hours. Tax-band rows identify income in a band; employer NI is explicitly not an
+employee deduction. The former finite-difference marginal-rate card is described as the estimated
+rounded tax/NI (and applicable loan) on the next £100/year, rather than a statutory rate.
+
+Policy, region, code basis, salary-sacrifice assumptions and mixed-income limitations stay visible
+or available in labelled workings. Input edits invalidate the calculation and email actions;
+optional settings show their active state and cannot conceal rejected amounts. These presentation
+changes do not complete the open pension-method or tax-domain result-contract work in the backlog.
+See the [calculator implementation evidence](reports/main-calculator-redesign-2026-10-21.md).
+
 ## Architecture north star
 
 > One effective-dated policy model, one policy selector, one pay-basis derivation, one rule owner

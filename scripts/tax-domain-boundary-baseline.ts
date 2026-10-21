@@ -163,16 +163,6 @@ const BASELINE_ENTRIES = [
     ['PERIODS', 'type:StudentLoanPlan'],
   ],
   [
-    'src/components/organisms/CalculatorResults/ResultsSummaryCards.tsx',
-    '@/constants/taxRates',
-    ['TAX_YEARS', 'type:TaxYear'],
-  ],
-  [
-    'src/components/organisms/CalculatorResults/ResultsTable.tsx',
-    '@/constants/taxRates',
-    ['CURRENT_TAX_YEAR', 'TAX_RATES', 'type:TaxYear'],
-  ],
-  [
     'src/components/organisms/DirectorGuide/DirectorDashboard.tsx',
     '@/lib/tax/variableIncome',
     ['resolveAnnualFinancials'],

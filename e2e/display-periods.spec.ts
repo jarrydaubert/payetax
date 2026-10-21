@@ -1,70 +1,30 @@
-/**
- * Display Periods - Essential Tests
- *
- * What bugs do these tests find?
- * - Period checkboxes don't render
- * - Toggling periods doesn't update results table
- * - State doesn't persist after recalculation
- */
-
 import { expect, test } from '@playwright/test';
+import { editCalculatorInputs, showPeriodComparison } from './helpers/calculator-ui';
 
-test.describe('Display Periods', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/#tax-calculator');
-    await page.waitForLoadState('networkidle');
-
-    // Enter salary to show results
-    await page.getByTestId('salary-input').fill('50000');
-    await page.getByTestId('calculate-button').click();
-    await expect(page.getByTestId('results-table')).toBeVisible();
-  });
-
-  test('renders all period checkboxes', async ({ page }) => {
-    const periods = ['Yearly', 'Monthly', 'Weekly', 'Daily', 'Hourly'];
-
-    for (const period of periods) {
-      await expect(page.getByRole('checkbox', { name: period, exact: true })).toBeVisible();
-    }
-  });
-
-  test('toggling period updates results table columns', async ({ page }) => {
-    const hourlyCheckbox = page.getByRole('checkbox', { name: 'Hourly', exact: true });
-    const resultsTable = page.getByTestId('results-table');
-
-    // Check initial state
-    const initiallyChecked = await hourlyCheckbox.isChecked();
-    await hourlyCheckbox.scrollIntoViewIfNeeded();
-
-    // Radix renders role=checkbox buttons; click directly to avoid check()/uncheck() flakiness in WebKit.
-    if (initiallyChecked) {
-      await hourlyCheckbox.click({ force: true });
-      await expect(hourlyCheckbox).not.toBeChecked();
-    } else {
-      await hourlyCheckbox.click({ force: true });
-      await expect(hourlyCheckbox).toBeChecked();
-    }
-
-    if (initiallyChecked) {
-      await expect(resultsTable.locator('th:has-text("Hourly")')).not.toBeVisible();
-    } else {
-      await expect(resultsTable.locator('th:has-text("Hourly")')).toBeVisible();
-    }
-  });
-
-  test('period selections persist after recalculation', async ({ page }) => {
-    // Uncheck a period
-    const dailyCheckbox = page.getByRole('checkbox', { name: 'Daily', exact: true });
-    if (await dailyCheckbox.isChecked()) {
-      await dailyCheckbox.scrollIntoViewIfNeeded();
-      await dailyCheckbox.click({ force: true });
-    }
-
-    // Recalculate with new salary
-    await page.getByTestId('salary-input').fill('60000');
-    await page.getByTestId('calculate-button').click();
-
-    // Verify selection persisted
-    await expect(dailyCheckbox).not.toBeChecked();
-  });
+test('comparison columns retain at least one period and result selection survives edits', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/#tax-calculator');
+  await page.getByTestId('salary-input').fill('60000');
+  await page.getByTestId('calculate-button').click();
+  await page.getByRole('combobox', { name: 'View by', exact: true }).selectOption('weekly');
+  await showPeriodComparison(page);
+  await page.getByText('Choose comparison columns', { exact: true }).click();
+  const periods = ['Yearly', 'Monthly', '4-Weekly', 'Fortnightly', 'Weekly', 'Daily', 'Hourly'];
+  for (const period of periods.slice(0, -1)) {
+    const checkbox = page.getByRole('checkbox', { name: period, exact: true });
+    await expect(checkbox).toBeChecked();
+    await checkbox.click();
+    await expect(checkbox).not.toBeChecked();
+  }
+  await page.getByRole('checkbox', { name: 'Hourly', exact: true }).click();
+  await expect(page.getByRole('checkbox', { name: 'Hourly', exact: true })).toBeChecked();
+  await expect(
+    page.getByTestId('results-table').getByRole('columnheader', { name: 'Hourly', exact: true }),
+  ).toBeVisible();
+  await editCalculatorInputs(page);
+  await page.getByTestId('salary-input').fill('70000');
+  await page.getByTestId('calculate-button').click();
+  await expect(page.getByRole('combobox', { name: 'View by', exact: true })).toHaveValue('weekly');
 });

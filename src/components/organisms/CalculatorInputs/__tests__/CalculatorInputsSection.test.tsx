@@ -266,7 +266,7 @@ describe('CalculatorInputsSection Component', () => {
     it('should have correct spacing between elements', () => {
       const { container } = render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
 
-      const wrapper = container.querySelector('.space-y-4');
+      const wrapper = container.querySelector('form');
       expect(wrapper).toBeInTheDocument();
     });
 

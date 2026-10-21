@@ -1,56 +1,36 @@
-/**
- * Scroll Indicators - Essential Tests
- *
- * What bugs do these tests find?
- * - Scroll indicators not showing when table overflows
- * - Mobile horizontal scroll broken
- */
+import { expect, test } from '@playwright/test';
+import { showPeriodComparison } from './helpers/calculator-ui';
 
-import { expect, type Page, test } from '@playwright/test';
-
-async function forceTableOverflow(page: Page) {
-  const periods = ['4-Weekly', 'Fortnightly', 'Daily', 'Hourly'];
-  for (const period of periods) {
-    const checkbox = page.getByRole('checkbox', { name: new RegExp(period, 'i') });
-    if (!(await checkbox.isChecked())) {
-      await checkbox.click();
-    }
-  }
-}
-
-test.describe('Scroll Indicators', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/#tax-calculator');
-    await page.waitForLoadState('networkidle');
-    await page.getByTestId('salary-input').fill('50000');
-    await page.getByTestId('calculate-button').click();
-    await expect(page.getByTestId('results-table')).toBeVisible();
+test('financial figures remain selectable for copying without drag interception', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  await page.getByTestId('salary-input').fill('60000');
+  await page.getByTestId('tax-code-input').fill('1257L');
+  await page.getByTestId('calculate-button').click();
+  await showPeriodComparison(page);
+  const value = page
+    .getByTestId('results-table')
+    .getByRole('row')
+    .filter({ hasText: 'Income Tax' })
+    .first()
+    .locator('td')
+    .nth(1);
+  await value.scrollIntoViewIfNeeded();
+  const bounds = await value.evaluate((element) => {
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    const rect = range.getBoundingClientRect();
+    return { left: rect.left, right: rect.right, y: rect.top + rect.height / 2 };
   });
-
-  test('shows scroll indicator when table overflows on mobile', async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 667 });
-
-    // Enable additional periods to force overflow.
-    await forceTableOverflow(page);
-
-    // Table should be scrollable
-    const scrollContainer = page.getByTestId('results-table-container');
-    const isScrollable = await scrollContainer.evaluate((el) => el.scrollWidth > el.clientWidth);
-
-    expect(isScrollable).toBe(true);
-  });
-
-  test('table container exposes horizontal scrolling behavior', async ({ page }) => {
-    await page.setViewportSize({ width: 375, height: 667 });
-    await forceTableOverflow(page);
-
-    const scrollContainer = page.getByTestId('results-table-container');
-    const containerState = await scrollContainer.evaluate((el) => ({
-      overflowX: window.getComputedStyle(el).overflowX,
-      hasHorizontalOverflow: el.scrollWidth > el.clientWidth,
-    }));
-
-    expect(containerState.hasHorizontalOverflow).toBe(true);
-    expect(['auto', 'scroll']).toContain(containerState.overflowX);
-  });
+  await page.mouse.move(bounds.left, bounds.y);
+  await page.mouse.down();
+  await page.mouse.move(bounds.right, bounds.y, { steps: 12 });
+  await page.mouse.up();
+  expect(await page.evaluate(() => window.getSelection()?.toString())).toContain('£11,424.72');
+  await expect(
+    page.locator('[data-testid="scroll-indicator-left"], [data-testid="scroll-indicator-right"]'),
+  ).toHaveCount(0);
 });

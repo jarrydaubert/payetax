@@ -1,11 +1,8 @@
 // src/components/molecules/PeriodSelectorCard.tsx
 'use client';
 
-import { motion } from 'framer-motion';
 import { PeriodCheckbox } from '@/components/atoms/PeriodCheckbox';
 import { Card } from '@/components/ui/card';
-import { ANIMATION_TRANSITIONS } from '@/constants/animationTokens';
-import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { cn } from '@/lib/utils';
 
 interface PeriodSelectorCardProps {
@@ -19,9 +16,6 @@ interface PeriodSelectorCardProps {
  * Composes multiple PeriodCheckbox atoms within a Card layout.
  * Follows atomic design pattern - molecule combining atoms with layout.
  *
- * Features smooth layout animations when checkboxes are toggled using Framer Motion.
- * Respects user motion preferences for accessibility.
- *
  * The selector compacts into a single toolbar row on desktop so the results table stays dominant.
  */
 export function PeriodSelectorCard({
@@ -29,8 +23,6 @@ export function PeriodSelectorCard({
   visiblePeriods,
   onPeriodToggle,
 }: PeriodSelectorCardProps) {
-  const shouldReduceMotion = useMotionPreference();
-
   return (
     <Card
       className={cn('w-full rounded-sm border-border bg-card shadow-none', 'p-2', 'sm:p-3 md:p-4')}
@@ -46,17 +38,13 @@ export function PeriodSelectorCard({
           )}
         >
           {periods.map((period) => (
-            <motion.div
-              key={period}
-              layout={!shouldReduceMotion}
-              transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.spring}
-            >
+            <div key={period}>
               <PeriodCheckbox
                 period={period}
                 checked={visiblePeriods.includes(period)}
                 onCheckedChange={() => onPeriodToggle(period)}
               />
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>

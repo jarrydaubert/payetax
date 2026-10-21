@@ -1,4 +1,5 @@
 import type { PayPeriod } from '@/constants/taxRates';
+import { convertAnnualToPeriod } from '@/lib/periodCalculator';
 import { parseTaxCode } from '@/lib/tax';
 import type { TaxCalculationResults } from '@/lib/types/calculator';
 
@@ -51,6 +52,16 @@ export const PERIOD_LABEL_TO_PAY_PERIOD: Record<string, PayPeriod> = {
   Daily: 'daily',
   Hourly: 'hourly',
 };
+
+/** Prefer the engine's payroll-period amount; derive only annual-only presentation rows. */
+export function getResultPeriodValue(
+  annual: number,
+  valuesByPeriod: Partial<Record<PayPeriod, number>> | undefined,
+  period: PayPeriod,
+  hoursPerWeek = 37.5,
+): number {
+  return valuesByPeriod?.[period] ?? convertAnnualToPeriod(annual, period, hoursPerWeek);
+}
 
 function calculatePercentage(amount: number, total: number): string {
   if (total === 0) return '0.0%';
@@ -182,7 +193,7 @@ export function buildResultsTableRows({
     {
       id: 'income-tax',
       kind: 'incomeTax',
-      category: 'Total Tax Due',
+      category: 'Income Tax',
       annual: results.incomeTax.annually,
       whatIfAnnual: whatIfResults?.incomeTax.annually,
       valuesByPeriod: results.incomeTax,
@@ -195,7 +206,7 @@ export function buildResultsTableRows({
     ...results.taxBands.map((band, index) => ({
       id: `tax-band-${band.rate}-${index}`,
       kind: 'taxBand' as const,
-      category: `${band.rate}% Rate`,
+      category: `Income taxed at ${band.rate}%`,
       annual: band.amount,
       whatIfAnnual: whatIfResults?.taxBands[index]?.amount,
       percentage: calculatePercentage(band.amount, grossAnnual),
@@ -259,7 +270,7 @@ export function buildResultsTableRows({
     {
       id: 'employer-ni',
       kind: 'employerNI',
-      category: 'Employers NI',
+      category: 'Employer NI (not deducted)',
       annual: results.employerNI,
       whatIfAnnual: whatIfResults?.employerNI,
       percentage: calculatePercentage(results.employerNI, grossAnnual),

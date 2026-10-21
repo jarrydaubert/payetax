@@ -1,17 +1,11 @@
 // src/components/molecules/ResultTableRow.tsx
 'use client';
 
-import { motion } from 'framer-motion';
 import * as React from 'react';
 import { TableCell, TableRow } from '@/components/ui/table';
 import type { PayPeriod } from '@/constants/taxRates';
 
-// Create motion component once at module level (Framer Motion best practice)
-const MotionTableRow = motion.create(TableRow);
-
-import { ANIMATION_TRANSITIONS } from '@/constants/animationTokens';
-import { useMotionPreference } from '@/hooks/useMotionPreference';
-import { PERIOD_LABEL_TO_PAY_PERIOD } from '@/lib/calculatorResultsPresenter';
+import { getResultPeriodValue, PERIOD_LABEL_TO_PAY_PERIOD } from '@/lib/calculatorResultsPresenter';
 import { cn, formatCurrency } from '@/lib/utils';
 
 interface ResultTableRowProps {
@@ -27,6 +21,7 @@ interface ResultTableRowProps {
   isSubRow?: boolean;
   visiblePeriods: string[];
   periodOptions: Record<string, number>;
+  hoursPerWeek?: number;
 }
 
 /**
@@ -49,23 +44,21 @@ export function ResultTableRow({
   isSubRow = false,
   visiblePeriods,
   periodOptions,
+  hoursPerWeek = 37.5,
 }: ResultTableRowProps) {
-  const shouldReduceMotion = useMotionPreference();
   const hasWhatIf = whatIfAnnual !== undefined;
 
-  // Use static TableRow if motion is reduced, otherwise use animated version
-  const RowComponent = shouldReduceMotion ? TableRow : MotionTableRow;
-
   return (
-    <RowComponent
+    <TableRow
+      role='row'
       className={cn(
         'border-border/80 border-b transition-colors hover:bg-secondary/60',
         isHighlight && 'border-primary/40 border-y bg-primary/10 hover:bg-primary/10',
       )}
-      layout={!shouldReduceMotion}
-      transition={!shouldReduceMotion ? ANIMATION_TRANSITIONS.layout : undefined}
     >
       <th
+        // biome-ignore lint/a11y/noRedundantRoles: Preserve row-header semantics in the CSS-grid paired layout on WebKit.
+        role='rowheader'
         scope='row'
         className={cn(
           color,
@@ -93,11 +86,15 @@ export function ResultTableRow({
       {visiblePeriods.map((period) => {
         const divisor = periodOptions[period] ?? 1;
         const periodKey = PERIOD_LABEL_TO_PAY_PERIOD[period];
-        const currentValue =
-          (periodKey ? valuesByPeriod?.[periodKey] : undefined) ?? annual / divisor;
+        const currentValue = periodKey
+          ? getResultPeriodValue(annual, valuesByPeriod, periodKey, hoursPerWeek)
+          : annual / divisor;
         const whatIfValue =
-          (periodKey ? whatIfValuesByPeriod?.[periodKey] : undefined) ??
-          (whatIfAnnual !== undefined ? whatIfAnnual / divisor : undefined);
+          whatIfAnnual !== undefined
+            ? periodKey
+              ? getResultPeriodValue(whatIfAnnual, whatIfValuesByPeriod, periodKey, hoursPerWeek)
+              : whatIfAnnual / divisor
+            : undefined;
 
         if (hasWhatIf && whatIfValue !== undefined) {
           // Render Current and What If columns with min-width to prevent overlap
@@ -105,7 +102,7 @@ export function ResultTableRow({
             <React.Fragment key={period}>
               <TableCell
                 className={cn(
-                  'min-w-[8.5rem] whitespace-nowrap bg-primary/10 px-2 py-2.5 text-right font-mono tabular-nums',
+                  'min-w-[8rem] whitespace-nowrap bg-primary/10 px-2 py-2.5 text-right font-mono tabular-nums',
                   'text-[0.8125rem] xl:text-sm',
                   color,
                   isHighlight && 'font-bold',
@@ -115,7 +112,7 @@ export function ResultTableRow({
               </TableCell>
               <TableCell
                 className={cn(
-                  'min-w-[8.5rem] whitespace-nowrap bg-success/10 px-2 py-2.5 text-right font-mono tabular-nums',
+                  'min-w-[8rem] whitespace-nowrap bg-success/10 px-2 py-2.5 text-right font-mono tabular-nums',
                   'text-[0.8125rem] xl:text-sm',
                   color,
                   isHighlight && 'font-bold',
@@ -132,7 +129,7 @@ export function ResultTableRow({
           <TableCell
             key={period}
             className={cn(
-              'min-w-[8.5rem] whitespace-nowrap px-1.5 py-2.5 text-right font-mono tabular-nums xl:px-2',
+              'min-w-[8rem] whitespace-nowrap px-1.5 py-2.5 text-right font-mono tabular-nums xl:px-2',
               'text-[0.8125rem] xl:text-sm',
               color,
               isHighlight && 'font-bold',
@@ -142,6 +139,6 @@ export function ResultTableRow({
           </TableCell>
         );
       })}
-    </RowComponent>
+    </TableRow>
   );
 }

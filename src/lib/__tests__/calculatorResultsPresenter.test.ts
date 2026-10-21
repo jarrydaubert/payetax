@@ -1,5 +1,5 @@
 import { calculateMarginalTaxRate } from '@/lib/calculatorMarginalTax';
-import { buildResultsTableRows } from '@/lib/calculatorResultsPresenter';
+import { buildResultsTableRows, getResultPeriodValue } from '@/lib/calculatorResultsPresenter';
 import { calculateTax, type TaxCalculationInput } from '@/lib/taxCalculator';
 
 const payslipInput: TaxCalculationInput = {
@@ -115,5 +115,15 @@ describe('calculatorResultsPresenter', () => {
 
     expect(rows.find((row) => row.kind === 'taxable')?.percentage).toBe('100%');
     expect(rows.find((row) => row.kind === 'taxFree')?.percentage).toMatch(/\d+\.\d%/);
+  });
+});
+
+describe('shared result-period presentation', () => {
+  it('preserves an explicit payroll amount instead of dividing the annual total', () => {
+    expect(getResultPeriodValue(1000, { monthly: 83.31 }, 'monthly')).toBe(83.31);
+  });
+  it('uses the selected working hours for annual-only rows', () => {
+    expect(getResultPeriodValue(2080, undefined, 'hourly', 40)).toBe(1);
+    expect(getResultPeriodValue(2080, undefined, 'daily', 40)).toBe(8);
   });
 });

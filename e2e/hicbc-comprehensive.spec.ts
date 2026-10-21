@@ -1,3 +1,4 @@
+import { editCalculatorInputs, showPeriodComparison } from './helpers/calculator-ui';
 /**
  * High Income Child Benefit Charge (HICBC) - Comprehensive Test Suite
  *
@@ -17,7 +18,9 @@ async function getTableValueByHeader(
   rowLabel: string,
   headerLabel: string,
 ): Promise<number> {
-  const headers = page.locator('table thead th');
+  await showPeriodComparison(page, headerLabel);
+  const table = page.getByTestId('results-table');
+  const headers = table.locator('thead th');
   const headerTexts = await headers.allTextContents();
   const headerIndex = headerTexts.findIndex((text) =>
     text.trim().toLowerCase().includes(headerLabel.toLowerCase()),
@@ -29,7 +32,7 @@ async function getTableValueByHeader(
 
   // Table rows use a label column first; data cells start after that.
   const dataIndex = Math.max(0, headerIndex - 1);
-  const row = page.locator(`tr:has-text("${rowLabel}")`).first();
+  const row = table.locator(`tr:has-text("${rowLabel}")`).first();
   const cells = row.locator('td');
   const cellText = await cells.nth(dataIndex).textContent();
   const numeric = Number.parseFloat(cellText?.replace(/[£,]/g, '') || '0');
@@ -67,15 +70,16 @@ test.describe('HICBC - Child Benefit Charge Comprehensive', () => {
     // £60k = 50% into taper (£50k-£80k)
     // Should charge 50% = £665.60
 
+    await editCalculatorInputs(page);
     await page.getByTestId('salary-input').fill('60000');
 
     // TODO: Add children input field to calculator
     // For now, verify we can at least calculate the salary correctly
     await page.getByTestId('calculate-button').click();
-    await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByTestId('take-home-amount')).toBeVisible({ timeout: 5000 });
 
     // Expected by the calculator's payroll-period annualised model.
-    const tax = await getTableValueByHeader(page, 'Total Tax Due', 'Yearly');
+    const tax = await getTableValueByHeader(page, 'Income Tax', 'Yearly');
 
     expect(tax).toBeCloseTo(11428.8, 1);
   });
@@ -85,9 +89,10 @@ test.describe('HICBC - Child Benefit Charge Comprehensive', () => {
     // £80k = full charge (over £80k threshold)
     // Should lose entire benefit
 
+    await editCalculatorInputs(page);
     await page.getByTestId('salary-input').fill('80000');
     await page.getByTestId('calculate-button').click();
-    await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByTestId('take-home-amount')).toBeVisible({ timeout: 5000 });
 
     // This test documents that HICBC needs to be added to calculator
     // Currently calculator doesn't have children input field
@@ -98,9 +103,10 @@ test.describe('HICBC - Child Benefit Charge Comprehensive', () => {
     // £65k = 75% into taper
     // Should charge 75% = £2,320.20
 
+    await editCalculatorInputs(page);
     await page.getByTestId('salary-input').fill('65000');
     await page.getByTestId('calculate-button').click();
-    await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByTestId('take-home-amount')).toBeVisible({ timeout: 5000 });
   });
 
   test('HICBC: 4 children at £55k (25% charge)', async ({ page }) => {
@@ -108,9 +114,10 @@ test.describe('HICBC - Child Benefit Charge Comprehensive', () => {
     // £55k = 25% into taper
     // Should charge 25% = £993.70
 
+    await editCalculatorInputs(page);
     await page.getByTestId('salary-input').fill('55000');
     await page.getByTestId('calculate-button').click();
-    await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByTestId('take-home-amount')).toBeVisible({ timeout: 5000 });
   });
 
   test('HICBC: Pension avoidance - £65k with £5k pension to drop below £60k ANI', async ({
@@ -121,6 +128,7 @@ test.describe('HICBC - Child Benefit Charge Comprehensive', () => {
     // vs no pension = £65k (75% charge)
     // Savings: 25% of benefit per child
 
+    await editCalculatorInputs(page);
     await page.getByTestId('salary-input').fill('65000');
 
     // Add pension contribution (use testId to avoid matching tooltip button)
@@ -132,7 +140,7 @@ test.describe('HICBC - Child Benefit Charge Comprehensive', () => {
     await pensionInput.blur();
 
     await page.getByTestId('calculate-button').click();
-    await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByTestId('take-home-amount')).toBeVisible({ timeout: 5000 });
 
     // Verify pension shows in results table (Yearly column)
     const pensionValue = await getTableValueByHeader(page, 'Pension', 'Yearly');
@@ -141,27 +149,30 @@ test.describe('HICBC - Child Benefit Charge Comprehensive', () => {
 
   test('HICBC: Edge case - exactly £50k (0% charge)', async ({ page }) => {
     // At exactly £50k, no HICBC applies
+    await editCalculatorInputs(page);
     await page.getByTestId('salary-input').fill('50000');
     await page.getByTestId('calculate-button').click();
-    await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByTestId('take-home-amount')).toBeVisible({ timeout: 5000 });
 
-    const tax = await getTableValueByHeader(page, 'Total Tax Due', 'Yearly');
+    const tax = await getTableValueByHeader(page, 'Income Tax', 'Yearly');
 
     expect(tax).toBeCloseTo(7483.2, 1);
   });
 
   test('HICBC: Edge case - exactly £80k (100% charge)', async ({ page }) => {
     // At exactly £80k, full charge applies
+    await editCalculatorInputs(page);
     await page.getByTestId('salary-input').fill('80000');
     await page.getByTestId('calculate-button').click();
-    await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByTestId('take-home-amount')).toBeVisible({ timeout: 5000 });
   });
 
   test('HICBC: Above £80k means no benefit at all', async ({ page }) => {
     // Above £80k, child benefit fully withdrawn
+    await editCalculatorInputs(page);
     await page.getByTestId('salary-input').fill('90000');
     await page.getByTestId('calculate-button').click();
-    await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByTestId('take-home-amount')).toBeVisible({ timeout: 5000 });
   });
 });
 

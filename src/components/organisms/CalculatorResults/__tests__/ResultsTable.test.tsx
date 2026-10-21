@@ -234,7 +234,7 @@ describe('ResultsTable Component', () => {
     it('should render income tax row', () => {
       render(<ResultsTable results={mockResults} />);
 
-      expect(screen.getByText('Total Tax Due')).toBeInTheDocument();
+      expect(screen.getByText('Income Tax')).toBeInTheDocument();
       expect(screen.getAllByText(/£3,486/).length).toBeGreaterThan(0);
     });
 
@@ -261,7 +261,7 @@ describe('ResultsTable Component', () => {
     it('should render employer NI row', () => {
       render(<ResultsTable results={mockResults} />);
 
-      expect(screen.getByText('Employers NI')).toBeInTheDocument();
+      expect(screen.getByText('Employer NI (not deducted)')).toBeInTheDocument();
     });
 
     it('should NOT render pension footnote (removed in UX improvements)', () => {
@@ -275,7 +275,7 @@ describe('ResultsTable Component', () => {
     it('should render tax band breakdown', () => {
       render(<ResultsTable results={mockResults} />);
 
-      expect(screen.getByText('20% Rate')).toBeInTheDocument();
+      expect(screen.getByText('Income taxed at 20%')).toBeInTheDocument();
     });
 
     it('should handle multiple tax bands', () => {
@@ -289,8 +289,8 @@ describe('ResultsTable Component', () => {
 
       render(<ResultsTable results={resultsWithMultipleBands} />);
 
-      expect(screen.getByText('20% Rate')).toBeInTheDocument();
-      expect(screen.getByText('40% Rate')).toBeInTheDocument();
+      expect(screen.getByText('Income taxed at 20%')).toBeInTheDocument();
+      expect(screen.getByText('Income taxed at 40%')).toBeInTheDocument();
     });
 
     it('should handle no tax bands', () => {
@@ -303,7 +303,7 @@ describe('ResultsTable Component', () => {
 
       // Should still render the table without tax band rows
       expect(screen.getByText('Gross Pay')).toBeInTheDocument();
-      expect(screen.queryByText('20% Rate')).not.toBeInTheDocument();
+      expect(screen.queryByText('Income taxed at 20%')).not.toBeInTheDocument();
     });
   });
 
@@ -1289,7 +1289,7 @@ describe('ResultsTable Component', () => {
     it('should apply correct color to tax rows', () => {
       render(<ResultsTable results={mockResults} />);
 
-      const taxRow = screen.getByText('Total Tax Due').closest('tr');
+      const taxRow = screen.getByText('Income Tax').closest('tr');
       // Verify row exists and has tax value, don't test specific color class
       expect(taxRow).toBeInTheDocument();
       expect(taxRow).toHaveTextContent('£');
@@ -1324,7 +1324,7 @@ describe('ResultsTable Component', () => {
     it('should apply muted color to employer NI', () => {
       render(<ResultsTable results={mockResults} />);
 
-      const employerNIRow = screen.getByText('Employers NI').closest('tr');
+      const employerNIRow = screen.getByText('Employer NI (not deducted)').closest('tr');
       const employerNIValue = employerNIRow?.querySelector('.text-muted-foreground');
       expect(employerNIValue).toBeInTheDocument();
     });

@@ -398,6 +398,7 @@ test.describe('WCAG 2.2 AA - Keyboard Navigation', () => {
     await ensureCalculatorVisible(page);
 
     const salaryInput = page.getByTestId('salary-input');
+    await expect(salaryInput).toBeEnabled();
     await salaryInput.focus();
     await expect(salaryInput).toBeFocused();
   });

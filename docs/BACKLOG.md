@@ -64,7 +64,7 @@ below.
 | Concern | Desired outcome | Current status | Evidence or completion reference |
 | --- | --- | --- | --- |
 | Explicit pension-method handling | Salary-sacrifice, net-pay and relief-at-source are handled explicitly, with the method exposed in the result. | Open | The shared pay-basis owner currently models the pension input as salary sacrifice. |
-| A transparent result that clearly exposes the selected policy, calculation basis, relevant pay bases and individual deductions | One result exposes the policy selected, the calculation basis, the relevant pay bases and each individual deduction, without callers reassembling them. | Partial | Tax-code basis is exposed after PRs #111/#112. Selected policy, relevant pay bases and pension method remain incomplete. |
+| A transparent result that clearly exposes the selected policy, calculation basis, relevant pay bases and individual deductions | One result exposes the policy selected, the calculation basis, the relevant pay bases and each individual deduction, without callers reassembling them. | Partial | Tax-code basis is exposed after PRs #111/#112. The main statement now shows selected year/region, code basis and the salary-sacrifice assumption. A first-class selected-policy/pay-basis/pension-method result contract remains incomplete. |
 | Compact independent full-calculation fixture set | A small set of JSON fixtures, derived independently of production code, covers representative full-calculation interactions. | Partial | Representative PAYE and tax-code fixtures now include Month 1 Cvalue/exact-threshold and final-penny cases. Supported-year, wider boundary and per-scenario provenance gaps remain below. Director extraction calculations have no independent fixtures yet; DI-19 introduces the first minimal set. |
 | Balanced test portfolio and updated `TESTING.md` | JSON fixtures, TypeScript rule and boundary tests, and Playwright journeys are balanced, with `TESTING.md` describing the split. | Partial | The three-layer split exists; the final coverage balance and documentation reconciliation remain open. |
 | Final backlog reconciliation | After the foundation audit, the detailed backlog items are reconciled against verified outcomes. | Open | Remove the remaining Foundation rows as focused slices close them. |
@@ -110,6 +110,21 @@ to 0 with an input explanation. Regression evidence belongs in the input-integri
 - [ ] Evergreen-content policy-value guard: extend `audit-blog-content --strict` to reject literal rates in evergreen posts. Import-boundary and tax-fact guards already run in `check:repo`; do not recreate them. DoD: the residual blog guard fails on a seeded violation.
 
 Implementation sequencing for these items remains documented in the ownership audit report §6, beginning with its recommended Scottish vertical.
+
+### Local verification follow-up
+
+Reproduced against clean `main` during the [calculator implementation](reports/main-calculator-redesign-2026-10-21.md):
+
+- Reconcile the HICBC £60k and pension £50k/£20k-sacrifice browser expectations with current
+  independently derived payroll fixtures. Both expected-tax assertions already fail on `main`;
+  do not update numbers from engine output alone.
+- Repair dark-mode privacy links and the footer wordmark touch target. WebKit's native-control
+  colour inheritance on the calculator is addressed by the statement work; retain browser coverage.
+- Stabilise mobile Director critical journeys against the existing mounted UI (email, strategy and
+  Learn panel). The same missing-control failures occur on clean `main`; do not conflate them with
+  the separate verified Director financial defects below.
+- Reconcile the five local unit failures in InputTooltip, analytics, rateLimit and origin with the
+  test environment. All five reproduce on `main`; GitHub checks for input-integrity PR #127 pass.
 
 ### Director Intelligence audit follow-up
 

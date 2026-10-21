@@ -38,8 +38,11 @@ export function CalculatorInputsSection({
   resultAction,
 }: CalculatorInputsSectionProps) {
   const { reset } = useCalculatorActions();
-  const inputsRef = React.useRef<HTMLDivElement>(null);
+  const inputsRef = React.useRef<HTMLFormElement>(null);
   const [isCalculating, setIsCalculating] = React.useState(false);
+  // Server-rendered controls must not accept edits that hydration can replace.
+  const [interactive, setInteractive] = React.useState(false);
+  React.useEffect(() => setInteractive(true), []);
   const [formMessage, setFormMessage] = React.useState<{
     tone: 'error' | 'warning';
     text: string;
@@ -119,53 +122,80 @@ export function CalculatorInputsSection({
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className={'space-y-4'}>
-        <div ref={inputsRef}>
-          <BasicInputs />
-        </div>
+      <form
+        ref={inputsRef}
+        aria-label='Your pay calculator'
+        className='flex flex-col gap-5'
+        noValidate
+        onKeyDownCapture={(event) => {
+          if (event.key === 'Enter' && event.target instanceof HTMLInputElement) {
+            event.preventDefault();
+            handleCalculate();
+          }
+        }}
+        onSubmit={(event) => {
+          event.preventDefault();
+          handleCalculate();
+        }}
+      >
+        <fieldset
+          disabled={!interactive}
+          aria-busy={!interactive}
+          className='m-0 flex min-w-0 flex-col gap-5 border-0 p-0'
+        >
+          <div>
+            <BasicInputs />
+          </div>
 
-        {/* Calculate and Reset buttons */}
-        <div className={cn('flex', 'gap-2')}>
-          <Button
-            onClick={handleCalculate}
-            disabled={isCalculating}
-            size='default'
-            className='min-w-0 flex-1 px-3'
-            data-testid='calculate-button'
-          >
-            {isCalculating ? (
-              <>
-                <Spinner className={cn('mr-2', 'size-5')} />
-                Calculating...
-              </>
-            ) : (
-              <>
-                <Calculator className={cn('mr-2', 'size-5')} />
-                Calculate
-              </>
-            )}
-          </Button>
+          {/* Calculate and Reset buttons */}
+          <div className={cn('flex', 'gap-2')}>
+            <Button
+              type='submit'
+              disabled={isCalculating}
+              size='default'
+              className='min-h-11 min-w-0 flex-1 px-3'
+              data-testid='calculate-button'
+            >
+              {isCalculating ? (
+                <>
+                  <Spinner className={cn('mr-2', 'size-5')} />
+                  Calculating...
+                </>
+              ) : (
+                <>
+                  <Calculator className={cn('mr-2', 'size-5')} />
+                  Calculate
+                </>
+              )}
+            </Button>
 
-          <Button onClick={handleReset} variant='outline' size='default' className='shrink-0 px-3'>
-            <RotateCcw className={cn('mr-1.5', 'size-5')} />
-            Reset
-          </Button>
-          {resultAction}
-        </div>
-        {formMessage && (
-          <p
-            className={cn(
-              'rounded-md border px-3 py-2 text-sm',
-              formMessage.tone === 'error'
-                ? 'border-destructive/30 bg-destructive/10 text-destructive'
-                : 'border-warning/30 bg-warning/10 text-warning',
-            )}
-            role={formMessage.tone === 'error' ? 'alert' : 'status'}
-          >
-            {formMessage.text}
-          </p>
-        )}
-      </div>
+            <Button
+              type='button'
+              onClick={handleReset}
+              variant='outline'
+              size='default'
+              className='min-h-11 shrink-0 px-3'
+            >
+              <RotateCcw className={cn('mr-1.5', 'size-5')} />
+              Reset
+            </Button>
+            {resultAction}
+          </div>
+          {formMessage && (
+            <p
+              className={cn(
+                'rounded-md border px-3 py-2 text-sm',
+                formMessage.tone === 'error'
+                  ? 'border-destructive/30 bg-destructive/10 text-destructive'
+                  : 'border-warning/30 bg-warning/10 text-warning',
+              )}
+              role={formMessage.tone === 'error' ? 'alert' : 'status'}
+            >
+              {formMessage.text}
+            </p>
+          )}
+        </fieldset>
+      </form>
     </TooltipProvider>
   );
 }

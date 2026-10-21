@@ -41,7 +41,9 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
             'text-xs xl:text-sm',
           )}
         >
-          %
+          <span title='Share of gross pay. Previous-year change is relative to previous take-home.'>
+            %
+          </span>
         </TableHead>
         {hasWhatIfResults
           ? // Two-row header for What If comparison - wider columns needed for Current/What If
@@ -49,7 +51,7 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
               <TableHead
                 key={period}
                 className={cn(
-                  'min-w-[17rem] border-border border-r text-center font-semibold text-muted-foreground',
+                  'min-w-[16rem] border-border border-r text-center font-semibold text-muted-foreground',
                   'px-2',
                   'py-2.5',
                   'text-xs xl:text-sm',
@@ -64,7 +66,7 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
               <TableHead
                 key={period}
                 className={cn(
-                  'min-w-[8.5rem] whitespace-nowrap text-right font-semibold text-muted-foreground',
+                  'min-w-[8rem] whitespace-nowrap text-right font-semibold text-muted-foreground',
                   'px-1.5 xl:px-2',
                   'py-2.5',
                   'text-xs xl:text-sm',
@@ -84,7 +86,7 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
             <React.Fragment key={period}>
               <TableHead
                 className={cn(
-                  'min-w-[8.5rem] whitespace-nowrap bg-primary/10 text-center font-medium text-muted-foreground',
+                  'min-w-[8rem] whitespace-nowrap bg-primary/10 text-center font-medium text-muted-foreground',
                   'px-2',
                   'py-2',
                   'text-sm',
@@ -95,7 +97,7 @@ export function ResultsTableHeader({ visiblePeriods, hasWhatIfResults }: Results
               </TableHead>
               <TableHead
                 className={cn(
-                  'min-w-[8.5rem] whitespace-nowrap bg-accent/10 text-center font-medium text-muted-foreground',
+                  'min-w-[8rem] whitespace-nowrap bg-accent/10 text-center font-medium text-muted-foreground',
                   'px-2',
                   'py-2',
                   'text-sm',
