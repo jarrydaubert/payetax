@@ -27,7 +27,7 @@ Current correctness sequence:
 2. Transparent calculation results.
 3. Independent fixture/test-portfolio completion and Foundation reconciliation.
 
-Verified Director Intelligence correctness exceptions (see [Urgent correctness exceptions](#urgent-correctness-exceptions)) may be taken as small independent slices between these items; they do not reorder them. The verified [main-calculator input-integrity defects](#main-calculator-input-integrity) are taken the same way, next, reusing the shared currency parser DI-01 introduced (`src/lib/currencyInput.ts`); currency parsing has landed and the focus-and-leave fix follows.
+Verified Director Intelligence correctness exceptions (see [Urgent correctness exceptions](#urgent-correctness-exceptions)) may be taken as small independent slices between these items; they do not reorder them. The verified [main-calculator input-integrity defects](#main-calculator-input-integrity) are taken the same way, next, reusing the shared currency parser DI-01 introduced (`src/lib/currencyInput.ts`); currency parsing, focus preservation, pension-unit reset and stale-result protection have landed.
 
 ### Foundation
 
@@ -80,17 +80,10 @@ below.
 
 ### Main calculator input integrity
 
-Currency parsing in the shared `NumberInput` atom now uses `parseCurrencyInput` (`src/lib/currencyInput.ts`): pence are kept, negative, malformed and over-limit text is rejected with a visible, associated error, and while a field the calculation uses holds rejected text the results are cleared and Calculate is refused. Remaining work is recorded below as separate PRs (see the [agreed order](#urgent-correctness-exceptions)). Browser evidence for the original defects: [PR #123](https://github.com/jarrydaubert/payetax/pull/123).
-
-- [ ] **P1 — Focusing a filled field and leaving it erases the value while the old result stays visible.** `NumberInput` clears its display on focus by default, and blur commits empty text as 0. With a £30,000 salary already calculated, clicking into Salary and tabbing away sets the salary to £0.00. After Calculate, the validation message appears, but the £30,000 results remain on screen. (Rejected text is no longer cleared on focus, and rejected text already clears results; the empty-commits-0 rule is deliberately unchanged until this fix.)
-
-  Related stale-result gap (found in PR #125 review, not changed there): a *valid* edit leaves the previous result on screen. With £30,000 calculated, committing 40,000 keeps the £30,000 results and the email action, and the email recalculates from the new inputs, so it sends a £40,000 breakdown while the screen shows £30,000. Likewise the tax-trap pension suggestion computed for the shown result can be applied after a valid edit to another field. Rejected text, including half-typed text such as `30,0`, already clears results immediately; valid edits should be equally explicit.
-
-  **DoD:** Focusing a field without editing it never changes its value. A field the user genuinely clears is treated as empty, not zero. A result whose inputs are no longer valid, or no longer match the committed inputs, is cleared or marked not current, and email is unavailable until the shown result matches its inputs. Browser regression covers focus-and-leave, clearing, a valid edit after calculating and recovery.
-
-- [ ] **P1 — Switching the pension type reinterprets the amount.** Changing Pension from £ to % keeps the number, so a committed £5,000 becomes 5,000%: the percentage path is uncapped and a £30,000 salary calculates a £1,500,000 pension and −£1,470,000 net pay. `setPensionContributionType` does not revalidate the stored contribution. Found while fixing currency parsing; not changed there.
-
-  **DoD:** Changing the pension type never silently reinterprets an amount: the contribution is converted with a visible explanation, cleared, or rejected against the new type's limits before any calculation, and results for the old meaning are cleared. Store and browser regressions cover £→% and %→£ switches above and within the other type's limits.
+The shared currency parser, focus preservation, explicit empty-field validation, pension-unit reset
+and stale-result invalidation are implemented. Editing any amount clears all result variants;
+committed changes use the same invalidation path. Changing pension units resets the contribution
+to 0 with an input explanation. Regression evidence belongs in the input-integrity pull request.
 
 ### Tax correctness and product semantics
 

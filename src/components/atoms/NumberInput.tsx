@@ -44,13 +44,15 @@ interface NumberInputProps
    * typing and on commit), and with `null` when valid text is committed after a report.
    */
   onValidityChange?: (invalid: NumberInputInvalidDraft | null) => void;
+  /** Invalidates a displayed calculation as soon as its text is edited. */
+  onDraftChange?: () => void;
   /** Invalid text held by the owner (e.g. while this field was unmounted); shown with its error. */
   invalidDraft?: NumberInputInvalidDraft;
   /**
    * Changing this discards any text being edited, its error and what was last reported, and
    * shows `value`, even while the field is focused (e.g. the owner's Reset).
    */
-  resetKey?: number;
+  resetKey?: number | string;
   /**
    * Decimal places accepted and displayed: 2 for pounds and pence, 0 for whole units only.
    * Text with more significant decimal places is rejected, never rounded.
@@ -62,7 +64,7 @@ interface NumberInputProps
   prefix?: string;
   /** Optional suffix (e.g., percentage symbol) */
   suffix?: string;
-  /** Whether to clear on focus for easier entry (invalid text is kept so it can be corrected) */
+  /** Whether to select the value on focus for easier replacement (never erases it) */
   clearOnFocus?: boolean;
   /** Whether to show increment/decrement controls */
   showControls?: boolean;
@@ -88,6 +90,7 @@ const NumberInput = memo(
       value,
       onChange,
       onValidityChange,
+      onDraftChange,
       invalidDraft,
       resetKey,
       decimals = 0,
@@ -148,12 +151,16 @@ const NumberInput = memo(
       onValidityChangeRef.current?.(invalid);
     }, []);
 
+    const rejectsEmpty = Boolean(onValidityChange);
     const parseText = useCallback(
       (text: string): CurrencyInputParseResult => {
         const result = parseCurrencyInput(
           text,
           max === undefined ? { unit, decimals } : { max, unit, decimals },
         );
+        if (result.status === 'empty' && rejectsEmpty) {
+          return { status: 'invalid', error: 'Enter an amount, or 0 for none.' };
+        }
         if (result.status === 'valid' && result.value < min) {
           const minimum =
             unit === 'percent' ? `${min.toLocaleString('en-GB')}%` : formatCurrencyInputValue(min);
@@ -161,7 +168,7 @@ const NumberInput = memo(
         }
         return result;
       },
-      [decimals, max, min, unit],
+      [decimals, max, min, unit, rejectsEmpty],
     );
 
     /** Show a committed amount, discarding any invalid text and its error. */
@@ -191,24 +198,27 @@ const NumberInput = memo(
 
     // The owner reset its inputs: discard everything this field holds, focused or not, so the
     // text shown, the committed value, the error and the reporting state all agree. A later
-    // blur commits the reset value (an emptied field commits 0, which is every reset value),
+    // blur commits the reset value,
     // and the same invalid text is reported again if retyped.
     const valueRef = useRef(value);
     valueRef.current = value;
     const previousResetKeyRef = useRef(resetKey);
+    const selectAfterResetRef = useRef(false);
     useEffect(() => {
       if (previousResetKeyRef.current === resetKey) return;
       previousResetKeyRef.current = resetKey;
       previousValueRef.current = valueRef.current;
       reportedRef.current = null;
       showValue(valueRef.current);
-      // A field still being edited shows what a fresh focus would, so typing starts afresh
-      // rather than appending to the formatted reset value.
-      if (isFocusedRef.current && clearOnFocus) {
-        displayValueRef.current = '';
-        setDisplayValue('');
-      }
-    }, [resetKey, showValue, clearOnFocus]);
+      selectAfterResetRef.current = isFocusedRef.current;
+    }, [resetKey, showValue]);
+    useEffect(() => {
+      if (!selectAfterResetRef.current || displayValue !== formatNumber(valueRef.current, decimals))
+        return;
+      selectAfterResetRef.current = false;
+      const element = document.getElementById(inputId);
+      if (element instanceof HTMLInputElement) element.select();
+    }, [displayValue, inputId, decimals]);
 
     // Re-format valid text when the display precision changes.
     useEffect(() => {
@@ -235,8 +245,8 @@ const NumberInput = memo(
     }, [draftText, draftError, showValue]);
 
     /**
-     * Commit text: a valid amount is formatted and passed on; empty text commits 0 (the amount
-     * the calculator uses for an empty field); invalid text is kept with a visible error and the
+     * Commit text: a valid amount is formatted and passed on; owned fields require an explicit
+     * amount (including 0). Invalid text is kept with a visible error and the
      * committed value is left unchanged.
      */
     const commit = useCallback(
@@ -301,7 +311,7 @@ const NumberInput = memo(
     );
 
     /**
-     * Handle focus event - clear field for easier entry if configured
+     * Handle focus event - optionally select the value without changing it
      */
     const handleFocus = useCallback(
       (e: FocusEvent<HTMLInputElement>) => {
@@ -310,7 +320,7 @@ const NumberInput = memo(
 
         // Keep invalid text so the person can correct it.
         if (clearOnFocus && errorRef.current === null) {
-          setDisplayValue('');
+          e.currentTarget.select();
         }
 
         onFocus?.(e);
@@ -340,6 +350,7 @@ const NumberInput = memo(
     const handleChange = useCallback(
       (e: ChangeEvent<HTMLInputElement>) => {
         const text = e.target.value;
+        onDraftChange?.();
         setDisplayValue(text);
         const result = parseText(text);
         if (result.status === 'invalid') {
@@ -350,7 +361,7 @@ const NumberInput = memo(
           setErrorVisible(false);
         }
       },
-      [parseText, reportValidity],
+      [onDraftChange, parseText, reportValidity],
     );
 
     /**

@@ -231,9 +231,10 @@ working rule, they may be fixed as small independent slices between the items ab
 currency-input preservation and minimal stale-result protection have landed, with one shared
 currency parser in `src/lib/currencyInput.ts`. The main calculator's amount fields now reuse that
 parser: pence are kept, rejected text is shown with its error and clears results until corrected.
-The remaining [main-calculator input-integrity defects](BACKLOG.md#main-calculator-input-integrity)
-(focus-and-leave erasing a value, and pension type switching reinterpreting an amount) follow next,
-then the interim Director email guard and Corporation Tax deadline arithmetic. The
+The [main-calculator input-integrity fixes](BACKLOG.md#main-calculator-input-integrity) now preserve
+values on focus, keep cleared fields empty with validation, reset contributions when switching
+pension units and invalidate results (including email and pension suggestions) on edits. The
+remaining interim Director email guard and Corporation Tax deadline arithmetic follow. The
 backlog records the agreed order, under which these first slices come before item 1. They do not
 reorder items 1–3, they must reuse existing tax-domain owners, and any exception that needs a Foundation change waits for, or is folded into, that item. Director design and
 refactoring proposals are parked.

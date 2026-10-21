@@ -42,6 +42,8 @@ describe('BasicInputs - Regression Tests', () => {
     );
 
     (useCalculatorActions as jest.Mock).mockReturnValue({
+      setInputError: jest.fn(),
+      invalidateResults: jest.fn(),
       setSalary: jest.fn(),
       setPayPeriod: mockSetPayPeriod,
       setTaxYear: jest.fn(),

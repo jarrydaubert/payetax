@@ -325,7 +325,7 @@ test.describe('Calculator critical @critical', () => {
     const pension = page.getByTestId('pension-input');
     await pension.fill('abc');
     await page.getByRole('button', { name: /Reset/ }).dispatchEvent('click');
-    await expect(pension).toHaveValue('');
+    await expect(pension).toHaveValue('0.00');
     await expect(pension).not.toHaveAttribute('aria-invalid');
     await pension.blur();
     await expect(pension).toHaveValue('0.00');
@@ -356,4 +356,42 @@ test.describe('Calculator critical @critical', () => {
     const sl = await getYearlyTableValue(page, 'Student Loan');
     expect(sl).toBe(3588);
   });
+});
+
+test('focus, drafts, empty fields and pension unit changes preserve result integrity @critical', async ({
+  page,
+}) => {
+  await gotoCalculator(page);
+  await page.getByTestId('salary-input').fill('60000');
+  await page.getByTestId('tax-code-input').fill('1257L');
+  await page.getByTestId('calculate-button').click();
+  await expect(page.getByTestId('tax-results')).toBeVisible();
+  const salary = page.getByTestId('salary-input');
+  await salary.focus();
+  await salary.press('Tab');
+  await expect(salary).toHaveValue('60,000.00');
+  await expect(page.getByTestId('tax-results')).toBeVisible();
+  await salary.fill('70000');
+  await expect(page.getByTestId('tax-results')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Email tax calculation results' })).toHaveCount(0);
+  await page.getByTestId('calculate-button').click();
+  await expect(page.getByTestId('tax-results')).toBeVisible();
+  await salary.fill('');
+  await salary.press('Tab');
+  await expect(salary).toHaveValue('');
+  await expect(salary).toHaveAttribute('aria-invalid', 'true');
+  await page.getByTestId('calculate-button').click();
+  await expect(page.getByTestId('tax-results')).toHaveCount(0);
+  await salary.fill('60000');
+  const pensionType = page.getByTestId('pension-type-select');
+  await pensionType.click();
+  await page.getByRole('option').last().click();
+  await page.getByTestId('pension-input').fill('5000');
+  await page.getByTestId('calculate-button').click();
+  await pensionType.click();
+  await page.getByRole('option').first().click();
+  await expect(page.getByTestId('pension-input')).toHaveValue('0.00');
+  await expect(page.getByTestId('tax-results')).toHaveCount(0);
+  await page.getByTestId('calculate-button').click();
+  await expect(page.getByTestId('tax-results')).toBeVisible();
 });

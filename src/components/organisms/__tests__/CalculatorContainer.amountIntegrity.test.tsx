@@ -38,6 +38,35 @@ describe('Main calculator amount integrity (mounted)', () => {
     useCalculatorStore.getState().reset();
   });
 
+  it('preserves a calculated salary on focus and leave, invalidates on a valid draft and recovers', async () => {
+    const user = userEvent.setup();
+    render(<CalculatorContainer />);
+    const salary = screen.getByTestId('salary-input');
+    await typeInto(user, salary, '30000');
+    await calculate(user);
+    await waitFor(() => expect(resultsShown()).toBe(true));
+    await user.click(salary);
+    await user.tab();
+    expect(salary).toHaveValue('30,000.00');
+    expect(resultsShown()).toBe(true);
+    await user.click(salary);
+    fireEvent.change(salary, { target: { value: '40000' } });
+    await waitFor(() => expect(resultsShown()).toBe(false));
+    expect(
+      screen.queryByRole('button', { name: 'Email tax calculation results' }),
+    ).not.toBeInTheDocument();
+    await user.tab();
+    await calculate(user);
+    await waitFor(() => expect(resultsShown()).toBe(true));
+    expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(40000);
+    await user.clear(salary);
+    await user.tab();
+    expect(salary).toHaveValue('');
+    expect(salary).toHaveAttribute('aria-invalid', 'true');
+    await calculate(user);
+    expect(resultsShown()).toBe(false);
+  });
+
   it.each([
     ['1234.56'],
     ['£1,234.56'],
@@ -109,7 +138,7 @@ describe('Main calculator amount integrity (mounted)', () => {
     await typeInto(user, field, text);
 
     expect(field).toHaveValue(text);
-    expect(field).toHaveAccessibleDescription(error);
+    expect(field).toHaveAccessibleDescription(expect.stringContaining(error));
     await waitFor(() => expect(resultsShown()).toBe(false));
     expect(useCalculatorStore.getState().input.allowancesDeductions).toBe(
       before.allowancesDeductions,
@@ -296,26 +325,19 @@ describe('Main calculator amount integrity (mounted)', () => {
       expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(30000);
     });
 
-    it('commits the field being edited before applying a suggested pension', async () => {
+    it('removes a pension suggestion on a valid draft and refuses a stale action', async () => {
       const user = userEvent.setup();
       render(<CalculatorContainer />);
       await typeInto(user, screen.getByTestId('salary-input'), '110000');
       await calculate(user);
       const apply = await screen.findByRole('button', { name: /to Pension$/ });
-
-      // Typing into Pension, then activating the suggestion without moving focus.
       const pension = screen.getByTestId('pension-input');
-      await user.click(pension);
+      await user.clear(pension);
       await user.keyboard('3');
+      expect(apply).not.toBeInTheDocument();
       fireEvent.click(apply);
-
-      expect(pension).not.toHaveFocus();
-      const { input } = useCalculatorStore.getState();
-      expect(input.pensionContributionType).toBe('amount');
-      expect(input.pensionContribution).toBeGreaterThan(3);
-      expect(pension).toHaveValue(
-        input.pensionContribution.toLocaleString('en-GB', { minimumFractionDigits: 2 }),
-      );
+      expect(useCalculatorStore.getState().input.pensionContributionType).toBe('percentage');
+      expect(useCalculatorStore.getState().results).toBeNull();
     });
 
     it('removes the suggested-pension action as soon as rejected text is typed', async () => {
@@ -381,10 +403,10 @@ describe('Main calculator amount integrity (mounted)', () => {
       fireEvent.click(screen.getByRole('button', { name: /Reset/i }));
 
       // Displayed draft, committed value, validation and store all agree on the reset state.
-      // Still focused, so emptied as a fresh focus would be; it shows the reset value once left.
-      expect(field).toHaveValue('');
+      // Reset shows and selects its value, even while the field remains focused.
+      expect(field).toHaveValue('0.00');
       expect(field).not.toHaveAttribute('aria-invalid');
-      expect(field).not.toHaveAccessibleDescription(/./);
+      expect(field).not.toHaveAccessibleDescription(/Negative|invalid|Enter an amount/);
       expect(useCalculatorStore.getState().inputErrors).toEqual({});
       expect(useCalculatorStore.getState().input.pensionContribution).toBe(0);
       expect(useCalculatorStore.getState().input.allowancesDeductions).toBe(0);
@@ -413,7 +435,7 @@ describe('Main calculator amount integrity (mounted)', () => {
       await user.keyboard('1200');
       fireEvent.click(screen.getByRole('button', { name: /Reset/i }));
 
-      expect(allowances).toHaveValue('');
+      expect(allowances).toHaveValue('0.00');
       await user.tab();
       expect(useCalculatorStore.getState().input.allowancesDeductions).toBe(0);
       expect(allowances).toHaveValue('0.00');

@@ -198,7 +198,7 @@ describe('NumberInput Component', () => {
       expect(screen.getByText('Enter an amount no more than £10,000,000.')).toBeInTheDocument();
     });
 
-    it('does not report empty text as invalid', () => {
+    it('keeps a cleared owned field empty and asks for an explicit amount', () => {
       const onValidityChange = jest.fn();
       render(
         <NumberInput
@@ -210,8 +210,12 @@ describe('NumberInput Component', () => {
       );
       commit(screen.getByRole('spinbutton'), '');
 
-      expect(onValidityChange).not.toHaveBeenCalled();
-      expect(screen.getByRole('spinbutton')).not.toHaveAttribute('aria-invalid');
+      expect(onValidityChange).toHaveBeenCalledWith({
+        text: '',
+        error: 'Enter an amount, or 0 for none.',
+      });
+      expect(screen.getByRole('spinbutton')).toHaveValue('');
+      expect(screen.getByRole('spinbutton')).toHaveAttribute('aria-invalid', 'true');
     });
 
     it('recovers when invalid text is corrected', () => {
@@ -363,7 +367,7 @@ describe('NumberInput Component', () => {
 
         rerender(<NumberInput {...props} resetKey={1} />);
         // Still focused: emptied as a fresh focus would be, ready for new typing.
-        expect(input).toHaveValue('');
+        expect(input).toHaveValue('0.00');
         expect(input).not.toHaveAttribute('aria-invalid');
 
         // Leaving does not resurrect it; retyping the same text is reported again.
@@ -476,13 +480,13 @@ describe('NumberInput Component', () => {
   });
 
   describe('Focus Behavior', () => {
-    it('should clear value on focus when clearOnFocus is true', () => {
+    it('preserves the value when select-on-focus is enabled', () => {
       render(<NumberInput value={1000} onChange={mockOnChange} clearOnFocus={true} />);
       const input = screen.getByRole('spinbutton') as HTMLInputElement;
 
       fireEvent.focus(input);
 
-      expect(input.value).toBe('');
+      expect(input.value).toBe('1,000');
     });
 
     it('should not clear value on focus when clearOnFocus is false', () => {
