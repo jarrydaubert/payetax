@@ -72,6 +72,27 @@ bun run check:production-env-contract
 
 Local development should use `.env.local`. Never commit real credentials, and rotate any credential that was pasted into chat, committed, or pushed.
 
+## Secret Prevention And Retired Integrations
+
+`bun run check:tracked-env` rejects tracked `.env*` paths at any depth, with only the root
+`.env.template` allowed. It checks names without opening environment files.
+
+Stage the intended files, then run `bun run check:secrets` with Gitleaks 8.30.1 on `PATH`
+(or set `GITLEAKS_BIN` to its executable). CI downloads the pinned, SHA-256-verified release.
+The check exports the Git index to a temporary directory and scans that snapshot, including
+the template. Unstaged edits, untracked files, local environment files and Git history are not
+scanned. Stage changes before running it locally. Scanner failure is blocking; findings are
+fully redacted and only their count is printed. No baseline, inline suppression or repository
+ignore file exempts secrets. The only project false-positive exception matches the public
+`payetax-api-v<version>` cache namespace value in `public/sw.js`, for the generic API-key rule;
+other values and findings in that file are scanned. Temporary exports and redacted reports are
+removed after the check.
+
+The old Linear integration is retired. No replacement key or workspace is required for PayeTax.
+For the historical exposure and outstanding owner-side revocation/alert actions, see the
+[21 October 2026 incident record](../reports/linear-credential-retirement-2026-10-21.md).
+Removing code or closing a GitHub alert does not revoke a key at its provider.
+
 ## Vercel Link Recovery
 
 If Vercel CLI reports that it cannot retrieve project settings, `.vercel/project.json` may point at a stale project id.
