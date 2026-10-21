@@ -6,7 +6,7 @@
  * positive and malformed text became 0, and checks that rejected text never leaves results for
  * the previous amount on screen or lets Calculate use it.
  */
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CURRENCY_INPUT_ERRORS } from '@/lib/currencyInput';
 import { useCalculatorStore } from '@/store/calculatorStore';
@@ -199,6 +199,94 @@ describe('Main calculator amount integrity (mounted)', () => {
 
     // The close request made while the amount was rejected is not replayed after correction.
     expect(screen.getByRole('spinbutton', { name: 'Income source 1 amount' })).toHaveValue('5.00');
+  });
+
+  describe('while the field is still being edited (no blur)', () => {
+    /** Calculate £30,000, then put the caret back in Salary and type without leaving it. */
+    const calculateThenEditSalary = async (user: User, keys: string) => {
+      render(<CalculatorContainer />);
+      const salary = screen.getByTestId('salary-input');
+      await typeInto(user, salary, '30000');
+      await calculate(user);
+      await waitFor(() => expect(resultsShown()).toBe(true));
+      expect(emailAction()).toBeInTheDocument();
+
+      await user.click(salary);
+      await user.clear(salary);
+      await user.keyboard(keys);
+      expect(salary).toHaveFocus();
+      return salary;
+    };
+
+    /** Activate Calculate without moving focus first, so the field receives no blur. */
+    const clickCalculateWithoutBlur = () => fireEvent.click(screen.getByTestId('calculate-button'));
+
+    const emailAction = () =>
+      screen.queryByRole('button', { name: 'Email tax calculation results' });
+
+    it.each(['-500', 'abc'])('removes results and email as soon as %j is typed', async (keys) => {
+      const user = userEvent.setup();
+      const salary = await calculateThenEditSalary(user, keys);
+
+      expect(salary).toHaveFocus();
+      expect(useCalculatorStore.getState().inputErrors.salary?.text).toBe(keys);
+      expect(useCalculatorStore.getState().results).toBeNull();
+      await waitFor(() => expect(resultsShown()).toBe(false));
+      expect(emailAction()).not.toBeInTheDocument();
+      // The committed amount is unchanged; it is just not usable.
+      expect(useCalculatorStore.getState().input.salary).toBe(30000);
+    });
+
+    it.each([
+      ['-500', CURRENCY_INPUT_ERRORS.negative],
+      ['abc', CURRENCY_INPUT_ERRORS.malformed],
+    ])('refuses a direct Calculate click with %j still in the field', async (keys, error) => {
+      const user = userEvent.setup();
+      const salary = await calculateThenEditSalary(user, keys);
+
+      clickCalculateWithoutBlur();
+
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        'Correct the invalid amount in Salary before calculating.',
+      );
+      expect(useCalculatorStore.getState().results).toBeNull();
+      expect(resultsShown()).toBe(false);
+      expect(emailAction()).not.toBeInTheDocument();
+      expect(salary).toHaveValue(keys);
+      expect(salary).toHaveAccessibleDescription(error);
+    });
+
+    it('does not revive the old result when the text is corrected before leaving the field', async () => {
+      const user = userEvent.setup();
+      const salary = await calculateThenEditSalary(user, '-500');
+
+      await user.clear(salary);
+      await user.keyboard('40000');
+      expect(salary).toHaveFocus();
+      // Valid but uncommitted text: still blocked, results still gone.
+      expect(useCalculatorStore.getState().inputErrors.salary).toBeDefined();
+      expect(useCalculatorStore.getState().results).toBeNull();
+      expect(resultsShown()).toBe(false);
+
+      clickCalculateWithoutBlur();
+
+      // Calculate commits the field first, then calculates from the amount shown.
+      await waitFor(() => expect(resultsShown()).toBe(true));
+      expect(useCalculatorStore.getState().inputErrors).toEqual({});
+      expect(useCalculatorStore.getState().input.salary).toBe(40000);
+      expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(40000);
+      expect(salary).toHaveValue('40,000.00');
+    });
+
+    it('calculates from a valid edited amount, never the previous one', async () => {
+      const user = userEvent.setup();
+      await calculateThenEditSalary(user, '50000');
+
+      clickCalculateWithoutBlur();
+
+      await waitFor(() => expect(resultsShown()).toBe(true));
+      expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(50000);
+    });
   });
 
   it('rejects amounts the calculator would otherwise silently drop', async () => {

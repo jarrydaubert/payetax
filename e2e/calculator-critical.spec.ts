@@ -268,8 +268,18 @@ test.describe('Calculator critical @critical', () => {
     await calculate.click();
     await expect(results).toBeVisible();
 
-    // A negative salary is not turned into a positive one.
+    // A negative salary is not turned into a positive one. Results and email go as soon as it is
+    // typed, before the field is left, and Calculate activated without moving focus refuses.
     await salary.fill('-500');
+    await expect(salary).toBeFocused();
+    await expect(results).toBeHidden();
+    await expect(page.getByRole('button', { name: 'Email tax calculation results' })).toBeHidden();
+    await calculate.dispatchEvent('click');
+    await expect(
+      page.getByRole('alert').filter({ hasText: 'Correct the invalid amount in Salary' }),
+    ).toBeVisible();
+    await expect(results).toBeHidden();
+    await salary.focus();
     await salary.press('Tab');
     await expect(salary).toHaveValue('-500');
     await expect(salary).toHaveAttribute('aria-invalid', 'true');

@@ -4,9 +4,10 @@
  * - Typed or pasted text is parsed by the shared currency parser (`@/lib/currencyInput`), so pence
  *   are kept, never scaled. Text is never rewritten while focused; it is formatted on blur.
  * - Negative, malformed and out-of-range text is not converted into another amount: the text is
- *   kept, a specific error is shown and associated with the input, the committed value is left
- *   unchanged, and the invalid text is reported through `onValidityChange` so the owner can stop
- *   calculating from (and showing results for) the previous amount.
+ *   kept, a specific error is shown (once the field is left) and associated with the input, and
+ *   the committed value is left unchanged. Invalid text is reported through `onValidityChange` as
+ *   it is typed, so the owner can stop calculating from (and showing results for) the previous
+ *   amount before the field is left; recovery is reported when valid text is committed.
  * - Optional increment/decrement controls (spinbutton semantics) and reduced-motion-safe styling.
  *
  * @module components/atoms/NumberInput
@@ -39,8 +40,8 @@ interface NumberInputProps
    */
   onChange: (value: number) => void;
   /**
-   * Called on commit with the invalid text and its error when the text is not a valid amount, and
-   * with `null` when a previously reported field becomes valid again.
+   * Called with the invalid text and its error as soon as the text is not a valid amount (while
+   * typing and on commit), and with `null` when valid text is committed after a report.
    */
   onValidityChange?: (invalid: NumberInputInvalidDraft | null) => void;
   /** Invalid text held by the owner (e.g. while this field was unmounted); shown with its error. */
@@ -299,8 +300,10 @@ const NumberInput = memo(
     );
 
     /**
-     * Handle input change - keep the text exactly as typed; once an error is showing, keep its
-     * message in step with the text.
+     * Handle input change - keep the text exactly as typed. Invalid text is reported to the owner
+     * immediately, so nothing can keep using the previous amount while the field shows something
+     * else. Recovery is reported only on commit, when the committed value matches the text, so
+     * valid but uncommitted text never unblocks a calculation from the previous amount.
      */
     const handleChange = useCallback(
       (e: ChangeEvent<HTMLInputElement>) => {
@@ -309,12 +312,13 @@ const NumberInput = memo(
         const result = parseText(text);
         if (result.status === 'invalid') {
           setError(result.error);
+          reportValidity({ text, error: result.error });
         } else {
           setError(null);
           setErrorVisible(false);
         }
       },
-      [parseText],
+      [parseText, reportValidity],
     );
 
     /**

@@ -12,6 +12,12 @@ jest.mock('../BasicInputs', () => ({
   BasicInputs: () => <div data-testid='basic-inputs-mock'>Basic Inputs</div>,
 }));
 
+/** Serve the same state to selectors and to `getState()`, which Calculate reads after committing. */
+const mockStoreState = (state: object) => {
+  (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) => selector(state));
+  Object.assign(useCalculatorStore, { getState: () => state });
+};
+
 describe('CalculatorInputsSection Component', () => {
   const mockOnCalculate = jest.fn();
   const mockReset = jest.fn();
@@ -26,9 +32,7 @@ describe('CalculatorInputsSection Component', () => {
     (useCalculatorActions as jest.Mock).mockReturnValue({
       reset: mockReset,
     });
-    (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-      selector({ inputErrors: {}, input: defaultInput }),
-    );
+    mockStoreState({ inputErrors: {}, input: defaultInput });
   });
 
   describe('Rendering', () => {
@@ -201,9 +205,7 @@ describe('CalculatorInputsSection Component', () => {
     });
 
     it('should clear inline messages on reset', () => {
-      (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({ inputErrors: {}, input: { ...defaultInput, salary: 0 } }),
-      );
+      mockStoreState({ inputErrors: {}, input: { ...defaultInput, salary: 0 } });
       render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
 
       fireEvent.click(screen.getByTestId('calculate-button'));
@@ -220,12 +222,10 @@ describe('CalculatorInputsSection Component', () => {
     });
 
     it('does not show the low annual salary warning for a normal hourly rate', () => {
-      (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({
-          inputErrors: {},
-          input: { ...defaultInput, salary: 12.5, payPeriod: 'hourly' },
-        }),
-      );
+      mockStoreState({
+        inputErrors: {},
+        input: { ...defaultInput, salary: 12.5, payPeriod: 'hourly' },
+      });
       render(<CalculatorInputsSection onCalculate={mockOnCalculate} />);
 
       fireEvent.click(screen.getByTestId('calculate-button'));

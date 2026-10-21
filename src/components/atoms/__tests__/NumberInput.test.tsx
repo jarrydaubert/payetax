@@ -239,6 +239,52 @@ describe('NumberInput Component', () => {
       expect(screen.queryByText(CURRENCY_INPUT_ERRORS.negative)).not.toBeInTheDocument();
     });
 
+    it('reports invalid text while typing, before the field is left', () => {
+      const onValidityChange = jest.fn();
+      render(
+        <NumberInput
+          value={30000}
+          onChange={mockOnChange}
+          onValidityChange={onValidityChange}
+          decimals={2}
+        />,
+      );
+      const input = screen.getByRole('spinbutton');
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: '-500' } });
+
+      expect(onValidityChange).toHaveBeenLastCalledWith({
+        text: '-500',
+        error: CURRENCY_INPUT_ERRORS.negative,
+      });
+      expect(mockOnChange).not.toHaveBeenCalled();
+    });
+
+    it('reports recovery only when the valid text is committed', () => {
+      const onValidityChange = jest.fn();
+      render(
+        <NumberInput
+          value={30000}
+          onChange={mockOnChange}
+          onValidityChange={onValidityChange}
+          decimals={2}
+        />,
+      );
+      const input = screen.getByRole('spinbutton');
+      fireEvent.focus(input);
+      fireEvent.change(input, { target: { value: 'abc' } });
+      fireEvent.change(input, { target: { value: '40000' } });
+
+      // Valid but uncommitted: the owner still holds the rejection, so the previous amount
+      // cannot be used.
+      expect(onValidityChange).toHaveBeenCalledTimes(1);
+      expect(input).not.toHaveAttribute('aria-invalid');
+
+      fireEvent.blur(input);
+      expect(onValidityChange).toHaveBeenLastCalledWith(null);
+      expect(mockOnChange).toHaveBeenCalledWith(40000);
+    });
+
     it('keeps invalid text on focus so it can be corrected', () => {
       render(<NumberInput value={100} onChange={mockOnChange} decimals={2} />);
       const input = screen.getByRole('spinbutton');
