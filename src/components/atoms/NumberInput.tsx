@@ -167,7 +167,12 @@ const NumberInput = memo(
     /** Show a committed amount, discarding any invalid text and its error. */
     const showValue = useCallback(
       (amount: number) => {
-        setDisplayValue(formatNumber(amount, decimals));
+        const text = formatNumber(amount, decimals);
+        // Keep the refs in step now: later effects in the same commit (e.g. the rules-change
+        // re-check when Reset also switches the pension unit) must not act on the old text.
+        displayValueRef.current = text;
+        errorRef.current = null;
+        setDisplayValue(text);
         setError(null);
         setErrorVisible(false);
       },
@@ -186,7 +191,8 @@ const NumberInput = memo(
 
     // The owner reset its inputs: discard everything this field holds, focused or not, so the
     // text shown, the committed value, the error and the reporting state all agree. A later
-    // blur then commits the reset value, and the same invalid text is reported again if retyped.
+    // blur commits the reset value (an emptied field commits 0, which is every reset value),
+    // and the same invalid text is reported again if retyped.
     const valueRef = useRef(value);
     valueRef.current = value;
     const previousResetKeyRef = useRef(resetKey);
@@ -196,7 +202,13 @@ const NumberInput = memo(
       previousValueRef.current = valueRef.current;
       reportedRef.current = null;
       showValue(valueRef.current);
-    }, [resetKey, showValue]);
+      // A field still being edited shows what a fresh focus would, so typing starts afresh
+      // rather than appending to the formatted reset value.
+      if (isFocusedRef.current && clearOnFocus) {
+        displayValueRef.current = '';
+        setDisplayValue('');
+      }
+    }, [resetKey, showValue, clearOnFocus]);
 
     // Re-format valid text when the display precision changes.
     useEffect(() => {

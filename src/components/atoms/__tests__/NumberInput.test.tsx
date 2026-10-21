@@ -362,7 +362,8 @@ describe('NumberInput Component', () => {
         expect(onValidityChange).toHaveBeenCalledTimes(1);
 
         rerender(<NumberInput {...props} resetKey={1} />);
-        expect(input).toHaveValue('0.00');
+        // Still focused: emptied as a fresh focus would be, ready for new typing.
+        expect(input).toHaveValue('');
         expect(input).not.toHaveAttribute('aria-invalid');
 
         // Leaving does not resurrect it; retyping the same text is reported again.
@@ -388,6 +389,19 @@ describe('NumberInput Component', () => {
 
         expect(mockOnChange).not.toHaveBeenCalled();
         expect(input).toHaveValue('0.00');
+      });
+
+      it('lets typing start afresh in a field still focused after reset', () => {
+        const { input, props, rerender } = setup();
+        fireEvent.focus(input);
+        fireEvent.change(input, { target: { value: 'abc' } });
+        rerender(<NumberInput {...props} resetKey={1} />);
+
+        fireEvent.change(input, { target: { value: '30000' } });
+        fireEvent.blur(input);
+
+        expect(mockOnChange).toHaveBeenCalledWith(30000);
+        expect(input).toHaveValue('30,000.00');
       });
 
       it('discards a committed rejection and shows the reset value', () => {

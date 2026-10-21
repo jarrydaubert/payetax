@@ -325,8 +325,10 @@ test.describe('Calculator critical @critical', () => {
     const pension = page.getByTestId('pension-input');
     await pension.fill('abc');
     await page.getByRole('button', { name: /Reset/ }).dispatchEvent('click');
-    await expect(pension).toHaveValue('0.00');
+    await expect(pension).toHaveValue('');
     await expect(pension).not.toHaveAttribute('aria-invalid');
+    await pension.blur();
+    await expect(pension).toHaveValue('0.00');
     await salary.fill('30000');
     await calculate.click();
     await expect(results).toBeVisible();

@@ -361,10 +361,10 @@ describe('Main calculator amount integrity (mounted)', () => {
       screen.queryByRole('button', { name: 'Email tax calculation results' });
 
     it.each([
-      ['pension-input', '0.00'],
-      ['non-taxable-allowances-input', '0.00'],
-      ['salary-input', '0.00'],
-    ])('discards %s text, so later calculations and email work normally', async (testId, resetText) => {
+      ['pension-input'],
+      ['non-taxable-allowances-input'],
+      ['salary-input'],
+    ])('discards %s text, so later calculations and email work normally', async (testId) => {
       const user = userEvent.setup();
       render(<CalculatorContainer />);
       await typeInto(user, screen.getByTestId('salary-input'), '30000');
@@ -381,7 +381,8 @@ describe('Main calculator amount integrity (mounted)', () => {
       fireEvent.click(screen.getByRole('button', { name: /Reset/i }));
 
       // Displayed draft, committed value, validation and store all agree on the reset state.
-      expect(field).toHaveValue(resetText);
+      // Still focused, so emptied as a fresh focus would be; it shows the reset value once left.
+      expect(field).toHaveValue('');
       expect(field).not.toHaveAttribute('aria-invalid');
       expect(field).not.toHaveAccessibleDescription(/./);
       expect(useCalculatorStore.getState().inputErrors).toEqual({});
@@ -412,10 +413,51 @@ describe('Main calculator amount integrity (mounted)', () => {
       await user.keyboard('1200');
       fireEvent.click(screen.getByRole('button', { name: /Reset/i }));
 
-      expect(allowances).toHaveValue('0.00');
+      expect(allowances).toHaveValue('');
       await user.tab();
       expect(useCalculatorStore.getState().input.allowancesDeductions).toBe(0);
       expect(allowances).toHaveValue('0.00');
+    });
+
+    it('lets the person keep typing in the focused field after Reset', async () => {
+      const user = userEvent.setup();
+      render(<CalculatorContainer />);
+      const salary = screen.getByTestId('salary-input');
+      await user.click(salary);
+      await user.keyboard('abc');
+      fireEvent.click(screen.getByRole('button', { name: /Reset/i }));
+
+      await user.keyboard('30000');
+      await user.tab();
+
+      expect(salary).toHaveValue('30,000.00');
+      expect(salary).not.toHaveAttribute('aria-invalid');
+      expect(useCalculatorStore.getState().input.salary).toBe(30000);
+      await calculate(user);
+      await waitFor(() => expect(resultsShown()).toBe(true));
+    });
+
+    it('clears rejected Pension text entered in pounds, where Reset also switches the unit', async () => {
+      const user = userEvent.setup();
+      render(<CalculatorContainer />);
+      useCalculatorStore.getState().setPensionContributionType('amount');
+      const pension = screen.getByTestId('pension-input');
+      await typeInto(user, pension, 'abc');
+      expect(pension).toHaveAttribute('aria-invalid', 'true');
+
+      // An ordinary click on Reset (focus moves, the field is already committed).
+      await user.click(screen.getByRole('button', { name: /Reset/i }));
+
+      expect(useCalculatorStore.getState().input.pensionContributionType).toBe('percentage');
+      expect(useCalculatorStore.getState().inputErrors).toEqual({});
+      expect(pension).toHaveValue('0.00');
+      expect(pension).not.toHaveAttribute('aria-invalid');
+      await typeInto(user, screen.getByTestId('salary-input'), '30000');
+      await calculate(user);
+      await waitFor(() => expect(resultsShown()).toBe(true));
+      expect(
+        screen.getByRole('button', { name: 'Email tax calculation results' }),
+      ).toBeInTheDocument();
     });
 
     it('keeps blocking when invalid text is typed again after Reset', async () => {
