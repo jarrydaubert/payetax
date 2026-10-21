@@ -694,7 +694,13 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          set((state) => ({ input: { ...state.input, isMarried: validated.data } }));
+          set((state) => {
+            if (validated.data) return { input: { ...state.input, isMarried: true } };
+            // The partner wage field is hidden once unmarried: discard its rejected text so it can
+            // never reappear, blocking, beside results calculated without it.
+            const { partnerGrossWage: _hidden, ...inputErrors } = state.inputErrors;
+            return { input: { ...state.input, isMarried: false }, inputErrors };
+          });
         },
         setPartnerGrossWage: (partnerGrossWage) => {
           // Validate partner wage

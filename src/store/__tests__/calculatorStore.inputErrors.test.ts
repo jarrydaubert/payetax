@@ -61,6 +61,15 @@ describe('calculatorStore rejected amount text', () => {
     expect(useCalculatorStore.getState().inputErrors).toEqual({});
   });
 
+  it('discards a rejected partner wage when the partner field stops applying', () => {
+    useCalculatorStore.getState().setIsMarried(true);
+    useCalculatorStore.getState().setInputError('partnerGrossWage', rejected);
+
+    useCalculatorStore.getState().setIsMarried(false);
+
+    expect(useCalculatorStore.getState().inputErrors).toEqual({});
+  });
+
   it('Reset clears all rejected text', () => {
     useCalculatorStore.getState().setInputError('salary', rejected);
     useCalculatorStore.getState().setInputError('allowancesDeductions', rejected);

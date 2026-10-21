@@ -164,6 +164,41 @@ describe('Main calculator amount integrity (mounted)', () => {
     await user.click(married);
     await calculate(user);
     await waitFor(() => expect(resultsShown()).toBe(true));
+
+    // Re-ticking shows the committed wage, not the discarded text beside those results.
+    await user.click(married);
+    const shownAgain = screen.getByTestId('partner-salary-input');
+    expect(shownAgain).toHaveValue('0.00');
+    expect(shownAgain).not.toHaveAttribute('aria-invalid');
+    expect(useCalculatorStore.getState().inputErrors).toEqual({});
+  });
+
+  it('counts each rejected amount in the Calculate message', async () => {
+    const user = userEvent.setup();
+    render(<CalculatorContainer />);
+    await typeInto(user, screen.getByTestId('salary-input'), '30000');
+    const first = await addIncomeSource(user);
+    await typeInto(user, first, '-1');
+    await user.click(screen.getByTestId('add-income-source'));
+    await typeInto(user, screen.getByRole('spinbutton', { name: 'Income source 2 amount' }), 'x');
+
+    await calculate(user);
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'Correct the invalid amounts in Additional Income Sources before calculating.',
+    );
+  });
+
+  it('keeps the income list open while one of its amounts is rejected', async () => {
+    const user = userEvent.setup();
+    render(<CalculatorContainer />);
+    const amount = await addIncomeSource(user);
+    await typeInto(user, amount, '-5');
+
+    await user.click(screen.getByRole('button', { name: /Additional Income Sources/i }));
+    await typeInto(user, amount, '5');
+
+    // The close request made while the amount was rejected is not replayed after correction.
+    expect(screen.getByRole('spinbutton', { name: 'Income source 1 amount' })).toHaveValue('5.00');
   });
 
   it('rejects amounts the calculator would otherwise silently drop', async () => {

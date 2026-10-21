@@ -75,7 +75,10 @@ export function IncomeSourceList() {
   }, [incomeSources.length]);
 
   return (
-    <Collapsible open={isOpen || hasRejectedAmount} onOpenChange={setIsOpen}>
+    <Collapsible
+      open={isOpen || hasRejectedAmount}
+      onOpenChange={(open) => setIsOpen(open || hasRejectedAmount)}
+    >
       <div className='flex items-center justify-between'>
         <CollapsibleTrigger
           className={cn(

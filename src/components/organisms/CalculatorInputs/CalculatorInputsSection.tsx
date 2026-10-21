@@ -55,7 +55,7 @@ export function CalculatorInputsSection({
       .filter((label, index, labels) => labels.indexOf(label) === index)
       .join(', '),
   );
-  const blockingFieldCount = blockingFields === '' ? 0 : blockingFields.split(', ').length;
+  const blockingAmountCount = useCalculatorStore((state) => getBlockingInputErrors(state).length);
 
   React.useEffect(() => {
     if (blockingFields === '') {
@@ -67,7 +67,7 @@ export function CalculatorInputsSection({
     if (blockingFields !== '') {
       setFormMessage({
         tone: 'error',
-        text: `Correct the invalid ${blockingFieldCount === 1 ? 'amount' : 'amounts'} in ${blockingFields} before calculating.`,
+        text: `Correct the invalid ${blockingAmountCount === 1 ? 'amount' : 'amounts'} in ${blockingFields} before calculating.`,
         rejectedAmounts: true,
       });
       return;
