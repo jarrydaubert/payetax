@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { type CalculatorAmountField, getBlockingInputErrors } from '@/store/calculatorInputErrors';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
 import { BasicInputs } from './BasicInputs';
+import { commitFocusedField } from './commitFocusedField';
 
 const AMOUNT_FIELD_LABELS: Record<
   Exclude<CalculatorAmountField, `incomeSource:${string}`>,
@@ -59,13 +60,8 @@ export function CalculatorInputsSection({
   }, [hasBlockingAmounts]);
 
   const handleCalculate = () => {
-    // Commit the field being edited first. A pointer click normally moves focus (and so commits
-    // the field) before this runs, but not every activation does, and Calculate must never use a
-    // previous amount while the field shows different text. Blur commits synchronously.
-    const active = document.activeElement;
-    if (active instanceof HTMLElement && inputsRef.current?.contains(active)) {
-      active.blur();
-    }
+    // Calculate must never use a previous amount while a field shows different text.
+    commitFocusedField(inputsRef.current);
 
     // Read the store after that commit, not the values captured at the last render.
     const state = useCalculatorStore.getState();

@@ -278,6 +278,62 @@ describe('Main calculator amount integrity (mounted)', () => {
       expect(salary).toHaveValue('40,000.00');
     });
 
+    it('clears results while an amount is half-typed, and Calculate restores them', async () => {
+      // Intermediate text such as `30,0` (on the way to `30,000`) is not a valid amount, so the
+      // results go: the safe direction. They are not restored without Calculate.
+      const user = userEvent.setup();
+      const salary = await calculateThenEditSalary(user, '30,0');
+      await waitFor(() => expect(resultsShown()).toBe(false));
+
+      await user.keyboard('00');
+      await user.tab();
+      expect(salary).not.toHaveAttribute('aria-invalid');
+      expect(useCalculatorStore.getState().inputErrors).toEqual({});
+      expect(resultsShown()).toBe(false);
+
+      await calculate(user);
+      await waitFor(() => expect(resultsShown()).toBe(true));
+      expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(30000);
+    });
+
+    it('commits the field being edited before applying a suggested pension', async () => {
+      const user = userEvent.setup();
+      render(<CalculatorContainer />);
+      await typeInto(user, screen.getByTestId('salary-input'), '110000');
+      await calculate(user);
+      const apply = await screen.findByRole('button', { name: /to Pension$/ });
+
+      // Typing into Pension, then activating the suggestion without moving focus.
+      const pension = screen.getByTestId('pension-input');
+      await user.click(pension);
+      await user.keyboard('3');
+      fireEvent.click(apply);
+
+      expect(pension).not.toHaveFocus();
+      const { input } = useCalculatorStore.getState();
+      expect(input.pensionContributionType).toBe('amount');
+      expect(input.pensionContribution).toBeGreaterThan(3);
+      expect(pension).toHaveValue(
+        input.pensionContribution.toLocaleString('en-GB', { minimumFractionDigits: 2 }),
+      );
+    });
+
+    it('removes the suggested-pension action as soon as rejected text is typed', async () => {
+      const user = userEvent.setup();
+      render(<CalculatorContainer />);
+      const salary = screen.getByTestId('salary-input');
+      await typeInto(user, salary, '110000');
+      await calculate(user);
+      const apply = await screen.findByRole('button', { name: /to Pension$/ });
+
+      // The apply button is part of the results, which go as soon as rejected text is typed.
+      await user.click(salary);
+      await user.clear(salary);
+      await user.keyboard('abc');
+      expect(apply).not.toBeInTheDocument();
+      expect(useCalculatorStore.getState().input.pensionContribution).toBe(0);
+    });
+
     it('calculates from a valid edited amount, never the previous one', async () => {
       const user = userEvent.setup();
       await calculateThenEditSalary(user, '50000');
