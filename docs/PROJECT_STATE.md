@@ -31,6 +31,39 @@ the retained blog, email results, PWA, analytics and operational controls. Do no
 families, competitor-intent content or generic articles merely to capture queries. Published
 content must earn its place through user value, evidence and maintainable accuracy.
 
+## Main calculator: current state and agreed direction
+
+Merged `main` at `8d12f20a` includes the shared currency-parsing fix (#125). The input-integrity
+PR [#127](https://github.com/jarrydaubert/payetax/pull/127) and stacked responsive-statement
+PR [#128](https://github.com/jarrydaubert/payetax/pull/128) remain open and unmerged. Their
+implementation reports and passing checks are evidence for those refs, not released behaviour.
+Claude's independent review requests changes for WebKit amount entry and legacy saved pension
+percentages; #128 inherits both blockers.
+
+The main calculator must keep calculation explicit: every calculation-input edit, including
+applying a pension suggestion, requires Calculate again. Display-only period changes reuse the
+current calculation. After edits, figures may be cleared or retained as visibly out-of-date
+context; they cannot be presented as current or combined with results for changed inputs. Email
+and result-dependent actions require the same current validated calculation as the display.
+These integrity guarantees are release-blocking acceptance criteria for #127 independently of
+#128's edited-state presentation.
+
+The agreed target retains five compact desktop summary cards and a readily visible seven-period
+breakdown, while preserving the new mobile experience's readable payslip and simple comparison.
+The old marginal-rate card's rounded next-£100 estimate must not be presented as a statutory rate.
+Removing the large homepage hero is acceptable, but search protection is unproven. The
+[search audit](BACKLOG.md#search-and-discoverability) requires essential live/technical evidence
+and safeguards before the first deployment containing that change, followed by performance
+measurement after release against windows and a mitigation trigger set before deployment.
+This direction supersedes the earlier preference for removing desktop cards and making comparison
+a separate mode; it does not complete pension-method or transparent-result Foundation work.
+
+The [22 October reconciliation](reports/calculator-backlog-reconciliation-2026-10-22.md) records
+sources, review disagreements, exclusions and the distinction between blockers, acceptance work,
+polish and investigations. Unresolved work and testable completion criteria have one owner in
+[`BACKLOG.md`](BACKLOG.md). Implementation proceeds in small slices with Codex and Claude reviewing
+each other's changes before separately authorised merges.
+
 ## Architecture north star
 
 > One effective-dated policy model, one policy selector, one pay-basis derivation, one rule owner
@@ -231,12 +264,18 @@ working rule, they may be fixed as small independent slices between the items ab
 currency-input preservation and minimal stale-result protection have landed, with one shared
 currency parser in `src/lib/currencyInput.ts`. The main calculator's amount fields now reuse that
 parser: pence are kept, rejected text is shown with its error and clears results until corrected.
-The remaining [main-calculator input-integrity defects](BACKLOG.md#main-calculator-input-integrity)
-(focus-and-leave erasing a value, and pension type switching reinterpreting an amount) follow next,
-then the interim Director email guard and Corporation Tax deadline arithmetic. The
-backlog records the agreed order, under which these first slices come before item 1. They do not
-reorder items 1–3, they must reuse existing tax-domain owners, and any exception that needs a Foundation change waits for, or is folded into, that item. Director design and
-refactoring proposals are parked.
+The remaining [main-calculator input-integrity queue](BACKLOG.md#main-calculator-input-integrity)
+comes next: MC-01/02 and MC-03's integrity scope are #127 acceptance criteria, inherited by #128.
+After the interim DI-05 email guard, MC-03's presentation scope and MC-04/05 may proceed alongside
+Director urgent slices without pre-empting a ready, verified wrong-money fix; completing the entire
+Director queue is not a main-calculator prerequisite. Keep the Director sequence and Foundation
+insertion points, including Corporation Tax deadlines. The desktop/mobile acceptance changes and
+the search audit's pre-deployment gate precede release of the changed homepage; finish observational
+measurement afterward. On future #127/#128 rebases, preserve this backlog's decisions and open MC
+scope, reconcile superseded branch documentation and retain distinct dated implementation evidence;
+do not restore premature completion claims or a parallel queue. The backlog owns the detailed order.
+Reuse existing tax-domain owners; an exception that needs a Foundation change waits for, or is
+folded into, that item. Director design and refactoring proposals remain parked.
 
 Optional polish does not outrank these correctness items.
 
