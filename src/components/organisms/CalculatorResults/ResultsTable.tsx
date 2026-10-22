@@ -1,7 +1,6 @@
 // src/components/organisms/CalculatorResults/ResultsTable.tsx
 'use client';
 
-import { motion } from 'framer-motion';
 import {
   Building,
   Calculator,
@@ -17,31 +16,30 @@ import {
   Wallet,
 } from 'lucide-react';
 import * as React from 'react';
-import { ScrollIndicator } from '@/components/atoms/ScrollIndicator';
-import { MarriageAllowanceAlert } from '@/components/molecules/MarriageAllowanceAlert';
 import { PeriodSelectorCard } from '@/components/molecules/PeriodSelectorCard';
 import { ResultsTableHeader } from '@/components/molecules/ResultsTableHeader';
 import { ResultTableRow } from '@/components/molecules/ResultTableRow';
-import { TaxTrapInlineAlert } from '@/components/molecules/TaxTrapInlineAlert';
 import { Card } from '@/components/ui/card';
 import { TableBody } from '@/components/ui/table';
-import { CURRENT_TAX_YEAR, TAX_RATES, type TaxYear } from '@/constants/taxRates';
-import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
-import { useMotionPreference } from '@/hooks/useMotionPreference';
-import { useMouseDragScroll } from '@/hooks/useMouseDragScroll';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { trackEvent } from '@/lib/analytics';
 import {
   buildResultsTableRows,
+  PERIOD_LABEL_TO_PAY_PERIOD,
   type ResultsTableRowKind,
   type ResultsTableRowViewModel,
 } from '@/lib/calculatorResultsPresenter';
-import { calculateOptimalPension } from '@/lib/pensionOptimizer';
-import { parseTaxCode } from '@/lib/tax';
+import { CURRENT_TAX_YEAR } from '@/lib/tax';
 import type { TaxCalculationResults } from '@/lib/types/calculator';
 import { cn } from '@/lib/utils';
+import { CalculatorInsights } from './CalculatorInsights';
+import { ResultPeriodSelect } from './ResultPeriodSelect';
 
 interface ResultsTableProps {
   results: TaxCalculationResults;
+  responsive?: boolean;
+  hoursPerWeek?: number;
+  showInsights?: boolean;
   allowancesDeductions?: number;
   studentLoans?: string[];
   previousYearResults?: TaxCalculationResults | null;
@@ -75,19 +73,19 @@ const periodOptions: Record<string, number> = {
 };
 
 const TABLE_FIXED_COLUMNS_WIDTH_REM = 15;
-const TABLE_PERIOD_COLUMN_WIDTH_REM = 8.5;
+const TABLE_PERIOD_COLUMN_WIDTH_REM = 8;
 
 const rowPresentation: Record<ResultsTableRowKind, RowPresentation> = {
   gross: { icon: PoundSterling, color: 'text-foreground' },
   employment: { icon: Building, color: 'text-muted-foreground' },
   otherIncome: { icon: Coins, color: 'text-muted-foreground' },
   taxFree: { icon: Shield, color: 'text-foreground' },
-  taxCodeAdjustment: { icon: Scale, color: 'text-warning' },
+  taxCodeAdjustment: { icon: Scale, color: 'text-foreground' },
   taxable: { icon: Scale, color: 'text-foreground' },
-  incomeTax: { icon: Calculator, color: 'text-destructive' },
-  taxBand: { icon: Percent, color: 'text-destructive' },
-  studentLoan: { icon: GraduationCap, color: 'text-destructive' },
-  nationalInsurance: { icon: CreditCard, color: 'text-warning' },
+  incomeTax: { icon: Calculator, color: 'text-foreground' },
+  taxBand: { icon: Percent, color: 'text-foreground' },
+  studentLoan: { icon: GraduationCap, color: 'text-foreground' },
+  nationalInsurance: { icon: CreditCard, color: 'text-foreground' },
   pension: { icon: PiggyBank, color: 'text-accent-foreground' },
   nonTaxableAllowance: { icon: Coins, color: 'text-primary' },
   netPay: { icon: Wallet, color: 'text-success' },
@@ -97,7 +95,7 @@ const rowPresentation: Record<ResultsTableRowKind, RowPresentation> = {
 
 function getRowPresentation(row: ResultsTableRowViewModel): RowPresentation {
   if (row.kind === 'yearChange' && row.annual < 0) {
-    return { icon: TrendingUp, color: 'text-destructive' };
+    return { icon: TrendingUp, color: 'text-foreground' };
   }
 
   return rowPresentation[row.kind];
@@ -109,68 +107,24 @@ export function ResultsTable({
   studentLoans = [],
   previousYearResults = null,
   whatIfResults = null,
-  visiblePeriods = ['Yearly', 'Monthly', 'Weekly'],
+  visiblePeriods: requestedPeriods = ['Yearly', 'Monthly', 'Weekly'],
+  responsive = false,
+  hoursPerWeek = 37.5,
+  showInsights = true,
   onVisiblePeriodsChange,
   taxYear,
   onApplyPensionOptimization,
   marriageAllowance,
 }: ResultsTableProps) {
-  const {
-    isMarried = false,
-    partnerGrossWage = 0,
-    taxCode = '1257L',
-    isScottish = false,
-  } = marriageAllowance ?? {};
+  const taxCode = marriageAllowance?.taxCode ?? '';
   // Generate unique ID for accessibility
   const scrollHintId = React.useId();
-  const shouldReduceMotion = useMotionPreference();
 
-  // Scroll indicators - recheck when periods change
   const containerRef = React.useRef<HTMLDivElement>(null);
-  const { showLeftIndicator, showRightIndicator } = useHorizontalScrollIndicator(containerRef, [
-    visiblePeriods,
-  ]);
-
-  // Enable mouse drag scrolling for better UX
-  useMouseDragScroll(containerRef);
-
-  // Tax trap detection - pass current pension to check if trap is already avoided
-  const taxTrapOptimization = React.useMemo(() => {
-    return calculateOptimalPension(
-      results.grossSalary.annually,
-      results.pensionContribution.annually,
-    );
-  }, [results.grossSalary.annually, results.pensionContribution.annually]);
-
-  // Marriage allowance eligibility check
-  const marriageAllowanceEligible = React.useMemo(() => {
-    // Must be married - partnerGrossWage can be 0 (that's a valid eligible case!)
-    if (!isMarried) return false;
-    if (partnerGrossWage == null) return false;
-
-    // M and N both mean the code already reflects a Marriage Allowance transfer.
-    // M1 is an unrelated non-cumulative marker and must not suppress this UI.
-    const parsedTaxCode = parseTaxCode(taxCode, 0);
-    const hasMarriageCode = parsedTaxCode.letter === 'M' || parsedTaxCode.letter === 'N';
-    if (hasMarriageCode) return false;
-
-    // Get tax constants for the current year
-    const taxConstants = TAX_RATES[(taxYear || CURRENT_TAX_YEAR) as TaxYear];
-    const basicBand = taxConstants?.bands[0];
-    if (!(taxConstants && basicBand)) return false;
-    const personalAllowance = taxConstants.personalAllowance;
-    const basicRateUpper = personalAllowance + basicBand.threshold;
-
-    // Partner must earn less than Personal Allowance
-    if (partnerGrossWage >= personalAllowance) return false;
-
-    // User must be a basic rate taxpayer
-    const userSalary = results.grossSalary.annually;
-    if (userSalary <= personalAllowance || userSalary > basicRateUpper) return false;
-
-    // User is eligible!
-    return true;
-  }, [isMarried, partnerGrossWage, taxCode, results.grossSalary.annually, taxYear]);
+  const isWide = useMediaQuery('(min-width: 1280px)');
+  const [pairedPeriods, setPairedPeriods] = React.useState(['Yearly', 'Monthly']);
+  const paired = responsive && !isWide;
+  const visiblePeriods = paired ? pairedPeriods : requestedPeriods;
 
   // Extract current year from taxYear to show "Net Change from 2024" instead of "Previous Year"
   // Default to current tax year if not provided
@@ -181,6 +135,7 @@ export function ResultsTable({
   const handlePeriodToggle = (period: string) => {
     if (!onVisiblePeriodsChange) return;
 
+    if (visiblePeriods.length === 1 && visiblePeriods.includes(period)) return;
     const currentlyVisible = visiblePeriods.includes(period);
     const newPeriods = visiblePeriods.includes(period)
       ? visiblePeriods.filter((p) => p !== period)
@@ -219,7 +174,7 @@ export function ResultsTable({
     const direction = event.key === 'ArrowRight' ? 1 : -1;
     event.currentTarget.scrollBy({
       left: direction * Math.max(80, event.currentTarget.clientWidth * 0.25),
-      behavior: shouldReduceMotion ? 'instant' : 'smooth',
+      behavior: 'auto',
     });
   };
 
@@ -238,46 +193,68 @@ export function ResultsTable({
     visiblePeriods.length * valuesPerPeriod * TABLE_PERIOD_COLUMN_WIDTH_REM;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: 0.2 }}
-      className={cn('w-full', 'space-y-4')}
-    >
+    <div className={cn('flex w-full flex-col gap-4', paired && 'paye-comparison--paired')}>
       {/* Period Selection */}
-      <PeriodSelectorCard
-        periods={Object.keys(periodOptions)}
-        visiblePeriods={visiblePeriods}
-        onPeriodToggle={handlePeriodToggle}
-      />
+      {paired ? (
+        <div className='flex flex-wrap gap-4'>
+          <ResultPeriodSelect
+            label='First period'
+            value={PERIOD_LABEL_TO_PAY_PERIOD[pairedPeriods[0] ?? 'Yearly'] ?? 'annually'}
+            exclude={PERIOD_LABEL_TO_PAY_PERIOD[pairedPeriods[1] ?? 'Monthly']}
+            onChange={(value) =>
+              setPairedPeriods([
+                Object.keys(PERIOD_LABEL_TO_PAY_PERIOD).find(
+                  (label) => PERIOD_LABEL_TO_PAY_PERIOD[label] === value,
+                ) ?? 'Yearly',
+                pairedPeriods[1] ?? 'Monthly',
+              ])
+            }
+          />
+          <ResultPeriodSelect
+            label='Second period'
+            value={PERIOD_LABEL_TO_PAY_PERIOD[pairedPeriods[1] ?? 'Monthly'] ?? 'monthly'}
+            exclude={PERIOD_LABEL_TO_PAY_PERIOD[pairedPeriods[0] ?? 'Yearly']}
+            onChange={(value) =>
+              setPairedPeriods([
+                pairedPeriods[0] ?? 'Yearly',
+                Object.keys(PERIOD_LABEL_TO_PAY_PERIOD).find(
+                  (label) => PERIOD_LABEL_TO_PAY_PERIOD[label] === value,
+                ) ?? 'Monthly',
+              ])
+            }
+          />
+        </div>
+      ) : (
+        <details className='statement-disclosure'>
+          <summary>Choose comparison columns</summary>
+          <PeriodSelectorCard
+            periods={Object.keys(periodOptions)}
+            visiblePeriods={visiblePeriods}
+            onPeriodToggle={handlePeriodToggle}
+          />
+        </details>
+      )}
 
-      {/* Results Table with Scroll Indicators */}
-      <div className='relative -mx-4 w-[calc(100%+2rem)] sm:mx-0 sm:w-full'>
-        {/* Scroll Indicators - must be positioned absolutely to overlay the card */}
-        <ScrollIndicator
-          direction='left'
-          visible={showLeftIndicator}
-          className='left-[calc(10.5rem+0.5rem)] xl:left-[calc(11.5rem+0.5rem)]'
-        />
-        <ScrollIndicator direction='right' visible={showRightIndicator} />
-
-        <Card className='relative w-full overflow-hidden rounded-sm border-border bg-card shadow-none'>
+      {/* Comparison keeps values selectable, without overlays covering monetary figures. */}
+      <div className='relative w-full min-w-0'>
+        <Card
+          className={cn(
+            'relative w-full rounded-sm border-border bg-card shadow-none',
+            !paired && 'overflow-hidden',
+          )}
+        >
           {/* Screen reader hint for scrollable region */}
           <div id={scrollHintId} className='sr-only'>
-            Use the Left and Right Arrow keys, horizontal scroll, swipe, or click and drag to view
-            all pay periods. Navigate through the table to see yearly, monthly, weekly, and other
-            breakdowns.
+            Use the Left and Right Arrow keys, horizontal scroll or swipe to view all pay periods.
+            Navigate through the table to see yearly, monthly, weekly, and other breakdowns.
           </div>
 
-          {/* 
-            IMPORTANT: This container has scroll-behavior: smooth for regular scrolling UX
-            The useMouseDragScroll hook handles this correctly by using scrollTo({ behavior: 'auto' })
-            during drag operations. If drag scroll breaks, check the hook implementation - it MUST use
-            scrollTo() method, NOT direct scrollLeft assignment! See useMouseDragScroll.ts for details.
-          */}
           <section
             ref={containerRef}
-            className='scroll-area-thin w-full cursor-grab overflow-x-auto scroll-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:cursor-grabbing [&.is-dragging]:cursor-grabbing [&.is-dragging]:select-none [&.is-dragging_*]:select-none'
+            className={cn(
+              'w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+              !paired && 'scroll-area-thin overflow-x-auto',
+            )}
             aria-label='Tax calculation results table - scrollable'
             aria-describedby={scrollHintId}
             data-testid='results-table-container'
@@ -288,7 +265,9 @@ export function ResultsTable({
             <table
               data-testid='results-table'
               className={cn('w-full caption-bottom', 'text-[0.8125rem] xl:text-sm')}
-              style={{ minWidth: `${tableMinWidthRem}rem` }}
+              style={paired ? undefined : { minWidth: `${tableMinWidthRem}rem` }}
+              // biome-ignore lint/a11y/noRedundantRoles: Preserve table semantics when the paired layout uses CSS grid in WebKit.
+              role='table'
             >
               <colgroup>
                 <col className='w-[10.5rem] xl:w-[11.5rem]' />
@@ -296,11 +275,11 @@ export function ResultsTable({
                 {visiblePeriods.map((period) =>
                   whatIfResults ? (
                     <React.Fragment key={period}>
-                      <col className='w-[8.5rem]' />
-                      <col className='w-[8.5rem]' />
+                      <col className='w-[8rem]' />
+                      <col className='w-[8rem]' />
                     </React.Fragment>
                   ) : (
-                    <col key={period} className='w-[8.5rem]' />
+                    <col key={period} className='w-[8rem]' />
                   ),
                 )}
               </colgroup>
@@ -331,6 +310,7 @@ export function ResultsTable({
                       isSubRow={row.isSubRow}
                       visiblePeriods={visiblePeriods}
                       periodOptions={periodOptions}
+                      hoursPerWeek={hoursPerWeek}
                     />
                   );
                 })}
@@ -340,30 +320,18 @@ export function ResultsTable({
         </Card>
       </div>
 
-      {/* Tax Trap Inline Alert */}
-      {taxTrapOptimization && onApplyPensionOptimization && (
-        <div className={'mt-4'}>
-          <TaxTrapInlineAlert
-            salary={results.grossSalary.annually}
-            suggestedPension={taxTrapOptimization.suggested}
-            onApplyPension={onApplyPensionOptimization}
-            taxYear={taxYear as TaxYear}
-          />
-        </div>
+      <p className='text-muted-foreground text-xs'>
+        Percentages are shares of gross pay; the previous-year change is relative to previous
+        take-home.
+      </p>
+      {showInsights && (
+        <CalculatorInsights
+          results={results}
+          taxYear={taxYear}
+          marriageAllowance={marriageAllowance}
+          onApplyPensionOptimization={onApplyPensionOptimization}
+        />
       )}
-
-      {/* Marriage Allowance Alert */}
-      {marriageAllowanceEligible && (
-        <div className={'mt-4'}>
-          <MarriageAllowanceAlert
-            userSalary={results.grossSalary.annually}
-            partnerSalary={partnerGrossWage}
-            hasMarriageCode={false}
-            taxYear={taxYear as TaxYear}
-            isScottish={isScottish}
-          />
-        </div>
-      )}
-    </motion.div>
+    </div>
   );
 }

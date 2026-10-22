@@ -90,7 +90,7 @@ export function IncomeSourceList() {
           className={cn(
             'group flex min-h-6 items-center rounded-md py-1 font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
             'gap-2',
-            'text-sm',
+            'text-foreground text-sm',
           )}
         >
           <ChevronRight
@@ -104,11 +104,10 @@ export function IncomeSourceList() {
           )}
         </CollapsibleTrigger>
       </div>
-      <p className={cn('mt-1 text-muted-foreground', 'text-xs')}>
-        Add other income here if you have anything besides your main salary.
-      </p>
-
       <CollapsibleContent className={cn('pt-3', 'space-y-3')}>
+        <p className='text-muted-foreground text-xs'>
+          Add other income here if you have anything besides your main salary.
+        </p>
         {incomeSources.length === 0 && (
           <p className={cn('text-muted-foreground', 'text-sm')}>
             Add pension income, rental income, or other sources
@@ -177,6 +176,7 @@ export function IncomeSourceList() {
 
                 {/* Remove Button */}
                 <Button
+                  type='button'
                   variant='ghost'
                   size='icon'
                   className='h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive'
@@ -239,6 +239,7 @@ export function IncomeSourceList() {
 
         {/* Add Button */}
         <Button
+          type='button'
           variant='outline'
           onClick={addIncomeSource}
           className='w-full'

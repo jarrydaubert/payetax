@@ -74,7 +74,7 @@ describe('BasicInputs Component', () => {
   describe('Rendering', () => {
     it('should render heading', () => {
       render(<BasicInputs />);
-      expect(screen.getByText('Enter Income Tax Details')).toBeInTheDocument();
+      expect(screen.getByText('Your pay')).toBeInTheDocument();
     });
 
     it('should render salary input', () => {
@@ -108,9 +108,9 @@ describe('BasicInputs Component', () => {
 
     it('should render 3 checkboxes in one row', () => {
       render(<BasicInputs />);
-      expect(screen.getByText('Married')).toBeInTheDocument();
-      expect(screen.getByText('Blind')).toBeInTheDocument();
-      expect(screen.getByText('No NI')).toBeInTheDocument();
+      expect(screen.getByText('Marriage Allowance circumstances')).toBeInTheDocument();
+      expect(screen.getByText('Blind Person’s Allowance')).toBeInTheDocument();
+      expect(screen.getByText('Exempt from employee NI')).toBeInTheDocument();
     });
 
     it('should render age dropdown', () => {
@@ -237,11 +237,7 @@ describe('BasicInputs Component', () => {
       render(<BasicInputs />);
       const taxCodeInput = screen.getByPlaceholderText('1257L');
       expect(taxCodeInput).toBeInTheDocument();
-      expect(
-        screen.getByText(
-          /Leave blank to estimate from the selected year, income and allowance answers/,
-        ),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Blank uses a policy estimate/)).toBeInTheDocument();
     });
 
     it('should show S1257L placeholder for Scotland', () => {

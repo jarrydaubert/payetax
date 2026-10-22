@@ -34,6 +34,7 @@ const addIncomeSource = async (user: User) => {
 
 describe('Main calculator amount integrity (mounted)', () => {
   beforeEach(() => {
+    Element.prototype.scrollIntoView = jest.fn();
     window.localStorage.clear();
     useCalculatorStore.getState().reset();
   });
@@ -179,7 +180,7 @@ describe('Main calculator amount integrity (mounted)', () => {
     const user = userEvent.setup();
     render(<CalculatorContainer />);
     await typeInto(user, screen.getByTestId('salary-input'), '30000');
-    const married = screen.getByRole('checkbox', { name: /Married/i });
+    const married = screen.getByRole('checkbox', { name: /Marriage Allowance circumstances/i });
     await user.click(married);
     const partnerWage = screen.getByTestId('partner-salary-input');
     await typeInto(user, partnerWage, 'abc');

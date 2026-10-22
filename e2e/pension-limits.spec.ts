@@ -1,3 +1,4 @@
+import { editCalculatorInputs, showPeriodComparison } from './helpers/calculator-ui';
 /**
  * Pension Annual Allowance & Limits - Comprehensive Test Suite
  *
@@ -24,7 +25,9 @@ async function getTableValueByHeader(
   rowLabel: string,
   headerLabel: string,
 ): Promise<number> {
-  const headers = page.locator('table thead th');
+  await showPeriodComparison(page, headerLabel);
+  const table = page.getByTestId('results-table');
+  const headers = table.locator('thead th');
   const headerTexts = await headers.allTextContents();
   const headerIndex = headerTexts.findIndex((text) =>
     text.trim().toLowerCase().includes(headerLabel.toLowerCase()),
@@ -35,7 +38,7 @@ async function getTableValueByHeader(
   }
 
   const dataIndex = Math.max(0, headerIndex - 1);
-  const row = page.locator(`tr:has-text("${rowLabel}")`).first();
+  const row = table.locator(`tr:has-text("${rowLabel}")`).first();
   const cells = row.locator('td');
   const cellText = await cells.nth(dataIndex).textContent();
   const numeric = Number.parseFloat(cellText?.replace(/[£,]/g, '') || '0');
@@ -72,6 +75,7 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
     // £80k salary, £60k pension = exactly at annual allowance limit
     // Should be allowed (no breach warning)
 
+    await editCalculatorInputs(page);
     await page.getByTestId('salary-input').fill('80000');
 
     // Add £60k pension contribution - switch to amount type first
@@ -82,7 +86,7 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
     await pensionInput.blur();
 
     await page.getByTestId('calculate-button').click();
-    await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByTestId('take-home-amount')).toBeVisible({ timeout: 5000 });
 
     // Verify pension shows in results
     const pensionValue = await getTableValueByHeader(page, 'Pension', 'Yearly');
@@ -94,6 +98,7 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
     // Should show warning about annual allowance charge
     // Excess taxed at marginal rate (40% = £2k tax charge)
 
+    await editCalculatorInputs(page);
     await page.getByTestId('salary-input').fill('100000');
 
     await selectPensionAmountType(page);
@@ -102,7 +107,7 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
     await pensionInput.blur();
 
     await page.getByTestId('calculate-button').click();
-    await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByTestId('take-home-amount')).toBeVisible({ timeout: 5000 });
 
     // TODO: Add warning banner detection once calculator implements this
     // For now, just verify calculation completes
@@ -113,6 +118,7 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
     // Reduction: £20k ÷ 2 = £10k
     // Tapered allowance: £60k - £10k = £50k
 
+    await editCalculatorInputs(page);
     await page.getByTestId('salary-input').fill('280000');
 
     // Try to contribute £60k (will breach tapered allowance)
@@ -122,7 +128,7 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
     await pensionInput.blur();
 
     await page.getByTestId('calculate-button').click();
-    await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByTestId('take-home-amount')).toBeVisible({ timeout: 5000 });
 
     // This documents that tapered allowance needs to be implemented
   });
@@ -132,6 +138,7 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
     // Minimum allowance: £10,000
     // Any contribution over £10k breaches limit
 
+    await editCalculatorInputs(page);
     await page.getByTestId('salary-input').fill('400000');
 
     await selectPensionAmountType(page);
@@ -140,7 +147,7 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
     await pensionInput.blur();
 
     await page.getByTestId('calculate-button').click();
-    await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByTestId('take-home-amount')).toBeVisible({ timeout: 5000 });
   });
 
   test('Salary sacrifice vs net pay: £50k with £20k sacrifice', async ({ page }) => {
@@ -148,6 +155,7 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
     // Result: Lower taxable income, employer NI savings
     // £50k - £20k = £30k taxable
 
+    await editCalculatorInputs(page);
     await page.getByTestId('salary-input').fill('50000');
 
     await selectPensionAmountType(page);
@@ -156,10 +164,10 @@ test.describe('Pension Limits - Annual Allowance Tests', () => {
     await pensionInput.blur();
 
     await page.getByTestId('calculate-button').click();
-    await expect(page.locator('tr:has-text("Total Tax Due")')).toBeVisible({ timeout: 5000 });
+    await expect(page.getByTestId('take-home-amount')).toBeVisible({ timeout: 5000 });
 
     // Verify taxable income is reduced
-    const tax = await getTableValueByHeader(page, 'Total Tax Due', 'Yearly');
+    const tax = await getTableValueByHeader(page, 'Income Tax', 'Yearly');
 
     // Should match the calculator's payroll-period annualised tax for £30k taxable pay.
     expect(tax).toBeCloseTo(3484.8, 1);

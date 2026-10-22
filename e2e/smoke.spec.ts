@@ -10,22 +10,10 @@
 
 import { expect, type Page, test } from '@playwright/test';
 
-async function clickCalculatorCta(page: Page): Promise<void> {
-  const namedCta = page
-    .getByRole('link', { name: /open calculator|see my take home pay/i })
-    .first();
-  if (await namedCta.isVisible().catch(() => false)) {
-    const href = await namedCta.getAttribute('href');
-    expect(href).toMatch(/#tax-calculator|\/calculator/);
-    await namedCta.click();
-    return;
-  }
-
-  const fallbackCta = page.locator('a[href="/calculator"], a[href="#tax-calculator"]').first();
-  await expect(fallbackCta).toBeVisible();
-  const href = await fallbackCta.getAttribute('href');
-  expect(href).toMatch(/#tax-calculator|\/calculator/);
-  await fallbackCta.click();
+async function expectCalculatorAvailable(page: Page): Promise<void> {
+  const salary = page.getByTestId('salary-input');
+  await expect(salary).toBeVisible();
+  await expect(salary).toBeEnabled();
 }
 
 async function openMainMenuIfCollapsed(page: Page): Promise<void> {
@@ -43,13 +31,13 @@ async function openMainMenuIfCollapsed(page: Page): Promise<void> {
 }
 
 test.describe('Smoke Tests', () => {
-  test('Homepage loads and "Open Calculator" works @smoke', async ({ page }) => {
+  test('Homepage loads with the calculator available @smoke', async ({ page }) => {
     await page.goto('/');
     await expect(page).toHaveTitle(/PayeTax|Tax Calculator|PAYE/i);
     await expect(page.locator('h1')).toBeVisible();
 
-    // Home CTA copy differs between variants; assert action, not exact label text.
-    await clickCalculatorCta(page);
+    // The calculator is available directly on the homepage.
+    await expectCalculatorAvailable(page);
   });
 
   test('Blog page loads with posts @smoke', async ({ page }) => {
@@ -116,8 +104,8 @@ test.describe('Smoke Tests', () => {
       .click();
     await expect(page.locator('h1')).toBeVisible();
 
-    // Ensure primary CTA still navigates to the calculator.
-    await clickCalculatorCta(page);
+    // Ensure the calculator is available after navigating home.
+    await expectCalculatorAvailable(page);
   });
 
   test('No CSP errors in console @smoke', async ({ page }) => {

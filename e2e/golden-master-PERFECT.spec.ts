@@ -1,3 +1,4 @@
+import { showPeriodComparison } from './helpers/calculator-ui';
 /**
  * GOLDEN MASTER E2E TEST SUITE - Calculator UI Regression
  *
@@ -94,6 +95,7 @@ async function getTableValueOrThrow(
   label: string,
   options: { optional?: boolean } = {},
 ): Promise<number> {
+  await showPeriodComparison(page);
   const resultsTable = page.getByTestId('results-table');
 
   // Resolve the "Yearly" column index from the header so we don't couple the
@@ -173,6 +175,7 @@ async function getTableValueOrThrow(
  * More reliable than fixed timeouts.
  */
 async function waitForCalculatorResults(page: Page): Promise<void> {
+  await showPeriodComparison(page);
   const resultsTable = page.getByTestId('results-table');
   await expect(resultsTable).toBeVisible({ timeout: 10000 });
 
@@ -365,7 +368,7 @@ test.describe('HMRC Golden Master 2025/26 – Regression Suite', () => {
       // ====================================================================
 
       const results = {
-        incomeTax: await getTableValueOrThrow(page, 'Total Tax Due'),
+        incomeTax: await getTableValueOrThrow(page, 'Income Tax'),
         employeeNI: await getTableValueOrThrow(page, 'National Insurance'),
         netPay: await getTableValueOrThrow(page, 'Net Pay'),
         pension: await getTableValueOrThrow(page, 'Pension', { optional: true }),

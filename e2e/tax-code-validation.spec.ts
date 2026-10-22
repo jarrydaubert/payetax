@@ -1,3 +1,4 @@
+import { showPeriodComparison } from './helpers/calculator-ui';
 /**
  * E2E Tests for Tax Code Validation
  *
@@ -49,6 +50,7 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
     await calculateButton.click();
 
     // Verify calculation succeeds
+    await showPeriodComparison(page);
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
 
@@ -73,6 +75,7 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
 
+    await showPeriodComparison(page);
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
 
@@ -96,6 +99,7 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
 
+    await showPeriodComparison(page);
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
 
@@ -119,6 +123,7 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
 
+    await showPeriodComparison(page);
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
 
@@ -142,6 +147,7 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
 
+    await showPeriodComparison(page);
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
 
@@ -165,6 +171,7 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
 
+    await showPeriodComparison(page);
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
 
@@ -188,6 +195,7 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
 
+    await showPeriodComparison(page);
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
 
@@ -211,6 +219,7 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
 
+    await showPeriodComparison(page);
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
 
@@ -234,6 +243,7 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
 
+    await showPeriodComparison(page);
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
 
@@ -257,6 +267,7 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
 
+    await showPeriodComparison(page);
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
 
@@ -280,6 +291,7 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
 
+    await showPeriodComparison(page);
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
 
@@ -303,6 +315,7 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
 
+    await showPeriodComparison(page);
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
 
@@ -350,6 +363,7 @@ test.describe('Tax Code Validation - HMRC Comprehensive Support', () => {
     const calculateButton = page.getByTestId('calculate-button');
     await calculateButton.click();
 
+    await showPeriodComparison(page);
     const resultsTable = page.locator('[data-testid="results-table"]');
     await expect(resultsTable).toBeVisible();
 

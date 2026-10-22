@@ -187,7 +187,7 @@ test.describe('Essential SEO Tests', () => {
       await expect(
         page.getByRole('heading', {
           level: 1,
-          name: 'UK PAYE tax calculator See your take-home pay',
+          name: 'UK PAYE tax calculator',
           exact: true,
         }),
       ).toBeVisible({ timeout: 10000 });

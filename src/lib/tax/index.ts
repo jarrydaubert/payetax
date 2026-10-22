@@ -6,7 +6,7 @@
  * `@/lib/tax-code-decoder` so it is not bundled with every calculator route.
  */
 
-export type { NICategory, TaxYear } from '@/constants/taxRates';
+export type { NICategory, PayPeriod, TaxYear } from '@/constants/taxRates';
 export {
   CURRENT_TAX_YEAR,
   formatTaxYearDisplay,

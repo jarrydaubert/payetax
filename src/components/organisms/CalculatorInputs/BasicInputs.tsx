@@ -1,9 +1,7 @@
 // src/components/organisms/CalculatorInputs/BasicInputs.tsx
 'use client';
 
-import { motion } from 'framer-motion';
-import { Percent, PoundSterling } from 'lucide-react';
-import { useId, useRef } from 'react';
+import { useId, useRef, useState } from 'react';
 import { LabelTooltip } from '@/components/atoms/LabelTooltip';
 import NumberInput from '@/components/atoms/NumberInput';
 import TaxYearSelect from '@/components/atoms/TaxYearSelect';
@@ -177,18 +175,24 @@ export function BasicInputs() {
     setStudentLoanPlans([undergraduateLoan, 'postgrad']);
   };
 
-  const fieldRowClass = cn(
-    'flex flex-col items-start sm:grid sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center',
-    'gap-2',
-    'sm:gap-3',
-  );
-  const fieldLabelClass = cn('flex min-w-0 items-center', 'gap-1.5');
-  const fieldControlClass = 'min-w-0 justify-self-start';
-  const selectControlClass = cn(fieldControlClass, 'w-44 max-w-full');
-  const longSelectControlClass = cn(fieldControlClass, 'w-full max-w-64');
-  const numericControlClass = cn(fieldControlClass, 'w-36 max-w-full');
+  const fieldRowClass = 'grid min-w-0 grid-cols-[5.5rem_minmax(0,1fr)] items-start gap-2';
+  const fieldLabelClass = 'flex min-h-11 min-w-0 items-center gap-1.5';
+  const fieldControlClass = 'min-w-0 w-full';
+  const selectControlClass = fieldControlClass;
+  const longSelectControlClass = fieldControlClass;
   const fullWidthInputClass = 'w-full';
-  const flexInputWrapperClass = numericControlClass;
+  const flexInputWrapperClass = fieldControlClass;
+  const [adjustmentsOpen, setAdjustmentsOpen] = useState(false);
+  const adjustmentNames = [
+    input.isMarried && 'married',
+    input.isBlind && 'blind allowance',
+    input.payNoNI && 'NI exemption',
+    isOverStatePensionAge && 'State Pension age',
+    input.allowancesDeductions > 0 && 'non-taxable allowance',
+  ].filter(Boolean);
+  const adjustmentErrors = Boolean(
+    inputErrors.partnerGrossWage || inputErrors.allowancesDeductions,
+  );
 
   /**
    * Normalize tax code input:
@@ -201,29 +205,22 @@ export function BasicInputs() {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className={'space-y-3'}
-    >
+    <div className='calculator-inputs flex flex-col gap-3'>
       {/* Heading */}
-      <h3 className={cn('font-semibold text-foreground', 'text-base', 'sm:text-lg')}>
-        Enter Income Tax Details
-      </h3>
+      <h2 className={cn('font-semibold text-foreground', 'text-base', 'sm:text-lg')}>Your pay</h2>
 
       {/* Salary and Pay Period on one line */}
-      <div className={fieldRowClass}>
-        <div className={fieldLabelClass}>
+      <div className='grid gap-2'>
+        <div className={cn(fieldLabelClass, 'min-h-0')}>
           <LabelTooltip fieldName='salary' />
-          <Label htmlFor={salaryId} className={cn('whitespace-nowrap', 'text-sm')}>
+          <Label htmlFor={salaryId} className='text-sm'>
             Salary
           </Label>
         </div>
         <div
           className={cn(
             fieldControlClass,
-            'grid w-full max-w-full grid-cols-[minmax(0,1fr)_7.5rem] items-start sm:w-[17rem]',
+            'grid w-full grid-cols-[minmax(0,1fr)_7.5rem] items-start',
             'gap-2',
           )}
         >
@@ -288,7 +285,7 @@ export function BasicInputs() {
       <div className={fieldRowClass}>
         <div className={fieldLabelClass}>
           <LabelTooltip fieldName='taxCode' />
-          <Label htmlFor={taxCodeId} className={cn('whitespace-nowrap', 'text-sm')}>
+          <Label htmlFor={taxCodeId} className='text-sm'>
             Tax Code
           </Label>
         </div>
@@ -300,7 +297,7 @@ export function BasicInputs() {
             onChange={handleTaxCodeChange}
             onFocus={() => trackCalculatorFieldFocus('tax_code')}
             placeholder={input.region === 'Scotland' ? 'S1257L' : '1257L'}
-            className={cn(fieldControlClass, 'w-full max-w-full font-mono uppercase sm:w-52')}
+            className={cn(fieldControlClass, 'w-full font-mono uppercase')}
             maxLength={TAX_CODE_MAX_LENGTH}
             aria-describedby={taxCodeHelpId}
             data-testid='tax-code-input'
@@ -309,8 +306,7 @@ export function BasicInputs() {
             id={taxCodeHelpId}
             className='mt-1 max-w-sm text-muted-foreground text-xs leading-snug'
           >
-            Leave blank to estimate from the selected year, income and allowance answers. Enter a
-            complete HMRC code to use that code instead.
+            Optional. Blank uses a policy estimate; a complete HMRC code takes precedence.
           </p>
         </div>
       </div>
@@ -319,11 +315,7 @@ export function BasicInputs() {
       <div className={fieldRowClass}>
         <div className={fieldLabelClass}>
           <LabelTooltip fieldName='region' />
-          <Label
-            id={regionLabelId}
-            htmlFor={regionId}
-            className={cn('whitespace-nowrap', 'text-sm')}
-          >
+          <Label id={regionLabelId} htmlFor={regionId} className='text-sm'>
             Region
           </Label>
         </div>
@@ -346,123 +338,12 @@ export function BasicInputs() {
         </Select>
       </div>
 
-      {/* 3 Checkboxes on 1 row: Married, Blind, I pay no NI */}
-      <fieldset className='border-0 p-0'>
-        <legend className='sr-only'>Tax allowances and exemptions</legend>
-        <div className='flex flex-wrap items-center gap-x-4 gap-y-3 sm:flex-nowrap'>
-          <div className={fieldLabelClass}>
-            <LabelTooltip fieldName='marriageAllowance' />
-            <Label htmlFor={marriedId} className={cn('whitespace-nowrap', 'text-sm')}>
-              Married
-            </Label>
-            <Checkbox
-              id={marriedId}
-              checked={input.isMarried}
-              onCheckedChange={(v) => setIsMarried(v === true)}
-              data-testid='married-checkbox'
-            />
-          </div>
-
-          <div className={fieldLabelClass}>
-            <LabelTooltip fieldName='blindAllowance' />
-            <Label htmlFor={blindId} className={cn('whitespace-nowrap', 'text-sm')}>
-              Blind
-            </Label>
-            <Checkbox
-              id={blindId}
-              checked={input.isBlind}
-              onCheckedChange={(v) => setIsBlind(v === true)}
-            />
-          </div>
-
-          <div className={fieldLabelClass}>
-            <LabelTooltip fieldName='payNoNI' />
-            <Label htmlFor={payNoNIId} className={cn('whitespace-nowrap', 'text-sm')}>
-              No NI
-            </Label>
-            <Checkbox
-              id={payNoNIId}
-              checked={input.payNoNI}
-              onCheckedChange={(v) => setPayNoNI(v === true)}
-            />
-          </div>
-        </div>
-      </fieldset>
-
-      {input.isMarried && (
-        <div className={fieldRowClass}>
-          <div className={fieldLabelClass}>
-            <LabelTooltip fieldName='partnerGrossWage' />
-            <Label htmlFor={partnerWageId} className={cn('sm:whitespace-nowrap', 'text-sm')}>
-              Partner's Gross Wage
-            </Label>
-          </div>
-          <NumberInput
-            onDraftChange={invalidateResults}
-            id={partnerWageId}
-            value={input.partnerGrossWage}
-            onChange={setPartnerGrossWage}
-            onValidityChange={validityFor('partnerGrossWage')}
-            invalidDraft={inputErrors.partnerGrossWage}
-            resetKey={inputRevision}
-            prefix='£'
-            decimals={2}
-            placeholder='0.00'
-            min={0}
-            max={PARTNER_WAGE_MAX}
-            wrapperClassName={flexInputWrapperClass}
-            className={fullWidthInputClass}
-            data-testid='partner-salary-input'
-          />
-        </div>
-      )}
-
-      {/* Age - Dropdown for State Pension Age (affects NI) */}
-      <div className={cn(fieldRowClass, 'mt-4')}>
-        <div className={cn(fieldLabelClass, 'sm:whitespace-nowrap')}>
-          <LabelTooltip fieldName='age' />
-          <Label id={ageLabelId} htmlFor={ageId} className={cn('whitespace-nowrap', 'text-sm')}>
-            Age
-          </Label>
-        </div>
-        <Select
-          value={isOverStatePensionAge ? 'over-spa' : 'under-spa'}
-          onValueChange={(value) => {
-            // Store a representative age for calculation purposes
-            // Under SPA: undefined (standard NI applies)
-            // Over SPA: 67 (NI exempt - employees don't pay NI after State Pension Age)
-            if (value === 'under-spa') {
-              setAge(undefined);
-            } else {
-              setAge(67); // Representative age over State Pension Age
-            }
-          }}
-        >
-          <SelectTrigger
-            id={ageId}
-            className={longSelectControlClass}
-            data-testid='age-select'
-            aria-labelledby={ageLabelId}
-          >
-            <SelectValue placeholder='Select age range' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='under-spa'>Under State Pension Age</SelectItem>
-            <SelectItem value='over-spa'>State Pension Age or over</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
       {/* Student Loan - Select + Conditional */}
       <div className={cn('flex flex-col', 'gap-2')}>
         <div className={fieldRowClass}>
           <div className={fieldLabelClass}>
             <LabelTooltip fieldName='studentLoanPlan' />
-            <Label
-              id={studentLoanLabelId}
-              htmlFor={studentLoanId}
-              className={cn('whitespace-nowrap', 'text-sm')}
-            >
+            <Label id={studentLoanLabelId} htmlFor={studentLoanId} className='text-sm'>
               Student Loan
             </Label>
           </div>
@@ -501,45 +382,18 @@ export function BasicInputs() {
         )}
       </div>
 
-      {/* Non-taxable allowances */}
-      <div className={fieldRowClass}>
-        <div className={fieldLabelClass}>
-          <LabelTooltip fieldName='allowancesDeductions' />
-          <Label htmlFor={allowancesId} className={cn('sm:whitespace-nowrap', 'text-sm')}>
-            Non-taxable allowance(s)
-          </Label>
-        </div>
-        <NumberInput
-          onDraftChange={invalidateResults}
-          id={allowancesId}
-          value={input.allowancesDeductions}
-          onChange={setAllowancesDeductions}
-          onValidityChange={validityFor('allowancesDeductions')}
-          invalidDraft={inputErrors.allowancesDeductions}
-          resetKey={inputRevision}
-          prefix='£'
-          decimals={2}
-          placeholder='0.00'
-          min={0}
-          max={ALLOWANCES_MAX}
-          wrapperClassName={flexInputWrapperClass}
-          className={fullWidthInputClass}
-          data-testid='non-taxable-allowances-input'
-        />
-      </div>
-
       {/* Pension - Combined Type + Amount on 1 row */}
       <div className={fieldRowClass}>
         <div className={fieldLabelClass}>
           <LabelTooltip fieldName='pensionContribution' />
-          <Label htmlFor={pensionId} className={cn('whitespace-nowrap', 'text-sm')}>
+          <Label htmlFor={pensionId} className='text-sm'>
             Pension
           </Label>
         </div>
         <div
           className={cn(
             fieldControlClass,
-            'grid w-full max-w-[15rem] grid-cols-[4.75rem_minmax(0,1fr)] items-start sm:grid-cols-[5rem_minmax(0,1fr)]',
+            'grid w-full grid-cols-[5rem_minmax(0,1fr)] items-start',
             'gap-1.5',
           )}
         >
@@ -560,23 +414,19 @@ export function BasicInputs() {
             >
               <SelectValue>
                 {input.pensionContributionType === 'percentage' ? (
-                  <Percent className='size-4' />
+                  <span>
+                    %<span className='sr-only'> percentage</span>
+                  </span>
                 ) : (
-                  <PoundSterling className='size-4' />
+                  <span>
+                    £<span className='sr-only'> annual amount</span>
+                  </span>
                 )}
               </SelectValue>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value='percentage'>
-                <div className='flex items-center justify-center'>
-                  <Percent className='size-4' />
-                </div>
-              </SelectItem>
-              <SelectItem value='amount'>
-                <div className='flex items-center justify-center'>
-                  <PoundSterling className='size-4' />
-                </div>
-              </SelectItem>
+              <SelectItem value='percentage'>Percentage (%)</SelectItem>
+              <SelectItem value='amount'>Annual amount (£)</SelectItem>
             </SelectContent>
           </Select>
           {/* Hidden label for screen readers */}
@@ -614,10 +464,162 @@ export function BasicInputs() {
       </div>
 
       <p className='text-muted-foreground text-xs' id={`${pensionId}-method`}>
-        Modelled as salary sacrifice. Changing between % and £ resets the contribution to 0; enter
-        your contribution again. Amounts in £ are annual.
+        Salary sacrifice. £ amounts are annual. Switching units resets the contribution to 0.
       </p>
+      <details
+        className='statement-disclosure'
+        open={adjustmentsOpen || adjustmentErrors}
+        onToggle={(event) => {
+          if (adjustmentErrors && !event.currentTarget.open) {
+            event.currentTarget.open = true;
+            return;
+          }
+          setAdjustmentsOpen(event.currentTarget.open);
+        }}
+      >
+        <summary>
+          Allowances and exemptions
+          <span className='block font-normal text-muted-foreground text-xs'>
+            {adjustmentNames.length ? adjustmentNames.join(', ') : 'None applied'}
+          </span>
+        </summary>
+        <div className='flex flex-col gap-4 pt-4'>
+          {/* 3 Checkboxes on 1 row: Married, Blind, I pay no NI */}
+          <fieldset className='border-0 p-0'>
+            <legend className='sr-only'>Tax allowances and exemptions</legend>
+            <div className='flex flex-col items-start gap-3'>
+              <div className={fieldLabelClass}>
+                <LabelTooltip fieldName='marriageAllowance' />
+                <Label htmlFor={marriedId} className='text-sm'>
+                  Marriage Allowance circumstances
+                </Label>
+                <Checkbox
+                  id={marriedId}
+                  checked={input.isMarried}
+                  onCheckedChange={(v) => setIsMarried(v === true)}
+                  data-testid='married-checkbox'
+                />
+              </div>
+
+              <div className={fieldLabelClass}>
+                <LabelTooltip fieldName='blindAllowance' />
+                <Label htmlFor={blindId} className='text-sm'>
+                  Blind Person’s Allowance
+                </Label>
+                <Checkbox
+                  id={blindId}
+                  checked={input.isBlind}
+                  onCheckedChange={(v) => setIsBlind(v === true)}
+                />
+              </div>
+
+              <div className={fieldLabelClass}>
+                <LabelTooltip fieldName='payNoNI' />
+                <Label htmlFor={payNoNIId} className='text-sm'>
+                  Exempt from employee NI
+                </Label>
+                <Checkbox
+                  id={payNoNIId}
+                  checked={input.payNoNI}
+                  onCheckedChange={(v) => setPayNoNI(v === true)}
+                />
+              </div>
+            </div>
+          </fieldset>
+
+          {input.isMarried && (
+            <div className={fieldRowClass}>
+              <div className={fieldLabelClass}>
+                <LabelTooltip fieldName='partnerGrossWage' />
+                <Label htmlFor={partnerWageId} className='text-sm'>
+                  Partner's Gross Wage
+                </Label>
+              </div>
+              <NumberInput
+                onDraftChange={invalidateResults}
+                id={partnerWageId}
+                value={input.partnerGrossWage}
+                onChange={setPartnerGrossWage}
+                onValidityChange={validityFor('partnerGrossWage')}
+                invalidDraft={inputErrors.partnerGrossWage}
+                resetKey={inputRevision}
+                prefix='£'
+                decimals={2}
+                placeholder='0.00'
+                min={0}
+                max={PARTNER_WAGE_MAX}
+                wrapperClassName={flexInputWrapperClass}
+                className={fullWidthInputClass}
+                data-testid='partner-salary-input'
+              />
+            </div>
+          )}
+
+          {/* Age - Dropdown for State Pension Age (affects NI) */}
+          <div className={cn(fieldRowClass, 'mt-4')}>
+            <div className={cn(fieldLabelClass, 'sm:whitespace-nowrap')}>
+              <LabelTooltip fieldName='age' />
+              <Label id={ageLabelId} htmlFor={ageId} className='text-sm'>
+                Age
+              </Label>
+            </div>
+            <Select
+              value={isOverStatePensionAge ? 'over-spa' : 'under-spa'}
+              onValueChange={(value) => {
+                // Store a representative age for calculation purposes
+                // Under SPA: undefined (standard NI applies)
+                // Over SPA: 67 (NI exempt - employees don't pay NI after State Pension Age)
+                if (value === 'under-spa') {
+                  setAge(undefined);
+                } else {
+                  setAge(67); // Representative age over State Pension Age
+                }
+              }}
+            >
+              <SelectTrigger
+                id={ageId}
+                className={longSelectControlClass}
+                data-testid='age-select'
+                aria-labelledby={ageLabelId}
+              >
+                <SelectValue placeholder='Select age range' />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='under-spa'>Under State Pension Age</SelectItem>
+                <SelectItem value='over-spa'>State Pension Age or over</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Non-taxable allowances */}
+          <div className={fieldRowClass}>
+            <div className={fieldLabelClass}>
+              <LabelTooltip fieldName='allowancesDeductions' />
+              <Label htmlFor={allowancesId} className='text-sm'>
+                Non-taxable allowance(s)
+              </Label>
+            </div>
+            <NumberInput
+              onDraftChange={invalidateResults}
+              id={allowancesId}
+              value={input.allowancesDeductions}
+              onChange={setAllowancesDeductions}
+              onValidityChange={validityFor('allowancesDeductions')}
+              invalidDraft={inputErrors.allowancesDeductions}
+              resetKey={inputRevision}
+              prefix='£'
+              decimals={2}
+              placeholder='0.00'
+              min={0}
+              max={ALLOWANCES_MAX}
+              wrapperClassName={flexInputWrapperClass}
+              className={fullWidthInputClass}
+              data-testid='non-taxable-allowances-input'
+            />
+          </div>
+        </div>
+      </details>
       <IncomeSourceList />
-    </motion.div>
+    </div>
   );
 }
