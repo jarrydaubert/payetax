@@ -109,7 +109,7 @@ If a Vercel CLI command cannot retrieve project settings, check `.vercel/project
 
 ## Pull Request Expectations
 
-Before committing non-trivial code changes, run a fresh-context review (`/code-review` or a second agent that did not write the code) and address or note its findings.
+Before merging non-trivial code changes, run a fresh-context review (`/code-review` or a second agent that did not write the code) and address or note its findings.
 
 For code changes, report:
 
