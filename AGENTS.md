@@ -15,6 +15,18 @@ It is not a commercial growth site. Keep the product useful, accurate, and simpl
 3. Follow dated reports and pull requests for supporting evidence and completed-work history.
 4. For statutory truth, verify canonical policy data against current primary official sources.
 
+## Engineering Approach
+
+Use proportionate engineering: prefer the simplest complete, maintainable solution that meets the requirements. Follow established patterns and avoid speculative abstractions, dependencies, infrastructure or unrelated refactoring.
+
+Before editing, inspect Git state, project guidance and affected code. Work on an appropriate branch without disturbing unrelated changes.
+
+Implement the change, verify the relevant behaviour with tests and direct inspection where appropriate, update documentation only when necessary, and commit the completed work.
+
+Match verification effort to risk. Financial correctness, security and consequential user interactions require stronger evidence than routine changes.
+
+Report what changed, what passed, what remains unverified and any meaningful trade-offs. Obtain independent review before merging, and do not merge without authorisation.
+
 ## Scope Guardrails
 
 - Keep the main calculator, tools, Director Intelligence, blog, email-results, PWA, GA4, Sentry, Brevo API email, and Upstash-backed rate limiting.
@@ -97,7 +109,7 @@ If a Vercel CLI command cannot retrieve project settings, check `.vercel/project
 
 ## Pull Request Expectations
 
-Before committing non-trivial code changes, run a fresh-context review (`/code-review` or a second agent that did not write the code) and address or note its findings.
+Before merging non-trivial code changes, run a fresh-context review (`/code-review` or a second agent that did not write the code) and address or note its findings.
 
 For code changes, report:
 
