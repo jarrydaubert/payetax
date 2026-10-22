@@ -4,7 +4,7 @@
 
 Started from fetched `main` at `8d12f20a6c70e0faf76c4f1910555b8aadc1ed4e`.
 Review the input-integrity PR [#127](https://github.com/jarrydaubert/payetax/pull/127) first,
-then the stacked pay-statement PR. Neither is merged. The first slice is independently useful:
+then the stacked pay-statement PR [#128](https://github.com/jarrydaubert/payetax/pull/128). Neither is merged. The first slice is independently useful:
 focus preservation, explicit empty-field validation, pension-unit reset, immediate stale-result
 invalidation and current-result guards. The second changes the information hierarchy and browser
 journey on that foundation.
@@ -173,3 +173,18 @@ covered without sending real mail or claiming provider delivery. Local productio
 existing unavailable Vercel analytics/speed-insights scripts; WebKit also reports the existing
 unsupported `interactive-widget` viewport hint. These are recorded separately from application
 runtime errors.
+
+## Review follow-up — 22 October 2026
+
+The automated [CTA review finding](https://github.com/jarrydaubert/payetax/pull/128#discussion_r4340947279)
+is rejected on direct code and browser evidence. `SimpleNavbar.tsx` retains the Open Calculator
+link; the case-insensitive locators in the cited SEO and accessibility tests find that link. The
+exact three cited tests were rerun in Chromium and WebKit: **6/6 passed**. Removing the hero's
+duplicate link therefore does not break these journeys. No redundant CTA or test-only workaround
+was introduced.
+
+The preview build is ready. The existing Actions workflows trigger only for main-targeted PRs,
+and changing the base alone does not trigger their configured event types. To validate this
+stack without adding a workflow, the PR is temporarily targeted at main while this documentation
+update is pushed, then returned to the input-integrity branch for its focused review diff. Check
+results belong to the exact head shown on the PR; no merge is performed.
