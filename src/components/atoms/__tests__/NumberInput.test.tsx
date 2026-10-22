@@ -480,6 +480,46 @@ describe('NumberInput Component', () => {
   });
 
   describe('Focus Behavior', () => {
+    it('selects on first pointer entry without relying on the browser focus default', async () => {
+      const user = userEvent.setup();
+      const onPointerDown = jest.fn();
+      render(
+        <NumberInput
+          value={25000}
+          onChange={mockOnChange}
+          decimals={2}
+          onPointerDown={onPointerDown}
+        />,
+      );
+      const input = screen.getByRole('spinbutton') as HTMLInputElement;
+      await user.click(input);
+      expect(input).toHaveFocus();
+      expect([input.selectionStart, input.selectionEnd]).toEqual([0, input.value.length]);
+      expect(input).toHaveValue('25,000.00');
+      expect(mockOnChange).not.toHaveBeenCalled();
+
+      await user.pointer({ target: input, keys: '[MouseLeft>]' });
+      input.setSelectionRange(1, 4);
+      await user.pointer({ keys: '[/MouseLeft]' });
+      expect([input.selectionStart, input.selectionEnd]).toEqual([1, 4]);
+      expect(onPointerDown).toHaveBeenCalledTimes(2);
+    });
+
+    it('respects a caller cancelling pointer entry', async () => {
+      const user = userEvent.setup();
+      render(
+        <NumberInput
+          value={25000}
+          onChange={mockOnChange}
+          onPointerDown={(e) => e.preventDefault()}
+        />,
+      );
+      const input = screen.getByRole('spinbutton');
+      await user.click(input);
+      expect(input).not.toHaveFocus();
+      expect(input).toHaveValue('25,000');
+    });
+
     it('preserves the value when select-on-focus is enabled', () => {
       render(<NumberInput value={1000} onChange={mockOnChange} clearOnFocus={true} />);
       const input = screen.getByRole('spinbutton') as HTMLInputElement;

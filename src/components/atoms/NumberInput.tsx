@@ -13,7 +13,13 @@
  * @module components/atoms/NumberInput
  */
 
-import type { ChangeEvent, FocusEvent, InputHTMLAttributes, KeyboardEvent } from 'react';
+import type {
+  ChangeEvent,
+  FocusEvent,
+  InputHTMLAttributes,
+  KeyboardEvent,
+  PointerEvent,
+} from 'react';
 import { forwardRef, memo, useCallback, useEffect, useId, useRef, useState } from 'react';
 import type { CurrencyInputInvalidDraft } from '@/components/atoms/CurrencyInput';
 import {
@@ -110,6 +116,7 @@ const NumberInput = memo(
       onFocus,
       onBlur,
       onKeyDown,
+      onPointerDown,
       'aria-describedby': ariaDescribedBy,
       ...props
     },
@@ -328,6 +335,23 @@ const NumberInput = memo(
       [clearOnFocus, onFocus],
     );
 
+    const handlePointerDown = (e: PointerEvent<HTMLInputElement>) => {
+      onPointerDown?.(e);
+      if (
+        !e.defaultPrevented &&
+        e.button === 0 &&
+        clearOnFocus &&
+        errorRef.current === null &&
+        document.activeElement !== e.currentTarget
+      ) {
+        // WebKit places its caret after focus/click handlers. Cancel that first-entry default
+        // and focus explicitly so replacement is reliable; subsequent caret edits stay native.
+        e.preventDefault();
+        e.currentTarget.focus();
+        e.currentTarget.select();
+      }
+    };
+
     /**
      * Handle blur event - commit the current text
      */
@@ -435,6 +459,7 @@ const NumberInput = memo(
             onFocus={handleFocus}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
+            onPointerDown={handlePointerDown}
             disabled={disabled}
             aria-valuenow={showError ? undefined : value}
             aria-valuemin={min}
