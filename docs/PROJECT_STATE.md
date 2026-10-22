@@ -38,7 +38,11 @@ PR [#127](https://github.com/jarrydaubert/payetax/pull/127) and stacked responsi
 PR [#128](https://github.com/jarrydaubert/payetax/pull/128) remain open and unmerged. Their
 implementation reports and passing checks are evidence for those refs, not released behaviour.
 Claude's independent review requests changes for WebKit amount entry and legacy saved pension
-percentages; #128 inherits both blockers.
+percentages; #128 inherits both blockers. The MC-01 follow-up in #127 now has an explicit
+first-pointer focus/selection fix and focused cross-engine evidence; see the
+[22 October investigation](reports/mc-01-webkit-monetary-input-2026-10-22.md). It is unmerged and
+awaits independent review. Legacy pension restoration and MC-03's explicit-calculation acceptance
+remain open; this does not establish #127 or #128 as release-ready.
 
 The main calculator must keep calculation explicit: every calculation-input edit, including
 applying a pension suggestion, requires Calculate again. Display-only period changes reuse the
