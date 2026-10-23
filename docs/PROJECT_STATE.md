@@ -37,12 +37,12 @@ Merged `main` at `8d12f20a` includes the shared currency-parsing fix (#125). The
 PR [#127](https://github.com/jarrydaubert/payetax/pull/127) and stacked responsive-statement
 PR [#128](https://github.com/jarrydaubert/payetax/pull/128) remain open and unmerged. Their
 implementation reports and passing checks are evidence for those refs, not released behaviour.
-Claude's independent review requests changes for WebKit amount entry and legacy saved pension
-percentages; #128 inherits both blockers. The MC-01 follow-up in #127 now has an explicit
-first-pointer focus/selection fix and focused cross-engine evidence; see the
-[22 October investigation](reports/mc-01-webkit-monetary-input-2026-10-22.md). It is unmerged and
-awaits independent review. Legacy pension restoration and MC-03's explicit-calculation acceptance
-remain open; this does not establish #127 or #128 as release-ready.
+Claude independently confirmed the original WebKit wrong-amount fix at `9a2f6d1e`, but requested
+changes for a new touch-pan focus regression (F1). The follow-up in #127 defers touch/pen entry
+until the matching pointer release and forgets cancelled gestures; see the
+[23 October review response](reports/mc-01-touch-pan-follow-up-2026-10-23.md). It is unmerged and
+awaits independent re-review. Legacy pension restoration and MC-03's explicit-calculation
+acceptance remain separate blockers inherited by #128; neither PR is release-ready.
 
 The main calculator must keep calculation explicit: every calculation-input edit, including
 applying a pension suggestion, requires Calculate again. Display-only period changes reuse the

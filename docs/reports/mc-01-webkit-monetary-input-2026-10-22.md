@@ -1,5 +1,10 @@
 # MC-01: WebKit monetary input investigation
 
+**23 October review update:** Claude independently confirmed the wrong-amount fix at `9a2f6d1e`
+but requested changes for a newly reproduced touch-pan focus regression (F1). The runs below did
+not test that gesture. See the [touch-pan follow-up](mc-01-touch-pan-follow-up-2026-10-23.md) for
+the response, fresh verification and exact tree identities clarifying recreated-commit equivalence.
+
 Date: 22 October 2026. Scope: the MC-01 follow-up to [PR #127](https://github.com/jarrydaubert/payetax/pull/127).
 Verified source: `810bf04e17b45effc9790b29a9eaf6486841b271`. This is unmerged implementation evidence,
 not approval of #127, #128 or a release. The [reconciled backlog](../BACKLOG.md#main-calculator-input-integrity)
