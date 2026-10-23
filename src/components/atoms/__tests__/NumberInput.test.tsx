@@ -480,6 +480,49 @@ describe('NumberInput Component', () => {
   });
 
   describe('Focus Behavior', () => {
+    it('prevents the mouse default only on first entry', async () => {
+      const user = userEvent.setup();
+      render(<NumberInput value={25000} onChange={mockOnChange} decimals={2} />);
+      const input = screen.getByRole('spinbutton');
+      const prevented: boolean[] = [];
+      const record = (event: Event) => prevented.push(event.defaultPrevented);
+      document.addEventListener('pointerdown', record);
+      try {
+        await user.click(input);
+        await user.click(input);
+        expect(prevented).toEqual([true, false]);
+      } finally {
+        document.removeEventListener('pointerdown', record);
+      }
+    });
+
+    it.each([
+      'touch',
+      'pen',
+    ])('focuses %s entry only on an uncancelled matching release', (pointerType) => {
+      render(<NumberInput value={25000} onChange={mockOnChange} decimals={2} />);
+      const input = screen.getByRole('spinbutton') as HTMLInputElement;
+      const dispatch = (name: string, pointerId: number) => {
+        const event = new MouseEvent(name, { bubbles: true, cancelable: true, button: 0 });
+        Object.assign(event, { pointerType, pointerId });
+        fireEvent(input, event);
+        return event;
+      };
+      expect(dispatch('pointerdown', 1).defaultPrevented).toBe(true);
+      expect(input).not.toHaveFocus();
+      dispatch('pointercancel', 1);
+      dispatch('pointerup', 1);
+      expect(input).not.toHaveFocus();
+      dispatch('pointerdown', 2);
+      dispatch('pointerup', 3);
+      expect(input).not.toHaveFocus();
+      dispatch('pointerup', 2);
+      expect(input).toHaveFocus();
+      expect([input.selectionStart, input.selectionEnd]).toEqual([0, input.value.length]);
+      expect(input).toHaveValue('25,000.00');
+      expect(mockOnChange).not.toHaveBeenCalled();
+    });
+
     it('selects on first pointer entry without relying on the browser focus default', async () => {
       const user = userEvent.setup();
       const onPointerDown = jest.fn();

@@ -117,6 +117,8 @@ const NumberInput = memo(
       onBlur,
       onKeyDown,
       onPointerDown,
+      onPointerUp,
+      onPointerCancel,
       'aria-describedby': ariaDescribedBy,
       ...props
     },
@@ -131,6 +133,7 @@ const NumberInput = memo(
     const [isFocused, setIsFocused] = useState<boolean>(false);
 
     const isFocusedRef = useRef(false);
+    const pendingTouchPointerRef = useRef<number | null>(null);
     const displayValueRef = useRef(displayValue);
     displayValueRef.current = displayValue;
     const errorRef = useRef(error);
@@ -336,6 +339,7 @@ const NumberInput = memo(
     );
 
     const handlePointerDown = (e: PointerEvent<HTMLInputElement>) => {
+      pendingTouchPointerRef.current = null;
       onPointerDown?.(e);
       if (
         !e.defaultPrevented &&
@@ -347,9 +351,34 @@ const NumberInput = memo(
         // WebKit places its caret after focus/click handlers. Cancel that first-entry default
         // and focus explicitly so replacement is reliable; subsequent caret edits stay native.
         e.preventDefault();
+        if (e.pointerType === 'touch' || e.pointerType === 'pen') {
+          // A pan cancels the pointer. Wait for a completed tap before entering the field.
+          pendingTouchPointerRef.current = e.pointerId;
+        } else {
+          e.currentTarget.focus();
+          e.currentTarget.select();
+        }
+      }
+    };
+
+    const handlePointerUp = (e: PointerEvent<HTMLInputElement>) => {
+      onPointerUp?.(e);
+      if (pendingTouchPointerRef.current !== e.pointerId) return;
+      pendingTouchPointerRef.current = null;
+      if (
+        !e.defaultPrevented &&
+        clearOnFocus &&
+        errorRef.current === null &&
+        document.activeElement !== e.currentTarget
+      ) {
         e.currentTarget.focus();
         e.currentTarget.select();
       }
+    };
+
+    const handlePointerCancel = (e: PointerEvent<HTMLInputElement>) => {
+      if (pendingTouchPointerRef.current === e.pointerId) pendingTouchPointerRef.current = null;
+      onPointerCancel?.(e);
     };
 
     /**
@@ -460,6 +489,8 @@ const NumberInput = memo(
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
             onPointerDown={handlePointerDown}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerCancel}
             disabled={disabled}
             aria-valuenow={showError ? undefined : value}
             aria-valuemin={min}

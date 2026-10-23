@@ -1,19 +1,9 @@
-import { expect, type Locator, type Page, test } from '@playwright/test';
-import { dismissCookieBannerIfPresent, ensureCalculatorVisible } from './helpers/calculator-ui';
+import { expect, type Locator, test } from '@playwright/test';
+import { openCalculatorForAmountEntry as openCalculator } from './helpers/calculator-ui';
 
 async function activate(control: Locator, touch: boolean) {
   if (touch) await control.tap();
   else await control.click();
-}
-
-async function openCalculator(page: Page, touch: boolean) {
-  await page.goto('/#tax-calculator');
-  await page.waitForLoadState('networkidle');
-  await dismissCookieBannerIfPresent(page);
-  await ensureCalculatorVisible(page);
-  // A visible SSR input is not proof its React event handlers are ready.
-  await activate(page.getByTestId('married-checkbox'), touch);
-  await expect(page.getByTestId('partner-salary-input')).toBeVisible();
 }
 
 async function enterAt(field: Locator, position: 'left' | 'middle' | 'right', touch: boolean) {

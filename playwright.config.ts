@@ -76,6 +76,7 @@ export default defineConfig({
     // WebKit (Safari engine)
     {
       name: 'webkit',
+      testIgnore: '**/monetary-input-pan.spec.ts',
       use: {
         ...devices['Desktop Safari'],
       },
@@ -91,6 +92,7 @@ export default defineConfig({
         '**/smoke.spec.ts',
         '**/calculator-critical.spec.ts',
         '**/monetary-input-interaction.spec.ts',
+        '**/monetary-input-pan.spec.ts',
         '**/director-guide-critical.spec.ts',
         '**/payslip-regression.spec.ts',
         '**/golden-master-PERFECT.spec.ts',
