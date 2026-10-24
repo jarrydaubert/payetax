@@ -1,5 +1,10 @@
 {
   "installCommand": "bun install --frozen-lockfile",
+  "git": {
+    "deploymentEnabled": {
+      "security/dependency-advisories-2026-10-24": false
+    }
+  },
   "redirects": [
     {
       "source": "/",
