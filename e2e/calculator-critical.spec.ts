@@ -19,6 +19,170 @@ function parsePercent(text: string): number {
   return Number.parseFloat(match[1] ?? 'NaN');
 }
 
+test.describe('MC-02 pension units and restoration @critical', () => {
+  async function typePension(pension: Locator, text: string) {
+    await pension.click();
+    await expect(pension).toBeFocused();
+    await pension.press('ControlOrMeta+A');
+    await pension.pressSequentially(text);
+    await expect(pension).toHaveValue(text);
+    await pension.press('Tab');
+  }
+
+  async function switchPensionUnit(page: Page, to: 'percentage' | 'amount') {
+    const trigger = page.getByTestId('pension-type-select');
+    await trigger.focus();
+    await trigger.press('Space');
+    await expect(page.getByRole('listbox')).toBeVisible();
+    const option =
+      to === 'percentage' ? page.getByRole('option').first() : page.getByRole('option').last();
+    await option.press('Enter');
+    await expect(page.getByRole('listbox')).toBeHidden();
+    await expect(trigger).toBeFocused();
+  }
+
+  async function restorePension(page: Page, value: number, type: 'percentage' | 'amount') {
+    await page.addInitScript(
+      ({ value, type }) => {
+        if (localStorage.getItem('tax-calculator-storage') !== null) return;
+        localStorage.setItem(
+          'tax-calculator-storage',
+          JSON.stringify({
+            state: {
+              input: {
+                salary: 60000,
+                taxYear: '2026-2027',
+                taxCode: '1257L',
+                pensionContribution: value,
+                pensionContributionType: type,
+              },
+            },
+            version: 0,
+          }),
+        );
+      },
+      { value, type },
+    );
+  }
+
+  async function openPensionCalculator(page: Page, touch: boolean, reload = false) {
+    if (reload) await page.reload({ waitUntil: 'domcontentloaded' });
+    else await page.goto('/#tax-calculator', { waitUntil: 'domcontentloaded' });
+    await dismissCookieBannerIfPresent(page);
+    await ensureCalculatorVisible(page);
+    const married = page.getByTestId('married-checkbox');
+    const checked = (await married.getAttribute('aria-checked')) !== 'true';
+    // Readiness is a mounted React interaction, independent of external analytics requests.
+    await expect(async () => {
+      if ((await married.getAttribute('aria-checked')) !== String(checked)) {
+        if (touch) await married.tap();
+        else await married.press('Space');
+      }
+      await expect(married).toHaveAttribute('aria-checked', String(checked), { timeout: 1000 });
+      if (checked)
+        await expect(page.getByTestId('partner-salary-input')).toBeVisible({ timeout: 1000 });
+      else await expect(page.getByTestId('partner-salary-input')).toBeHidden({ timeout: 1000 });
+    }).toPass({ timeout: 15000 });
+  }
+
+  for (const [type, value, display, annual] of [
+    ['percentage', 5.25, '5.25', 3150],
+    ['amount', 5000.25, '5,000.25', 5000.25],
+  ] as const) {
+    test(`valid restored ${value} ${type} keeps its meaning`, async ({ page, isMobile }) => {
+      await restorePension(page, value, type);
+      await openPensionCalculator(page, isMobile);
+      const pension = page.getByTestId('pension-input');
+      await expect(pension).toHaveValue(display);
+      await expect(pension).not.toHaveAttribute('aria-invalid');
+      await expect(page.getByTestId('tax-results')).toHaveCount(0);
+      await page.getByTestId('calculate-button').click();
+      expect(await getYearlyTableValue(page, 'Pension')).toBe(annual);
+    });
+  }
+
+  for (const recovery of ['percentage', 'amount'] as const) {
+    test(`legacy 5000% is preserved, blocked and recoverable as ${recovery}`, async ({
+      page,
+      isMobile,
+    }) => {
+      await restorePension(page, 5000, 'percentage');
+      await openPensionCalculator(page, isMobile);
+      const pension = page.getByTestId('pension-input');
+      const calculate = page.getByTestId('calculate-button');
+      const results = page.getByTestId('tax-results');
+      await expect(pension).toHaveValue('5000');
+      await expect(pension).toHaveAttribute('aria-invalid', 'true');
+      await expect(pension).toHaveAccessibleDescription(/no more than 100%/);
+      await pension.focus();
+      await pension.press('Tab');
+      await calculate.click();
+      await expect(
+        page.getByRole('alert').filter({ hasText: 'Correct the invalid amount in Pension' }),
+      ).toBeVisible();
+      await expect(results).toHaveCount(0);
+      await expect(page.getByRole('button', { name: 'Email tax calculation results' })).toHaveCount(
+        0,
+      );
+      const saved = await page.evaluate(() =>
+        JSON.parse(localStorage.getItem('tax-calculator-storage') ?? '{}'),
+      );
+      expect(saved.state.input.pensionContribution).toBe(5000);
+      expect(saved.state.input.pensionContributionType).toBe('percentage');
+      await openPensionCalculator(page, isMobile, true);
+      await expect(pension).toHaveAttribute('aria-invalid', 'true');
+
+      if (recovery === 'amount') {
+        await switchPensionUnit(page, 'amount');
+        await expect(pension).toHaveValue('0.00');
+        await expect(page.getByText(/Changing between % and £ resets/)).toBeVisible();
+      }
+      await typePension(pension, recovery === 'amount' ? '5000' : '5.25');
+      await expect(pension).not.toHaveAttribute('aria-invalid');
+      await expect(results).toHaveCount(0);
+      await calculate.click();
+      expect(await getYearlyTableValue(page, 'Pension')).toBe(recovery === 'amount' ? 5000 : 3150);
+      await openPensionCalculator(page, isMobile, true);
+      await expect(pension).toHaveValue(recovery === 'amount' ? '5,000.00' : '5.25');
+      await expect(pension).not.toHaveAttribute('aria-invalid');
+      await expect(results).toHaveCount(0);
+    });
+  }
+
+  for (const [from, value] of [
+    ['amount', 50],
+    ['amount', 5000],
+    ['percentage', 5.25],
+    ['percentage', 100],
+  ] as const) {
+    test(`switching ${value} ${from} explains reset and validates the new unit`, async ({
+      page,
+      isMobile,
+    }) => {
+      await restorePension(page, value, from);
+      await openPensionCalculator(page, isMobile);
+      const pension = page.getByTestId('pension-input');
+      const calculate = page.getByTestId('calculate-button');
+      await calculate.click();
+      await expect(page.getByTestId('tax-results')).toBeVisible();
+      await switchPensionUnit(page, from === 'amount' ? 'percentage' : 'amount');
+      await expect(pension).toHaveValue('0.00');
+      await expect(page.getByText(/Changing between % and £ resets/)).toBeVisible();
+      await expect(page.getByTestId('tax-results')).toHaveCount(0);
+      await typePension(pension, from === 'amount' ? '100.01' : '10000000.01');
+      await expect(pension).toHaveAttribute('aria-invalid', 'true');
+      await expect(pension).toHaveAccessibleDescription(/no more than/);
+      await calculate.click();
+      await expect(page.getByTestId('tax-results')).toHaveCount(0);
+      await typePension(pension, from === 'amount' ? '5.25' : '5000.25');
+      await expect(pension).not.toHaveAttribute('aria-invalid');
+      await expect(page.getByTestId('tax-results')).toHaveCount(0);
+      await calculate.click();
+      expect(await getYearlyTableValue(page, 'Pension')).toBe(from === 'amount' ? 3150 : 5000.25);
+    });
+  }
+});
+
 function parseGBP(text: string): number {
   const cleaned = text.replace(/[£,]/g, '').trim();
   const n = Number.parseFloat(cleaned);

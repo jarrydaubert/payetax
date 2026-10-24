@@ -44,6 +44,7 @@ import {
   PensionContributionTypeSchema,
   WhatIfTypeSchema,
 } from '@/lib/calculatorValidation';
+import { parseCurrencyInput } from '@/lib/currencyInput';
 import { safeStorage } from '@/lib/safeStorage';
 import {
   addBreadcrumb,
@@ -548,7 +549,10 @@ const CalculatorInputPartialSchema = z
 
 const PersistedCalculatorStoreSchema = z
   .object({
-    input: CalculatorInputPartialSchema.optional(),
+    // Preserve invalid saved pension numbers for correction, rather than discarding the form.
+    input: CalculatorInputPartialSchema.extend({
+      pensionContribution: z.number().optional(),
+    }).optional(),
     _savedAt: z.number().int().positive().optional(),
     _taxYear: z.string().optional(),
   })
@@ -820,9 +824,13 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          setCalculatorState(set, (state) => ({
-            input: { ...state.input, pensionContribution: validated.data },
-          }));
+          setCalculatorState(set, (state) => {
+            const { pensionContribution: _corrected, ...inputErrors } = state.inputErrors;
+            return {
+              input: { ...state.input, pensionContribution: validated.data },
+              inputErrors,
+            };
+          });
         },
         setPensionContributionType: (pensionContributionType) => {
           // Validate pension type using extracted schema
@@ -1374,15 +1382,32 @@ export const useCalculatorStore = create<CalculatorState>()(
             normalizedTaxYear = getCurrentTaxYear();
           }
 
+          const input = {
+            ...currentState.input,
+            ...persistedInput,
+            // Ensure new fields have defaults if missing in persisted state
+            incomeSources: persistedInput?.incomeSources ?? [],
+            taxYear: normalizedTaxYear,
+          };
+          const percentage = input.pensionContributionType === 'percentage';
+          const text = String(input.pensionContribution);
+          const pension = parseCurrencyInput(text, {
+            unit: percentage ? 'percent' : 'pounds',
+            max: percentage ? 100 : 10_000_000,
+          });
+          const { pensionContribution: _previous, ...otherErrors } = currentState.inputErrors;
+          const inputErrors: CalculatorInputErrors = otherErrors;
+          if (pension.status === 'invalid') {
+            inputErrors.pensionContribution = { text, error: pension.error };
+          }
+
           return {
             ...currentState,
-            input: {
-              ...currentState.input,
-              ...persistedInput,
-              // Ensure new fields have defaults if missing in persisted state
-              incomeSources: persistedInput?.incomeSources ?? [],
-              taxYear: normalizedTaxYear,
-            },
+            input,
+            inputErrors,
+            results: null,
+            previousYearResults: null,
+            whatIfResults: null,
           };
         },
         onRehydrateStorage: () => (state, error) => {
