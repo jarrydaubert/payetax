@@ -37,8 +37,15 @@ Merged `main` at `8d12f20a` includes the shared currency-parsing fix (#125). The
 PR [#127](https://github.com/jarrydaubert/payetax/pull/127) and stacked responsive-statement
 PR [#128](https://github.com/jarrydaubert/payetax/pull/128) remain open and unmerged. Their
 implementation reports and passing checks are evidence for those refs, not released behaviour.
-Claude's independent review requests changes for WebKit amount entry and legacy saved pension
-percentages; #128 inherits both blockers.
+The owner supplied Claude's independent MC-01 approval at exact ref
+`f0bcdc9742fcf58cf5f49cec5feb7bf8fe0ccd1c`, recorded as an
+[owner-supplied review summary in #127](https://github.com/jarrydaubert/payetax/pull/127#issuecomment-6388698120).
+MC-01 is accepted and remains unmerged. Its [23 October evidence](reports/mc-01-touch-pan-follow-up-2026-10-23.md)
+retains the native WebKit-pan, physical-device, virtual-keyboard and OS-clipboard limitations.
+The MC-02 restoration fix in #127 preserves saved numeric contributions and units, attaches
+invalid values to the pension field, and allows correction without clearing storage. It is
+unmerged and awaits independent review. MC-02 acceptance and MC-03's explicit-calculation
+acceptance remain separate blockers inherited by #128; neither PR is release-ready.
 
 The main calculator must keep calculation explicit: every calculation-input edit, including
 applying a pension suggestion, requires Calculate again. Display-only period changes reuse the
@@ -265,7 +272,7 @@ currency-input preservation and minimal stale-result protection have landed, wit
 currency parser in `src/lib/currencyInput.ts`. The main calculator's amount fields now reuse that
 parser: pence are kept, rejected text is shown with its error and clears results until corrected.
 The remaining [main-calculator input-integrity queue](BACKLOG.md#main-calculator-input-integrity)
-comes next: MC-01/02 and MC-03's integrity scope are #127 acceptance criteria, inherited by #128.
+comes next: MC-02 and MC-03's integrity scope are remaining #127 acceptance criteria, inherited by #128.
 After the interim DI-05 email guard, MC-03's presentation scope and MC-04/05 may proceed alongside
 Director urgent slices without pre-empting a ready, verified wrong-money fix; completing the entire
 Director queue is not a main-calculator prerequisite. Keep the Director sequence and Foundation

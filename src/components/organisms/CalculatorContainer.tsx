@@ -197,7 +197,9 @@ export function CalculatorContainer() {
     // blur and the recalculation uses the amounts shown. Rejected text clears the results this
     // action belongs to; then there is nothing to apply to.
     commitFocusedField(sectionRef.current);
-    if (getBlockingInputErrors(useCalculatorStore.getState()).length > 0) return;
+    const current = useCalculatorStore.getState();
+    if (!results || current.results !== results || getBlockingInputErrors(current).length > 0)
+      return;
     try {
       // Validate pension amount
       if (typeof pensionAmount !== 'number' || Number.isNaN(pensionAmount) || pensionAmount < 0) {

@@ -31,7 +31,7 @@ Verified Director Intelligence correctness exceptions (see [Urgent correctness e
 
 For the calculator reconciliation, use the [22 October evidence and decisions](reports/calculator-backlog-reconciliation-2026-10-22.md). The implementation order is:
 
-1. Close MC-01, MC-02 and MC-03's integrity criteria in the input-integrity prerequisite (#127), with store and browser regressions. #127 must independently prevent stale results, mismatched email and stale suggestions before merge; those requirements cannot wait for #128.
+1. Close MC-02 and MC-03's integrity criteria in the input-integrity prerequisite (#127), with store and browser regressions. MC-01 was independently accepted at `f0bcdc97` (owner-supplied Claude approval recorded in #127). #127 must independently prevent stale results, mismatched email and stale suggestions before merge; those requirements cannot wait for #128.
 2. Complete the DI-05 interim email guard next. MC-03's presentation scope and MC-04/05 may then proceed alongside the Director urgent slices, without pre-empting a ready, verified wrong-money fix. The entire Director queue is not a prerequisite for completing the main calculator; retain its internal order and existing Foundation insertion points.
 3. Before the first deployment containing #128's homepage/hero change, complete the search audit's pre-deployment gate below. This applies to that change wherever it is eventually delivered, not merely a later audit PR. MC-04/05 and #127's integrity guarantees are also acceptance requirements for the redesign.
 4. MC-06/07 are smaller follow-ups. Complete the search audit's performance observation after release using the windows and mitigation trigger recorded before deployment. Any newly reproduced wrong-money defect takes correctness priority.
@@ -93,13 +93,11 @@ below.
 
 Currency parsing through `parseCurrencyInput` is merged in #125. The following items replace the previous focus/stale-result and pension-switch entries, including the outstanding work in [#127](https://github.com/jarrydaubert/payetax/pull/127). Claude's review reports two additional blockers; #128 inherits them and the existing stale-result integrity requirements. The [reported review evidence](reports/calculator-backlog-reconciliation-2026-10-22.md#reported-calculator-review-evidence) records reproduction details and limits without depending on private chat access.
 
-- [ ] **MC-01 · P1 · Release blocker — Preserve the intended amount through focus, typing and blur.** Main erases untouched values on focus/blur; #127's select-on-focus replacement can insert typed digits into existing text in WebKit, silently calculating a different salary (Claude B1).
-
-  **DoD:** Focus-and-leave preserves the value; deliberately clearing a used amount retains an explicit empty/error state rather than committing zero. Replacing initial `0.00` and an existing £25,000 with `30000` produces exactly £30,000, or a specific visible rejection, never another accepted amount. Mounted salary, pension, allowance, partner-wage and additional-income fields preserve pence and reject malformed/negative text. Production-browser regressions exercise pointer clicks at left/middle/right positions, touch entry, keyboard focus and actual typing/paste in Chromium and WebKit; replacement tests must not rely solely on `fill()`. Existing valid entry, Enter/Calculate, Reset and focus-return journeys still work. Before #127 merges or any affected release ships, the fixed head passes repeat runs of the targeted WebKit regression on desktop and touch-emulated mobile. Record the command, ref, engine version, projects, repeat/worker counts and results. A local production-build run is sufficient; explicitly record that Chromium-only CI does not enforce it and that emulation is not a physical-iPhone test. Missing or failing WebKit evidence blocks acceptance, not a reason to assume Chromium parity. Stale-result behaviour belongs to MC-03.
-
 - [ ] **MC-02 · P1 · Release blocker — Keep pension units and restored inputs valid and recoverable.** Main can reinterpret £5,000 as 5,000%. #127 resets new unit changes, but its persistence merge still accepts a previously saved percentage above 100; Calculate then throws without an actionable field error (Claude B2; #128 adds a form alert).
 
   **DoD:** £↔% changes never silently reinterpret a contribution; the resulting value and unit are valid or visibly need correction, and any reset/conversion is explained. Returning visitors with synthetic legacy `{pensionContribution: 5000, pensionContributionType: 'percentage'}` can recover without clearing browser storage: invalid restored data is visibly corrected or associated with the pension field and blocks calculation until resolved. Calculate never silently fails or publishes a result for invalid input. Store and production-browser regressions in Chromium and WebKit cover both switch directions within/above limits, valid restoration, the legacy case and recovery; store tests also cover expiry and tax-year rollover. Edits still require Calculate under MC-03. This is input integrity, not the separate Foundation pension-method work.
+
+  **Implementation for independent review (unmerged):** #127 preserves saved numeric pension contributions and their units, restores an associated blocking error using the existing field parser, and allows correction or a deliberate explained unit reset without clearing storage. Store tests cover restoration, all result variants, recovery, expiry and tax-year rollover; mounted tests cover hydration before/after render. Production-browser evidence and remaining limits are recorded in #127. Keep MC-02 open pending independent acceptance; MC-03 remains separate.
 
 - [ ] **MC-03 · P1 · #127 integrity acceptance; separate #128 presentation scope — Keep calculation explicit and prevent stale-result use.** Valid edits on main leave current-looking results and mismatched email/suggestions; #127 clears them atomically, while #128 removes the entire statement on the first keystroke (Claude S2). Both PRs still recalculate immediately when a pension suggestion is applied, contrary to the product decision.
 
@@ -189,7 +187,7 @@ Agreed order, with one small PR per item unless stated otherwise (DI-08 lands wi
 and the minimal part of DI-02 have landed:
 
 1. The [main-calculator input-integrity queue](#main-calculator-input-integrity): currency parsing
-   is merged; MC-01/02 and MC-03's integrity scope are #127 acceptance criteria, inherited by #128.
+   is merged; MC-02 and MC-03's integrity scope remain #127 acceptance criteria, inherited by #128.
    Keep fixes independently reviewable; neither PR is merged.
 2. The interim email guard from DI-05.
 3. DI-07, then DI-26, DI-23, DI-06 and DI-27.

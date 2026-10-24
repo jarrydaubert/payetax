@@ -1,5 +1,21 @@
 import { expect, type Page } from '@playwright/test';
 
+export async function openCalculatorForAmountEntry(page: Page, touch: boolean): Promise<void> {
+  await page.goto('/#tax-calculator');
+  await page.waitForLoadState('networkidle');
+  await dismissCookieBannerIfPresent(page);
+  await ensureCalculatorVisible(page);
+  // Retry only the readiness probe: SSR visibility does not prove React handlers are attached.
+  const married = page.getByTestId('married-checkbox');
+  await expect(async () => {
+    if ((await married.getAttribute('aria-checked')) !== 'true') {
+      if (touch) await married.tap();
+      else await married.click();
+    }
+    await expect(page.getByTestId('partner-salary-input')).toBeVisible({ timeout: 1000 });
+  }).toPass({ timeout: 15000 });
+}
+
 export async function dismissCookieBannerIfPresent(page: Page): Promise<void> {
   const acceptCookiesButton = page.locator('button:has-text("Accept All")');
   const cookieBannerVisible = await acceptCookiesButton.isVisible().catch(() => false);

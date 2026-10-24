@@ -142,7 +142,9 @@ describe('CalculatorContainer Component', () => {
     (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector(storeState),
     );
-    Object.assign(useCalculatorStore, { getState: () => storeState });
+    Object.assign(useCalculatorStore, {
+      getState: () => ({ ...storeState, results: useCalculatorResults() }),
+    });
   });
 
   describe('Initial Rendering', () => {

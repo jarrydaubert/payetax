@@ -44,6 +44,7 @@ import {
   PensionContributionTypeSchema,
   WhatIfTypeSchema,
 } from '@/lib/calculatorValidation';
+import { parseCurrencyInput } from '@/lib/currencyInput';
 import { safeStorage } from '@/lib/safeStorage';
 import {
   addBreadcrumb,
@@ -246,6 +247,7 @@ interface CalculatorState {
   setAllowancesDeductions: (amount: number) => void;
   setInput: (partial: Partial<CalculatorInput>) => void;
   /** Record (or, with `null`, clear) rejected text for an amount field. */
+  invalidateResults: () => void;
   setInputError: (field: CalculatorAmountField, invalid: CalculatorInvalidAmount | null) => void;
 
   // Income Sources Management
@@ -547,11 +549,36 @@ const CalculatorInputPartialSchema = z
 
 const PersistedCalculatorStoreSchema = z
   .object({
-    input: CalculatorInputPartialSchema.optional(),
+    // Preserve invalid saved pension numbers for correction, rather than discarding the form.
+    input: CalculatorInputPartialSchema.extend({
+      pensionContribution: z.number().optional(),
+    }).optional(),
     _savedAt: z.number().int().positive().optional(),
     _taxYear: z.string().optional(),
   })
   .passthrough();
+
+type CalculatorUpdate =
+  | Partial<CalculatorState>
+  | ((state: CalculatorState) => Partial<CalculatorState>);
+
+/** Keep all result variants tied to the committed inputs in the same state write. */
+function setCalculatorState(
+  set: (update: (state: CalculatorState) => Partial<CalculatorState>) => void,
+  update: CalculatorUpdate,
+) {
+  set((state) => {
+    const next = typeof update === 'function' ? update(state) : update;
+    const changed =
+      next.input &&
+      Object.entries(next.input).some(
+        ([key, value]) => !Object.is(value, state.input[key as keyof CalculatorInput]),
+      );
+    return changed
+      ? { ...next, results: null, previousYearResults: null, whatIfResults: null }
+      : next;
+  });
+}
 
 // Create the calculator store
 export const useCalculatorStore = create<CalculatorState>()(
@@ -594,7 +621,9 @@ export const useCalculatorStore = create<CalculatorState>()(
             data: { salaryRange: getSalaryRange(validated.data) ?? 'none' },
           });
 
-          set((state) => ({ input: { ...state.input, salary: validated.data } }));
+          setCalculatorState(set, (state) => ({
+            input: { ...state.input, salary: validated.data },
+          }));
         },
         setPayPeriod: (payPeriod) => {
           const validated = PAY_PERIOD_INPUT_SCHEMA.safeParse(payPeriod);
@@ -607,7 +636,9 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          set((state) => ({ input: { ...state.input, payPeriod: validated.data } }));
+          setCalculatorState(set, (state) => ({
+            input: { ...state.input, payPeriod: validated.data },
+          }));
         },
         setTaxYear: (taxYear) => {
           const validated = TAX_YEAR_INPUT_SCHEMA.safeParse(taxYear);
@@ -626,12 +657,12 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          set((state) => ({ input: { ...state.input, taxYear: normalized } }));
+          setCalculatorState(set, (state) => ({ input: { ...state.input, taxYear: normalized } }));
         },
         setTaxCode: (taxCode) => {
           // Validate tax code format (allow empty for default)
           if (taxCode.trim() === '') {
-            set((state) => ({ input: { ...state.input, taxCode: '' } }));
+            setCalculatorState(set, (state) => ({ input: { ...state.input, taxCode: '' } }));
             return;
           }
 
@@ -643,7 +674,9 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          set((state) => ({ input: { ...state.input, taxCode: normalizedTaxCode } }));
+          setCalculatorState(set, (state) => ({
+            input: { ...state.input, taxCode: normalizedTaxCode },
+          }));
         },
         setRegion: (region) => {
           const validated = REGION_INPUT_SCHEMA.safeParse(region);
@@ -656,7 +689,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          set((state) => ({
+          setCalculatorState(set, (state) => ({
             input: {
               ...state.input,
               region: validated.data,
@@ -677,7 +710,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           }
 
           // Keep region and isScottish in sync to prevent impossible states
-          set((state) => ({
+          setCalculatorState(set, (state) => ({
             input: {
               ...state.input,
               isScottish: validated.data,
@@ -701,7 +734,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          set((state) => {
+          setCalculatorState(set, (state) => {
             if (validated.data) return { input: { ...state.input, isMarried: true } };
             // The partner wage field is hidden once unmarried: discard its rejected text so it can
             // never reappear, blocking, beside results calculated without it.
@@ -720,7 +753,9 @@ export const useCalculatorStore = create<CalculatorState>()(
             );
             return;
           }
-          set((state) => ({ input: { ...state.input, partnerGrossWage: validated.data } }));
+          setCalculatorState(set, (state) => ({
+            input: { ...state.input, partnerGrossWage: validated.data },
+          }));
         },
         setIsBlind: (isBlind) => {
           // Validate boolean using extracted schema
@@ -734,7 +769,9 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          set((state) => ({ input: { ...state.input, isBlind: validated.data } }));
+          setCalculatorState(set, (state) => ({
+            input: { ...state.input, isBlind: validated.data },
+          }));
         },
         setAge: (age) => {
           // Validate age if provided
@@ -750,7 +787,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             }
             age = validated.data;
           }
-          set((state) => ({ input: { ...state.input, age } }));
+          setCalculatorState(set, (state) => ({ input: { ...state.input, age } }));
         },
         setPayNoNI: (payNoNI) => {
           // Validate boolean using extracted schema
@@ -764,7 +801,9 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          set((state) => ({ input: { ...state.input, payNoNI: validated.data } }));
+          setCalculatorState(set, (state) => ({
+            input: { ...state.input, payNoNI: validated.data },
+          }));
         },
         setPensionContribution: (pensionContribution) => {
           const { input } = get();
@@ -785,7 +824,13 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          set((state) => ({ input: { ...state.input, pensionContribution: validated.data } }));
+          setCalculatorState(set, (state) => {
+            const { pensionContribution: _corrected, ...inputErrors } = state.inputErrors;
+            return {
+              input: { ...state.input, pensionContribution: validated.data },
+              inputErrors,
+            };
+          });
         },
         setPensionContributionType: (pensionContributionType) => {
           // Validate pension type using extracted schema
@@ -799,7 +844,18 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          set((state) => ({ input: { ...state.input, pensionContributionType: validated.data } }));
+          setCalculatorState(set, (state) => {
+            if (state.input.pensionContributionType === validated.data) return state;
+            const { pensionContribution: _cleared, ...inputErrors } = state.inputErrors;
+            return {
+              input: {
+                ...state.input,
+                pensionContributionType: validated.data,
+                pensionContribution: 0,
+              },
+              inputErrors,
+            };
+          });
         },
         setStudentLoanPlans: (studentLoanPlans) => {
           // Validate student loan plans - either 'none' or array of valid plans
@@ -813,7 +869,9 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          set((state) => ({ input: { ...state.input, studentLoanPlans: validated.data } }));
+          setCalculatorState(set, (state) => ({
+            input: { ...state.input, studentLoanPlans: validated.data },
+          }));
         },
         toggleStudentLoan: (plan) => {
           // Validate plan
@@ -827,7 +885,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          set((state) => {
+          setCalculatorState(set, (state) => {
             const currentPlans = state.input.studentLoanPlans;
 
             // If 'none', initialize with this plan
@@ -881,7 +939,9 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          set((state) => ({ input: { ...state.input, niCategory: validated.data } }));
+          setCalculatorState(set, (state) => ({
+            input: { ...state.input, niCategory: validated.data },
+          }));
         },
         setHoursPerWeek: (hoursPerWeek) => {
           // Validate hours per week
@@ -894,7 +954,9 @@ export const useCalculatorStore = create<CalculatorState>()(
             );
             return;
           }
-          set((state) => ({ input: { ...state.input, hoursPerWeek: validated.data } }));
+          setCalculatorState(set, (state) => ({
+            input: { ...state.input, hoursPerWeek: validated.data },
+          }));
         },
         setAllowancesDeductions: (allowancesDeductions) => {
           // Validate allowances/deductions
@@ -907,7 +969,9 @@ export const useCalculatorStore = create<CalculatorState>()(
             );
             return;
           }
-          set((state) => ({ input: { ...state.input, allowancesDeductions: validated.data } }));
+          setCalculatorState(set, (state) => ({
+            input: { ...state.input, allowancesDeductions: validated.data },
+          }));
         },
         setInput: (partial) => {
           const validated = CalculatorInputPartialSchema.safeParse(partial);
@@ -928,15 +992,23 @@ export const useCalculatorStore = create<CalculatorState>()(
             }
           }
 
-          set((state) => ({
+          setCalculatorState(set, (state) => ({
             input: { ...state.input, ...nextInput },
           }));
         },
 
+        invalidateResults: () => {
+          if (!(get().results || get().previousYearResults || get().whatIfResults)) return;
+          setCalculatorState(set, {
+            results: null,
+            previousYearResults: null,
+            whatIfResults: null,
+          });
+        },
         setInputError: (field, invalid) => {
           if (invalid) {
             // Results for the previously committed amount must not stay on screen looking current.
-            set((state) => ({
+            setCalculatorState(set, (state) => ({
               inputErrors: { ...state.inputErrors, [field]: invalid },
               results: null,
               previousYearResults: null,
@@ -944,7 +1016,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             }));
             return;
           }
-          set((state) => {
+          setCalculatorState(set, (state) => {
             if (!(field in state.inputErrors)) return state;
             const { [field]: _cleared, ...rest } = state.inputErrors;
             return { inputErrors: rest };
@@ -959,7 +1031,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          set((state) => ({
+          setCalculatorState(set, (state) => ({
             input: {
               ...state.input,
               incomeSources: [
@@ -986,7 +1058,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          set((state) => ({
+          setCalculatorState(set, (state) => ({
             input: {
               ...state.input,
               incomeSources: state.input.incomeSources.map((source: IncomeSource) =>
@@ -997,7 +1069,7 @@ export const useCalculatorStore = create<CalculatorState>()(
         },
 
         removeIncomeSource: (id) => {
-          set((state) => {
+          setCalculatorState(set, (state) => {
             const { [incomeSourceAmountField(id)]: _removed, ...inputErrors } = state.inputErrors;
             return {
               inputErrors,
@@ -1015,7 +1087,11 @@ export const useCalculatorStore = create<CalculatorState>()(
         calculate: () => {
           // Never calculate from a previous amount while a field it uses holds rejected text.
           if (getBlockingInputErrors(get()).length > 0) {
-            set({ results: null, previousYearResults: null, whatIfResults: null });
+            setCalculatorState(set, {
+              results: null,
+              previousYearResults: null,
+              whatIfResults: null,
+            });
             return;
           }
 
@@ -1059,8 +1135,15 @@ export const useCalculatorStore = create<CalculatorState>()(
               taxCode: input.taxCode.trim(),
             };
 
+            const pensionSchema =
+              input.pensionContributionType === 'percentage'
+                ? PENSION_PERCENT_INPUT_SCHEMA
+                : PENSION_AMOUNT_INPUT_SCHEMA;
+            const pension = pensionSchema.safeParse(input.pensionContribution);
+            if (!pension.success)
+              throw new Error(pension.error.issues[0]?.message ?? 'Invalid pension contribution');
             const results = calculateTax(inputWithNormalizedTaxCode);
-            set({ results });
+            setCalculatorState(set, { results });
             reportCalculationAnomalies(results, inputWithNormalizedTaxCode, 'primary');
 
             // Track successful calculation
@@ -1115,7 +1198,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             });
 
             // Reset results on error
-            set({ results: null });
+            setCalculatorState(set, { results: null });
             throw error; // Re-throw to let UI handle it
           } finally {
             transaction?.end();
@@ -1133,12 +1216,12 @@ export const useCalculatorStore = create<CalculatorState>()(
           if (previousYear) {
             const previousYearInput = { ...input, taxYear: previousYear };
             const previousResults = calculateTax(previousYearInput);
-            set({ previousYearResults: previousResults });
+            setCalculatorState(set, { previousYearResults: previousResults });
             reportCalculationAnomalies(previousResults, previousYearInput, 'previous_year');
           }
         },
         reset: () => {
-          set({
+          setCalculatorState(set, {
             input: { ...defaultInput },
             inputErrors: {},
             inputRevision: get().inputRevision + 1,
@@ -1158,7 +1241,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           const { whatIf, calculateWhatIf } = get();
           const newEnabled = !whatIf.enabled;
 
-          set({
+          setCalculatorState(set, {
             whatIf: { ...whatIf, enabled: newEnabled },
           });
 
@@ -1166,7 +1249,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           if (newEnabled) {
             calculateWhatIf();
           } else {
-            set({ whatIfResults: null });
+            setCalculatorState(set, { whatIfResults: null });
           }
         },
 
@@ -1182,7 +1265,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          set((state) => ({
+          setCalculatorState(set, (state) => ({
             whatIf: { ...state.whatIf, type: validated.data },
           }));
           // Don't auto-calculate - let user click Compare button
@@ -1203,7 +1286,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             return;
           }
 
-          set((state) => ({
+          setCalculatorState(set, (state) => ({
             whatIf: { ...state.whatIf, value: validated.data },
           }));
           // Don't auto-calculate - let user click Compare button
@@ -1242,7 +1325,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           const whatIfInput = { ...input, salary: newSalary };
           const whatIfResults = calculateTax(whatIfInput);
 
-          set({ whatIfResults });
+          setCalculatorState(set, { whatIfResults });
           reportCalculationAnomalies(whatIfResults, whatIfInput, 'what_if');
         },
 
@@ -1251,7 +1334,7 @@ export const useCalculatorStore = create<CalculatorState>()(
          * Resets What If results and returns to normal calculation view
          */
         clearWhatIf: () => {
-          set({
+          setCalculatorState(set, {
             whatIfResults: null,
             whatIf: {
               enabled: false,
@@ -1299,15 +1382,32 @@ export const useCalculatorStore = create<CalculatorState>()(
             normalizedTaxYear = getCurrentTaxYear();
           }
 
+          const input = {
+            ...currentState.input,
+            ...persistedInput,
+            // Ensure new fields have defaults if missing in persisted state
+            incomeSources: persistedInput?.incomeSources ?? [],
+            taxYear: normalizedTaxYear,
+          };
+          const percentage = input.pensionContributionType === 'percentage';
+          const text = String(input.pensionContribution);
+          const pension = parseCurrencyInput(text, {
+            unit: percentage ? 'percent' : 'pounds',
+            max: percentage ? 100 : 10_000_000,
+          });
+          const { pensionContribution: _previous, ...otherErrors } = currentState.inputErrors;
+          const inputErrors: CalculatorInputErrors = otherErrors;
+          if (pension.status === 'invalid') {
+            inputErrors.pensionContribution = { text, error: pension.error };
+          }
+
           return {
             ...currentState,
-            input: {
-              ...currentState.input,
-              ...persistedInput,
-              // Ensure new fields have defaults if missing in persisted state
-              incomeSources: persistedInput?.incomeSources ?? [],
-              taxYear: normalizedTaxYear,
-            },
+            input,
+            inputErrors,
+            results: null,
+            previousYearResults: null,
+            whatIfResults: null,
           };
         },
         onRehydrateStorage: () => (state, error) => {
@@ -1354,6 +1454,7 @@ export const useCalculatorActions = () =>
       setAllowancesDeductions: state.setAllowancesDeductions,
       setInput: state.setInput,
       setInputError: state.setInputError,
+      invalidateResults: state.invalidateResults,
       addIncomeSource: state.addIncomeSource,
       updateIncomeSource: state.updateIncomeSource,
       removeIncomeSource: state.removeIncomeSource,

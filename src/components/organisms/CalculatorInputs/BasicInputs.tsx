@@ -58,6 +58,7 @@ export function BasicInputs() {
     setPensionContributionType,
     setAllowancesDeductions,
     setInputError,
+    invalidateResults,
   } = useCalculatorActions();
   const validityFor = (field: CalculatorAmountField) => (invalid: CalculatorInvalidAmount | null) =>
     setInputError(field, invalid);
@@ -227,6 +228,7 @@ export function BasicInputs() {
           )}
         >
           <NumberInput
+            onDraftChange={invalidateResults}
             id={salaryId}
             value={input.salary}
             onChange={(value) => {
@@ -396,6 +398,7 @@ export function BasicInputs() {
             </Label>
           </div>
           <NumberInput
+            onDraftChange={invalidateResults}
             id={partnerWageId}
             value={input.partnerGrossWage}
             onChange={setPartnerGrossWage}
@@ -507,6 +510,7 @@ export function BasicInputs() {
           </Label>
         </div>
         <NumberInput
+          onDraftChange={invalidateResults}
           id={allowancesId}
           value={input.allowancesDeductions}
           onChange={setAllowancesDeductions}
@@ -582,12 +586,14 @@ export function BasicInputs() {
 
           {/* Input field */}
           <NumberInput
+            onDraftChange={invalidateResults}
+            aria-describedby={`${pensionId}-method`}
             id={pensionId}
             value={input.pensionContribution}
             onChange={setPensionContribution}
             onValidityChange={validityFor('pensionContribution')}
             invalidDraft={inputErrors.pensionContribution}
-            resetKey={inputRevision}
+            resetKey={`${inputRevision}-${input.pensionContributionType}`}
             onFocus={() => trackCalculatorFieldFocus('pension')}
             prefix={input.pensionContributionType === 'amount' ? '£' : undefined}
             suffix={input.pensionContributionType === 'percentage' ? '%' : undefined}
@@ -607,6 +613,10 @@ export function BasicInputs() {
         </div>
       </div>
 
+      <p className='text-muted-foreground text-xs' id={`${pensionId}-method`}>
+        Modelled as salary sacrifice. Changing between % and £ resets the contribution to 0; enter
+        your contribution again. Amounts in £ are annual.
+      </p>
       <IncomeSourceList />
     </motion.div>
   );
