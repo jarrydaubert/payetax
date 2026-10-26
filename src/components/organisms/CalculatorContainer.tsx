@@ -140,6 +140,7 @@ export function CalculatorContainer() {
 
   React.useLayoutEffect(() => {
     if (results && window.innerWidth >= BREAKPOINTS.XL) {
+      resultsRef.current?.focus({ preventScroll: true });
       resultsRef.current?.scrollIntoView({ behavior: 'instant', block: 'start' });
     }
   }, [results]);
@@ -350,6 +351,7 @@ export function CalculatorContainer() {
             className='order-4 scroll-mt-[calc(var(--navbar-height)+1rem)] xl:order-3 xl:col-span-2 min-[112.5rem]:order-2'
             role='region'
             aria-label='Tax calculation results summary'
+            tabIndex={-1}
           >
             {actionMessage && (
               <motion.div

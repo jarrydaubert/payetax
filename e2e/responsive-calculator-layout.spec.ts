@@ -27,12 +27,15 @@ const ALL_PERIODS = [
   'Hourly',
 ] as const;
 
-async function openWithoutStoredConsent(page: Page): Promise<void> {
+async function openWithoutStoredConsent(
+  page: Page,
+  reducedMotion: 'reduce' | 'no-preference' = 'reduce',
+): Promise<void> {
   await page.addInitScript(() => {
     window.localStorage.removeItem('cookie-consent');
     window.localStorage.removeItem('cookie-consent-timestamp');
   });
-  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.emulateMedia({ reducedMotion });
   await page.goto('/#tax-calculator', { waitUntil: 'domcontentloaded' });
   await page.waitForLoadState('networkidle').catch(() => {});
 }
@@ -257,6 +260,111 @@ async function expectXlBoundaryLayout(page: Page, width: number): Promise<void> 
 }
 
 test.describe('Responsive calculator geometry', () => {
+  for (const [width, height] of [
+    [1440, 900],
+    [1920, 1080],
+  ]) {
+    for (const key of ['Enter', 'Space']) {
+      test(`${width}px Calculate keyboard focus with ${key} stays visible`, async ({
+        page,
+      }, testInfo) => {
+        await page.setViewportSize({ width, height });
+        await openWithoutStoredConsent(page, key === 'Enter' ? 'no-preference' : 'reduce');
+        await dismissCookieBannerIfPresent(page);
+        await page.getByRole('combobox', { name: 'Pay period', exact: true }).click();
+        await page.getByRole('option', { name: 'Annually', exact: true }).click();
+        await expect(page.getByRole('combobox', { name: 'Pay period', exact: true })).toBeFocused();
+        await page.getByTestId('salary-input').fill('60000');
+        await page.getByTestId('tax-code-input').fill('1257L');
+
+        const calculate = page.getByTestId('calculate-button');
+        await calculate.focus();
+        await expect(calculate).toBeFocused();
+        await page.keyboard.press(key);
+        const destination = page.getByRole('region', {
+          name: 'Tax calculation results summary',
+          exact: true,
+        });
+        await expect(destination).toBeVisible();
+        await testInfo.attach('after-calculate-focus', {
+          body: Buffer.from(
+            JSON.stringify(
+              await page.evaluate(() => {
+                const focused = document.activeElement;
+                const rect = focused?.getBoundingClientRect();
+                return {
+                  focused: focused?.getAttribute('aria-label') ?? focused?.textContent,
+                  top: rect?.top,
+                  bottom: rect?.bottom,
+                  headerBottom: document
+                    .querySelector('nav[aria-label="Main navigation"]')
+                    ?.getBoundingClientRect().bottom,
+                };
+              }),
+            ),
+          ),
+          contentType: 'application/json',
+        });
+        await expect(destination).toBeFocused();
+        await expect(destination).toHaveAttribute('tabindex', '-1');
+        await expect(destination).toHaveCSS('outline-style', 'solid');
+        expect(
+          await destination.evaluate((el) => Number.parseFloat(getComputedStyle(el).outlineWidth)),
+        ).toBeGreaterThanOrEqual(2);
+
+        const visibleFocus = async (target: Locator) => {
+          await expect(target).toBeFocused();
+          await expect
+            .poll(() =>
+              target.evaluate((el) => {
+                const rect = el.getBoundingClientRect();
+                const nav = document.querySelector('nav[aria-label="Main navigation"]');
+                let node: Element | null = el;
+                while (node) {
+                  const style = getComputedStyle(node);
+                  if (Number(style.opacity) < 0.99 || style.visibility === 'hidden') return false;
+                  node = node.parentElement;
+                }
+                return (
+                  rect.top >= (nav?.getBoundingClientRect().bottom ?? 0) + 4 &&
+                  rect.bottom <= innerHeight - 4 &&
+                  rect.left >= 4 &&
+                  rect.right <= document.documentElement.clientWidth - 4 &&
+                  el.matches(':focus-visible')
+                );
+              }),
+            )
+            .toBe(true);
+        };
+        await visibleFocus(destination);
+        await testInfo.attach(`focus-destination-${width}-${key}`, {
+          body: await page.screenshot({ path: testInfo.outputPath('focus-destination.png') }),
+          contentType: 'image/png',
+        });
+        const scrollY = await page.evaluate(() => window.scrollY);
+        const cards = page
+          .getByRole('region', { name: 'Tax calculation summary results', exact: true })
+          .getByRole('button');
+        await expect(cards).toHaveCount(5);
+        // Normal-motion cards include Framer's focusable gesture wrapper as well as the button.
+        const focusStops = page
+          .getByRole('region', { name: 'Tax calculation summary results', exact: true })
+          .locator('button, [tabindex="0"]');
+        await expect.poll(() => focusStops.count()).toBe(key === 'Enter' ? 10 : 5);
+        for (let index = 0; index < (await focusStops.count()); index++) {
+          await page.keyboard.press('Tab');
+          await visibleFocus(focusStops.nth(index));
+          expect(await page.evaluate(() => window.scrollY)).toBeCloseTo(scrollY, 0);
+        }
+        await expect(page.getByTestId('results-table')).toContainText('£45,365.28');
+        await testInfo.attach(`keyboard-focus-${width}-${key}`, {
+          body: await page.screenshot({ path: testInfo.outputPath('keyboard-tab.png') }),
+          contentType: 'image/png',
+        });
+      });
+    }
+  }
+
   for (const [width, height] of [
     [1280, 800],
     [1440, 900],
