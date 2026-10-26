@@ -11,6 +11,7 @@
  */
 
 import { expect, type Locator, type Page, test } from '@playwright/test';
+import { parseCurrencyInput } from '../src/lib/currencyInput';
 import payrollFixtures from '../src/test/payeVerificationFixtures/salary-guides-payroll-2026-27.json';
 import { dismissCookieBannerIfPresent, ensureCalculatorVisible } from './helpers/calculator-ui';
 
@@ -101,6 +102,9 @@ test.describe('MC-09 pension suggestion @critical', () => {
       addition: '5,000',
       total: '10,000.00',
       annualPension: 10000,
+      target: 10000,
+      annualGross: 110000,
+      periodsPerYear: 1,
     },
     {
       period: 'Monthly',
@@ -109,7 +113,10 @@ test.describe('MC-09 pension suggestion @critical', () => {
       amount: false,
       addition: '14,000',
       total: '1,666.67',
-      annualPension: 20000,
+      annualPension: 20000.04,
+      target: 20000,
+      annualGross: 120000,
+      periodsPerYear: 12,
     },
     {
       period: 'Weekly',
@@ -117,11 +124,38 @@ test.describe('MC-09 pension suggestion @critical', () => {
       pension: '0',
       amount: true,
       addition: '4,000',
-      total: '76.92',
-      annualPension: 4000,
+      total: '76.93',
+      annualPension: 4000.36,
+      target: 4000,
+      annualGross: 104000,
+      periodsPerYear: 52,
+    },
+    {
+      period: 'Hourly',
+      salary: '50',
+      pension: '0',
+      amount: true,
+      addition: '4,000',
+      total: '1.93',
+      annualPension: 4014.4,
+      target: 4000,
+      annualGross: 104000,
+      periodsPerYear: 2080,
+    },
+    {
+      period: 'Monthly',
+      salary: '9333.33',
+      pension: '0',
+      amount: true,
+      addition: '12,000',
+      total: '1,000.00',
+      annualPension: 12000,
+      target: 12000,
+      annualGross: 111999.96,
+      periodsPerYear: 12,
     },
   ]) {
-    test(`${scenario.period}: annual addition, existing pension and explicit Calculate`, async ({
+    test(`${scenario.period}, £${scenario.addition}: annual addition, existing pension and explicit Calculate`, async ({
       page,
     }) => {
       await gotoCalculator(page);
@@ -154,20 +188,66 @@ test.describe('MC-09 pension suggestion @critical', () => {
         'Calculate again to update your results',
       );
       await expect(page.getByRole('status')).toBeVisible();
+      if (scenario.annualPension > scenario.target) {
+        await expect(page.getByRole('status')).toContainText('Rounded up to the next penny');
+      } else {
+        await expect(page.getByRole('status')).not.toContainText('Rounded up');
+      }
       if (!scenario.amount) {
         await expect(page.getByRole('status')).toContainText(
           'Your existing 5% pension was converted to a £ amount',
         );
       }
 
+      const stored = await page.evaluate(
+        () =>
+          JSON.parse(localStorage.getItem('tax-calculator-storage') ?? 'null')?.state.input
+            .pensionContribution,
+      );
+      expect(stored).toBe(Number(scenario.total.replaceAll(',', '')));
+      expect(parseCurrencyInput(String(stored))).toEqual({ status: 'valid', value: stored });
+      expect(stored * scenario.periodsPerYear).toBeGreaterThanOrEqual(scenario.target);
+      expect(stored * scenario.periodsPerYear - scenario.target).toBeLessThan(
+        0.01 * scenario.periodsPerYear,
+      );
+      await page.reload({ waitUntil: 'networkidle' });
+      await expect(page.getByTestId('pension-input')).toHaveValue(scenario.total);
+      await expect(page.getByTestId('tax-results')).toHaveCount(0);
+      expect(
+        await page.evaluate(
+          () =>
+            JSON.parse(localStorage.getItem('tax-calculator-storage') ?? 'null')?.state.input
+              .pensionContribution,
+        ),
+      ).toBe(stored);
+
       await page.getByTestId('calculate-button').click();
       await expect(page.getByTestId('results-table')).toBeVisible();
       expect(await getYearlyTableValue(page, 'Pension')).toBe(scenario.annualPension);
-      expect(await getYearlyTableValue(page, 'Total Tax Due')).toBe(expected.incomeTaxAnnual);
-      expect(await getYearlyTableValue(page, 'National Insurance')).toBe(
-        expected.nationalInsuranceAnnual,
-      );
-      expect(await getYearlyTableValue(page, 'Net Pay')).toBe(expected.netPayAnnual);
+      expect(await getYearlyTableValue(page, 'Estimated Tax-Free Amount')).toBe(12570);
+      if (scenario.period === 'Annually') {
+        expect(await getYearlyTableValue(page, 'Total Tax Due')).toBe(expected.incomeTaxAnnual);
+        expect(await getYearlyTableValue(page, 'National Insurance')).toBe(
+          expected.nationalInsuranceAnnual,
+        );
+        expect(await getYearlyTableValue(page, 'Net Pay')).toBe(expected.netPayAnnual);
+      } else {
+        const cashPay = scenario.annualGross - scenario.annualPension;
+        expect(cashPay).toBeLessThanOrEqual(100000);
+        // Hand-derived changes from the independent £100k fixture: monthly taxable
+        // pay is floored to whole pounds before 40% PAYE; NI falls at 2%, rounded monthly.
+        const wholePoundsLost =
+          Math.floor(100000 / 12 - 1048.26) - Math.floor(cashPay / 12 - 1048.26);
+        const tax =
+          (Math.round((expected.incomeTaxAnnual ?? NaN) * 100) - wholePoundsLost * 40 * 12) / 100;
+        const ni =
+          (Math.round(((4189 - 1048) * 0.08 + (cashPay / 12 - 4189) * 0.02) * 100) * 12) / 100;
+        expect(await getYearlyTableValue(page, 'Total Tax Due')).toBe(tax);
+        expect(await getYearlyTableValue(page, 'National Insurance')).toBe(ni);
+        expect(tax).toBeLessThanOrEqual(expected.incomeTaxAnnual ?? NaN);
+        expect(ni).toBeLessThanOrEqual(expected.nationalInsuranceAnnual ?? NaN);
+        expect(await getYearlyTableValue(page, 'Net Pay')).toBeCloseTo(cashPay - tax - ni, 2);
+      }
       await expect(page.getByText('Tax Trap Alert', { exact: true })).toHaveCount(0);
     });
   }

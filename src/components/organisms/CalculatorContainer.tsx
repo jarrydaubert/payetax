@@ -19,6 +19,7 @@ import { ANIMATION_TRANSITIONS, ANIMATION_VARIANTS } from '@/constants/animation
 import { BREAKPOINTS, TIMERS } from '@/constants/ui';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { trackEvent } from '@/lib/analytics';
+import { roundPensionUpToPence } from '@/lib/pensionOptimizer';
 import { convertAnnualToPeriod } from '@/lib/periodCalculator';
 import {
   derivePayePayBasis,
@@ -219,14 +220,14 @@ export function CalculatorContainer() {
 
       const basis = derivePayePayBasis(current.input);
       const totalAnnualPension = basis.salarySacrificePensionDeduction.annual + pensionAmount;
-      // Retain conversion precision: rounding a weekly/monthly input to pence can leave
-      // adjusted annual income above the threshold and show the suggestion again.
+      const perPeriodPension = convertAnnualToPeriod(
+        totalAnnualPension,
+        current.input.payPeriod,
+        basis.hoursPerWeek,
+      );
+      const pensionContribution = roundPensionUpToPence(perPeriodPension);
       setInput({
-        pensionContribution: convertAnnualToPeriod(
-          totalAnnualPension,
-          current.input.payPeriod,
-          basis.hoursPerWeek,
-        ),
+        pensionContribution,
         pensionContributionType: 'amount',
       });
       useCalculatorStore.setState({
@@ -246,7 +247,11 @@ export function CalculatorContainer() {
         current.input.pensionContribution > 0
           ? ` Your existing ${current.input.pensionContribution}% pension was converted to a £ amount for your pay period.`
           : '';
-      const message = `${formattedAmount} added to your annual pension contribution.${conversionNotice} Calculate again to update your results.`;
+      const roundingNotice =
+        pensionContribution > perPeriodPension
+          ? ' Rounded up to the next penny for your pay period so your annual contribution meets the target.'
+          : '';
+      const message = `${formattedAmount} added to your annual pension contribution.${conversionNotice}${roundingNotice} Calculate again to update your results.`;
       setActionMessage({ tone: 'info', text: message, requiresCalculate: true });
       setLiveMessage(message);
     } catch (error) {
