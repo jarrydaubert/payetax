@@ -458,7 +458,21 @@ describe('CalculatorContainer Component', () => {
       ).not.toBeInTheDocument();
     });
 
-    it('should apply pension optimization before recalculating', () => {
+    it('should apply pension optimization and require Calculate again', () => {
+      const mockSetState = jest.fn();
+      Object.assign(useCalculatorStore, {
+        getState: () => ({
+          results: mockResults,
+          inputErrors: {},
+          input: {
+            salary: 110000,
+            payPeriod: 'annually',
+            pensionContribution: 0,
+            pensionContributionType: 'amount',
+          },
+        }),
+        setState: mockSetState,
+      });
       render(<CalculatorContainer />);
 
       fireEvent.click(screen.getByRole('button', { name: /Apply pension optimization/i }));
@@ -467,11 +481,13 @@ describe('CalculatorContainer Component', () => {
         pensionContribution: 5000,
         pensionContributionType: 'amount',
       });
-      expect(mockCalculate).toHaveBeenCalledTimes(1);
-      expect(mockCalculatePreviousYear).toHaveBeenCalledTimes(1);
-      expect(mockSetInput.mock.invocationCallOrder[0]).toBeLessThan(
-        mockCalculate.mock.invocationCallOrder[0],
-      );
+      expect(mockCalculate).not.toHaveBeenCalled();
+      expect(mockCalculatePreviousYear).not.toHaveBeenCalled();
+      expect(mockSetState).toHaveBeenCalledWith({
+        results: null,
+        previousYearResults: null,
+        whatIfResults: null,
+      });
     });
   });
 

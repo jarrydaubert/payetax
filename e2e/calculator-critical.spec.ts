@@ -11,6 +11,7 @@
  */
 
 import { expect, type Locator, type Page, test } from '@playwright/test';
+import payrollFixtures from '../src/test/payeVerificationFixtures/salary-guides-payroll-2026-27.json';
 import { dismissCookieBannerIfPresent, ensureCalculatorVisible } from './helpers/calculator-ui';
 
 function parsePercent(text: string): number {
@@ -84,6 +85,93 @@ async function getYearlyTableValue(page: Page, label: string): Promise<number> {
   if (!cellText) throw new Error(`Yearly value cell empty for "${label}"`);
   return parseGBP(cellText);
 }
+
+test.describe('MC-09 pension suggestion @critical', () => {
+  const expected = payrollFixtures.scenarios.find(
+    (scenario) => scenario.id === 'salary-guide-100k-base',
+  )?.expected;
+  if (!expected) throw new Error('Missing independent £100k payroll fixture');
+
+  for (const scenario of [
+    {
+      period: 'Annually',
+      salary: '110000',
+      pension: '5000',
+      amount: true,
+      addition: '5,000',
+      total: '10,000.00',
+      annualPension: 10000,
+    },
+    {
+      period: 'Monthly',
+      salary: '10000',
+      pension: '5',
+      amount: false,
+      addition: '14,000',
+      total: '1,666.67',
+      annualPension: 20000,
+    },
+    {
+      period: 'Weekly',
+      salary: '2000',
+      pension: '0',
+      amount: true,
+      addition: '4,000',
+      total: '76.92',
+      annualPension: 4000,
+    },
+  ]) {
+    test(`${scenario.period}: annual addition, existing pension and explicit Calculate`, async ({
+      page,
+    }) => {
+      await gotoCalculator(page);
+      await selectOption(
+        page,
+        page.getByRole('combobox', { name: 'Pay period', exact: true }),
+        new RegExp(`^${scenario.period}$`),
+      );
+      await selectOption(page, page.getByTestId('tax-year-select'), /2026.*2027/);
+      await page.getByTestId('tax-code-input').fill('');
+      await page.getByTestId('salary-input').fill(scenario.salary);
+      if (scenario.amount) {
+        await page.getByTestId('pension-type-select').click();
+        await page.getByRole('option').nth(1).click();
+      }
+      await page.getByTestId('pension-input').fill(scenario.pension);
+      await page.getByTestId('calculate-button').click();
+      const apply = page.getByRole('button', { name: `Add £${scenario.addition} to Pension` });
+      await expect(apply).toBeVisible();
+      await expect(page.getByText(/each year to avoid this trap/)).toBeVisible();
+      await apply.click();
+
+      await expect(page.getByTestId('pension-input')).toHaveValue(scenario.total);
+      await expect(page.getByTestId('tax-results')).toHaveCount(0);
+      await expect(page.getByRole('button', { name: 'Email tax calculation results' })).toHaveCount(
+        0,
+      );
+      await expect(page.getByRole('button', { name: /to Pension$/ })).toHaveCount(0);
+      await expect(page.getByRole('status')).toContainText(
+        'Calculate again to update your results',
+      );
+      await expect(page.getByRole('status')).toBeVisible();
+      if (!scenario.amount) {
+        await expect(page.getByRole('status')).toContainText(
+          'Your existing 5% pension was converted to a £ amount',
+        );
+      }
+
+      await page.getByTestId('calculate-button').click();
+      await expect(page.getByTestId('results-table')).toBeVisible();
+      expect(await getYearlyTableValue(page, 'Pension')).toBe(scenario.annualPension);
+      expect(await getYearlyTableValue(page, 'Total Tax Due')).toBe(expected.incomeTaxAnnual);
+      expect(await getYearlyTableValue(page, 'National Insurance')).toBe(
+        expected.nationalInsuranceAnnual,
+      );
+      expect(await getYearlyTableValue(page, 'Net Pay')).toBe(expected.netPayAnnual);
+      await expect(page.getByText('Tax Trap Alert', { exact: true })).toHaveCount(0);
+    });
+  }
+});
 
 test.describe('Calculator critical @critical', () => {
   test('Age select text is not visually truncated in the side panel @critical', async ({

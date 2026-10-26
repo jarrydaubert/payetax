@@ -19,7 +19,9 @@ import { ANIMATION_TRANSITIONS, ANIMATION_VARIANTS } from '@/constants/animation
 import { BREAKPOINTS, TIMERS } from '@/constants/ui';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { trackEvent } from '@/lib/analytics';
+import { convertAnnualToPeriod } from '@/lib/periodCalculator';
 import {
+  derivePayePayBasis,
   getTaxCodeRegionOverride,
   hasNonCumulativeTaxCodeMarker,
   parseTaxCode,
@@ -84,6 +86,7 @@ export function CalculatorContainer() {
     tone: 'info' | 'error';
     text: string;
     taxCodeLink?: boolean;
+    requiresCalculate?: boolean;
   } | null>(null);
   const resultsRef = React.useRef<HTMLDivElement>(null);
   const sectionRef = React.useRef<HTMLDivElement>(null);
@@ -96,6 +99,7 @@ export function CalculatorContainer() {
 
   // Derive showResults from results state
   const showResults = !!results;
+  const pensionNeedsCalculate = !results && actionMessage?.requiresCalculate;
   const emailInput: PayeEmailInput = {
     salary: input.salary,
     payPeriod: input.payPeriod,
@@ -193,14 +197,18 @@ export function CalculatorContainer() {
 
   const handleApplyPensionOptimization = (pensionAmount: number) => {
     setActionMessage(null);
-    // Commit any field being edited first, so the applied pension is not overwritten by a later
-    // blur and the recalculation uses the amounts shown. Rejected text clears the results this
-    // action belongs to; then there is nothing to apply to.
+    // Commit the focused field so a later blur cannot overwrite the applied pension.
+    // Rejected text clears the results this action belongs to; then there is nothing to apply to.
     commitFocusedField(sectionRef.current);
-    if (getBlockingInputErrors(useCalculatorStore.getState()).length > 0) return;
+    const current = useCalculatorStore.getState();
+    if (!current.results || getBlockingInputErrors(current).length > 0) return;
     try {
       // Validate pension amount
-      if (typeof pensionAmount !== 'number' || Number.isNaN(pensionAmount) || pensionAmount < 0) {
+      if (
+        typeof pensionAmount !== 'number' ||
+        !Number.isFinite(pensionAmount) ||
+        pensionAmount < 0
+      ) {
         console.error('[CalculatorContainer] Invalid pension amount:', pensionAmount);
         setActionMessage({
           tone: 'error',
@@ -209,15 +217,23 @@ export function CalculatorContainer() {
         return;
       }
 
-      // Update both fields in one store write so the immediate recalculation reads the new value.
+      const basis = derivePayePayBasis(current.input);
+      const totalAnnualPension = basis.salarySacrificePensionDeduction.annual + pensionAmount;
+      // Retain conversion precision: rounding a weekly/monthly input to pence can leave
+      // adjusted annual income above the threshold and show the suggestion again.
       setInput({
-        pensionContribution: pensionAmount,
+        pensionContribution: convertAnnualToPeriod(
+          totalAnnualPension,
+          current.input.payPeriod,
+          basis.hoursPerWeek,
+        ),
         pensionContributionType: 'amount',
       });
-
-      // Recalculate
-      calculate();
-      calculatePreviousYear();
+      useCalculatorStore.setState({
+        results: null,
+        previousYearResults: null,
+        whatIfResults: null,
+      });
 
       // Show success message
       const formattedAmount = new Intl.NumberFormat('en-GB', {
@@ -225,7 +241,14 @@ export function CalculatorContainer() {
         currency: 'GBP',
         minimumFractionDigits: 0,
       }).format(pensionAmount);
-      setLiveMessage(`${formattedAmount} pension contribution applied. Results updated.`);
+      const conversionNotice =
+        current.input.pensionContributionType === 'percentage' &&
+        current.input.pensionContribution > 0
+          ? ` Your existing ${current.input.pensionContribution}% pension was converted to a £ amount for your pay period.`
+          : '';
+      const message = `${formattedAmount} added to your annual pension contribution.${conversionNotice} Calculate again to update your results.`;
+      setActionMessage({ tone: 'info', text: message, requiresCalculate: true });
+      setLiveMessage(message);
     } catch (error) {
       console.error('[CalculatorContainer] Error applying pension:', error);
       setActionMessage({
@@ -297,7 +320,7 @@ export function CalculatorContainer() {
 
       {/* Summary Cards - Between inputs and table on mobile (order-4), top on desktop (order-2) */}
       <AnimatePresence mode='wait'>
-        {showResults && results && (
+        {(showResults || pensionNeedsCalculate) && (
           <motion.div
             ref={resultsRef}
             variants={shouldReduceMotion ? {} : ANIMATION_VARIANTS.fadeInDown}
@@ -334,8 +357,12 @@ export function CalculatorContainer() {
                 )}
               </motion.div>
             )}
-            <TaxCodeBasisNotice basis={results.taxCodeBasis} />
-            <ResultsSummaryCards results={results} taxYear={input.taxYear} input={input} />
+            {results && (
+              <>
+                <TaxCodeBasisNotice basis={results.taxCodeBasis} />
+                <ResultsSummaryCards results={results} taxYear={input.taxYear} input={input} />
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -355,6 +382,10 @@ export function CalculatorContainer() {
       >
         <CalculatorInputsSection
           onCalculate={handleCalculate}
+          onReset={() => {
+            setActionMessage(null);
+            setLiveMessage('');
+          }}
           resultAction={showResults ? emailResultsAction : undefined}
         />
       </Card>
@@ -401,9 +432,13 @@ export function CalculatorContainer() {
           >
             <div>
               <Sparkles className={cn('mx-auto text-muted-foreground', 'mb-4', 'size-12')} />
-              <h3 className={cn('font-semibold', 'mb-2', 'text-lg')}>Ready to Calculate</h3>
+              <h3 className={cn('font-semibold', 'mb-2', 'text-lg')}>
+                {pensionNeedsCalculate ? 'Calculate again' : 'Ready to Calculate'}
+              </h3>
               <p className={cn('text-muted-foreground', 'text-sm')}>
-                Enter your salary. See your take-home pay in seconds.
+                {pensionNeedsCalculate
+                  ? 'Your pension input has changed. Calculate to see your updated take-home pay.'
+                  : 'Enter your salary. See your take-home pay in seconds.'}
               </p>
             </div>
           </motion.div>

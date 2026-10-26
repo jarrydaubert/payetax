@@ -30,11 +30,13 @@ const amountFieldLabel = (field: CalculatorAmountField): string =>
 
 interface CalculatorInputsSectionProps {
   onCalculate: () => void;
+  onReset?: () => void;
   resultAction?: React.ReactNode;
 }
 
 export function CalculatorInputsSection({
   onCalculate,
+  onReset,
   resultAction,
 }: CalculatorInputsSectionProps) {
   const { reset } = useCalculatorActions();
@@ -114,6 +116,7 @@ export function CalculatorInputsSection({
 
   const handleReset = () => {
     reset();
+    onReset?.();
     setFormMessage(null);
   };
 
