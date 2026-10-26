@@ -251,6 +251,13 @@ export function ResultsTable({
         onPeriodToggle={handlePeriodToggle}
       />
 
+      {whatIfResults && (
+        <p className='text-muted-foreground text-sm'>
+          Each period compares Current and What If. Scroll horizontally to see all pairs, or choose
+          fewer periods above. Row labels stay visible while you scroll.
+        </p>
+      )}
+
       {/* Results Table with Scroll Indicators */}
       <div className='relative -mx-4 w-[calc(100%+2rem)] sm:mx-0 sm:w-full'>
         {/* Scroll Indicators - must be positioned absolutely to overlay the card */}

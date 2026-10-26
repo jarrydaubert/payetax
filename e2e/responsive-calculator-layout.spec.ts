@@ -10,7 +10,11 @@ const VIEWPORTS = [
   { name: 'tablet-landscape', width: 1024, height: 768 },
   { name: 'xl-boundary-below', width: 1279, height: 800 },
   { name: 'xl-boundary', width: 1280, height: 800 },
+  { name: 'desktop', width: 1440, height: 900 },
+  { name: 'rail-boundary-below', width: 1799, height: 1000 },
+  { name: 'rail-boundary', width: 1800, height: 1000 },
   { name: 'large-desktop', width: 1920, height: 1080 },
+  { name: 'wide-desktop', width: 2560, height: 1440 },
 ] as const;
 
 const ALL_PERIODS = [
@@ -168,13 +172,16 @@ async function expectStickyLabelReadable(page: Page): Promise<void> {
       stickyPosition: getComputedStyle(stickyLabel).position,
       stickyDelta: Math.abs(labelRect.left - containerRect.left),
       indicatorOverlap: labelRect.right - indicatorRect.left,
+      indicatorVisible: getComputedStyle(left).opacity !== '0',
       labelWidth: labelRect.width,
     };
   });
 
   expect(stickyGeometry.stickyPosition).toBe('sticky');
   expect(stickyGeometry.stickyDelta).toBeLessThanOrEqual(1);
-  expect(stickyGeometry.indicatorOverlap).toBeLessThanOrEqual(1);
+  if (stickyGeometry.indicatorVisible) {
+    expect(stickyGeometry.indicatorOverlap).toBeLessThanOrEqual(1);
+  }
   expect(stickyGeometry.labelWidth).toBeGreaterThanOrEqual(168);
 }
 
@@ -250,6 +257,99 @@ async function expectXlBoundaryLayout(page: Page, width: number): Promise<void> 
 }
 
 test.describe('Responsive calculator geometry', () => {
+  for (const [width, height] of [
+    [1280, 800],
+    [1440, 900],
+    [1920, 1080],
+    [2560, 1440],
+  ]) {
+    test(`${width}px desktop shows all seven periods and five cards without scrolling`, async ({
+      page,
+    }, testInfo) => {
+      await page.setViewportSize({ width, height });
+      await openWithoutStoredConsent(page);
+      await dismissCookieBannerIfPresent(page);
+      // An opened Radix select also confirms the calculator is hydrated before amount entry.
+      await page.getByRole('combobox', { name: 'Pay period', exact: true }).click();
+      await page.getByRole('option', { name: 'Annually', exact: true }).click();
+      await page.getByTestId('salary-input').fill('60000');
+      await page.getByTestId('tax-code-input').fill('1257L');
+      await page.getByTestId('calculate-button').press('Enter');
+      const table = page.getByTestId('results-table');
+      await expect(table).toBeVisible();
+      await expect(table.locator('thead tr').first().locator('th')).toHaveText([
+        'Breakdown',
+        '%',
+        ...ALL_PERIODS,
+      ]);
+      const summary = page.getByRole('region', {
+        name: 'Tax calculation summary results',
+        exact: true,
+      });
+      await expect(summary.getByRole('button')).toHaveCount(5);
+      await expect(summary).toContainText('£45,365.28');
+
+      await expect
+        .poll(() =>
+          page.evaluate(() => {
+            const nav = document.querySelector('nav[aria-label="Main navigation"]');
+            const summary = document.querySelector(
+              '[aria-label="Tax calculation summary results"]',
+            );
+            const firstRow = document.querySelector('[data-testid="results-table"] tbody tr');
+            if (!(nav && summary && firstRow)) return false;
+            return (
+              summary.getBoundingClientRect().top >= nav.getBoundingClientRect().bottom &&
+              firstRow.getBoundingClientRect().bottom <= window.innerHeight
+            );
+          }),
+        )
+        .toBe(true);
+      const geometry = await expectTableGeometry(page);
+      expect(geometry.clientWidth).toBeGreaterThanOrEqual(1192);
+      // Geometric visibility alone can miss an opacity-zero reduced-motion card.
+      await expect
+        .poll(() =>
+          summary.getByRole('button').evaluateAll((cards) =>
+            cards.every((card) => {
+              let element: Element | null = card;
+              while (element) {
+                const style = getComputedStyle(element);
+                if (Number(style.opacity) === 0 || style.visibility === 'hidden') return false;
+                element = element.parentElement;
+              }
+              return true;
+            }),
+          ),
+        )
+        .toBe(true);
+      await expect(table.locator('tbody tr').first().locator('td').last()).toHaveCSS(
+        'white-space',
+        'nowrap',
+      );
+      const fontSize = await table
+        .locator('tbody tr')
+        .first()
+        .locator('td')
+        .last()
+        .evaluate((el) => Number.parseFloat(getComputedStyle(el).fontSize));
+      expect(fontSize).toBeGreaterThanOrEqual(14);
+      await testInfo.attach(`desktop-${width}`, {
+        body: await page.screenshot(),
+        contentType: 'image/png',
+      });
+      await expectNonScrollableInteraction(page);
+
+      // User period choices survive resizing; display changes do not calculate again.
+      await page.getByRole('checkbox', { name: 'Daily', exact: true }).uncheck();
+      await page.setViewportSize({ width: 393, height: 852 });
+      await expect(page.getByRole('checkbox', { name: 'Daily', exact: true })).not.toBeChecked();
+      await expect(table).toContainText('£45,365.28');
+      await page.setViewportSize({ width, height });
+      await expect(page.getByRole('checkbox', { name: 'Daily', exact: true })).not.toBeChecked();
+    });
+  }
+
   for (const viewport of VIEWPORTS) {
     test(`${viewport.name} keeps results readable`, async ({ page }) => {
       test.slow();

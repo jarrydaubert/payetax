@@ -128,7 +128,13 @@ export function CalculatorInputsSection({
         </div>
 
         {/* Calculate and Reset buttons */}
-        <div className={cn('flex', 'gap-2')}>
+        <div
+          className={cn(
+            'flex',
+            'gap-2',
+            'xl:ml-auto xl:max-w-sm min-[112.5rem]:ml-0 min-[112.5rem]:max-w-none',
+          )}
+        >
           <Button
             onClick={handleCalculate}
             disabled={isCalculating}

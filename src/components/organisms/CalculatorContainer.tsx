@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import { ANIMATION_TRANSITIONS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
 import { BREAKPOINTS, TIMERS } from '@/constants/ui';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { trackEvent } from '@/lib/analytics';
 import { roundPensionUpToPence } from '@/lib/pensionOptimizer';
@@ -42,6 +43,17 @@ import { commitFocusedField } from './CalculatorInputs/commitFocusedField';
 import { ResultsSummaryCards } from './CalculatorResults/ResultsSummaryCards';
 import { ResultsTable } from './CalculatorResults/ResultsTable';
 import { TaxCodeBasisNotice } from './CalculatorResults/TaxCodeBasisNotice';
+
+const MOBILE_PERIODS = ['Yearly', 'Monthly', 'Weekly', 'Daily', 'Hourly'];
+const DESKTOP_PERIODS = [
+  'Yearly',
+  'Monthly',
+  '4-Weekly',
+  'Fortnightly',
+  'Weekly',
+  'Daily',
+  'Hourly',
+];
 
 export function CalculatorContainer() {
   // Use optimized selectors to prevent unnecessary re-renders
@@ -76,13 +88,9 @@ export function CalculatorContainer() {
     codeRegionOverride === 'Scotland' ||
     (codeRegionOverride === null && input.region === 'Scotland');
   const [, startTransition] = React.useTransition();
-  const [visiblePeriods, setVisiblePeriods] = React.useState<string[]>([
-    'Yearly',
-    'Monthly',
-    'Weekly',
-    'Daily',
-    'Hourly',
-  ]);
+  const isDesktop = useMediaQuery('(min-width: 1280px)');
+  const [selectedPeriods, setSelectedPeriods] = React.useState<string[] | null>(null);
+  const visiblePeriods = selectedPeriods ?? (isDesktop ? DESKTOP_PERIODS : MOBILE_PERIODS);
   const [actionMessage, setActionMessage] = React.useState<{
     tone: 'info' | 'error';
     text: string;
@@ -129,6 +137,12 @@ export function CalculatorContainer() {
       if (calcScrollTimeoutRef.current) clearTimeout(calcScrollTimeoutRef.current);
     };
   }, []);
+
+  React.useLayoutEffect(() => {
+    if (results && window.innerWidth >= BREAKPOINTS.XL) {
+      resultsRef.current?.scrollIntoView({ behavior: 'instant', block: 'start' });
+    }
+  }, [results]);
 
   const handleCalculate = () => {
     setActionMessage(null);
@@ -181,7 +195,7 @@ export function CalculatorContainer() {
     // Clear any pending scroll timeout
     if (calcScrollTimeoutRef.current) clearTimeout(calcScrollTimeoutRef.current);
 
-    // Only scroll to results on mobile (desktop has everything visible)
+    // Only scroll to results on mobile (desktop scrolls when its results commit).
     calcScrollTimeoutRef.current = window.setTimeout(() => {
       if (window.innerWidth < BREAKPOINTS.LG) {
         resultsRef.current?.scrollIntoView({
@@ -193,7 +207,7 @@ export function CalculatorContainer() {
   };
 
   const handleVisiblePeriodsChange = (periods: string[]) => {
-    setVisiblePeriods(periods);
+    setSelectedPeriods(periods);
   };
 
   const handleApplyPensionOptimization = (pensionAmount: number) => {
@@ -289,7 +303,7 @@ export function CalculatorContainer() {
   return (
     <div
       className={cn(
-        'mx-auto flex w-full max-w-screen-2xl flex-col sm:px-4 md:py-8 xl:grid xl:grid-cols-[390px_minmax(0,1fr)] xl:px-8 2xl:grid-cols-[380px_minmax(0,1fr)]',
+        'mx-auto flex w-full max-w-[120rem] flex-col sm:px-4 md:py-8 xl:grid xl:grid-cols-[380px_minmax(0,1fr)] xl:px-8',
         'gap-3',
         'px-4',
         'py-4',
@@ -329,11 +343,11 @@ export function CalculatorContainer() {
           <motion.div
             ref={resultsRef}
             variants={shouldReduceMotion ? {} : ANIMATION_VARIANTS.fadeInDown}
-            initial={shouldReduceMotion ? {} : 'initial'}
+            initial={shouldReduceMotion || isDesktop ? false : 'initial'}
             animate={shouldReduceMotion ? {} : 'animate'}
             exit={shouldReduceMotion ? {} : 'exit'}
             transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.default}
-            className='order-4 scroll-mt-[calc(var(--navbar-height)+1rem)] xl:order-2 xl:col-span-2'
+            className='order-4 scroll-mt-[calc(var(--navbar-height)+1rem)] xl:order-3 xl:col-span-2 min-[112.5rem]:order-2'
             role='region'
             aria-label='Tax calculation results summary'
           >
@@ -377,10 +391,10 @@ export function CalculatorContainer() {
         {liveMessage}
       </div>
 
-      {/* Inputs Section - order-2 on mobile, left column on desktop (sticky) */}
+      {/* Desktop inputs span the page until there is room for both the rail and financial table. */}
       <Card
         className={cn(
-          'order-2 mx-auto w-full max-w-xl xl:sticky xl:top-[calc(var(--navbar-height)+1rem)] xl:order-3 xl:mx-0 xl:max-w-none xl:self-start',
+          'order-2 mx-auto w-full max-w-xl xl:col-span-2 xl:mx-0 xl:max-w-none xl:self-start min-[112.5rem]:sticky min-[112.5rem]:top-[calc(var(--navbar-height)+1rem)] min-[112.5rem]:order-3 min-[112.5rem]:col-span-1',
           'p-3',
           'sm:p-4 md:p-6',
         )}
@@ -404,7 +418,11 @@ export function CalculatorContainer() {
             animate={shouldReduceMotion ? {} : 'animate'}
             exit={shouldReduceMotion ? {} : 'exit'}
             transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.default}
-            className={cn('order-6 flex flex-col', 'gap-4', 'xl:order-3 xl:min-w-0 xl:self-start')}
+            className={cn(
+              'order-6 flex flex-col',
+              'gap-4',
+              'xl:order-4 xl:col-span-2 xl:min-w-0 xl:self-start min-[112.5rem]:order-3 min-[112.5rem]:col-span-1',
+            )}
             data-testid='tax-results'
           >
             <ResultsTable
@@ -431,7 +449,7 @@ export function CalculatorContainer() {
             exit={shouldReduceMotion ? undefined : { opacity: 0 }}
             transition={shouldReduceMotion ? { duration: 0 } : undefined}
             className={cn(
-              'order-6 flex min-h-[28rem] items-center justify-center rounded-sm border border-dashed bg-card/70 text-center xl:order-3',
+              'order-6 flex min-h-[28rem] items-center justify-center rounded-sm border border-dashed bg-card/70 text-center xl:order-4 xl:col-span-2 min-[112.5rem]:order-3 min-[112.5rem]:col-span-1',
               'p-12',
             )}
           >
