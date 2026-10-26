@@ -48,6 +48,7 @@ export {
   sliceClass1EmployeeEarnings,
   sliceClass1EmployerEarnings,
 } from './nationalInsurance';
+export { derivePayePayBasis } from './payePayBasis';
 export type {
   RukTaxableIncomeBand,
   RukTaxBandCalculation,
