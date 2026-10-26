@@ -31,6 +31,30 @@ const validDirectorInput = {
   expenses: 20000,
 };
 
+describe('Email collection validation resource bounds', () => {
+  it.each([
+    ['PAYE income sources', SendResultsRequestSchema, validPayeInput, 'incomeSources'],
+    [
+      'Director loan plans',
+      SendDirectorResultsRequestSchema,
+      validDirectorInput,
+      'studentLoanPlans',
+    ],
+  ] as const)('rejects oversized %s before accumulating per-element errors', (_name, schema, input, field) => {
+    // This synthetic request is below the routes' body cap; a collection limit must also bound
+    // validation work and error allocation, not just reject after walking every invalid item.
+    const result = schema.safeParse({
+      email: 'test@example.com',
+      input: { ...input, [field]: Array(1000).fill(0) },
+    });
+    expect(result.success).toBe(false);
+    if (result.success) throw new Error('Oversized collection was accepted');
+    expect(result.error.issues).toEqual([
+      expect.objectContaining({ code: 'too_big', path: ['input', field] }),
+    ]);
+  });
+});
+
 describe('TaxYearStringSchema', () => {
   it('accepts optional or valid tax-year strings', () => {
     expect(TaxYearStringSchema.safeParse(undefined).success).toBe(true);
