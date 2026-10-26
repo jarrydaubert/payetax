@@ -27,14 +27,15 @@ Current correctness sequence:
 2. Transparent calculation results.
 3. Independent fixture/test-portfolio completion and Foundation reconciliation.
 
-Verified Director Intelligence correctness exceptions (see [Urgent correctness exceptions](#urgent-correctness-exceptions)) may be taken as small independent slices between these items; they do not reorder them. Main-calculator input integrity comes next: parsing is merged, but PRs #127 and #128 are open and their work must not be marked complete.
+Verified Director Intelligence correctness exceptions (see [Urgent correctness exceptions](#urgent-correctness-exceptions)) may be taken as small independent slices between these items; they do not reorder them. Main-calculator work comes next, in the order below. Currency parsing (#125) and MC-09 (#134) are merged and deployed; PRs #127 and #128 are open and their work must not be marked complete.
 
-For the calculator reconciliation, use the [22 October evidence and decisions](reports/calculator-backlog-reconciliation-2026-10-22.md). The implementation order is:
+For the calculator reconciliation, use the [22 October evidence and decisions](reports/calculator-backlog-reconciliation-2026-10-22.md). The implementation order (agreed 26 October) is:
 
-1. Close MC-01, MC-02 and MC-03's integrity criteria in the input-integrity prerequisite (#127), with store and browser regressions. #127 must independently prevent stale results, mismatched email and stale suggestions before merge; those requirements cannot wait for #128.
-2. Complete the DI-05 interim email guard next. MC-03's presentation scope and MC-04/05 may then proceed alongside the Director urgent slices, without pre-empting a ready, verified wrong-money fix. The entire Director queue is not a prerequisite for completing the main calculator; retain its internal order and existing Foundation insertion points.
-3. Before the first deployment containing #128's homepage/hero change, complete the search audit's pre-deployment gate below. This applies to that change wherever it is eventually delivered, not merely a later audit PR. MC-04/05 and #127's integrity guarantees are also acceptance requirements for the redesign.
-4. MC-06/07 are smaller follow-ups. Complete the search audit's performance observation after release using the windows and mitigation trigger recorded before deployment. Any newly reproduced wrong-money defect takes correctness priority.
+1. **Standalone desktop layout fix on `main`.** This delivers MC-05's desktop criteria against the existing layout: five summary cards and all seven period columns, with no horizontal table scrolling. See [MC-05](#main-calculator-experience) for the criteria and the production geometry. It is presentation-only: no calculation, input, persistence or stale-result behaviour changes. It does not wait for #127 or #128, and it is not done by removing cards, hiding columns or adding a comparison mode.
+2. **#127, input integrity.** Rebase onto `main`, including #133, #134 and the desktop fix, following the #134 rebase notes under MC-03. Then close MC-03's integrity criteria with store and browser regressions. MC-01 was accepted at `f0bcdc97` (recorded in #127); Claude approved MC-02 at `6a9bee73` on 24 October, which #127 should record. #127 must independently prevent stale results, mismatched email and stale suggestions before merge; those requirements cannot wait for #128.
+3. **DI-05 interim email guard, then #128 (mobile payslip and redesign).** The DI-05 position is unchanged from the agreed Director order. #128 rebases onto #127 and keeps the desktop layout from step 1. It delivers the mobile payslip, MC-03's presentation scope, MC-04 and MC-05's remaining criteria. These may proceed alongside the Director urgent slices, without pre-empting a ready, verified wrong-money fix. The entire Director queue is not a prerequisite for completing the main calculator; retain its internal order and existing Foundation insertion points.
+4. Before the first deployment containing #128's homepage/hero change, complete the search audit's pre-deployment gate below. This applies to that change wherever it is eventually delivered, not merely a later audit PR. MC-04/05 and #127's integrity guarantees are also acceptance requirements for the redesign.
+5. MC-06/07 are smaller follow-ups. Complete the search audit's performance observation after release using the windows and mitigation trigger recorded before deployment. Any newly reproduced wrong-money defect takes correctness priority.
 
 Each implementation slice carries its own relevant regression coverage and independent review by the other model (Claude reviews Codex changes and vice versa), reconciliation against code/evidence, and re-review after material fixes. MC-08 owns only the remaining coverage gaps listed there. Record exact refs and results; do not infer approval from earlier audits. Keep the PRs small, reuse the existing checks and reports, and merge only when separately authorised.
 
@@ -125,7 +126,7 @@ Currency parsing through `parseCurrencyInput` is merged in #125. The following i
 
 ### Main calculator experience
 
-The agreed target combines compact desktop results with the simpler mobile statement. [#128](https://github.com/jarrydaubert/payetax/pull/128) is an unmerged starting point, not acceptance of its removal of desktop cards or comparison-by-mode. Preserve its verified improvements where applicable; do not restore the original audit defects.
+The agreed target combines compact desktop results (the existing five cards and seven-period table, fitted by the standalone desktop fix) with the simpler mobile payslip from [#128](https://github.com/jarrydaubert/payetax/pull/128). #128 is an unmerged starting point for the mobile experience, not acceptance of its removal of desktop cards or comparison-by-mode. Preserve its verified improvements where applicable; do not restore the original audit defects.
 
 - [ ] **MC-04 · P2 · Redesign acceptance — Lead with the user's pay period.** #128 always starts Monthly (Claude S1).
 
@@ -135,7 +136,22 @@ The agreed target combines compact desktop results with the simpler mobile state
 
   **DoD:** Desktop shows five summary cards and all seven period columns in the default results flow, without opening a comparison mode. Preserve annual/monthly take-home, annual Tax & NI and a clearly defined effective-rate summary; the fifth card explains the next-£100 payroll difference honestly rather than calling it a statutory marginal rate. After Calculate, the five cards, table headers and first monetary row are visible together at 1440×900, 1920×1080 and 2560×1440 without further interaction or scrolling through a statement. Full figures, pence and essential labels remain unobscured with no unintended horizontal scrolling. Before/after captures at those widths demonstrate label-to-value alignment and are assessed by the independent reviewer before acceptance; there is no fixed column-width prescription. The mobile statement, direct Edit action and complete two-period comparison remain usable at 393×852, 852×393 and 320px width. Breakpoint neighbours, 200% zoom, large amounts, active optional inputs and errors stay usable. All details remain reachable, native copying works, and computed visibility confirms five-card content is visible with reduced motion. Keyboard, semantic headers, focus and light/dark contrast are verified in both engines. Exact layout and breakpoint choices are left to implementation; MC-03's current/stale distinction applies to every card/table/statement.
 
-  **Production evidence (`28f0a63`, 26 October):** main already shows the five cards and seven period columns, but the table overflows at every desktop width. `ResultsTable` sets a 74.5rem minimum (15rem fixed plus 7 × 8.5rem), which is 1,192px before card padding. `CalculatorContainer` gives the results column about 962px at 1440 (`xl:px-8`, a 390px input column, `gap-6`). From 1536 upwards it is capped at about 1,068px (`max-w-screen-2xl`, a 380px column), so wider monitors never help. The shortfall at 1440 is about 230px; narrowing columns towards the widest realistic value (£1,234,567.89) recovers only about 70px, so meeting this DoD needs a structural layout change. What-if mode doubles the period columns (134.5rem) and cannot fit any common desktop width. Acceptance must state what-if's intended behaviour rather than treat its scrolling as unintended. Whether to fix the existing desktop layout on `main` before #128 lands is an open sequencing decision.
+  **Production evidence (`28f0a63`, 26 October):** main already shows the five cards and seven period columns, but the table overflows at every desktop width. `ResultsTable` sets a 74.5rem minimum (15rem fixed plus 7 × 8.5rem), which is 1,192px before card padding. `CalculatorContainer` gives the results column about 962px at 1440 (`xl:px-8`, a 390px input column, `gap-6`). From 1536 upwards it is capped at about 1,068px (`max-w-screen-2xl`, a 380px column), so wider monitors never help. The shortfall at 1440 is about 230px; narrowing columns towards the widest realistic value (£1,234,567.89) recovers only about 70px, so meeting this DoD needs a structural layout change. What-if mode doubles the period columns (134.5rem) and cannot fit any common desktop width. Acceptance must state what-if's intended behaviour rather than treat its scrolling as unintended.
+
+  **Delivery (decided 26 October):** a standalone PR to `main` delivers the desktop criteria first, against the existing layout.
+  - **Acceptance:**
+    - The five cards and seven period columns show with no unintended horizontal table scrolling at 1440×900, 1920×1080 and 2560×1440.
+    - The cards, table headers and first monetary row are visible together after Calculate.
+    - Full figures and pence are unclipped, with text no smaller than the current `text-[0.8125rem]`.
+    - What-if's behaviour is stated explicitly.
+    - Tablet and mobile are unchanged.
+    - Breakpoint neighbours, 200% zoom and light/dark themes stay usable.
+  - **Evidence:**
+    - Before/after captures at each width.
+    - Computed table `scrollWidth` against `clientWidth`.
+    - Vertical positions of the headers and first row.
+    - Assessment by the independent reviewer.
+  - **Afterwards:** that PR narrows this item to the criteria it does not demonstrably meet. #128 then keeps that desktop layout and owns the remaining mobile criteria: the statement, direct Edit and two-period comparison. It must re-verify the desktop criteria after its rebase.
 
 - [ ] **MC-06 · P2 · Follow-up — Make deduction and rounding presentation auditable.** Claude found unsigned deductions, no deduction total and period statements that differ by a penny when rounded displayed rows are added.
 
@@ -206,9 +222,10 @@ DI-27 are exceptions because they show or send wrong money figures (decision: PR
 Agreed order, with one small PR per item unless stated otherwise (DI-08 lands with DI-24). DI-01
 and the minimal part of DI-02 have landed:
 
-1. The [main-calculator input-integrity queue](#main-calculator-input-integrity): currency parsing
-   is merged; MC-01/02 and MC-03's integrity scope are #127 acceptance criteria, inherited by #128.
-   Keep fixes independently reviewable; neither PR is merged.
+1. The main-calculator queue in [Active](#active): currency parsing (#125) and MC-09 (#134) are
+   merged. The standalone desktop layout fix comes next, then #127, whose MC-01/02 and MC-03
+   integrity scope #128 inherits. Keep fixes independently reviewable; neither #127 nor #128 is
+   merged.
 2. The interim email guard from DI-05.
 3. DI-07, then DI-26, DI-23, DI-06 and DI-27.
 4. Company budget: DI-19, then DI-21.
