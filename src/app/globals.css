@@ -296,6 +296,13 @@
 }
 
 /* Focus States */
+@media (min-width: 80rem) {
+  html:has(.paye-calculator:focus-within) {
+    scroll-padding-block: calc(var(--navbar-height) + 1rem) 0.5rem;
+    scroll-behavior: auto;
+  }
+}
+
 *:focus-visible {
   outline: 2px solid var(--ring);
   outline-offset: 2px;

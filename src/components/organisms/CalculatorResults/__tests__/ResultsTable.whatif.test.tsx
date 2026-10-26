@@ -71,6 +71,8 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
       />,
     );
 
+    expect(screen.getByText(/Each period compares Current and What If/)).toBeInTheDocument();
+
     // Find the Pension row
     const pensionRow = screen.getByText('Pension').closest('tr');
     expect(pensionRow).toBeInTheDocument();

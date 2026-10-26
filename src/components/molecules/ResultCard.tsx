@@ -122,7 +122,11 @@ export const ResultCard = memo(function ResultCard({
 
   // Animation props based on reveal mode and motion preference
   const animationProps = shouldReduceMotion
-    ? {} // No animation if user prefers reduced motion
+    ? {
+        initial: false as const,
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0 },
+      }
     : revealOnScroll
       ? {
           // Scroll-triggered reveal

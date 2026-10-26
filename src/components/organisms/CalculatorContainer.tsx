@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/dialog';
 import { ANIMATION_TRANSITIONS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
 import { BREAKPOINTS, TIMERS } from '@/constants/ui';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { trackEvent } from '@/lib/analytics';
 import { roundPensionUpToPence } from '@/lib/pensionOptimizer';
@@ -42,6 +43,17 @@ import { commitFocusedField } from './CalculatorInputs/commitFocusedField';
 import { ResultsSummaryCards } from './CalculatorResults/ResultsSummaryCards';
 import { ResultsTable } from './CalculatorResults/ResultsTable';
 import { TaxCodeBasisNotice } from './CalculatorResults/TaxCodeBasisNotice';
+
+const MOBILE_PERIODS = ['Yearly', 'Monthly', 'Weekly', 'Daily', 'Hourly'];
+const DESKTOP_PERIODS = [
+  'Yearly',
+  'Monthly',
+  '4-Weekly',
+  'Fortnightly',
+  'Weekly',
+  'Daily',
+  'Hourly',
+];
 
 export function CalculatorContainer() {
   // Use optimized selectors to prevent unnecessary re-renders
@@ -76,13 +88,10 @@ export function CalculatorContainer() {
     codeRegionOverride === 'Scotland' ||
     (codeRegionOverride === null && input.region === 'Scotland');
   const [, startTransition] = React.useTransition();
-  const [visiblePeriods, setVisiblePeriods] = React.useState<string[]>([
-    'Yearly',
-    'Monthly',
-    'Weekly',
-    'Daily',
-    'Hourly',
-  ]);
+  const isDesktop = useMediaQuery('(min-width: 1280px)');
+  const [inputsBeforeSummary, setInputsBeforeSummary] = React.useState(false);
+  const [selectedPeriods, setSelectedPeriods] = React.useState<string[] | null>(null);
+  const visiblePeriods = selectedPeriods ?? (isDesktop ? DESKTOP_PERIODS : MOBILE_PERIODS);
   const [actionMessage, setActionMessage] = React.useState<{
     tone: 'info' | 'error';
     text: string;
@@ -93,6 +102,7 @@ export function CalculatorContainer() {
   const sectionRef = React.useRef<HTMLDivElement>(null);
   const hasTrackedCalculatorStartRef = React.useRef(false);
   const calcScrollTimeoutRef = React.useRef<number | null>(null);
+  const focusFrameRef = React.useRef<number | null>(null);
   const shouldReduceMotion = useMotionPreference();
 
   // SR-only live region message (event-driven, not region-driven)
@@ -127,8 +137,51 @@ export function CalculatorContainer() {
   React.useEffect(() => {
     return () => {
       if (calcScrollTimeoutRef.current) clearTimeout(calcScrollTimeoutRef.current);
+      if (focusFrameRef.current !== null) cancelAnimationFrame(focusFrameRef.current);
     };
   }, []);
+
+  React.useLayoutEffect(() => {
+    const desktop = window.matchMedia('(min-width: 80rem)');
+    const sidebar = window.matchMedia('(min-width: 112.5rem)');
+    const updateOrder = () => setInputsBeforeSummary(desktop.matches && !sidebar.matches);
+    updateOrder();
+    desktop.addEventListener('change', updateOrder);
+    sidebar.addEventListener('change', updateOrder);
+    return () => {
+      desktop.removeEventListener('change', updateOrder);
+      sidebar.removeEventListener('change', updateOrder);
+    };
+  }, []);
+
+  React.useLayoutEffect(() => {
+    if (results && window.innerWidth >= BREAKPOINTS.XL) {
+      resultsRef.current?.focus({ preventScroll: true });
+      resultsRef.current?.scrollIntoView({ behavior: 'instant', block: 'start' });
+    }
+  }, [results]);
+
+  const handleDesktopFocus = (event: React.FocusEvent<HTMLDivElement>) => {
+    if (focusFrameRef.current !== null) cancelAnimationFrame(focusFrameRef.current);
+    if (window.innerWidth < BREAKPOINTS.XL) return;
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    if (!event.currentTarget.contains(target)) return;
+    // Check after native focus scrolling; never scroll for a control the user has already left.
+    focusFrameRef.current = requestAnimationFrame(() => {
+      focusFrameRef.current = null;
+      if (window.innerWidth < BREAKPOINTS.XL) return;
+      if (document.activeElement !== target || !target.matches(':focus-visible')) return;
+      const rect = target.getBoundingClientRect();
+      const style = getComputedStyle(document.documentElement);
+      if (
+        rect.top < Number.parseFloat(style.scrollPaddingTop) ||
+        rect.bottom > window.innerHeight - Number.parseFloat(style.scrollPaddingBottom)
+      ) {
+        target.scrollIntoView({ behavior: 'instant', block: 'nearest', inline: 'nearest' });
+      }
+    });
+  };
 
   const handleCalculate = () => {
     setActionMessage(null);
@@ -181,7 +234,7 @@ export function CalculatorContainer() {
     // Clear any pending scroll timeout
     if (calcScrollTimeoutRef.current) clearTimeout(calcScrollTimeoutRef.current);
 
-    // Only scroll to results on mobile (desktop has everything visible)
+    // Only scroll to results on mobile (desktop scrolls when its results commit).
     calcScrollTimeoutRef.current = window.setTimeout(() => {
       if (window.innerWidth < BREAKPOINTS.LG) {
         resultsRef.current?.scrollIntoView({
@@ -193,7 +246,7 @@ export function CalculatorContainer() {
   };
 
   const handleVisiblePeriodsChange = (periods: string[]) => {
-    setVisiblePeriods(periods);
+    setSelectedPeriods(periods);
   };
 
   const handleApplyPensionOptimization = (pensionAmount: number) => {
@@ -286,10 +339,81 @@ export function CalculatorContainer() {
     </Dialog>
   );
 
+  const summarySection = (
+    <AnimatePresence key='summary' mode='wait'>
+      {(showResults || pensionNeedsCalculate) && (
+        <motion.div
+          ref={resultsRef}
+          variants={shouldReduceMotion ? {} : ANIMATION_VARIANTS.fadeInDown}
+          initial={shouldReduceMotion || isDesktop ? false : 'initial'}
+          animate={shouldReduceMotion ? {} : 'animate'}
+          exit={shouldReduceMotion ? {} : 'exit'}
+          transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.default}
+          className='order-4 scroll-mt-[calc(var(--navbar-height)+1rem)] xl:order-3 xl:col-span-2 xl:scroll-mt-0 min-[112.5rem]:order-2'
+          role='region'
+          aria-label='Tax calculation results summary'
+          tabIndex={-1}
+        >
+          {actionMessage && (
+            <motion.div
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={shouldReduceMotion ? undefined : { opacity: 0, y: 12 }}
+              transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2 }}
+              className={cn(
+                'mb-3 rounded-md border px-3 py-2 text-sm',
+                actionMessage.tone === 'error'
+                  ? 'border-destructive/30 bg-destructive/10 text-destructive'
+                  : 'border-primary/30 bg-primary/10 text-primary',
+              )}
+              role={actionMessage.tone === 'error' ? 'alert' : 'status'}
+            >
+              <span>{actionMessage.text}</span>
+              {actionMessage.taxCodeLink && (
+                <Link
+                  href='/tools/tax-code-decoder'
+                  className='ml-1 inline-flex min-h-11 items-center font-medium underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                >
+                  Check the code
+                </Link>
+              )}
+            </motion.div>
+          )}
+          {results && (
+            <>
+              <TaxCodeBasisNotice basis={results.taxCodeBasis} />
+              <ResultsSummaryCards results={results} taxYear={input.taxYear} input={input} />
+            </>
+          )}
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+
+  const inputsSection = (
+    <Card
+      key='inputs'
+      className={cn(
+        'order-2 mx-auto w-full max-w-xl xl:col-span-2 xl:mx-0 xl:max-w-none xl:self-start min-[112.5rem]:sticky min-[112.5rem]:top-[calc(var(--navbar-height)+1rem)] min-[112.5rem]:order-3 min-[112.5rem]:col-span-1',
+        'p-3',
+        'sm:p-4 md:p-6',
+      )}
+    >
+      <CalculatorInputsSection
+        onCalculate={handleCalculate}
+        onReset={() => {
+          setActionMessage(null);
+          setLiveMessage('');
+        }}
+        resultAction={showResults ? emailResultsAction : undefined}
+      />
+    </Card>
+  );
+
   return (
     <div
       className={cn(
-        'mx-auto flex w-full max-w-screen-2xl flex-col sm:px-4 md:py-8 xl:grid xl:grid-cols-[390px_minmax(0,1fr)] xl:px-8 2xl:grid-cols-[380px_minmax(0,1fr)]',
+        'paye-calculator mx-auto flex w-full max-w-[120rem] flex-col sm:px-4 md:py-8 xl:grid xl:grid-cols-[380px_minmax(0,1fr)] xl:px-8',
         'gap-3',
         'px-4',
         'py-4',
@@ -297,6 +421,7 @@ export function CalculatorContainer() {
       )}
       data-testid='calculator-section'
       ref={sectionRef}
+      onFocusCapture={handleDesktopFocus}
     >
       {/* Header - CSS animation for better mobile LCP (no JS blocking) */}
       <div
@@ -323,77 +448,12 @@ export function CalculatorContainer() {
         </p>
       </div>
 
-      {/* Summary Cards - Between inputs and table on mobile (order-4), top on desktop (order-2) */}
-      <AnimatePresence mode='wait'>
-        {(showResults || pensionNeedsCalculate) && (
-          <motion.div
-            ref={resultsRef}
-            variants={shouldReduceMotion ? {} : ANIMATION_VARIANTS.fadeInDown}
-            initial={shouldReduceMotion ? {} : 'initial'}
-            animate={shouldReduceMotion ? {} : 'animate'}
-            exit={shouldReduceMotion ? {} : 'exit'}
-            transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.default}
-            className='order-4 scroll-mt-[calc(var(--navbar-height)+1rem)] xl:order-2 xl:col-span-2'
-            role='region'
-            aria-label='Tax calculation results summary'
-          >
-            {actionMessage && (
-              <motion.div
-                initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={shouldReduceMotion ? undefined : { opacity: 0, y: 12 }}
-                transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2 }}
-                className={cn(
-                  'mb-3 rounded-md border px-3 py-2 text-sm',
-                  actionMessage.tone === 'error'
-                    ? 'border-destructive/30 bg-destructive/10 text-destructive'
-                    : 'border-primary/30 bg-primary/10 text-primary',
-                )}
-                role={actionMessage.tone === 'error' ? 'alert' : 'status'}
-              >
-                <span>{actionMessage.text}</span>
-                {actionMessage.taxCodeLink && (
-                  <Link
-                    href='/tools/tax-code-decoder'
-                    className='ml-1 inline-flex min-h-11 items-center font-medium underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
-                  >
-                    Check the code
-                  </Link>
-                )}
-              </motion.div>
-            )}
-            {results && (
-              <>
-                <TaxCodeBasisNotice basis={results.taxCodeBasis} />
-                <ResultsSummaryCards results={results} taxYear={input.taxYear} input={input} />
-              </>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
+      {/* Match the desktop DOM sequence to the input-band and sidebar layouts. */}
+      {inputsBeforeSummary ? [inputsSection, summarySection] : [summarySection, inputsSection]}
       {/* SR-only live region for announcing state changes (event-driven) */}
       <div aria-live='polite' aria-atomic='true' className='sr-only'>
         {liveMessage}
       </div>
-
-      {/* Inputs Section - order-2 on mobile, left column on desktop (sticky) */}
-      <Card
-        className={cn(
-          'order-2 mx-auto w-full max-w-xl xl:sticky xl:top-[calc(var(--navbar-height)+1rem)] xl:order-3 xl:mx-0 xl:max-w-none xl:self-start',
-          'p-3',
-          'sm:p-4 md:p-6',
-        )}
-      >
-        <CalculatorInputsSection
-          onCalculate={handleCalculate}
-          onReset={() => {
-            setActionMessage(null);
-            setLiveMessage('');
-          }}
-          resultAction={showResults ? emailResultsAction : undefined}
-        />
-      </Card>
 
       {/* Results column - order-6 on mobile, right column on desktop */}
       <AnimatePresence mode='wait'>
@@ -404,7 +464,11 @@ export function CalculatorContainer() {
             animate={shouldReduceMotion ? {} : 'animate'}
             exit={shouldReduceMotion ? {} : 'exit'}
             transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.default}
-            className={cn('order-6 flex flex-col', 'gap-4', 'xl:order-3 xl:min-w-0 xl:self-start')}
+            className={cn(
+              'order-6 flex flex-col',
+              'gap-4',
+              'xl:order-4 xl:col-span-2 xl:min-w-0 xl:self-start min-[112.5rem]:order-3 min-[112.5rem]:col-span-1',
+            )}
             data-testid='tax-results'
           >
             <ResultsTable
@@ -431,7 +495,7 @@ export function CalculatorContainer() {
             exit={shouldReduceMotion ? undefined : { opacity: 0 }}
             transition={shouldReduceMotion ? { duration: 0 } : undefined}
             className={cn(
-              'order-6 flex min-h-[28rem] items-center justify-center rounded-sm border border-dashed bg-card/70 text-center xl:order-3',
+              'order-6 flex min-h-[28rem] items-center justify-center rounded-sm border border-dashed bg-card/70 text-center xl:order-4 xl:col-span-2 min-[112.5rem]:order-3 min-[112.5rem]:col-span-1',
               'p-12',
             )}
           >

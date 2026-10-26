@@ -204,10 +204,10 @@ export function BasicInputs() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={'space-y-3'}
+      className='space-y-3 xl:grid xl:grid-cols-3 xl:items-start xl:gap-x-6 xl:gap-y-4 xl:space-y-0 min-[112.5rem]:block min-[112.5rem]:space-y-3'
     >
       {/* Heading */}
-      <h3 className={cn('font-semibold text-foreground', 'text-base', 'sm:text-lg')}>
+      <h3 className={cn('font-semibold text-foreground xl:col-span-3', 'text-base', 'sm:text-lg')}>
         Enter Income Tax Details
       </h3>
 
@@ -415,7 +415,7 @@ export function BasicInputs() {
       )}
 
       {/* Age - Dropdown for State Pension Age (affects NI) */}
-      <div className={cn(fieldRowClass, 'mt-4')}>
+      <div className={cn(fieldRowClass, 'mt-4 xl:mt-0 min-[112.5rem]:mt-4')}>
         <div className={cn(fieldLabelClass, 'sm:whitespace-nowrap')}>
           <LabelTooltip fieldName='age' />
           <Label id={ageLabelId} htmlFor={ageId} className={cn('whitespace-nowrap', 'text-sm')}>
@@ -607,7 +607,9 @@ export function BasicInputs() {
         </div>
       </div>
 
-      <IncomeSourceList />
+      <div className='xl:col-span-3'>
+        <IncomeSourceList />
+      </div>
     </motion.div>
   );
 }

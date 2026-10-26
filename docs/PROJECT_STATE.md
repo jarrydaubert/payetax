@@ -33,14 +33,24 @@ content must earn its place through user value, evidence and maintainable accura
 
 ## Main calculator: current state and agreed direction
 
-Merged and deployed `main` at `44d8d02` includes:
+The recorded production baseline is `44d8d02`, which includes:
 - the shared currency-parsing fix (#125);
 - the October dependency-security patch (#133);
 - MC-09 (#134): applying a tax-trap pension suggestion now adds the annual amount to the existing
   contribution in the user's pay period, rounded up to the penny, and requires Calculate again.
 
-The desktop results still need horizontal scrolling at every desktop width. A standalone desktop
-layout fix on `main` comes next (see the backlog's agreed order).
+Verified `main` at `d1592fbb` includes #132's agreed delivery plan. The desktop implementation is
+on [#135](https://github.com/jarrydaubert/payetax/pull/135), whose runtime independently passed
+review at `1fc01a92`: five desktop summary cards, all seven periods visible by default, no
+normal-table horizontal scrolling, and the cards, headers and first monetary row visible together
+after Calculate. Desktop Tab/Shift+Tab follows the visual order and keeps focus below the fixed
+header. The wider fourteen-column What-if table intentionally scrolls within its labelled region,
+with sticky row labels and keyboard arrows; #135 adds no homepage comparison mode.
+
+At this 26 October documentation update, #135 is implemented on this PR and has not merged or
+deployed. Its separately authorised merge delivers that desktop behaviour to `main`; production
+deployment must be verified separately. #127 is the next calculator implementation task after
+that merge.
 
 The input-integrity PR [#127](https://github.com/jarrydaubert/payetax/pull/127) and stacked
 responsive-statement PR [#128](https://github.com/jarrydaubert/payetax/pull/128) remain open and
@@ -60,9 +70,14 @@ and result-dependent actions require the same current validated calculation as t
 These integrity guarantees are release-blocking acceptance criteria for #127 independently of
 #128's edited-state presentation.
 
-The agreed target retains five compact desktop summary cards and a readily visible seven-period
-breakdown, while preserving the new mobile experience's readable payslip and simple comparison.
-The old marginal-rate card's rounded next-£100 estimate must not be presented as a statutory rate.
+The remaining MC-05 work is #128's mobile payslip, direct Edit action and complete two-period
+comparison; the existing mobile Calculate-focus issue; and the fifth card's marginal-rate wording.
+The visible "Marginal Tax Rate" label still needs to describe the rounded next-£100 payroll
+estimate (tax, NI and applicable student loans), rather than a statutory marginal rate. At
+393×852 the existing mobile Calculate scroll leaves focus behind the fixed header; #135 preserves
+that behaviour and the backlog tracks its correction separately. #127/#128 must retain and
+re-verify #135's desktop cards, seven-period fit and keyboard navigation after their rebases.
+
 Removing the large homepage hero is acceptable, but search protection is unproven. The
 [search audit](BACKLOG.md#search-and-discoverability) requires essential live/technical evidence
 and safeguards before the first deployment containing that change, followed by performance
@@ -276,11 +291,12 @@ working rule, they may be fixed as small independent slices between the items ab
 currency-input preservation and minimal stale-result protection have landed, with one shared
 currency parser in `src/lib/currencyInput.ts`. The main calculator's amount fields now reuse that
 parser: pence are kept, rejected text is shown with its error and clears results until corrected.
-The main-calculator queue comes next, in the [backlog's agreed order](BACKLOG.md#active):
-1. the standalone desktop layout fix on `main`;
-2. #127, whose MC-01/02 and MC-03 integrity scope #128 inherits;
-3. the interim DI-05 email guard;
-4. #128's mobile payslip and redesign.
+After #135's separately authorised merge, the main-calculator queue resumes in the
+[backlog's agreed order](BACKLOG.md#active):
+1. #127, preserving #135's desktop behaviour and MC-01/02 guarantees while closing MC-03's
+   integrity scope; #128 inherits those guarantees;
+2. the interim DI-05 email guard;
+3. #128's mobile payslip and remaining redesign acceptance.
 
 MC-03's presentation scope and MC-04/05 may proceed alongside
 Director urgent slices without pre-empting a ready, verified wrong-money fix; completing the entire
