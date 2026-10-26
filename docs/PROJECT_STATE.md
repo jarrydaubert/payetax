@@ -33,12 +33,24 @@ content must earn its place through user value, evidence and maintainable accura
 
 ## Main calculator: current state and agreed direction
 
-Merged `main` at `8d12f20a` includes the shared currency-parsing fix (#125). The input-integrity
-PR [#127](https://github.com/jarrydaubert/payetax/pull/127) and stacked responsive-statement
-PR [#128](https://github.com/jarrydaubert/payetax/pull/128) remain open and unmerged. Their
-implementation reports and passing checks are evidence for those refs, not released behaviour.
-Claude's independent review requests changes for WebKit amount entry and legacy saved pension
-percentages; #128 inherits both blockers.
+Merged and deployed `main` at `44d8d02` includes:
+- the shared currency-parsing fix (#125);
+- the October dependency-security patch (#133);
+- MC-09 (#134): applying a tax-trap pension suggestion now adds the annual amount to the existing
+  contribution in the user's pay period, rounded up to the penny, and requires Calculate again.
+
+The desktop results still need horizontal scrolling at every desktop width. A standalone desktop
+layout fix on `main` comes next (see the backlog's agreed order).
+
+The input-integrity PR [#127](https://github.com/jarrydaubert/payetax/pull/127) and stacked
+responsive-statement PR [#128](https://github.com/jarrydaubert/payetax/pull/128) remain open and
+unmerged. Their implementation reports and passing checks are evidence for those refs, not released
+behaviour. On #127:
+- MC-01 was accepted at `f0bcdc97`.
+- Claude approved MC-02 at `6a9bee73`.
+- MC-03's integrity scope remains open.
+
+#128 inherits #127's guarantees.
 
 The main calculator must keep calculation explicit: every calculation-input edit, including
 applying a pension suggestion, requires Calculate again. Display-only period changes reuse the
@@ -264,9 +276,13 @@ working rule, they may be fixed as small independent slices between the items ab
 currency-input preservation and minimal stale-result protection have landed, with one shared
 currency parser in `src/lib/currencyInput.ts`. The main calculator's amount fields now reuse that
 parser: pence are kept, rejected text is shown with its error and clears results until corrected.
-The remaining [main-calculator input-integrity queue](BACKLOG.md#main-calculator-input-integrity)
-comes next: MC-01/02 and MC-03's integrity scope are #127 acceptance criteria, inherited by #128.
-After the interim DI-05 email guard, MC-03's presentation scope and MC-04/05 may proceed alongside
+The main-calculator queue comes next, in the [backlog's agreed order](BACKLOG.md#active):
+1. the standalone desktop layout fix on `main`;
+2. #127, whose MC-01/02 and MC-03 integrity scope #128 inherits;
+3. the interim DI-05 email guard;
+4. #128's mobile payslip and redesign.
+
+MC-03's presentation scope and MC-04/05 may proceed alongside
 Director urgent slices without pre-empting a ready, verified wrong-money fix; completing the entire
 Director queue is not a main-calculator prerequisite. Keep the Director sequence and Foundation
 insertion points, including Corporation Tax deadlines. The desktop/mobile acceptance changes and
