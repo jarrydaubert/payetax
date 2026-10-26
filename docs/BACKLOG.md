@@ -27,18 +27,26 @@ Current correctness sequence:
 2. Transparent calculation results.
 3. Independent fixture/test-portfolio completion and Foundation reconciliation.
 
-Verified Director Intelligence correctness exceptions (see [Urgent correctness exceptions](#urgent-correctness-exceptions)) may be taken as small independent slices between these items; they do not reorder them. Main-calculator input integrity comes next: parsing is merged, but PRs #127 and #128 are open and their work must not be marked complete.
+Verified Director Intelligence correctness exceptions (see [Urgent correctness exceptions](#urgent-correctness-exceptions)) may be taken as small independent slices between these items; they do not reorder them. Main-calculator work comes next, in the order below. Currency parsing (#125) and MC-09 (#134) are merged and deployed; PRs #127 and #128 are open and their work must not be marked complete.
 
-For the calculator reconciliation, use the [22 October evidence and decisions](reports/calculator-backlog-reconciliation-2026-10-22.md). The implementation order is:
+For the calculator reconciliation, use the [22 October evidence and decisions](reports/calculator-backlog-reconciliation-2026-10-22.md). The implementation order (agreed 26 October) is:
 
-1. Close MC-01, MC-02 and MC-03's integrity criteria in the input-integrity prerequisite (#127), with store and browser regressions. #127 must independently prevent stale results, mismatched email and stale suggestions before merge; those requirements cannot wait for #128.
-2. Complete the DI-05 interim email guard next. MC-03's presentation scope and MC-04/05 may then proceed alongside the Director urgent slices, without pre-empting a ready, verified wrong-money fix. The entire Director queue is not a prerequisite for completing the main calculator; retain its internal order and existing Foundation insertion points.
-3. Before the first deployment containing #128's homepage/hero change, complete the search audit's pre-deployment gate below. This applies to that change wherever it is eventually delivered, not merely a later audit PR. MC-04/05 and #127's integrity guarantees are also acceptance requirements for the redesign.
-4. MC-06/07 are smaller follow-ups. Complete the search audit's performance observation after release using the windows and mitigation trigger recorded before deployment. Any newly reproduced wrong-money defect takes correctness priority.
+1. **Standalone desktop layout fix on `main`.** This delivers MC-05's desktop criteria against the existing layout: five summary cards and all seven period columns, with no horizontal table scrolling. See [MC-05](#main-calculator-experience) for the criteria and the production geometry. It is presentation-only: no calculation, input, persistence or stale-result behaviour changes. It does not wait for #127 or #128, and it is not done by removing cards, hiding columns or adding a comparison mode.
+2. **#127, input integrity.** Rebase onto `main`, including #133, #134 and the desktop fix, following the #134 rebase notes under MC-03. Then close MC-03's integrity criteria with store and browser regressions. MC-01 was accepted at `f0bcdc97` (recorded in #127); Claude approved MC-02 at `6a9bee73` on 24 October, which #127 should record. #127 must independently prevent stale results, mismatched email and stale suggestions before merge; those requirements cannot wait for #128.
+3. **DI-05 interim email guard, then #128 (mobile payslip and redesign).** The DI-05 position is unchanged from the agreed Director order. #128 rebases onto #127 and keeps the desktop layout from step 1. It delivers the mobile payslip, MC-03's presentation scope, MC-04 and MC-05's remaining criteria. These may proceed alongside the Director urgent slices, without pre-empting a ready, verified wrong-money fix. The entire Director queue is not a prerequisite for completing the main calculator; retain its internal order and existing Foundation insertion points.
+4. Before the first deployment containing #128's homepage/hero change, complete the search audit's pre-deployment gate below. This applies to that change wherever it is eventually delivered, not merely a later audit PR. MC-04/05 and #127's integrity guarantees are also acceptance requirements for the redesign.
+5. MC-06/07 are smaller follow-ups. Complete the search audit's performance observation after release using the windows and mitigation trigger recorded before deployment. Any newly reproduced wrong-money defect takes correctness priority.
 
 Each implementation slice carries its own relevant regression coverage and independent review by the other model (Claude reviews Codex changes and vice versa), reconciliation against code/evidence, and re-review after material fixes. MC-08 owns only the remaining coverage gaps listed there. Record exact refs and results; do not infer approval from earlier audits. Keep the PRs small, reuse the existing checks and reports, and merge only when separately authorised.
 
 When rebasing #127/#128, reconcile their `BACKLOG.md` and `PROJECT_STATE.md` edits against this authoritative backlog: discard superseded deletions, premature "landed" claims, duplicate queues and conflicting design decisions, not useful evidence. Preserve distinct implementation details and dated verification in reports, and update current-state prose only to verified merged behaviour. An MC item is removed or narrowed only by the PR that demonstrably closes that scope, with evidence; do not accept an older branch's version wholesale. The [reconciliation report](reports/calculator-backlog-reconciliation-2026-10-22.md#documentation-reconciliation-on-rebase) maps the conflicts.
+
+### Security and dependencies
+
+The 24 October dependency advisories (Next.js, Sentry, Zod, fast-uri) were patched in [#133](https://github.com/jarrydaubert/payetax/pull/133), which carries the exposure assessment and verification. It was merged and deployed to production as `28f0a63` on 26 October. The items below are its residual findings.
+
+- [ ] P2 — Results-email routes buffer the whole request before the size check. `send-results` and `send-director-results` call `request.text()` and only then compare `rawBody.length` (50 × 1024 *characters*, not bytes) with `MAX_BODY_SIZE`. Zod 4.6.6 now bounds validation work for oversized collections (#133's regressions), but nothing limits how much is read. DoD: record the platform's effective request-body limit for these functions from current Vercel documentation. Then either justify that limit as sufficient, or reject oversized requests before buffering, measured in bytes. Keep the existing 413 response, origin, rate-limit and validation order, with regressions for an oversized body and for a missing or understated `Content-Length`.
+- [ ] P3 — Zod is pinned twice. `package.json` lists `zod` 4.6.6 in both `dependencies` and `overrides`. The override was needed to remove Knip's nested 4.4.3, and it silently wins over the direct pin: in #133's review, a frozen install with a direct pin of 4.6.5 still resolved 4.6.6. DoD: the two cannot drift unnoticed. Either a repo check fails when they differ, or the override is removed once a frozen install proves no vulnerable nested copy remains.
 
 ### Foundation
 
@@ -107,9 +115,18 @@ Currency parsing through `parseCurrencyInput` is merged in #125. The following i
 
   **#128 DoD (presentation):** Edits expose an accessible "Inputs changed — Calculate again" state. Previous figures may be cleared or retained as context; if retained, they are visibly out of date and cannot be mistaken for, or combined with, results for the new inputs. First use and Reset show no calculated result or enabled result actions and offer salary entry/Calculate; after editing an existing result, the message requests recalculation rather than saying no salary was entered. Invalid submissions identify the affected fields and allow correction without losing entered values or trapping focus. Verify those states across desktop cards/table and mobile statement. Presentation choices do not defer or replace #127's integrity criteria.
 
+  **#127 rebase onto #134:** [#134](https://github.com/jarrydaubert/payetax/pull/134) (merged 26 October as `44d8d02`) fixed the tax-trap suggestion on `main`. Applying it now adds the annual amount to the existing pension, converts the total to the pay period and rounds up to the next penny. It also clears current, previous-year and what-if results and asks for Calculate.
+  - Keep #134's addition, conversion and rounding behaviour and its regressions.
+  - Replace #134's direct `useCalculatorStore.setState({ results: null, … })` with #127's store invalidation (`invalidateResults()`), so applying a suggestion invalidates results the same way as any other edit.
+  - Keep #127's guard that the clicked suggestion belongs to the current results (`current.results !== results`).
+
+  #134 does not prevent stale suggestions on `main`. Valid edits there leave results on screen, so editing the pension after Calculate and then applying the old suggestion adds both: £110,000 calculated with no pension → type £5,000 → "Add £10,000" → £15,000 total. That stays within this item's stale-suggestion requirement.
+
+- [ ] P3 — Tax-trap alert can reappear from floating-point noise at the exact £100,000 boundary. `calculateOptimalPension` compares unrounded adjusted income with the threshold. After #134's penny round-up, Claude probed every whole-pound total from £1,000 to £60,000 across six pay periods and nine weekly-hour values (3.19 million cases). 447 per-period amounts annualise below the target by about 1e-14. This matters only when salary minus existing pension is an exact £1,000 multiple: after Calculate, the alert could then offer "Add £1,000" although nothing remains to fix. The tax effect is unverified and depends on how the engine rounds the allowance taper. DoD: the optimiser compares adjusted income in pence, or with an explicit sub-penny tolerance. The engine's taper is confirmed to treat the same values consistently. Add a regression for an exact-boundary combination that annualises below target.
+
 ### Main calculator experience
 
-The agreed target combines compact desktop results with the simpler mobile statement. [#128](https://github.com/jarrydaubert/payetax/pull/128) is an unmerged starting point, not acceptance of its removal of desktop cards or comparison-by-mode. Preserve its verified improvements where applicable; do not restore the original audit defects.
+The agreed target combines compact desktop results (the existing five cards and seven-period table, fitted by the standalone desktop fix) with the simpler mobile payslip from [#128](https://github.com/jarrydaubert/payetax/pull/128). #128 is an unmerged starting point for the mobile experience, not acceptance of its removal of desktop cards or comparison-by-mode. Preserve its verified improvements where applicable; do not restore the original audit defects.
 
 - [ ] **MC-04 · P2 · Redesign acceptance — Lead with the user's pay period.** #128 always starts Monthly (Claude S1).
 
@@ -118,6 +135,23 @@ The agreed target combines compact desktop results with the simpler mobile state
 - [ ] **MC-05 · P2 · Redesign acceptance — Restore desktop density and preserve the mobile payslip.** #128 removes all five cards, stretches statement rows widely and puts comparison behind an action below the statement (Claude S3 and the product discussion).
 
   **DoD:** Desktop shows five summary cards and all seven period columns in the default results flow, without opening a comparison mode. Preserve annual/monthly take-home, annual Tax & NI and a clearly defined effective-rate summary; the fifth card explains the next-£100 payroll difference honestly rather than calling it a statutory marginal rate. After Calculate, the five cards, table headers and first monetary row are visible together at 1440×900, 1920×1080 and 2560×1440 without further interaction or scrolling through a statement. Full figures, pence and essential labels remain unobscured with no unintended horizontal scrolling. Before/after captures at those widths demonstrate label-to-value alignment and are assessed by the independent reviewer before acceptance; there is no fixed column-width prescription. The mobile statement, direct Edit action and complete two-period comparison remain usable at 393×852, 852×393 and 320px width. Breakpoint neighbours, 200% zoom, large amounts, active optional inputs and errors stay usable. All details remain reachable, native copying works, and computed visibility confirms five-card content is visible with reduced motion. Keyboard, semantic headers, focus and light/dark contrast are verified in both engines. Exact layout and breakpoint choices are left to implementation; MC-03's current/stale distinction applies to every card/table/statement.
+
+  **Production evidence (`28f0a63`, 26 October):** main already shows the five cards and seven period columns, but the table overflows at every desktop width. `ResultsTable` sets a 74.5rem minimum (15rem fixed plus 7 × 8.5rem), which is 1,192px before card padding. `CalculatorContainer` gives the results column about 962px at 1440 (`xl:px-8`, a 390px input column, `gap-6`). From 1536 upwards it is capped at about 1,068px (`max-w-screen-2xl`, a 380px column), so wider monitors never help. The shortfall at 1440 is about 230px; narrowing columns towards the widest realistic value (£1,234,567.89) recovers only about 70px, so meeting this DoD needs a structural layout change. What-if mode doubles the period columns (134.5rem) and cannot fit any common desktop width. Acceptance must state what-if's intended behaviour rather than treat its scrolling as unintended.
+
+  **Delivery (decided 26 October):** a standalone PR to `main` delivers the desktop criteria first, against the existing layout.
+  - **Acceptance:**
+    - The five cards and seven period columns show with no unintended horizontal table scrolling at 1440×900, 1920×1080 and 2560×1440.
+    - The cards, table headers and first monetary row are visible together after Calculate.
+    - Full figures and pence are unclipped, with text no smaller than the current `text-[0.8125rem]`.
+    - What-if's behaviour is stated explicitly.
+    - Tablet and mobile are unchanged.
+    - Breakpoint neighbours, 200% zoom and light/dark themes stay usable.
+  - **Evidence:**
+    - Before/after captures at each width.
+    - Computed table `scrollWidth` against `clientWidth`.
+    - Vertical positions of the headers and first row.
+    - Assessment by the independent reviewer.
+  - **Afterwards:** that PR narrows this item to the criteria it does not demonstrably meet. #128 then keeps that desktop layout and owns the remaining mobile criteria: the statement, direct Edit and two-period comparison. It must re-verify the desktop criteria after its rebase.
 
 - [ ] **MC-06 · P2 · Follow-up — Make deduction and rounding presentation auditable.** Claude found unsigned deductions, no deduction total and period statements that differ by a penny when rounded displayed rows are added.
 
@@ -188,9 +222,10 @@ DI-27 are exceptions because they show or send wrong money figures (decision: PR
 Agreed order, with one small PR per item unless stated otherwise (DI-08 lands with DI-24). DI-01
 and the minimal part of DI-02 have landed:
 
-1. The [main-calculator input-integrity queue](#main-calculator-input-integrity): currency parsing
-   is merged; MC-01/02 and MC-03's integrity scope are #127 acceptance criteria, inherited by #128.
-   Keep fixes independently reviewable; neither PR is merged.
+1. The main-calculator queue in [Active](#active): currency parsing (#125) and MC-09 (#134) are
+   merged. The standalone desktop layout fix comes next, then #127, whose MC-01/02 and MC-03
+   integrity scope #128 inherits. Keep fixes independently reviewable; neither #127 nor #128 is
+   merged.
 2. The interim email guard from DI-05.
 3. DI-07, then DI-26, DI-23, DI-06 and DI-27.
 4. Company budget: DI-19, then DI-21.
@@ -315,7 +350,24 @@ and before step 4, and transparent calculation results after step 5.
 - [ ] Director critical E2E on mobile viewports. `e2e/director-guide-critical.spec.ts` fails on `Mobile Chrome` on `main` as well as on the DI-01 branch: closing the Your Numbers drawer intermittently leaves it open, and the results assertions query a page that is inert while the drawer is open. The CI critical slice runs desktop Chromium only, so this is not gated. DoD: the Director critical spec passes on the `Mobile Chrome` project without retries, or the mobile drawer journey has its own stable spec.
 - [ ] Non-gated E2E specs failing on `main`. On desktop Chromium, `e2e/hicbc-comprehensive.spec.ts` (1 child at £60k), `e2e/pension-limits.spec.ts` (£50k with £20k sacrifice: £3,482.40 against an expected £3,484.80) and three `e2e/accessibility-wcag22.spec.ts` checks (privacy page in dark mode, desktop and mobile; 24×24px touch targets) fail identically on `main` and on the currency-parsing branch. None is in the CI critical slice. DoD: each expectation is reconciled against primary evidence or the UI is fixed, and the specs pass, or a spec that no longer earns its place is removed.
 - [ ] P2 — Intermittent browser input/commit failures (investigation, not an established cause). #125 evidence includes golden-master `emergency-m1` (results never appeared), `pension-sacrifice-10pct` (filled/blurred 10 displayed as 0.00) and Director pasted-pence (field empty). Targeted repeats passed 12/12 and 75/75, and the critical slice passed at `--workers=1`. The golden-master setup waited for `networkidle` and a visible server-rendered salary input, making pre-hydration entry a lead, not a proven cause. Claude additionally reported one WebKit pension `5.00` with an empty-field error (217/218), unreproduced in 20 targeted and 25 scripted repetitions. Main also loses some Calculate clicks; #128 has a separately traced scroll repair. DoD: record exact refs, engines, readiness and draft/commit/error event ordering; after any fix, displayed/committed values, errors and Calculate eligibility agree and the critical slice passes repeated production-build runs under recorded parallel worker/repeat counts. Alternatively, close an unreproduced symptom only with a documented no-reproduction matrix covering all three #125 symptoms and the WebKit stale-error sequence at single and parallel worker counts, recording commands, results and limits without claiming a fix. Do not hide failures with skips, blanket retries or arbitrary sleeps, or assume one hydration cause. Promote reproducible wrong amounts or blocked valid input to correctness priority; MC-01 owns its deterministic typing defect.
+
+  **#133 evidence (24–25 October), line numbers refer to `e2e/calculator-critical.spec.ts` at `c5ed77b`:**
+  - **Codex (Windows):** the Mobile Safari "Rejected amounts" journey failed after Reset in 2/5 runs on `main` and 5/5 on the patch.
+  - **Claude's independent review (Linux, Playwright 1.61.1, WebKit iPhone 12 emulation, production builds, interleaved 8 × 5 runs per arm):**
+    - Failure rates were 23/40 on `main` and 16/40 on the patch; the step after Reset (line 334) failed 11/40 and 9/40. That is no regression.
+    - Failures occurred at four steps: lines 269, 299, 307 and 334.
+    - At line 269, the typed salary had reverted to `0.00` before the first Calculate, which supports the pre-hydration lead.
+    - Desktop WebKit `director-guide-critical` passed 20/20 on both arms, though Codex's Windows runs failed it.
+
+  **#134 evidence (26 October), desktop WebKit tax-trap Apply:**
+  - In the monthly journey with an existing 5% pension, clicking "Add £… to Pension" sometimes left the original `5.00%` unchanged instead of applying £1,666.67.
+  - It failed once in Codex's targeted MC-09 run (14/15 passed) and once in 10 repeats, with one worker and zero retries.
+  - The trace shows three unstable-element waits and then a completed click. The screenshot shows the alert scrolled behind the fixed header.
+  - The outcome is fail-safe: nothing is applied, and the original value stays visible.
+  - The cause is not established. Before treating this as test-only, check whether the fixed header can cover the alert's button for real users after Calculate scrolls the results into view.
 - [ ] P2 — Local unit-environment disagreement (technical investigation). Codex reported five failures in InputTooltip, analytics, rateLimit and origin on both main and the PRs; Claude reported zero failures on all three refs. DoD: a bounded clean comparison records exact refs, runtime, relevant non-secret test configuration and commands; any reproducible environment dependency is corrected or documented with its limits. Reports no longer label the five failures universal main defects. Close with evidence if they cannot be reproduced; do not weaken assertions merely to align counts.
+
+  **Probable cause (#133):** Codex traced five Windows baseline failures to `src/test/env.ts`. Jest's case-insensitive environment proxy on Windows ignored `Object.defineProperty` for runtime `NODE_ENV` reads. #133 switched to assignment and added helper tests. It did not confirm that these were the same five tests, so close this item by re-running the five named suites on Windows at `28f0a63` or later.
 - [ ] Documented modelling assumptions and limitations (month-1 projection, NI year model and pension method). Non-cumulative tax-code limitations are now visible. DoD: the remaining assumptions are published where users see results and kept in sync with the engine.
 
 ### Trust and sourcing
