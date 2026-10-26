@@ -9,7 +9,57 @@
  * - Edge cases at threshold boundaries
  */
 
-import { calculateOptimalPension, compareWithOptimization } from '../pensionOptimizer';
+import type { PayPeriod } from '@/constants/taxRates';
+import { parseCurrencyInput } from '@/lib/currencyInput';
+import { convertAnnualToPeriod, convertPeriodToAnnual } from '@/lib/periodCalculator';
+import {
+  calculateOptimalPension,
+  compareWithOptimization,
+  roundPensionUpToPence,
+} from '../pensionOptimizer';
+
+describe('pension suggestion penny rounding', () => {
+  it.each([
+    [12000 / 12, 1000],
+    [10000 / 12, 833.34],
+    [4000 / 2080, 1.93],
+    [1.1, 1.1],
+    [0.29, 0.29],
+    [4.01, 4.01],
+  ])('rounds %p upwards to %p without penalising exact pennies', (amount, expected) => {
+    expect(roundPensionUpToPence(amount)).toBe(expected);
+  });
+
+  const conversions: [PayPeriod, number][] = [
+    ['annually', 40],
+    ['monthly', 40],
+    ['fourWeekly', 40],
+    ['fortnightly', 40],
+    ['weekly', 40],
+    ['daily', 40],
+    ...[20, 25, 30, 35, 37.5, 40, 45, 50, 60].map((hours): [PayPeriod, number] => [
+      'hourly',
+      hours,
+    ]),
+  ];
+  it.each(
+    [1000, 3000, 5000, 10000, 12000, 14000, 20000, 25000, 13.2, 1.1].flatMap((annual) =>
+      conversions.map(([period, hours]) => ({ annual, period, hours })),
+    ),
+  )('keeps $annual/year in $period at $hours hours valid and within one penny/period', ({
+    annual,
+    period,
+    hours,
+  }) => {
+    const raw = convertAnnualToPeriod(annual, period, hours);
+    const amount = roundPensionUpToPence(raw);
+    expect(parseCurrencyInput(String(amount))).toEqual({ status: 'valid', value: amount });
+    const annualised = convertPeriodToAnnual(amount, period, hours);
+    expect(annualised).toBeGreaterThanOrEqual(annual);
+    expect(annualised - annual).toBeLessThan(convertPeriodToAnnual(0.01, period, hours));
+    if (parseCurrencyInput(String(raw)).status === 'valid') expect(amount).toBe(raw);
+  });
+});
 
 describe('pensionOptimizer', () => {
   describe('calculateOptimalPension - Core Logic', () => {

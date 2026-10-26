@@ -27,6 +27,13 @@ import { selectTaxPolicy } from '@/lib/tax';
 
 const shouldLogWarnings = process.env.NODE_ENV !== 'production';
 
+/** Round a suggested per-period pension upwards without adding a penny to exact amounts. */
+export function roundPensionUpToPence(amount: number): number {
+  const nearestPence = Math.round(amount * 100);
+  // Compare pounds, not the scaled product: e.g. 1.1 * 100 is slightly above 110.
+  return (nearestPence + (nearestPence / 100 < amount ? 1 : 0)) / 100;
+}
+
 function logPensionWarning(message: string): void {
   if (shouldLogWarnings) {
     console.warn(message);
