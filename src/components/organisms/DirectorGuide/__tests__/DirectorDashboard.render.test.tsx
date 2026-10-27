@@ -129,6 +129,7 @@ function setCurrentResult(
     },
     strategyComparison: createComparison(grossProfit) as never,
   } as never);
+  useDirectorGuideStore.setState({ calculatedFormData: useDirectorGuideStore.getState().formData });
 }
 
 describe('DirectorDashboard (normal mode)', () => {

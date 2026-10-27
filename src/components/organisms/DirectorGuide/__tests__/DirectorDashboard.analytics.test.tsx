@@ -27,6 +27,10 @@ jest.mock('@/store/directorGuideStore', () => ({
   useDirectorGuideActions: jest.fn(),
 }));
 
+jest.mock('@/components/molecules/DirectorGuide/useDirectorEmailUnavailableReason', () => ({
+  useDirectorEmailUnavailableReason: () => null,
+}));
+
 jest.mock('@/components/molecules/DirectorGuide/calculator', () => ({
   KeyDates: () => null,
   PensionGapWarning: () => null,

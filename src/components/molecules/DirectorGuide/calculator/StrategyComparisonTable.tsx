@@ -9,21 +9,24 @@
 'use client';
 
 import { AlertTriangle, Banknote, PiggyBank, Split, User } from 'lucide-react';
-import { useState } from 'react';
 import { trackStrategySelected } from '@/lib/directorGuideAnalytics';
 import type { YourSetupResult } from '@/lib/tax/strategyComparison';
 import { cn, formatCurrency } from '@/lib/utils';
-import { useDirectorGuideActions, useSelectedStrategy } from '@/store/directorGuideStore';
+import {
+  type StrategyObjective,
+  useDirectorGuideActions,
+  useDirectorGuideStore,
+  useSelectedStrategy,
+} from '@/store/directorGuideStore';
 import { useActiveDirectorScenario } from './useActiveDirectorScenario';
 
 type StrategyKey = 'allSalary' | 'optimalMix' | 'allDividends';
-type StrategyObjective = 'maximizeTakeHome' | 'minimizeNI';
 
 export function StrategyComparisonTable() {
   const selectedStrategy = useSelectedStrategy();
   const { comparison, activeScenario } = useActiveDirectorScenario();
-  const { setSelectedStrategy, setSliderSalary } = useDirectorGuideActions();
-  const [objective, setObjective] = useState<StrategyObjective>('maximizeTakeHome');
+  const { setSelectedStrategy, setSliderSalary, setObjective } = useDirectorGuideActions();
+  const objective = useDirectorGuideStore((state) => state.objective);
 
   if (!comparison || comparison.grossProfit <= 0) return null;
 
