@@ -21,6 +21,8 @@ error UI, but their browser errors are filtered before they reach Sentry.
 - Blog rendering errors on public article routes.
 - Handled operational failures for PAYE and Director email-results API routes.
 - Calculator anomaly exceptions.
+- Validated error digests (the reference shown by `ErrorState`), error-boundary and router-kind
+  tags, and request paths with credentials, queries and fragments removed.
 - Source maps for production releases when `SENTRY_AUTH_TOKEN` is configured and the build is a
   Vercel production build or `PAYETAX_ENABLE_SENTRY_SOURCEMAPS=true`.
 
@@ -40,6 +42,7 @@ error UI, but their browser errors are filtered before they reach Sentry.
 - Server configuration: `sentry.server.config.ts`.
 - Edge configuration: `sentry.edge.config.ts`.
 - Calculator utility wrappers: `src/lib/sentry.ts`.
+- Shared event/breadcrumb privacy filter: `src/lib/sentryPrivacy.ts`.
 
 ## Calculation Anomaly Alerts
 
@@ -52,6 +55,8 @@ Primary signal:
 
 Minimum triage steps:
 
-1. Capture the Sentry event ID and inspect non-PII tags such as tax year and region.
-2. Reproduce with equivalent non-PII input in non-production.
+1. Capture the Sentry event ID or displayed error digest. Inspect the boundary, router kind,
+   cleaned request path, calculation stage and anomaly codes. Financial attributes such as
+   tax year, region and calculator figures are excluded from attached diagnostic context.
+2. Reproduce with synthetic input in non-production.
 3. If reproducible, create a blocker issue before marking release health as complete.

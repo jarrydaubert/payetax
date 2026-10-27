@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/nextjs';
 import { shouldDropClientSentryEvent } from '@/lib/sentryClientFilters';
+import { sanitizeSentryBreadcrumb, sanitizeSentryEvent } from '@/lib/sentryPrivacy';
 import { isSentryMonitoredPath, shouldDropSentryEventForUnmonitoredPath } from '@/lib/sentryScope';
 
 Sentry.init({
@@ -10,6 +11,7 @@ Sentry.init({
   release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || 'development',
 
   enableLogs: false,
+  sendDefaultPii: false,
   tracesSampleRate: 0,
 
   // Error-focused client monitoring. Session Replay and Browser Tracing are
@@ -19,7 +21,7 @@ Sentry.init({
       ? [
           Sentry.breadcrumbsIntegration({
             console: false, // Don't track console.log
-            dom: true, // Track DOM events
+            dom: false, // Manual breadcrumbs avoid selectors containing financial labels
             fetch: true, // Track fetch requests
             history: true, // Track navigation
             xhr: true, // Track XHR requests
@@ -138,66 +140,6 @@ Sentry.init({
       }
     }
 
-    // Remove query strings with potential PII
-    if (event.request?.url) {
-      try {
-        const url = new URL(event.request.url);
-        event.request.url = url.origin + url.pathname;
-      } catch {
-        // Invalid URL, keep as is
-      }
-    }
-
-    // Scrub form data that might contain PII
-    if (event.request?.data && typeof event.request.data === 'object') {
-      const sanitized = { ...event.request.data } as Record<string, unknown>;
-      // Remove potentially sensitive fields
-      const sensitiveFields = [
-        'email',
-        'name',
-        'phone',
-        'address',
-        'postcode',
-        'ssn',
-        'nationalInsuranceNumber',
-        'taxCode',
-        'salary',
-        'pensionContribution',
-      ];
-      for (const field of sensitiveFields) {
-        sanitized[field] = undefined;
-      }
-      event.request.data = sanitized;
-    }
-
-    // Scrub context data that might contain PII
-    if (event.contexts) {
-      const sensitiveFields = [
-        'email',
-        'name',
-        'phone',
-        'address',
-        'postcode',
-        'ssn',
-        'nationalInsuranceNumber',
-        'taxCode',
-        'salary',
-        'pensionContribution',
-      ];
-
-      for (const [key, value] of Object.entries(event.contexts)) {
-        if (value && typeof value === 'object' && !Array.isArray(value)) {
-          const sanitized = { ...(value as Record<string, unknown>) };
-          for (const field of sensitiveFields) {
-            if (field in sanitized) {
-              sanitized[field] = '[Filtered]';
-            }
-          }
-          (event.contexts as Record<string, unknown>)[key] = sanitized;
-        }
-      }
-    }
-
     // Add browser and device context
     if (typeof window !== 'undefined') {
       event.contexts = {
@@ -213,48 +155,8 @@ Sentry.init({
       };
     }
 
-    return event;
+    return sanitizeSentryEvent(event);
   },
 
-  // Breadcrumb filtering
-  beforeBreadcrumb(breadcrumb, _hint) {
-    // Skip console breadcrumbs (too noisy)
-    if (breadcrumb.category === 'console') {
-      return null;
-    }
-
-    // Sanitize URLs in breadcrumbs
-    if (breadcrumb.data?.url) {
-      try {
-        const url = new URL(breadcrumb.data.url);
-        breadcrumb.data.url = url.origin + url.pathname;
-      } catch {
-        // Invalid URL, keep as is
-      }
-    }
-
-    // Scrub breadcrumb data fields
-    if (breadcrumb.data && typeof breadcrumb.data === 'object') {
-      const data = breadcrumb.data as Record<string, unknown>;
-      const sensitiveFields = [
-        'email',
-        'name',
-        'phone',
-        'address',
-        'postcode',
-        'ssn',
-        'nationalInsuranceNumber',
-        'taxCode',
-        'salary',
-        'pensionContribution',
-      ];
-      for (const field of sensitiveFields) {
-        if (field in data) {
-          data[field] = '[Filtered]';
-        }
-      }
-    }
-
-    return breadcrumb;
-  },
+  beforeBreadcrumb: sanitizeSentryBreadcrumb,
 });

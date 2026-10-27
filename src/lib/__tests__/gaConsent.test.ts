@@ -1,4 +1,5 @@
 // src/lib/__tests__/gaConsent.test.ts
+import { trackSEOAction } from '@/lib/analytics';
 import {
   applyConsentUpdate,
   bootstrapGa,
@@ -58,6 +59,7 @@ function clearAllCookies(): void {
 
 describe('gaConsent', () => {
   beforeEach(() => {
+    window.history.replaceState({}, '', '/');
     resetGaConsentStateForTests();
     mockConsented.mockReturnValue(true);
     mockMeasurementId.mockReturnValue(GA_ID);
@@ -66,6 +68,49 @@ describe('gaConsent', () => {
     win.gtag = undefined;
     win[`ga-disable-${GA_ID}`] = undefined;
     clearAllCookies();
+  });
+
+  afterEach(() => window.history.replaceState({}, '', '/'));
+
+  it.each([
+    ['results_email', 'results_followup'],
+    ['director_results_email', 'director_recalculate'],
+  ])('keeps only the approved %s campaign in config and outbound events', (source, campaign) => {
+    window.history.replaceState(
+      {},
+      '',
+      `/?utm_source=${source}&utm_medium=email&utm_campaign=${campaign}&salary=73123&gclid=click73123`,
+    );
+    bootstrapGa();
+    applyConsentUpdate(true);
+    markGaLoaded();
+    gtagQueued('event', 'calculator_completed', {
+      label: 'paye_calculator',
+      campaign_source: 'unapproved73123',
+    });
+    const attribution = {
+      campaign_source: source,
+      campaign_medium: 'email',
+      campaign_name: campaign,
+    };
+    expect(dlEntries().find((e) => e[0] === 'config')?.[2]).toMatchObject(attribution);
+    expect(dlEntries().find((e) => e[0] === 'event')?.[2]).toMatchObject({
+      ...attribution,
+      page_location: 'http://localhost/',
+    });
+    expect(JSON.stringify(dlEntries())).not.toContain('73123');
+  });
+
+  it('cleans SEO labels at the final GA boundary, including queued events', () => {
+    bootstrapGa();
+    applyConsentUpdate(true);
+    trackSEOAction('navigation', { source: 'https://x.test/?salary=73123' });
+    markGaLoaded();
+    expect(dlEntries().find((e) => e[0] === 'event')?.[2]).toMatchObject({
+      label: 'https://x.test/',
+      source: 'https://x.test/',
+    });
+    expect(JSON.stringify(dlEntries())).not.toContain('73123');
   });
 
   describe('bootstrapGa', () => {
@@ -205,13 +250,13 @@ describe('gaConsent', () => {
       expect(pendingEventCount()).toBe(0);
 
       applyConsentUpdate(true); // re-accept
-      gtagQueued('event', 'calculator_start', { label: 'after-re-accept' });
+      gtagQueued('event', 'calculator_start', { label: 'paye_calculator' });
 
       markGaLoaded(); // gtag.js finishes loading
 
       const events = dlEntries().filter((e) => e[0] === 'event' && e[1] === 'calculator_start');
       expect(events).toHaveLength(1);
-      expect(events[0][2]).toMatchObject({ label: 'after-re-accept' });
+      expect(events[0][2]).toMatchObject({ label: 'paye_calculator' });
     });
 
     it('never accumulates events while analytics is disabled or unconfigured', () => {

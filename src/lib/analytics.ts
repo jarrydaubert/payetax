@@ -15,6 +15,7 @@
  */
 
 import type { AnalyticsAction, SEOActionType } from '@/lib/analyticsEvents';
+import { sanitizeAnalyticsParameters } from '@/lib/analyticsPrivacy';
 import { isAnalyticsConsented } from '@/lib/cookieUtils';
 import { gtagQueued } from '@/lib/gaConsent';
 
@@ -122,6 +123,14 @@ export function trackSEOAction(action: SEOActionType, data: SEOAnalyticsData = {
  */
 export function trackEvent(event: AnalyticsEvent): void {
   try {
+    const parameters = sanitizeAnalyticsParameters(event.action, {
+      ...(event.custom_data ?? {}),
+      category: event.category || 'general',
+      label: event.label,
+      value: event.value,
+    });
+    if (!parameters) return;
+
     // Respect user consent - only track if cookies accepted
     if (!isAnalyticsConsented()) {
       return;
@@ -129,28 +138,21 @@ export function trackEvent(event: AnalyticsEvent): void {
 
     if (process.env.NODE_ENV === 'development') {
       // biome-ignore lint/suspicious/noConsole: Dev logging for analytics debugging
-      console.log('📊 Analytics Event:', event);
+      console.log('📊 Analytics Event:', { action: event.action, ...parameters });
     }
 
     // Only breadcrumb high-signal events to avoid Sentry noise
     if (HIGH_SIGNAL_ACTIONS.has(event.action)) {
       addAnalyticsBreadcrumb(`Analytics event: ${event.action}`, {
         action: event.action,
-        category: event.category,
-        label: event.label,
-        value: event.value,
+        ...parameters,
       });
     }
 
     // Track with Google Analytics. Events queue until gtag.js has loaded,
     // so nothing is lost right after acceptance; withdrawal purges the queue.
     // GA4: flatten all params (no custom_parameters wrapper)
-    gtagQueued('event', event.action, {
-      category: event.category || 'general',
-      label: event.label,
-      value: event.value,
-      ...(event.custom_data ?? {}),
-    });
+    gtagQueued('event', event.action, parameters);
   } catch (error) {
     logAnalyticsWarning('Analytics tracking error:', error);
   }
@@ -160,17 +162,12 @@ export function trackEvent(event: AnalyticsEvent): void {
  * Track a calculator-specific event
  *
  * @param action - The specific calculator action
- * @param data - Calculator-related data
  */
-export function trackCalculatorEvent(
-  action: 'calculate' | 'reset' | 'update' | 'error',
-  data?: Record<string, unknown>,
-): void {
+export function trackCalculatorEvent(action: 'calculate' | 'reset' | 'update' | 'error'): void {
   trackEvent({
     action: 'calculator_action',
     category: 'calculator',
     label: action,
-    custom_data: data,
   });
 }
 
@@ -178,17 +175,12 @@ export function trackCalculatorEvent(
  * Track calculator usage
  *
  * @param calculation_type - Type of calculation performed
- * @param salary_range - Salary range for analytics segmentation
  */
-export function trackCalculatorUsage(calculation_type: string, salary_range?: string): void {
+export function trackCalculatorUsage(calculation_type: 'paye'): void {
   trackEvent({
     action: 'calculator_usage',
     category: 'engagement',
     label: calculation_type,
-    custom_data: {
-      salary_range,
-      timestamp: new Date().toISOString(),
-    },
   });
 }
 

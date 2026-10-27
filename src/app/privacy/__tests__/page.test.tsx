@@ -5,9 +5,14 @@ describe('PrivacyPage', () => {
   it('renders hero copy and last updated date', () => {
     render(<PrivacyPage />);
 
-    expect(screen.getByText('Your Tax Data Stays')).toBeInTheDocument();
-    expect(screen.getByText('On Your Device')).toBeInTheDocument();
-    expect(screen.getByText('Last updated: 17 July 2026')).toBeInTheDocument();
+    expect(screen.getByText('Your Figures, Calculated')).toBeInTheDocument();
+    expect(screen.getByText('In Your Browser')).toBeInTheDocument();
+    expect(screen.getByText('Last updated: 27 October 2026')).toBeInTheDocument();
+    expect(screen.getByText('tax-calculator-storage')).toBeInTheDocument();
+    expect(screen.getByText('director-guide-storage')).toBeInTheDocument();
+    expect(
+      screen.getByText(/Calculator inputs are currently remembered automatically/),
+    ).toBeInTheDocument();
   });
 
   it('renders the formal UK GDPR policy sections', () => {

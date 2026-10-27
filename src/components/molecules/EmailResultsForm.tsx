@@ -7,6 +7,7 @@
 'use client';
 
 import { Mail, RotateCcw, Send } from 'lucide-react';
+import Link from 'next/link';
 import { type FormEvent, useEffect, useId, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -106,10 +107,6 @@ export function EmailResultsForm({ input, className, canSend }: EmailResultsForm
         action: 'result_shared',
         category: 'engagement',
         label: 'email',
-        custom_data: {
-          tax_year: input.taxYear,
-          region: input.isScottish ? 'Scotland' : 'rUK',
-        },
       });
     } catch (error) {
       // Ignore abort errors
@@ -203,6 +200,14 @@ export function EmailResultsForm({ input, className, canSend }: EmailResultsForm
           )}
         </Button>
       </form>
+      <p className='text-muted-foreground text-xs'>
+        Sending shares your email address and calculator inputs with PayeTax to prepare your
+        results, which Brevo delivers by email. See our{' '}
+        <Link href='/privacy' className='underline underline-offset-2'>
+          Privacy Policy
+        </Link>
+        .
+      </p>
       {submitError && (
         <p id={`${formId}-email-error`} className='text-destructive text-sm' role='alert'>
           {submitError}

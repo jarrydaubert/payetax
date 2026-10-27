@@ -46,12 +46,7 @@ import {
 } from '@/lib/calculatorValidation';
 import { parseCurrencyInput } from '@/lib/currencyInput';
 import { safeStorage } from '@/lib/safeStorage';
-import {
-  addBreadcrumb,
-  captureCalculatorError,
-  setContext,
-  startPerformanceTransaction,
-} from '@/lib/sentry';
+import { addBreadcrumb, captureCalculatorError, startPerformanceTransaction } from '@/lib/sentry';
 import {
   calculateTax,
   isTaxCodeEditCandidate,
@@ -287,18 +282,6 @@ const getCurrentTaxYear = (): TaxYear => {
   return resolveTaxYear(candidate);
 };
 
-// Get salary range for privacy-safe analytics
-const getSalaryRange = (salary: number): string | null => {
-  if (salary <= 0) return null; // Don't track empty/zero salary
-  if (salary < 25000) return 'under_25k';
-  if (salary < 35000) return '25k_35k';
-  if (salary < 50000) return '35k_50k';
-  if (salary < 75000) return '50k_75k';
-  if (salary < 100000) return '75k_100k';
-  if (salary < 150000) return '100k_150k';
-  return 'over_150k';
-};
-
 type CalculationAnomalyCode =
   | 'non_finite_value'
   | 'negative_component'
@@ -431,7 +414,6 @@ export const collectCalculationAnomalies = (
 
 const reportCalculationAnomalies = (
   results: TaxCalculationResults,
-  input: CalculatorInput,
   source: 'primary' | 'previous_year' | 'what_if',
 ): void => {
   const anomalies = collectCalculationAnomalies(results);
@@ -446,10 +428,9 @@ const reportCalculationAnomalies = (
     level: 'warning',
     data: {
       source,
-      tax_year: input.taxYear,
-      region: input.region,
       anomaly_count: anomalies.length,
-      anomaly_preview: anomalyPreview,
+      anomaly_codes: [...new Set(anomalies.map((anomaly) => anomaly.code))].join(','),
+      anomaly_fields: [...new Set(anomalies.map((anomaly) => anomaly.detail))].join(','),
     },
   });
 
@@ -462,23 +443,12 @@ const reportCalculationAnomalies = (
       source,
       anomaly_count: anomalies.length,
       anomaly_codes: [...new Set(anomalies.map((anomaly) => anomaly.code))].join(','),
-      tax_year: input.taxYear,
-      region: input.region,
-      salary_range: getSalaryRange(input.salary) || 'unknown',
     },
   });
 
   captureCalculatorError(
     new Error(`Calculation anomaly detected (${source})`),
-    {
-      salary: input.salary,
-      taxYear: input.taxYear,
-      region: input.region,
-      taxCode: input.taxCode,
-      studentLoanPlans: input.studentLoanPlans,
-      pensionContribution: input.pensionContribution,
-      isMarried: input.isMarried,
-    },
+    { stage: source },
     'warning',
   );
 
@@ -618,7 +588,6 @@ export const useCalculatorStore = create<CalculatorState>()(
           addBreadcrumb('calculator-input', {
             message: 'Salary updated',
             level: 'info',
-            data: { salaryRange: getSalaryRange(validated.data) ?? 'none' },
           });
 
           setCalculatorState(set, (state) => ({
@@ -1102,25 +1071,10 @@ export const useCalculatorStore = create<CalculatorState>()(
           try {
             const { input } = get();
 
-            // Set context for error tracking
-            setContext('calculator_input', {
-              taxYear: input.taxYear,
-              region: input.region,
-              salaryRange: getSalaryRange(input.salary) ?? 'none',
-              taxCodeProvided: Boolean(input.taxCode),
-              studentLoanPlans: input.studentLoanPlans,
-              hasPension: input.pensionContribution > 0,
-            });
-
             // Add breadcrumb
             addBreadcrumb('calculator', {
               message: 'Starting tax calculation',
               level: 'info',
-              data: {
-                salaryRange: getSalaryRange(input.salary) ?? 'none',
-                taxYear: input.taxYear,
-                region: input.region,
-              },
             });
 
             // Allow calculations with £0 salary for demonstration purposes
@@ -1144,7 +1098,7 @@ export const useCalculatorStore = create<CalculatorState>()(
               throw new Error(pension.error.issues[0]?.message ?? 'Invalid pension contribution');
             const results = calculateTax(inputWithNormalizedTaxCode);
             setCalculatorState(set, { results });
-            reportCalculationAnomalies(results, inputWithNormalizedTaxCode, 'primary');
+            reportCalculationAnomalies(results, 'primary');
 
             // Track successful calculation
             addBreadcrumb('calculator', {
@@ -1152,33 +1106,17 @@ export const useCalculatorStore = create<CalculatorState>()(
               level: 'info',
               data: {
                 resultShape: 'annual-periods',
-                hasTaxDue: results.incomeTax.annually > 0,
               },
             });
 
-            // Analytics tracking (privacy-safe: no exact salary, skip if no salary)
-            const salaryRange = getSalaryRange(input.salary);
-            if (salaryRange) {
-              trackCalculatorEvent('calculate', {
-                tax_year: input.taxYear,
-                region: input.region,
-                has_student_loan: input.studentLoanPlans !== 'none',
-                has_pension: input.pensionContribution > 0,
-                salary_range: salaryRange,
-              });
-              trackCalculatorUsage('paye', salaryRange);
+            // Count successful use without describing the user's calculation.
+            if (input.salary > 0) {
+              trackCalculatorEvent('calculate');
+              trackCalculatorUsage('paye');
               trackEvent({
                 action: 'calculator_completed',
                 category: 'funnel',
                 label: 'paye_calculator',
-                custom_data: {
-                  salary_range: salaryRange,
-                  has_student_loan: input.studentLoanPlans !== 'none',
-                  has_pension: input.pensionContribution > 0,
-                  tax_year: input.taxYear,
-                  region: input.region,
-                  employment_type: 'paye',
-                },
               });
             }
           } catch (error) {
@@ -1186,16 +1124,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             console.error('Tax calculation error:', error);
 
             // Track error in Sentry
-            const { input } = get();
-            captureCalculatorError(error, {
-              salary: input.salary,
-              taxYear: input.taxYear,
-              region: input.region,
-              taxCode: input.taxCode,
-              studentLoanPlans: input.studentLoanPlans,
-              pensionContribution: input.pensionContribution,
-              isMarried: input.isMarried,
-            });
+            captureCalculatorError(error, { stage: 'primary' });
 
             // Reset results on error
             setCalculatorState(set, { results: null });
@@ -1217,7 +1146,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             const previousYearInput = { ...input, taxYear: previousYear };
             const previousResults = calculateTax(previousYearInput);
             setCalculatorState(set, { previousYearResults: previousResults });
-            reportCalculationAnomalies(previousResults, previousYearInput, 'previous_year');
+            reportCalculationAnomalies(previousResults, 'previous_year');
           }
         },
         reset: () => {
@@ -1326,7 +1255,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           const whatIfResults = calculateTax(whatIfInput);
 
           setCalculatorState(set, { whatIfResults });
-          reportCalculationAnomalies(whatIfResults, whatIfInput, 'what_if');
+          reportCalculationAnomalies(whatIfResults, 'what_if');
         },
 
         /**

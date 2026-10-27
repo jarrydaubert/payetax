@@ -14,7 +14,6 @@ import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 import type { StudentLoanPlan } from '@/constants/taxRates';
 import {
-  trackBufferShortfallShown,
   trackGuideReset,
   trackModeChanged,
   trackSafeDrawCalculated,
@@ -814,9 +813,6 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
               };
               if (typeof window !== 'undefined') {
                 trackSafeDrawCalculated();
-                if (monthlyModeOutput.hasBufferShortfall) {
-                  trackBufferShortfallShown();
-                }
               }
             }
 

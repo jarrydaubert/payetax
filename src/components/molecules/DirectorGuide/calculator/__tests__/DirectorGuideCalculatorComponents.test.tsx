@@ -281,7 +281,7 @@ describe('Director Intelligence calculator components', () => {
       render(<StrategyComparisonTable />);
       fireEvent.click(screen.getByRole('button', { name: /All Salary/i }));
 
-      expect(mockTrackStrategySelected).toHaveBeenCalledWith('allSalary', false);
+      expect(mockTrackStrategySelected).toHaveBeenCalledWith();
     });
   });
 
