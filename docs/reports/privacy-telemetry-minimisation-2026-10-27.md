@@ -1,9 +1,10 @@
 # Privacy telemetry minimisation — 27 October 2026
 
-Review candidate based on merged main `51aaf14522d19579f3be9e5f7a4440f97180fc7a` (#127 included),
-in the isolated `fix/privacy-telemetry` worktree. Revised after Claude's REQUEST CHANGES;
-awaiting independent Claude re-review. No commit, PR, merge or deployment is authorised.
-The implementation is local and uncommitted.
+Implementation based on merged main `51aaf14522d19579f3be9e5f7a4440f97180fc7a` (#127 included),
+in the isolated `fix/privacy-telemetry` worktree. Claude independently APPROVED the revised
+implementation. Committed and pushed at `fe63ac27`;
+[PR #137](https://github.com/jarrydaubert/payetax/pull/137) is open for final PR verification.
+No merge is authorised; production deployment remains unverified.
 
 ## Problem and resulting behaviour
 
@@ -159,7 +160,8 @@ and separately authorised historical telemetry deletion. DI-10's acceptance crit
 reintroducing financial warning analytics. Other supporting-page and accessibility findings remain
 outside this candidate. Passing local checks is not production deployment or provider-dashboard evidence.
 
-Claude should independently re-review M1/M2/M3, the L1 assessment and the recorded WebKit test
+Final PR verification should confirm M1/M2/M3, the L1 assessment and the recorded WebKit test
 limitation, then inspect source removal and outbound boundaries, diagnostic usefulness,
 all URL/referrer paths (including Vercel suppression), claims versus current storage behaviour,
-and preservation of #127/consent/email behaviour. No independent approval is claimed here.
+and preservation of #127/consent/email behaviour. Claude's independent review returned APPROVE;
+the historical verification evidence and unverified limitations above remain applicable.
