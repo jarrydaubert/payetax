@@ -491,6 +491,9 @@ test.describe('Responsive calculator geometry', () => {
       const table = page.getByTestId('results-table');
       await expect(table).toBeVisible();
       await enableAllPeriods(page);
+      // WebKit may scroll to a checkbox while enabling optional periods (also on main).
+      // Measure the overview after Calculate with that selection, as the test promises.
+      await page.getByTestId('calculate-button').press('Enter');
       await expect(table.locator('thead tr').first().locator('th')).toHaveText([
         'Breakdown',
         '%',

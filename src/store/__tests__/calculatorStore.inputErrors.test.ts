@@ -123,3 +123,36 @@ describe('getBlockingInputErrors', () => {
     ).toHaveLength(1);
   });
 });
+
+describe('Pension units and result currency', () => {
+  beforeEach(() => useCalculatorStore.getState().reset());
+
+  it.each([
+    ['amount', 5000, 'percentage'],
+    ['amount', 50, 'percentage'],
+    ['percentage', 5, 'amount'],
+    ['percentage', 100, 'amount'],
+  ] as const)('clears %s %s when switching to %s', (from, value, to) => {
+    const store = useCalculatorStore.getState();
+    store.setSalary(30000);
+    store.setPensionContributionType(from);
+    store.setPensionContribution(value);
+    store.calculate();
+    store.calculatePreviousYear();
+    store.setPensionContributionType(to);
+    expect(useCalculatorStore.getState().input.pensionContribution).toBe(0);
+    expect(useCalculatorStore.getState().input.pensionContributionType).toBe(to);
+    expect(useCalculatorStore.getState().results).toBeNull();
+    expect(useCalculatorStore.getState().previousYearResults).toBeNull();
+  });
+
+  it('invalidates results for programmatic edits and retains them for a no-op', () => {
+    const store = useCalculatorStore.getState();
+    store.setSalary(30000);
+    store.calculate();
+    store.setSalary(30000);
+    expect(useCalculatorStore.getState().results).not.toBeNull();
+    store.setInput({ salary: 40000 });
+    expect(useCalculatorStore.getState().results).toBeNull();
+  });
+});

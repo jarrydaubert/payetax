@@ -25,9 +25,10 @@ const maskEmail = (email: string): string => {
 interface EmailResultsFormProps {
   input: PayeEmailInput;
   className?: string;
+  canSend?: () => boolean;
 }
 
-export function EmailResultsForm({ input, className }: EmailResultsFormProps) {
+export function EmailResultsForm({ input, className, canSend }: EmailResultsFormProps) {
   const formId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -47,6 +48,11 @@ export function EmailResultsForm({ input, className }: EmailResultsFormProps) {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (canSend && !canSend()) {
+      setSubmitError('Inputs changed. Calculate again before emailing results.');
+      return;
+    }
 
     // Use native validation
     if (!inputRef.current?.validity.valid) {

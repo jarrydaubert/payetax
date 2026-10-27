@@ -120,6 +120,7 @@ describe('CalculatorContainer Component', () => {
   const mockCalculate = jest.fn();
   const mockCalculatePreviousYear = jest.fn();
   const mockSetInput = jest.fn();
+  const mockInvalidateResults = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -127,6 +128,7 @@ describe('CalculatorContainer Component', () => {
       calculate: mockCalculate,
       calculatePreviousYear: mockCalculatePreviousYear,
       setInput: mockSetInput,
+      invalidateResults: mockInvalidateResults,
     });
     (useCalculatorResults as jest.Mock).mockReturnValue(null);
     const storeState = {
@@ -142,7 +144,9 @@ describe('CalculatorContainer Component', () => {
     (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector(storeState),
     );
-    Object.assign(useCalculatorStore, { getState: () => storeState });
+    Object.assign(useCalculatorStore, {
+      getState: () => ({ ...storeState, results: useCalculatorResults() }),
+    });
   });
 
   describe('Initial Rendering', () => {
@@ -459,7 +463,6 @@ describe('CalculatorContainer Component', () => {
     });
 
     it('should apply pension optimization and require Calculate again', () => {
-      const mockSetState = jest.fn();
       Object.assign(useCalculatorStore, {
         getState: () => ({
           results: mockResults,
@@ -471,7 +474,6 @@ describe('CalculatorContainer Component', () => {
             pensionContributionType: 'amount',
           },
         }),
-        setState: mockSetState,
       });
       render(<CalculatorContainer />);
 
@@ -483,11 +485,7 @@ describe('CalculatorContainer Component', () => {
       });
       expect(mockCalculate).not.toHaveBeenCalled();
       expect(mockCalculatePreviousYear).not.toHaveBeenCalled();
-      expect(mockSetState).toHaveBeenCalledWith({
-        results: null,
-        previousYearResults: null,
-        whatIfResults: null,
-      });
+      expect(mockInvalidateResults).toHaveBeenCalledTimes(1);
     });
   });
 

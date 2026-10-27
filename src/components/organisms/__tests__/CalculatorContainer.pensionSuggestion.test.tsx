@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { PayPeriod } from '@/constants/taxRates';
 import { parseCurrencyInput } from '@/lib/currencyInput';
@@ -71,6 +71,40 @@ describe('Tax-trap pension suggestion (mounted real inputs, store and engine)', 
     ['monthly', 12, 1666.67],
     ['weekly', 52, 384.62],
   ];
+
+  it('rejects a stale suggestion callback before React has removed its button', async () => {
+    const user = userEvent.setup();
+    useCalculatorStore.getState().setInput({ salary: 110000, taxCode: '' });
+    render(<CalculatorContainer />);
+    await user.click(screen.getByTestId('calculate-button'));
+    const apply = await screen.findByRole('button', { name: 'Add £10,000 to Pension' });
+    act(() => {
+      useCalculatorStore.getState().setPensionContribution(5);
+      fireEvent.click(apply);
+    });
+    expect(useCalculatorStore.getState().input.pensionContribution).toBe(5);
+    expect(useCalculatorStore.getState().input.pensionContributionType).toBe('percentage');
+    expect(useCalculatorStore.getState().results).toBeNull();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+
+  it('rejects an old suggestion when another Calculate has replaced its result', async () => {
+    const user = userEvent.setup();
+    useCalculatorStore.getState().setInput({ salary: 110000, taxCode: '' });
+    render(<CalculatorContainer />);
+    await user.click(screen.getByTestId('calculate-button'));
+    const apply = await screen.findByRole('button', { name: 'Add £10,000 to Pension' });
+    act(() => {
+      const store = useCalculatorStore.getState();
+      store.setSalary(120000);
+      store.calculate();
+      fireEvent.click(apply);
+    });
+    expect(useCalculatorStore.getState().input.pensionContribution).toBe(0);
+    expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(120000);
+    expect(screen.queryByText(/added to your annual pension contribution/)).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Add £20,000 to Pension' })).toBeInTheDocument();
+  });
 
   it('returns to the initial prompt when Reset discards an applied suggestion', async () => {
     const user = userEvent.setup();

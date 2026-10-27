@@ -39,7 +39,7 @@ The recorded production baseline is `44d8d02`, which includes:
 - MC-09 (#134): applying a tax-trap pension suggestion now adds the annual amount to the existing
   contribution in the user's pay period, rounded up to the penny, and requires Calculate again.
 
-Verified `main` at `3c758f77` includes #132's agreed delivery plan and the desktop implementation
+Verified `main` at `534b8eff` includes #132's agreed delivery plan and the desktop implementation
 from [#135](https://github.com/jarrydaubert/payetax/pull/135). Its runtime independently passed
 review at `1fc01a92`: five desktop summary cards, all seven desktop periods visible by default
 at that reviewed ref, no normal-table horizontal scrolling, and the cards, headers and first
@@ -51,12 +51,12 @@ GitHub records #135 as merged on 26 October 2026 at `3c758f77`. This verifies de
 not production deployment. Deployment of #135 has not been independently verified here; the
 recorded production baseline remains `44d8d02`. #127 is the next calculator implementation task.
 
-The current display-period requirement, implemented on review PR
+The current display-period requirement, merged to `main` at `534b8eff` on 27 October 2026 by
 [#136](https://github.com/jarrydaubert/payetax/pull/136), supersedes #135's historical default:
 Yearly, Monthly, Weekly, Daily and Hourly are selected by default on both mobile and desktop.
 All seven periods remain available; 4-Weekly and Fortnightly start unchecked and can be enabled.
 User selections survive resizing, and all seven normal-table columns fit on desktop without
-horizontal scrolling when enabled. #136 remains subject to review and merge; this is not a claim
+horizontal scrolling when enabled. Delivery to `main` is verified; this is not a claim
 about production deployment. The #135 review evidence above records its original delivery.
 On #136, the Tax Code input remains optional with a region-aware placeholder and tooltip; a blank
 value stays blank and uses policy-derived allowances. Its explanatory paragraph has been removed.
@@ -66,8 +66,25 @@ responsive-statement PR [#128](https://github.com/jarrydaubert/payetax/pull/128)
 unmerged. Their implementation reports and passing checks are evidence for those refs, not released
 behaviour. On #127:
 - MC-01 was accepted at `f0bcdc97`.
-- Claude approved MC-02 at `6a9bee73`.
-- MC-03's integrity scope remains open.
+- Claude approved MC-02 at `6a9bee73` on 24 October, now recorded as an
+  [owner-supplied independent review record on #127](https://github.com/jarrydaubert/payetax/pull/127#issuecomment-6440302170).
+- Claude approved all MC-03 integrity requirements at `8ad733a2`, recorded in the
+  [owner-supplied review summary](https://github.com/jarrydaubert/payetax/pull/127#issuecomment-6441865445).
+  A test/documentation-only pre-merge cleanup awaits focused independent re-review. MC-03's #128
+  presentation scope remains open.
+
+Claude's repeated Mobile Safari MC-03 runs returned 29/32 and 28/32 because Calculate taps were
+lost during scrolling; the same defect reproduced on main. The earlier local 32/32 is one observed
+run, not a touch-repeatability or acceptance guarantee. The existing
+[Verification investigation](BACKLOG.md#verification) owns this user-facing lost-tap defect and the
+related desktop WebKit pension-suggestion click issue. Keyboard-driven integrity regressions do
+not fix or close either pointer defect; #127's cleanup changes no application code.
+
+The unmerged MC-02 implementation preserves invalid saved pension numbers and units, associates
+the error with the field, and permits explicit correction without clearing storage. MC-01's
+[23 October evidence](reports/mc-01-touch-pan-follow-up-2026-10-23.md) retains its native WebKit-pan,
+physical-device, virtual-keyboard and OS-clipboard limitations. Those earlier approvals do not
+certify the unverified paths; MC-03's separate approval does not certify reliable pointer delivery.
 
 #128 inherits #127's guarantees.
 

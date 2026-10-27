@@ -392,6 +392,14 @@ Current GitHub hard gates:
 
 - JavaScript/TypeScript CodeQL analysis on push, pull request, and weekly schedule.
 
+The existing `E2E critical (non-blocking)` job runs `test:e2e:critical:ci` in Chromium,
+including `monetary-input-interaction.spec.ts` and the trusted touch-pan regression in
+`monetary-input-pan.spec.ts`. It retains `continue-on-error: true`; this is not a required
+WebKit gate. The pan test uses Chromium DevTools touch events and is excluded from WebKit,
+whose taps and amount replacements remain covered by the shared interaction spec.
+MC-01 acceptance also requires repeated production-build WebKit/Mobile Safari runs with
+the source/tree identity, engine version, repeat count, workers and outcomes recorded.
+
 Why the full Playwright suite is not a default PR blocker:
 
 - It is valuable but slower.

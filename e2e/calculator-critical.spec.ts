@@ -13,13 +13,316 @@
 import { expect, type Locator, type Page, test } from '@playwright/test';
 import { parseCurrencyInput } from '../src/lib/currencyInput';
 import payrollFixtures from '../src/test/payeVerificationFixtures/salary-guides-payroll-2026-27.json';
-import { dismissCookieBannerIfPresent, ensureCalculatorVisible } from './helpers/calculator-ui';
+import {
+  dismissCookieBannerIfPresent,
+  ensureCalculatorVisible,
+  openCalculatorForAmountEntry,
+} from './helpers/calculator-ui';
 
 function parsePercent(text: string): number {
   const match = text.match(/(\d+(\.\d+)?)%/);
   if (!match) throw new Error(`Could not parse % from: ${text}`);
   return Number.parseFloat(match[1] ?? 'NaN');
 }
+
+test.describe('MC-03 input integrity @critical', () => {
+  // Test input/result integrity through native keyboard activation. Lost Calculate taps during
+  // scrolling and WebKit pension-Apply clicks remain user-facing defects owned by BACKLOG.md
+  // Verification; this suite does not certify pointer delivery.
+  test.beforeEach(async ({ page, isMobile }) => {
+    await openCalculatorForAmountEntry(page, isMobile);
+    await page.getByTestId('married-checkbox').press('Space');
+    await expect(page.getByTestId('partner-salary-input')).toBeHidden();
+  });
+
+  async function typeAmount(field: Locator, text: string) {
+    await field.focus();
+    await expect(field).toBeFocused();
+    await field.press('ControlOrMeta+A');
+    await field.pressSequentially(text);
+    await expect(field).toHaveValue(text);
+  }
+
+  const emailAction = (page: Page) =>
+    page.getByRole('button', { name: 'Email tax calculation results' });
+
+  test('valid salary edit and blur require Calculate, then email matches the displayed inputs', async ({
+    page,
+  }) => {
+    const sent: unknown[] = [];
+    await page.route('**/api/send-results', async (route) => {
+      sent.push(route.request().postDataJSON());
+      await route.fulfill({ json: { success: true } });
+    });
+    const salary = page.getByTestId('salary-input');
+    await typeAmount(salary, '30000');
+    await page.getByTestId('calculate-button').press('Enter');
+    expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(30000);
+    await typeAmount(salary, '40000');
+    await expect(page.getByTestId('tax-results')).toHaveCount(0);
+    await expect(emailAction(page)).toHaveCount(0);
+    await salary.press('Tab');
+    await expect(salary).toHaveValue('40,000.00');
+    await expect(page.getByTestId('tax-results')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /to Pension$/ })).toHaveCount(0);
+    expect(sent).toEqual([]);
+    await page.getByTestId('calculate-button').press('Enter');
+    expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(40000);
+    await emailAction(page).press('Enter');
+    await page.getByLabel('Email address for results').fill('mc03@example.com');
+    await page.getByRole('button', { name: /^Email Results$/ }).press('Enter');
+    await expect(page.getByRole('status').filter({ hasText: 'Results sent' })).toBeVisible();
+    expect(sent).toEqual([
+      expect.objectContaining({
+        input: expect.objectContaining({
+          salary: 40000,
+          payPeriod: 'annually',
+          pensionContribution: 0,
+        }),
+      }),
+    ]);
+  });
+
+  test('invalid drafts stay blocked through recovery until explicit Calculate', async ({
+    page,
+  }) => {
+    const salary = page.getByTestId('salary-input');
+    await typeAmount(salary, '30000');
+    await page.getByTestId('calculate-button').press('Enter');
+    await expect(page.getByTestId('tax-results')).toBeVisible();
+    await typeAmount(salary, '-500');
+    await page.getByTestId('calculate-button').press('Enter');
+    await expect(
+      page.getByRole('alert').filter({
+        hasText: 'Correct the invalid amount in Salary before calculating.',
+      }),
+    ).toBeVisible();
+    await expect(salary).toHaveAttribute('aria-invalid', 'true');
+    await expect(page.getByTestId('tax-results')).toHaveCount(0);
+    await expect(emailAction(page)).toHaveCount(0);
+    await typeAmount(salary, '40000');
+    await salary.press('Enter');
+    await expect(salary).toHaveValue('40,000.00');
+    await expect(page.getByTestId('tax-results')).toHaveCount(0);
+    await page.getByTestId('calculate-button').press('Enter');
+    expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(40000);
+  });
+
+  test('pension edit removes stale suggestions; applying a fresh suggestion only edits input', async ({
+    page,
+  }) => {
+    await typeAmount(page.getByTestId('salary-input'), '120000');
+    await page.getByTestId('calculate-button').press('Enter');
+    await expect(page.getByRole('button', { name: 'Add £20,000 to Pension' })).toBeVisible();
+    const pension = page.getByTestId('pension-input');
+    await typeAmount(pension, '5');
+    await expect(page.getByRole('button', { name: /to Pension$/ })).toHaveCount(0);
+    await pension.press('Tab');
+    await expect(page.getByTestId('tax-results')).toHaveCount(0);
+    await page.getByTestId('calculate-button').press('Enter');
+    await page.getByRole('button', { name: 'Add £14,000 to Pension' }).press('Enter');
+    await expect(pension).toHaveValue('20,000.00');
+    await expect(page.getByTestId('tax-results')).toHaveCount(0);
+    await expect(emailAction(page)).toHaveCount(0);
+    await expect(page.getByRole('status').filter({ hasText: 'Calculate again' })).toBeVisible();
+    await pension.focus();
+    await pension.press('Tab');
+    await expect(page.getByTestId('tax-results')).toHaveCount(0);
+    await page.getByTestId('calculate-button').press('Enter');
+    expect(await getYearlyTableValue(page, 'Pension')).toBe(20000);
+    await expect(page.getByRole('button', { name: /to Pension$/ })).toHaveCount(0);
+  });
+
+  test('an already-open email form cannot send after a concurrent input edit', async ({ page }) => {
+    const sent: unknown[] = [];
+    await page.route('**/api/send-results', async (route) => {
+      sent.push(route.request().postDataJSON());
+      await route.fulfill({ json: { success: true } });
+    });
+    await typeAmount(page.getByTestId('salary-input'), '30000');
+    await page.getByTestId('calculate-button').press('Enter');
+    await emailAction(page).press('Enter');
+    await page.getByLabel('Email address for results').fill('mc03@example.com');
+    // Model another mounted consumer editing while this dialog is open. Dispatch the stale
+    // form in the same task, before React has necessarily removed its DOM.
+    await page.evaluate(() => {
+      const salary = document.querySelector<HTMLInputElement>('[data-testid="salary-input"]');
+      const form = document.querySelector<HTMLFormElement>('[role="dialog"] form');
+      const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+      if (!(salary && form && setter)) throw new Error('Missing mounted salary/email form');
+      setter.call(salary, '40000');
+      salary.dispatchEvent(new Event('input', { bubbles: true }));
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    });
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await expect(page.getByTestId('tax-results')).toHaveCount(0);
+    expect(sent).toEqual([]);
+  });
+});
+
+test.describe('MC-02 pension units and restoration @critical', () => {
+  async function typePension(pension: Locator, text: string) {
+    await pension.click();
+    await expect(pension).toBeFocused();
+    await pension.press('ControlOrMeta+A');
+    await pension.pressSequentially(text);
+    await expect(pension).toHaveValue(text);
+    await pension.press('Tab');
+  }
+
+  async function switchPensionUnit(page: Page, to: 'percentage' | 'amount') {
+    const trigger = page.getByTestId('pension-type-select');
+    await trigger.focus();
+    await trigger.press('Space');
+    await expect(page.getByRole('listbox')).toBeVisible();
+    const option =
+      to === 'percentage' ? page.getByRole('option').first() : page.getByRole('option').last();
+    await option.press('Enter');
+    await expect(page.getByRole('listbox')).toBeHidden();
+    await expect(trigger).toBeFocused();
+  }
+
+  async function restorePension(page: Page, value: number, type: 'percentage' | 'amount') {
+    await page.addInitScript(
+      ({ value, type }) => {
+        if (localStorage.getItem('tax-calculator-storage') !== null) return;
+        localStorage.setItem(
+          'tax-calculator-storage',
+          JSON.stringify({
+            state: {
+              input: {
+                salary: 60000,
+                taxYear: '2026-2027',
+                taxCode: '1257L',
+                pensionContribution: value,
+                pensionContributionType: type,
+              },
+            },
+            version: 0,
+          }),
+        );
+      },
+      { value, type },
+    );
+  }
+
+  async function openPensionCalculator(page: Page, touch: boolean, reload = false) {
+    if (reload) await page.reload({ waitUntil: 'domcontentloaded' });
+    else await page.goto('/#tax-calculator', { waitUntil: 'domcontentloaded' });
+    await dismissCookieBannerIfPresent(page);
+    await ensureCalculatorVisible(page);
+    const married = page.getByTestId('married-checkbox');
+    const checked = (await married.getAttribute('aria-checked')) !== 'true';
+    // Readiness is a mounted React interaction, independent of external analytics requests.
+    await expect(async () => {
+      if ((await married.getAttribute('aria-checked')) !== String(checked)) {
+        if (touch) await married.tap();
+        else await married.press('Space');
+      }
+      await expect(married).toHaveAttribute('aria-checked', String(checked), { timeout: 1000 });
+      if (checked)
+        await expect(page.getByTestId('partner-salary-input')).toBeVisible({ timeout: 1000 });
+      else await expect(page.getByTestId('partner-salary-input')).toBeHidden({ timeout: 1000 });
+    }).toPass({ timeout: 15000 });
+  }
+
+  for (const [type, value, display, annual] of [
+    ['percentage', 5.25, '5.25', 3150],
+    ['amount', 5000.25, '5,000.25', 5000.25],
+  ] as const) {
+    test(`valid restored ${value} ${type} keeps its meaning`, async ({ page, isMobile }) => {
+      await restorePension(page, value, type);
+      await openPensionCalculator(page, isMobile);
+      const pension = page.getByTestId('pension-input');
+      await expect(pension).toHaveValue(display);
+      await expect(pension).not.toHaveAttribute('aria-invalid');
+      await expect(page.getByTestId('tax-results')).toHaveCount(0);
+      await page.getByTestId('calculate-button').press('Enter');
+      expect(await getYearlyTableValue(page, 'Pension')).toBe(annual);
+    });
+  }
+
+  for (const recovery of ['percentage', 'amount'] as const) {
+    test(`legacy 5000% is preserved, blocked and recoverable as ${recovery}`, async ({
+      page,
+      isMobile,
+    }) => {
+      await restorePension(page, 5000, 'percentage');
+      await openPensionCalculator(page, isMobile);
+      const pension = page.getByTestId('pension-input');
+      const calculate = page.getByTestId('calculate-button');
+      const results = page.getByTestId('tax-results');
+      await expect(pension).toHaveValue('5000');
+      await expect(pension).toHaveAttribute('aria-invalid', 'true');
+      await expect(pension).toHaveAccessibleDescription(/no more than 100%/);
+      await pension.focus();
+      await pension.press('Tab');
+      await calculate.press('Enter');
+      await expect(
+        page.getByRole('alert').filter({ hasText: 'Correct the invalid amount in Pension' }),
+      ).toBeVisible();
+      await expect(results).toHaveCount(0);
+      await expect(page.getByRole('button', { name: 'Email tax calculation results' })).toHaveCount(
+        0,
+      );
+      const saved = await page.evaluate(() =>
+        JSON.parse(localStorage.getItem('tax-calculator-storage') ?? '{}'),
+      );
+      expect(saved.state.input.pensionContribution).toBe(5000);
+      expect(saved.state.input.pensionContributionType).toBe('percentage');
+      await openPensionCalculator(page, isMobile, true);
+      await expect(pension).toHaveAttribute('aria-invalid', 'true');
+
+      if (recovery === 'amount') {
+        await switchPensionUnit(page, 'amount');
+        await expect(pension).toHaveValue('0.00');
+        await expect(page.getByText(/Changing between % and £ resets/)).toBeVisible();
+      }
+      await typePension(pension, recovery === 'amount' ? '5000' : '5.25');
+      await expect(pension).not.toHaveAttribute('aria-invalid');
+      await expect(results).toHaveCount(0);
+      await calculate.press('Enter');
+      expect(await getYearlyTableValue(page, 'Pension')).toBe(recovery === 'amount' ? 5000 : 3150);
+      await openPensionCalculator(page, isMobile, true);
+      await expect(pension).toHaveValue(recovery === 'amount' ? '5,000.00' : '5.25');
+      await expect(pension).not.toHaveAttribute('aria-invalid');
+      await expect(results).toHaveCount(0);
+    });
+  }
+
+  for (const [from, value] of [
+    ['amount', 50],
+    ['amount', 5000],
+    ['percentage', 5.25],
+    ['percentage', 100],
+  ] as const) {
+    test(`switching ${value} ${from} explains reset and validates the new unit`, async ({
+      page,
+      isMobile,
+    }) => {
+      await restorePension(page, value, from);
+      await openPensionCalculator(page, isMobile);
+      const pension = page.getByTestId('pension-input');
+      const calculate = page.getByTestId('calculate-button');
+      await calculate.press('Enter');
+      await expect(page.getByTestId('tax-results')).toBeVisible();
+      await switchPensionUnit(page, from === 'amount' ? 'percentage' : 'amount');
+      await expect(pension).toHaveValue('0.00');
+      await expect(page.getByText(/Changing between % and £ resets/)).toBeVisible();
+      await expect(page.getByTestId('tax-results')).toHaveCount(0);
+      await typePension(pension, from === 'amount' ? '100.01' : '10000000.01');
+      await expect(pension).toHaveAttribute('aria-invalid', 'true');
+      await expect(pension).toHaveAccessibleDescription(/no more than/);
+      await calculate.press('Enter');
+      await expect(page.getByTestId('tax-results')).toHaveCount(0);
+      await typePension(pension, from === 'amount' ? '5.25' : '5000.25');
+      await expect(pension).not.toHaveAttribute('aria-invalid');
+      await expect(page.getByTestId('tax-results')).toHaveCount(0);
+      await calculate.press('Enter');
+      expect(await getYearlyTableValue(page, 'Pension')).toBe(from === 'amount' ? 3150 : 5000.25);
+    });
+  }
+});
 
 function parseGBP(text: string): number {
   const cleaned = text.replace(/[£,]/g, '').trim();
@@ -88,6 +391,21 @@ async function getYearlyTableValue(page: Page, label: string): Promise<number> {
 }
 
 test.describe('MC-09 pension suggestion @critical', () => {
+  async function typeCommittedAmount(field: Locator, text: string) {
+    await field.click();
+    await expect(field).toBeFocused();
+    await field.press('ControlOrMeta+A');
+    await field.pressSequentially(text);
+    await expect(field).toHaveValue(text);
+    await field.press('Enter');
+    await expect(field).toHaveValue(
+      Number(text).toLocaleString('en-GB', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }),
+    );
+  }
+
   const expected = payrollFixtures.scenarios.find(
     (scenario) => scenario.id === 'salary-guide-100k-base',
   )?.expected;
@@ -166,13 +484,15 @@ test.describe('MC-09 pension suggestion @critical', () => {
       );
       await selectOption(page, page.getByTestId('tax-year-select'), /2026.*2027/);
       await page.getByTestId('tax-code-input').fill('');
-      await page.getByTestId('salary-input').fill(scenario.salary);
+      await typeCommittedAmount(page.getByTestId('salary-input'), scenario.salary);
       if (scenario.amount) {
         await page.getByTestId('pension-type-select').click();
         await page.getByRole('option').nth(1).click();
+        await expect(page.getByRole('listbox')).toBeHidden();
+        await expect(page.getByTestId('pension-type-select')).toBeFocused();
       }
-      await page.getByTestId('pension-input').fill(scenario.pension);
-      await page.getByTestId('calculate-button').click();
+      await typeCommittedAmount(page.getByTestId('pension-input'), scenario.pension);
+      await page.getByTestId('calculate-button').press('Enter');
       const apply = page.getByRole('button', { name: `Add £${scenario.addition} to Pension` });
       await expect(apply).toBeVisible();
       await expect(page.getByText(/each year to avoid this trap/)).toBeVisible();
@@ -221,7 +541,7 @@ test.describe('MC-09 pension suggestion @critical', () => {
         ),
       ).toBe(stored);
 
-      await page.getByTestId('calculate-button').click();
+      await page.getByTestId('calculate-button').press('Enter');
       await expect(page.getByTestId('results-table')).toBeVisible();
       expect(await getYearlyTableValue(page, 'Pension')).toBe(scenario.annualPension);
       expect(await getYearlyTableValue(page, 'Estimated Tax-Free Amount')).toBe(12570);
@@ -493,7 +813,7 @@ test.describe('Calculator critical @critical', () => {
     const pension = page.getByTestId('pension-input');
     await pension.fill('abc');
     await page.getByRole('button', { name: /Reset/ }).dispatchEvent('click');
-    await expect(pension).toHaveValue('');
+    await expect(pension).toHaveValue('0.00');
     await expect(pension).not.toHaveAttribute('aria-invalid');
     await pension.blur();
     await expect(pension).toHaveValue('0.00');
@@ -524,4 +844,42 @@ test.describe('Calculator critical @critical', () => {
     const sl = await getYearlyTableValue(page, 'Student Loan');
     expect(sl).toBe(3588);
   });
+});
+
+test('focus, drafts, empty fields and pension unit changes preserve result integrity @critical', async ({
+  page,
+}) => {
+  await gotoCalculator(page);
+  await page.getByTestId('salary-input').fill('60000');
+  await page.getByTestId('tax-code-input').fill('1257L');
+  await page.getByTestId('calculate-button').click();
+  await expect(page.getByTestId('tax-results')).toBeVisible();
+  const salary = page.getByTestId('salary-input');
+  await salary.focus();
+  await salary.press('Tab');
+  await expect(salary).toHaveValue('60,000.00');
+  await expect(page.getByTestId('tax-results')).toBeVisible();
+  await salary.fill('70000');
+  await expect(page.getByTestId('tax-results')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Email tax calculation results' })).toHaveCount(0);
+  await page.getByTestId('calculate-button').click();
+  await expect(page.getByTestId('tax-results')).toBeVisible();
+  await salary.fill('');
+  await salary.press('Tab');
+  await expect(salary).toHaveValue('');
+  await expect(salary).toHaveAttribute('aria-invalid', 'true');
+  await page.getByTestId('calculate-button').click();
+  await expect(page.getByTestId('tax-results')).toHaveCount(0);
+  await salary.fill('60000');
+  const pensionType = page.getByTestId('pension-type-select');
+  await pensionType.click();
+  await page.getByRole('option').last().click();
+  await page.getByTestId('pension-input').fill('5000');
+  await page.getByTestId('calculate-button').click();
+  await pensionType.click();
+  await page.getByRole('option').first().click();
+  await expect(page.getByTestId('pension-input')).toHaveValue('0.00');
+  await expect(page.getByTestId('tax-results')).toHaveCount(0);
+  await page.getByTestId('calculate-button').click();
+  await expect(page.getByTestId('tax-results')).toBeVisible();
 });

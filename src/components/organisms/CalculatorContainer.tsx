@@ -1,7 +1,7 @@
 // src/components/organisms/CalculatorContainer.tsx
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Mail, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
@@ -72,7 +72,7 @@ export function CalculatorContainer() {
       region: state.input.region,
     })),
   );
-  const { calculate, calculatePreviousYear, setInput } = useCalculatorActions();
+  const { calculate, calculatePreviousYear, setInput, invalidateResults } = useCalculatorActions();
   const parsedInputTaxCode = React.useMemo(() => parseTaxCode(input.taxCode, 0), [input.taxCode]);
   const codeRegionOverride = getTaxCodeRegionOverride(parsedInputTaxCode);
   const effectiveIsScottish =
@@ -245,7 +245,8 @@ export function CalculatorContainer() {
     // Rejected text clears the results this action belongs to; then there is nothing to apply to.
     commitFocusedField(sectionRef.current);
     const current = useCalculatorStore.getState();
-    if (!current.results || getBlockingInputErrors(current).length > 0) return;
+    if (!results || current.results !== results || getBlockingInputErrors(current).length > 0)
+      return;
     try {
       // Validate pension amount
       if (
@@ -273,11 +274,7 @@ export function CalculatorContainer() {
         pensionContribution,
         pensionContributionType: 'amount',
       });
-      useCalculatorStore.setState({
-        results: null,
-        previousYearResults: null,
-        whatIfResults: null,
-      });
+      invalidateResults();
 
       // Show success message
       const formattedAmount = new Intl.NumberFormat('en-GB', {
@@ -324,13 +321,24 @@ export function CalculatorContainer() {
           <DialogTitle>Email Results</DialogTitle>
           <DialogDescription>Send a copy of this calculation to your inbox.</DialogDescription>
         </DialogHeader>
-        <EmailResultsForm input={emailInput} className='w-full' />
+        <EmailResultsForm
+          input={emailInput}
+          canSend={() => {
+            const current = useCalculatorStore.getState();
+            return (
+              !!results &&
+              current.results === results &&
+              getBlockingInputErrors(current).length === 0
+            );
+          }}
+          className='w-full'
+        />
       </DialogContent>
     </Dialog>
   );
 
   const summarySection = (
-    <AnimatePresence key='summary' mode='wait'>
+    <React.Fragment key='summary'>
       {(showResults || pensionNeedsCalculate) && (
         <motion.div
           ref={resultsRef}
@@ -377,7 +385,7 @@ export function CalculatorContainer() {
           )}
         </motion.div>
       )}
-    </AnimatePresence>
+    </React.Fragment>
   );
 
   const inputsSection = (
@@ -446,7 +454,7 @@ export function CalculatorContainer() {
       </div>
 
       {/* Results column - order-6 on mobile, right column on desktop */}
-      <AnimatePresence mode='wait'>
+      <React.Fragment key='results'>
         {showResults && results ? (
           <motion.div
             variants={shouldReduceMotion ? {} : ANIMATION_VARIANTS.scaleIn}
@@ -502,7 +510,7 @@ export function CalculatorContainer() {
             </div>
           </motion.div>
         )}
-      </AnimatePresence>
+      </React.Fragment>
     </div>
   );
 }
