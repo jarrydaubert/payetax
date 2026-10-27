@@ -274,7 +274,7 @@ export function generateDirectorEmailHtml(args: {
                 </tr>
                 <tr>
                   <td style="padding: 12px 0; color: #465468;">Personal tax pot</td>
-                  <td style="padding: 12px 0; text-align: right; color: #123a66; font-family: Menlo, Consolas, monospace;">${formatCurrency(strategy.totalPersonalTax)}</td>
+                  <td style="padding: 12px 0; text-align: right; color: #123a66; font-family: Menlo, Consolas, monospace;">${formatCurrency(strategy.incomeTax + strategy.dividendTax + strategy.studentLoan)}</td>
                 </tr>
               </table>
             </td>

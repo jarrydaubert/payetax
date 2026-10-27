@@ -6,7 +6,11 @@ Started from fetched `main` at `6e2a4c8bfaf3b11ad1b6694f5fd3c79d789c1691` (#138)
 on `fix/di05-interim-email-safeguard`. This implements only the interim guard in
 [DI-05](../BACKLOG.md#urgent-correctness-exceptions). The full DI-05 export contract
 remains open. No #128, calculation mechanics, tax policy, API payload/template,
-deployment, dependency or unrelated backlog changes are included.
+deployment, dependency or unrelated backlog changes are included in the initial slice.
+The later [email inspection and active-export assessment](di05-email-content-and-active-export-assessment-2026-10-27.md)
+records the requested end-to-end follow-up and its one-line personal-reserve
+template correction. The checks below describe the initial safeguard revision;
+the follow-up report carries the added validation and findings.
 
 ## Investigation and implementation
 
