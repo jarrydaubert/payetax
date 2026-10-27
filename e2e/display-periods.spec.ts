@@ -20,11 +20,63 @@ test.describe('Display Periods', () => {
     await expect(page.getByTestId('results-table')).toBeVisible();
   });
 
-  test('renders all period checkboxes', async ({ page }) => {
-    const periods = ['Yearly', 'Monthly', 'Weekly', 'Daily', 'Hourly'];
+  const defaultPeriods = ['Yearly', 'Monthly', 'Weekly', 'Daily', 'Hourly'];
+  const optionalPeriods = ['4-Weekly', 'Fortnightly'];
+  const allPeriods = ['Yearly', 'Monthly', '4-Weekly', 'Fortnightly', 'Weekly', 'Daily', 'Hourly'];
 
-    for (const period of periods) {
-      await expect(page.getByRole('checkbox', { name: period, exact: true })).toBeVisible();
+  test('offers seven periods with exactly five selected by default', async ({ page }) => {
+    await expect(
+      page.getByRole('checkbox', {
+        name: /^(Yearly|Monthly|4-Weekly|Fortnightly|Weekly|Daily|Hourly)$/,
+      }),
+    ).toHaveCount(7);
+    for (const period of defaultPeriods) {
+      await expect(page.getByRole('checkbox', { name: period, exact: true })).toBeChecked();
+    }
+    for (const period of optionalPeriods) {
+      await expect(page.getByRole('checkbox', { name: period, exact: true })).not.toBeChecked();
+    }
+    await expect(
+      page.getByTestId('results-table').locator('thead tr').first().locator('th'),
+    ).toHaveText(['Breakdown', '%', ...defaultPeriods]);
+  });
+
+  test('optional periods can be enabled and selections survive resizing both ways', async ({
+    page,
+  }) => {
+    for (const period of optionalPeriods) {
+      await page.getByRole('checkbox', { name: period, exact: true }).click();
+    }
+    const table = page.getByTestId('results-table');
+    const netPay = table.locator('tbody tr', { hasText: 'Net Pay' });
+    const yearlyNetPay = await netPay.locator('td').nth(1).textContent();
+    for (const width of [1440, 390, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const period of allPeriods) {
+        await expect(page.getByRole('checkbox', { name: period, exact: true })).toBeChecked();
+      }
+      await expect(table.locator('thead tr').first().locator('th')).toHaveText([
+        'Breakdown',
+        '%',
+        ...allPeriods,
+      ]);
+      await expect(netPay.locator('td').nth(1)).toHaveText(yearlyNetPay ?? '');
+      if (width >= 1280) {
+        const geometry = await page.getByTestId('results-table-container').evaluate((region) => ({
+          clientWidth: region.clientWidth,
+          scrollWidth: region.scrollWidth,
+        }));
+        expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.clientWidth + 1);
+      }
+    }
+    await page.getByRole('checkbox', { name: 'Daily', exact: true }).click();
+    for (const width of [390, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      await expect(page.getByRole('checkbox', { name: 'Daily', exact: true })).not.toBeChecked();
+      await expect(table.getByRole('columnheader', { name: 'Daily', exact: true })).toHaveCount(0);
+      for (const period of optionalPeriods) {
+        await expect(page.getByRole('checkbox', { name: period, exact: true })).toBeChecked();
+      }
     }
   });
 

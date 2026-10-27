@@ -109,7 +109,7 @@ export function ResultsTable({
   studentLoans = [],
   previousYearResults = null,
   whatIfResults = null,
-  visiblePeriods = ['Yearly', 'Monthly', 'Weekly'],
+  visiblePeriods = ['Yearly', 'Monthly', 'Weekly', 'Daily', 'Hourly'],
   onVisiblePeriodsChange,
   taxYear,
   onApplyPensionOptimization,

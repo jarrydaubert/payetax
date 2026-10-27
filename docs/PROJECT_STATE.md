@@ -52,6 +52,14 @@ deployed. Its separately authorised merge delivers that desktop behaviour to `ma
 deployment must be verified separately. #127 is the next calculator implementation task after
 that merge.
 
+Current display-period selection supersedes #135's reviewed default: Yearly, Monthly, Weekly,
+Daily and Hourly are selected by default on both mobile and desktop. All seven periods remain
+available; 4-Weekly and Fortnightly start unchecked and can be enabled. User selections survive
+resizing, and all seven normal-table columns still fit on desktop without horizontal scrolling.
+The Tax Code input remains optional with a region-aware placeholder and tooltip; a blank value
+stays blank and uses policy-derived allowances. Its explanatory paragraph has been removed.
+The #135 review evidence above records its original delivery, not these subsequent defaults.
+
 The input-integrity PR [#127](https://github.com/jarrydaubert/payetax/pull/127) and stacked
 responsive-statement PR [#128](https://github.com/jarrydaubert/payetax/pull/128) remain open and
 unmerged. Their implementation reports and passing checks are evidence for those refs, not released
