@@ -13,7 +13,7 @@ rebase of #128, provider-setting change, deletion, release or merge is performed
 | [#136](https://github.com/jarrydaubert/payetax/pull/136), merged `534b8eff01c09b959139c4276aac779bccb986bd`, 27 October | Optional Tax Code input with region-aware placeholder/tooltip; five default periods, seven available. | Supersedes the historical all-seven-default review of #135; does not remove the fifth card or change financial formulas. |
 | [#127](https://github.com/jarrydaubert/payetax/pull/127), merged `51aaf14522d19579f3be9e5f7a4440f97180fc7a`, 27 October | MC-01, MC-02 and MC-03 integrity are merged; amount entry, legacy pension recovery, explicit Calculate and stale result/email/suggestion guards are no longer unfinished implementation tasks. | The complete regression contracts are retained below. MC-03 presentation and MC-04–08 remain open. Pointer/action-delivery and native-device limits remain separately owned. |
 | [#137](https://github.com/jarrydaubert/payetax/pull/137), merged `e3f857397e65a4aef79a47889641756bdaad5bfe`, 27 October | Financial telemetry minimised; GA labels/parameters and URLs filtered; useful non-financial Sentry diagnostics retained; policy/storage/PAYE email disclosures corrected. Claude's independent APPROVE was supplied by the maintainer. | Automatic remembering, Director privacy controls, provider verification and vendor history are not fixed by prospective collection changes. No production behaviour is certified by the merge. |
-| #137 final head `35a2c7fa3875faba560358f4fcdd2264455c9cf3` | Existing Windows evidence: exact `bun run test:ci`, 250 suites/4,441 tests pass; TrafficMetrics 100% statements/branches/functions/lines. [Hosted CI and critical E2E](https://github.com/jarrydaubert/payetax/actions/runs/40547076908), [CodeQL](https://github.com/jarrydaubert/payetax/actions/runs/40547077038) and Vercel status were checked successful for this head. | These are checks for the recorded head, not new execution in this documentation task. The earlier 4,433-test run lacked the new component suite; the final test-only commit closes the coverage failure without lowering thresholds. |
+| #137 final head `35a2c7fa3875faba560358f4fcdd2264455c9cf3` | Independently accessible [hosted CI](https://github.com/jarrydaubert/payetax/actions/runs/40547076908/job/122340439388) records 250 suites/4,441 tests passing and TrafficMetrics 100% statements/branches/functions/lines. [Critical Chromium E2E (non-blocking)](https://github.com/jarrydaubert/payetax/actions/runs/40547076908/job/122340438859) and [CodeQL](https://github.com/jarrydaubert/payetax/actions/runs/40547077038) also succeeded for this head. [Vercel preview status](https://vercel.com/jgfprojects/payetax/Endv3Ww8HXUWqQmorAFy3nGLqeBX) was also checked successful. Windows `bun run test:ci` with the same counts/coverage is a separately supplied maintainer report. | Hosted run metadata, job status and CI test/coverage log were independently read for the recorded head; the reported Windows command was not rerun in this documentation task. The earlier 4,433-test run lacked the new component suite; the final test-only commit closes the coverage failure without lowering thresholds. |
 | [Privacy verification report](privacy-telemetry-minimisation-2026-10-27.md) | Preserves actual GA/Sentry/Vercel interceptions, regression results, M1/M2/M3 resolutions and L1–L5 limitations. | Its "PR open" wording is historical to that report; current merge truth is recorded here. The 17/18 WebKit run is not rewritten as fully green. The Director timing race reproduced 6/10 on candidate and base. |
 | [22 October calculator reconciliation](calculator-backlog-reconciliation-2026-10-22.md), [MC-01 input](mc-01-webkit-monetary-input-2026-10-22.md) and [touch-pan follow-up](mc-01-touch-pan-follow-up-2026-10-23.md) | Original decisions, disagreements, acceptance requirements, commands and limitations remain unchanged. | Their old open-PR/MC status is dated evidence, not current project state. Native WebKit pan, physical devices, OS clipboard/native paste are not newly verified. |
 | [18 October Director audit](director-intelligence-audit-2026-10-18.md) and [19 October addendum](director-intelligence-audit-addendum-2026-10-19.md) | Preserve F01–F18/DI-19–27 arithmetic, sources, examples, UI observations and original uncertainty. | No fresh financial or browser audit is claimed. Apart from removing warning telemetry, #137 does not close the Director correctness queue. |
@@ -21,6 +21,32 @@ rebase of #128, provider-setting change, deletion, release or merge is performed
 GitHub PR metadata and the local merged graph were checked against fetched `origin/main`.
 The last independently recorded production baseline remains `44d8d02`; successful previews and
 repository merges are not evidence of what a public visitor currently receives.
+
+### #137 review and local-evidence provenance
+
+The [maintainer-authored #137 description](https://github.com/jarrydaubert/payetax/pull/137)
+records Claude's independent **APPROVE as reported by the maintainer**, not a formal GitHub
+review. [GitHub review submissions](https://api.github.com/repos/jarrydaubert/payetax/pulls/137/reviews)
+returned an empty list when checked on 27 October 2026. The supplied approval covers the reviewed
+implementation; the later final-head TrafficMetrics test-only change has the hosted CI evidence
+above, not a newly inferred Claude approval.
+
+Preserved maintainer-reported local results are 4,433 tests/249 suites, repository checks and
+production build passing; a fresh consent/privacy slice passing 18/18 in Chromium/WebKit; and
+the broader reviewed-source regression run passing 73/73 Chromium and 17/18 WebKit. The existing
+Director focus-timing race reportedly reproduced 6/10 on both candidate and base `51aaf145`.
+The final Windows report gives exact `bun run test:ci`, 250 suites/4,441 tests and TrafficMetrics
+100% statements/branches/functions/lines. These local and independent-review reports are retained
+with their attribution; the linked hosted CI independently corroborates the final test/coverage
+counts, not the local browser, outbound-payload or Claude-review execution.
+
+The [historical implementation report](privacy-telemetry-minimisation-2026-10-27.md) remains
+unchanged, including its local/scratch artifact references and the 38-file source-hash/build
+provenance summary. Those raw artifacts are not bundled or independently verified here; the
+committed summaries preserve their reported results and limitations. Its historical pending-review
+wording does not override the merge record. Future PR evidence must follow `AGENTS.md`'s permanent
+report/PR-attachment rule, including a useful summary and original-artifact hash where raw
+artifacts cannot be retained safely. No production or provider-dashboard verification is implied.
 
 Earlier #127 acceptance records remain reachable: MC-01 at `f0bcdc97`; Claude's MC-02 APPROVE at
 `6a9bee73` ([maintainer-supplied record](https://github.com/jarrydaubert/payetax/pull/127#issuecomment-6440302170));
@@ -56,6 +82,11 @@ guard without pre-empting a ready verified wrong-money fix. The entire Director 
 prerequisite for #128. The search pre-deployment gate still applies to the first homepage/hero
 change wherever it ships; post-release observation remains a separate completion point.
 
+#135's five desktop summary cards remain the agreed design. The earlier #128 direction to
+remove those cards and introduce a separate homepage comparison mode was superseded, as recorded
+in the [22 October documentation reconciliation](calculator-backlog-reconciliation-2026-10-22.md#documentation-reconciliation-on-rebase).
+Mobile two-period comparison remains within MC-05; it does not revive the superseded homepage mode.
+
 ## #128 reconciliation checkpoint
 
 Recorded head: `b4f10087b263a2f87456a432ef03c65385f4fc5e`, branch
@@ -73,11 +104,36 @@ commits. `git merge-tree --write-tree --messages origin/main origin/pr-128` retu
 | Calculation/result integration | `src/store/calculatorStore.ts`, `src/components/organisms/CalculatorContainer.tsx`, `src/components/organisms/CalculatorResults/ResultsTable.tsx`, `src/components/molecules/ResultCard.tsx` (modify/delete) |
 | Mounted integrity coverage | `src/components/organisms/__tests__/CalculatorContainer.amountIntegrity.test.tsx`, `src/components/organisms/__tests__/CalculatorContainer.test.tsx` |
 
+### Silent deletions outside the conflict list
+
+The same #128 head deletes the following paths relative to its common ancestor. These deletions
+can merge without a textual conflict because main did not modify them; the 16-conflict inventory
+therefore does not cover all semantic risks:
+
+- `src/components/organisms/CalculatorResults/ResultsSummaryCards.tsx`
+- `src/components/organisms/CalculatorResults/__tests__/ResultsSummaryCards.test.tsx`
+- `src/components/molecules/__tests__/ResultCard.test.tsx`
+
+The existing `ResultCard.tsx` modify/delete conflict is already counted above. Review both the
+conflicted paths and clean deletions for loss of #135's five-card desktop functionality and
+meaningful regression coverage. Retain or restore the files where needed; where their
+functionality genuinely moves to replacement components, preserve equivalent behaviour and
+coverage on the mounted production path rather than blindly retaining obsolete files/tests.
+
 Reconcile in the existing PR against latest main; do not take either side wholesale or infer that
 an automatically merged file is semantically safe. The implementation owner must preserve:
 
 - #135's five cards, desktop density, accessible navigation and deliberate What-if scrolling;
   #136's five selected defaults, seven available periods, optional Tax Code and retained selections.
+- [#134/MC-09](https://github.com/jarrydaubert/payetax/pull/134) pension-suggestion arithmetic:
+  add the additional annual suggestion to the existing £/% pension through the engine-owned pay
+  basis, convert the total from annual to the selected pay period, round **up** to the penny
+  before storage, then require **Calculate again**. Applying alone cannot publish results.
+  Preserve `src/components/organisms/__tests__/CalculatorContainer.pensionSuggestion.test.tsx`
+  and `src/lib/__tests__/pensionOptimizer.test.ts` regressions: existing £/% pension addition,
+  monthly/weekly/hourly conversion, exact pennies without an extra penny, parser-valid storage/
+  rehydration, independent payroll expectations and invalidation of old results/actions. The
+  separate exact-£100,000 floating-point residual remains open; this preservation does not close it.
 - #127's amount/empty/error handling, unit-aware legacy restoration, atomic invalidation, explicit
   Calculate, matching validated email inputs and input-only/current-suggestion guards.
 - #137's removal of financial derivatives/warnings, shared GA/Sentry/Vercel URL and label filters,
@@ -119,7 +175,7 @@ one owner in the backlog. Audit severity is not a new execution order.
 | P5 retention; audit GA/Sentry/provider open questions | P2 Privacy provider verification. Do not invent retention periods/IP settings or infer them from local SDK tests. |
 | P6/P11 controller/complaints/ICO questions; Terms applicability | P2 Privacy obligations verification using current primary guidance/legal input. These remain uncertainties; no legal conclusion or duty exemption is assumed. |
 | P7 statistical analytics exception; P9 self-assessment tone | Decision-gated supporting-page/privacy proposals. GA4 remains opt-in; no vendor or consent redesign is authorised. |
-| P8 policy links and focusable tables | Existing Verification accessibility owner, extended to the two observed rule types; no duplicate Privacy task. Dark-mode and footer target debt remain there too. |
+| P8 policy links and focusable tables | Existing Verification accessibility owner; closure explicitly requires fixing `link-in-text-block` and all three `scrollable-region-focusable` violations, with passing desktop/mobile keyboard and axe evidence. Removing a spec or changing privacy wording cannot close P8. Dark-mode and footer target debt remain there too. |
 | P10 PAYE collection notice | Closed by #137. Remaining Director email/blog absolutes (#137 L5) have a separate Privacy disclosure owner, coordinated with DI-05 without changing its order or financial-parity scope. |
 | A1/C5 Scottish attribution/dead source link | P2 Trust attribution/source-link owner, now explicitly including About. |
 | A2/T2 missing linked limits | Existing P2 Verification modelling-assumptions owner, coordinated with Foundation transparent results. |
@@ -130,7 +186,7 @@ one owner in the backlog. Audit severity is not a new execution order.
 | I3/I4 install instructions/share target | P3 Content/PWA verification; current iOS steps need evidence, and shared-input support requires an explicit product contract. |
 | I2 optional HowTo utility | Parked supporting-page proposal. I1 remains a strength, not repair work. |
 | O1–O3 offline persistence/sync/metadata | P2 Content accuracy. Remembered inputs do not imply saved results or automatic tax-rate synchronisation. |
-| T3 Tools optimiser description | Existing DI-18 qualified naming/estimate scope, extended to the hub; no parallel Director redesign. |
+| T3 Tools optimiser description | Opinion; explicitly decision-gated with parked DI-18 qualified naming/estimate scope. Agree the wording contract before implementation, including the Tools hub; no active defect or parallel Director redesign is created. |
 | T4 navigation; blog sub-brand | Parked product proposals. Stale blog/listing/`llms.txt` year titles stay with the existing Content evergreen/historical owner. |
 | D1 Director privacy/consent/Compliance access | P2 Privacy controls owner, coordinated with DI-12/13 without duplicating their landmarks/drawer work. |
 | D2 Director hint contrast | DI-12's existing P2 accessibility acceptance; not closed by a privacy wording change. |
@@ -204,6 +260,8 @@ Windows coverage gate passes; exact failure-to-fix mapping remains the bounded u
 
 ## Verification of this documentation change
 
+### Initial revision `c6597eb8` (historical)
+
 `bun --no-env-file run check:repo` and `git diff --check` passed. The local documentation check
 passed 54 relative links/anchors, all 53 supporting-audit finding dispositions, all 23 unchanged
 active Director DoDs, all three retained merged integrity contracts, the verbatim comparative
@@ -212,3 +270,29 @@ gate, the complete audit's byte hash and the five-Markdown-file scope.
 No new application build, browser execution, statutory re-derivation, provider inspection or
 production verification is claimed by this reconciliation. Stop for independent review; this task
 does not authorise a merge or deployment.
+
+
+### Follow-up to Claude's REQUEST CHANGES at `c6597eb8`
+
+This four-file documentation correction restores #134/MC-09 and #135 preservation requirements,
+records #128's silent-deletion risks, clarifies #137 evidence provenance, explicitly decision-gates
+T3, retains concrete Compliance examples, requires P8 accessibility fixes for closure and adds the
+permanent PR-evidence rule to `AGENTS.md`. The complete imported audit and historical #137
+implementation report are unchanged. Independent re-review of this correction remains pending.
+
+Fresh verification on this correction:
+
+- `bun --no-env-file run check:repo` passed (including lint and application/test type checks).
+- `git diff --check` passed.
+- Read-only Python documentation assertions passed: 56 relative links/anchors across the four
+  changed documents and report index; all 53 finding dispositions and every disposition row;
+  all 23 original active Director DoDs; unchanged Foundation order/burn-down, Director sequence,
+  DI-05 interim guard → #128, search release gate/observation and retained #127 contracts and
+  comparative/unit evidence; exactly four changed Markdown files.
+- Byte comparisons against `c6597eb8` confirmed the imported audit, historical #137 report and
+  22 October reconciliation are unchanged. The audit's SHA-256 remains
+  `8f211cc17008342cf5be456e3adb2c1247c28c58576412f858fcfe554bc86dbf`.
+
+No application build/browser run is needed for this documentation correction; no fresh runtime,
+statutory, provider or production verification is claimed. No workflow, branch-protection,
+environment or secret change, #128 implementation work, merge or deployment is performed.

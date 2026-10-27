@@ -42,7 +42,9 @@ This reconciliation verifies repository state, not a new production deployment.
 
 The desktop implementation from #135 remains: five summary cards, direct table access, readable
 seven-period fit when enabled, accessible forward/reverse keyboard navigation below the fixed
-header, and intentional scrolling for the wider What-if table. #136 supersedes the older
+header, and intentional scrolling for the wider What-if table. The earlier #128 direction to
+remove the desktop cards and introduce a separate homepage comparison mode was superseded;
+#135's five desktop cards remain the agreed design. #136 supersedes the older
 all-seven-default evidence: Yearly, Monthly, Weekly, Daily and Hourly start selected on desktop
 and mobile; 4-Weekly and Fortnightly are available but unchecked. Resizing preserves selection and
 the current calculation. The Tax Code input is optional, with a region-aware placeholder and
@@ -58,6 +60,12 @@ tooltip; a blank stays blank and uses policy-derived allowances.
   changes reuse the same calculation. Email, already-open dialogs and result actions cannot use a
   stale or invalid snapshot. A current pension suggestion edits input only and still needs Calculate.
 
+#134/MC-09 remains an explicit #128 preservation requirement: add the suggested annual pension
+amount to the existing pension (whether entered in £ or %), convert the total from annual to the
+selected pay period and round up to the penny before storing it. Applying edits input only and
+requires Calculate again. Preserve `CalculatorContainer.pensionSuggestion.test.tsx` and
+`pensionOptimizer.test.ts` regressions, including parser/storage validity and exact-penny cases.
+
 The full [regression acceptance contracts](reports/project-documentation-reconciliation-2026-10-27.md#retained-127-regression-acceptance-criteria)
 remain requirements for #128. The dated MC-01 [input](reports/mc-01-webkit-monetary-input-2026-10-22.md)
 and [touch-pan](reports/mc-01-touch-pan-follow-up-2026-10-23.md) reports retain their evidence limits:
@@ -70,8 +78,11 @@ and MC-05 owners. Keyboard-driven integrity passes do not close pointer delivery
 It must be reconciled against latest main, not treated as current behaviour or reopened as a new
 redesign. A read-only merge probe against `e3f85739` finds 16 conflicted paths; the
 [checkpoint](reports/project-documentation-reconciliation-2026-10-27.md#128-reconciliation-checkpoint)
-records scope and preservation requirements. Its earlier tests certify its recorded ref, not a
-reconciled candidate. Preserve #136 defaults, #127 input/result/email contracts and #137 privacy/
+records scope and preservation requirements, including silent deletions of
+`ResultsSummaryCards.tsx`, its test and `ResultCard.test.tsx`. Preserve their five-card desktop
+functionality and meaningful regression coverage in retained or equivalent replacement code;
+automatic deletion is not evidence that the functionality has been replaced. Its earlier tests
+certify its recorded ref, not a reconciled candidate. Preserve #136 defaults, #127 input/result/email contracts and #137 privacy/
 consent boundaries, along with #135 desktop behaviour. Reconcile both project documents rather
 than accepting stale branch versions wholesale; retain #128's dated implementation report.
 
@@ -101,6 +112,9 @@ The final test-only fix exercises both Vercel providers through their real priva
 Jest coverage thresholds were preserved. The [implementation report](reports/privacy-telemetry-minimisation-2026-10-27.md)
 and [27 October reconciliation](reports/project-documentation-reconciliation-2026-10-27.md)
 record the dated checks and limitations; their historical pending-review wording is not current status.
+The reconciliation links final-head hosted CI separately from maintainer-reported local tests and
+Claude APPROVE; no formal GitHub review submission was found. The historical implementation
+report remains unchanged.
 
 Remembering is still automatic. The 30-day PAYE/seven-day Director restoration guards do not
 promise physical deletion of browser storage. Explicit opt-in (off by default), clear-data,

@@ -94,6 +94,7 @@ If a Vercel CLI command cannot retrieve project settings, check `.vercel/project
 - Edit source files, not generated output, unless the repo clearly treats the file as committed source.
 - Keep docs aligned with code in the same change.
 - Keep evergreen docs useful and stable; put dated run evidence in PRs or `docs/reports/*`.
+- Evidence relied upon for a PR must be committed under `docs/reports/` or attached to the PR; it must not be available exclusively through a local or scratch path. If raw artifacts are too large or sensitive, preserve a useful summary and a SHA-256 hash of the original artifact in the report or PR attachment, without committing sensitive data. Distinguish independently accessible results from maintainer reports and record the relevant ref, command and limitations.
 - Verify commands before claiming they pass.
 - When touching frontend UI, inspect the changed route locally when practical.
 - For email, privacy, security, and tax claims, confirm the implementation before changing wording.
