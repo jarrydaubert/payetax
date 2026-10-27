@@ -68,14 +68,23 @@ behaviour. On #127:
 - MC-01 was accepted at `f0bcdc97`.
 - Claude approved MC-02 at `6a9bee73` on 24 October, now recorded as an
   [owner-supplied independent review record on #127](https://github.com/jarrydaubert/payetax/pull/127#issuecomment-6440302170).
-- MC-03's integrity implementation is reconciled with `534b8eff` on #127 and awaits Claude's
-  independent review. MC-03's #128 presentation scope remains open.
+- Claude approved all MC-03 integrity requirements at `8ad733a2`, recorded in the
+  [owner-supplied review summary](https://github.com/jarrydaubert/payetax/pull/127#issuecomment-6441865445).
+  A test/documentation-only pre-merge cleanup awaits focused independent re-review. MC-03's #128
+  presentation scope remains open.
+
+Claude's repeated Mobile Safari MC-03 runs returned 29/32 and 28/32 because Calculate taps were
+lost during scrolling; the same defect reproduced on main. The earlier local 32/32 is one observed
+run, not a touch-repeatability or acceptance guarantee. The existing
+[Verification investigation](BACKLOG.md#verification) owns this user-facing lost-tap defect and the
+related desktop WebKit pension-suggestion click issue. Keyboard-driven integrity regressions do
+not fix or close either pointer defect; #127's cleanup changes no application code.
 
 The unmerged MC-02 implementation preserves invalid saved pension numbers and units, associates
 the error with the field, and permits explicit correction without clearing storage. MC-01's
 [23 October evidence](reports/mc-01-touch-pan-follow-up-2026-10-23.md) retains its native WebKit-pan,
-physical-device, virtual-keyboard and OS-clipboard limitations. Neither approval certifies those
-unverified paths or the new MC-03 work.
+physical-device, virtual-keyboard and OS-clipboard limitations. Those earlier approvals do not
+certify the unverified paths; MC-03's separate approval does not certify reliable pointer delivery.
 
 #128 inherits #127's guarantees.
 
