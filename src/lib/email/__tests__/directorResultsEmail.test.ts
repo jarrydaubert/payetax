@@ -2,11 +2,46 @@ import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
 import {
   escapeHtml,
   generateDirectorEmailHtml,
+  generateDirectorEmailText,
   getDirectorEmailThresholds,
 } from '@/lib/email/directorResultsEmail';
 import type { DirectorStrategy } from '@/lib/validation/emailValidation';
 
 describe('directorResultsEmail', () => {
+  test('personal reserve excludes payroll NI while deduction totals retain it', () => {
+    const strategy: DirectorStrategy = {
+      name: 'Synthetic reserve fixture',
+      salary: 20000,
+      dividends: 10000,
+      pension: 0,
+      companyCarBIK: 0,
+      employerNI: 900,
+      employeeNI: 600,
+      incomeTax: 1200,
+      corporationTax: 2000,
+      dividendTax: 800,
+      studentLoan: 300,
+      totalPersonalTax: 2900,
+      companyCost: 22900,
+      takeHome: 27100,
+      effectiveRate: 17.63,
+    };
+    const args = {
+      grossProfit: 32900,
+      strategies: { allSalary: strategy, optimalMix: strategy, allDividends: strategy },
+      recommended: 'optimalMix' as const,
+      savingsVsAllSalary: 0,
+      taxYear: CURRENT_TAX_YEAR,
+    };
+    const html = generateDirectorEmailHtml(args);
+    // Hand arithmetic for these synthetic amounts: 1,200 + 800 + 300 = 2,300 reserve;
+    // adding the 600 payroll NI still gives 2,900 overall personal deductions.
+    expect(html).toMatch(/Personal tax pot<\/td>\s*<td[^>]*>£2,300\.00<\/td>/);
+    expect(html).toMatch(/Personal tax<\/td>\s*<td[^>]*>£2,900\.00<\/td>/);
+    expect(generateDirectorEmailText(args)).toContain('Employee NI: £600.00');
+    expect(generateDirectorEmailText(args)).toContain('Annual Take-Home: £27,100.00');
+  });
+
   test('escapeHtml escapes dangerous characters', () => {
     expect(escapeHtml(`<script>alert("x")</script>`)).toBe(
       '&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;',

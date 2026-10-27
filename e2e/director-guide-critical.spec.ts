@@ -13,6 +13,10 @@
  */
 
 import { type BrowserContext, expect, type Locator, type Page, test } from '@playwright/test';
+import type { TaxYear } from '../src/constants/taxRates';
+import { calculateStrategyComparison } from '../src/lib/tax/strategyComparison';
+import { formatCurrency } from '../src/lib/utils';
+import type { DirectorEmailInput } from '../src/lib/validation/emailValidation';
 
 const DIRECTOR_WELCOME_DISMISS_KEY = 'directorGuideWelcome:dismissed:v1';
 
@@ -58,15 +62,8 @@ async function selectDropdownOption(
   const option = page.getByRole('option', { name: optionName }).first();
   await expect(option).toBeVisible();
 
-  try {
-    await option.click();
-  } catch {
-    try {
-      await option.click({ force: true });
-    } catch {
-      await option.evaluate((el) => (el as HTMLElement).click());
-    }
-  }
+  await option.press('Enter');
+  await expect(page.getByRole('listbox')).toHaveCount(0);
 }
 
 async function dismissWelcomeDialogIfPresent(page: Page): Promise<void> {
@@ -112,11 +109,13 @@ async function ensureInputsPanelIsVisible(page: Page): Promise<void> {
 }
 
 async function closeInputsPanelIfOpen(page: Page): Promise<void> {
+  const drawer = page.getByRole('dialog', { name: 'Your Numbers', includeHidden: true });
   const closeInputsButton = page.getByRole('button', { name: /close your numbers panel/i }).first();
-  if (await closeInputsButton.isVisible().catch(() => false)) {
-    await closeInputsButton.click();
+  if ((await drawer.count()) > 0) {
+    await expect(closeInputsButton).toBeVisible();
+    await closeInputsButton.press('Enter');
   }
-  await expect(page.getByRole('dialog', { name: 'Your Numbers' })).toHaveCount(0);
+  await expect(drawer).toHaveCount(0);
 }
 
 async function ensureLearnPanelIsVisible(page: Page): Promise<void> {
@@ -137,6 +136,193 @@ async function ensureLearnPanelIsVisible(page: Page): Promise<void> {
 }
 
 test.describe('Director Intelligence critical @critical', () => {
+  test('DI-05: only matching scenarios can email, with recovery after each divergence @critical', async ({
+    page,
+  }) => {
+    const requests: { input: DirectorEmailInput; taxYear: TaxYear }[] = [];
+    await page.route('/api/send-director-results', async (route) => {
+      requests.push(route.request().postDataJSON());
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: '{"success":true}',
+      });
+    });
+    await openDirectorGuide(page);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 100000);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 20000);
+    await selectEngland(page);
+    await closeInputsPanelIfOpen(page);
+
+    const email = page.getByRole('button', { name: 'Email My Results', exact: true });
+    const sidebarEmail = page.getByRole('button', { name: 'Email Results', exact: true }).first();
+    const reason = page.getByTestId('director-dashboard-main').getByRole('status');
+    const strategySection = page.locator('[data-director-section="director-strategy"]');
+    const recommended = strategySection
+      .getByRole('button')
+      .filter({ hasText: 'Highest Take-Home' });
+    const expectBlocked = async (message: RegExp) => {
+      await expect(email).toBeDisabled();
+      await expect(reason).toHaveText(message);
+      // Native disabled controls must not open the dialog, including programmatic clicks.
+      await email.evaluate((el: HTMLButtonElement) => el.click());
+      if (await sidebarEmail.isVisible()) {
+        await expect(sidebarEmail).toBeDisabled();
+        await sidebarEmail.evaluate((el: HTMLButtonElement) => el.click());
+      }
+      await expect(page.getByRole('dialog', { name: 'Email Your Results' })).toHaveCount(0);
+      expect(requests).toHaveLength(0);
+    };
+
+    await expect(email).toBeEnabled();
+    // Same-value edits (including a trailing decimal point) must not leave email paused.
+    await ensureInputsPanelIsVisible(page);
+    const revenue = visibleInputByTestId(page, 'director-revenue-input');
+    await replaceText(revenue, '100000.');
+    await revenue.blur();
+    await closeInputsPanelIfOpen(page);
+    await expect(email).toBeEnabled();
+    const salarySlider = page.getByTestId('director-salary-slider').getByRole('slider');
+    await salarySlider.focus();
+    await salarySlider.press('ArrowRight');
+    await expectBlocked(/what-if salary/);
+    await recommended.click();
+    await expect(email).toBeEnabled();
+
+    const profitSlider = page.getByTestId('director-profit-slider').getByRole('slider');
+    await profitSlider.focus();
+    await profitSlider.press('ArrowRight');
+    await expectBlocked(/what-if company profit/);
+    await page
+      .locator('[data-director-section="director-slider"]')
+      .getByRole('button', { name: 'Reset', exact: true })
+      .click();
+    await expect(email).toBeEnabled();
+
+    await strategySection.getByRole('button', { name: /All Salary/ }).click();
+    await expectBlocked(/recommended strategy/);
+    await recommended.click();
+    await expect(email).toBeEnabled();
+
+    await page.getByRole('button', { name: 'Minimize NI', exact: true }).click();
+    await expectBlocked(/selected objective/);
+    await page.getByRole('button', { name: 'Maximize take-home', exact: true }).click();
+    await expect(email).toBeEnabled();
+
+    await email.click();
+    await expect(page.getByText(/Company key dates are not included/)).toBeVisible();
+    await page.getByLabel('Email address').fill('di05@example.com');
+    await page.getByRole('button', { name: 'Send Results', exact: true }).click();
+    await expect(page.getByText(/Results sent to di05@example.com/)).toBeVisible();
+    expect(requests).toHaveLength(1);
+    const request = requests[0];
+    expect(request.input.revenue).toBe(100000);
+    expect(request.input.expenses).toBe(20000);
+    // Parity check using exactly the input/year the existing email server receives.
+    const exported = calculateStrategyComparison(request.input, request.taxYear);
+    const reported = exported.strategies[exported.recommended];
+    await page
+      .getByRole('dialog', { name: 'Email Your Results' })
+      .getByRole('button', { name: 'Close', exact: true })
+      .first()
+      .click();
+    await expect(page.locator('[data-director-section="director-summary"]')).toContainText(
+      formatCurrency(reported.salary, 0),
+    );
+    await expect(page.locator('[data-director-section="director-summary"]')).toContainText(
+      formatCurrency(reported.dividends, 0),
+    );
+    await expect(page.locator('[data-director-section="director-summary"]')).toContainText(
+      formatCurrency(reported.corporationTax, 0),
+    );
+    await expect(page.locator('[data-director-section="director-recommendation"]')).toContainText(
+      formatCurrency(reported.takeHome, 0),
+    );
+  });
+
+  test('DI-05: an open dialog rejects a submit in the same task as an input edit @critical', async ({
+    page,
+  }) => {
+    const requests: unknown[] = [];
+    await page.route('/api/send-director-results', async (route) => {
+      requests.push(route.request().postDataJSON());
+      await route.fulfill({ json: { success: true } });
+    });
+    await openDirectorGuide(page);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 100000);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 20000);
+    await selectEngland(page);
+    await closeInputsPanelIfOpen(page);
+    await page.getByRole('button', { name: 'Email My Results' }).click();
+    await page.getByLabel('Email address').fill('di05@example.com');
+    await page.evaluate(() => {
+      const input = document.querySelector<HTMLInputElement>(
+        '[data-testid="director-revenue-input"]',
+      );
+      const form = document.querySelector<HTMLFormElement>('[role="dialog"] form');
+      const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+      if (!(input && form && setter)) throw new Error('Missing Director input/email form');
+      setter.call(input, '110000');
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    });
+    await expect(page.getByRole('alert')).toHaveText(
+      /Results changed|Email is paused until results have updated/,
+    );
+    await expect(page.getByRole('button', { name: 'Send Results' })).toBeEnabled();
+    expect(requests).toEqual([]);
+  });
+
+  test('DI-05: year-end changes recover and monthly cash projections stay blocked @critical', async ({
+    page,
+  }) => {
+    const requests: unknown[] = [];
+    await page.route('/api/send-director-results', async (route) => {
+      requests.push(route.request().postDataJSON());
+      await route.fulfill({ json: { success: true } });
+    });
+    await openDirectorGuide(page);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 100000);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 20000);
+    await selectEngland(page);
+    await selectDropdownOption(
+      page,
+      page.getByRole('combobox', { name: 'Company Year-End' }).filter({ visible: true }),
+      '31 December',
+    );
+    await closeInputsPanelIfOpen(page);
+    const email = page.getByRole('button', { name: 'Email My Results' });
+    await expect(email).toBeEnabled();
+    await ensureInputsPanelIsVisible(page);
+    await page
+      .getByRole('button', { name: 'Monthly', exact: true })
+      .filter({ visible: true })
+      .click();
+    await fillCurrencyInput(
+      page.getByRole('textbox', { name: 'Monthly Contract Income' }).filter({ visible: true }),
+      10000,
+    );
+    await fillCurrencyInput(
+      page.getByRole('textbox', { name: 'Monthly Business Expenses' }).filter({ visible: true }),
+      2000,
+    );
+    await closeInputsPanelIfOpen(page);
+    await expect(email).toBeDisabled();
+    await expect(page.getByTestId('director-dashboard-main').getByRole('status')).toHaveText(
+      /cash-aware monthly draw/,
+    );
+    await email.evaluate((el: HTMLButtonElement) => el.click());
+    expect(requests).toEqual([]);
+    const openInputs = page.getByRole('button', { name: /open calculator inputs/i });
+    if (await openInputs.isVisible()) await openInputs.click();
+    await page
+      .getByRole('button', { name: 'Annual', exact: true })
+      .filter({ visible: true })
+      .click();
+    await closeInputsPanelIfOpen(page);
+    await expect(email).toBeEnabled();
+  });
+
   test('Normal mode: calculates and can email results @critical', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await suppressWelcomeDialog(page);
@@ -231,8 +417,20 @@ async function openDirectorGuide(page: Page): Promise<void> {
 async function replaceText(input: Locator, text: string): Promise<void> {
   await expect(input).toBeEditable();
   await input.click();
+  await expect(input).toBeFocused();
+  // Wait for currency focus formatting before selecting; otherwise the format update can
+  // collapse the selection in WebKit and delete/replace only one digit.
+  await expect(input).not.toHaveValue(/^£/);
   await input.press('ControlOrMeta+A');
-  await input.page().keyboard.insertText(text);
+  await expect
+    .poll(() =>
+      input.evaluate(
+        (el: HTMLInputElement) => el.selectionStart === 0 && el.selectionEnd === el.value.length,
+      ),
+    )
+    .toBe(true);
+  if (text === '') await input.press('Backspace');
+  else await input.page().keyboard.insertText(text);
 }
 
 /**
@@ -344,11 +542,14 @@ test.describe('Director Intelligence currency inputs @critical', () => {
     const expensesInput = visibleInputByTestId(page, 'director-expenses-input');
     const emailCta = page.getByRole('button', { name: 'Email My Results' });
     const recommendation = page.locator('[data-director-section="director-recommendation"]');
-    const sidebarEmail = page.getByRole('button', { name: 'Email Results', exact: true }).first();
+    const sidebarEmail = page
+      .getByRole('button', { name: 'Email Results', exact: true, includeHidden: true })
+      .first();
 
     await fillCurrencyInput(revenueInput, 100000);
     await fillCurrencyInput(expensesInput, 20000);
     await selectEngland(page);
+    await closeInputsPanelIfOpen(page);
     await expect(recommendation).toBeVisible();
     await expect(emailCta).toBeVisible();
     await expect(sidebarEmail).toBeEnabled();
@@ -360,7 +561,9 @@ test.describe('Director Intelligence currency inputs @critical', () => {
     await expect(revenueInput).toHaveValue('-500');
     await expect(revenueInput).toHaveAttribute('aria-invalid', 'true');
     await expect(
-      page.getByText('Enter an amount of £0 or more. Negative amounts are not supported.'),
+      page
+        .getByText('Enter an amount of £0 or more. Negative amounts are not supported.')
+        .filter({ visible: true }),
     ).toBeVisible();
     await expect(page.getByTestId('director-results-paused')).toBeVisible();
     await expect(recommendation).toHaveCount(0);
@@ -370,14 +573,14 @@ test.describe('Director Intelligence currency inputs @critical', () => {
     // Correcting the amount restores a current result and email.
     await replaceText(revenueInput, '100000');
     await revenueInput.blur();
+    await closeInputsPanelIfOpen(page);
     await expect(recommendation).toBeVisible();
     await expect(emailCta).toBeVisible();
     await expect(sidebarEmail).toBeEnabled();
 
     // Clearing a required input removes the result; empty is not treated as £0.
-    await expensesInput.click();
-    await expensesInput.press('ControlOrMeta+A');
-    await expensesInput.press('Backspace');
+    await ensureInputsPanelIsVisible(page);
+    await replaceText(expensesInput, '');
     await expensesInput.blur();
     await expect(expensesInput).toHaveValue('');
     await expect(recommendation).toHaveCount(0);

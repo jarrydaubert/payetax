@@ -12,7 +12,7 @@
 
 import { Calculator, Mail } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import {
   KeyDates,
   PensionGapWarning,
@@ -32,6 +32,7 @@ import {
   SurvivalModePanel,
 } from '@/components/molecules/DirectorGuide/dashboard';
 import { EmailResultsDialog } from '@/components/molecules/DirectorGuide/EmailResultsDialog';
+import { useDirectorEmailUnavailableReason } from '@/components/molecules/DirectorGuide/useDirectorEmailUnavailableReason';
 import { Button } from '@/components/ui/button';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import {
@@ -56,6 +57,7 @@ const CALCULATE_DEBOUNCE_MS = 200;
 export const DIRECTOR_EDUCATION_COLLAPSED_STORAGE_KEY = 'director-guide-education-collapsed:v1';
 
 export function DirectorDashboard() {
+  const emailUnavailableId = useId();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true); // Icon menu collapsed by default
   const [inputsCollapsed, setInputsCollapsed] = useState(false); // Inputs panel expanded
   const [educationCollapsed, setEducationCollapsed] = useState(true); // Start collapsed to prioritize calculator workspace
@@ -66,6 +68,8 @@ export function DirectorDashboard() {
 
   const formData = useDirectorFormSlice((state) => ({
     mode: state.mode,
+    yearEndMonth: state.yearEndMonth,
+    yearEndCustom: state.yearEndCustom,
     region: state.region,
     revenue: state.revenue,
     includesVat: state.includesVat,
@@ -95,6 +99,8 @@ export function DirectorDashboard() {
   const comparison = useStrategyComparison();
   const monthlyModeOutput = useMonthlyModeOutput();
   const hasInputErrors = useHasDirectorInputErrors();
+  const emailUnavailableReason = useDirectorEmailUnavailableReason();
+  const canEmail = emailUnavailableReason === null;
   const { calculate, invalidateResults, reset } = useDirectorGuideActions();
   const isMonthlyMode = formData.mode === 'monthly';
 
@@ -241,7 +247,9 @@ export function DirectorDashboard() {
   useEffect(() => {
     if (!hasComparison) setEmailDialogOpen(false);
   }, [hasComparison]);
-  const openEmailDialog = useCallback(() => setEmailDialogOpen(true), []);
+  const openEmailDialog = useCallback(() => {
+    if (canEmail) setEmailDialogOpen(true);
+  }, [canEmail]);
 
   return (
     <TooltipProvider>
@@ -250,7 +258,8 @@ export function DirectorDashboard() {
           <SidebarNav
             collapsed={sidebarCollapsed}
             onToggle={() => setSidebarCollapsed((prev) => !prev)}
-            onEmailResults={hasComparison ? openEmailDialog : undefined}
+            onEmailResults={canEmail ? openEmailDialog : undefined}
+            emailUnavailableReason={emailUnavailableReason}
             onReset={handleReset}
             dashboardVariant={hasComparison ? (isSurvivalMode ? 'survival' : 'normal') : undefined}
           />
@@ -395,6 +404,8 @@ export function DirectorDashboard() {
                     </div>
                     <Button
                       onClick={openEmailDialog}
+                      disabled={!canEmail}
+                      aria-describedby={emailUnavailableReason ? emailUnavailableId : undefined}
                       variant='outline'
                       className='flex shrink-0 items-center gap-2 px-6 py-3 font-semibold'
                     >
@@ -402,6 +413,15 @@ export function DirectorDashboard() {
                       Email My Results
                     </Button>
                   </div>
+                  {emailUnavailableReason && (
+                    <p
+                      id={emailUnavailableId}
+                      role='status'
+                      className='mt-3 text-muted-foreground text-sm'
+                    >
+                      {emailUnavailableReason}
+                    </p>
+                  )}
                 </div>
               </div>
             ) : (
@@ -501,6 +521,7 @@ export function DirectorDashboard() {
         onOpenChange={setEmailDialogOpen}
         comparison={comparison}
         emailInput={emailInput}
+        unavailableReason={emailUnavailableReason}
       />
     </TooltipProvider>
   );

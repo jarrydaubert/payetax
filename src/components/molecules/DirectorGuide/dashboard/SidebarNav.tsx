@@ -22,13 +22,14 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface SidebarNavProps {
   collapsed?: boolean;
   onToggle?: () => void;
   onEmailResults?: () => void;
+  emailUnavailableReason?: string | null;
   onReset?: () => void;
   dashboardVariant?: 'normal' | 'survival';
 }
@@ -116,6 +117,7 @@ function NavButton({
   onClick,
   disabled,
   className,
+  describedBy,
 }: {
   icon: typeof Mail;
   label: string;
@@ -123,12 +125,14 @@ function NavButton({
   onClick?: () => void;
   disabled?: boolean;
   className?: string;
+  describedBy?: string;
 }) {
   return (
     <button
       type='button'
       onClick={onClick}
       disabled={disabled}
+      aria-describedby={describedBy}
       className={cn(
         getItemClass(collapsed),
         disabled && 'cursor-not-allowed opacity-50',
@@ -175,10 +179,12 @@ export function SidebarNav({
   collapsed = false,
   onToggle,
   onEmailResults,
+  emailUnavailableReason,
   onReset,
   dashboardVariant,
 }: SidebarNavProps) {
   const pathname = usePathname();
+  const emailUnavailableId = useId();
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
   const workflowItems = useMemo(() => {
     if (dashboardVariant === 'normal') {
@@ -313,7 +319,16 @@ export function SidebarNav({
           onClick={onEmailResults}
           disabled={!onEmailResults}
           className='mb-0.5'
+          describedBy={emailUnavailableReason ? emailUnavailableId : undefined}
         />
+        {emailUnavailableReason && (
+          <p
+            id={emailUnavailableId}
+            className={cn('px-2 text-muted-foreground text-xs', collapsed && 'sr-only')}
+          >
+            {emailUnavailableReason}
+          </p>
+        )}
         <NavButton
           icon={RotateCcw}
           label='Reset Guide'

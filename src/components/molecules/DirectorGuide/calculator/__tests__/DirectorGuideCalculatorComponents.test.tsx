@@ -124,6 +124,7 @@ describe('Director Intelligence calculator components', () => {
       selectedStrategy: 'optimalMix',
       sliderSalary: null,
       profitWhatIfPercent: 0,
+      objective: 'maximizeTakeHome',
     });
     mockCalculateSalaryScenario.mockReset();
     mockTrackStrategySelected.mockClear();
