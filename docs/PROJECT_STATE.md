@@ -39,26 +39,27 @@ The recorded production baseline is `44d8d02`, which includes:
 - MC-09 (#134): applying a tax-trap pension suggestion now adds the annual amount to the existing
   contribution in the user's pay period, rounded up to the penny, and requires Calculate again.
 
-Verified `main` at `d1592fbb` includes #132's agreed delivery plan. The desktop implementation is
-on [#135](https://github.com/jarrydaubert/payetax/pull/135), whose runtime independently passed
-review at `1fc01a92`: five desktop summary cards, all seven periods visible by default, no
-normal-table horizontal scrolling, and the cards, headers and first monetary row visible together
-after Calculate. Desktop Tab/Shift+Tab follows the visual order and keeps focus below the fixed
+Verified `main` at `3c758f77` includes #132's agreed delivery plan and the desktop implementation
+from [#135](https://github.com/jarrydaubert/payetax/pull/135). Its runtime independently passed
+review at `1fc01a92`: five desktop summary cards, all seven desktop periods visible by default
+at that reviewed ref, no normal-table horizontal scrolling, and the cards, headers and first
+monetary row visible together after Calculate. Desktop Tab/Shift+Tab follows the visual order and keeps focus below the fixed
 header. The wider fourteen-column What-if table intentionally scrolls within its labelled region,
 with sticky row labels and keyboard arrows; #135 adds no homepage comparison mode.
 
-At this 26 October documentation update, #135 is implemented on this PR and has not merged or
-deployed. Its separately authorised merge delivers that desktop behaviour to `main`; production
-deployment must be verified separately. #127 is the next calculator implementation task after
-that merge.
+GitHub records #135 as merged on 26 October 2026 at `3c758f77`. This verifies delivery to `main`,
+not production deployment. Deployment of #135 has not been independently verified here; the
+recorded production baseline remains `44d8d02`. #127 is the next calculator implementation task.
 
-Current display-period selection supersedes #135's reviewed default: Yearly, Monthly, Weekly,
-Daily and Hourly are selected by default on both mobile and desktop. All seven periods remain
-available; 4-Weekly and Fortnightly start unchecked and can be enabled. User selections survive
-resizing, and all seven normal-table columns still fit on desktop without horizontal scrolling.
-The Tax Code input remains optional with a region-aware placeholder and tooltip; a blank value
-stays blank and uses policy-derived allowances. Its explanatory paragraph has been removed.
-The #135 review evidence above records its original delivery, not these subsequent defaults.
+The current display-period requirement, implemented on review PR
+[#136](https://github.com/jarrydaubert/payetax/pull/136), supersedes #135's historical default:
+Yearly, Monthly, Weekly, Daily and Hourly are selected by default on both mobile and desktop.
+All seven periods remain available; 4-Weekly and Fortnightly start unchecked and can be enabled.
+User selections survive resizing, and all seven normal-table columns fit on desktop without
+horizontal scrolling when enabled. #136 remains subject to review and merge; this is not a claim
+about production deployment. The #135 review evidence above records its original delivery.
+On #136, the Tax Code input remains optional with a region-aware placeholder and tooltip; a blank
+value stays blank and uses policy-derived allowances. Its explanatory paragraph has been removed.
 
 The input-integrity PR [#127](https://github.com/jarrydaubert/payetax/pull/127) and stacked
 responsive-statement PR [#128](https://github.com/jarrydaubert/payetax/pull/128) remain open and
@@ -299,7 +300,7 @@ working rule, they may be fixed as small independent slices between the items ab
 currency-input preservation and minimal stale-result protection have landed, with one shared
 currency parser in `src/lib/currencyInput.ts`. The main calculator's amount fields now reuse that
 parser: pence are kept, rejected text is shown with its error and clears results until corrected.
-After #135's separately authorised merge, the main-calculator queue resumes in the
+Following #135's merge on 26 October, the main-calculator queue continues in the
 [backlog's agreed order](BACKLOG.md#active):
 1. #127, preserving #135's desktop behaviour and MC-01/02 guarantees while closing MC-03's
    integrity scope; #128 inherits those guarantees;
