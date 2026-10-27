@@ -15,8 +15,11 @@
  * @module lib/gaConsent
  */
 
+import { getApprovedCampaignParameters } from '@/lib/analyticsAttribution';
 import { getGoogleAnalyticsMeasurementId, isGoogleAnalyticsEnabled } from '@/lib/analyticsConfig';
+import { sanitizeAnalyticsParameters } from '@/lib/analyticsPrivacy';
 import { isAnalyticsConsented } from '@/lib/cookieUtils';
+import { getTelemetryPageContext } from '@/lib/telemetryUrl';
 
 import type { GtagFunction } from '@/types/gtag';
 
@@ -109,6 +112,8 @@ export function bootstrapGa(): void {
   gtag('config', measurementId, {
     send_page_view: false,
     cookie_domain: 'auto',
+    ...getTelemetryPageContext(),
+    ...getApprovedCampaignParameters(window.location.search),
   });
 }
 
@@ -166,6 +171,15 @@ export const gtagQueued = function gtagQueued() {
   }
   // biome-ignore lint/complexity/noArguments: gtag.js only processes Arguments objects pushed to the dataLayer
   const args = arguments;
+  if (args[0] === 'event') {
+    const params = sanitizeAnalyticsParameters(args[1], args[2] ?? {});
+    if (!params) return;
+    args[2] = {
+      ...getTelemetryPageContext(),
+      ...params,
+      ...getApprovedCampaignParameters(window.location.search),
+    };
+  }
   if (gaLoaded && window.dataLayer) {
     window.dataLayer.push(args);
     return;

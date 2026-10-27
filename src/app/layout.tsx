@@ -1,7 +1,5 @@
 // src/app/layout.tsx
 
-import { Analytics as VercelAnalytics } from '@vercel/analytics/next';
-import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
@@ -13,6 +11,7 @@ import { Suspense } from 'react';
 import { ibmPlexMono, newsreader, publicSans } from '@/app/fonts';
 import GoogleAnalytics from '@/components/organisms/Analytics';
 import { StructuredData } from '@/components/organisms/StructuredData';
+import { TrafficMetrics } from '@/components/organisms/TrafficMetrics';
 import Layout from '@/components/templates/Layout';
 import { APP_VERSION } from '@/constants/version';
 import { isAnalyticsFlagEnabled } from '@/lib/analyticsConfig';
@@ -83,12 +82,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <StructuredData type='organization' />
 
         <ThemeProvider>
-          {analyticsEnabled ? (
-            <>
-              <VercelAnalytics />
-              <SpeedInsights />
-            </>
-          ) : null}
+          {analyticsEnabled ? <TrafficMetrics /> : null}
           {/* Keep the consent controller mounted even when analytics is disabled so
               stale GA cookies and expired consent are still cleaned up. Its central
               gate prevents any Google bootstrap or event queue in that state. */}

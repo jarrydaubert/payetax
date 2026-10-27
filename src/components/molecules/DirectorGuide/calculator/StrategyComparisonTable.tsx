@@ -91,7 +91,7 @@ export function StrategyComparisonTable() {
       : Math.abs(niDifference) < 10;
 
   const handleSelectStrategy = (key: StrategyKey) => {
-    trackStrategySelected(key, objectiveReferenceKey === key);
+    trackStrategySelected();
     setSelectedStrategy(key);
     const salary = comparison.strategies[key].salary;
     setSliderSalary(salary);

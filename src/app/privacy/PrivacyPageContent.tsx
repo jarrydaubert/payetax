@@ -32,12 +32,12 @@ export function PrivacyPageContent() {
         badge={{ icon: Shield, text: 'Privacy Policy' }}
         title={
           <>
-            Your Tax Data Stays
+            Your Figures, Calculated
             <br />
-            <span className='text-foreground'>On Your Device</span>
+            <span className='text-foreground'>In Your Browser</span>
           </>
         }
-        subtitle='Calculations run in your browser. The only time your inputs leave your device is when you choose to email your results — and even then we never store them.'
+        subtitle='Calculations run in your browser. We keep calculator figures and financial attributes out of analytics and attached diagnostic context. Your browser currently remembers your inputs on this device. Emailing results sends your inputs to our server and the prepared email to our delivery provider.'
       />
 
       {/* Last Updated */}
@@ -156,9 +156,10 @@ export function PrivacyPageContent() {
             {/* biome-ignore lint/correctness/useUniqueElementIds: Static ID required for in-page anchor navigation */}
             <LegalSection id='data-we-process' title='Data we process'>
               <p>
-                Your calculator inputs are processed in your browser to produce a result and are not
-                sent to us for that purpose. We only receive your inputs if you ask us to email your
-                results, and we do not store them. The table below summarises every category.
+                Your calculator inputs are processed in your browser to produce a result. Your
+                browser remembers them locally. Requesting an email sends your inputs to our server
+                to prepare the results. We do not maintain a calculations database. The table below
+                summarises the data we process.
               </p>
               <div className='overflow-x-auto rounded-sm border border-border bg-background'>
                 <table className='w-full min-w-3xl border-collapse text-sm'>
@@ -248,7 +249,12 @@ export function PrivacyPageContent() {
                 work without cookies or persistent identifiers and help us understand basic usage
                 and page speed either way.
               </p>
-              <p>The analytics and consent storage used by this choice is:</p>
+              <p>
+                The site uses the following cookies and browser storage. Calculator inputs are
+                currently remembered automatically, independently of your analytics choice. On a
+                shared device, clear this site’s browser data when finished; this removes saved
+                figures and consent preferences.
+              </p>
               <div className='overflow-x-auto rounded-sm border border-border bg-background'>
                 <table className='w-full min-w-3xl border-collapse text-sm'>
                   <thead>

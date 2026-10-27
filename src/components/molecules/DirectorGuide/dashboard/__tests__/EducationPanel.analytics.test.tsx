@@ -1,15 +1,9 @@
-import { render } from '@testing-library/react';
-import { trackWarningShown } from '@/lib/directorGuideAnalytics';
+import { render, screen } from '@testing-library/react';
+import { trackEvent } from '@/lib/analytics';
 import { useDirectorGuideStore } from '@/store/directorGuideStore';
 import { EducationPanel } from '../EducationPanel';
 
-jest.mock('@/lib/directorGuideAnalytics', () => {
-  const actual = jest.requireActual('@/lib/directorGuideAnalytics');
-  return {
-    ...actual,
-    trackWarningShown: jest.fn(),
-  };
-});
+jest.mock('@/lib/analytics', () => ({ trackEvent: jest.fn() }));
 
 function setDirectorGuideState(
   partial: Partial<ReturnType<typeof useDirectorGuideStore.getState>>,
@@ -33,7 +27,7 @@ describe('EducationPanel warning analytics', () => {
     });
   });
 
-  test('fires guide_warning_shown for a rendered VAT warning', () => {
+  test('shows a VAT warning without sending financial warning telemetry', () => {
     setDirectorGuideState({
       strategyComparison: null,
       formData: { ...useDirectorGuideStore.getState().formData, revenue: 91000 },
@@ -41,6 +35,7 @@ describe('EducationPanel warning analytics', () => {
 
     render(<EducationPanel />);
 
-    expect(trackWarningShown).toHaveBeenCalledWith('vat-mandatory');
+    expect(screen.getByText('VAT Registration Required')).toBeVisible();
+    expect(trackEvent).not.toHaveBeenCalled();
   });
 });

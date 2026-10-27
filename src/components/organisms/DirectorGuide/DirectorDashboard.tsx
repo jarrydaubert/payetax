@@ -211,12 +211,7 @@ export function DirectorDashboard() {
     // Track once per distinct input set (avoid spamming analytics while typing).
     const signature = `${formData.mode}|${region}|${revenue}|${expenses}|${String(includesVat)}`;
     if (lastTrackedCalcSignature.current !== signature) {
-      trackCalculationRun({
-        revenue,
-        expenses,
-        region,
-        includesVat,
-      });
+      trackCalculationRun();
       lastTrackedCalcSignature.current = signature;
     }
 
@@ -227,10 +222,7 @@ export function DirectorDashboard() {
   // Track results shown (once per session, when comparison first becomes available)
   useEffect(() => {
     if (comparison && !hasTrackedResults.current) {
-      trackResultsShown(
-        comparison.grossProfit,
-        comparison.grossProfit <= 0 ? 'survival' : 'normal',
-      );
+      trackResultsShown();
       hasTrackedResults.current = true;
     }
   }, [comparison]);

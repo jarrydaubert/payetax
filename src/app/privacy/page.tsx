@@ -7,7 +7,7 @@ import { PrivacyPageContent } from './PrivacyPageContent';
 export const metadata = generateMetadata({
   title: 'Privacy Policy | PayeTax - Privacy-First Tax Calculations',
   description:
-    "PayeTax privacy policy: Interactive calculations run in your browser and tax inputs aren't stored. Learn how we protect your financial privacy.",
+    'How PayeTax handles browser-stored calculator inputs, emailed results, consent-based analytics and technical diagnostics.',
   pathname: '/privacy',
 });
 

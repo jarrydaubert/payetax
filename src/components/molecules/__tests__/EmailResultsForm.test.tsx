@@ -34,6 +34,11 @@ describe('EmailResultsForm', () => {
 
     render(<EmailResultsForm input={makeInput()} />);
 
+    expect(screen.getByRole('link', { name: 'Privacy Policy' })).toHaveAttribute(
+      'href',
+      '/privacy',
+    );
+
     const button = screen.getByRole('button', { name: /Email Results/i });
     expect(button).toBeDisabled();
 
