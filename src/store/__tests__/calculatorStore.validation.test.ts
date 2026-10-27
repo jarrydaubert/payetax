@@ -242,6 +242,7 @@ describe('Calculator Store Validation', () => {
       useCalculatorStore.getState().calculate();
 
       // £12,570 tapered by £5,000, then the independent £3,250 blind allowance.
+      expect(useCalculatorStore.getState().input.taxCode).toBe('');
       expect(useCalculatorStore.getState().results?.taxFreeAmount).toBe(10820);
     });
 

@@ -1205,7 +1205,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           }
         },
         calculatePreviousYear: () => {
-          if (getBlockingInputErrors(get()).length > 0) return;
+          if (!get().results || getBlockingInputErrors(get()).length > 0) return;
           const { input } = get();
 
           // Get previous tax year
@@ -1293,7 +1293,7 @@ export const useCalculatorStore = create<CalculatorState>()(
         },
 
         calculateWhatIf: () => {
-          if (getBlockingInputErrors(get()).length > 0) return;
+          if (!get().results || getBlockingInputErrors(get()).length > 0) return;
           const { input, whatIf } = get();
 
           const currentSalary = input.salary;

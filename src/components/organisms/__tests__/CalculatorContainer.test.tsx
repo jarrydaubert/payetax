@@ -120,6 +120,7 @@ describe('CalculatorContainer Component', () => {
   const mockCalculate = jest.fn();
   const mockCalculatePreviousYear = jest.fn();
   const mockSetInput = jest.fn();
+  const mockInvalidateResults = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -127,6 +128,7 @@ describe('CalculatorContainer Component', () => {
       calculate: mockCalculate,
       calculatePreviousYear: mockCalculatePreviousYear,
       setInput: mockSetInput,
+      invalidateResults: mockInvalidateResults,
     });
     (useCalculatorResults as jest.Mock).mockReturnValue(null);
     const storeState = {
@@ -460,7 +462,19 @@ describe('CalculatorContainer Component', () => {
       ).not.toBeInTheDocument();
     });
 
-    it('should apply pension optimization before recalculating', () => {
+    it('should apply pension optimization and require Calculate again', () => {
+      Object.assign(useCalculatorStore, {
+        getState: () => ({
+          results: mockResults,
+          inputErrors: {},
+          input: {
+            salary: 110000,
+            payPeriod: 'annually',
+            pensionContribution: 0,
+            pensionContributionType: 'amount',
+          },
+        }),
+      });
       render(<CalculatorContainer />);
 
       fireEvent.click(screen.getByRole('button', { name: /Apply pension optimization/i }));
@@ -469,11 +483,9 @@ describe('CalculatorContainer Component', () => {
         pensionContribution: 5000,
         pensionContributionType: 'amount',
       });
-      expect(mockCalculate).toHaveBeenCalledTimes(1);
-      expect(mockCalculatePreviousYear).toHaveBeenCalledTimes(1);
-      expect(mockSetInput.mock.invocationCallOrder[0]).toBeLessThan(
-        mockCalculate.mock.invocationCallOrder[0],
-      );
+      expect(mockCalculate).not.toHaveBeenCalled();
+      expect(mockCalculatePreviousYear).not.toHaveBeenCalled();
+      expect(mockInvalidateResults).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -484,8 +496,7 @@ describe('CalculatorContainer Component', () => {
       const section = screen.getByTestId('calculator-section');
       expect(section).toHaveClass('xl:grid');
       expect(section).not.toHaveClass('lg:grid');
-      expect(section).toHaveClass('xl:grid-cols-[390px_minmax(0,1fr)]');
-      expect(section).toHaveClass('2xl:grid-cols-[380px_minmax(0,1fr)]');
+      expect(section).toHaveClass('xl:grid-cols-[380px_minmax(0,1fr)]');
     });
 
     it('should have responsive spacing', () => {
@@ -501,8 +512,7 @@ describe('CalculatorContainer Component', () => {
       render(<CalculatorContainer />);
 
       const section = screen.getByTestId('calculator-section');
-      // Updated to match current max-width
-      expect(section).toHaveClass('max-w-screen-2xl');
+      expect(section).toHaveClass('max-w-[120rem]');
     });
 
     it('should prevent the results column from stretching on desktop', () => {

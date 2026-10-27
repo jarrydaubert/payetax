@@ -358,13 +358,20 @@ describe('ResultsTable Component', () => {
     it('should show only default periods initially', () => {
       render(<ResultsTable results={mockResults} />);
 
-      // Default periods: Yearly, Monthly, Weekly
       const headers = screen.getAllByRole('columnheader');
       const headerTexts = headers.map((h) => h.textContent);
 
-      expect(headerTexts).toContain('Yearly');
-      expect(headerTexts).toContain('Monthly');
-      expect(headerTexts).toContain('Weekly');
+      expect(headerTexts).toEqual([
+        'Breakdown',
+        '%',
+        'Yearly',
+        'Monthly',
+        'Weekly',
+        'Daily',
+        'Hourly',
+      ]);
+      expect(screen.getByRole('checkbox', { name: '4-Weekly' })).not.toBeChecked();
+      expect(screen.getByRole('checkbox', { name: 'Fortnightly' })).not.toBeChecked();
     });
 
     it('should respect custom visible periods', () => {

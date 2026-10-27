@@ -69,7 +69,6 @@ export function BasicInputs() {
   const payPeriodLabelId = `${payPeriodId}-label`;
   const taxYearId = useId();
   const taxCodeId = useId();
-  const taxCodeHelpId = `${taxCodeId}-help`;
   const regionId = useId();
   const regionLabelId = `${regionId}-label`;
   const marriedId = useId();
@@ -205,10 +204,10 @@ export function BasicInputs() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={'space-y-3'}
+      className='space-y-3 xl:grid xl:grid-cols-3 xl:items-start xl:gap-x-6 xl:gap-y-4 xl:space-y-0 min-[112.5rem]:block min-[112.5rem]:space-y-3'
     >
       {/* Heading */}
-      <h3 className={cn('font-semibold text-foreground', 'text-base', 'sm:text-lg')}>
+      <h3 className={cn('font-semibold text-foreground xl:col-span-3', 'text-base', 'sm:text-lg')}>
         Enter Income Tax Details
       </h3>
 
@@ -284,7 +283,7 @@ export function BasicInputs() {
         />
       </div>
 
-      {/* Tax Code Input with Tooltip - defaults to 1257L (S1257L for Scotland) */}
+      {/* Optional Tax Code Input with region-aware placeholder and Tooltip */}
       <div className={fieldRowClass}>
         <div className={fieldLabelClass}>
           <LabelTooltip fieldName='taxCode' />
@@ -302,16 +301,8 @@ export function BasicInputs() {
             placeholder={input.region === 'Scotland' ? 'S1257L' : '1257L'}
             className={cn(fieldControlClass, 'w-full max-w-full font-mono uppercase sm:w-52')}
             maxLength={TAX_CODE_MAX_LENGTH}
-            aria-describedby={taxCodeHelpId}
             data-testid='tax-code-input'
           />
-          <p
-            id={taxCodeHelpId}
-            className='mt-1 max-w-sm text-muted-foreground text-xs leading-snug'
-          >
-            Leave blank to estimate from the selected year, income and allowance answers. Enter a
-            complete HMRC code to use that code instead.
-          </p>
         </div>
       </div>
 
@@ -418,7 +409,7 @@ export function BasicInputs() {
       )}
 
       {/* Age - Dropdown for State Pension Age (affects NI) */}
-      <div className={cn(fieldRowClass, 'mt-4')}>
+      <div className={cn(fieldRowClass, 'mt-4 xl:mt-0 min-[112.5rem]:mt-4')}>
         <div className={cn(fieldLabelClass, 'sm:whitespace-nowrap')}>
           <LabelTooltip fieldName='age' />
           <Label id={ageLabelId} htmlFor={ageId} className={cn('whitespace-nowrap', 'text-sm')}>
@@ -613,11 +604,13 @@ export function BasicInputs() {
         </div>
       </div>
 
-      <p className='text-muted-foreground text-xs' id={`${pensionId}-method`}>
-        Modelled as salary sacrifice. Changing between % and £ resets the contribution to 0; enter
-        your contribution again. Amounts in £ are annual.
-      </p>
-      <IncomeSourceList />
+      <div className='xl:col-span-3'>
+        <p className='mb-3 text-muted-foreground text-xs' id={`${pensionId}-method`}>
+          Modelled as salary sacrifice. Changing between % and £ resets the contribution to 0; enter
+          your contribution again. Amounts in £ are for your selected pay period.
+        </p>
+        <IncomeSourceList />
+      </div>
     </motion.div>
   );
 }

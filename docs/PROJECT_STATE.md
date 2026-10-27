@@ -33,19 +33,51 @@ content must earn its place through user value, evidence and maintainable accura
 
 ## Main calculator: current state and agreed direction
 
-Merged `main` at `8d12f20a` includes the shared currency-parsing fix (#125). The input-integrity
-PR [#127](https://github.com/jarrydaubert/payetax/pull/127) and stacked responsive-statement
-PR [#128](https://github.com/jarrydaubert/payetax/pull/128) remain open and unmerged. Their
-implementation reports and passing checks are evidence for those refs, not released behaviour.
-The owner supplied Claude's independent MC-01 approval at exact ref
-`f0bcdc9742fcf58cf5f49cec5feb7bf8fe0ccd1c`, recorded as an
-[owner-supplied review summary in #127](https://github.com/jarrydaubert/payetax/pull/127#issuecomment-6388698120).
-MC-01 is accepted and remains unmerged. Its [23 October evidence](reports/mc-01-touch-pan-follow-up-2026-10-23.md)
-retains the native WebKit-pan, physical-device, virtual-keyboard and OS-clipboard limitations.
-The MC-02 restoration fix in #127 preserves saved numeric contributions and units, attaches
-invalid values to the pension field, and allows correction without clearing storage. It is
-unmerged and awaits independent review. MC-02 acceptance and MC-03's explicit-calculation
-acceptance remain separate blockers inherited by #128; neither PR is release-ready.
+The recorded production baseline is `44d8d02`, which includes:
+- the shared currency-parsing fix (#125);
+- the October dependency-security patch (#133);
+- MC-09 (#134): applying a tax-trap pension suggestion now adds the annual amount to the existing
+  contribution in the user's pay period, rounded up to the penny, and requires Calculate again.
+
+Verified `main` at `534b8eff` includes #132's agreed delivery plan and the desktop implementation
+from [#135](https://github.com/jarrydaubert/payetax/pull/135). Its runtime independently passed
+review at `1fc01a92`: five desktop summary cards, all seven desktop periods visible by default
+at that reviewed ref, no normal-table horizontal scrolling, and the cards, headers and first
+monetary row visible together after Calculate. Desktop Tab/Shift+Tab follows the visual order and keeps focus below the fixed
+header. The wider fourteen-column What-if table intentionally scrolls within its labelled region,
+with sticky row labels and keyboard arrows; #135 adds no homepage comparison mode.
+
+GitHub records #135 as merged on 26 October 2026 at `3c758f77`. This verifies delivery to `main`,
+not production deployment. Deployment of #135 has not been independently verified here; the
+recorded production baseline remains `44d8d02`. #127 is the next calculator implementation task.
+
+The current display-period requirement, merged to `main` at `534b8eff` on 27 October 2026 by
+[#136](https://github.com/jarrydaubert/payetax/pull/136), supersedes #135's historical default:
+Yearly, Monthly, Weekly, Daily and Hourly are selected by default on both mobile and desktop.
+All seven periods remain available; 4-Weekly and Fortnightly start unchecked and can be enabled.
+User selections survive resizing, and all seven normal-table columns fit on desktop without
+horizontal scrolling when enabled. Delivery to `main` is verified; this is not a claim
+about production deployment. The #135 review evidence above records its original delivery.
+On #136, the Tax Code input remains optional with a region-aware placeholder and tooltip; a blank
+value stays blank and uses policy-derived allowances. Its explanatory paragraph has been removed.
+
+The input-integrity PR [#127](https://github.com/jarrydaubert/payetax/pull/127) and stacked
+responsive-statement PR [#128](https://github.com/jarrydaubert/payetax/pull/128) remain open and
+unmerged. Their implementation reports and passing checks are evidence for those refs, not released
+behaviour. On #127:
+- MC-01 was accepted at `f0bcdc97`.
+- Claude approved MC-02 at `6a9bee73` on 24 October, now recorded as an
+  [owner-supplied independent review record on #127](https://github.com/jarrydaubert/payetax/pull/127#issuecomment-6440302170).
+- MC-03's integrity implementation is reconciled with `534b8eff` on #127 and awaits Claude's
+  independent review. MC-03's #128 presentation scope remains open.
+
+The unmerged MC-02 implementation preserves invalid saved pension numbers and units, associates
+the error with the field, and permits explicit correction without clearing storage. MC-01's
+[23 October evidence](reports/mc-01-touch-pan-follow-up-2026-10-23.md) retains its native WebKit-pan,
+physical-device, virtual-keyboard and OS-clipboard limitations. Neither approval certifies those
+unverified paths or the new MC-03 work.
+
+#128 inherits #127's guarantees.
 
 The main calculator must keep calculation explicit: every calculation-input edit, including
 applying a pension suggestion, requires Calculate again. Display-only period changes reuse the
@@ -55,9 +87,14 @@ and result-dependent actions require the same current validated calculation as t
 These integrity guarantees are release-blocking acceptance criteria for #127 independently of
 #128's edited-state presentation.
 
-The agreed target retains five compact desktop summary cards and a readily visible seven-period
-breakdown, while preserving the new mobile experience's readable payslip and simple comparison.
-The old marginal-rate card's rounded next-£100 estimate must not be presented as a statutory rate.
+The remaining MC-05 work is #128's mobile payslip, direct Edit action and complete two-period
+comparison; the existing mobile Calculate-focus issue; and the fifth card's marginal-rate wording.
+The visible "Marginal Tax Rate" label still needs to describe the rounded next-£100 payroll
+estimate (tax, NI and applicable student loans), rather than a statutory marginal rate. At
+393×852 the existing mobile Calculate scroll leaves focus behind the fixed header; #135 preserves
+that behaviour and the backlog tracks its correction separately. #127/#128 must retain and
+re-verify #135's desktop cards, seven-period fit and keyboard navigation after their rebases.
+
 Removing the large homepage hero is acceptable, but search protection is unproven. The
 [search audit](BACKLOG.md#search-and-discoverability) requires essential live/technical evidence
 and safeguards before the first deployment containing that change, followed by performance
@@ -271,9 +308,14 @@ working rule, they may be fixed as small independent slices between the items ab
 currency-input preservation and minimal stale-result protection have landed, with one shared
 currency parser in `src/lib/currencyInput.ts`. The main calculator's amount fields now reuse that
 parser: pence are kept, rejected text is shown with its error and clears results until corrected.
-The remaining [main-calculator input-integrity queue](BACKLOG.md#main-calculator-input-integrity)
-comes next: MC-02 and MC-03's integrity scope are remaining #127 acceptance criteria, inherited by #128.
-After the interim DI-05 email guard, MC-03's presentation scope and MC-04/05 may proceed alongside
+Following #135's merge on 26 October, the main-calculator queue continues in the
+[backlog's agreed order](BACKLOG.md#active):
+1. #127, preserving #135's desktop behaviour and MC-01/02 guarantees while closing MC-03's
+   integrity scope; #128 inherits those guarantees;
+2. the interim DI-05 email guard;
+3. #128's mobile payslip and remaining redesign acceptance.
+
+MC-03's presentation scope and MC-04/05 may proceed alongside
 Director urgent slices without pre-empting a ready, verified wrong-money fix; completing the entire
 Director queue is not a main-calculator prerequisite. Keep the Director sequence and Foundation
 insertion points, including Corporation Tax deadlines. The desktop/mobile acceptance changes and

@@ -38,6 +38,77 @@ describe('Main calculator amount integrity (mounted)', () => {
     useCalculatorStore.getState().reset();
   });
 
+  it('requires Calculate after a valid salary draft and closes an already-open email dialog', async () => {
+    const user = userEvent.setup();
+    const originalFetch = global.fetch;
+    global.fetch = jest.fn().mockResolvedValue({ ok: true });
+    try {
+      render(<CalculatorContainer />);
+      const salary = screen.getByTestId('salary-input');
+      await typeInto(user, salary, '30000');
+      await calculate(user);
+      await user.click(screen.getByRole('button', { name: 'Email tax calculation results' }));
+      await user.type(screen.getByLabelText('Email address for results'), 'test@example.com');
+      // An edit from another mounted consumer must invalidate an already-open dialog, too.
+      act(() => useCalculatorStore.getState().setSalary(40000));
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(resultsShown()).toBe(false);
+      await calculate(user);
+      await user.click(salary);
+      await user.keyboard('{Control>}a{/Control}30000');
+      expect(resultsShown()).toBe(false);
+      await user.tab();
+      expect(useCalculatorStore.getState().results).toBeNull();
+      await typeInto(user, salary, '40000');
+      expect(useCalculatorStore.getState().results).toBeNull();
+      await calculate(user);
+      expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(40000);
+      await user.click(screen.getByRole('button', { name: 'Email tax calculation results' }));
+      await user.type(screen.getByLabelText('Email address for results'), 'test@example.com');
+      await user.click(screen.getByRole('button', { name: /^Email Results$/ }));
+      expect(global.fetch).toHaveBeenCalledWith(
+        '/api/send-results',
+        expect.objectContaining({
+          body: expect.any(String),
+        }),
+      );
+      const payload = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
+      expect(payload.input.salary).toBe(40000);
+      expect(payload.input.payPeriod).toBe(useCalculatorStore.getState().input.payPeriod);
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+
+  it('refuses an old email callback when a newer calculation exists before React renders', async () => {
+    const user = userEvent.setup();
+    const originalFetch = global.fetch;
+    global.fetch = jest.fn().mockResolvedValue({ ok: true });
+    try {
+      render(<CalculatorContainer />);
+      await typeInto(user, screen.getByTestId('salary-input'), '30000');
+      await calculate(user);
+      await user.click(screen.getByRole('button', { name: 'Email tax calculation results' }));
+      await user.type(screen.getByLabelText('Email address for results'), 'test@example.com');
+      const form = screen.getByLabelText('Email address for results').closest('form');
+      if (!form) throw new Error('Missing email form');
+      act(() => {
+        const store = useCalculatorStore.getState();
+        store.setSalary(40000);
+        store.calculate();
+        fireEvent.submit(form);
+      });
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(40000);
+      await user.click(screen.getByRole('button', { name: /^Email Results$/ }));
+      const payload = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
+      expect(payload.input.salary).toBe(40000);
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+
   it.each([
     false,
     true,

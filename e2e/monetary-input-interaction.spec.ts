@@ -97,6 +97,8 @@ test('MC-01 mounted amounts keep pence and rejected text recoverable', async ({
   await openCalculator(page, isMobile);
   await activate(page.getByTestId('pension-type-select'), isMobile);
   await activate(page.getByRole('option').last(), isMobile);
+  await expect(page.getByRole('listbox')).toBeHidden();
+  await expect(page.getByTestId('pension-type-select')).toBeFocused();
   await activate(page.getByText('Additional Income Sources', { exact: true }), isMobile);
   await activate(page.getByTestId('add-income-source'), isMobile);
 

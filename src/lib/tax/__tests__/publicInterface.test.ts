@@ -16,6 +16,7 @@ describe('tax-domain public interface', () => {
       'calculateEmployerNI',
       'calculateIncomeTax',
       'calculateTax',
+      'derivePayePayBasis',
       'formatTaxYearDisplay',
       'getClass1PeriodThresholds',
       'getDirectorsAnnualPrimaryRate',

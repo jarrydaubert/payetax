@@ -49,4 +49,17 @@ describe('EmailResultsForm', () => {
       expect(screen.getByRole('status')).toHaveTextContent('Results sent to t***@example.com');
     });
   });
+
+  it('checks calculation validity at submission even if the open form has old props', () => {
+    global.fetch = jest.fn();
+    let current = true;
+    render(<EmailResultsForm input={makeInput()} canSend={() => current} />);
+    fireEvent.change(screen.getByLabelText('Email address for results'), {
+      target: { value: 'test@example.com' },
+    });
+    current = false;
+    fireEvent.click(screen.getByRole('button', { name: /Email Results/i }));
+    expect(global.fetch).not.toHaveBeenCalled();
+    expect(screen.getByRole('alert')).toHaveTextContent('Calculate again before emailing');
+  });
 });
