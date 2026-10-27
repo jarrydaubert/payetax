@@ -44,16 +44,7 @@ import { ResultsSummaryCards } from './CalculatorResults/ResultsSummaryCards';
 import { ResultsTable } from './CalculatorResults/ResultsTable';
 import { TaxCodeBasisNotice } from './CalculatorResults/TaxCodeBasisNotice';
 
-const MOBILE_PERIODS = ['Yearly', 'Monthly', 'Weekly', 'Daily', 'Hourly'];
-const DESKTOP_PERIODS = [
-  'Yearly',
-  'Monthly',
-  '4-Weekly',
-  'Fortnightly',
-  'Weekly',
-  'Daily',
-  'Hourly',
-];
+const DEFAULT_PERIODS = ['Yearly', 'Monthly', 'Weekly', 'Daily', 'Hourly'];
 
 export function CalculatorContainer() {
   // Use optimized selectors to prevent unnecessary re-renders
@@ -90,8 +81,7 @@ export function CalculatorContainer() {
   const [, startTransition] = React.useTransition();
   const isDesktop = useMediaQuery('(min-width: 1280px)');
   const [inputsBeforeSummary, setInputsBeforeSummary] = React.useState(false);
-  const [selectedPeriods, setSelectedPeriods] = React.useState<string[] | null>(null);
-  const visiblePeriods = selectedPeriods ?? (isDesktop ? DESKTOP_PERIODS : MOBILE_PERIODS);
+  const [visiblePeriods, setSelectedPeriods] = React.useState<string[]>(DEFAULT_PERIODS);
   const [actionMessage, setActionMessage] = React.useState<{
     tone: 'info' | 'error';
     text: string;

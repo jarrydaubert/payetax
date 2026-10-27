@@ -490,6 +490,7 @@ test.describe('Responsive calculator geometry', () => {
       await page.getByTestId('calculate-button').press('Enter');
       const table = page.getByTestId('results-table');
       await expect(table).toBeVisible();
+      await enableAllPeriods(page);
       await expect(table.locator('thead tr').first().locator('th')).toHaveText([
         'Breakdown',
         '%',
