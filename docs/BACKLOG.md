@@ -21,6 +21,11 @@ sources, not in backlog prose.
 
 ## Active
 
+- [ ] **Budget 2026 / 2027–28 policy implementation (separate PR):** keep the calculator limited
+  to 2026–27 until final legislation, regional rates and independent fixtures are verified.
+  Follow the [dated implementation requirements](reports/budget-2026-future-year-requirements-2026-10-28.md);
+  the Budget content PR changes no calculations and enables no tax year.
+
 Current correctness sequence:
 
 1. Explicit pension-method handling.
@@ -355,6 +360,10 @@ Single owners for the unresolved parts of the [supporting-pages audit](reports/p
 Privacy link/table accessibility (P8) stays with [Verification](#verification); Director hint contrast (D2) stays with DI-12. Public methodology and source/authority claims stay with [Trust and sourcing](#trust-and-sourcing) and the existing modelling-assumptions owner.
 
 ### Verification
+
+- [ ] **Blog client navigation QA:** investigate the local cross-article flow remaining at
+  `Loading article...` despite successful direct loads; reproduce against the unchanged runtime
+  before attributing a regression. Evidence and limits: [Budget content verification](reports/budget-2026-content-verification-2026-10-28.md#checks-and-practical-limits).
 
 - [ ] P3 — Reduced-motion results emit a React DOM warning in development. `ResultTableRow` selects the static `TableRow` when reduced motion is enabled but still passes `layout={false}` to the DOM. Reproduced during MC-03 visual QA; the same source exists on base `d2ee3ee8`. DoD: omit motion-only props on the static path and verify reduced-motion results without the non-boolean `layout` warning. This is separate from the existing mobile focus/pointer work.
 
