@@ -76,7 +76,7 @@ Calculate focus/header defect remain open under the existing [Verification](BACK
 and MC-05 owners. Keyboard-driven integrity passes do not close pointer delivery defects.
 
 The agreed delivery decision is to **supersede #128 and build small mobile payslip PRs from
-current `main`**, using its implementation and dated report as reference rather than rebasing
+current `main`** (agreed in maintainer discussion; recorded in [#140](https://github.com/jarrydaubert/payetax/pull/140)), using its implementation and dated report as reference rather than rebasing
 or merging the broad redesign. [#128](https://github.com/jarrydaubert/payetax/pull/128), head
 `b4f10087`, is still open and unmerged; closing it as superseded is a separate action that has
 not happened. Its historical [checkpoint](reports/project-documentation-reconciliation-2026-10-27.md#128-reconciliation-checkpoint)
@@ -105,7 +105,8 @@ preserve review history and superseded decisions.
 
 #139 delivered the temporary client safeguard: both email actions and an open dialog require
 valid, current input values and an annual active result matching every financial field of the
-server's original recommendation. Same-value amount edits remain eligible; input changes,
+client-calculated original recommendation, which the server recalculates from the same inputs.
+Same-value amount edits remain eligible; input changes,
 failed calculations, profit what-if, a differing salary/selected strategy or objective, monthly mode
 and survival mode block email with a reason. A store edit and submit in the same task cannot
 send the stale snapshot. The HTML personal reserve now matches the display's reserve basis
@@ -121,7 +122,8 @@ Direct API callers still get the original server-recalculated recommendation. Al
 can remain unable to email because existing controls cannot display that recommendation exactly;
 the guard must not be weakened to bypass this limitation.
 
-Claude's maintainer-supplied post-merge verdict was **FOLLOW-UP REQUIRED**, retaining #139.
+Claude's maintainer-supplied post-merge verdict was **FOLLOW-UP REQUIRED**, retaining #139;
+[#140](https://github.com/jarrydaubert/payetax/pull/140) preserves its provenance, findings and source hash.
 The merge and reviewed head `10e69f8b` have the same tree. The review identified a year-end edit
 resetting salary what-if, reduced option/drawer pointer coverage, and misleading empty-form
 "paused" wording, alongside the deferred email findings. These are unresolved, not fixed by this
@@ -129,7 +131,9 @@ documentation update. The [backlog's single-owner map](BACKLOG.md#director-intel
 assigns the audit residuals; DI-04 owns the All Salary limitation and separate year-end regression,
 and Verification owns restoring pointer coverage. Regional/taper explanation accuracy, missing
 context, reserve meanings, format differences and responsive/client rendering retain explicit
-owners. Historical reports are unchanged; their earlier APPROVE and passing keyboard-assisted
+owners. DI-11's incorrect email "Rates used" panel qualifies for a small slice under the existing
+urgent-correctness rule; its remaining explanations retain P2, and the delivery order is unchanged.
+Historical reports are unchanged; their earlier APPROVE and passing keyboard-assisted
 runs do not constitute final-head review, pointer-repeatability or production-deployment proof.
 
 ## Privacy and supporting-page state
