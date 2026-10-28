@@ -46,6 +46,41 @@ test.describe('MC-03 input integrity @critical', () => {
   const emailAction = (page: Page) =>
     page.getByRole('button', { name: 'Email tax calculation results' });
 
+  test('first use and keyboard Reset offer Calculate without results or result actions', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('heading', { name: 'Ready to Calculate' })).toBeVisible();
+    await expect(
+      page.getByText('Enter your salary, then select Calculate to see your take-home pay.'),
+    ).toBeVisible();
+    await expect(page.getByTestId('tax-results')).toHaveCount(0);
+    await expect(emailAction(page)).toHaveCount(0);
+    await page.getByTestId('calculate-button').press('Enter');
+    await expect(page.getByTestId('calculator-section').getByRole('alert')).toContainText(
+      'Enter your gross salary',
+    );
+    await typeAmount(page.getByTestId('salary-input'), '40000');
+    await page.getByTestId('salary-input').press('Tab');
+    await expect(page.getByTestId('calculator-section').getByRole('alert')).toHaveCount(0);
+    await expect(
+      page.getByText('Check your inputs, then select Calculate to see your take-home pay.'),
+    ).toBeVisible();
+    await expect(page.getByTestId('tax-results')).toHaveCount(0);
+    await page.getByTestId('calculate-button').press('Enter');
+    expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(40000);
+    const reset = page.getByRole('button', { name: /^Reset$/ });
+    await reset.press('Enter');
+    await expect(reset).toBeFocused();
+    await expect(page.getByTestId('salary-input')).toHaveValue('0.00');
+    await expect(page.getByRole('heading', { name: 'Ready to Calculate' })).toBeVisible();
+    await expect(page.getByTestId('tax-results')).toHaveCount(0);
+    await expect(page.getByRole('region', { name: 'Tax calculation results summary' })).toHaveCount(
+      0,
+    );
+    await expect(emailAction(page)).toHaveCount(0);
+    await expect(page.getByText(/Inputs changed — Calculate again/)).toHaveCount(0);
+  });
+
   test('valid salary edit and blur require Calculate, then email matches the displayed inputs', async ({
     page,
   }) => {
@@ -59,6 +94,13 @@ test.describe('MC-03 input integrity @critical', () => {
     await page.getByTestId('calculate-button').press('Enter');
     expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(30000);
     await typeAmount(salary, '40000');
+    await expect(salary).toBeFocused();
+    await expect(page.getByRole('status')).toContainText('Inputs changed — Calculate again');
+    await expect(page.getByRole('status')).toHaveAttribute('aria-live', 'polite');
+    await expect(page.getByRole('heading', { name: 'Calculate again' })).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Tax calculation results summary' })).toHaveCount(
+      0,
+    );
     await expect(page.getByTestId('tax-results')).toHaveCount(0);
     await expect(emailAction(page)).toHaveCount(0);
     await salary.press('Tab');
@@ -68,6 +110,7 @@ test.describe('MC-03 input integrity @critical', () => {
     expect(sent).toEqual([]);
     await page.getByTestId('calculate-button').press('Enter');
     expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(40000);
+    await expect(page.getByText(/Inputs changed — Calculate again/)).toHaveCount(0);
     await emailAction(page).press('Enter');
     await page.getByLabel('Email address for results').fill('mc03@example.com');
     await page.getByRole('button', { name: /^Email Results$/ }).press('Enter');
@@ -93,15 +136,21 @@ test.describe('MC-03 input integrity @critical', () => {
     await typeAmount(salary, '-500');
     await page.getByTestId('calculate-button').press('Enter');
     await expect(
-      page.getByRole('alert').filter({
+      page.getByTestId('calculator-section').getByRole('alert').filter({
         hasText: 'Correct the invalid amount in Salary before calculating.',
       }),
     ).toBeVisible();
     await expect(salary).toHaveAttribute('aria-invalid', 'true');
+    await expect(salary).toHaveAccessibleDescription(/negative/i);
+    await expect(salary).toHaveValue('-500');
+    await expect(page.getByRole('status')).toContainText('Inputs changed — Calculate again');
     await expect(page.getByTestId('tax-results')).toHaveCount(0);
     await expect(emailAction(page)).toHaveCount(0);
     await typeAmount(salary, '40000');
     await salary.press('Enter');
+    await expect(salary).not.toHaveAttribute('aria-invalid');
+    await expect(page.getByTestId('calculator-section').getByRole('alert')).toHaveCount(0);
+    await expect(page.getByRole('status')).toContainText('Calculate again');
     await expect(salary).toHaveValue('40,000.00');
     await expect(page.getByTestId('tax-results')).toHaveCount(0);
     await page.getByTestId('calculate-button').press('Enter');
@@ -131,6 +180,40 @@ test.describe('MC-03 input integrity @critical', () => {
     await page.getByTestId('calculate-button').press('Enter');
     expect(await getYearlyTableValue(page, 'Pension')).toBe(20000);
     await expect(page.getByRole('button', { name: /to Pension$/ })).toHaveCount(0);
+  });
+
+  test('invalid pension is described and keyboard correction can return to Calculate', async ({
+    page,
+  }) => {
+    await typeAmount(page.getByTestId('salary-input'), '40000');
+    await page.getByTestId('calculate-button').press('Enter');
+    const pension = page.getByTestId('pension-input');
+    await typeAmount(pension, '101');
+    const calculate = page.getByTestId('calculate-button');
+    await calculate.press('Enter');
+    await expect(page.getByTestId('calculator-section').getByRole('alert')).toContainText(
+      'Pension',
+    );
+    await expect(pension).toHaveValue('101');
+    await expect(pension).toHaveAttribute('aria-invalid', 'true');
+    await expect(pension).toHaveAccessibleDescription(/no more than 100%/);
+    await expect(page.getByTestId('salary-input')).toHaveValue('40,000.00');
+    await expect(page.getByTestId('tax-results')).toHaveCount(0);
+    await typeAmount(pension, '5');
+    await pension.press('Tab');
+    const additionalIncome = page.getByRole('button', { name: /Additional Income Sources/ });
+    await expect(additionalIncome).toBeFocused();
+    await additionalIncome.press('Tab');
+    await expect(calculate).toBeFocused();
+    await calculate.press('Shift+Tab');
+    await expect(additionalIncome).toBeFocused();
+    await additionalIncome.press('Tab');
+    await expect(page.getByTestId('calculator-section').getByRole('alert')).toHaveCount(0);
+    await expect(page.getByRole('status')).toContainText('Calculate again');
+    await calculate.press('Enter');
+    expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(40000);
+    expect(await getYearlyTableValue(page, 'Pension')).toBe(2000);
+    await expect(page.getByText(/Inputs changed — Calculate again/)).toHaveCount(0);
   });
 
   test('an already-open email form cannot send after a concurrent input edit', async ({ page }) => {

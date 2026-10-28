@@ -38,6 +38,77 @@ describe('Main calculator amount integrity (mounted)', () => {
     useCalculatorStore.getState().reset();
   });
 
+  it('distinguishes first use, entered salary and Reset without publishing a result', async () => {
+    const user = userEvent.setup();
+    render(<CalculatorContainer />);
+    await waitFor(() =>
+      expect(screen.getByText(/Enter your salary, then select Calculate/)).toBeVisible(),
+    );
+    expect(resultsShown()).toBe(false);
+    expect(screen.queryByRole('button', { name: 'Email tax calculation results' })).toBeNull();
+    await calculate(user);
+    expect(screen.getByRole('alert')).toHaveTextContent('Enter your gross salary');
+
+    await typeInto(user, screen.getByTestId('salary-input'), '40000');
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(screen.getByText(/Check your inputs, then select Calculate/)).toBeVisible();
+    expect(resultsShown()).toBe(false);
+    await calculate(user);
+    expect(resultsShown()).toBe(true);
+
+    await user.click(screen.getByRole('button', { name: /Reset/ }));
+    expect(screen.getByTestId('salary-input')).toHaveValue('0.00');
+    expect(screen.getByText(/Enter your salary, then select Calculate/)).toBeVisible();
+    expect(screen.queryByRole('status')).toBeNull();
+    expect(resultsShown()).toBe(false);
+    expect(screen.queryByRole('button', { name: 'Email tax calculation results' })).toBeNull();
+  });
+
+  it('announces edited results through invalid submission, correction and remount until Calculate', async () => {
+    const user = userEvent.setup();
+    const mounted = render(<CalculatorContainer />);
+    await typeInto(user, screen.getByTestId('salary-input'), '30000');
+    await calculate(user);
+    await typeInto(user, screen.getByTestId('pension-input'), '-5');
+    await calculate(user);
+    expect(screen.getByRole('alert')).toHaveTextContent('Pension');
+    expect(screen.getByRole('status')).toHaveTextContent('Inputs changed — Calculate again');
+    expect(screen.getByRole('status')).toHaveAttribute('aria-live', 'polite');
+    expect(screen.getByRole('status')).toHaveAttribute('aria-atomic', 'true');
+    expect(screen.getByTestId('salary-input')).toHaveValue('30,000.00');
+    expect(screen.getByTestId('pension-input')).toHaveValue('-5');
+
+    await typeInto(user, screen.getByTestId('pension-input'), '5');
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(screen.getByRole('status')).toHaveTextContent('Calculate again');
+    mounted.unmount();
+    render(<CalculatorContainer />);
+    expect(screen.getByRole('status')).toHaveTextContent('Calculate again');
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Calculate again' })).toBeVisible(),
+    );
+    expect(resultsShown()).toBe(false);
+    await calculate(user);
+    expect(resultsShown()).toBe(true);
+    expect(screen.queryByText(/Inputs changed — Calculate again/)).toBeNull();
+  });
+
+  it('updates the invalid submission summary as individual fields are corrected', async () => {
+    const user = userEvent.setup();
+    render(<CalculatorContainer />);
+    await typeInto(user, screen.getByTestId('salary-input'), '-1');
+    await typeInto(user, screen.getByTestId('pension-input'), '101');
+    await calculate(user);
+    expect(screen.getByRole('alert')).toHaveTextContent('amounts in Salary, Pension');
+    await typeInto(user, screen.getByTestId('salary-input'), '40000');
+    expect(screen.getByRole('alert')).toHaveTextContent('amount in Pension');
+    expect(screen.getByRole('alert')).not.toHaveTextContent('Salary');
+    expect(screen.getByTestId('pension-input')).toHaveValue('101');
+    await typeInto(user, screen.getByTestId('pension-input'), '5');
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(resultsShown()).toBe(false);
+  });
+
   it('requires Calculate after a valid salary draft and closes an already-open email dialog', async () => {
     const user = userEvent.setup();
     const originalFetch = global.fetch;

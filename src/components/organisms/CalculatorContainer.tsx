@@ -49,6 +49,7 @@ const DEFAULT_PERIODS = ['Yearly', 'Monthly', 'Weekly', 'Daily', 'Hourly'];
 export function CalculatorContainer() {
   // Use optimized selectors to prevent unnecessary re-renders
   const results = useCalculatorResults();
+  const hasCalculated = useCalculatorStore((state) => state.hasCalculated);
   const previousYearResults = useCalculatorStore((state) => state.previousYearResults);
   const input = useCalculatorStore(
     useShallow((state) => ({
@@ -100,7 +101,7 @@ export function CalculatorContainer() {
 
   // Derive showResults from results state
   const showResults = !!results;
-  const pensionNeedsCalculate = !results && actionMessage?.requiresCalculate;
+  const needsCalculate = !results && hasCalculated;
   const emailInput: PayeEmailInput = {
     salary: input.salary,
     payPeriod: input.payPeriod,
@@ -339,7 +340,7 @@ export function CalculatorContainer() {
 
   const summarySection = (
     <React.Fragment key='summary'>
-      {(showResults || pensionNeedsCalculate) && (
+      {showResults && (
         <motion.div
           ref={resultsRef}
           variants={shouldReduceMotion ? {} : ANIMATION_VARIANTS.fadeInDown}
@@ -405,6 +406,23 @@ export function CalculatorContainer() {
         }}
         resultAction={showResults ? emailResultsAction : undefined}
       />
+      <p
+        aria-live='polite'
+        aria-atomic='true'
+        role={needsCalculate ? 'status' : undefined}
+        className={
+          needsCalculate
+            ? 'mt-3 rounded-md border border-primary/30 bg-primary/10 px-3 py-2 text-sm'
+            : 'sr-only'
+        }
+      >
+        {needsCalculate && (
+          <>
+            Inputs changed — Calculate again. Previous results have been cleared.
+            {actionMessage?.requiresCalculate && ` ${actionMessage.text}`}
+          </>
+        )}
+      </p>
     </Card>
   );
 
@@ -500,12 +518,14 @@ export function CalculatorContainer() {
             <div>
               <Sparkles className={cn('mx-auto text-muted-foreground', 'mb-4', 'size-12')} />
               <h3 className={cn('font-semibold', 'mb-2', 'text-lg')}>
-                {pensionNeedsCalculate ? 'Calculate again' : 'Ready to Calculate'}
+                {needsCalculate ? 'Calculate again' : 'Ready to Calculate'}
               </h3>
               <p className={cn('text-muted-foreground', 'text-sm')}>
-                {pensionNeedsCalculate
-                  ? 'Your pension input has changed. Calculate to see your updated take-home pay.'
-                  : 'Enter your salary. See your take-home pay in seconds.'}
+                {needsCalculate
+                  ? 'Your inputs have changed. Calculate to see your updated take-home pay.'
+                  : input.salary > 0
+                    ? 'Check your inputs, then select Calculate to see your take-home pay.'
+                    : 'Enter your salary, then select Calculate to see your take-home pay.'}
               </p>
             </div>
           </motion.div>

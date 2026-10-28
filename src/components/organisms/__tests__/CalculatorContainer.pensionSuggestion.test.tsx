@@ -85,7 +85,8 @@ describe('Tax-trap pension suggestion (mounted real inputs, store and engine)', 
     expect(useCalculatorStore.getState().input.pensionContribution).toBe(5);
     expect(useCalculatorStore.getState().input.pensionContributionType).toBe('percentage');
     expect(useCalculatorStore.getState().results).toBeNull();
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('Inputs changed — Calculate again');
+    expect(screen.getByRole('status')).not.toHaveTextContent('added to your annual pension');
   });
 
   it('rejects an old suggestion when another Calculate has replaced its result', async () => {

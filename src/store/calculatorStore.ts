@@ -215,6 +215,8 @@ interface CalculatorState {
 
   // Calculation results
   results: CalculationResults;
+  /** Successful calculation in this session, retained through edits and cleared by Reset. */
+  hasCalculated: boolean;
   previousYearResults: CalculationResults;
 
   // What If scenario
@@ -560,6 +562,7 @@ export const useCalculatorStore = create<CalculatorState>()(
         inputErrors: {},
         inputRevision: 0,
         results: null,
+        hasCalculated: false,
         previousYearResults: null,
 
         // What If state
@@ -1097,7 +1100,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             if (!pension.success)
               throw new Error(pension.error.issues[0]?.message ?? 'Invalid pension contribution');
             const results = calculateTax(inputWithNormalizedTaxCode);
-            setCalculatorState(set, { results });
+            setCalculatorState(set, { results, hasCalculated: true });
             reportCalculationAnomalies(results, 'primary');
 
             // Track successful calculation
@@ -1151,6 +1154,7 @@ export const useCalculatorStore = create<CalculatorState>()(
         },
         reset: () => {
           setCalculatorState(set, {
+            hasCalculated: false,
             input: { ...defaultInput },
             inputErrors: {},
             inputRevision: get().inputRevision + 1,

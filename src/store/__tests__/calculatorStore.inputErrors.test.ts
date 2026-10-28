@@ -15,6 +15,41 @@ describe('calculatorStore rejected amount text', () => {
     useCalculatorStore.getState().calculatePreviousYear();
   };
 
+  it('keeps calculation history through draft/committed invalidation and recovery, but Reset clears it', () => {
+    expect(useCalculatorStore.getState().hasCalculated).toBe(false);
+    calculateFor(30000);
+    expect(useCalculatorStore.getState().hasCalculated).toBe(true);
+    useCalculatorStore.getState().invalidateResults();
+    expect(useCalculatorStore.getState().hasCalculated).toBe(true);
+    useCalculatorStore.getState().setSalary(40000);
+    useCalculatorStore.getState().setInputError('salary', rejected);
+    useCalculatorStore.getState().calculate();
+    expect(useCalculatorStore.getState().hasCalculated).toBe(true);
+    expect(useCalculatorStore.getState().results).toBeNull();
+    useCalculatorStore.getState().setInputError('salary', null);
+    useCalculatorStore.getState().calculate();
+    expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(40000);
+    useCalculatorStore.getState().reset();
+    expect(useCalculatorStore.getState().hasCalculated).toBe(false);
+    expect(useCalculatorStore.getState().results).toBeNull();
+  });
+
+  it('does not mistake a first rejected submission or restored inputs for a past calculation', async () => {
+    useCalculatorStore.getState().setInputError('salary', rejected);
+    useCalculatorStore.getState().calculate();
+    expect(useCalculatorStore.getState().hasCalculated).toBe(false);
+    useCalculatorStore.getState().setInputError('salary', null);
+    calculateFor(30000);
+    const saved = JSON.parse(localStorage.getItem('tax-calculator-storage') ?? '{}');
+    expect(saved.state).not.toHaveProperty('hasCalculated');
+    useCalculatorStore.getState().reset();
+    localStorage.setItem('tax-calculator-storage', JSON.stringify(saved));
+    await useCalculatorStore.persist.rehydrate();
+    expect(useCalculatorStore.getState().input.salary).toBe(30000);
+    expect(useCalculatorStore.getState().hasCalculated).toBe(false);
+    expect(useCalculatorStore.getState().results).toBeNull();
+  });
+
   it('clears every result when a field holds rejected text', () => {
     calculateFor(30000);
     expect(useCalculatorStore.getState().results).not.toBeNull();
