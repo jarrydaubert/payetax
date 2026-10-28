@@ -407,6 +407,13 @@ These extend existing owners rather than creating a second supporting-pages queu
 
 ### Content accuracy
 
+- [ ] **P3 — Blog reading typography (small, separate UI slice):** align paragraph and list
+  text sizing/line height, keep a comfortable article reading width, and reduce excessive
+  uppercase/letter spacing in table headings. Preserve Ledger styling and tax content; verify
+  one long post, a four-column comparison and category/listing context at desktop and mobile
+  widths, including zoom, horizontal table scrolling and keyboard access. No site-wide redesign
+  or calculator changes; the Budget 2026 reader-first content PR only records this follow-up.
+
 - [ ] Tax-code guide: add the statutory 50% overriding limit; fix the "K500 = you owe £5,000" conflation; refresh stale 2025-26 titles/meta; cover Scottish SD codes. DoD: all four corrections published and consistent with the engine.
 - [ ] Remaining salary-page unsupported-claim audit: after the priority repair, inspect the retained series for uncited percentile/median, lifestyle, rent, savings and mortgage claims. The verified £70k article is the reference pattern and should not be rewritten without a reproduced defect. DoD: each remaining claim is sourced from an appropriate primary dataset, qualified or removed.
 - [ ] Evergreen vs historical article policy: frontmatter declares the mode. DoD: evergreen posts contain no hardcoded rate values; historical posts stay pinned and labelled; the blog audit enforces the split. This existing owner also covers the supporting audit's stale blog/listing/`llms.txt` year titles; do not update genuinely historical content to look current without checking its mode.
