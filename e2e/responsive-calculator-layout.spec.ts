@@ -391,7 +391,7 @@ test.describe('Responsive calculator geometry', () => {
           // Normal-motion cards include Framer's focusable gesture wrapper as well as the button.
           const focusStops = page
             .getByRole('region', { name: 'Tax calculation summary results', exact: true })
-            .locator('button, [tabindex="0"]');
+            .locator('button:visible, [tabindex="0"]:visible');
           await expect.poll(() => focusStops.count()).toBe(key === 'Enter' ? 10 : 5);
           for (let index = 0; index < (await focusStops.count()); index++) {
             await page.keyboard.press('Tab');
