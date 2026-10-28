@@ -25,6 +25,108 @@ function parsePercent(text: string): number {
   return Number.parseFloat(match[1] ?? 'NaN');
 }
 
+test.describe('MC-04 submitted pay period @critical', () => {
+  test.use({ viewport: { width: 393, height: 852 } });
+
+  async function enterSalary(page: Page, value: string) {
+    const field = page.getByTestId('salary-input');
+    await field.focus();
+    await expect(field).toBeFocused();
+    await field.press('ControlOrMeta+A');
+    await field.pressSequentially(value);
+    await expect(field).toHaveValue(value);
+    await field.press('Tab');
+    await expect(field).toHaveValue(
+      Number(value).toLocaleString('en-GB', { minimumFractionDigits: 2 }),
+    );
+  }
+
+  test.beforeEach(async ({ page, isMobile }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await openCalculatorForAmountEntry(page, isMobile);
+    await page.getByTestId('married-checkbox').press('Space');
+    await expect(page.getByTestId('partner-salary-input')).toBeHidden();
+  });
+
+  for (const [inputLabel, displayed, salary] of [
+    ['Annually', 'Monthly', '40000'],
+    ['Monthly', 'Monthly', '3000'],
+    ['4-Weekly', '4-Weekly', '3000'],
+    ['Fortnightly', 'Fortnightly', '1500'],
+    ['Weekly', 'Weekly', '800'],
+    ['Daily', 'Daily', '160'],
+    ['Hourly', 'Hourly', '20'],
+  ]) {
+    test(`${inputLabel} input leads with ${displayed} take-home`, async ({ page }) => {
+      const inputPeriod = page.getByRole('combobox', { name: 'Pay period', exact: true });
+      await inputPeriod.click();
+      await page.getByRole('option', { name: inputLabel, exact: true }).click();
+      await expect(inputPeriod).toBeFocused();
+      await enterSalary(page, salary);
+      await page.getByTestId('tax-code-input').fill('1257L');
+      await page.getByTestId('calculate-button').press('Enter');
+      const display = page.getByRole('combobox', { name: 'Take-home pay period' });
+      await expect(display).toHaveText(displayed);
+      if (displayed === '4-Weekly' || displayed === 'Fortnightly') {
+        await page.getByRole('checkbox', { name: displayed, exact: true }).click();
+      }
+      const table = page.getByTestId('results-table');
+      const headers = await table.locator('thead tr').first().locator('th').allTextContents();
+      const net = table.locator('tbody tr', { hasText: 'Net Pay' });
+      const engineValue = await net
+        .locator('td')
+        .nth(headers.indexOf(displayed) - 1)
+        .textContent();
+      await expect(page.getByTestId('mobile-take-home')).toHaveText(engineValue ?? '');
+      await expect(page.getByTestId('mobile-take-home-context')).toContainText('per year');
+      if (inputLabel === 'Annually') {
+        // Independent HMRC-derived fixture, rather than an engine-generated correctness claim.
+        await expect(page.getByTestId('mobile-take-home')).toHaveText('£2,693.50');
+        await expect(page.getByTestId('mobile-take-home-context')).toHaveText(
+          '£32,322.04 per year',
+        );
+      }
+    });
+  }
+
+  test('display selection survives resizing and a new Calculate reapplies the submitted period', async ({
+    page,
+  }) => {
+    await enterSalary(page, '40000');
+    await page.getByTestId('calculate-button').press('Enter');
+    const display = page.getByRole('combobox', { name: 'Take-home pay period' });
+    await display.click();
+    await page.getByRole('option', { name: 'Weekly', exact: true }).click();
+    const weekly = await page.getByTestId('mobile-take-home').textContent();
+    const tableBefore = await page.getByTestId('results-table').textContent();
+    for (const width of [320, 852, 1023, 1024, 1280, 1440, 2560, 393]) {
+      await page.setViewportSize({ width, height: 852 });
+      if (width < 1024) {
+        await expect(display).toHaveText('Weekly');
+        await expect(page.getByTestId('mobile-take-home')).toHaveText(weekly ?? '');
+      } else {
+        await expect(display).toBeHidden();
+        await expect(
+          page
+            .getByRole('region', { name: 'Tax calculation summary results', exact: true })
+            .getByRole('button'),
+        ).toHaveCount(5);
+      }
+      await expect(page.getByTestId('results-table')).toHaveText(tableBefore ?? '');
+    }
+    await page.getByTestId('calculate-button').press('Enter');
+    await expect(display).toHaveText('Monthly');
+    await page.getByRole('combobox', { name: 'Pay period', exact: true }).click();
+    await page.getByRole('option', { name: 'Fortnightly', exact: true }).click();
+    await expect(page.getByRole('combobox', { name: 'Pay period', exact: true })).toBeFocused();
+    await expect(display).toHaveCount(0);
+    await expect(page.getByRole('status')).toContainText('Calculate again');
+    await enterSalary(page, '1500');
+    await page.getByTestId('calculate-button').press('Enter');
+    await expect(display).toHaveText('Fortnightly');
+  });
+});
+
 test.describe('MC-03 input integrity @critical', () => {
   // Test input/result integrity through native keyboard activation. Lost Calculate taps during
   // scrolling and WebKit pension-Apply clicks remain user-facing defects owned by BACKLOG.md

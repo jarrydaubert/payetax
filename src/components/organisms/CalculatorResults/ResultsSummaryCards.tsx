@@ -12,6 +12,7 @@ import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { calculateMarginalTaxRate } from '@/lib/calculatorMarginalTax';
 import type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
 import { cn, formatCurrency } from '@/lib/utils';
+import { MobileTakeHomeCard } from './MobileTakeHomeCard';
 
 interface ResultsSummaryCardsProps {
   results: TaxCalculationResults;
@@ -42,6 +43,7 @@ export function ResultsSummaryCards({
 
   return (
     <TooltipProvider delayDuration={200}>
+      <MobileTakeHomeCard results={results} submittedPeriod={input?.payPeriod ?? 'annually'} />
       <motion.section
         className={cn('grid border-border border-b py-4 md:grid-cols-2 lg:grid-cols-5', 'gap-4')}
         variants={shouldReduceMotion ? undefined : ANIMATION_CONTAINER_VARIANTS.staggerFast}
@@ -61,7 +63,10 @@ export function ResultsSummaryCards({
             tooltip='Your total yearly salary after income tax, National Insurance, and other deductions have been taken out.'
           />
         </motion.div>
-        <motion.div variants={shouldReduceMotion ? undefined : ANIMATION_VARIANTS.fadeInUp}>
+        <motion.div
+          className='hidden lg:block'
+          variants={shouldReduceMotion ? undefined : ANIMATION_VARIANTS.fadeInUp}
+        >
           <ResultCard
             label='Monthly Take-Home'
             value={formatCurrency(results.netPay.monthly)}

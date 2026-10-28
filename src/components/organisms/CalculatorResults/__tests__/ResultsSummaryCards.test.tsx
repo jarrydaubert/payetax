@@ -1,5 +1,5 @@
 // src/components/organisms/CalculatorResults/__tests__/ResultsSummaryCards.test.tsx
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { ResultsSummaryCards } from '../ResultsSummaryCards';
 
@@ -70,7 +70,7 @@ describe('ResultsSummaryCards Component', () => {
       render(<ResultsSummaryCards results={mockResults} />);
 
       expect(screen.getByText('Annual Take-Home')).toBeInTheDocument();
-      expect(screen.getByText('Monthly Take-Home')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Monthly Take-Home/ })).toBeInTheDocument();
       expect(screen.getByText('Total Tax & NI')).toBeInTheDocument();
       expect(screen.getByText('Effective Tax Rate')).toBeInTheDocument();
       expect(screen.getByText('Marginal Tax Rate')).toBeInTheDocument();
@@ -85,7 +85,9 @@ describe('ResultsSummaryCards Component', () => {
     it('should display correct monthly take-home value', () => {
       render(<ResultsSummaryCards results={mockResults} />);
 
-      expect(screen.getByText('£2,040.50')).toBeInTheDocument();
+      expect(
+        within(screen.getByRole('button', { name: /Monthly Take-Home/ })).getByText('£2,040.50'),
+      ).toBeInTheDocument();
     });
 
     it('should display correct total tax and NI', () => {
@@ -153,7 +155,9 @@ describe('ResultsSummaryCards Component', () => {
       render(<ResultsSummaryCards results={highSalaryResults} />);
 
       expect(screen.getByText('£85,000.00')).toBeInTheDocument();
-      expect(screen.getByText('£7,083.33')).toBeInTheDocument();
+      expect(
+        within(screen.getByRole('button', { name: /Monthly Take-Home/ })).getByText('£7,083.33'),
+      ).toBeInTheDocument();
       expect(screen.getByText('£56,500.00')).toBeInTheDocument(); // Total tax: 50000 + 6500
     });
 
@@ -192,7 +196,7 @@ describe('ResultsSummaryCards Component', () => {
       // Cards are rendered by ResultCard component
       // We just verify they're present with correct text
       expect(screen.getByText('Annual Take-Home')).toBeInTheDocument();
-      expect(screen.getByText('Monthly Take-Home')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Monthly Take-Home/ })).toBeInTheDocument();
       expect(screen.getByText('Total Tax & NI')).toBeInTheDocument();
       expect(screen.getByText('Effective Tax Rate')).toBeInTheDocument();
       expect(screen.getByText('Marginal Tax Rate')).toBeInTheDocument();
