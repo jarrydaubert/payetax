@@ -5,10 +5,7 @@ argument-hint: [issue description]
 
 # /debug - Debugging Session
 
-**CRITICAL INSTRUCTIONS - READ FIRST:**
-- Do NOT use the EnterPlanMode tool
-- Do NOT save anything to ~/.claude/plans/
-- Output ALL findings directly in this conversation as markdown
+Read `AGENTS.md` first. Report findings in chat and preserve relied-upon PR evidence according to the root contract. Implement only within the requested scope.
 
 Start a systematic debugging session for an issue.
 
@@ -37,7 +34,7 @@ Start a systematic debugging session for an issue.
 - Check browser console (client errors)
 - Check Sentry (production errors)
 - Check build output (Next.js warnings)
-- Add strategic console.log statements
+- Use synthetic fixtures and local debugging; do not log real calculator inputs, recipient details or secrets to application logs or telemetry.
 
 ### 4. Hypothesize
 Form 2-3 hypotheses ranked by likelihood:
@@ -78,29 +75,15 @@ For tax-related bugs:
 
 1. **Verify inputs** - Is the salary/tax code valid?
 2. **Check taxRates.ts** - Are rates correct for tax year?
-3. **Trace calculation** - Step through the math manually
-4. **Compare to HMRC** - Use official calculator
+3. **Trace calculation** - Derive expectations independently, including pay basis, period thresholds and rounding
+4. **Compare to primary sources** - Use the relevant year's official payroll rules and hand-derived verification fixtures; the production engine and its generated golden master are not independent proof
 5. **Check edge cases** - £100k taper, Scottish rates
-
-```typescript
-// Debug output for tax calculations
-console.log({
-  salary: input.salary,
-  taxYear: input.taxYear,
-  taxCode: input.taxCode,
-  personalAllowance: calculated.personalAllowance,
-  taxableIncome: calculated.taxableIncome,
-  incomeTax: calculated.incomeTax,
-  ni: calculated.ni,
-  takeHome: calculated.takeHome,
-});
-```
 
 ## Useful Commands
 
 ```bash
-# Development with verbose output
-bun run dev --verbose
+# Start local development
+bun run dev
 
 # Check for TypeScript errors
 bun run typecheck
@@ -109,7 +92,7 @@ bun run typecheck
 bun run lint
 
 # Run specific test file
-bun run test:no-coverage -- taxCalculations
+bun run test:no-coverage --runTestsByPath src/lib/__tests__/taxCalculator.verification.test.ts
 
 # Check bundle for issues
 bun run bundle:analyze
@@ -156,5 +139,5 @@ bun run bundle:analyze
 
 ### UI/State
 - `src/store/` - Zustand stores
-- `src/components/organisms/TaxCalculator/` - Main UI
+- `src/components/organisms/CalculatorContainer.tsx` - Main UI
 - `src/app/` - Page components

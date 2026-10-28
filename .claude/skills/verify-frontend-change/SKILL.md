@@ -5,6 +5,8 @@ description: Verify any UI change end-to-end before declaring it done. Use after
 
 # Verifying frontend changes
 
+Read `AGENTS.md` first; it owns shared verification, evidence and approval rules. This skill adds UI-specific checks and can be read explicitly by clients that do not discover `.claude/skills/`.
+
 Never report a UI change as complete based on a successful edit alone. A passing edit is the start of verification, not the end. Verify the way a human reviewer would:
 
 1. **Run the smallest relevant deterministic checks first.** `bun run lint`, `bun run typecheck`, and `bun run test:changed`. Fix failures before touching a browser.
@@ -18,10 +20,10 @@ Never report a UI change as complete based on a successful edit alone. A passing
 5. **Run the matching test slice.**
    - Calculator or shared UI: `bun run test:e2e:smoke`
    - Calculation logic or expected tax outputs — both of:
-     1. the independent PAYE verification tests (`src/lib/__tests__/taxCalculator.verification.test.ts`, driven by hand-derived HMRC fixtures in `src/test/payeVerificationFixtures/`) via `bun run test:no-coverage` — no smaller supported command exists. This is the correctness oracle.
+     1. the independent PAYE verification tests (`src/lib/__tests__/taxCalculator.verification.test.ts`, driven by hand-derived HMRC fixtures in `src/test/payeVerificationFixtures/`) via `bun run test:no-coverage`. For a focused development run, use the file-specific command in `AGENTS.md`; retain the full Jest check for a completed calculation change. These independent expectations, checked against primary official sources, provide correctness evidence.
      2. `bun run test:e2e:golden` for browser/result regression and presentation consistency. Golden-master expectations are generated from the production engine, so this slice alone cannot prove statutory correctness.
    - Director flow: include `e2e/director-guide-critical.spec.ts`
 
 6. **Before commit:** `bun run check:repo` and `bun run build:ci`.
 
-If any step fails, fix the issue and rerun from step 1 — do not hand back partially verified work. When reporting done, list the commands run and their pass/fail status per the PR expectations in AGENTS.md.
+If a check fails, fix in-scope issues and rerun the affected checks. If verification is blocked or exposes an unrelated defect, report the exact failure, evidence and remaining checks; do not expand scope indefinitely or claim the UI work is complete. List commands and pass/fail status per `AGENTS.md`, and preserve PR evidence there as required.

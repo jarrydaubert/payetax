@@ -5,6 +5,8 @@ argument-hint: [scope]
 
 # /cleanup - Deep Housekeeping
 
+Read `AGENTS.md` first. Keep this workflow read-only until removals are explicitly authorised; preserve relied-upon PR evidence under the root contract.
+
 **CRITICAL INSTRUCTIONS:**
 - Do NOT delete anything automatically
 - Do NOT trust knip/tooling blindly - VERIFY each finding
@@ -89,7 +91,7 @@ public/* (referenced by metadata/icons/manifest)
 - `src/app/`
 - `public/`
 - `scripts/`
-- `emails/`
+- `src/lib/email/`
 
 Always ignore generated/cache directories during housekeeping:
 - `.next/`
@@ -206,9 +208,8 @@ Always exempt unless PROVEN unused:
 - Sentry packages (`@sentry/*`)
 - Analytics packages
 - Testing utilities (`@testing-library/*`, `jest-*`)
-- Content processing (`gray-matter`, `reading-time`)
+- Content processing (`gray-matter`)
 - Service worker files (`public/register-sw.js`, `public/sw.js`)
-- Kit embed styling source (`docs/guides/KIT_EMBED_CSS.css`)
 - Search-engine verification files in `public/*.txt` (verify external ownership usage before flagging)
 
 ---
