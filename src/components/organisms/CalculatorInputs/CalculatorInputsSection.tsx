@@ -47,19 +47,28 @@ export function CalculatorInputsSection({
     text: string;
     /** Set when the message reports rejected amounts, so it clears once they are corrected. */
     rejectedAmounts?: boolean;
+    missingSalary?: boolean;
   } | null>(null);
 
   // A rejected amount in a field the calculation uses blocks calculating from its old amount.
-  const hasBlockingAmounts = useCalculatorStore(
-    (state) => getBlockingInputErrors(state).length > 0,
-  );
+  const rejectedAmountsMessage = useCalculatorStore((state) => {
+    const blocking = getBlockingInputErrors(state);
+    const labels = [...new Set(blocking.map(([field]) => amountFieldLabel(field)))].join(', ');
+    return blocking.length > 0
+      ? `Correct the invalid ${blocking.length === 1 ? 'amount' : 'amounts'} in ${labels} before calculating.`
+      : '';
+  });
+  const hasBlockingAmounts = rejectedAmountsMessage !== '';
+  const hasSalary = useCalculatorStore((state) => state.input.salary > 0);
 
   // Once every rejected amount is corrected, the message asking for that correction is stale.
   React.useEffect(() => {
-    if (!hasBlockingAmounts) {
-      setFormMessage((message) => (message?.rejectedAmounts ? null : message));
-    }
-  }, [hasBlockingAmounts]);
+    setFormMessage((message) =>
+      (message?.rejectedAmounts && !hasBlockingAmounts) || (message?.missingSalary && hasSalary)
+        ? null
+        : message,
+    );
+  }, [hasBlockingAmounts, hasSalary]);
 
   const handleCalculate = () => {
     // Calculate must never use a previous amount while a field shows different text.
@@ -85,6 +94,7 @@ export function CalculatorInputsSection({
       setFormMessage({
         tone: 'error',
         text: 'Enter your gross salary to calculate your tax breakdown.',
+        missingSalary: true,
       });
       return;
     }
@@ -171,7 +181,7 @@ export function CalculatorInputsSection({
             )}
             role={formMessage.tone === 'error' ? 'alert' : 'status'}
           >
-            {formMessage.text}
+            {formMessage.rejectedAmounts ? rejectedAmountsMessage : formMessage.text}
           </p>
         )}
       </div>

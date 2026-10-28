@@ -78,16 +78,22 @@ and MC-05 owners. Keyboard-driven integrity passes do not close pointer delivery
 The agreed delivery decision is to **supersede #128 and build small mobile payslip PRs from
 current `main`** (agreed in maintainer discussion; recorded in [#140](https://github.com/jarrydaubert/payetax/pull/140)), using its implementation and dated report as reference rather than rebasing
 or merging the broad redesign. [#128](https://github.com/jarrydaubert/payetax/pull/128), head
-`b4f10087`, is still open and unmerged; closing it as superseded is a separate action that has
-not happened. Its historical [checkpoint](reports/project-documentation-reconciliation-2026-10-27.md#128-reconciliation-checkpoint)
+`b4f10087`, was closed unmerged on 28 October 2026. Its historical
+[checkpoint](reports/project-documentation-reconciliation-2026-10-27.md#128-reconciliation-checkpoint)
 remains useful preservation evidence, not a current rebase plan. Keep the five-card desktop
 functionality and meaningful coverage in retained or equivalent replacement code; do not import
 silent deletions or stale branch documentation. Earlier tests certify their recorded refs only.
 Every replacement slice preserves #135/#136 desktop/default-period behaviour, #127 integrity,
 #134 pension application, #137 privacy/consent and #139's Director email safeguard.
 
-The remaining calculator work is MC-03's accessible edited-state presentation, MC-04's submitted
-pay-period rule and MC-05's mobile payslip, direct Edit and two-period comparison. The fifth card
+MC-03's [input-state presentation](reports/mc03-input-state-presentation-2026-10-28.md) distinguishes
+first use/Reset from edits after Calculate on the existing desktop/mobile cards and table. An
+accessible recalculation notice accompanies cleared results; invalid submission summaries track
+the fields still needing correction. Its session-only history flag is not persisted. Future mobile
+statements must preserve these states and #127's validated-result action guards.
+
+The remaining calculator work is MC-04's submitted pay-period rule and MC-05's mobile payslip,
+direct Edit and two-period comparison. The fifth card
 still needs honest rounded next-£100 payroll wording, and the existing mobile focus issue remains
 open. MC-06/07 are smaller follow-ups; MC-08 owns the named residual test-portfolio gaps.
 The **DI-05 interim email guard is delivered**. Small mobile payslip PRs are the remaining
@@ -370,10 +376,10 @@ parser: pence are kept, rejected text is shown with its error and clears results
 With #136/#127/#137 and the interim #139 safeguard merged, the remaining calculator work is
 small mobile payslip PRs from current `main`, using #128 as reference and preserving the merged
 desktop, integrity and privacy contracts. The [backlog](BACKLOG.md#active) owns the delivery
-criteria; #128 still awaits separate closure as superseded. Full DI-05 is not moved forward
+criteria; #128 is closed and retained only as historical reference. Full DI-05 is not moved forward
 merely because the annual-export prototype is promising.
 
-MC-03's presentation scope and MC-04/05 may proceed alongside
+MC-04/05 may proceed alongside
 Director urgent slices without pre-empting a ready, verified wrong-money fix; completing the entire
 Director queue is not a main-calculator prerequisite. Keep the Director sequence and Foundation
 insertion points, including Corporation Tax deadlines. The desktop/mobile acceptance changes and
