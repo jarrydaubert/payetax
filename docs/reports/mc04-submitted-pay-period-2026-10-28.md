@@ -44,9 +44,11 @@ The new mounted tests use the real store and engine for all seven input periods,
 selection, a fresh Calculate with unchanged inputs, a changed submitted period, MC-03's
 recalculation notice and Reset. Existing desktop-card assertions are scoped to the original
 monthly tooltip button because CSS-hidden mobile/desktop content both exist in JSDOM.
-The desktop keyboard journey now selects visible focus stops, excluding the hidden mobile
-selector; it retains the exact five-card/ten-normal-motion-stop expectations and checks every
-forward/reverse focus destination and header clearance.
+The desktop keyboard journey selects visible focus stops and retains the exact five-card/
+ten-normal-motion-stop expectations, checking every forward/reverse focus destination and
+header clearance. Filtering excluded the hidden selector before the accessibility fix; after
+that fix the selector is a sibling outside the summary region, so the filter has no additional
+effect at the tested desktop widths.
 
 The new critical E2E slice checks all seven submitted periods against the existing engine-owned
 table values and one independent HMRC-derived fixture: `uk-40k-1257L` from
@@ -95,6 +97,12 @@ No account privacy setting or global Git configuration was changed. The accessib
 a subsequent commit; the PR records its exact final SHA and the requested Claude re-review.
 SHA-256 of the initial raw CLI review JSON:
 `d778cbe78759c5dc116398a2ab53695459f9354a60e61f592cec5911ded08f06`.
+
+The fresh-context Claude CLI re-review approved `ef8b42a4c0ab7a6560765d7ff0685fda1738df9f`
+against the same base, with no findings at medium severity or above. Its sole optional cleanup
+was the stale focus-query rationale, clarified in this documentation-only follow-up. Application
+code and tests are unchanged from that approved commit. SHA-256 of that raw review JSON:
+`59fdf2bcc675ec46e0591e4c238ffba630405b8114d6de3d028d950f7c690772`.
 
 ## Post-review-fix verification
 
