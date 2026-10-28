@@ -33,10 +33,11 @@ content must earn its place through user value, evidence and maintainable accura
 
 ## Main calculator: current state and agreed direction
 
-Current verified merged `main` is `e3f857397e65a4aef79a47889641756bdaad5bfe`, after
-[#136](https://github.com/jarrydaubert/payetax/pull/136) (`534b8eff`),
+Current verified merged `main` is `1de37c3535122eeb1f20a76aab3faaa748558ee3`, after
+[#139](https://github.com/jarrydaubert/payetax/pull/139) merged on 27 October 2026.
+It retains [#136](https://github.com/jarrydaubert/payetax/pull/136) (`534b8eff`),
 [#127](https://github.com/jarrydaubert/payetax/pull/127) (`51aaf145`) and
-[#137](https://github.com/jarrydaubert/payetax/pull/137) (`e3f85739`) merged on 27 October 2026.
+[#137](https://github.com/jarrydaubert/payetax/pull/137) (`e3f85739`).
 The last independently recorded production baseline remains `44d8d02` (#125/#133/#134 included).
 This reconciliation verifies repository state, not a new production deployment.
 
@@ -60,38 +61,38 @@ tooltip; a blank stays blank and uses policy-derived allowances.
   changes reuse the same calculation. Email, already-open dialogs and result actions cannot use a
   stale or invalid snapshot. A current pension suggestion edits input only and still needs Calculate.
 
-#134/MC-09 remains an explicit #128 preservation requirement: add the suggested annual pension
+#134/MC-09 remains a preservation requirement for every mobile payslip replacement: add the suggested annual pension
 amount to the existing pension (whether entered in £ or %), convert the total from annual to the
 selected pay period and round up to the penny before storing it. Applying edits input only and
 requires Calculate again. Preserve `CalculatorContainer.pensionSuggestion.test.tsx` and
 `pensionOptimizer.test.ts` regressions, including parser/storage validity and exact-penny cases.
 
 The full [regression acceptance contracts](reports/project-documentation-reconciliation-2026-10-27.md#retained-127-regression-acceptance-criteria)
-remain requirements for #128. The dated MC-01 [input](reports/mc-01-webkit-monetary-input-2026-10-22.md)
+remain requirements for the main-based mobile slices. The dated MC-01 [input](reports/mc-01-webkit-monetary-input-2026-10-22.md)
 and [touch-pan](reports/mc-01-touch-pan-follow-up-2026-10-23.md) reports retain their evidence limits:
 native WebKit pan, physical-device keyboards, OS clipboard and native paste remain unverified.
 Mobile Safari lost Calculate taps, desktop WebKit missed pension-suggestion clicks and the mobile
 Calculate focus/header defect remain open under the existing [Verification](BACKLOG.md#verification)
 and MC-05 owners. Keyboard-driven integrity passes do not close pointer delivery defects.
 
-[#128](https://github.com/jarrydaubert/payetax/pull/128), head `b4f10087`, remains open and unmerged.
-It must be reconciled against latest main, not treated as current behaviour or reopened as a new
-redesign. A read-only merge probe against `e3f85739` finds 16 conflicted paths; the
-[checkpoint](reports/project-documentation-reconciliation-2026-10-27.md#128-reconciliation-checkpoint)
-records scope and preservation requirements, including silent deletions of
-`ResultsSummaryCards.tsx`, its test and `ResultCard.test.tsx`. Preserve their five-card desktop
-functionality and meaningful regression coverage in retained or equivalent replacement code;
-automatic deletion is not evidence that the functionality has been replaced. Its earlier tests
-certify its recorded ref, not a reconciled candidate. Preserve #136 defaults, #127 input/result/email contracts and #137 privacy/
-consent boundaries, along with #135 desktop behaviour. Reconcile both project documents rather
-than accepting stale branch versions wholesale; retain #128's dated implementation report.
+The agreed delivery decision is to **supersede #128 and build small mobile payslip PRs from
+current `main`** (agreed in maintainer discussion; recorded in [#140](https://github.com/jarrydaubert/payetax/pull/140)), using its implementation and dated report as reference rather than rebasing
+or merging the broad redesign. [#128](https://github.com/jarrydaubert/payetax/pull/128), head
+`b4f10087`, is still open and unmerged; closing it as superseded is a separate action that has
+not happened. Its historical [checkpoint](reports/project-documentation-reconciliation-2026-10-27.md#128-reconciliation-checkpoint)
+remains useful preservation evidence, not a current rebase plan. Keep the five-card desktop
+functionality and meaningful coverage in retained or equivalent replacement code; do not import
+silent deletions or stale branch documentation. Earlier tests certify their recorded refs only.
+Every replacement slice preserves #135/#136 desktop/default-period behaviour, #127 integrity,
+#134 pension application, #137 privacy/consent and #139's Director email safeguard.
 
 The remaining calculator work is MC-03's accessible edited-state presentation, MC-04's submitted
 pay-period rule and MC-05's mobile payslip, direct Edit and two-period comparison. The fifth card
 still needs honest rounded next-£100 payroll wording, and the existing mobile focus issue remains
 open. MC-06/07 are smaller follow-ups; MC-08 owns the named residual test-portfolio gaps.
-The **DI-05 interim email guard precedes #128**; its full scenario/export fix keeps its later
-Director position. Completing the entire Director queue is not a prerequisite for the calculator.
+The **DI-05 interim email guard is delivered**. Small mobile payslip PRs are the remaining
+calculator delivery path; full DI-05 retains its later Director position and DI-02/04 dependencies.
+Completing the entire Director queue is not a prerequisite for the calculator.
 
 Hero removal remains accepted direction subject to the [search protection gate](BACKLOG.md#search-and-discoverability):
 essential live evidence and technical safeguards before the first deployment containing it, then
@@ -99,6 +100,41 @@ measurement against predeclared windows and a mitigation trigger. Neither #128 n
 work completes the pension-method or transparent-result Foundation work. The backlog owns the
 unchanged detailed delivery order; the [dated reconciliations](reports/project-documentation-reconciliation-2026-10-27.md)
 preserve review history and superseded decisions.
+
+## Director Intelligence email state
+
+#139 delivered the temporary client safeguard: both email actions and an open dialog require
+valid, current input values and an annual active result matching every financial field of the
+client-calculated original recommendation, which the server recalculates from the same inputs.
+Same-value amount edits remain eligible; input changes,
+failed calculations, profit what-if, a differing salary/selected strategy or objective, monthly mode
+and survival mode block email with a reason. A store edit and submit in the same task cannot
+send the stale snapshot. The HTML personal reserve now matches the display's reserve basis
+without removing employee NI from overall deductions/take-home. Company key dates are no
+longer promised; HTML still has a generic Self Assessment date and plain text has no dates.
+
+The [safeguard report](reports/di05-interim-email-safeguard-2026-10-27.md) and
+[email audit/annual-export assessment](reports/di05-email-content-and-active-export-assessment-2026-10-27.md)
+preserve the implementation, reported checks and limits. The 19-case audit supports a bounded
+annual active exporter using existing mechanics; 18 active matches establish parity, not statutory
+correctness or monthly cash-aware export. No full validated scenario export is implemented.
+Direct API callers still get the original server-recalculated recommendation. All Salary cases
+can remain unable to email because existing controls cannot display that recommendation exactly;
+the guard must not be weakened to bypass this limitation.
+
+Claude's maintainer-supplied post-merge verdict was **FOLLOW-UP REQUIRED**, retaining #139;
+[#140](https://github.com/jarrydaubert/payetax/pull/140) preserves its provenance, findings and source hash.
+The merge and reviewed head `10e69f8b` have the same tree. The review identified a year-end edit
+resetting salary what-if, reduced option/drawer pointer coverage, and misleading empty-form
+"paused" wording, alongside the deferred email findings. These are unresolved, not fixed by this
+documentation update. The [backlog's single-owner map](BACKLOG.md#director-intelligence-audit-follow-up)
+assigns the audit residuals; DI-04 owns the All Salary limitation and separate year-end regression,
+and Verification owns restoring pointer coverage. Regional/taper explanation accuracy, missing
+context, reserve meanings, format differences and responsive/client rendering retain explicit
+owners. DI-11's incorrect email "Rates used" panel qualifies for a small slice under the existing
+urgent-correctness rule; its remaining explanations retain P2, and the delivery order is unchanged.
+Historical reports are unchanged; their earlier APPROVE and passing keyboard-assisted
+runs do not constitute final-head review, pointer-repeatability or production-deployment proof.
 
 ## Privacy and supporting-page state
 
@@ -331,20 +367,19 @@ working rule, they may be fixed as small independent slices between the items ab
 currency-input preservation and minimal stale-result protection have landed, with one shared
 currency parser in `src/lib/currencyInput.ts`. The main calculator's amount fields now reuse that
 parser: pence are kept, rejected text is shown with its error and clears results until corrected.
-With #136/#127/#137 merged, the remaining calculator queue follows the
-[backlog's unchanged order](BACKLOG.md#active):
-
-1. the interim DI-05 email guard;
-2. reconciliation of existing #128 against latest main, followed by its mobile payslip and
-   remaining redesign acceptance, preserving the merged desktop, integrity and privacy contracts.
+With #136/#127/#137 and the interim #139 safeguard merged, the remaining calculator work is
+small mobile payslip PRs from current `main`, using #128 as reference and preserving the merged
+desktop, integrity and privacy contracts. The [backlog](BACKLOG.md#active) owns the delivery
+criteria; #128 still awaits separate closure as superseded. Full DI-05 is not moved forward
+merely because the annual-export prototype is promising.
 
 MC-03's presentation scope and MC-04/05 may proceed alongside
 Director urgent slices without pre-empting a ready, verified wrong-money fix; completing the entire
 Director queue is not a main-calculator prerequisite. Keep the Director sequence and Foundation
 insertion points, including Corporation Tax deadlines. The desktop/mobile acceptance changes and
 the search audit's pre-deployment gate precede release of the changed homepage; finish observational
-measurement afterward. On #128's reconciliation, preserve the backlog's decisions and open MC
-scope, reconcile superseded branch documentation and retain distinct dated implementation evidence;
+measurement afterward. Replacement slices preserve the backlog's decisions and open MC scope,
+use historical branch work as reference and retain distinct dated implementation evidence;
 do not restore premature completion claims or a parallel queue. The backlog owns the detailed order.
 Reuse existing tax-domain owners; an exception that needs a Foundation change waits for, or is
 folded into, that item. Director design and refactoring proposals remain parked.
