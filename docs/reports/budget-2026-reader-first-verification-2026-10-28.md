@@ -15,6 +15,7 @@ preview, with no merge or manual deployment.
 - [Treasury Budget 2026](https://www.gov.uk/government/publications/budget-2026-document/budget-2026-html), household support, personal taxation and policy-decision tables: wage rates and other Budget measures.
 - [Official minimum wage rates](https://www.gov.uk/national-minimum-wage-rates) independently confirms £12.71 → £13.21 and £11.27 for ages 18–20 from April 2027; [LPC recommendations](https://www.gov.uk/government/publications/minimum-wage-rates-for-2027) corroborate the values. The LPC landing-page introduction mistakenly says April 2026, while its table says April 2027; Treasury explicitly dates the increase 1 April 2027. The article uses that corroborated date, not the conflicting introduction.
 - [Minimum wage calculation guidance](https://www.gov.uk/guidance/calculating-the-minimum-wage/calculating-the-minimum-wage): a new rate applies from the first pay reference period beginning on or after the change.
+- [HMRC emergency tax codes](https://www.gov.uk/tax-codes/emergency-tax-codes): M1 calculates tax on that month's pay only; independently confirms the new plain-English explanation.
 - [Finance Act 2026](https://www.legislation.gov.uk/ukpga/2026/11/contents/enacted), sections 5–8: 22/42/47% are enacted 2027/28 savings/property rates, remaining law unless amended. Budget 2026's proposed 24/44/49% replacement needs Finance Bill 2026–27. Both columns and savings examples distinguish their status.
 - [HMRC online-selling guidance](https://www.gov.uk/guidance/selling-goods-or-services-on-a-digital-platform): selling unwanted personal possessions is usually not trading; buying/making goods to sell for profit can be. The paid-gardening example is explicitly qualifying gross trading income, not a house-clearance example. The proposed £3,000 threshold is not presented as current law or a salary allowance.
 - [Budget 2025](https://www.gov.uk/government/publications/budget-2025-document/budget-2025-html) and the [pension NI Act](https://www.legislation.gov.uk/ukpga/2026/15): earlier salary-sacrifice/PTA/Plan 2 origins retained. The enacted pension framework is distinguished from operational regulations; PTA still requires the Finance Bill. No interest-cap claim is added.
@@ -82,6 +83,13 @@ proposed law and identify the current column as savings, avoiding Scottish prope
 ambiguity. A visible swipe instruction explains the existing horizontal table behaviour;
 the key £702.60/£58.55 comparison is repeated in prose outside the wide table.
 
+An additional column-by-column check found that the original overview/earlier-measures text
+cells were wider than a narrow phone's viewport. The final revision shortens those summary
+cells, adds explicit wage/Child Benefit units immediately below, and keeps pension and legal
+qualifications in nearby prose. It retains the four-column wage and rates comparisons.
+The final production-build check brings every individual column of every table fully into
+view at 1440/390/320px in Chrome; even at 320px, no cell is wider than its scrolling viewport.
+
 No shared typography or table implementation is changed. Browser checks confirm all four
 tables scroll within the article without page-wide overflow at 1440, 390 and 320 CSS pixels,
 in installed Chrome 156.0.8078.49 and WebKit 26.5. Real horizontal wheel input reaches each
@@ -106,7 +114,7 @@ the separately recorded backlog task, not a hidden redesign.
 Source/schema/SEO/image/link/arithmetic checks and strict blog audit pass. The supplied SEO
 title exceeded the 60-character check, so only SEO metadata was shortened; the visible title
 is preserved exactly. The original publication date, filename/slug and image remain intact.
-The article's source word count is about 1,560, matching its eight-minute reading estimate.
+The article's source word count is about 1,590, matching its eight-minute reading estimate.
 
 Repository checks, 13 blog/MDX/current-guidance suites (118 tests) and production build pass.
 The existing SEO/blog-navigation and search-discoverability browser suites also pass (9 tests),
@@ -117,3 +125,28 @@ Screenshot evidence SHA-256 (390px left/right):
 `9121deb506b7caad4f8ad3a0372ef668969f28be88194abe7caebf352e79f5fb`.
 Exact-head independent review and hosted run results will be attached to the draft PR,
 without making another commit solely to insert its own SHA.
+
+## First independent review and dispositions
+
+Claude CLI 2.1.308 independently audited `7d853eb42285cfb1a17ccdd93d29b1647f500f78`
+against the base, including official sources and PR #144's original dispositions. Verdict:
+**APPROVE WITH NONBLOCKING NOTES**, with no blocking findings. It derived the wage figures
+by hand and confirmed the enacted/proposed and previously announced distinctions.
+
+- Savings FAQ: made enacted 22/42/47% and proposed 24/44/49% explicit, because the FAQ can
+  appear independently in structured data/search.
+- Month 1 jargon: explained that this emergency basis taxes each month separately and
+  replaced “free pay” with plain language. Exact figures and non-cumulative caveat retained.
+- Wage timing citation: linked the first-pay-reference-period claim directly to HMRC's
+  calculation guidance, keeping the official rate source separately.
+- Scenario inputs: clarified retained rates and annual/weekly thresholds, using existing
+  monthly routines, rather than suggesting that final 2027/28 payroll tables are available.
+- Mileage breadth: kept this concise article's explicitly specified above-10,000-mile case.
+  The row is not a full mileage guide. No 55p claim is added: the reviewer could corroborate
+  that broader change only in Treasury text and did not verify the earlier HMRC announcement.
+- Density/mobile: retained the supplied structure and exact wage comparison, shortening long
+  summary cells and moving qualifications into prose. Shared typography stays in the backlog.
+
+The reviewer did not rerun checks or audit physical devices/screen readers; source-access
+limitations and the full response will be attached to the PR. These content/presentation
+follow-ups require verification and an independent re-review of the new exact head.
