@@ -150,3 +150,12 @@ by hand and confirmed the enacted/proposed and previously announced distinctions
 The reviewer did not rerun checks or audit physical devices/screen readers; source-access
 limitations and the full response will be attached to the PR. These content/presentation
 follow-ups require verification and an independent re-review of the new exact head.
+
+A fresh-context review of `49ab50dd2bccb0f52ad0ff8cc5261098e88ea8ad` again approved
+with nonblocking notes and independently confirmed the figures. Two final wording fixes restore
+the property-rate territorial limit beside the overview and introduce the LEL abbreviation.
+The broader devolved qualification remains in the main property section. The reviewer also
+asked that PR evidence identify the correct build log: `reader-build-reviewed.log` covers the
+larger article follow-up (built 20:52 UTC, browser checks 20:53), whereas the older
+`reader-build-final.log` covers the first draft only. Exact-ref build/check evidence and an
+independent re-review of these last wording fixes will be attached to the PR.
