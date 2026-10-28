@@ -56,6 +56,14 @@ describe('Submitted pay period presentation (mounted)', () => {
     const snapshot = useCalculatorStore.getState();
     const selector = () => screen.getByRole('combobox', { name: 'Take-home pay period' });
 
+    expect(
+      screen.getByRole('region', { name: 'Tax calculation summary results' }),
+    ).not.toContainElement(selector());
+    const announcement = screen.getByTestId('mobile-take-home').parentElement;
+    expect(announcement).toHaveAttribute('aria-live', 'polite');
+    expect(announcement).toHaveAttribute('aria-atomic', 'true');
+    expect(announcement).not.toContainElement(selector());
+
     act(() => selector().focus());
     await user.keyboard('{ArrowDown}{Home}{Enter}');
     expect(selector()).toHaveTextContent('Yearly');

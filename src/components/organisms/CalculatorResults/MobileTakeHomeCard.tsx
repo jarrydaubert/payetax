@@ -62,20 +62,22 @@ export function MobileTakeHomeCard({ results, submittedPeriod }: MobileTakeHomeC
           </SelectGroup>
         </SelectContent>
       </Select>
-      <p className='font-medium text-foreground/80 text-sm uppercase tracking-[0.12em]'>
-        {periodLabel} Take-Home
-      </p>
-      <p
-        className='font-mono font-semibold text-2xl text-foreground tabular-nums'
-        data-testid='mobile-take-home'
-      >
-        {formatCurrency(results.netPay[period])}
-      </p>
-      <p className='text-muted-foreground text-sm' data-testid='mobile-take-home-context'>
-        {period === 'annually'
-          ? `${formatCurrency(results.netPay.monthly)} per month`
-          : `${formatCurrency(results.netPay.annually)} per year`}
-      </p>
+      <div className='flex flex-col gap-2' aria-live='polite' aria-atomic='true'>
+        <p className='font-medium text-foreground/80 text-sm uppercase tracking-[0.12em]'>
+          {periodLabel} Take-Home
+        </p>
+        <p
+          className='font-mono font-semibold text-2xl text-foreground tabular-nums'
+          data-testid='mobile-take-home'
+        >
+          {formatCurrency(results.netPay[period])}
+        </p>
+        <p className='text-muted-foreground text-sm' data-testid='mobile-take-home-context'>
+          {period === 'annually'
+            ? `${formatCurrency(results.netPay.monthly)} per month`
+            : `${formatCurrency(results.netPay.annually)} per year`}
+        </p>
+      </div>
     </Card>
   );
 }

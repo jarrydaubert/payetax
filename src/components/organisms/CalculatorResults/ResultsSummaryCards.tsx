@@ -43,6 +43,7 @@ export function ResultsSummaryCards({
 
   return (
     <TooltipProvider delayDuration={200}>
+      <MobileTakeHomeCard results={results} submittedPeriod={input?.payPeriod ?? 'annually'} />
       <motion.section
         className={cn('grid border-border border-b py-4 md:grid-cols-2 lg:grid-cols-5', 'gap-4')}
         variants={shouldReduceMotion ? undefined : ANIMATION_CONTAINER_VARIANTS.staggerFast}
@@ -52,7 +53,6 @@ export function ResultsSummaryCards({
         aria-atomic='true'
         aria-label='Tax calculation summary results'
       >
-        <MobileTakeHomeCard results={results} submittedPeriod={input?.payPeriod ?? 'annually'} />
         <motion.div variants={shouldReduceMotion ? undefined : ANIMATION_VARIANTS.fadeInUp}>
           <ResultCard
             label='Annual Take-Home'

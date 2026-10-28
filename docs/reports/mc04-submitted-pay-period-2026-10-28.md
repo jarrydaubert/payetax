@@ -33,6 +33,9 @@ future statement/comparison; this slice does not claim to deliver them.
 - Existing invalidation unmounts the result cards after edits, invalid drafts or Reset. No stale
   result/action guards, session-history behaviour, engine, pension application, storage,
   telemetry, consent or email code changed. No new persisted financial state or analytics events.
+- The mobile selector is outside the desktop cards' atomic live region. A separate polite,
+  atomic region announces only the selected period's take-home value/context; it excludes the
+  selector. This addresses the independent Claude CLI review's accessibility finding.
 
 ## Regressions and verification
 
@@ -51,10 +54,13 @@ table values and one independent HMRC-derived fixture: `uk-40k-1257L` from
 £2,693.50 monthly take-home. It checks selection/calculation preservation at widths 320, 393,
 852, 1023, 1024, 1280, 1440 and 2560, plus a fresh/changed-period Calculate and stale-result removal.
 
-Verification commands and final results are recorded in the draft PR. Full Jest verification:
+Verification commands and final results are recorded in the draft PR. Full Jest verification before
+the accessibility review fix:
 `bun --no-env-file run test:no-coverage --runInBand` — **255 suites, 4,513 tests passed**.
 This includes independent PAYE, MC-03, pension suggestion and privacy tests. The final expanded
 Yearly-display assertion also passed in the eight-test mounted slice.
+
+The following browser/check rows record the pre-review-fix checkpoint:
 
 | Check | Result |
 | --- | --- |
@@ -69,7 +75,44 @@ The final browser command was:
 bun --no-env-file x playwright test e2e/calculator-critical.spec.ts e2e/responsive-calculator-layout.spec.ts --grep 'MC-04|Desktop keyboard navigation' --project=chromium --project=webkit --workers=1 --reporter=line
 ```
 
-The unchanged remainder of the broader run was not repeated after these test-only corrections.
+The unchanged remainder of the broader run was not repeated at that checkpoint. The accessibility
+review fix below is a later product change and carries fresh affected checks, recorded in the PR.
+
+## Independent review and reconciliation
+
+Claude CLI reviewed `09d2627fd0c3843aa224f795117568cad34c1aba` against the recorded base and
+requested one medium accessibility change: the mobile selector was inside the summary's atomic
+live region, so a period change could announce all cards. Moving the card outside that region
+and giving only its value/context a separate live region addresses the finding; a mounted
+regression checks the boundaries. Desktop cards retain their original live region. Actual
+NVDA/VoiceOver/TalkBack output remains unverified. The initial review identified no other
+actionable finding and did not run tests/builds itself.
+
+GitHub rejected the first push for publishing the local private commit email. Commit `926305cc`
+changed only the author/committer identity to the repository's established GitHub noreply
+address; both commits have tree `94e588f0feab838001a67b8ae102e4245060457a`.
+No account privacy setting or global Git configuration was changed. The accessibility fix is
+a subsequent commit; the PR records its exact final SHA and the requested Claude re-review.
+SHA-256 of the initial raw CLI review JSON:
+`d778cbe78759c5dc116398a2ab53695459f9354a60e61f592cec5911ded08f06`.
+
+## Post-review-fix verification
+
+| Check | Result |
+| --- | --- |
+| `bun --no-env-file run check:repo` | Passed |
+| Fresh production `build:ci` via existing Playwright web-server setup | Passed |
+| Affected mounted period, amount-integrity, pension-suggestion and summary-card suites | Four suites / 73 tests passed, including the new live-region boundary assertion |
+| Complete seven-file Chromium run listed above, repeated after the product fix | 83 passed |
+| WebKit MC-04 + desktop keyboard-navigation subset, repeated after the product fix | 12 passed |
+
+The WebKit rerun used a temporary config outside the repository to reuse that same production
+server and put its results in a separate directory. It inherited the repository's tests,
+projects and options; only `reuseExistingServer` and absolute test/setup/storage/output paths
+were overridden. Its selection was the two specs and grep expression shown above, with
+`--project=webkit --workers=1 --reporter=line`. No test or runner changes were made after these
+passing runs. The complete Jest suite predates the accessibility fix; affected suites were rerun
+after it. No financial calculation code changed in either revision.
 
 ## Browser inspection and limits
 
@@ -95,7 +138,7 @@ claim to close the backlog's native tap/pointer defects. Physical-device keyboar
 MC-05 mobile focus, statement copying, full comparison, and the broader MC-05 visual matrix
 remain unverified here.
 
-Local inspection images are not independent hosted evidence. Their useful observations are
+Initial inspection images are not independent hosted or final-review-fix evidence. Their useful observations are
 preserved above; SHA-256 hashes of the temporary originals:
 
 | Image | SHA-256 |
@@ -104,3 +147,14 @@ preserved above; SHA-256 hashes of the temporary originals:
 | Chromium Hourly, 393×852 | `bd9e52e9c63ced75a66cbc264e2eb02180a732189baf48ac575aa05a5e3dcd76` |
 | Chromium desktop, 1440×900 | `fff721a3f37aaddc21b77e9f733f668665d1665b4b7a411b510b1c1a96627e56` |
 | Chromium production Monthly, 393×852, after animations settled | `ed3b6becbaf1f8da9f440bb31e155e0b618bb3733560f1e95cf02b427883124f` |
+
+Post-fix Chromium production inspection confirmed no live-region ancestor around the selector,
+the narrow output announcement, the independent £40k fixture, five desktop cards and selection
+preservation after resizing. Post-fix screenshot hashes:
+
+| Image | SHA-256 |
+| --- | --- |
+| Monthly, 393×852 | `a37832b6ad721aa4b005ce089426b64bc634ba112add9bf670b0a499438062b1` |
+| Hourly, 393×852 | `46674f42fe9918d160b5cf9bd3be547f8785c7c9d85a8842520fa495d3e890c3` |
+| Desktop, 1440×900 | `93011d635e8e27ea4d39202edc1c032e29a694c7eda0dadff7c0230fb13c4047` |
+| Monthly card detail | `d99cbb01305ce0301735c6d9078d75c5e3ced867bd8bc72e2caab186919e3b1a` |
