@@ -29,7 +29,7 @@ The blog is a public trust surface for the calculator. Treat every tax claim, de
 
 Use this hierarchy whenever publishing or refreshing content:
 
-1. `src/constants/taxRates.ts` for tax-rate values supported by the calculator.
+1. Canonical effective-dated policy and implemented tax-domain code for the calculator's supported years; `src/constants/taxRates.ts` is a useful published-value interface, not independent statutory evidence. Verify relevant values against the current primary official sources below.
 2. Official primary sources for rules and dates:
    - GOV.UK Income Tax: `https://www.gov.uk/income-tax-rates`
    - GOV.UK Scottish Income Tax: `https://www.gov.uk/scottish-income-tax/how-it-works`
@@ -60,7 +60,7 @@ The house rule is conservative:
 
 - Avoid hardcoded tax-rate and threshold values in prose when the calculator can carry the answer.
 - Hardcoded values are allowed only when they are the subject of the article, source-checked, and necessary for clarity.
-- Any worked example must be recalculated against `src/constants/taxRates.ts` or the app calculator before publication.
+- For any supported-year worked calculation, record exact inputs and compare the calculator result with **independently derived** official-rule workings or approved hand-derived fixtures. Neither the calculator nor `src/constants/taxRates.ts` independently proves statutory correctness. Do not present hypothetical future-year projections as supported calculator outputs.
 - Never copy a worked example forward from a previous tax year without recalculating it.
 - Avoid "save thousands", "free money", or similar claims unless the exact assumptions are visible and sourced.
 
@@ -116,13 +116,13 @@ After the opening, each section should deliver additional explanation, a worked 
 
 ## Reader Journey
 
-Apply this before publishing or refreshing every post:
+Check the reader's next useful step before publishing or refreshing a post:
 
-- Primary calculator path present: link to `/#tax-calculator` where appropriate.
-- Secondary calculator path present: link to `/tools/director-guide` when relevant.
-- Trust/compliance path present: link to `/compliance`.
-- At least one contextual internal tool or article link when it genuinely helps.
-- Do not link to tools, features, or future products that do not exist.
+- Link to `/#tax-calculator` when readers can genuinely use the supported calculator for the scenario; explain any unsupported year or calculation.
+- Link to `/tools/director-guide` only for a relevant, supported director scenario.
+- Link to `/compliance` where evidence, methodology or limitations materially help assess a claim; it is **not** a mandatory promotional link in every post.
+- Add genuinely useful contextual article or tool links without a fixed link quota.
+- Do not link to tools, features or future products that do not exist.
 
 ## Refresh Workflow
 
@@ -132,7 +132,7 @@ Use this workflow for audits, tax-year refreshes, or consistency passes:
 2. Inventory the posts being touched and classify each as `keep`, `refresh`, `rewrite`, `merge`, or `retire`.
 3. Check frontmatter, slug/date alignment, current tax year, image path, and links.
 4. Source-check unstable claims against the hierarchy above.
-5. Compare calculator-linked examples with `src/constants/taxRates.ts` or the running calculator.
+5. Recalculate supported-year examples with recorded engine inputs/outputs **and** independently cross-check official-rule workings or hand-derived fixtures. For future years, separate illustrative assumptions from unsupported calculator functionality.
 6. Rewrite prose against the voice guide, then update examples, metadata, disclaimer and internal links together. Keep material caveats close to claims; remove duplicative defensive text.
 7. Regenerate the featured image if the post image does not match the Ledger style in `docs/blog/IMAGE_WORKFLOW.md`.
 8. Update `updatedAt` only for meaningful factual refreshes.
@@ -146,7 +146,7 @@ Before a content PR is ready, run **one independent review with two explicit ver
 
 - Current tax year and absolute dates are correct.
 - Official sources were checked during the work session for unstable claims.
-- Examples match the calculator or `src/constants/taxRates.ts`.
+- For supported years, worked examples have recorded inputs/outputs **and** an independent statutory calculation or fixture confirming the relevant values and rounding; future-year illustrations are clearly labelled and separately sourced.
 - No unsupported provider, product, security, production-status, or usage claims were introduced.
 - UK English is used throughout.
 - The article does not overpromise savings, certainty, or personalised advice.
