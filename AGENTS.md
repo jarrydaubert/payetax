@@ -1,6 +1,6 @@
 # AGENTS.md: PayeTax
 
-Instructions for coding agents and contributors working in this repository.
+The authoritative repository guidance for Codex, Claude Code and contributors. Keep shared rules here; `CLAUDE.md` only imports this file. Task commands and skills below must follow this contract.
 
 ## What This Is
 
@@ -22,17 +22,17 @@ Use proportionate engineering: prefer the simplest complete, maintainable soluti
 
 Before editing, inspect Git state, project guidance and affected code. Work on an appropriate branch without disturbing unrelated changes.
 
-Implement the change, verify the relevant behaviour with tests and direct inspection where appropriate, update documentation only when necessary, and commit the completed work.
+Implement the change, verify the relevant behaviour with tests and direct inspection where appropriate, and update documentation only when necessary. Commit and push only when requested (including when needed to open a requested PR).
 
 Match verification effort to risk. Financial correctness, security and consequential user interactions require stronger evidence than routine changes.
 
-Report what changed, what passed, what remains unverified and any meaningful trade-offs. Obtain independent review before merging, and do not merge without authorisation.
+Report what changed, what passed, what remains unverified and any meaningful trade-offs. Obtain independent review before merging. Merge and deployment each require explicit maintainer approval; passing checks or review does not grant it.
 
 ## Scope Guardrails
 
 - Keep the main calculator, tools, Director Intelligence, blog, email-results, PWA, GA4, Sentry, Brevo API email, and Upstash-backed rate limiting.
 - Do not reintroduce growth page families, competitor-style SEO pages, partner lead capture, or mailing-list plumbing unless explicitly requested.
-- Do not add extra analytics vendors beyond GA4 unless there is a specific implementation task.
+- Keep existing Vercel Web Analytics, Vercel Speed Insights and consent-based GA4; do not add analytics vendors unless explicitly requested.
 - Do not reintroduce the feedback feature or external issue-tracker integrations unless explicitly requested.
 - Do not invent tax behaviour, provider support, production status, usage metrics, or security controls.
 - Do not commit secrets.
@@ -44,21 +44,21 @@ bun install --frozen-lockfile
 bun run check:repo
 bun run test:no-coverage
 bun run build:ci
-bun audit
+bun run audit:deps
 ```
 
 Use the smallest relevant check while developing, then run `bun run check:repo` and `bun run build:ci` before committing broad changes. Use `bun run build:release` only when validating release behaviour that needs Sentry source maps.
 
-## Agent Loops
+## Verification And Agent Workflows
 
-Prefer loop primitives with deterministic stop conditions over open-ended iterative prompting:
+Use existing scripts and bounded tasks with explicit stop conditions. Slash commands, loops and scheduling features depend on the client; they are not repository commands or merge permission.
 
 - **Verification:** for any UI change, use the `verify-frontend-change` skill (`.claude/skills/verify-frontend-change/SKILL.md`). Do not report UI work done on a successful edit alone.
-- **Goal loops:** hand off the stop condition instead of checking each turn, e.g. `/goal bun run check:repo and bun run test:e2e:critical pass, stop after 5 tries`. For changes to calculation logic or expected tax outputs, the stop condition must include the independent PAYE verification tests (hand-derived fixtures in `src/test/payeVerificationFixtures/`; run `bun run test:no-coverage` — no smaller supported command exists) **and** the golden-master E2E slice for browser/result regression. Golden-master expectations are generated from the production engine, so they are not a correctness oracle on their own.
-- **PR loops:** `/loop 10m check my open PR, address review comments, fix failing CI` — stops on merge.
-- **Scheduled upkeep:** a weekly `/schedule` routine running `bun run check:rate-freshness`, `bun run audit:deps`, and `bun audit`. Report findings; do not auto-merge dependency changes.
+- **Tax correctness:** for changes to calculation logic or expected tax outputs, run `bun run test:no-coverage` (including the hand-derived independent PAYE fixtures in `src/test/payeVerificationFixtures/`) **and** `bun run test:e2e:golden` for browser/result regression. Derive expectations independently using current primary official sources and the relevant tax year, region, pay basis and rounding. Golden-master expectations are generated from the production engine, so they are not a correctness oracle on their own. A focused development check is `bun run test:no-coverage --runTestsByPath src/lib/__tests__/taxCalculator.verification.test.ts`; it does not replace the broader checks required for a completed calculation change.
+- **PR follow-up:** address in-scope findings and failing checks, then stop for maintainer review; never merge or enable auto-merge as a loop stop condition.
+- **Upkeep:** when requested, run `bun run check:rate-freshness` and `bun run audit:deps`; report findings without automatically upgrading or merging dependencies.
 
-Loops must respect the scope guardrails above and the token rule of this repo: use the existing check scripts (deterministic, cheap) rather than re-deriving verification steps.
+See `.claude/commands/README.md` for the checked-in workflow inventory and client-loading notes. Use only skills actually available in the session; do not assume removed or personal installations exist.
 
 ## CI And Repo Quality
 
@@ -87,7 +87,7 @@ Production secrets belong in Vercel project settings:
 - Sentry values for monitoring and source maps
 - GA4 measurement id for basic analytics
 
-If a Vercel CLI command cannot retrieve project settings, check `.vercel/project.json`. A stale local link should be replaced by relinking to the current project.
+If a Vercel CLI command cannot retrieve project settings, follow `docs/guides/OPERATIONS.md`; do not relink a project or change remote settings without explicit authorisation.
 
 ## Editing Rules
 
@@ -97,7 +97,7 @@ If a Vercel CLI command cannot retrieve project settings, check `.vercel/project
 - Keep evergreen docs useful and stable; put dated run evidence in PRs or `docs/reports/*`.
 - Evidence relied upon for a PR must be committed under `docs/reports/` or attached to the PR; it must not be available exclusively through a local or scratch path. If raw artifacts are too large or sensitive, preserve a useful summary and a SHA-256 hash of the original artifact in the report or PR attachment, without committing sensitive data. Distinguish independently accessible results from maintainer reports and record the relevant ref, command and limitations.
 - Verify commands before claiming they pass.
-- When touching frontend UI, inspect the changed route locally when practical.
+- When touching frontend UI, inspect and interact with the changed route locally as required by the verification skill; report blocked checks rather than claiming completion.
 - For email, privacy, security, and tax claims, confirm the implementation before changing wording.
 
 ## Current Public Surface
@@ -111,7 +111,7 @@ If a Vercel CLI command cannot retrieve project settings, check `.vercel/project
 
 ## Pull Request Expectations
 
-Before merging non-trivial code changes, run a fresh-context review (`/code-review` or a second agent that did not write the code) and address or note its findings.
+Before merging non-trivial code or agent-guidance changes, obtain a fresh-context review from a reviewer or agent that did not write the change and address or note its findings. Use the review capability available in the client; no particular slash command is required.
 
 For code changes, report:
 
