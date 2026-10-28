@@ -142,6 +142,7 @@
     "esbuild": "0.28.1",
     "argparse": "2.0.1",
     "postcss-selector-parser": "7.1.6",
+    "deepmerge": "npm:@stackline/deepmerge@1.1.0",
     "zod": "4.6.6"
   },
   "devDependencies": {
