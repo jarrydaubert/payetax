@@ -21,6 +21,11 @@ sources, not in backlog prose.
 
 ## Active
 
+- [ ] **Budget 2026 / 2027–28 policy implementation (separate PR):** keep the calculator limited
+  to 2026–27 until final legislation, regional rates and independent fixtures are verified.
+  Follow the [dated implementation requirements](reports/budget-2026-future-year-requirements-2026-10-28.md);
+  the Budget content PR changes no calculations and enables no tax year.
+
 Current correctness sequence:
 
 1. Explicit pension-method handling.
@@ -355,6 +360,12 @@ Single owners for the unresolved parts of the [supporting-pages audit](reports/p
 Privacy link/table accessibility (P8) stays with [Verification](#verification); Director hint contrast (D2) stays with DI-12. Public methodology and source/authority claims stay with [Trust and sourcing](#trust-and-sourcing) and the existing modelling-assumptions owner.
 
 ### Verification
+
+- [ ] **P3 — Playwright native-link navigation coverage:** the installed Playwright 1.61.1 /
+  Chromium 149 view-transition regression reproduces on unchanged `main`; installed Chrome 156
+  and WebKit pass the Budget pointer journeys. Revisit bundled-Chromium coverage with a separately
+  scoped dependency update, rather than changing application transitions or weakening assertions.
+  [Reproduction and limits](reports/budget-2026-final-verification-2026-10-28.md#navigation-investigation).
 
 - [ ] P3 — Reduced-motion results emit a React DOM warning in development. `ResultTableRow` selects the static `TableRow` when reduced motion is enabled but still passes `layout={false}` to the DOM. Reproduced during MC-03 visual QA; the same source exists on base `d2ee3ee8`. DoD: omit motion-only props on the static path and verify reduced-motion results without the non-boolean `layout` warning. This is separate from the existing mobile focus/pointer work.
 
