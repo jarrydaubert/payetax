@@ -17,11 +17,13 @@ The blog is a public trust surface for the calculator. Treat every tax claim, de
 
 ## Editorial Position
 
-- Write as `TaxInsights by PayeTax`: plain, practical, and source-backed.
-- Help the reader understand what changed, why it matters, and what to check next.
-- Prefer calm precision over urgency. Do not use fear-mongering, exaggerated savings claims, or aggressive sales language.
-- Use UK English in frontmatter, headings, body copy, CTAs, image alt text, and generated image prompts.
-- Be honest about calculator scope. PayeTax is a PAYE and director calculator, not a full Self Assessment, accounting, or regulated financial-advice product.
+- Read [VOICE_AND_STYLE.md](VOICE_AND_STYLE.md) before drafting **or reviewing** a post. It defines the reader, answer-first openings, five flexible formats and the caveat rule; this guide owns the accuracy and publishing constraints.
+- Write as `TaxInsights by PayeTax`: direct, warm, contemporary British English, grounded in concrete pay and tax examples. A reader should understand the useful answer before meeting specialist terminology.
+- Target a real UK working adult's question or decision; avoid writing to an age bracket or producing content merely to catch search queries.
+- Prefer clarity over drama. No aggressive saving promises, fear-mongering, fake urgency, fabricated expertise, forced slang or formulaic SEO filler.
+- Be honest about scope: PayeTax is a PAYE and director calculator, not full Self Assessment, accounting or regulated personal tax advice.
+- Keep material exclusions alongside their claims. Remove repeated, non-material defensive caveats rather than allowing review to make prose progressively stiffer.
+- Every article's structure and length must fit its reader question. Answer-first is universal; mandatory Quick Summaries, FAQs and uniformly sized articles are not.
 
 ## Source Hierarchy
 
@@ -98,15 +100,19 @@ Frontmatter guidance:
 
 ## Post Structure
 
-Use this default structure unless the article has a better natural shape:
+**Universal: open with the useful answer and its consequence.** Usually two or three sentences establish the result, who it affects and why the reader should continue. For a technical explanation or myth-buster, name the recognisable reader problem and resolve it promptly.
 
-1. Clear intro with the current takeaway.
-2. Short summary for the reader who wants the answer.
-3. Plain-language explanation of the rules or decision.
-4. Worked example only when it adds clarity and has been recalculated.
-5. Reader action section linking to the calculator or relevant tool.
-6. Short FAQ for search intent and common misunderstandings.
-7. Informational disclaimer.
+Choose the primary article format from [VOICE_AND_STYLE.md](VOICE_AND_STYLE.md):
+
+- **Salary snapshot:** net pay first, one readable breakdown, material assumptions, relevant differences.
+- **Explainer:** familiar situation, simple mechanism, appropriate example, practical check.
+- **Problem-solver:** symptom, likely causes, tests to distinguish them, resolution.
+- **What's changed:** affected groups, practical consequence, start dates and policy status.
+- **Myth-buster / decision:** belief, correction, supporting calculation, where the answer differs.
+
+These are choices, not rigid templates. Vary length with complexity; do not add a mandatory FAQ, character, table, joke or “TL;DR” box. A worked example is encouraged **when useful and when its outputs can be independently validated**, not required for every brief news update.
+
+After the opening, each section should deliver additional explanation, a worked consequence or a useful next step—not repeat the same summary. Use headings that make the next thought clear; questions are optional.
 
 ## Reader Journey
 
@@ -127,14 +133,16 @@ Use this workflow for audits, tax-year refreshes, or consistency passes:
 3. Check frontmatter, slug/date alignment, current tax year, image path, and links.
 4. Source-check unstable claims against the hierarchy above.
 5. Compare calculator-linked examples with `src/constants/taxRates.ts` or the running calculator.
-6. Update prose, examples, metadata, disclaimer, and internal links together.
+6. Rewrite prose against the voice guide, then update examples, metadata, disclaimer and internal links together. Keep material caveats close to claims; remove duplicative defensive text.
 7. Regenerate the featured image if the post image does not match the Ledger style in `docs/blog/IMAGE_WORKFLOW.md`.
 8. Update `updatedAt` only for meaningful factual refreshes.
 9. Record large refresh batches in `docs/BACKLOG.md`, a GitHub issue, or the PR description.
 
-## Accuracy Checklist
+## Accuracy and Readability Checklist
 
-Before a content PR is ready:
+Before a content PR is ready, run **one independent review with two explicit verdicts** (accuracy and editorial readability). Both must pass; there is no second mandatory reviewer loop.
+
+**Accuracy:**
 
 - Current tax year and absolute dates are correct.
 - Official sources were checked during the work session for unstable claims.
@@ -144,6 +152,17 @@ Before a content PR is ready:
 - The article does not overpromise savings, certainty, or personalised advice.
 - The disclaimer is present and proportionate.
 - The image path exists, the image is 1600x1000, and the `imageAlt` is accurate.
+
+**Readability:**
+
+- The first screen gives the answer and consequence in natural British English; the intro does not begin with obligatory caveats or a definition when the reader came for an answer.
+- The draft has a specific intended reader and one useful primary format; paragraphs and examples advance the explanation rather than repeat a Quick Summary.
+- Headings, sentence rhythm, tables, examples and links are easy to follow; forced slang, hype, generic transitions and repetitive disclaimers are removed.
+- Caveats that materially affect interpretation stay with their claims. Other assumptions are grouped or omitted when genuinely non-material; citations remain traceable to the statements they support.
+- Realistic scenarios are clearly hypothetical, show the relevant pay period and use independently verified figures. Do not invent a named person's real experience or force a character into every article.
+- Inspect the rendered opening and a representative middle section, including mobile table width and text hierarchy. The maintainer makes the final publication decision.
+
+Reviewers must flag misleading omissions **and** remove unnecessary caveats. Passing repo tests proves neither editorial quality nor article comprehension.
 
 ## Verification
 
@@ -169,3 +188,5 @@ When touching blog rendering, category behaviour, image paths, or MDX components
 - at least one changed post
 
 Use local visual inspection when practical. The build catches MDX and route-generation failures, but it will not tell you whether a post reads well or whether a generated image feels off-brand.
+
+For editorial changes, inspect the title, opening, at least one middle section, tables and links in a real desktop/mobile rendering. Keep one independent review with separate accuracy and readability verdicts, followed by the maintainer's human spot-check. Do not infer article completion from GA4's `blog_article_read` event: it fires on component mount, while site-wide `scroll_depth` tracks the whole page. Consent limitations and the backlog's search-evidence protection remain in force.
