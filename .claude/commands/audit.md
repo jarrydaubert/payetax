@@ -6,10 +6,9 @@ argument-hint: [target]
 # /audit - Evidence-Driven Audit
 
 **CRITICAL INSTRUCTIONS:**
-- Do NOT use planning/spec modes or persist artifacts to disk.
-- Output the audit directly in this conversation as markdown.
+- Report findings directly in this conversation; preserve relied-upon PR evidence as required by `AGENTS.md`.
 - Do NOT write or modify application code.
-- Audit shipped flows only by default. Tax Pack is deferred unless the user explicitly asks for it.
+- Audit shipped flows only by default; include unshipped features only when explicitly requested.
 - Do NOT claim exhaustive coverage unless you actually enumerated and checked the whole scoped set.
 - Do NOT write phrases like "all routes", "all components", "none found", or "fully read" unless your evidence section proves that exact scope.
 
@@ -23,8 +22,8 @@ argument-hint: [target]
 - `app` - shipped application audit across the main calculator, director flow, APIs, shared validation, and app shell
 - `calculator` - tax calculator system (`taxRates.ts`, `taxCalculator.ts`, calculator UI/store)
 - `director` - Director Intelligence (`/tools/director-guide`, related calculator modules, send-director-results)
-- `emails` - newsletter + transactional email flows
-- `api` - shipped API routes under `src/app/api/` (exclude Tax Pack unless explicitly requested)
+- `emails` - transactional PAYE and Director results email flows
+- `api` - shipped API routes under `src/app/api/`
 - `security` - security/privacy focus (headers, tokens, logging, rate limiting, origin checks)
 - `performance` - performance patterns and obvious bundle/hydration risks
 - `components` - component architecture and client/server boundaries
@@ -125,7 +124,7 @@ Use this format, not blanket checkmarks:
 - Never say `none found` unless you ran a search or review that justifies that exact negative claim.
 - Never say `covered` if the test was not opened or executed.
 - Never promote `Partially verified` to `Verified` in the summary.
-- If scope excludes Tax Pack, do not cite Tax Pack files as findings. Mention them only in `Deferred/Excluded`.
+- Do not cite excluded features as findings; mention them only in `Deferred/Excluded`.
 
 ## PayeTax-Specific Focus Areas
 
@@ -157,7 +156,7 @@ Use this format, not blanket checkmarks:
 - `src/lib/validation.ts`
 - `src/store/calculatorStore.ts`
 - `next.config.ts`
-- shipped `src/app/api/**/route.ts*` files, excluding Tax Pack unless requested
+- shipped `src/app/api/**/route.ts*` files
 
 ### `calculator`
 - `src/constants/taxRates.ts`
@@ -175,14 +174,12 @@ Use this format, not blanket checkmarks:
 - `src/app/api/send-director-results/route.ts`
 
 ### `emails`
-- `emails/*.tsx`
-- `src/app/api/newsletter/subscribe/route.ts`
-- `src/app/api/newsletter/unsubscribe/route.ts`
+- `src/lib/email/`
 - `src/app/api/send-results/route.ts`
 - `src/app/api/send-director-results/route.ts`
 
 ### `api`
-- shipped `src/app/api/**/route.ts*`, excluding Tax Pack unless requested
+- shipped `src/app/api/**/route.ts*`
 - `src/lib/rateLimit.ts`
 - `src/lib/security/origin.ts`
 - `src/lib/security/botGuard.ts`
