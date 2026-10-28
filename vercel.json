@@ -1,4 +1,9 @@
 {
+  "git": {
+    "deploymentEnabled": {
+      "content/budget-2026": false
+    }
+  },
   "installCommand": "bun install --frozen-lockfile",
   "redirects": [
     {
