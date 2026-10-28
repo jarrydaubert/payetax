@@ -1,5 +1,8 @@
 # Budget 2026 content verification — 28 October 2026
 
+> Historical first-pass evidence at `0964c2e4`. The [final verification follow-up](budget-2026-final-verification-2026-10-28.md)
+> supersedes the unresolved navigation assessment and temporary deployment guard below.
+
 Base: `origin/main` at `89b442918db23177bd9faeb7f2309c5bc8119aa0` (#143).
 Scope: correct the historical Budget 2025 savings/property projections and calculator claims;
 add one TaxInsights explainer and one Ledger image. No calculator, policy, tax-year selection,
@@ -118,7 +121,7 @@ The local time is 28 October 2026; this means **19:20 London time**. There is no
 and no final-head independent approval. Keep the PR in draft with re-review pending. No merge
 or deployment is authorised.
 
-## No-deployment guard
+## Historical no-deployment guard — subsequently removed
 
 Existing PR #131 has a successful Vercel deployment, establishing that draft/content PRs can
 trigger preview hosting. `vercel.json` disables Git deployments only for `content/budget-2026`.
@@ -126,6 +129,6 @@ This follows [Vercel's documented branch exclusion](https://vercel.com/docs/proj
 It leaves `main` and all other branches at their existing defaults. No deployment command,
 environment change, merge or production release is authorised or performed.
 
-The deployment exclusion is kept in a separate commit so that the maintainer can remove it
-when preparing an authorised merge/release. While the no-deployment instruction applies,
-retain the guard on this PR branch. No branch protection, workflow, environment or secret changes.
+The deployment exclusion was isolated in its own commit. The maintainer subsequently requested
+its removal before merge preparation; the follow-up restores `vercel.json` exactly to `main`.
+The earlier retention plan is retired. No branch protection, workflow, environment or secret changes.

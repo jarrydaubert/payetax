@@ -361,9 +361,11 @@ Privacy link/table accessibility (P8) stays with [Verification](#verification); 
 
 ### Verification
 
-- [ ] **Blog client navigation QA:** investigate the local cross-article flow remaining at
-  `Loading article...` despite successful direct loads; reproduce against the unchanged runtime
-  before attributing a regression. Evidence and limits: [Budget content verification](reports/budget-2026-content-verification-2026-10-28.md#checks-and-practical-limits).
+- [ ] **P3 — Playwright native-link navigation coverage:** the installed Playwright 1.61.1 /
+  Chromium 149 view-transition regression reproduces on unchanged `main`; installed Chrome 156
+  and WebKit pass the Budget pointer journeys. Revisit bundled-Chromium coverage with a separately
+  scoped dependency update, rather than changing application transitions or weakening assertions.
+  [Reproduction and limits](reports/budget-2026-final-verification-2026-10-28.md#navigation-investigation).
 
 - [ ] P3 — Reduced-motion results emit a React DOM warning in development. `ResultTableRow` selects the static `TableRow` when reduced motion is enabled but still passes `layout={false}` to the DOM. Reproduced during MC-03 visual QA; the same source exists on base `d2ee3ee8`. DoD: omit motion-only props on the static path and verify reduced-motion results without the non-boolean `layout` warning. This is separate from the existing mobile focus/pointer work.
 
