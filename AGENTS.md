@@ -14,6 +14,7 @@ It is not a commercial growth site. Keep the product useful, accurate, and simpl
 2. Read `docs/BACKLOG.md` for unresolved work only.
 3. Follow dated reports and pull requests for supporting evidence and completed-work history.
 4. For statutory truth, verify canonical policy data against current primary official sources.
+5. For **blog writing or review**, follow `docs/blog/README.md` (including the voice guide and combined accuracy/readability standard), without weakening source checks or the existing release rules.
 
 ## Engineering Approach
 
