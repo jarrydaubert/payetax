@@ -15,7 +15,7 @@ preview, with no merge or manual deployment.
 - [Treasury Budget 2026](https://www.gov.uk/government/publications/budget-2026-document/budget-2026-html), household support, personal taxation and policy-decision tables: wage rates and other Budget measures.
 - [Official minimum wage rates](https://www.gov.uk/national-minimum-wage-rates) independently confirms £12.71 → £13.21 and £11.27 for ages 18–20 from April 2027; [LPC recommendations](https://www.gov.uk/government/publications/minimum-wage-rates-for-2027) corroborate the values. The LPC landing-page introduction mistakenly says April 2026, while its table says April 2027; Treasury explicitly dates the increase 1 April 2027. The article uses that corroborated date, not the conflicting introduction.
 - [Minimum wage calculation guidance](https://www.gov.uk/guidance/calculating-the-minimum-wage/calculating-the-minimum-wage): a new rate applies from the first pay reference period beginning on or after the change.
-- [HMRC emergency tax codes](https://www.gov.uk/tax-codes/emergency-tax-codes): M1 calculates tax on that month's pay only; independently confirms the new plain-English explanation.
+- [HMRC emergency tax codes](https://www.gov.uk/tax-codes/emergency-tax-codes): M1 calculates tax on that month's pay only. The final editorial pass replaces that exceptional basis with standard cumulative 1257L.
 - [Finance Act 2026](https://www.legislation.gov.uk/ukpga/2026/11/contents/enacted), sections 5–8: 22/42/47% are enacted 2027/28 savings/property rates, remaining law unless amended. Budget 2026's proposed 24/44/49% replacement needs Finance Bill 2026–27. Both columns and savings examples distinguish their status.
 - [HMRC online-selling guidance](https://www.gov.uk/guidance/selling-goods-or-services-on-a-digital-platform): selling unwanted personal possessions is usually not trading; buying/making goods to sell for profit can be. The paid-gardening example is explicitly qualifying gross trading income, not a house-clearance example. The proposed £3,000 threshold is not presented as current law or a salary allowance.
 - [Budget 2025](https://www.gov.uk/government/publications/budget-2025-document/budget-2025-html) and the [pension NI Act](https://www.legislation.gov.uk/ukpga/2026/15): earlier salary-sacrifice/PTA/Plan 2 origins retained. The enacted pension framework is distinguished from operational regulations; PTA still requires the Finance Bill. No interest-cap claim is added.
@@ -28,12 +28,16 @@ before Budget day, and applies to the specified own-car/van mileage case.
 
 ## Independently derived wage example
 
-The following hand derivation uses Decimal arithmetic and official rules, not engine outputs
-as an oracle. It was then cross-checked against the existing 2026/27 calculator for both salaries.
-Both engine calls explicitly used **2026-2027**, with no future-year selection or policy mutation.
+The final editorial pass replaces the Month 1 example reviewed at `ceaed62d` with standard
+cumulative 1257L. This is more representative and removes the emergency-code explanation from
+the article. Earlier M1 reviews below remain historical; this section records the current figures.
+The opening now summarises the Budget naturally, without an explicit TL;DR-style instruction.
+
+The following independent Decimal derivation uses official rules, not production-engine outputs
+as an oracle. No calculator code, fixtures, supported years or policy parameters are changed.
 
 Sources: [HMRC PAYE routines v24.0](https://assets.publishing.service.gov.uk/media/698c9824bd090be481c2879a/PAYErout-v24-0.odt),
-paragraphs 4.3–4.4, the monthly Appendix B and Month 1 basis section 8;
+paragraph 1.5 (monthly substitutions), 4.2–4.4 (cumulative pay, code allowance and tax);
 [Tables A](https://www.gov.uk/government/publications/tables-a-pay-adjustment-tables);
 [2026/27 employer rates](https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027);
 [CWG2 exact-percentage NI rounding](https://www.gov.uk/government/publications/cwg2-further-guide-to-paye-and-national-insurance-contributions/2026-to-2027-employer-further-guide-to-paye-and-national-insurance-contributions).
@@ -41,14 +45,17 @@ paragraphs 4.3–4.4, the monthly Appendix B and Month 1 basis section 8;
 Official ODT downloaded during this session, SHA-256:
 `799609b7ba81b5399015b32ebdaed774683ce4992caff33d67bbf68ba57f5599`.
 
-Assumptions: England, age 21+, 37.5 paid hours × 52 weeks, 12 monthly periods, 1257L M1,
-NI category A, no pension/student loan/other deductions. Each column annualises a constant wage,
-not actual calendar payroll history. The future column is a what-if using the existing monthly
-routine and retained headline parameters, not independently certified 2027/28 payroll software.
+Assumptions: England, age 21+, 37.5 paid hours × 52 weeks, 12 monthly periods from the start
+of the tax year, standard cumulative 1257L throughout, NI category A, no pension/student loan
+or other deductions. Each column uses a constant wage for a full year, rather than projecting a
+change part-way through a pay reference period. The future column uses existing monthly
+routines and retained headline parameters; it is not certified 2027/28 payroll software.
 
 Tables A free pay: code 1257 = two full 500 blocks plus code 257.
 `2 × ceil-to-pence(5000 / 12) + ceil-to-pence(2579 / 12) = 1048.26`.
-PAYE taxable pay is rounded down to whole pounds before applying 20%; employee NI is 8%
+Multiply £1,048.26 by the month number for cumulative code free pay: Month 12 is £12,579.12.
+Subtract from cumulative gross and round taxable pay down to whole pounds before applying
+20%; deduct tax already paid to obtain the current month's PAYE. Employee NI is 8%
 above the published monthly £1,048 threshold, rounded separately to the nearest penny
 (exact half-pennies down). Never use £12,570 / 12 as the monthly NI threshold.
 
@@ -56,20 +63,25 @@ above the published monthly £1,048 threshold, rounded separately to the nearest
 | --- | --- | --- |
 | Annual gross: hourly rate × 37.5 × 52 | £24,784.50 | £25,759.50 |
 | Six monthly gross pays of each amount, retaining annual gross exactly | £2,065.37 / £2,065.38 | £2,146.62 / £2,146.63 |
-| Monthly whole-pound taxable pay after £1,048.26 free pay | £1,017 | £1,098 |
-| Monthly PAYE | £203.40 | £219.60 |
+| Month 12 cumulative code free pay | £12,579.12 | £12,579.12 |
+| Month 12 whole-pound taxable pay | £12,205 | £13,180 |
+| Cumulative PAYE at Month 12 | £2,441.00 | £2,636.00 |
 | Monthly employee NI | £81.39 | £87.89 |
-| Annual PAYE (monthly amount × 12) | £2,440.80 | £2,635.20 |
 | Annual NI (monthly amount × 12) | £976.68 | £1,054.68 |
-| Annualised net | £21,367.02 | £22,069.62 |
-| Actual monthly net penny pair in this model | £1,780.58 / £1,780.59 | £1,839.13 / £1,839.14 |
-| Rounded average monthly net | £1,780.59 | £1,839.14 |
+| Annual net | £21,366.82 | £22,068.82 |
+| Rounded average monthly net | £1,780.57 | £1,839.07 |
 
-Differences: £975 gross, £702.60 annual net and £58.55 average monthly net. Rounding the
-half-penny monthly averages before multiplying by 12 creates a 6p discrepancy; the article
-explains that its monthly amounts are rounded averages. These results are not interchangeable
-with cumulative PAYE, or a simple annual allowance/band calculation. This article's explicitly
-stated 37.5 × 52 assumption produces £975 gross; it does not reuse the Treasury's £910 headline.
+Differences: £975 gross, £195 PAYE, £78 NI, **£702 annual net and £58.50 average monthly net**.
+Independent marginal-rate check: £975 × (1 − 20% − 8%) = £702. The 12-period derivation and
+direct year-end calculation agree. Monthly PAYE varies as cumulative rounding catches up;
+monthly amounts in the article are averages, not promised payslip amounts. Rounded averages
+multiplied by 12 are 2p above each annual net figure; the long rounding digression is removed
+from the reader-facing text. No emergency M1 figures remain in the article.
+
+Official ODT was re-downloaded and its source hash confirmed for this editorial pass.
+The independent 12-period proof, with gross, cumulative allowance/tax and NI for each month,
+has SHA-256 `8f8ee8a62bb1bcb8a76b8bcb8dcc59992e75dc19a0b100042da291bbd4c0d555`.
+This article's 37.5 × 52 assumption produces £975 gross; it does not reuse Treasury's £910 headline.
 
 The two savings calculations are independently unchanged: £500 taxable × 40/42/44% yields
 £200/£210/£220. The proposed £3,000 allowance example uses £2,500 qualifying gardening receipts
@@ -81,7 +93,7 @@ The four-column wage comparison is retained. Its first header is “Pay measure�
 blank; its future header is “2027/28 scenario”. Rates-table headers distinguish enacted and
 proposed law and identify the current column as savings, avoiding Scottish property-rate
 ambiguity. A visible swipe instruction explains the existing horizontal table behaviour;
-the key £702.60/£58.55 comparison is repeated in prose outside the wide table.
+the key £702/£58.50 comparison is repeated in prose outside the wide table.
 
 An additional column-by-column check found that the original overview/earlier-measures text
 cells were wider than a narrow phone's viewport. The final revision shortens those summary
@@ -114,13 +126,13 @@ the separately recorded backlog task, not a hidden redesign.
 Source/schema/SEO/image/link/arithmetic checks and strict blog audit pass. The supplied SEO
 title exceeded the 60-character check, so only SEO metadata was shortened; the visible title
 is preserved exactly. The original publication date, filename/slug and image remain intact.
-The article's source word count is about 1,590, matching its eight-minute reading estimate.
+The article's source word count is about 1,560, matching its eight-minute reading estimate.
 
 Repository checks, 13 blog/MDX/current-guidance suites (118 tests) and production build pass.
 The existing SEO/blog-navigation and search-discoverability browser suites also pass (9 tests),
 using installed Chrome against the same production build. A temporary ignored configuration
 reuses the running server and selects installed Chrome; no committed test configuration changes.
-Screenshot evidence SHA-256 (390px left/right):
+Earlier M1 screenshot evidence at `ceaed62d`, SHA-256 (390px left/right):
 `d3c8241bace1313bed03f6a855c7680bd4a212a02376be66900c4fe6702a7bd9` /
 `9121deb506b7caad4f8ad3a0372ef668969f28be88194abe7caebf352e79f5fb`.
 Exact-head independent review and hosted run results will be attached to the draft PR,
@@ -159,3 +171,24 @@ asked that PR evidence identify the correct build log: `reader-build-reviewed.lo
 larger article follow-up (built 20:52 UTC, browser checks 20:53), whereas the older
 `reader-build-final.log` covers the first draft only. Exact-ref build/check evidence and an
 independent re-review of these last wording fixes will be attached to the PR.
+
+## Final editorial pass after `ceaed62d`
+
+At the maintainer's request, the only reader-facing edits are the two opening paragraphs and
+the wage example/basis. Standard cumulative 1257L replaces emergency M1; the gain becomes
+£702/year and £58.50/month. The detailed payroll derivation stays in this report, while the
+article explains cumulative PAYE briefly and retains the material full-year, monthly-pay,
+England, age, hours and deduction assumptions. The title, slug, section order, four-column
+comparison, statutory-status wording, sources and calculator limits remain intact.
+
+Repeated content/schema/SEO/image/live-link checks, strict blog audit, `check:repo`, 13 blog
+test suites (118 tests) and the production build pass. Browser plugin is not available, so
+installed Playwright Chrome 156 and WebKit 26.5 were used at 1440/390/320px. The rendered
+opening has no TL;DR instruction; all revised wage cells match the independent proof, no old
+M1/£702.60/£58.55/6p wording remains, and every table column can be brought fully into view
+without page overflow. Opening, example and comparison screenshots were visually inspected.
+There are no JavaScript page errors; console messages are only the already documented local
+Vercel-script and WebKit viewport warnings. Physical-device/touch/screen-reader limits remain.
+
+Fresh independent review and new hosted results will be attached to PR #145 for the final SHA.
+Earlier reviews and hosted results above do not certify the revised cumulative example.
