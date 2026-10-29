@@ -118,7 +118,9 @@ describe('DirectorGuide InputsPanel', () => {
     expect(screen.getByLabelText('Annual Revenue')).toBeInTheDocument();
     expect(screen.getByLabelText('Business Expenses')).toBeInTheDocument();
     expect(screen.getByText('Total invoiced before expenses')).toBeInTheDocument();
-    expect(screen.getByText('Excluding modelled director salary and employer NI')).toBeInTheDocument();
+    expect(
+      screen.getByText('Excluding modelled director salary and employer NI'),
+    ).toBeInTheDocument();
     expect(screen.queryByLabelText('Monthly Contract Income')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Monthly' }));
@@ -127,7 +129,9 @@ describe('DirectorGuide InputsPanel', () => {
     expect(screen.getByLabelText('Monthly Contract Income')).toBeInTheDocument();
     expect(screen.getByLabelText('Monthly Business Expenses')).toBeInTheDocument();
     expect(screen.getByText('Typical gross invoicing per month')).toBeInTheDocument();
-    expect(screen.getByText('Excluding modelled director salary and employer NI')).toBeInTheDocument();
+    expect(
+      screen.getByText('Excluding modelled director salary and employer NI'),
+    ).toBeInTheDocument();
     expect(screen.queryByLabelText('Annual Revenue')).not.toBeInTheDocument();
   });
 
