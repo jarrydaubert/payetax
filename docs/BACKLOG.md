@@ -36,13 +36,42 @@ Verified Director Intelligence correctness exceptions (see [Urgent correctness e
 
 Current merged baseline is `1de37c35`: [#139](https://github.com/jarrydaubert/payetax/pull/139) delivered the interim DI-05 email safeguard and personal-reserve parity correction after #136/#127/#137. The [safeguard](reports/di05-interim-email-safeguard-2026-10-27.md) and [email audit](reports/di05-email-content-and-active-export-assessment-2026-10-27.md) preserve its evidence; the [earlier reconciliation](reports/project-documentation-reconciliation-2026-10-27.md) records the calculator/privacy contracts. The last independently recorded production baseline remains `44d8d02`; merging is not proof of deployment. Full DI-05 remains open. #128 was closed unmerged on 28 October 2026 and remains historical reference only.
 
-The [22 October decisions](reports/calculator-backlog-reconciliation-2026-10-22.md) govern retained acceptance criteria, with the later delivery decision below superseding the #128 rebase plan (agreed in maintainer discussion; recorded in [#140](https://github.com/jarrydaubert/payetax/pull/140)). With #127 and the interim DI-05 guard delivered, continue as follows:
+**Delivery priority decision — 29 October 2026:** favour architecture, statutory accuracy and
+reproduced user-facing defects over a layout-led release. The Foundation milestones below
+remain the architectural plan; urgent correctness, security, privacy or blocked-input issues
+may interleave them as independently reviewed small slices. Priority does not imply that
+every older P1 must ship first or authorise a speculative rewrite.
 
-1. **Small mobile payslip PRs from current `main`.** Supersede #128 rather than rebase or merge its broad redesign. Use its `b4f10087` implementation/report only as reference; it was closed unmerged on 28 October 2026. Deliver MC-04/05's remaining criteria while preserving MC-03's input-state presentation in independently reviewable slices. Preserve #136's five-default/seven-available periods, #127's integrity contracts, #137's telemetry/consent protections and #139's Director safeguard. Preserve #134/MC-09: add the annual suggestion to the existing £/% pension, convert the total to the selected pay period, round up to the penny and require Calculate again; retain the `CalculatorContainer.pensionSuggestion.test.tsx` and `pensionOptimizer.test.ts` regressions. Keep #135's five-card desktop functionality/layout/navigation and meaningful coverage through retained or equivalent replacement code. These slices may proceed alongside Director urgent fixes without pre-empting a ready, verified wrong-money fix; the entire Director queue is not a prerequisite.
-2. Before the first deployment containing the proposed homepage/hero change, complete the search audit's pre-deployment gate below, whichever replacement PR delivers it. MC-03/04/05 and the merged integrity contracts remain acceptance requirements.
-3. MC-06/07 remain smaller follow-ups. Complete the search audit's performance observation after release using windows and a mitigation trigger recorded before deployment. Any newly reproduced wrong-money defect takes correctness priority. Full DI-05, including the bounded annual exporter assessed in #139, retains its later Director position and DI-02/04 dependencies.
+1. **First slice: explicit pension-method semantics.** Decide how salary sacrifice, net pay
+   and relief at source are represented, calculate or explicitly constrain supported methods,
+   and show the method/assumption at input and result. Verify statutory bases and rounding
+   independently; preserve the existing policy and pay-basis owners.
+2. **Next verified defects: DI-07, then DI-26.** Fix incorrect company deadline arithmetic
+   and invalid dates, then the revenue-versus-profit wording that can double-count expenses.
+   Continue the existing Director order (DI-23/06/27, company-budget then personal-tax
+   slices) subject to each item's dependencies. Escalate any newly reproduced wrong-money,
+   statutory-rate, security/privacy or blocked-valid-input problem immediately.
+3. **Foundation architecture and explainability.** Follow pension semantics with transparent
+   selected policy, pay bases, method and deduction results; independently sourced year and
+   boundary fixtures; and focused ownership work reducing duplicate tax maths, direct
+   imports, unowned rounding and hardcoded-year update drift. Do not start a generic
+   refactoring programme; urgent Director fixes may interleave these milestones.
+4. **Functional failures before visual polish.** Investigate lost Calculate taps, WebKit
+   pointer events and input-commit errors in the existing Verification owner. Address a
+   reproducible blocked calculation or wrong result ahead of layout; no blanket retries.
+5. **Mobile experience after correctness.** MC-04's submitted-pay-period behaviour,
+   MC-05's mobile payslip/Edit/comparison, and MC-06/07 remain accepted work, not the next
+   implementation PR. Retain #135's five desktop cards, #136's period defaults, #127's
+   state integrity, #134's pension behaviour, and #137/#139 safeguards. #128 remains
+   closed historical reference, not a broad redesign/rebase plan.
+6. **Conditional release gates.** Verify production separately from merged GitHub state.
+   The homepage/hero change needs its pre-deployment search evidence. Do not enable
+   2027/28 calculations until enacted rules, regional policy and independent fixtures
+   are verified in their own authorised PR.
 
-Supporting-page severity and the privacy priorities below identify risk and ownership, not a new delivery queue. They do not reorder the correctness sequence, the mobile payslip slices or the Director/Foundation insertion points. Escalate only on new verified evidence under the existing working rules.
+This is an **ordering decision only**. Existing owners, priorities, dependencies, DoDs,
+evidence limitations and parked product ideas remain unchanged; no implementation,
+deployment or completion claim follows from this document.
 
 Each implementation slice carries its own relevant regression coverage and independent review by the other model (Claude reviews Codex changes and vice versa), reconciliation against code/evidence, and re-review after material fixes. MC-08 owns only the remaining coverage gaps listed there. Record exact refs and results; do not infer approval from earlier audits. Keep the PRs small, reuse the existing checks and reports, and merge only when separately authorised.
 
@@ -106,40 +135,6 @@ below.
 - If an audit confirms that no work is required, remove the row and cite the audit reference in the related pull request.
 - Keep slices small and independently reviewable.
 - The permanent north star and flow descriptions remain after the burn-down rows have been removed.
-
-### Main calculator input integrity
-
-MC-01, MC-02 and MC-03's integrity scope are merged through #127. They are preserved regression contracts, not unfinished implementation tasks. The [retained acceptance criteria](reports/project-documentation-reconciliation-2026-10-27.md#retained-127-regression-acceptance-criteria) carry the full amount-entry, restoration, explicit-Calculate and stale-action requirements into every mobile payslip replacement PR. Native WebKit pan, physical devices and OS clipboard remain unverified; existing lost pointer/tap defects stay with [Verification](#verification). Future mobile statements must also preserve the MC-03 input-state presentation recorded in the 28 October report linked under MC-05.
-
-- [ ] P3 — Tax-trap alert can reappear from floating-point noise at the exact £100,000 boundary. `calculateOptimalPension` compares unrounded adjusted income with the threshold. After #134's penny round-up, Claude probed every whole-pound total from £1,000 to £60,000 across six pay periods and nine weekly-hour values (3.19 million cases). 447 per-period amounts annualise below the target by about 1e-14. This matters only when salary minus existing pension is an exact £1,000 multiple: after Calculate, the alert could then offer "Add £1,000" although nothing remains to fix. The tax effect is unverified and depends on how the engine rounds the allowance taper. DoD: the optimiser compares adjusted income in pence, or with an explicit sub-penny tolerance. The engine's taper is confirmed to treat the same values consistently. Add a regression for an exact-boundary combination that annualises below target.
-
-### Main calculator experience
-
-Small mobile payslip PRs from current `main` own the remaining scope; #128 is closed unmerged and is reference only. Each slice must retain the merged desktop contract from #135/#136: five summary cards, readable seven-period table when enabled, accessible forward/reverse focus order and intentional What-if scrolling. Current defaults are Yearly, Monthly, Weekly, Daily and Hourly; 4-Weekly and Fortnightly remain available but unchecked. Resizing preserves selections and the current calculation. Historical desktop verification remains in the implementing PRs and dated reports. The earlier #128 direction to remove the desktop cards and introduce a separate homepage comparison mode was superseded; #135's five desktop cards remain the agreed design. Do not blindly restore deleted files where equivalent functionality and meaningful regression coverage genuinely replace them.
-
-- [ ] **MC-04 · P2 · Mobile payslip acceptance — Lead with the user's pay period.** The reference #128 implementation always starts Monthly (Claude S1); replacement slices must meet this contract.
-
-  **DoD:** On successful Calculate, the statement starts in the submitted input period for monthly, four-weekly, fortnightly, weekly, daily and hourly pay; annual input defaults to Monthly with annual context. A subsequent Calculate applies that rule to the newly submitted input. Users can inspect other periods without recalculation, and resizing preserves the current calculation and selected presentation. Tests cover all seven input periods, a changed input period and display-only switching, using engine-owned period values.
-
-  **Focused slice:** The [28 October MC-04 report](reports/mc04-submitted-pay-period-2026-10-28.md) records this rule on the existing mobile take-home card, preserving the desktop cards and table defaults. The complete statement and two-period comparison remain MC-05 dependencies; apply the same rule when those components are implemented. Keep this row open until the slice is reviewed and merged.
-
-- [ ] **MC-05 · P2 · Remaining redesign acceptance — Mobile payslip, mobile focus and fifth-card wording.** #135 delivered the desktop layout/navigation slice; the following work remains open.
-
-  **Mobile payslip DoD:** The readable mobile payslip, direct Edit action and complete two-period comparison work at 393×852, 852×393 and 320px width. Details remain reachable and native copying works. Verify keyboard navigation, semantic headers, focus, reduced motion and light/dark contrast in Chromium and WebKit, including large amounts, active optional inputs and errors. Preserve the [MC-03 input-state presentation](reports/mc03-input-state-presentation-2026-10-28.md): first use/Reset have no results or result actions; edits request Calculate again; invalid submissions identify fields and allow correction without losing values or trapping focus. Its current/stale distinction applies to every card, table, statement and comparison, alongside #127's integrity contracts.
-
-  **Fifth-card wording DoD:** Correct the visible "Marginal Tax Rate" label and its explanation so the fifth card clearly describes the rounded next-£100 payroll estimate, including tax, NI and applicable student loans, rather than a statutory marginal rate. Retain all five cards and their financial values; this wording correction is not delivered by #135.
-
-  **Replacement-slice preservation:** Retain #135's five cards, accessible forward/reverse desktop focus order and intentional What-if scrolling, alongside the current requirement for five selected default periods, seven available periods and all seven normal-table columns fitting on desktop when enabled. Re-verify that retained behaviour after each affected slice at the desktop acceptance widths, breakpoint neighbours and 200% zoom, with readable figures/pence, reduced motion and light/dark themes. This is a regression obligation for those later changes, not an outstanding desktop layout implementation.
-
-  **Separate mobile keyboard follow-up (PR #135):** At 393×852 on `c8f21f77`, the delayed Calculate scroll leaves focus on Calculate at roughly 19px, behind the 64px fixed header. Reproduced in Chromium and WebKit with reduced motion; the desktop navigation correction preserves this existing mobile behaviour. Coordinate the mobile scroll and focus destination, then verify forward/reverse keyboard navigation and header clearance in both engines. This remains open independently of the desktop fix.
-
-- [ ] **MC-06 · P2 · Follow-up — Make deduction and rounding presentation auditable.** Claude found unsigned deductions, no deduction total and period statements that differ by a penny when rounded displayed rows are added.
-
-  **DoD:** Users can identify gross pay, each employee deduction, total deductions, any non-taxable addition and take-home consistently across statement/comparison. Deduction signs and zero-row visibility follow one documented convention, including zero pension versus zero allowance. Employer NI is visibly separate from employee deductions; tax-band rows describe income taxed in a band. A reproduced reconciliation for each of the seven periods, including pension/loans/allowance cases, either balances at displayed precision or has a nearby, accurate explanation of the rounding difference and its size. Preserve engine-owned period figures; do not adjust statutory results merely to balance a display. Any discovered calculation defect becomes a correctness slice with independent expectations. This does not duplicate Foundation rounding ownership or the existing marginal-rate chart/optimizer tasks.
-
-- [ ] **MC-07 · P2 · Polish — Use consistent labels and readable input proportions.** The reference #128 implementation exposes `fourWeekly` in the mobile setup summary, calls paired comparison "all 7", varies Gross/Net/Take-home labels and wraps common field labels in the narrow input rail; retain the criteria below for the replacement slices.
-
-  **DoD:** Setup summaries use human-readable names for every period; comparison headings describe the periods actually shown while making all seven discoverable. The same financial concepts use consistent wording across summary, statement and comparison. Common labels such as Tax code and Student loan remain readable with their controls at supported widths, zoom and expanded-error states, without squeezing financial figures. Essential inputs remain easy to edit; active optional adjustments, rejected text, named pension units and salary-sacrifice assumptions stay visible or clearly signposted. Keyboard and screen-reader names agree with visible labels. Typography changes are optional and judged by readability, not a separate font redesign.
 
 ### Tax correctness and product semantics
 
@@ -228,9 +223,9 @@ Remaining Director order, with one small PR per item unless stated otherwise:
    design.
 4. DI-04, the rest of DI-02, full DI-05, then DI-03.
 
-In the current correctness sequence, explicit pension-method handling remains after step 1
-and before step 2, and transparent calculation results after step 3. Removing delivered
-prerequisites from this list does not reorder the remaining work.
+The Foundation milestone order remains pension-method handling → transparent results →
+independent fixtures and reconciliation. Urgent Director fixes may interleave that order,
+but their retained dependencies and existing owners still apply.
 
 - [ ] **DI-02 · P1 — Expose validation and updating state (remaining scope).** Invalid/incomplete inputs clear results (DI-01); #139 additionally gates email against the successful calculation's input values and protects open dialogs. Still open: previous results can look current during the debounce; `error` and `isCalculating` are not surfaced; multi-field errors lack a summary; and display/email/save do not yet share the full validated scenario snapshot. On an untouched form, #139's expanded sidebar misleadingly says email is "paused"; distinguish first use from updating.
 
@@ -345,6 +340,12 @@ prerequisites from this list does not reorder the remaining work.
   **DoD:** Either the route is removed and its useful assertions are re-pointed at the rendered strategy path, or it is corrected so dividends cannot be negative and its relationship to the rendered path is documented. Aligns with the Foundation principle of one supported route to each statutory calculation; no new calculator is introduced.
 
 
+### Main calculator input integrity
+
+MC-01, MC-02 and MC-03's integrity scope are merged through #127. They are preserved regression contracts, not unfinished implementation tasks. The [retained acceptance criteria](reports/project-documentation-reconciliation-2026-10-27.md#retained-127-regression-acceptance-criteria) carry the full amount-entry, restoration, explicit-Calculate and stale-action requirements into every mobile payslip replacement PR. Native WebKit pan, physical devices and OS clipboard remain unverified; existing lost pointer/tap defects stay with [Verification](#verification). Future mobile statements must also preserve the MC-03 input-state presentation recorded in the 28 October report linked under MC-05.
+
+- [ ] P3 — Tax-trap alert can reappear from floating-point noise at the exact £100,000 boundary. `calculateOptimalPension` compares unrounded adjusted income with the threshold. After #134's penny round-up, Claude probed every whole-pound total from £1,000 to £60,000 across six pay periods and nine weekly-hour values (3.19 million cases). 447 per-period amounts annualise below the target by about 1e-14. This matters only when salary minus existing pension is an exact £1,000 multiple: after Calculate, the alert could then offer "Add £1,000" although nothing remains to fix. The tax effect is unverified and depends on how the engine rounds the allowance taper. DoD: the optimiser compares adjusted income in pence, or with an explicit sub-penny tolerance. The engine's taper is confirmed to treat the same values consistently. Add a regression for an exact-boundary combination that annualises below target.
+
 ### Privacy follow-ups
 
 Single owners for the unresolved parts of the [supporting-pages audit](reports/payetax-supporting-pages-audit-2026-10-27.md) and #137 review. P2 means a substantive follow-up and P3 a lower-risk verification/hygiene item; neither moves ahead of the agreed mobile-payslip/correctness sequence automatically. #139's interim guard is delivered; full DI-05 keeps its later Director position. #137 already stopped the reported financial telemetry, corrected storage/IP disclosures and added the PAYE email notice; do not reopen those as unimplemented tasks. The [dated disposition map](reports/project-documentation-reconciliation-2026-10-27.md#supporting-pages-dispositions) distinguishes partial closure from residual work.
@@ -392,6 +393,34 @@ Privacy link/table accessibility (P8) stays with [Verification](#verification); 
 - [ ] P2 — Close the historical unit-environment investigation with exact failure mapping. Current Windows coverage-gated tests pass at #137 head `35a2c7fa`; this is not an allegation of five current failures. The earlier disagreement and #133's probable `NODE_ENV` cause are [retained as dated evidence](reports/project-documentation-reconciliation-2026-10-27.md#retained-unit-environment-evidence). DoD: a bounded comparison maps the original five failures to the corrected helper or explicitly records non-reproduction, with exact refs, runtime, non-secret configuration and commands. Correct or document any remaining reproducible dependency; do not weaken assertions merely to align counts.
 
 - [ ] **P2 — Documented modelling assumptions and limitations (month-1 projection, NI year model and pension method).** Owner: Verification, coordinated with Foundation transparent results; supporting audit A2/T2 and Compliance limits. Non-cumulative tax-code limitations are visible, but About/Tools promises must lead to a real methodology/limits section. DoD: explain the steady-pay Month 1 PAYE projection, supported years, NI basis, salary-sacrifice assumption and excluded cases using the actual engine and Tools coverage table; provide sources and reachable fixture/proof links. Publish the same limitations near relevant results and keep linked page claims consistent. A visual rebuild is not a prerequisite and this does not complete the remaining Foundation result contract.
+
+### Main calculator experience
+
+Small mobile payslip PRs from current `main` own the remaining scope; #128 is closed unmerged and is reference only. Each slice must retain the merged desktop contract from #135/#136: five summary cards, readable seven-period table when enabled, accessible forward/reverse focus order and intentional What-if scrolling. Current defaults are Yearly, Monthly, Weekly, Daily and Hourly; 4-Weekly and Fortnightly remain available but unchecked. Resizing preserves selections and the current calculation. Historical desktop verification remains in the implementing PRs and dated reports. The earlier #128 direction to remove the desktop cards and introduce a separate homepage comparison mode was superseded; #135's five desktop cards remain the agreed design. Do not blindly restore deleted files where equivalent functionality and meaningful regression coverage genuinely replace them.
+
+- [ ] **MC-04 · P2 · Mobile payslip acceptance — Lead with the user's pay period.** The reference #128 implementation always starts Monthly (Claude S1); replacement slices must meet this contract.
+
+  **DoD:** On successful Calculate, the statement starts in the submitted input period for monthly, four-weekly, fortnightly, weekly, daily and hourly pay; annual input defaults to Monthly with annual context. A subsequent Calculate applies that rule to the newly submitted input. Users can inspect other periods without recalculation, and resizing preserves the current calculation and selected presentation. Tests cover all seven input periods, a changed input period and display-only switching, using engine-owned period values.
+
+  **Focused slice:** The [28 October MC-04 report](reports/mc04-submitted-pay-period-2026-10-28.md) records this rule on the existing mobile take-home card, preserving the desktop cards and table defaults. The complete statement and two-period comparison remain MC-05 dependencies; apply the same rule when those components are implemented. Keep this row open until the slice is reviewed and merged.
+
+- [ ] **MC-05 · P2 · Remaining redesign acceptance — Mobile payslip, mobile focus and fifth-card wording.** #135 delivered the desktop layout/navigation slice; the following work remains open.
+
+  **Mobile payslip DoD:** The readable mobile payslip, direct Edit action and complete two-period comparison work at 393×852, 852×393 and 320px width. Details remain reachable and native copying works. Verify keyboard navigation, semantic headers, focus, reduced motion and light/dark contrast in Chromium and WebKit, including large amounts, active optional inputs and errors. Preserve the [MC-03 input-state presentation](reports/mc03-input-state-presentation-2026-10-28.md): first use/Reset have no results or result actions; edits request Calculate again; invalid submissions identify fields and allow correction without losing values or trapping focus. Its current/stale distinction applies to every card, table, statement and comparison, alongside #127's integrity contracts.
+
+  **Fifth-card wording DoD:** Correct the visible "Marginal Tax Rate" label and its explanation so the fifth card clearly describes the rounded next-£100 payroll estimate, including tax, NI and applicable student loans, rather than a statutory marginal rate. Retain all five cards and their financial values; this wording correction is not delivered by #135.
+
+  **Replacement-slice preservation:** Retain #135's five cards, accessible forward/reverse desktop focus order and intentional What-if scrolling, alongside the current requirement for five selected default periods, seven available periods and all seven normal-table columns fitting on desktop when enabled. Re-verify that retained behaviour after each affected slice at the desktop acceptance widths, breakpoint neighbours and 200% zoom, with readable figures/pence, reduced motion and light/dark themes. This is a regression obligation for those later changes, not an outstanding desktop layout implementation.
+
+  **Separate mobile keyboard follow-up (PR #135):** At 393×852 on `c8f21f77`, the delayed Calculate scroll leaves focus on Calculate at roughly 19px, behind the 64px fixed header. Reproduced in Chromium and WebKit with reduced motion; the desktop navigation correction preserves this existing mobile behaviour. Coordinate the mobile scroll and focus destination, then verify forward/reverse keyboard navigation and header clearance in both engines. This remains open independently of the desktop fix.
+
+- [ ] **MC-06 · P2 · Follow-up — Make deduction and rounding presentation auditable.** Claude found unsigned deductions, no deduction total and period statements that differ by a penny when rounded displayed rows are added.
+
+  **DoD:** Users can identify gross pay, each employee deduction, total deductions, any non-taxable addition and take-home consistently across statement/comparison. Deduction signs and zero-row visibility follow one documented convention, including zero pension versus zero allowance. Employer NI is visibly separate from employee deductions; tax-band rows describe income taxed in a band. A reproduced reconciliation for each of the seven periods, including pension/loans/allowance cases, either balances at displayed precision or has a nearby, accurate explanation of the rounding difference and its size. Preserve engine-owned period figures; do not adjust statutory results merely to balance a display. Any discovered calculation defect becomes a correctness slice with independent expectations. This does not duplicate Foundation rounding ownership or the existing marginal-rate chart/optimizer tasks.
+
+- [ ] **MC-07 · P2 · Polish — Use consistent labels and readable input proportions.** The reference #128 implementation exposes `fourWeekly` in the mobile setup summary, calls paired comparison "all 7", varies Gross/Net/Take-home labels and wraps common field labels in the narrow input rail; retain the criteria below for the replacement slices.
+
+  **DoD:** Setup summaries use human-readable names for every period; comparison headings describe the periods actually shown while making all seven discoverable. The same financial concepts use consistent wording across summary, statement and comparison. Common labels such as Tax code and Student loan remain readable with their controls at supported widths, zoom and expanded-error states, without squeezing financial figures. Essential inputs remain easy to edit; active optional adjustments, rejected text, named pension units and salary-sacrifice assumptions stay visible or clearly signposted. Keyboard and screen-reader names agree with visible labels. Typography changes are optional and judged by readability, not a separate font redesign.
 
 ### Trust and sourcing
 
