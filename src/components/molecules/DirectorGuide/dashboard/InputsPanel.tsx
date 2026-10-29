@@ -876,7 +876,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                       htmlFor={ids.pensionDeducted}
                       className='cursor-pointer text-muted-foreground text-sm'
                     >
-                      Already deducted from profit figure
+                      Already included in business expenses
                     </Label>
                     <LabelTooltip fieldName='directorPensionDeducted' />
                   </div>
