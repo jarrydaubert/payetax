@@ -4,6 +4,19 @@ jest.mock('@sentry/nextjs', () => ({
 
 jest.mock('@next/bundle-analyzer', () => () => (config: unknown) => config);
 
+describe('PWA bootstrap caching', () => {
+  it('serves registration, worker and manifest without HTTP caching', async () => {
+    const { default: nextConfig } = await import('../../../next.config');
+    const headers = await nextConfig.headers?.();
+    for (const source of ['/sw.js', '/register-sw.js', '/manifest.json']) {
+      expect(headers).toContainEqual({
+        source,
+        headers: [{ key: 'Cache-Control', value: 'no-store' }],
+      });
+    }
+  });
+});
+
 describe('next.config canonical redirects', () => {
   it('redirects stale URLs to retained canonical surfaces', async () => {
     const { default: nextConfig } = await import('../../../next.config');
