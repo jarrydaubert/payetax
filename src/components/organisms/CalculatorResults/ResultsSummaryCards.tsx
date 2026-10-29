@@ -43,6 +43,16 @@ export function ResultsSummaryCards({
 
   return (
     <TooltipProvider delayDuration={200}>
+      {results.pensionContribution.annually > 0 && (
+        <p
+          className='mb-3 text-muted-foreground text-sm leading-relaxed'
+          data-testid='pension-method-result-note'
+        >
+          Pension is modelled as salary sacrifice in these results. This reduces the pay used for
+          Income Tax and National Insurance. Net pay and relief-at-source arrangements are not
+          supported, so take-home may differ if your pension uses either method.
+        </p>
+      )}
       <MobileTakeHomeCard results={results} submittedPeriod={input?.payPeriod ?? 'annually'} />
       <motion.section
         className={cn('grid border-border border-b py-4 md:grid-cols-2 lg:grid-cols-5', 'gap-4')}
@@ -108,16 +118,6 @@ export function ResultsSummaryCards({
           />
         </motion.div>
       </motion.section>
-      {results.pensionContribution.annually > 0 && (
-        <p
-          className='mt-2 text-muted-foreground text-xs leading-relaxed'
-          data-testid='pension-method-result-note'
-        >
-          Pension is modelled as salary sacrifice in these results. This reduces the pay used for
-          Income Tax and National Insurance. Net pay and relief-at-source arrangements are not
-          supported, so take-home may differ if your pension uses either method.
-        </p>
-      )}
     </TooltipProvider>
   );
 }
