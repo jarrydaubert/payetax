@@ -270,7 +270,7 @@ describe('DirectorDashboard (normal mode)', () => {
     expect(screen.getByText(/Enter revenue before expenses, not profit/)).toBeInTheDocument();
     expect(screen.getByText('1. Revenue or contract income')).toBeInTheDocument();
     expect(
-      screen.getByText(/expenses excluding the director salary being compared/),
+      screen.getByText(/Exclude director salary and employer NI modelled in the comparison/),
     ).toBeInTheDocument();
   });
 
