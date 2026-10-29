@@ -424,6 +424,28 @@ Work here completes only against deployed behaviour, external services or record
 
 ### Search and discoverability
 
+- [ ] **P2 — Triage Ahrefs crawl link failures (29 October 2026; evidence before fixes).**
+  Owner: Search and discoverability, with Trust and sourcing for official-source links.
+  The [dated Ahrefs crawl snapshot](reports/ahrefs-site-audit-2026-10-29.md) reports
+  2 newly affected URLs under “Page has links to broken page”, 3 external 4XX findings
+  (+2), and 3 pages linking through redirects (+1); these are crawler classifications,
+  not yet verified production defects or unique broken destinations. Do not double-count
+  overlapping findings or infer a sitewide indexing issue from the 99/100 health score.
+
+  **DoD:** Export the affected source page, anchor, destination, response code, internal/external
+  status, and crawl timestamp for each finding; reproduce failures against the live URL,
+  distinguishing genuine 404/410 from bot blocking, temporary responses, retired routes and
+  false positives. Prioritise broken essential calculator/navigation and primary-source links;
+  fix confirmed failures with the current canonical destination or remove invalid links.
+  Check relevant source/route regression coverage and recrawl to verify resolution. Escalate
+  severity only on verified material user/trust impact. Inspect the 4 changed pages flagged
+  “not submitted to IndexNow” against the actual submission/eligibility contract before
+  treating them as defects; record any gap separately under this owner. Redirect hops are
+  P3 hygiene unless demonstrably harmful. The 55 training-bot-policy notices belong to the
+  existing [crawler-claims owner](#trust-and-sourcing); do not change robots policy to chase
+  the audit score. Metadata-change notices are informational, not a rewrite mandate.
+  Preserve affected URLs, evidence, checks and outcome in the eventual implementation PR;
+  this item does not authorise changes or reorder [Active](#active).
 - [ ] **Dedicated search audit — Pre-deployment protection gate; P2 post-release observation.** Removal of the large hero is accepted for access to the calculator; its SEO effect is unproven. Keep one audit with two distinct completion points tied to the first release containing the proposed homepage/hero change, whichever main-based replacement PR delivers it; superseding #128 does not remove this gate.
 
   **Scope:** Compare the last unchanged homepage and proposed/deployed replacement: raw server HTML and rendered mobile/desktop content, meaningful H1/title/description, canonical and robots directives, response status/redirects, sitemap inclusion, structured data versus visible content, useful explanatory/trust copy and internal links to the calculator, tools and retained guides. Check crawlability without calculator interaction, mobile usability/performance and existing discoverability tests. Review page/query evidence for the homepage and retained organic surfaces, including the Scottish calculator, salary pages and beginner guide; use the August audits as dated context rather than a current baseline.
