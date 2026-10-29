@@ -105,6 +105,26 @@ describe('ResultsSummaryCards Component', () => {
     });
   });
 
+  describe('Pension method disclosure', () => {
+    it('shows salary-sacrifice assumptions when a pension contribution is entered', () => {
+      const withPension: TaxCalculationResults = {
+        ...mockResults,
+        pensionContribution: { ...mockResults.pensionContribution, annually: 1500 },
+      };
+
+      render(<ResultsSummaryCards results={withPension} />);
+
+      const note = screen.getByTestId('pension-method-result-note');
+      expect(note).toHaveTextContent(/Pension is modelled as salary sacrifice/);
+      expect(note).toHaveTextContent(/Net pay and relief-at-source arrangements are not/);
+    });
+
+    it('does not show a pension note when no pension is entered', () => {
+      render(<ResultsSummaryCards results={mockResults} />);
+      expect(screen.queryByTestId('pension-method-result-note')).not.toBeInTheDocument();
+    });
+  });
+
   describe('Accessibility', () => {
     it('should have proper ARIA labels', () => {
       const { container } = render(<ResultsSummaryCards results={mockResults} />);
