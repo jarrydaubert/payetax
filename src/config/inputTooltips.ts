@@ -144,7 +144,7 @@ export const INPUT_TOOLTIPS = {
 
   directorExpenses: {
     title: 'Business Expenses',
-    description: 'Allowable company expenses excluding your own salary',
+    description: 'Business costs excluding the director salary and employer NI modelled in the comparison',
     note: 'Include overheads, contractors, software, rent, and other costs',
   },
 
@@ -156,7 +156,7 @@ export const INPUT_TOOLTIPS = {
 
   directorMonthlyExpenses: {
     title: 'Monthly Business Expenses',
-    description: 'Typical monthly company costs excluding your own salary',
+    description: 'Typical monthly company costs excluding the director salary and employer NI modelled in the comparison',
     note: 'Used with runway and cash buffer logic to estimate a safe monthly draw',
   },
 
