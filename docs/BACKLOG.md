@@ -407,10 +407,36 @@ These extend existing owners rather than creating a second supporting-pages queu
 
 ### Content accuracy
 
+- [ ] **P3 — Blog reading typography (small, separate UI slice):** align paragraph and list
+  text sizing/line height, keep a comfortable article reading width, and reduce excessive
+  uppercase/letter spacing in table headings. Preserve Ledger styling and tax content; verify
+  one long post, a four-column comparison and category/listing context at desktop and mobile
+  widths, including zoom, horizontal table scrolling and keyboard access. No site-wide redesign
+  or calculator changes; the Budget 2026 reader-first content PR only records this follow-up.
+
 - [ ] Tax-code guide: add the statutory 50% overriding limit; fix the "K500 = you owe £5,000" conflation; refresh stale 2025-26 titles/meta; cover Scottish SD codes. DoD: all four corrections published and consistent with the engine.
 - [ ] Remaining salary-page unsupported-claim audit: after the priority repair, inspect the retained series for uncited percentile/median, lifestyle, rent, savings and mortgage claims. The verified £70k article is the reference pattern and should not be rewritten without a reproduced defect. DoD: each remaining claim is sourced from an appropriate primary dataset, qualified or removed.
 - [ ] Evergreen vs historical article policy: frontmatter declares the mode. DoD: evergreen posts contain no hardcoded rate values; historical posts stay pinned and labelled; the blog audit enforces the split. This existing owner also covers the supporting audit's stale blog/listing/`llms.txt` year titles; do not update genuinely historical content to look current without checking its mode.
 - [ ] Blog visual refresh: regenerate legacy post images into the Ledger editorial style and retire stale tax-year content in small verified batches. DoD: each batch lands with refreshed imagery and verified figures.
+- [ ] **P3 — TaxInsights editorial voice: one-article-at-a-time refresh after the high-priority queue.**
+  Owner: Content accuracy / editorial quality. The new [blog voice and workflow](blog/README.md)
+  govern all **future** posts immediately, but they do not authorise mass rewrites of the existing
+  33 articles. When correctness, privacy, mobile-payslip and verified Director risks allow, inventory
+  retained articles by reader value, accuracy/staleness, search evidence and voice; classify each
+  `keep`, `refresh`, `rewrite`, `merge` or `retire`. Pilot the new voice on a few low-risk articles
+  (the beginner's guide, Making Tax Digital, and a separately justified pay-rise problem-solver are
+  candidates, not committed delivery scope), then handle individual posts or small batches with
+  source-checked facts, independent engine fixtures for numbers, desktop/mobile readability, one
+  combined accuracy/readability review and maintainer approval. Protect high-visibility salary
+  guides (especially the £70k reference) from speculative rewrites and obey the separate
+  **beginner-guide rewrite trigger** under Parked / Triggered work: do not override it with this
+  pilot suggestion. Keep the already open Budget 2026 content PR outside this item. No new
+  analytics vendors or unsupported “read completion” claims; opt-in GA4 `blog_article_read` fires
+  on mount, and scroll depth measures the whole page.
+
+  **DoD:** Dated editorial inventory and priority rationale; each accepted change verified and
+  merged separately; meaningful qualitative and available consented search/engagement evidence
+  reviewed before expanding scope. Do not pre-empt the [Active](#active) correctness sequence.
 
 - [ ] **P2 — Correct Offline claims and metadata (O1–O3).** Owner: Content accuracy. Describe remembered inputs rather than persisted results/saved calculations, and build/service-worker refresh rather than automatic tax-rate sync. Give the offline route coherent title/canonical/noindex metadata consistent with its utility role. DoD: source and browser checks confirm the copy matches actual offline/reload behaviour without promising a saved-results or synchronisation feature.
 - [ ] **P3 — Verify Install/PWA contract (I3/I4).** Owner: Content accuracy, coordinated with the PWA implementation. Check installation steps on current iOS and correct them with dated evidence; resolve the unsupported manifest share target by removing the promise/declaration or obtaining an explicit product decision before implementing shared input. DoD: install/share instructions match supported behaviour. Do not restore unsupported calculator query prefill as an incidental fix.
