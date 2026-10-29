@@ -383,7 +383,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 
             <Field
               label='Monthly Business Expenses'
-              hint='Excluding director salary'
+              hint='Excluding modelled director salary and employer NI'
               id={ids.monthlyExpenses}
               tooltipFieldName='directorMonthlyExpenses'
             >
@@ -515,7 +515,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 
             <Field
               label='Business Expenses'
-              hint='Excluding your salary'
+              hint='Excluding modelled director salary and employer NI'
               id={ids.expenses}
               tooltipFieldName='directorExpenses'
             >
@@ -876,7 +876,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                       htmlFor={ids.pensionDeducted}
                       className='cursor-pointer text-muted-foreground text-sm'
                     >
-                      Already deducted from profit figure
+                      Already included in business expenses
                     </Label>
                     <LabelTooltip fieldName='directorPensionDeducted' />
                   </div>

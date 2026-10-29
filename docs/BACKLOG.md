@@ -32,7 +32,7 @@ Current correctness and architecture sequence (ahead of further layout work):
 2. **Transparent calculation results.** Expose selected policy, pay bases, pension method and individual deductions from their existing owners rather than re-deriving them in consumers.
 3. **Independent fixture/test-portfolio completion and Foundation reconciliation.** Finish the independent coverage and reduce architectural ownership debt in focused, verified slices, not a broad refactor.
 
-Verified Director Intelligence correctness exceptions (see [Urgent correctness exceptions](#urgent-correctness-exceptions)) may interleave these milestones. DI-26's revenue/profit instruction correction is a small, independently verifiable early fix; DI-07's wrong deadlines and invalid dates retain their narrow urgent scope. Reproduced wrong-money, blocked-input, security and privacy issues take precedence under the Working Rules. MC-04 was delivered by [#143](https://github.com/jarrydaubert/payetax/pull/143); remaining MC-05/06/07 experience work follows core correctness and architecture, with existing regression contracts preserved.
+Verified Director Intelligence correctness exceptions (see [Urgent correctness exceptions](#urgent-correctness-exceptions)) may interleave these milestones. [#152](https://github.com/jarrydaubert/payetax/pull/152) resolves DI-26's revenue/profit instructions; DI-07's wrong deadlines and invalid dates retain their narrow urgent scope. Reproduced wrong-money, blocked-input, security and privacy issues take precedence under the Working Rules. MC-04 was delivered by [#143](https://github.com/jarrydaubert/payetax/pull/143); remaining MC-05/06/07 experience work follows core correctness and architecture, with existing regression contracts preserved.
 
 [#139](https://github.com/jarrydaubert/payetax/pull/139) delivered the interim DI-05 email safeguard and personal-reserve parity correction after #136/#127/#137; its historical merge ref was `1de37c35`, not the current `main`. The [safeguard](reports/di05-interim-email-safeguard-2026-10-27.md) and [email audit](reports/di05-email-content-and-active-export-assessment-2026-10-27.md) preserve its evidence; the [earlier reconciliation](reports/project-documentation-reconciliation-2026-10-27.md) records the calculator/privacy contracts. The last independently recorded production baseline remains `44d8d02`; merging is not proof of deployment. Full DI-05 remains open. #128 was closed unmerged on 28 October 2026 and remains historical reference only.
 
@@ -202,8 +202,7 @@ burn-down.
 These items silently alter inputs or show wrong money figures, deadlines or statutory rates. Under
 the first working rule they may be taken as small independent slices between the Foundation items
 in the current correctness sequence; they do not reorder that sequence, and an exception that needs
-a Foundation change waits for, or is folded into, that Foundation item. DI-05, DI-06, DI-26 and
-DI-27 are exceptions because they show or send wrong money figures (decision: PR #123).
+a Foundation change waits for, or is folded into, that Foundation item. DI-05, DI-06 and DI-27 are exceptions because they show or send wrong money figures (decision: PR #123).
 
 DI-11's verified email "Rates used" defect also qualifies under the existing wrong-statutory-rate rule. A small correction or truthful qualification/suppression for affected reports may land independently; this does not reorder the queue below or promote all DI-11 explanation work.
 
@@ -211,7 +210,7 @@ DI-01, the minimal part of DI-02, #127's prerequisite input fixes and #139's int
 email guard have landed. Preserve their contracts in the [main-based mobile slices](#active).
 Remaining Director order, with one small PR per item unless stated otherwise:
 
-1. DI-26's input-instruction correction may ship first as a separate copy-only slice; then DI-07, DI-23, DI-06 and DI-27. DI-26 does not expand the engine input contract.
+1. DI-07, DI-23, DI-06 and DI-27.
 2. Company budget: DI-19, then DI-21.
 3. Personal tax: DI-08 with DI-24, then DI-20, then DI-25. DI-08, DI-20, DI-24 and DI-25 share
    `strategyComparison.ts` income attribution; the DI-08/DI-24 PR settles the shared helper's
@@ -281,10 +280,6 @@ The Foundation sequence above is the single architectural priority list. Urgent 
 - [ ] **DI-25 · P1 — Do not deduct another employer's student-loan collection from director take-home.** With £40,000 other employment income on Plan 2, the full £5,461.52 repayment is deducted from the director scenario although about £955.35 is already collected through the other employer's PAYE.
 
   **DoD:** Attributed repayment equals the total liability less the amount attributable to the other income, consistent with income-tax attribution (DI-20). Plans, postgraduate loans and the Self Assessment treatment of unearned income are confirmed against current GOV.UK/Student Loans Company guidance before fixtures are written. Independent fixtures cover each supported plan with and without other income.
-
-- [ ] **DI-26 · P1 — Align the empty-state instructions with the input contract.** The empty state asks for "company profit" and then expenses, while the fields are Annual Revenue and Business Expenses (excluding the salary being compared); following the instructions can deduct expenses twice. Verified from PR #120.
-
-  **DoD:** Empty-state steps, field labels, hints and tooltips describe the same revenue-minus-expenses contract and state which payroll costs to exclude. A component test pins the wording against the mounted fields. No new input mode is added without a product decision.
 
 - [ ] **DI-27 · P1 — Disclose that amounts already paid do not constrain annual strategies.** Entering £20,000 salary and £5,000 dividends already paid leaves every strategy unchanged, including a £12,570 Baseline Mix salary below the salary already paid. A director part-way through the year can therefore be shown a strategy they can no longer follow, with figures that do not describe their real year. Verified from PR #120.
 

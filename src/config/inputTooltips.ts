@@ -144,7 +144,8 @@ export const INPUT_TOOLTIPS = {
 
   directorExpenses: {
     title: 'Business Expenses',
-    description: 'Allowable company expenses excluding your own salary',
+    description:
+      'Business costs excluding the director salary and employer NI modelled in the comparison',
     note: 'Include overheads, contractors, software, rent, and other costs',
   },
 
@@ -156,7 +157,8 @@ export const INPUT_TOOLTIPS = {
 
   directorMonthlyExpenses: {
     title: 'Monthly Business Expenses',
-    description: 'Typical monthly company costs excluding your own salary',
+    description:
+      'Typical monthly company costs excluding the director salary and employer NI modelled in the comparison',
     note: 'Used with runway and cash buffer logic to estimate a safe monthly draw',
   },
 
@@ -239,9 +241,10 @@ export const INPUT_TOOLTIPS = {
   },
 
   directorPensionDeducted: {
-    title: 'Pension Already Deducted',
-    description: 'Whether your profit figure already includes pension costs',
-    note: 'Check this to avoid deducting the pension twice',
+    title: 'Pension Included in Business Expenses',
+    description:
+      'Select if the employer pension contribution is already included in the Business Expenses or Monthly Business Expenses entered above.',
+    note: 'This prevents the same pension cost being deducted twice',
   },
 
   directorCompanyCar: {

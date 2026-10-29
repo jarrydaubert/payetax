@@ -267,6 +267,11 @@ describe('DirectorDashboard (normal mode)', () => {
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Open Calculator/i })).toBeInTheDocument();
     expect(screen.getByText(/On mobile, tap the calculator button/i)).toBeInTheDocument();
+    expect(screen.getByText(/Enter revenue before expenses, not profit/)).toBeInTheDocument();
+    expect(screen.getByText('1. Revenue or contract income')).toBeInTheDocument();
+    expect(
+      screen.getByText(/Exclude director salary and employer NI modelled in the comparison/),
+    ).toBeInTheDocument();
   });
 
   it('tracks one reset event for one reset click', () => {

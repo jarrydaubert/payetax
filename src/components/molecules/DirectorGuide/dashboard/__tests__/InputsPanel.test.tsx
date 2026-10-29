@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
+import { getTooltipContent } from '@/config/inputTooltips';
 import { CURRENCY_INPUT_ERRORS } from '@/lib/currencyInput';
 import { useDirectorGuideStore } from '@/store/directorGuideStore';
 import { InputsPanel } from '../InputsPanel';
@@ -116,6 +117,11 @@ describe('DirectorGuide InputsPanel', () => {
     render(<InputsPanel />);
 
     expect(screen.getByLabelText('Annual Revenue')).toBeInTheDocument();
+    expect(screen.getByLabelText('Business Expenses')).toBeInTheDocument();
+    expect(screen.getByText('Total invoiced before expenses')).toBeInTheDocument();
+    expect(
+      screen.getByText('Excluding modelled director salary and employer NI'),
+    ).toBeInTheDocument();
     expect(screen.queryByLabelText('Monthly Contract Income')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Monthly' }));
@@ -123,7 +129,33 @@ describe('DirectorGuide InputsPanel', () => {
     expect(useDirectorGuideStore.getState().formData.mode).toBe('monthly');
     expect(screen.getByLabelText('Monthly Contract Income')).toBeInTheDocument();
     expect(screen.getByLabelText('Monthly Business Expenses')).toBeInTheDocument();
+    expect(screen.getByText('Typical gross invoicing per month')).toBeInTheDocument();
+    expect(
+      screen.getByText('Excluding modelled director salary and employer NI'),
+    ).toBeInTheDocument();
     expect(screen.queryByLabelText('Annual Revenue')).not.toBeInTheDocument();
+  });
+
+  it('identifies an employer pension already included in business expenses', () => {
+    const current = useDirectorGuideStore.getState();
+    setStoreState({
+      formData: { ...current.formData, pensionContribution: 2500, isPensionAlreadyDeducted: false },
+    });
+    render(<InputsPanel />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Full Inputs' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Advanced Options' }));
+
+    const included = screen.getByRole('checkbox', {
+      name: 'Already included in business expenses',
+    });
+    expect(included).not.toBeChecked();
+    expect(getTooltipContent('directorPensionDeducted')?.description).toContain(
+      'Business Expenses or Monthly Business Expenses',
+    );
+    expect(getTooltipContent('directorPensionDeducted')?.description).not.toMatch(/profit figure/);
+    fireEvent.click(included);
+    expect(useDirectorGuideStore.getState().formData.isPensionAlreadyDeducted).toBe(true);
   });
 
   it('uses quick start by default and reveals full sections on demand', () => {

@@ -448,19 +448,21 @@ export function DirectorDashboard() {
                     Enter your numbers to compare director pay options
                   </h2>
                   <p className='mx-auto max-w-2xl text-muted-foreground text-sm leading-7 sm:text-base'>
-                    Add your company profit, costs, and region to see take-home pay, tax to set
-                    aside, and common salary versus dividend mixes.
+                    Enter annual revenue and business expenses, or monthly contract income and
+                    costs, plus your tax region. Enter revenue before expenses, not profit: the
+                    calculator subtracts costs to estimate profit before the director salary being
+                    compared.
                   </p>
 
                   <div className='mt-6 grid gap-3 text-left sm:grid-cols-3'>
                     {[
                       {
-                        title: '1. Company profit',
-                        copy: 'Annual profit or monthly income, depending on the mode you choose.',
+                        title: '1. Revenue or contract income',
+                        copy: 'Use annual revenue or monthly contract income, not profit after expenses.',
                       },
                       {
                         title: '2. Expenses and region',
-                        copy: 'Add costs and select your tax region so the comparison is grounded.',
+                        copy: 'Exclude director salary and employer NI modelled in the comparison from expenses, then select your tax region.',
                       },
                       {
                         title: '3. Compare outcomes',
