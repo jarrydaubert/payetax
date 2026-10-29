@@ -58,20 +58,7 @@ export type ErrorSeverity = 'fatal' | 'error' | 'warning' | 'info' | 'debug';
  * Custom context types for different error scenarios
  */
 export interface CalculatorErrorContext {
-  /** Salary amount being calculated */
-  salary: number;
-  /** Tax year being used */
-  taxYear: string;
-  /** Tax region (England, Scotland, Wales) */
-  region: string;
-  /** Tax code if provided */
-  taxCode?: string;
-  /** Student loan plans if applicable */
-  studentLoanPlans?: string | string[];
-  /** Pension contribution amount */
-  pensionContribution?: number;
-  /** Whether married/civil partnership */
-  isMarried?: boolean;
+  stage: 'primary' | 'previous_year' | 'what_if';
 }
 
 export interface ValidationErrorContext {
@@ -180,10 +167,7 @@ export async function captureOperationalFailureAndFlush(
  *   const result = calculateTax(input);
  * } catch (error) {
  *   captureCalculatorError(error, {
- *     salary: 50000,
- *     taxYear: '2025-26',
- *     region: 'England',
- *     taxCode: '1257L'
+ *     stage: 'primary'
  *   });
  * }
  * ```
@@ -196,27 +180,9 @@ export function captureCalculatorError(
   const level: SeverityLevel = severity;
   return Sentry.captureException(error, {
     level,
-    tags: {
-      error_type: 'calculator',
-      tax_year: context.taxYear,
-      region: context.region,
-      has_student_loan:
-        context.studentLoanPlans && context.studentLoanPlans !== 'none' ? 'yes' : 'no',
-      has_pension: context.pensionContribution ? 'yes' : 'no',
-      is_married: context.isMarried ? 'yes' : 'no',
-    },
-    contexts: {
-      calculator: {
-        taxYear: context.taxYear,
-        region: context.region,
-        salaryProvided: Number.isFinite(context.salary),
-        taxCodeProvided: Boolean(context.taxCode),
-        studentLoanPlans: context.studentLoanPlans || 'none',
-        pensionContributionProvided: Boolean(context.pensionContribution),
-        isMarried: Boolean(context.isMarried),
-      },
-    },
-    fingerprint: ['calculator-error', context.taxYear, context.region],
+    tags: { error_type: 'calculator' },
+    contexts: { calculator: { stage: context.stage } },
+    fingerprint: ['calculator-error', context.stage],
   });
 }
 
@@ -251,15 +217,14 @@ export function captureValidationError(
   // Log as breadcrumb instead of exception - validation errors are expected user behavior
   Sentry.addBreadcrumb({
     category: 'validation',
-    message: `Validation failed for ${context.field}: ${context.errorMessage}`,
+    message: `Validation failed for ${context.field}`,
     level: 'warning',
     data: {
       field: context.field,
       location: context.location,
       attemptedValueShape: describeSentryValue(context.attemptedValue),
-      expectedFormat: context.expectedFormat,
       errorCount: zodDetails.issueCount,
-      errorCodes: zodDetails.errorCodes,
+      errorCodes: zodDetails.errorCodes.join(','),
     },
   });
 
@@ -422,8 +387,7 @@ export function capturePerformanceIssue(
  * @example
  * ```typescript
  * const transaction = startPerformanceTransaction('calculate-tax', {
- *   salary: 50000,
- *   taxYear: '2025-26'
+ *   operation: 'tax_calculation'
  * });
  *
  * try {
@@ -494,7 +458,7 @@ export function startPerformanceSpan(
  * ```typescript
  * addBreadcrumb('user-action', {
  *   message: 'User changed salary input',
- *   data: { previousSalary: 45000, newSalary: 50000 }
+ *   data: { stage: 'primary' }
  * });
  * ```
  */
@@ -559,8 +523,7 @@ export function setTags(tags: Record<string, string | number | boolean>): void {
  * @example
  * ```typescript
  * setContext('calculator_state', {
- *   salary: 50000,
- *   taxYear: '2025-26',
+ *   operation: 'tax_calculation',
  *   lastCalculation: new Date().toISOString()
  * });
  * ```

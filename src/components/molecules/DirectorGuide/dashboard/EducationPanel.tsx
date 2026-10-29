@@ -6,9 +6,8 @@
 'use client';
 
 import { AlertTriangle } from 'lucide-react';
-import { type ReactNode, useEffect, useMemo, useRef } from 'react';
+import { type ReactNode, useMemo } from 'react';
 import { CURRENT_TAX_YEAR, CURRENT_TAX_YEAR_DISPLAY, TAX_RATES } from '@/constants/taxRates';
-import { trackWarningShown } from '@/lib/directorGuideAnalytics';
 import { DIRECTOR_GUIDE_BUSINESS_THRESHOLDS } from '@/lib/tax/businessThresholds';
 import { cn } from '@/lib/utils';
 import {
@@ -185,17 +184,6 @@ export function EducationPanel({ className }: EducationPanelProps) {
     revenue,
     totalIncome,
   ]);
-
-  // Analytics: record which warnings were actually rendered (once per warning id).
-  const trackedWarningIds = useRef<Set<string>>(new Set());
-  useEffect(() => {
-    for (const w of sortedWarnings) {
-      if (!trackedWarningIds.current.has(w.id)) {
-        trackWarningShown(w.id);
-        trackedWarningIds.current.add(w.id);
-      }
-    }
-  }, [sortedWarnings]);
 
   return (
     <aside className={cn('flex h-full flex-col bg-card p-5', className)}>

@@ -15,6 +15,41 @@ describe('calculatorStore rejected amount text', () => {
     useCalculatorStore.getState().calculatePreviousYear();
   };
 
+  it('keeps calculation history through draft/committed invalidation and recovery, but Reset clears it', () => {
+    expect(useCalculatorStore.getState().hasCalculated).toBe(false);
+    calculateFor(30000);
+    expect(useCalculatorStore.getState().hasCalculated).toBe(true);
+    useCalculatorStore.getState().invalidateResults();
+    expect(useCalculatorStore.getState().hasCalculated).toBe(true);
+    useCalculatorStore.getState().setSalary(40000);
+    useCalculatorStore.getState().setInputError('salary', rejected);
+    useCalculatorStore.getState().calculate();
+    expect(useCalculatorStore.getState().hasCalculated).toBe(true);
+    expect(useCalculatorStore.getState().results).toBeNull();
+    useCalculatorStore.getState().setInputError('salary', null);
+    useCalculatorStore.getState().calculate();
+    expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(40000);
+    useCalculatorStore.getState().reset();
+    expect(useCalculatorStore.getState().hasCalculated).toBe(false);
+    expect(useCalculatorStore.getState().results).toBeNull();
+  });
+
+  it('does not mistake a first rejected submission or restored inputs for a past calculation', async () => {
+    useCalculatorStore.getState().setInputError('salary', rejected);
+    useCalculatorStore.getState().calculate();
+    expect(useCalculatorStore.getState().hasCalculated).toBe(false);
+    useCalculatorStore.getState().setInputError('salary', null);
+    calculateFor(30000);
+    const saved = JSON.parse(localStorage.getItem('tax-calculator-storage') ?? '{}');
+    expect(saved.state).not.toHaveProperty('hasCalculated');
+    useCalculatorStore.getState().reset();
+    localStorage.setItem('tax-calculator-storage', JSON.stringify(saved));
+    await useCalculatorStore.persist.rehydrate();
+    expect(useCalculatorStore.getState().input.salary).toBe(30000);
+    expect(useCalculatorStore.getState().hasCalculated).toBe(false);
+    expect(useCalculatorStore.getState().results).toBeNull();
+  });
+
   it('clears every result when a field holds rejected text', () => {
     calculateFor(30000);
     expect(useCalculatorStore.getState().results).not.toBeNull();
@@ -121,5 +156,38 @@ describe('getBlockingInputErrors', () => {
         inputErrors: { partnerGrossWage: rejected },
       }),
     ).toHaveLength(1);
+  });
+});
+
+describe('Pension units and result currency', () => {
+  beforeEach(() => useCalculatorStore.getState().reset());
+
+  it.each([
+    ['amount', 5000, 'percentage'],
+    ['amount', 50, 'percentage'],
+    ['percentage', 5, 'amount'],
+    ['percentage', 100, 'amount'],
+  ] as const)('clears %s %s when switching to %s', (from, value, to) => {
+    const store = useCalculatorStore.getState();
+    store.setSalary(30000);
+    store.setPensionContributionType(from);
+    store.setPensionContribution(value);
+    store.calculate();
+    store.calculatePreviousYear();
+    store.setPensionContributionType(to);
+    expect(useCalculatorStore.getState().input.pensionContribution).toBe(0);
+    expect(useCalculatorStore.getState().input.pensionContributionType).toBe(to);
+    expect(useCalculatorStore.getState().results).toBeNull();
+    expect(useCalculatorStore.getState().previousYearResults).toBeNull();
+  });
+
+  it('invalidates results for programmatic edits and retains them for a no-op', () => {
+    const store = useCalculatorStore.getState();
+    store.setSalary(30000);
+    store.calculate();
+    store.setSalary(30000);
+    expect(useCalculatorStore.getState().results).not.toBeNull();
+    store.setInput({ salary: 40000 });
+    expect(useCalculatorStore.getState().results).toBeNull();
   });
 });

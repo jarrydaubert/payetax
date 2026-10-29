@@ -7,6 +7,7 @@
 'use client';
 
 import { Mail, RotateCcw, Send } from 'lucide-react';
+import Link from 'next/link';
 import { type FormEvent, useEffect, useId, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,9 +26,10 @@ const maskEmail = (email: string): string => {
 interface EmailResultsFormProps {
   input: PayeEmailInput;
   className?: string;
+  canSend?: () => boolean;
 }
 
-export function EmailResultsForm({ input, className }: EmailResultsFormProps) {
+export function EmailResultsForm({ input, className, canSend }: EmailResultsFormProps) {
   const formId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -47,6 +49,11 @@ export function EmailResultsForm({ input, className }: EmailResultsFormProps) {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (canSend && !canSend()) {
+      setSubmitError('Inputs changed. Calculate again before emailing results.');
+      return;
+    }
 
     // Use native validation
     if (!inputRef.current?.validity.valid) {
@@ -100,10 +107,6 @@ export function EmailResultsForm({ input, className }: EmailResultsFormProps) {
         action: 'result_shared',
         category: 'engagement',
         label: 'email',
-        custom_data: {
-          tax_year: input.taxYear,
-          region: input.isScottish ? 'Scotland' : 'rUK',
-        },
       });
     } catch (error) {
       // Ignore abort errors
@@ -197,6 +200,14 @@ export function EmailResultsForm({ input, className }: EmailResultsFormProps) {
           )}
         </Button>
       </form>
+      <p className='text-muted-foreground text-xs'>
+        Sending shares your email address and calculator inputs with PayeTax to prepare your
+        results, which Brevo delivers by email. See our{' '}
+        <Link href='/privacy' className='underline underline-offset-2'>
+          Privacy Policy
+        </Link>
+        .
+      </p>
       {submitError && (
         <p id={`${formId}-email-error`} className='text-destructive text-sm' role='alert'>
           {submitError}

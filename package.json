@@ -23,7 +23,7 @@
     "test:e2e:smoke": "playwright test e2e/smoke.spec.ts e2e/homepage-portal-stability.spec.ts e2e/calculator-critical.spec.ts e2e/director-guide-critical.spec.ts e2e/payslip-regression.spec.ts --project=chromium --workers=1 && (test -n \"$CI\" || open audit-outputs/playwright-report/index.html)",
     "test:e2e:golden": "playwright test e2e/golden-master-PERFECT.spec.ts --project=chromium --workers=1 && (test -n \"$CI\" || open audit-outputs/playwright-report/index.html)",
     "test:e2e:critical": "bun run test:e2e:smoke && bun run test:e2e:golden",
-    "test:e2e:critical:ci": "NEXT_PUBLIC_ENABLE_ANALYTICS=true NEXT_PUBLIC_GA_ID=G-TESTLOCAL1 playwright test e2e/smoke.spec.ts e2e/homepage-portal-stability.spec.ts e2e/calculator-critical.spec.ts e2e/director-guide-critical.spec.ts e2e/payslip-regression.spec.ts e2e/golden-master-PERFECT.spec.ts e2e/analytics-consent.spec.ts e2e/seo-blog.spec.ts e2e/search-discoverability.spec.ts --project=chromium --workers=1",
+    "test:e2e:critical:ci": "NEXT_PUBLIC_ENABLE_ANALYTICS=true NEXT_PUBLIC_GA_ID=G-TESTLOCAL1 playwright test e2e/smoke.spec.ts e2e/homepage-portal-stability.spec.ts e2e/calculator-critical.spec.ts e2e/director-guide-critical.spec.ts e2e/payslip-regression.spec.ts e2e/golden-master-PERFECT.spec.ts e2e/monetary-input-interaction.spec.ts e2e/monetary-input-pan.spec.ts e2e/analytics-consent.spec.ts e2e/telemetry-privacy.spec.ts e2e/seo-blog.spec.ts e2e/search-discoverability.spec.ts --project=chromium --workers=1",
     "typecheck": "tsc --noEmit",
     "typecheck:tests": "tsc -p tsconfig.jest.json --noEmit && tsc -p tsconfig.e2e.json --noEmit",
     "format": "biome format --write .",
@@ -93,7 +93,7 @@
     "@radix-ui/react-slot": "1.3.0",
     "@radix-ui/react-switch": "1.3.3",
     "@radix-ui/react-tooltip": "1.2.12",
-    "@sentry/nextjs": "10.66.0",
+    "@sentry/nextjs": "10.75.2",
     "@tailwindcss/typography": "0.5.20",
     "@vercel/analytics": "2.0.1",
     "@vercel/speed-insights": "2.0.0",
@@ -105,7 +105,7 @@
     "gray-matter": "4.0.3",
     "lru-cache": "11.5.2",
     "lucide-react": "1.25.0",
-    "next": "16.3.8",
+    "next": "16.4.1",
     "next-mdx-remote": "6.0.0",
     "react": "19.2.7",
     "react-dom": "19.2.7",
@@ -115,7 +115,7 @@
     "shiki": "4.3.1",
     "tailwind-merge": "3.6.0",
     "tailwindcss": "4.3.3",
-    "zod": "4.4.3",
+    "zod": "4.6.6",
     "zustand": "5.0.14"
   },
   "overrides": {
@@ -135,13 +135,15 @@
     "@opentelemetry/core": "2.8.0",
     "@opentelemetry/sdk-trace-base": "2.8.0",
     "ajv": "^8.18.0",
-    "fast-uri": "3.1.8",
+    "fast-uri": "3.1.9",
     "nanoid": "3.3.18",
     "sharp": "0.35.5",
     "ws": "8.21.0",
     "esbuild": "0.28.1",
     "argparse": "2.0.1",
-    "postcss-selector-parser": "7.1.6"
+    "postcss-selector-parser": "7.1.6",
+    "deepmerge": "npm:@stackline/deepmerge@1.1.0",
+    "zod": "4.6.6"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.12.1",

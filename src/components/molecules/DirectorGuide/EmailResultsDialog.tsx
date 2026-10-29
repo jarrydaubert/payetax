@@ -24,6 +24,7 @@ import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
 import { trackEmailOpened, trackEmailSent } from '@/lib/directorGuideAnalytics';
 import type { StrategyComparison } from '@/lib/tax/strategyComparison';
 import type { DirectorEmailInput } from '@/lib/validation/emailValidation';
+import { useDirectorGuideStore } from '@/store/directorGuideStore';
 
 const TAX_YEAR = CURRENT_TAX_YEAR;
 
@@ -32,6 +33,7 @@ interface EmailResultsDialogProps {
   onOpenChange: (open: boolean) => void;
   comparison: StrategyComparison | null;
   emailInput: DirectorEmailInput | null;
+  unavailableReason?: string | null;
 }
 
 export function EmailResultsDialog({
@@ -39,7 +41,9 @@ export function EmailResultsDialog({
   onOpenChange,
   comparison,
   emailInput,
+  unavailableReason = null,
 }: EmailResultsDialogProps) {
+  const renderedState = useDirectorGuideStore();
   const emailInputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const [email, setEmail] = useState('');
@@ -61,14 +65,20 @@ export function EmailResultsDialog({
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // A store edit and submit can arrive in one task, before React updates the guard props.
+    if (useDirectorGuideStore.getState() !== renderedState) {
+      setSubmitError('Results changed. Check the current scenario before emailing.');
+      return;
+    }
+
     // Use native validation
     if (!inputRef.current?.validity.valid) {
       inputRef.current?.reportValidity();
       return;
     }
 
-    if (!(comparison && emailInput)) {
-      setSubmitError('No results to send right now.');
+    if (unavailableReason || !(comparison && emailInput)) {
+      setSubmitError(unavailableReason || 'No results to send right now.');
       return;
     }
 
@@ -194,7 +204,8 @@ export function EmailResultsDialog({
                 />
               </div>
               <p id={`${emailInputId}-hint`} className='text-muted-foreground text-xs'>
-                You&apos;ll receive a detailed breakdown with tax rates and key dates
+                You&apos;ll receive a director pay and tax breakdown. Company key dates are not
+                included.
               </p>
               {submitError && (
                 <p id={`${emailInputId}-error`} className='text-destructive text-sm' role='alert'>
@@ -202,6 +213,12 @@ export function EmailResultsDialog({
                 </p>
               )}
             </div>
+
+            {unavailableReason && (
+              <p role='status' className='text-sm text-warning'>
+                {unavailableReason}
+              </p>
+            )}
 
             <div className='flex justify-end gap-3'>
               <Button
@@ -213,7 +230,12 @@ export function EmailResultsDialog({
               >
                 Cancel
               </Button>
-              <Button type='submit' disabled={isLoading || !email.trim()}>
+              <Button
+                type='submit'
+                disabled={
+                  isLoading || !email.trim() || !!unavailableReason || !comparison || !emailInput
+                }
+              >
                 {isLoading ? 'Sending...' : 'Send Results'}
               </Button>
             </div>

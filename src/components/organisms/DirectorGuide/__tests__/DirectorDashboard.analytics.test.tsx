@@ -27,6 +27,10 @@ jest.mock('@/store/directorGuideStore', () => ({
   useDirectorGuideActions: jest.fn(),
 }));
 
+jest.mock('@/components/molecules/DirectorGuide/useDirectorEmailUnavailableReason', () => ({
+  useDirectorEmailUnavailableReason: () => null,
+}));
+
 jest.mock('@/components/molecules/DirectorGuide/calculator', () => ({
   KeyDates: () => null,
   PensionGapWarning: () => null,
@@ -134,12 +138,7 @@ describe('DirectorDashboard analytics', () => {
     render(<DirectorDashboard />);
 
     expect(trackCalculationRun).toHaveBeenCalledTimes(1);
-    expect(trackCalculationRun).toHaveBeenCalledWith({
-      revenue: 100000,
-      expenses: 20000,
-      region: 'rUK',
-      includesVat: false,
-    });
+    expect(trackCalculationRun).toHaveBeenCalledWith();
 
     act(() => {
       jest.advanceTimersByTime(250);
@@ -148,7 +147,7 @@ describe('DirectorDashboard analytics', () => {
     expect(mockCalculate).toHaveBeenCalledTimes(1);
   });
 
-  test('tracks projected revenue/expenses in monthly mode', () => {
+  test('counts a monthly calculation without passing projected financials', () => {
     const mockCalculate = jest.fn();
 
     mockFormSlice({
@@ -174,12 +173,7 @@ describe('DirectorDashboard analytics', () => {
     render(<DirectorDashboard />);
 
     expect(trackCalculationRun).toHaveBeenCalledTimes(1);
-    expect(trackCalculationRun).toHaveBeenCalledWith({
-      revenue: 18000,
-      expenses: 6000,
-      region: 'rUK',
-      includesVat: false,
-    });
+    expect(trackCalculationRun).toHaveBeenCalledWith();
 
     act(() => {
       jest.advanceTimersByTime(250);

@@ -12,10 +12,6 @@ export function setNodeEnv(value: string | undefined): void {
     return;
   }
 
-  Object.defineProperty(process.env, 'NODE_ENV', {
-    value,
-    configurable: true,
-    enumerable: true,
-    writable: true,
-  });
+  // Assignment also updates Jest's case-insensitive environment lookup on Windows.
+  (process.env as Record<string, string | undefined>).NODE_ENV = value;
 }

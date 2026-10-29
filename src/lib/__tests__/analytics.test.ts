@@ -152,16 +152,14 @@ describe('analytics', () => {
       const event: AnalyticsEvent = {
         action: 'result_shared',
         category: 'engagement',
-        label: 'Calculate Tax',
-        value: 1,
+        label: 'email',
       };
 
       trackEvent(event);
 
       expect(mockGtag).toHaveBeenCalledWith('event', 'result_shared', {
         category: 'engagement',
-        label: 'Calculate Tax',
-        value: 1,
+        label: 'email',
       });
     });
 
@@ -183,7 +181,10 @@ describe('analytics', () => {
 
       trackEvent(event);
 
-      expect(consoleLogSpy).toHaveBeenCalledWith('📊 Analytics Event:', event);
+      expect(consoleLogSpy).toHaveBeenCalledWith('📊 Analytics Event:', {
+        action: 'result_shared',
+        category: 'general',
+      });
     });
 
     it('handles missing gtag gracefully', () => {
@@ -201,26 +202,20 @@ describe('analytics', () => {
       expect(consoleWarnSpy).toHaveBeenCalledWith('Analytics tracking error:', expect.any(Error));
     });
 
-    it('includes custom data in event', () => {
+    it('drops unapproved custom identifiers', () => {
       const customData = { userId: '123', sessionId: 'abc' };
       trackEvent({
         action: 'result_shared',
         custom_data: customData,
       });
 
-      expect(mockGtag).toHaveBeenCalledWith(
-        'event',
-        'result_shared',
-        expect.objectContaining({
-          ...customData,
-        }),
-      );
+      expect(mockGtag).toHaveBeenCalledWith('event', 'result_shared', { category: 'general' });
     });
   });
 
   describe('trackCalculatorEvent', () => {
     it('tracks calculate action', () => {
-      trackCalculatorEvent('calculate', { salary: 50000 });
+      trackCalculatorEvent('calculate');
 
       expect(mockGtag).toHaveBeenCalledWith(
         'event',
@@ -228,7 +223,6 @@ describe('analytics', () => {
         expect.objectContaining({
           category: 'calculator',
           label: 'calculate',
-          salary: 50000,
         }),
       );
     });
@@ -247,7 +241,7 @@ describe('analytics', () => {
     });
 
     it('tracks update action', () => {
-      trackCalculatorEvent('update', { field: 'salary' });
+      trackCalculatorEvent('update');
 
       expect(mockGtag).toHaveBeenCalledWith(
         'event',
@@ -255,13 +249,12 @@ describe('analytics', () => {
         expect.objectContaining({
           category: 'calculator',
           label: 'update',
-          field: 'salary',
         }),
       );
     });
 
     it('tracks error action', () => {
-      trackCalculatorEvent('error', { message: 'Invalid input' });
+      trackCalculatorEvent('error');
 
       expect(mockGtag).toHaveBeenCalledWith(
         'event',
@@ -269,15 +262,14 @@ describe('analytics', () => {
         expect.objectContaining({
           category: 'calculator',
           label: 'error',
-          message: 'Invalid input',
         }),
       );
     });
   });
 
   describe('trackCalculatorUsage', () => {
-    it('tracks calculator usage with salary range', () => {
-      trackCalculatorUsage('paye', '50000-75000');
+    it('tracks calculator usage without financial attributes', () => {
+      trackCalculatorUsage('paye');
 
       expect(mockGtag).toHaveBeenCalledWith(
         'event',
@@ -285,23 +277,19 @@ describe('analytics', () => {
         expect.objectContaining({
           category: 'engagement',
           label: 'paye',
-          salary_range: '50000-75000',
-          timestamp: expect.any(String),
         }),
       );
     });
 
     it('tracks calculator usage without salary range', () => {
-      trackCalculatorUsage('self_employed');
+      trackCalculatorUsage('paye');
 
       expect(mockGtag).toHaveBeenCalledWith(
         'event',
         'calculator_usage',
         expect.objectContaining({
           category: 'engagement',
-          label: 'self_employed',
-          salary_range: undefined,
-          timestamp: expect.any(String),
+          label: 'paye',
         }),
       );
     });
@@ -362,46 +350,37 @@ describe('analytics', () => {
 
   describe('trackPerformanceMetric', () => {
     it('tracks performance metric with default unit', () => {
-      trackPerformanceMetric('page_load', 1250);
+      trackPerformanceMetric('page_load_time', 1250);
 
       expect(mockGtag).toHaveBeenCalledWith(
         'event',
         'performance_metric',
         expect.objectContaining({
           category: 'performance',
-          label: 'page_load',
+          label: 'page_load_time',
           value: 1250,
           unit: 'ms',
-          timestamp: expect.any(String),
         }),
       );
     });
 
-    it('tracks performance metric with custom unit', () => {
+    it('drops an unsupported performance label, value and unit', () => {
       trackPerformanceMetric('bundle_size', 2.5, 'MB');
 
-      expect(mockGtag).toHaveBeenCalledWith(
-        'event',
-        'performance_metric',
-        expect.objectContaining({
-          category: 'performance',
-          label: 'bundle_size',
-          value: 2.5,
-          unit: 'MB',
-          timestamp: expect.any(String),
-        }),
-      );
+      expect(mockGtag).toHaveBeenCalledWith('event', 'performance_metric', {
+        category: 'performance',
+      });
     });
 
     it('tracks zero value metrics', () => {
-      trackPerformanceMetric('cache_hits', 0);
+      trackPerformanceMetric('page_load_time', 0);
 
       expect(mockGtag).toHaveBeenCalledWith(
         'event',
         'performance_metric',
         expect.objectContaining({
           category: 'performance',
-          label: 'cache_hits',
+          label: 'page_load_time',
           value: 0,
           unit: 'ms',
         }),

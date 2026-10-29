@@ -28,7 +28,7 @@ import { cn, formatCurrency } from '@/lib/utils';
 interface TaxTrapInlineAlertProps {
   /** Current annual gross salary */
   salary: number;
-  /** Suggested pension contribution amount */
+  /** Additional annual pension contribution amount */
   suggestedPension: number;
   /** Callback when user clicks optimize button - receives the suggested pension amount */
   onApplyPension?: (amount: number) => void;
@@ -126,7 +126,8 @@ export function TaxTrapInlineAlert({
             in personal allowance due to the 60% tax trap (£100k-£125k zone).
             {onApplyPension && (
               <span className={cn('block', 'mt-1')}>
-                Add {formatCurrency(suggestedPension, 0)} to your pension to avoid this trap?
+                Add {formatCurrency(suggestedPension, 0)} to your pension each year to avoid this
+                trap? This updates your pension input; Calculate again to update your results.
               </span>
             )}
           </AlertDescription>

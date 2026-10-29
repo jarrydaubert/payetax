@@ -233,15 +233,38 @@ describe('BasicInputs Component', () => {
   });
 
   describe('Tax Code Placeholder', () => {
+    it('passes an empty string when an entered code is cleared', () => {
+      render(<BasicInputs />);
+      fireEvent.change(screen.getByTestId('tax-code-input'), { target: { value: '' } });
+      expect(mockSetTaxCode).toHaveBeenLastCalledWith('');
+    });
+
+    it.each(['England', 'Scotland'])('keeps a blank code optional in %s', (region) => {
+      (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
+        selector({ inputErrors: {}, input: { ...defaultInput, taxCode: '', region } }),
+      );
+
+      render(<BasicInputs />);
+      const taxCodeInput = screen.getByRole('textbox', { name: 'Tax Code' });
+      expect(taxCodeInput).toHaveValue('');
+      expect(taxCodeInput).toHaveAttribute(
+        'placeholder',
+        region === 'Scotland' ? 'S1257L' : '1257L',
+      );
+      expect(taxCodeInput).not.toBeRequired();
+      fireEvent.blur(taxCodeInput);
+      expect(mockSetTaxCode).not.toHaveBeenCalled();
+    });
+
     it('should show 1257L placeholder for England', () => {
       render(<BasicInputs />);
       const taxCodeInput = screen.getByPlaceholderText('1257L');
       expect(taxCodeInput).toBeInTheDocument();
       expect(
-        screen.getByText(
-          /Leave blank to estimate from the selected year, income and allowance answers/,
-        ),
-      ).toBeInTheDocument();
+        screen.queryByText(/Leave blank to estimate from the selected year/),
+      ).not.toBeInTheDocument();
+      expect(taxCodeInput).not.toHaveAttribute('aria-describedby');
+      expect(screen.getByRole('button', { name: 'Help for Tax Code' })).toBeInTheDocument();
     });
 
     it('should show S1257L placeholder for Scotland', () => {

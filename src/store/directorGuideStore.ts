@@ -14,7 +14,6 @@ import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 import type { StudentLoanPlan } from '@/constants/taxRates';
 import {
-  trackBufferShortfallShown,
   trackGuideReset,
   trackModeChanged,
   trackSafeDrawCalculated,
@@ -64,6 +63,7 @@ export type TakenViaPayroll = 'yes' | 'no' | 'unsure';
 
 /** Director Intelligence input mode */
 export type DirectorGuideMode = 'annual' | 'monthly';
+export type StrategyObjective = 'maximizeTakeHome' | 'minimizeNI';
 
 /** Monthly-mode derived outputs */
 export interface MonthlyModeOutput extends SafeDrawResult {
@@ -151,6 +151,7 @@ const CLEARED_RESULTS = {
   strategyComparison: null,
   monthlyModeOutput: null,
   sliderSalary: null,
+  calculatedFormData: null,
 } as const;
 
 /**
@@ -163,6 +164,8 @@ interface DirectorGuideState {
   // Calculation results
   results: DirectorCalculationResult | null;
   strategyComparison: StrategyComparison | null;
+  /** In-memory inputs that produced the comparison; used to pause email during updates. */
+  calculatedFormData: DirectorFormData | null;
   monthlyModeOutput: MonthlyModeOutput | null;
   error: string | null;
 
@@ -177,6 +180,7 @@ interface DirectorGuideState {
   selectedStrategy: 'allSalary' | 'optimalMix' | 'allDividends';
   sliderSalary: number | null;
   profitWhatIfPercent: number;
+  objective: StrategyObjective;
 }
 
 /**
@@ -228,6 +232,7 @@ interface DirectorGuideActions {
   setSelectedStrategy: (strategy: 'allSalary' | 'optimalMix' | 'allDividends') => void;
   setSliderSalary: (salary: number | null) => void;
   setProfitWhatIfPercent: (percent: number) => void;
+  setObjective: (objective: StrategyObjective) => void;
 
   // Input validity
   setInputError: (field: DirectorInputField, invalid: DirectorInvalidInput | null) => void;
@@ -283,6 +288,7 @@ const defaultState: DirectorGuideState = {
   formData: { ...defaultFormData },
   results: null,
   strategyComparison: null,
+  calculatedFormData: null,
   monthlyModeOutput: null,
   error: null,
   inputErrors: {},
@@ -291,6 +297,7 @@ const defaultState: DirectorGuideState = {
   selectedStrategy: 'optimalMix',
   sliderSalary: null,
   profitWhatIfPercent: 0,
+  objective: 'maximizeTakeHome',
 };
 
 const PersistedDirectorStudentLoanPlanSchema = z.enum([
@@ -662,6 +669,8 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
           set({ sliderSalary: salary });
         },
 
+        setObjective: (objective) => set({ objective }),
+
         setProfitWhatIfPercent: (percent) => {
           if (!Number.isFinite(percent)) return;
           const normalized = Math.max(
@@ -814,15 +823,13 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
               };
               if (typeof window !== 'undefined') {
                 trackSafeDrawCalculated();
-                if (monthlyModeOutput.hasBufferShortfall) {
-                  trackBufferShortfallShown();
-                }
               }
             }
 
             set({
               results,
               strategyComparison,
+              calculatedFormData: formData,
               monthlyModeOutput,
               isCalculating: false,
               sliderSalary: null, // Reset slider on new calculation
@@ -1057,6 +1064,7 @@ export function useDirectorGuideActions() {
       setSelectedStrategy: state.setSelectedStrategy,
       setSliderSalary: state.setSliderSalary,
       setProfitWhatIfPercent: state.setProfitWhatIfPercent,
+      setObjective: state.setObjective,
       // Input validity
       setInputError: state.setInputError,
       // Calculation

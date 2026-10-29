@@ -117,7 +117,7 @@ describe('EmailResultsDialog analytics', () => {
       json: async () => ({ ok: true }),
     })) as unknown as typeof fetch;
 
-    render(
+    const { rerender } = render(
       <EmailResultsDialog
         open={true}
         onOpenChange={onOpenChange}
@@ -127,6 +127,8 @@ describe('EmailResultsDialog analytics', () => {
     );
 
     expect(trackEmailOpened).toHaveBeenCalledTimes(1);
+    expect(screen.getByText(/Company key dates are not included/)).toBeInTheDocument();
+    expect(screen.queryByText(/with tax rates and key dates/)).not.toBeInTheDocument();
 
     const emailField = screen.getByLabelText('Email address');
     fireEvent.change(emailField, { target: { value: 'test@example.com' } });
@@ -138,5 +140,27 @@ describe('EmailResultsDialog analytics', () => {
     });
 
     expect(screen.getByText(/Results sent to test@example.com/i)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Send Another' }));
+    fireEvent.change(screen.getByLabelText('Email address'), {
+      target: { value: 'test@example.com' },
+    });
+    const unavailableReason = 'Email does not include this what-if salary.';
+    rerender(
+      <EmailResultsDialog
+        open={true}
+        onOpenChange={onOpenChange}
+        comparison={comparison}
+        emailInput={directorEmailInput}
+        unavailableReason={unavailableReason}
+      />,
+    );
+    expect(screen.getByRole('status')).toHaveTextContent(unavailableReason);
+    expect(screen.getByRole('button', { name: 'Send Results' })).toBeDisabled();
+    const form = screen.getByLabelText('Email address').closest('form');
+    if (!form) throw new Error('Expected email form');
+    fireEvent.submit(form);
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('alert')).toHaveTextContent(unavailableReason);
   });
 });

@@ -1,7 +1,7 @@
 // src/components/organisms/CalculatorContainer.tsx
 'use client';
 
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Mail, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
@@ -17,9 +17,13 @@ import {
 } from '@/components/ui/dialog';
 import { ANIMATION_TRANSITIONS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
 import { BREAKPOINTS, TIMERS } from '@/constants/ui';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { trackEvent } from '@/lib/analytics';
+import { roundPensionUpToPence } from '@/lib/pensionOptimizer';
+import { convertAnnualToPeriod } from '@/lib/periodCalculator';
 import {
+  derivePayePayBasis,
   getTaxCodeRegionOverride,
   hasNonCumulativeTaxCodeMarker,
   parseTaxCode,
@@ -40,9 +44,12 @@ import { ResultsSummaryCards } from './CalculatorResults/ResultsSummaryCards';
 import { ResultsTable } from './CalculatorResults/ResultsTable';
 import { TaxCodeBasisNotice } from './CalculatorResults/TaxCodeBasisNotice';
 
+const DEFAULT_PERIODS = ['Yearly', 'Monthly', 'Weekly', 'Daily', 'Hourly'];
+
 export function CalculatorContainer() {
   // Use optimized selectors to prevent unnecessary re-renders
   const results = useCalculatorResults();
+  const hasCalculated = useCalculatorStore((state) => state.hasCalculated);
   const previousYearResults = useCalculatorStore((state) => state.previousYearResults);
   const input = useCalculatorStore(
     useShallow((state) => ({
@@ -66,29 +73,27 @@ export function CalculatorContainer() {
       region: state.input.region,
     })),
   );
-  const { calculate, calculatePreviousYear, setInput } = useCalculatorActions();
+  const { calculate, calculatePreviousYear, setInput, invalidateResults } = useCalculatorActions();
   const parsedInputTaxCode = React.useMemo(() => parseTaxCode(input.taxCode, 0), [input.taxCode]);
   const codeRegionOverride = getTaxCodeRegionOverride(parsedInputTaxCode);
   const effectiveIsScottish =
     codeRegionOverride === 'Scotland' ||
     (codeRegionOverride === null && input.region === 'Scotland');
   const [, startTransition] = React.useTransition();
-  const [visiblePeriods, setVisiblePeriods] = React.useState<string[]>([
-    'Yearly',
-    'Monthly',
-    'Weekly',
-    'Daily',
-    'Hourly',
-  ]);
+  const isDesktop = useMediaQuery('(min-width: 1280px)');
+  const [inputsBeforeSummary, setInputsBeforeSummary] = React.useState(false);
+  const [visiblePeriods, setSelectedPeriods] = React.useState<string[]>(DEFAULT_PERIODS);
   const [actionMessage, setActionMessage] = React.useState<{
     tone: 'info' | 'error';
     text: string;
     taxCodeLink?: boolean;
+    requiresCalculate?: boolean;
   } | null>(null);
   const resultsRef = React.useRef<HTMLDivElement>(null);
   const sectionRef = React.useRef<HTMLDivElement>(null);
   const hasTrackedCalculatorStartRef = React.useRef(false);
   const calcScrollTimeoutRef = React.useRef<number | null>(null);
+  const focusFrameRef = React.useRef<number | null>(null);
   const shouldReduceMotion = useMotionPreference();
 
   // SR-only live region message (event-driven, not region-driven)
@@ -96,6 +101,7 @@ export function CalculatorContainer() {
 
   // Derive showResults from results state
   const showResults = !!results;
+  const needsCalculate = !results && hasCalculated;
   const emailInput: PayeEmailInput = {
     salary: input.salary,
     payPeriod: input.payPeriod,
@@ -122,8 +128,51 @@ export function CalculatorContainer() {
   React.useEffect(() => {
     return () => {
       if (calcScrollTimeoutRef.current) clearTimeout(calcScrollTimeoutRef.current);
+      if (focusFrameRef.current !== null) cancelAnimationFrame(focusFrameRef.current);
     };
   }, []);
+
+  React.useLayoutEffect(() => {
+    const desktop = window.matchMedia('(min-width: 80rem)');
+    const sidebar = window.matchMedia('(min-width: 112.5rem)');
+    const updateOrder = () => setInputsBeforeSummary(desktop.matches && !sidebar.matches);
+    updateOrder();
+    desktop.addEventListener('change', updateOrder);
+    sidebar.addEventListener('change', updateOrder);
+    return () => {
+      desktop.removeEventListener('change', updateOrder);
+      sidebar.removeEventListener('change', updateOrder);
+    };
+  }, []);
+
+  React.useLayoutEffect(() => {
+    if (results && window.innerWidth >= BREAKPOINTS.XL) {
+      resultsRef.current?.focus({ preventScroll: true });
+      resultsRef.current?.scrollIntoView({ behavior: 'instant', block: 'start' });
+    }
+  }, [results]);
+
+  const handleDesktopFocus = (event: React.FocusEvent<HTMLDivElement>) => {
+    if (focusFrameRef.current !== null) cancelAnimationFrame(focusFrameRef.current);
+    if (window.innerWidth < BREAKPOINTS.XL) return;
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    if (!event.currentTarget.contains(target)) return;
+    // Check after native focus scrolling; never scroll for a control the user has already left.
+    focusFrameRef.current = requestAnimationFrame(() => {
+      focusFrameRef.current = null;
+      if (window.innerWidth < BREAKPOINTS.XL) return;
+      if (document.activeElement !== target || !target.matches(':focus-visible')) return;
+      const rect = target.getBoundingClientRect();
+      const style = getComputedStyle(document.documentElement);
+      if (
+        rect.top < Number.parseFloat(style.scrollPaddingTop) ||
+        rect.bottom > window.innerHeight - Number.parseFloat(style.scrollPaddingBottom)
+      ) {
+        target.scrollIntoView({ behavior: 'instant', block: 'nearest', inline: 'nearest' });
+      }
+    });
+  };
 
   const handleCalculate = () => {
     setActionMessage(null);
@@ -176,7 +225,7 @@ export function CalculatorContainer() {
     // Clear any pending scroll timeout
     if (calcScrollTimeoutRef.current) clearTimeout(calcScrollTimeoutRef.current);
 
-    // Only scroll to results on mobile (desktop has everything visible)
+    // Only scroll to results on mobile (desktop scrolls when its results commit).
     calcScrollTimeoutRef.current = window.setTimeout(() => {
       if (window.innerWidth < BREAKPOINTS.LG) {
         resultsRef.current?.scrollIntoView({
@@ -188,19 +237,24 @@ export function CalculatorContainer() {
   };
 
   const handleVisiblePeriodsChange = (periods: string[]) => {
-    setVisiblePeriods(periods);
+    setSelectedPeriods(periods);
   };
 
   const handleApplyPensionOptimization = (pensionAmount: number) => {
     setActionMessage(null);
-    // Commit any field being edited first, so the applied pension is not overwritten by a later
-    // blur and the recalculation uses the amounts shown. Rejected text clears the results this
-    // action belongs to; then there is nothing to apply to.
+    // Commit the focused field so a later blur cannot overwrite the applied pension.
+    // Rejected text clears the results this action belongs to; then there is nothing to apply to.
     commitFocusedField(sectionRef.current);
-    if (getBlockingInputErrors(useCalculatorStore.getState()).length > 0) return;
+    const current = useCalculatorStore.getState();
+    if (!results || current.results !== results || getBlockingInputErrors(current).length > 0)
+      return;
     try {
       // Validate pension amount
-      if (typeof pensionAmount !== 'number' || Number.isNaN(pensionAmount) || pensionAmount < 0) {
+      if (
+        typeof pensionAmount !== 'number' ||
+        !Number.isFinite(pensionAmount) ||
+        pensionAmount < 0
+      ) {
         console.error('[CalculatorContainer] Invalid pension amount:', pensionAmount);
         setActionMessage({
           tone: 'error',
@@ -209,15 +263,19 @@ export function CalculatorContainer() {
         return;
       }
 
-      // Update both fields in one store write so the immediate recalculation reads the new value.
+      const basis = derivePayePayBasis(current.input);
+      const totalAnnualPension = basis.salarySacrificePensionDeduction.annual + pensionAmount;
+      const perPeriodPension = convertAnnualToPeriod(
+        totalAnnualPension,
+        current.input.payPeriod,
+        basis.hoursPerWeek,
+      );
+      const pensionContribution = roundPensionUpToPence(perPeriodPension);
       setInput({
-        pensionContribution: pensionAmount,
+        pensionContribution,
         pensionContributionType: 'amount',
       });
-
-      // Recalculate
-      calculate();
-      calculatePreviousYear();
+      invalidateResults();
 
       // Show success message
       const formattedAmount = new Intl.NumberFormat('en-GB', {
@@ -225,7 +283,18 @@ export function CalculatorContainer() {
         currency: 'GBP',
         minimumFractionDigits: 0,
       }).format(pensionAmount);
-      setLiveMessage(`${formattedAmount} pension contribution applied. Results updated.`);
+      const conversionNotice =
+        current.input.pensionContributionType === 'percentage' &&
+        current.input.pensionContribution > 0
+          ? ` Your existing ${current.input.pensionContribution}% pension was converted to a £ amount for your pay period.`
+          : '';
+      const roundingNotice =
+        pensionContribution > perPeriodPension
+          ? ' Rounded up to the next penny for your pay period so your annual contribution meets the target.'
+          : '';
+      const message = `${formattedAmount} added to your annual pension contribution.${conversionNotice}${roundingNotice} Calculate again to update your results.`;
+      setActionMessage({ tone: 'info', text: message, requiresCalculate: true });
+      setLiveMessage(message);
     } catch (error) {
       console.error('[CalculatorContainer] Error applying pension:', error);
       setActionMessage({
@@ -253,15 +322,114 @@ export function CalculatorContainer() {
           <DialogTitle>Email Results</DialogTitle>
           <DialogDescription>Send a copy of this calculation to your inbox.</DialogDescription>
         </DialogHeader>
-        <EmailResultsForm input={emailInput} className='w-full' />
+        <EmailResultsForm
+          input={emailInput}
+          canSend={() => {
+            const current = useCalculatorStore.getState();
+            return (
+              !!results &&
+              current.results === results &&
+              getBlockingInputErrors(current).length === 0
+            );
+          }}
+          className='w-full'
+        />
       </DialogContent>
     </Dialog>
+  );
+
+  const summarySection = (
+    <React.Fragment key='summary'>
+      {showResults && (
+        <motion.div
+          ref={resultsRef}
+          variants={shouldReduceMotion ? {} : ANIMATION_VARIANTS.fadeInDown}
+          initial={shouldReduceMotion || isDesktop ? false : 'initial'}
+          animate={shouldReduceMotion ? {} : 'animate'}
+          exit={shouldReduceMotion ? {} : 'exit'}
+          transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.default}
+          className='order-4 scroll-mt-[calc(var(--navbar-height)+1rem)] xl:order-3 xl:col-span-2 xl:scroll-mt-0 min-[112.5rem]:order-2'
+          role='region'
+          aria-label='Tax calculation results summary'
+          tabIndex={-1}
+        >
+          {actionMessage && (
+            <motion.div
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={shouldReduceMotion ? undefined : { opacity: 0, y: 12 }}
+              transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2 }}
+              className={cn(
+                'mb-3 rounded-md border px-3 py-2 text-sm',
+                actionMessage.tone === 'error'
+                  ? 'border-destructive/30 bg-destructive/10 text-destructive'
+                  : 'border-primary/30 bg-primary/10 text-primary',
+              )}
+              role={actionMessage.tone === 'error' ? 'alert' : 'status'}
+            >
+              <span>{actionMessage.text}</span>
+              {actionMessage.taxCodeLink && (
+                <Link
+                  href='/tools/tax-code-decoder'
+                  className='ml-1 inline-flex min-h-11 items-center font-medium underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                >
+                  Check the code
+                </Link>
+              )}
+            </motion.div>
+          )}
+          {results && (
+            <>
+              <TaxCodeBasisNotice basis={results.taxCodeBasis} />
+              <ResultsSummaryCards results={results} taxYear={input.taxYear} input={input} />
+            </>
+          )}
+        </motion.div>
+      )}
+    </React.Fragment>
+  );
+
+  const inputsSection = (
+    <Card
+      key='inputs'
+      className={cn(
+        'order-2 mx-auto w-full max-w-xl xl:col-span-2 xl:mx-0 xl:max-w-none xl:self-start min-[112.5rem]:sticky min-[112.5rem]:top-[calc(var(--navbar-height)+1rem)] min-[112.5rem]:order-3 min-[112.5rem]:col-span-1',
+        'p-3',
+        'sm:p-4 md:p-6',
+      )}
+    >
+      <CalculatorInputsSection
+        onCalculate={handleCalculate}
+        onReset={() => {
+          setActionMessage(null);
+          setLiveMessage('');
+        }}
+        resultAction={showResults ? emailResultsAction : undefined}
+      />
+      <p
+        aria-live='polite'
+        aria-atomic='true'
+        role={needsCalculate ? 'status' : undefined}
+        className={
+          needsCalculate
+            ? 'mt-3 rounded-md border border-primary/30 bg-primary/10 px-3 py-2 text-sm'
+            : 'sr-only'
+        }
+      >
+        {needsCalculate && (
+          <>
+            Inputs changed — Calculate again. Previous results have been cleared.
+            {actionMessage?.requiresCalculate && ` ${actionMessage.text}`}
+          </>
+        )}
+      </p>
+    </Card>
   );
 
   return (
     <div
       className={cn(
-        'mx-auto flex w-full max-w-screen-2xl flex-col sm:px-4 md:py-8 xl:grid xl:grid-cols-[390px_minmax(0,1fr)] xl:px-8 2xl:grid-cols-[380px_minmax(0,1fr)]',
+        'paye-calculator mx-auto flex w-full max-w-[120rem] flex-col sm:px-4 md:py-8 xl:grid xl:grid-cols-[380px_minmax(0,1fr)] xl:px-8',
         'gap-3',
         'px-4',
         'py-4',
@@ -269,6 +437,7 @@ export function CalculatorContainer() {
       )}
       data-testid='calculator-section'
       ref={sectionRef}
+      onFocusCapture={handleDesktopFocus}
     >
       {/* Header - CSS animation for better mobile LCP (no JS blocking) */}
       <div
@@ -295,72 +464,15 @@ export function CalculatorContainer() {
         </p>
       </div>
 
-      {/* Summary Cards - Between inputs and table on mobile (order-4), top on desktop (order-2) */}
-      <AnimatePresence mode='wait'>
-        {showResults && results && (
-          <motion.div
-            ref={resultsRef}
-            variants={shouldReduceMotion ? {} : ANIMATION_VARIANTS.fadeInDown}
-            initial={shouldReduceMotion ? {} : 'initial'}
-            animate={shouldReduceMotion ? {} : 'animate'}
-            exit={shouldReduceMotion ? {} : 'exit'}
-            transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.default}
-            className='order-4 scroll-mt-[calc(var(--navbar-height)+1rem)] xl:order-2 xl:col-span-2'
-            role='region'
-            aria-label='Tax calculation results summary'
-          >
-            {actionMessage && (
-              <motion.div
-                initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={shouldReduceMotion ? undefined : { opacity: 0, y: 12 }}
-                transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2 }}
-                className={cn(
-                  'mb-3 rounded-md border px-3 py-2 text-sm',
-                  actionMessage.tone === 'error'
-                    ? 'border-destructive/30 bg-destructive/10 text-destructive'
-                    : 'border-primary/30 bg-primary/10 text-primary',
-                )}
-                role={actionMessage.tone === 'error' ? 'alert' : 'status'}
-              >
-                <span>{actionMessage.text}</span>
-                {actionMessage.taxCodeLink && (
-                  <Link
-                    href='/tools/tax-code-decoder'
-                    className='ml-1 inline-flex min-h-11 items-center font-medium underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
-                  >
-                    Check the code
-                  </Link>
-                )}
-              </motion.div>
-            )}
-            <TaxCodeBasisNotice basis={results.taxCodeBasis} />
-            <ResultsSummaryCards results={results} taxYear={input.taxYear} input={input} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
+      {/* Match the desktop DOM sequence to the input-band and sidebar layouts. */}
+      {inputsBeforeSummary ? [inputsSection, summarySection] : [summarySection, inputsSection]}
       {/* SR-only live region for announcing state changes (event-driven) */}
       <div aria-live='polite' aria-atomic='true' className='sr-only'>
         {liveMessage}
       </div>
 
-      {/* Inputs Section - order-2 on mobile, left column on desktop (sticky) */}
-      <Card
-        className={cn(
-          'order-2 mx-auto w-full max-w-xl xl:sticky xl:top-[calc(var(--navbar-height)+1rem)] xl:order-3 xl:mx-0 xl:max-w-none xl:self-start',
-          'p-3',
-          'sm:p-4 md:p-6',
-        )}
-      >
-        <CalculatorInputsSection
-          onCalculate={handleCalculate}
-          resultAction={showResults ? emailResultsAction : undefined}
-        />
-      </Card>
-
       {/* Results column - order-6 on mobile, right column on desktop */}
-      <AnimatePresence mode='wait'>
+      <React.Fragment key='results'>
         {showResults && results ? (
           <motion.div
             variants={shouldReduceMotion ? {} : ANIMATION_VARIANTS.scaleIn}
@@ -368,7 +480,11 @@ export function CalculatorContainer() {
             animate={shouldReduceMotion ? {} : 'animate'}
             exit={shouldReduceMotion ? {} : 'exit'}
             transition={shouldReduceMotion ? { duration: 0 } : ANIMATION_TRANSITIONS.default}
-            className={cn('order-6 flex flex-col', 'gap-4', 'xl:order-3 xl:min-w-0 xl:self-start')}
+            className={cn(
+              'order-6 flex flex-col',
+              'gap-4',
+              'xl:order-4 xl:col-span-2 xl:min-w-0 xl:self-start min-[112.5rem]:order-3 min-[112.5rem]:col-span-1',
+            )}
             data-testid='tax-results'
           >
             <ResultsTable
@@ -395,20 +511,26 @@ export function CalculatorContainer() {
             exit={shouldReduceMotion ? undefined : { opacity: 0 }}
             transition={shouldReduceMotion ? { duration: 0 } : undefined}
             className={cn(
-              'order-6 flex min-h-[28rem] items-center justify-center rounded-sm border border-dashed bg-card/70 text-center xl:order-3',
+              'order-6 flex min-h-[28rem] items-center justify-center rounded-sm border border-dashed bg-card/70 text-center xl:order-4 xl:col-span-2 min-[112.5rem]:order-3 min-[112.5rem]:col-span-1',
               'p-12',
             )}
           >
             <div>
               <Sparkles className={cn('mx-auto text-muted-foreground', 'mb-4', 'size-12')} />
-              <h3 className={cn('font-semibold', 'mb-2', 'text-lg')}>Ready to Calculate</h3>
+              <h3 className={cn('font-semibold', 'mb-2', 'text-lg')}>
+                {needsCalculate ? 'Calculate again' : 'Ready to Calculate'}
+              </h3>
               <p className={cn('text-muted-foreground', 'text-sm')}>
-                Enter your salary. See your take-home pay in seconds.
+                {needsCalculate
+                  ? 'Your inputs have changed. Calculate to see your updated take-home pay.'
+                  : input.salary > 0
+                    ? 'Check your inputs, then select Calculate to see your take-home pay.'
+                    : 'Enter your salary, then select Calculate to see your take-home pay.'}
               </p>
             </div>
           </motion.div>
         )}
-      </AnimatePresence>
+      </React.Fragment>
     </div>
   );
 }

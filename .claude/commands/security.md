@@ -6,12 +6,13 @@ argument-hint: [scope]
 # /security - Security Review
 
 **CRITICAL INSTRUCTIONS:**
-- Do NOT use planning/spec modes or persist artifacts to disk
-- Output ALL findings directly in this conversation as markdown
+- Read `AGENTS.md` first. Report findings in chat; preserve relied-upon PR evidence under the root contract.
 - Do NOT write or modify code (small illustrative snippets for fixes are OK)
 - **No PASS/FAIL without referencing concrete files/snippets**
 - Every finding must include **evidence** and **reproduction path**
-- Tax Pack pre-live guardrail: Tax Pack is planned (not live); unless explicitly requested, review shipped surfaces only and list Tax Pack items as deferred readiness work.
+- Review shipped surfaces by default; include unshipped features only when explicitly requested.
+
+Use the checklist as investigation prompts, not blanket product requirements. Establish applicability per route and trust boundary using `docs/guides/API_AND_ABUSE_CONTROLS.md` and the implementation. Mark absent or inapplicable features accordingly; do not propose restoring removed flows to satisfy a checklist.
 
 ## Evidence Standard
 
@@ -45,8 +46,8 @@ rg -l "export.*GET|export.*POST|export.*PUT|export.*DELETE" src/app/api/
 # List server actions
 rg -l "use server" src/
 
-# Find middleware
-ls src/middleware.ts 2>/dev/null || echo "No middleware"
+# Discover middleware/proxy entrypoints if present
+rg --files src | rg '(^|[/\\])(middleware|proxy)\.[cm]?[jt]s$'
 
 # Check rewrites/redirects in config
 rg "rewrites|redirects" next.config.ts
@@ -64,7 +65,7 @@ rg "rewrites|redirects" next.config.ts
 - [ ] Per-route rate limits configured (not just global)
 - [ ] Correct IP extraction behind proxy (`x-forwarded-for` parsing)
 - [ ] **No "unknown" global bucket** (hash UA or fail closed)
-- [ ] Secondary keys for abuse-prone endpoints (e.g., per-email for newsletter)
+- [ ] Secondary keys for abuse-prone results-email endpoints where applicable
 - [ ] Documented limits per route
 
 **Search:**
@@ -180,11 +181,11 @@ rg "dangerouslySetInnerHTML" src/
 
 **Search:**
 ```bash
-rg "Content-Security-Policy|X-Frame-Options|Strict-Transport" next.config.ts src/middleware.ts
+rg "Content-Security-Policy|X-Frame-Options|Strict-Transport" next.config.ts src/
 ```
 
 ### Per-Route Headers
-- [ ] Sensitive endpoints (unsubscribe, tokens, og) have restrictive headers
+- [ ] Sensitive endpoints have appropriate restrictive headers; distinguish public cacheable OG output
 - [ ] API routes set `X-Content-Type-Options: nosniff`
 
 ---
@@ -228,7 +229,7 @@ rg "gtag\(|track\(|analytics\." src/ -A 2
 ## Step 6: Next.js-Specific Surfaces
 
 ### Middleware
-- [ ] `src/middleware.ts` reviewed for auth/security logic
+- [ ] Any discovered middleware/proxy entrypoint reviewed for auth/security logic
 - [ ] Middleware matcher patterns correct
 - [ ] No bypasses via unusual paths
 
@@ -281,7 +282,8 @@ rg "Script.*src=|gtag|posthog|analytics" src/app/
 ### Dependency Audit
 ```bash
 bun audit
-# Also cross-check: npm audit, GitHub advisory DB
+bun run audit:deps
+# Cross-check the GitHub advisory database when needed; keep Bun as the package manager.
 ```
 
 **Note:** Audit tools have false negatives. Treat as indicators, not proof.
@@ -334,13 +336,13 @@ rg "redirect\(|NextResponse.redirect|return.*redirect" src/
 # Non-public env vars in client files
 rg "process\.env\." src/components/ src/app/**/page.tsx | grep -v NEXT_PUBLIC
 
-# Hardcoded secrets
-rg "sk_live|sk_test|api_key|apikey|password|secret|token" src/ --iglob '*.ts' --iglob '*.tsx'
+# Use the repository's redacted secret scan rather than printing potential secret values
+bun run check:secrets
 ```
 
 ### Environment Files
 - [ ] `.env*` in `.gitignore`
-- [ ] `.env.example` has placeholders only, no real values
+- [ ] `.env.template` is the only tracked env file and contains placeholders only; do not open local env files
 - [ ] Required env vars validated at startup (fail fast)
 
 ---
@@ -349,16 +351,16 @@ rg "sk_live|sk_test|api_key|apikey|password|secret|token" src/ --iglob '*.ts' --
 
 | OWASP | PayeTax Relevance | What to Check |
 |-------|-------------------|---------------|
-| A01 Broken Access Control | Medium - no auth, but has admin-ish endpoints | Webhooks, IndexNow, email endpoints |
-| A02 Cryptographic Failures | Low - no stored secrets | Token generation (unsubscribe) |
+| A01 Broken Access Control | Assess per shipped route | Results email and operational health access controls |
+| A02 Cryptographic Failures | Assess actual secret/token handling | Server-only credentials and token comparison |
 | A03 Injection | Medium | Zod validation, no raw SQL/shell |
 | A04 Insecure Design | Medium | Trust boundaries in API routes |
 | A05 Security Misconfiguration | High | Headers, CSP, error exposure |
 | A06 Vulnerable Components | Medium | bun audit, dependency review |
 | A07 Auth Failures | N/A | No user authentication |
-| A08 Data Integrity Failures | Medium | Calculation logic, signed tokens |
+| A08 Data Integrity Failures | Medium | Calculation logic, submitted result integrity |
 | A09 Logging Failures | Medium | PII in logs, Sentry config |
-| A10 SSRF | Medium | IndexNow, any URL submission |
+| A10 SSRF | Assess actual outbound requests | Any user-influenced URL or remote fetch |
 
 ---
 
@@ -400,10 +402,10 @@ rg "sk_live|sk_test|api_key|apikey|password|secret|token" src/ --iglob '*.ts' --
 ## Key Files to Review
 
 - `next.config.ts` - Headers, rewrites, redirects, remote patterns
-- `src/middleware.ts` - Request filtering (if exists)
+- Any discovered middleware/proxy entrypoint - Request filtering (if present)
 - `src/app/api/**/*.ts` - All API routes
 - `src/lib/validation/` - Zod schemas
 - `src/lib/rateLimit.ts` - Rate limiting implementation
 - `sentry.*.config.ts` - Error tracking config
-- `emails/*.tsx` - Email templates for escaping
-- `.env.example` - Secret placeholders
+- `src/lib/email/` - Email rendering and delivery
+- `scripts/check-secrets.ts` - Redacted scan and tracked-env guard

@@ -198,7 +198,7 @@ describe('NumberInput Component', () => {
       expect(screen.getByText('Enter an amount no more than £10,000,000.')).toBeInTheDocument();
     });
 
-    it('does not report empty text as invalid', () => {
+    it('keeps a cleared owned field empty and asks for an explicit amount', () => {
       const onValidityChange = jest.fn();
       render(
         <NumberInput
@@ -210,8 +210,12 @@ describe('NumberInput Component', () => {
       );
       commit(screen.getByRole('spinbutton'), '');
 
-      expect(onValidityChange).not.toHaveBeenCalled();
-      expect(screen.getByRole('spinbutton')).not.toHaveAttribute('aria-invalid');
+      expect(onValidityChange).toHaveBeenCalledWith({
+        text: '',
+        error: 'Enter an amount, or 0 for none.',
+      });
+      expect(screen.getByRole('spinbutton')).toHaveValue('');
+      expect(screen.getByRole('spinbutton')).toHaveAttribute('aria-invalid', 'true');
     });
 
     it('recovers when invalid text is corrected', () => {
@@ -363,7 +367,7 @@ describe('NumberInput Component', () => {
 
         rerender(<NumberInput {...props} resetKey={1} />);
         // Still focused: emptied as a fresh focus would be, ready for new typing.
-        expect(input).toHaveValue('');
+        expect(input).toHaveValue('0.00');
         expect(input).not.toHaveAttribute('aria-invalid');
 
         // Leaving does not resurrect it; retyping the same text is reported again.
@@ -476,13 +480,96 @@ describe('NumberInput Component', () => {
   });
 
   describe('Focus Behavior', () => {
-    it('should clear value on focus when clearOnFocus is true', () => {
+    it('prevents the mouse default only on first entry', async () => {
+      const user = userEvent.setup();
+      render(<NumberInput value={25000} onChange={mockOnChange} decimals={2} />);
+      const input = screen.getByRole('spinbutton');
+      const prevented: boolean[] = [];
+      const record = (event: Event) => prevented.push(event.defaultPrevented);
+      document.addEventListener('pointerdown', record);
+      try {
+        await user.click(input);
+        await user.click(input);
+        expect(prevented).toEqual([true, false]);
+      } finally {
+        document.removeEventListener('pointerdown', record);
+      }
+    });
+
+    it.each([
+      'touch',
+      'pen',
+    ])('focuses %s entry only on an uncancelled matching release', (pointerType) => {
+      render(<NumberInput value={25000} onChange={mockOnChange} decimals={2} />);
+      const input = screen.getByRole('spinbutton') as HTMLInputElement;
+      const dispatch = (name: string, pointerId: number) => {
+        const event = new MouseEvent(name, { bubbles: true, cancelable: true, button: 0 });
+        Object.assign(event, { pointerType, pointerId });
+        fireEvent(input, event);
+        return event;
+      };
+      expect(dispatch('pointerdown', 1).defaultPrevented).toBe(true);
+      expect(input).not.toHaveFocus();
+      dispatch('pointercancel', 1);
+      dispatch('pointerup', 1);
+      expect(input).not.toHaveFocus();
+      dispatch('pointerdown', 2);
+      dispatch('pointerup', 3);
+      expect(input).not.toHaveFocus();
+      dispatch('pointerup', 2);
+      expect(input).toHaveFocus();
+      expect([input.selectionStart, input.selectionEnd]).toEqual([0, input.value.length]);
+      expect(input).toHaveValue('25,000.00');
+      expect(mockOnChange).not.toHaveBeenCalled();
+    });
+
+    it('selects on first pointer entry without relying on the browser focus default', async () => {
+      const user = userEvent.setup();
+      const onPointerDown = jest.fn();
+      render(
+        <NumberInput
+          value={25000}
+          onChange={mockOnChange}
+          decimals={2}
+          onPointerDown={onPointerDown}
+        />,
+      );
+      const input = screen.getByRole('spinbutton') as HTMLInputElement;
+      await user.click(input);
+      expect(input).toHaveFocus();
+      expect([input.selectionStart, input.selectionEnd]).toEqual([0, input.value.length]);
+      expect(input).toHaveValue('25,000.00');
+      expect(mockOnChange).not.toHaveBeenCalled();
+
+      await user.pointer({ target: input, keys: '[MouseLeft>]' });
+      input.setSelectionRange(1, 4);
+      await user.pointer({ keys: '[/MouseLeft]' });
+      expect([input.selectionStart, input.selectionEnd]).toEqual([1, 4]);
+      expect(onPointerDown).toHaveBeenCalledTimes(2);
+    });
+
+    it('respects a caller cancelling pointer entry', async () => {
+      const user = userEvent.setup();
+      render(
+        <NumberInput
+          value={25000}
+          onChange={mockOnChange}
+          onPointerDown={(e) => e.preventDefault()}
+        />,
+      );
+      const input = screen.getByRole('spinbutton');
+      await user.click(input);
+      expect(input).not.toHaveFocus();
+      expect(input).toHaveValue('25,000');
+    });
+
+    it('preserves the value when select-on-focus is enabled', () => {
       render(<NumberInput value={1000} onChange={mockOnChange} clearOnFocus={true} />);
       const input = screen.getByRole('spinbutton') as HTMLInputElement;
 
       fireEvent.focus(input);
 
-      expect(input.value).toBe('');
+      expect(input.value).toBe('1,000');
     });
 
     it('should not clear value on focus when clearOnFocus is false', () => {

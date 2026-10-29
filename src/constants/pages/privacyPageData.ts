@@ -24,8 +24,8 @@ import { SITE_CONTACT_EMAIL } from '@/constants/contact';
 import type { FeatureSchema } from '@/lib/validation/pageDataValidation';
 
 /** Update whenever the privacy policy materially changes. */
-export const PRIVACY_LAST_UPDATED_ISO = '2026-07-17';
-export const PRIVACY_LAST_UPDATED = '17 July 2026';
+export const PRIVACY_LAST_UPDATED_ISO = '2026-10-27';
+export const PRIVACY_LAST_UPDATED = '27 October 2026';
 
 /** Controller contact email (matches the address used on the compliance page). */
 export const PRIVACY_CONTACT_EMAIL = SITE_CONTACT_EMAIL;
@@ -47,16 +47,16 @@ export const PRIVACY_PRINCIPLES = [
     icon: Lock,
     title: 'Client-Side Calculations',
     description:
-      'Tax calculations run in your browser. Your salary and tax details are not sent to our servers to get a result — they only leave your device if you choose to email your results.',
+      'Tax calculations run in your browser. We do not attach your calculator figures, financial bands or personal tax answers to analytics or diagnostic reports. Emailing results sends your inputs to our server to prepare the email.',
     gradient: {
       icon: 'text-primary',
     },
   },
   {
     icon: Database,
-    title: 'No Stored Tax Data',
+    title: 'Figures Remembered On Your Device',
     description:
-      "We don't keep a copy of your calculations. Nothing about your salary or results is written to a PayeTax database, before or after you calculate.",
+      'Your browser currently remembers calculator inputs on this device, including on shared devices. We do not keep a calculations database. Emailing results creates copies with the email provider and in the recipient’s mailbox.',
     gradient: {
       icon: 'text-accent',
     },
@@ -85,8 +85,8 @@ export const PRIVACY_PRINCIPLES = [
  * What we DON'T do - negative list for ComparisonCards
  */
 export const PRIVACY_DONT_DO = [
-  'Keep a copy of your tax calculations',
-  'Sell, share, or monetise your data',
+  'Maintain a database of your calculator figures',
+  'Sell your data or use it for advertising',
   'Track you across other websites',
   'Require account creation or login',
   'Use third-party advertising networks',
@@ -98,7 +98,7 @@ export const PRIVACY_DONT_DO = [
  */
 export const PRIVACY_DO_DO = [
   'Calculate everything in your browser',
-  'Only send data when you ask us to email results',
+  'Keep calculator figures out of analytics and diagnostic context',
   'Use cookieless traffic and performance signals plus consent-based analytics',
   'Process the minimum data needed to prevent abuse',
   'Tell you exactly which third parties are involved',
@@ -115,14 +115,14 @@ export const PRIVACY_DATA_FLOW: DataFlowCard[] = [
     iconColor: 'bg-primary',
     title: 'Your Device',
     description:
-      'Calculations happen here in your browser. Your salary, tax code, and personal details stay on your device unless you choose to email your results.',
+      'Calculations happen here. Your browser remembers your salary, tax code and other input answers after you leave. Clear this site’s browser data to remove saved figures; this also clears your consent choice.',
   },
   {
     icon: Globe,
     iconColor: 'bg-primary/80',
     title: 'Our Servers',
     description:
-      'We send you the calculator app. We only receive your inputs if you request an email of your results — and even then we do not store them.',
+      'We deliver the app and receive ordinary technical request information. Requesting an email sends your inputs and email address to our server so it can prepare the results; we do not save them to a calculations database.',
   },
   {
     icon: FileText,
@@ -151,14 +151,16 @@ export const PRIVACY_DATA_CATEGORIES: PrivacyDataCategory[] = [
     data: 'Salary, tax code, pension, student loan, and similar figures you enter',
     purpose: 'Produce your tax breakdown in your browser',
     lawfulBasis: 'Not collected by us — processed locally on your device',
-    retention: 'Never stored on our servers',
+    retention:
+      'Remembered in browser storage on this device; not saved to a PayeTax calculations database',
   },
   {
     category: 'Emailed results',
-    data: 'Your email address and the calculated results you ask us to send',
+    data: 'Your email address and calculator inputs; the server prepares the results included in your email',
     purpose: 'Deliver the results email you requested',
     lawfulBasis: 'Performance of your request (Article 6(1)(b))',
-    retention: 'Not stored by us; held only in our email provider’s sending logs',
+    retention:
+      'Not saved to a PayeTax calculations database; copies are processed by the email provider and retained in the recipient’s mailbox',
   },
   {
     category: 'Support messages',
@@ -169,7 +171,7 @@ export const PRIVACY_DATA_CATEGORIES: PrivacyDataCategory[] = [
   },
   {
     category: 'Analytics',
-    data: 'Page views, device/browser type, and pseudonymous usage events',
+    data: 'Page views, device/browser type, interaction counts, technical timings and approved results-email campaign labels. No calculator amounts, financial bands, personal tax answers or financial warning conditions',
     purpose: 'Understand which tools are useful and improve the site',
     lawfulBasis: 'Consent (Article 6(1)(a)) — GA4 only after you opt in',
     retention: 'Per Google Analytics retention settings',
@@ -183,15 +185,15 @@ export const PRIVACY_DATA_CATEGORIES: PrivacyDataCategory[] = [
   },
   {
     category: 'Error diagnostics',
-    data: 'Technical error context on monitored calculator, tool, blog, and email routes',
+    data: 'Error types, stacks, app release, route, calculation stage, anomaly codes and technical context on monitored routes. Calculator figures and personal tax answers are excluded from attached context',
     purpose: 'Detect and fix faults that break calculations, public pages, or emails',
     lawfulBasis: 'Legitimate interests (Article 6(1)(f))',
     retention: 'Limited monitoring window',
   },
   {
     category: 'Abuse prevention',
-    data: 'A short-lived client identifier derived from your IP address',
-    purpose: 'Rate-limit requests and protect the email endpoints from abuse',
+    data: 'Your IP address in a short-lived rate-limit key, or a browser-header fallback if an IP address is unavailable',
+    purpose: 'Rate-limit requests to email-results and social-preview image endpoints',
     lawfulBasis: 'Legitimate interests (Article 6(1)(f))',
     retention: 'Short-lived (expires automatically)',
   },
@@ -226,17 +228,17 @@ export const PRIVACY_PROCESSORS: PrivacyProcessor[] = [
   {
     name: 'Google Analytics 4',
     role: 'Consent-based product analytics',
-    data: 'Pseudonymous usage events, loaded only after you accept analytics cookies',
+    data: 'Page views, interaction counts and technical timings after analytics consent; calculator figures and financial attributes are excluded',
   },
   {
     name: 'Sentry',
     role: 'Error monitoring on retained calculator, tool, blog, and email routes',
-    data: 'Technical error and diagnostic context',
+    data: 'Technical errors and diagnostic context, excluding attached calculator figures and personal tax answers',
   },
   {
     name: 'Upstash',
     role: 'Distributed rate limiting and abuse protection',
-    data: 'A short-lived client identifier derived from your IP address',
+    data: 'Your IP address in a short-lived rate-limit key, or a browser-header fallback if an IP address is unavailable',
   },
 ];
 
@@ -255,6 +257,40 @@ export interface PrivacyStorageItem {
 }
 
 export const PRIVACY_STORAGE_INVENTORY: PrivacyStorageItem[] = [
+  {
+    name: 'tax-calculator-storage',
+    type: 'localStorage (calculator inputs)',
+    purpose:
+      'Automatically remembers PAYE inputs, including salary, tax code, pension, loan and allowance answers, on this device',
+    duration:
+      'Until site data is cleared or overwritten. Snapshots older than 30 days are not restored; this is not scheduled deletion',
+  },
+  {
+    name: 'director-guide-storage',
+    type: 'localStorage (calculator inputs)',
+    purpose:
+      'Automatically remembers Director company/personal inputs and the selected strategy on this device',
+    duration:
+      'Until site data is cleared or overwritten. Snapshots older than 7 days or from another tax year are not restored; this is not scheduled deletion',
+  },
+  {
+    name: 'taxTrapAlertDismissed',
+    type: 'localStorage (interface preference)',
+    purpose: 'Remembers dismissal of the pension alert',
+    duration: 'Until site data is cleared',
+  },
+  {
+    name: 'pwa-install-banner-dismissed-at',
+    type: 'localStorage (interface preference)',
+    purpose: 'Suppresses the install prompt for 7 days after dismissal',
+    duration: 'Until site data is cleared or overwritten; the dismissal is used for 7 days',
+  },
+  {
+    name: 'director-guide-education-collapsed:v1',
+    type: 'localStorage (interface preference)',
+    purpose: 'Remembers whether the Director Learn panel is collapsed',
+    duration: 'Until site data is cleared or overwritten',
+  },
   {
     name: '_ga',
     type: 'Cookie (Google Analytics)',
