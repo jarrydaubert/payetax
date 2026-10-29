@@ -608,9 +608,10 @@ export function BasicInputs() {
         <p className='mb-3 text-muted-foreground text-xs' id={`${pensionId}-method`}>
           Enter your pension contribution even if your scheme uses net pay or relief at source. The
           calculator models all contributions as salary sacrifice, reducing the pay used for Income
-          Tax, National Insurance and any Student Loan repayments. Other pension methods are not
-          modelled, so estimated take-home may be too high. Changing between % and £ resets the
-          contribution to 0; enter it again. £ amounts are for your selected pay period.
+          Tax, employee National Insurance and any Student Loan repayments. Employer NI savings are
+          not modelled: employer NI is still calculated on gross employment pay. Other pension
+          methods are not modelled, so estimated take-home may be too high. Changing between % and £
+          resets the contribution to 0; enter it again. £ amounts are for your selected pay period.
         </p>
         <IncomeSourceList />
       </div>
