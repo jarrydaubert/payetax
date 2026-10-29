@@ -117,6 +117,10 @@ describe('ResultsSummaryCards Component', () => {
       const note = screen.getByTestId('pension-method-result-note');
       expect(note).toHaveTextContent(/Pension is modelled as salary sacrifice/);
       expect(note).toHaveTextContent(/Net pay and relief-at-source arrangements are not/);
+      expect(
+        note.compareDocumentPosition(screen.getByTestId('mobile-take-home')) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).not.toBe(0);
     });
 
     it('does not show a pension note when no pension is entered', () => {
