@@ -144,7 +144,8 @@ export const INPUT_TOOLTIPS = {
 
   directorExpenses: {
     title: 'Business Expenses',
-    description: 'Business costs excluding the director salary and employer NI modelled in the comparison',
+    description:
+      'Business costs excluding the director salary and employer NI modelled in the comparison',
     note: 'Include overheads, contractors, software, rent, and other costs',
   },
 
