@@ -134,11 +134,13 @@ describe('BasicInputs Component', () => {
 
     it('should render pension combined type + amount', () => {
       render(<BasicInputs />);
-      expect(screen.getByText('Pension (salary sacrifice)')).toBeInTheDocument();
+      expect(screen.getByText('Pension (modelled as salary sacrifice)')).toBeInTheDocument();
       expect(
-        screen.getByText(/Only enter pension contributions made through salary sacrifice/),
+        screen.getByText(/Enter your pension contribution even if your scheme uses net pay/),
       ).toBeInTheDocument();
-      expect(screen.getByText(/Net pay and relief at source/)).toBeInTheDocument();
+      expect(screen.getByText(/Other pension methods/)).toBeInTheDocument();
+      expect(screen.getByText(/Student Loan repayments/)).toBeInTheDocument();
+      expect(screen.queryByText(/Only enter pension contributions/)).not.toBeInTheDocument();
     });
 
     it('should NOT render hours per week field (removed)', () => {
