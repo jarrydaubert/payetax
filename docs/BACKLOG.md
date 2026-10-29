@@ -26,52 +26,19 @@ sources, not in backlog prose.
   Follow the [dated implementation requirements](reports/budget-2026-future-year-requirements-2026-10-28.md);
   the Budget content PR changes no calculations and enables no tax year.
 
-Current correctness sequence:
+Current correctness and architecture sequence (ahead of further layout work):
 
-1. Explicit pension-method handling.
-2. Transparent calculation results.
-3. Independent fixture/test-portfolio completion and Foundation reconciliation.
+1. **Explicit pension-method handling.** First, label input and result assumptions as salary sacrifice only; do not change calculations in this disclosure slice. Then implement net pay with independent statutory fixtures. Relief at source needs a separate gross-versus-net contribution decision and explicit higher-rate-relief, adjusted-net-income and tax-trap treatment before implementation.
+2. **Transparent calculation results.** Expose selected policy, pay bases, pension method and individual deductions from their existing owners rather than re-deriving them in consumers.
+3. **Independent fixture/test-portfolio completion and Foundation reconciliation.** Finish the independent coverage and reduce architectural ownership debt in focused, verified slices, not a broad refactor.
 
-Verified Director Intelligence correctness exceptions (see [Urgent correctness exceptions](#urgent-correctness-exceptions)) may be taken as small independent slices between these items; they do not reorder them.
+Verified Director Intelligence correctness exceptions (see [Urgent correctness exceptions](#urgent-correctness-exceptions)) may interleave these milestones. DI-26's revenue/profit instruction correction is a small, independently verifiable early fix; DI-07's wrong deadlines and invalid dates retain their narrow urgent scope. Reproduced wrong-money, blocked-input, security and privacy issues take precedence under the Working Rules. MC-04 was delivered by [#143](https://github.com/jarrydaubert/payetax/pull/143); remaining MC-05/06/07 experience work follows core correctness and architecture, with existing regression contracts preserved.
 
-Current merged baseline is `1de37c35`: [#139](https://github.com/jarrydaubert/payetax/pull/139) delivered the interim DI-05 email safeguard and personal-reserve parity correction after #136/#127/#137. The [safeguard](reports/di05-interim-email-safeguard-2026-10-27.md) and [email audit](reports/di05-email-content-and-active-export-assessment-2026-10-27.md) preserve its evidence; the [earlier reconciliation](reports/project-documentation-reconciliation-2026-10-27.md) records the calculator/privacy contracts. The last independently recorded production baseline remains `44d8d02`; merging is not proof of deployment. Full DI-05 remains open. #128 was closed unmerged on 28 October 2026 and remains historical reference only.
+[#139](https://github.com/jarrydaubert/payetax/pull/139) delivered the interim DI-05 email safeguard and personal-reserve parity correction after #136/#127/#137; its historical merge ref was `1de37c35`, not the current `main`. The [safeguard](reports/di05-interim-email-safeguard-2026-10-27.md) and [email audit](reports/di05-email-content-and-active-export-assessment-2026-10-27.md) preserve its evidence; the [earlier reconciliation](reports/project-documentation-reconciliation-2026-10-27.md) records the calculator/privacy contracts. The last independently recorded production baseline remains `44d8d02`; merging is not proof of deployment. Full DI-05 remains open. #128 was closed unmerged on 28 October 2026 and remains historical reference only.
 
-**Delivery priority decision — 29 October 2026:** favour architecture, statutory accuracy and
-reproduced user-facing defects over a layout-led release. The Foundation milestones below
-remain the architectural plan; urgent correctness, security, privacy or blocked-input issues
-may interleave them as independently reviewed small slices. Priority does not imply that
-every older P1 must ship first or authorise a speculative rewrite.
+The [22 October decisions](reports/calculator-backlog-reconciliation-2026-10-22.md) and [#140](https://github.com/jarrydaubert/payetax/pull/140) preserve the #128 supersession decision and mobile acceptance contracts. MC-04 shipped in [#143](https://github.com/jarrydaubert/payetax/pull/143); the remaining MC-05 payslip/Edit/two-period comparison and MC-06/07 presentation follow the correctness/architecture sequence above. Any eventual mobile slice must preserve #135's five desktop cards, #136's five-default/seven-available periods, #127's input/result integrity, #134/MC-09's pension suggestion application and tests, #137's consent/telemetry protections and #139's Director email safeguard. The proposed homepage/hero change remains subject to the [pre-deployment search gate](#search-and-discoverability), and production outcomes require separate post-release evidence. Full DI-05 retains its later Director position and DI-02/04 dependencies; the whole Director queue is not a prerequisite for mobile improvements.
 
-1. **First slice: explicit pension-method semantics.** Decide how salary sacrifice, net pay
-   and relief at source are represented, calculate or explicitly constrain supported methods,
-   and show the method/assumption at input and result. Verify statutory bases and rounding
-   independently; preserve the existing policy and pay-basis owners.
-2. **Next verified defects: DI-07, then DI-26.** Fix incorrect company deadline arithmetic
-   and invalid dates, then the revenue-versus-profit wording that can double-count expenses.
-   Continue the existing Director order (DI-23/06/27, company-budget then personal-tax
-   slices) subject to each item's dependencies. Escalate any newly reproduced wrong-money,
-   statutory-rate, security/privacy or blocked-valid-input problem immediately.
-3. **Foundation architecture and explainability.** Follow pension semantics with transparent
-   selected policy, pay bases, method and deduction results; independently sourced year and
-   boundary fixtures; and focused ownership work reducing duplicate tax maths, direct
-   imports, unowned rounding and hardcoded-year update drift. Do not start a generic
-   refactoring programme; urgent Director fixes may interleave these milestones.
-4. **Functional failures before visual polish.** Investigate lost Calculate taps, WebKit
-   pointer events and input-commit errors in the existing Verification owner. Address a
-   reproducible blocked calculation or wrong result ahead of layout; no blanket retries.
-5. **Mobile experience after correctness.** MC-04's submitted-pay-period behaviour,
-   MC-05's mobile payslip/Edit/comparison, and MC-06/07 remain accepted work, not the next
-   implementation PR. Retain #135's five desktop cards, #136's period defaults, #127's
-   state integrity, #134's pension behaviour, and #137/#139 safeguards. #128 remains
-   closed historical reference, not a broad redesign/rebase plan.
-6. **Conditional release gates.** Verify production separately from merged GitHub state.
-   The homepage/hero change needs its pre-deployment search evidence. Do not enable
-   2027/28 calculations until enacted rules, regional policy and independent fixtures
-   are verified in their own authorised PR.
-
-This is an **ordering decision only**. Existing owners, priorities, dependencies, DoDs,
-evidence limitations and parked product ideas remain unchanged; no implementation,
-deployment or completion claim follows from this document.
+Supporting-page severity and the privacy priorities below identify risk and ownership, not a new delivery queue. They do not reorder the correctness/Foundation milestones or Director dependencies. Escalate only on new verified evidence under the existing working rules.
 
 Each implementation slice carries its own relevant regression coverage and independent review by the other model (Claude reviews Codex changes and vice versa), reconciliation against code/evidence, and re-review after material fixes. MC-08 owns only the remaining coverage gaps listed there. Record exact refs and results; do not infer approval from earlier audits. Keep the PRs small, reuse the existing checks and reports, and merge only when separately authorised.
 
@@ -135,6 +102,34 @@ below.
 - If an audit confirms that no work is required, remove the row and cite the audit reference in the related pull request.
 - Keep slices small and independently reviewable.
 - The permanent north star and flow descriptions remain after the burn-down rows have been removed.
+
+### Main calculator input integrity
+
+MC-01, MC-02 and MC-03's integrity scope are merged through #127. They are preserved regression contracts, not unfinished implementation tasks. The [retained acceptance criteria](reports/project-documentation-reconciliation-2026-10-27.md#retained-127-regression-acceptance-criteria) carry the full amount-entry, restoration, explicit-Calculate and stale-action requirements into every mobile payslip replacement PR. Native WebKit pan, physical devices and OS clipboard remain unverified; existing lost pointer/tap defects stay with [Verification](#verification). Future mobile statements must also preserve the MC-03 input-state presentation recorded in the 28 October report linked under MC-05.
+
+- [ ] P3 — Tax-trap alert can reappear from floating-point noise at the exact £100,000 boundary. `calculateOptimalPension` compares unrounded adjusted income with the threshold. After #134's penny round-up, Claude probed every whole-pound total from £1,000 to £60,000 across six pay periods and nine weekly-hour values (3.19 million cases). 447 per-period amounts annualise below the target by about 1e-14. This matters only when salary minus existing pension is an exact £1,000 multiple: after Calculate, the alert could then offer "Add £1,000" although nothing remains to fix. The tax effect is unverified and depends on how the engine rounds the allowance taper. DoD: the optimiser compares adjusted income in pence, or with an explicit sub-penny tolerance. The engine's taper is confirmed to treat the same values consistently. Add a regression for an exact-boundary combination that annualises below target.
+
+### Main calculator experience
+
+Small mobile payslip PRs from current `main` own the remaining scope; #128 is closed unmerged and is reference only. Each slice must retain the merged desktop contract from #135/#136: five summary cards, readable seven-period table when enabled, accessible forward/reverse focus order and intentional What-if scrolling. Current defaults are Yearly, Monthly, Weekly, Daily and Hourly; 4-Weekly and Fortnightly remain available but unchecked. Resizing preserves selections and the current calculation. Historical desktop verification remains in the implementing PRs and dated reports. The earlier #128 direction to remove the desktop cards and introduce a separate homepage comparison mode was superseded; #135's five desktop cards remain the agreed design. Do not blindly restore deleted files where equivalent functionality and meaningful regression coverage genuinely replace them.
+
+- [ ] **MC-05 · P2 · Remaining redesign acceptance — Mobile payslip, mobile focus and fifth-card wording.** #135 delivered the desktop layout/navigation slice; [#143](https://github.com/jarrydaubert/payetax/pull/143) delivered MC-04's submitted-pay-period rule on the existing mobile take-home card. Preserve that rule (monthly, four-weekly, fortnightly, weekly, daily and hourly inputs open in their submitted periods; annual input opens Monthly with annual context; switching views does not recalculate; resize preserves state) in the new statement and comparison. The following work remains open.
+
+  **Mobile payslip DoD:** The readable mobile payslip, direct Edit action and complete two-period comparison work at 393×852, 852×393 and 320px width. Details remain reachable and native copying works. Verify keyboard navigation, semantic headers, focus, reduced motion and light/dark contrast in Chromium and WebKit, including large amounts, active optional inputs and errors. Preserve the [MC-03 input-state presentation](reports/mc03-input-state-presentation-2026-10-28.md): first use/Reset have no results or result actions; edits request Calculate again; invalid submissions identify fields and allow correction without losing values or trapping focus. Its current/stale distinction applies to every card, table, statement and comparison, alongside #127's integrity contracts.
+
+  **Fifth-card wording DoD:** Correct the visible "Marginal Tax Rate" label and its explanation so the fifth card clearly describes the rounded next-£100 payroll estimate, including tax, NI and applicable student loans, rather than a statutory marginal rate. Retain all five cards and their financial values; this wording correction is not delivered by #135.
+
+  **Replacement-slice preservation:** Retain #135's five cards, accessible forward/reverse desktop focus order and intentional What-if scrolling, alongside the current requirement for five selected default periods, seven available periods and all seven normal-table columns fitting on desktop when enabled. Re-verify that retained behaviour after each affected slice at the desktop acceptance widths, breakpoint neighbours and 200% zoom, with readable figures/pence, reduced motion and light/dark themes. This is a regression obligation for those later changes, not an outstanding desktop layout implementation.
+
+  **Separate mobile keyboard follow-up (PR #135):** At 393×852 on `c8f21f77`, the delayed Calculate scroll leaves focus on Calculate at roughly 19px, behind the 64px fixed header. Reproduced in Chromium and WebKit with reduced motion; the desktop navigation correction preserves this existing mobile behaviour. Coordinate the mobile scroll and focus destination, then verify forward/reverse keyboard navigation and header clearance in both engines. This remains open independently of the desktop fix.
+
+- [ ] **MC-06 · P2 · Follow-up — Make deduction and rounding presentation auditable.** Claude found unsigned deductions, no deduction total and period statements that differ by a penny when rounded displayed rows are added.
+
+  **DoD:** Users can identify gross pay, each employee deduction, total deductions, any non-taxable addition and take-home consistently across statement/comparison. Deduction signs and zero-row visibility follow one documented convention, including zero pension versus zero allowance. Employer NI is visibly separate from employee deductions; tax-band rows describe income taxed in a band. A reproduced reconciliation for each of the seven periods, including pension/loans/allowance cases, either balances at displayed precision or has a nearby, accurate explanation of the rounding difference and its size. Preserve engine-owned period figures; do not adjust statutory results merely to balance a display. Any discovered calculation defect becomes a correctness slice with independent expectations. This does not duplicate Foundation rounding ownership or the existing marginal-rate chart/optimizer tasks.
+
+- [ ] **MC-07 · P2 · Polish — Use consistent labels and readable input proportions.** The reference #128 implementation exposes `fourWeekly` in the mobile setup summary, calls paired comparison "all 7", varies Gross/Net/Take-home labels and wraps common field labels in the narrow input rail; retain the criteria below for the replacement slices.
+
+  **DoD:** Setup summaries use human-readable names for every period; comparison headings describe the periods actually shown while making all seven discoverable. The same financial concepts use consistent wording across summary, statement and comparison. Common labels such as Tax code and Student loan remain readable with their controls at supported widths, zoom and expanded-error states, without squeezing financial figures. Essential inputs remain easy to edit; active optional adjustments, rejected text, named pension units and salary-sacrifice assumptions stay visible or clearly signposted. Keyboard and screen-reader names agree with visible labels. Typography changes are optional and judged by readability, not a separate font redesign.
 
 ### Tax correctness and product semantics
 
@@ -216,16 +211,14 @@ DI-01, the minimal part of DI-02, #127's prerequisite input fixes and #139's int
 email guard have landed. Preserve their contracts in the [main-based mobile slices](#active).
 Remaining Director order, with one small PR per item unless stated otherwise:
 
-1. DI-07, then DI-26, DI-23, DI-06 and DI-27.
+1. DI-26's input-instruction correction may ship first as a separate copy-only slice; then DI-07, DI-23, DI-06 and DI-27. DI-26 does not expand the engine input contract.
 2. Company budget: DI-19, then DI-21.
 3. Personal tax: DI-08 with DI-24, then DI-20, then DI-25. DI-08, DI-20, DI-24 and DI-25 share
    `strategyComparison.ts` income attribution; the DI-08/DI-24 PR settles the shared helper's
    design.
 4. DI-04, the rest of DI-02, full DI-05, then DI-03.
 
-The Foundation milestone order remains pension-method handling → transparent results →
-independent fixtures and reconciliation. Urgent Director fixes may interleave that order,
-but their retained dependencies and existing owners still apply.
+The Foundation sequence above is the single architectural priority list. Urgent Director fixes may interleave it, but the dependencies and owners in this section still apply.
 
 - [ ] **DI-02 · P1 — Expose validation and updating state (remaining scope).** Invalid/incomplete inputs clear results (DI-01); #139 additionally gates email against the successful calculation's input values and protects open dialogs. Still open: previous results can look current during the debounce; `error` and `isCalculating` are not surfaced; multi-field errors lack a summary; and display/email/save do not yet share the full validated scenario snapshot. On an untouched form, #139's expanded sidebar misleadingly says email is "paused"; distinguish first use from updating.
 
@@ -340,15 +333,9 @@ but their retained dependencies and existing owners still apply.
   **DoD:** Either the route is removed and its useful assertions are re-pointed at the rendered strategy path, or it is corrected so dividends cannot be negative and its relationship to the rendered path is documented. Aligns with the Foundation principle of one supported route to each statutory calculation; no new calculator is introduced.
 
 
-### Main calculator input integrity
-
-MC-01, MC-02 and MC-03's integrity scope are merged through #127. They are preserved regression contracts, not unfinished implementation tasks. The [retained acceptance criteria](reports/project-documentation-reconciliation-2026-10-27.md#retained-127-regression-acceptance-criteria) carry the full amount-entry, restoration, explicit-Calculate and stale-action requirements into every mobile payslip replacement PR. Native WebKit pan, physical devices and OS clipboard remain unverified; existing lost pointer/tap defects stay with [Verification](#verification). Future mobile statements must also preserve the MC-03 input-state presentation recorded in the 28 October report linked under MC-05.
-
-- [ ] P3 — Tax-trap alert can reappear from floating-point noise at the exact £100,000 boundary. `calculateOptimalPension` compares unrounded adjusted income with the threshold. After #134's penny round-up, Claude probed every whole-pound total from £1,000 to £60,000 across six pay periods and nine weekly-hour values (3.19 million cases). 447 per-period amounts annualise below the target by about 1e-14. This matters only when salary minus existing pension is an exact £1,000 multiple: after Calculate, the alert could then offer "Add £1,000" although nothing remains to fix. The tax effect is unverified and depends on how the engine rounds the allowance taper. DoD: the optimiser compares adjusted income in pence, or with an explicit sub-penny tolerance. The engine's taper is confirmed to treat the same values consistently. Add a regression for an exact-boundary combination that annualises below target.
-
 ### Privacy follow-ups
 
-Single owners for the unresolved parts of the [supporting-pages audit](reports/payetax-supporting-pages-audit-2026-10-27.md) and #137 review. P2 means a substantive follow-up and P3 a lower-risk verification/hygiene item; neither moves ahead of the agreed mobile-payslip/correctness sequence automatically. #139's interim guard is delivered; full DI-05 keeps its later Director position. #137 already stopped the reported financial telemetry, corrected storage/IP disclosures and added the PAYE email notice; do not reopen those as unimplemented tasks. The [dated disposition map](reports/project-documentation-reconciliation-2026-10-27.md#supporting-pages-dispositions) distinguishes partial closure from residual work.
+Single owners for the unresolved parts of the [supporting-pages audit](reports/payetax-supporting-pages-audit-2026-10-27.md) and #137 review. P2 means a substantive follow-up and P3 a lower-risk verification/hygiene item; neither displaces the current correctness/Foundation order automatically, absent a verified higher-priority privacy or security risk. #139's interim guard is delivered; full DI-05 keeps its later Director position. #137 already stopped the reported financial telemetry, corrected storage/IP disclosures and added the PAYE email notice; do not reopen those as unimplemented tasks. The [dated disposition map](reports/project-documentation-reconciliation-2026-10-27.md#supporting-pages-dispositions) distinguishes partial closure from residual work.
 
 - [ ] **P2 — Remember figures only with explicit opt-in, off by default (PAYE and Director).** Owner: Privacy follow-ups (audit finding P3; remembering/erasure scope of DI-18). Add a clear-data action that clears current figures/results and persisted snapshots without clearing analytics preferences. Existing saved data is not evidence of opt-in: provide an explicit migration/restore-or-clear choice and prevent unchosen data from being silently reused or saved again. Cross-tab opt-out/erasure must clear stale in-memory state so another tab cannot recreate erased figures. Cover reloads, expiry/year rollover, blocked storage, existing snapshots and concurrent tabs. Preserve #127's input-integrity guarantees. DI-18's wider explanation/design proposal remains parked and must not duplicate this owner.
 - [ ] **P2 — Privacy controls on Director (D1).** Owner: Privacy follow-ups; coordinate with DI-12/13 without making this a duplicate accessibility redesign. Provide accessible Privacy, Cookie Settings and Compliance entry points and mount the existing consent UI on the full-screen route, including direct-entry visits. Preserve the established consent lifecycle and test withdrawal on desktop/mobile and across tabs. #137 did not close this access gap.
@@ -394,34 +381,6 @@ Privacy link/table accessibility (P8) stays with [Verification](#verification); 
 
 - [ ] **P2 — Documented modelling assumptions and limitations (month-1 projection, NI year model and pension method).** Owner: Verification, coordinated with Foundation transparent results; supporting audit A2/T2 and Compliance limits. Non-cumulative tax-code limitations are visible, but About/Tools promises must lead to a real methodology/limits section. DoD: explain the steady-pay Month 1 PAYE projection, supported years, NI basis, salary-sacrifice assumption and excluded cases using the actual engine and Tools coverage table; provide sources and reachable fixture/proof links. Publish the same limitations near relevant results and keep linked page claims consistent. A visual rebuild is not a prerequisite and this does not complete the remaining Foundation result contract.
 
-### Main calculator experience
-
-Small mobile payslip PRs from current `main` own the remaining scope; #128 is closed unmerged and is reference only. Each slice must retain the merged desktop contract from #135/#136: five summary cards, readable seven-period table when enabled, accessible forward/reverse focus order and intentional What-if scrolling. Current defaults are Yearly, Monthly, Weekly, Daily and Hourly; 4-Weekly and Fortnightly remain available but unchecked. Resizing preserves selections and the current calculation. Historical desktop verification remains in the implementing PRs and dated reports. The earlier #128 direction to remove the desktop cards and introduce a separate homepage comparison mode was superseded; #135's five desktop cards remain the agreed design. Do not blindly restore deleted files where equivalent functionality and meaningful regression coverage genuinely replace them.
-
-- [ ] **MC-04 · P2 · Mobile payslip acceptance — Lead with the user's pay period.** The reference #128 implementation always starts Monthly (Claude S1); replacement slices must meet this contract.
-
-  **DoD:** On successful Calculate, the statement starts in the submitted input period for monthly, four-weekly, fortnightly, weekly, daily and hourly pay; annual input defaults to Monthly with annual context. A subsequent Calculate applies that rule to the newly submitted input. Users can inspect other periods without recalculation, and resizing preserves the current calculation and selected presentation. Tests cover all seven input periods, a changed input period and display-only switching, using engine-owned period values.
-
-  **Focused slice:** The [28 October MC-04 report](reports/mc04-submitted-pay-period-2026-10-28.md) records this rule on the existing mobile take-home card, preserving the desktop cards and table defaults. The complete statement and two-period comparison remain MC-05 dependencies; apply the same rule when those components are implemented. Keep this row open until the slice is reviewed and merged.
-
-- [ ] **MC-05 · P2 · Remaining redesign acceptance — Mobile payslip, mobile focus and fifth-card wording.** #135 delivered the desktop layout/navigation slice; the following work remains open.
-
-  **Mobile payslip DoD:** The readable mobile payslip, direct Edit action and complete two-period comparison work at 393×852, 852×393 and 320px width. Details remain reachable and native copying works. Verify keyboard navigation, semantic headers, focus, reduced motion and light/dark contrast in Chromium and WebKit, including large amounts, active optional inputs and errors. Preserve the [MC-03 input-state presentation](reports/mc03-input-state-presentation-2026-10-28.md): first use/Reset have no results or result actions; edits request Calculate again; invalid submissions identify fields and allow correction without losing values or trapping focus. Its current/stale distinction applies to every card, table, statement and comparison, alongside #127's integrity contracts.
-
-  **Fifth-card wording DoD:** Correct the visible "Marginal Tax Rate" label and its explanation so the fifth card clearly describes the rounded next-£100 payroll estimate, including tax, NI and applicable student loans, rather than a statutory marginal rate. Retain all five cards and their financial values; this wording correction is not delivered by #135.
-
-  **Replacement-slice preservation:** Retain #135's five cards, accessible forward/reverse desktop focus order and intentional What-if scrolling, alongside the current requirement for five selected default periods, seven available periods and all seven normal-table columns fitting on desktop when enabled. Re-verify that retained behaviour after each affected slice at the desktop acceptance widths, breakpoint neighbours and 200% zoom, with readable figures/pence, reduced motion and light/dark themes. This is a regression obligation for those later changes, not an outstanding desktop layout implementation.
-
-  **Separate mobile keyboard follow-up (PR #135):** At 393×852 on `c8f21f77`, the delayed Calculate scroll leaves focus on Calculate at roughly 19px, behind the 64px fixed header. Reproduced in Chromium and WebKit with reduced motion; the desktop navigation correction preserves this existing mobile behaviour. Coordinate the mobile scroll and focus destination, then verify forward/reverse keyboard navigation and header clearance in both engines. This remains open independently of the desktop fix.
-
-- [ ] **MC-06 · P2 · Follow-up — Make deduction and rounding presentation auditable.** Claude found unsigned deductions, no deduction total and period statements that differ by a penny when rounded displayed rows are added.
-
-  **DoD:** Users can identify gross pay, each employee deduction, total deductions, any non-taxable addition and take-home consistently across statement/comparison. Deduction signs and zero-row visibility follow one documented convention, including zero pension versus zero allowance. Employer NI is visibly separate from employee deductions; tax-band rows describe income taxed in a band. A reproduced reconciliation for each of the seven periods, including pension/loans/allowance cases, either balances at displayed precision or has a nearby, accurate explanation of the rounding difference and its size. Preserve engine-owned period figures; do not adjust statutory results merely to balance a display. Any discovered calculation defect becomes a correctness slice with independent expectations. This does not duplicate Foundation rounding ownership or the existing marginal-rate chart/optimizer tasks.
-
-- [ ] **MC-07 · P2 · Polish — Use consistent labels and readable input proportions.** The reference #128 implementation exposes `fourWeekly` in the mobile setup summary, calls paired comparison "all 7", varies Gross/Net/Take-home labels and wraps common field labels in the narrow input rail; retain the criteria below for the replacement slices.
-
-  **DoD:** Setup summaries use human-readable names for every period; comparison headings describe the periods actually shown while making all seven discoverable. The same financial concepts use consistent wording across summary, statement and comparison. Common labels such as Tax code and Student loan remain readable with their controls at supported widths, zoom and expanded-error states, without squeezing financial figures. Essential inputs remain easy to edit; active optional adjustments, rejected text, named pension units and salary-sacrifice assumptions stay visible or clearly signposted. Keyboard and screen-reader names agree with visible labels. Typography changes are optional and judged by readability, not a separate font redesign.
-
 ### Trust and sourcing
 
 These extend existing owners rather than creating a second supporting-pages queue. Audit severities remain in the unchanged [dated report](reports/payetax-supporting-pages-audit-2026-10-27.md); P2/P3 below do not override [Active](#active).
@@ -450,7 +409,7 @@ These extend existing owners rather than creating a second supporting-pages queu
 - [ ] **P3 — TaxInsights editorial voice: one-article-at-a-time refresh after the high-priority queue.**
   Owner: Content accuracy / editorial quality. The new [blog voice and workflow](blog/README.md)
   govern all **future** posts immediately, but they do not authorise mass rewrites of the existing
-  33 articles. When correctness, privacy, mobile-payslip and verified Director risks allow, inventory
+  33 articles. When correctness, privacy, functional reliability and verified Director risks allow, inventory
   retained articles by reader value, accuracy/staleness, search evidence and voice; classify each
   `keep`, `refresh`, `rewrite`, `merge` or `retire`. Pilot the new voice on a few low-risk articles
   (the beginner's guide, Making Tax Digital, and a separately justified pay-rise problem-solver are
