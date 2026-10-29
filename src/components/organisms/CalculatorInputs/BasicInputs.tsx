@@ -520,7 +520,7 @@ export function BasicInputs() {
       </div>
 
       {/* Pension - Combined Type + Amount on 1 row */}
-      <div className={fieldRowClass}>
+      <div className='flex flex-col items-start gap-2'>
         <div className={fieldLabelClass}>
           <LabelTooltip fieldName='pensionContribution' />
           <Label htmlFor={pensionId} className='text-sm leading-tight'>
