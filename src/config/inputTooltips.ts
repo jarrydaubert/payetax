@@ -156,7 +156,8 @@ export const INPUT_TOOLTIPS = {
 
   directorMonthlyExpenses: {
     title: 'Monthly Business Expenses',
-    description: 'Typical monthly company costs excluding the director salary and employer NI modelled in the comparison',
+    description:
+      'Typical monthly company costs excluding the director salary and employer NI modelled in the comparison',
     note: 'Used with runway and cash buffer logic to estimate a safe monthly draw',
   },
 
