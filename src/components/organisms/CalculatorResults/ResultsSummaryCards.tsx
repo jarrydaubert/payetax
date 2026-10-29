@@ -50,8 +50,8 @@ export function ResultsSummaryCards({
         >
           Pension is modelled as salary sacrifice in these results. This reduces the pay used for
           Income Tax, National Insurance and any Student Loan repayments. Net pay and
-          relief-at-source arrangements are not modelled, so estimated take-home may be too high
-          if your pension uses either method.
+          relief-at-source arrangements are not modelled, so estimated take-home may be too high if
+          your pension uses either method.
         </p>
       )}
       <MobileTakeHomeCard results={results} submittedPeriod={input?.payPeriod ?? 'annually'} />
