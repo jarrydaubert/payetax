@@ -462,7 +462,7 @@ export function DirectorDashboard() {
                       },
                       {
                         title: '2. Expenses and region',
-                        copy: 'Enter expenses excluding the director salary being compared and select your tax region.',
+                        copy: 'Exclude director salary and employer NI modelled in the comparison from expenses, then select your tax region.',
                       },
                       {
                         title: '3. Compare outcomes',
