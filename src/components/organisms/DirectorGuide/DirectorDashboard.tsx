@@ -448,8 +448,8 @@ export function DirectorDashboard() {
                     Enter your numbers to compare director pay options
                   </h2>
                   <p className='mx-auto max-w-2xl text-muted-foreground text-sm leading-7 sm:text-base'>
-                    Enter annual revenue and business expenses, or monthly contract income and costs,
-                    plus your tax region. Enter revenue before expenses, not profit: the
+                    Enter annual revenue and business expenses, or monthly contract income and
+                    costs, plus your tax region. Enter revenue before expenses, not profit: the
                     calculator subtracts costs to estimate profit before the director salary being
                     compared.
                   </p>
