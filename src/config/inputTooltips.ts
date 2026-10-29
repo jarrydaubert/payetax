@@ -69,9 +69,9 @@ export const INPUT_TOOLTIPS = {
 
   // Pension Inputs
   pensionContribution: {
-    title: 'Pension Contribution',
-    description: 'Your voluntary pension contributions',
-    note: 'Salary sacrifice can reduce taxable income and National Insurance',
+    title: 'Pension (Modelled as Salary Sacrifice)',
+    description: 'Enter your pension contribution even if you use net pay or relief at source.',
+    note: 'The estimate uses salary sacrifice, reducing pay for Income Tax, employee National Insurance and any Student Loan repayments. Employer NI savings are not modelled: employer NI is still calculated on gross employment pay. Other pension methods may produce lower take-home than shown.',
   },
 
   pensionType: {

@@ -106,8 +106,8 @@ describe('BasicInputs - Regression Tests', () => {
     it('should render pension contribution section (verifies width fix is in place)', () => {
       render(<BasicInputs />);
 
-      // Component renders with Pension label
-      expect(screen.getByText('Pension')).toBeInTheDocument();
+      // The section retains its accessible pension label and amount input after the method disclosure.
+      expect(screen.getByText('Pension (modelled as salary sacrifice)')).toBeInTheDocument();
 
       // Input field exists (width fix prevents truncation)
       const pensionInput = screen.getByPlaceholderText('5.00');

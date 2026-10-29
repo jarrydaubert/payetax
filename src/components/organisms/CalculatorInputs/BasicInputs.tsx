@@ -520,11 +520,11 @@ export function BasicInputs() {
       </div>
 
       {/* Pension - Combined Type + Amount on 1 row */}
-      <div className={fieldRowClass}>
+      <div className='flex flex-col items-start gap-2'>
         <div className={fieldLabelClass}>
           <LabelTooltip fieldName='pensionContribution' />
-          <Label htmlFor={pensionId} className={cn('whitespace-nowrap', 'text-sm')}>
-            Pension
+          <Label htmlFor={pensionId} className='text-sm leading-tight'>
+            Pension (modelled as salary sacrifice)
           </Label>
         </div>
         <div
@@ -606,8 +606,12 @@ export function BasicInputs() {
 
       <div className='xl:col-span-3'>
         <p className='mb-3 text-muted-foreground text-xs' id={`${pensionId}-method`}>
-          Modelled as salary sacrifice. Changing between % and £ resets the contribution to 0; enter
-          your contribution again. Amounts in £ are for your selected pay period.
+          Enter your pension contribution even if your scheme uses net pay or relief at source. The
+          calculator models all contributions as salary sacrifice, reducing the pay used for Income
+          Tax, employee National Insurance and any Student Loan repayments. Employer NI savings are
+          not modelled: employer NI is still calculated on gross employment pay. Other pension
+          methods are not modelled, so estimated take-home may be too high. Changing between % and £
+          resets the contribution to 0; enter it again. £ amounts are for your selected pay period.
         </p>
         <IncomeSourceList />
       </div>
