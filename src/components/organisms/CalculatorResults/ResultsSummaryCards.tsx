@@ -49,8 +49,9 @@ export function ResultsSummaryCards({
           data-testid='pension-method-result-note'
         >
           Pension is modelled as salary sacrifice in these results. This reduces the pay used for
-          Income Tax and National Insurance. Net pay and relief-at-source arrangements are not
-          supported, so take-home may differ if your pension uses either method.
+          Income Tax, National Insurance and any Student Loan repayments. Net pay and
+          relief-at-source arrangements are not modelled, so estimated take-home may be too high
+          if your pension uses either method.
         </p>
       )}
       <MobileTakeHomeCard results={results} submittedPeriod={input?.payPeriod ?? 'annually'} />
