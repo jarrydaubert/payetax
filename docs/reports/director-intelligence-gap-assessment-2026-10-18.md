@@ -27,15 +27,18 @@ Read `AGENTS.md`, `docs/README.md`, `docs/PROJECT_STATE.md`, `docs/BACKLOG.md`,
 below. The starter's clone and branch-switch procedure was deliberately replaced with an
 isolated worktree of the same Git repository. The other agent's checkout was left on `main`.
 
-Inspected the public route and the isolated local production build in Chrome. The public and
-local empty states both show Annual Revenue and Business Expenses beside instructions to
-enter company profit and costs. Local interactions used invented £100,000 revenue, £20,000
-expenses, rUK, then £20,000 YTD salary and £5,000 YTD dividends. No real records, identifiers,
-email submission, deployment credentials or production settings were used.
+The original 18 October reviewer reported inspecting the public route and an isolated local
+production build in Chrome. They reported Annual Revenue and Business Expenses beside
+instructions to enter company profit and costs, using synthetic £100,000 revenue, £20,000
+expenses, rUK, £20,000 YTD salary and £5,000 YTD dividends. They reported using no real
+records, identifiers, email submission, deployment credentials or production settings.
 
-Browser inspection establishes these sampled states, not deployment parity, full accessibility
-compliance or statutory correctness for the whole tool. Source reproduction and passing tests
-do not make the production engine an independent tax oracle.
+These **historical browser observations are maintainer-reported, not independently inspectable
+screenshot evidence**: the ignored captures and their hashes were not retained with the PR.
+The revenue/profit discrepancy and YTD behaviour also have source-based reproductions in this
+report and in the [19 October Director audit addendum](director-intelligence-audit-addendum-2026-10-19.md)
+(DI-26/DI-27). Those reproducible sources, not unavailable screenshots, support the backlog
+mapping. No deployment parity, accessibility coverage or statutory correctness is certified.
 
 ## Existing capability and residual gap
 
@@ -99,8 +102,9 @@ These establish current behaviour only. Run from this worktree with Bun imports 
 - Compare `{region:'rUK', revenue:100000, expenses:20000, includesVat:false}` with the same
   input plus `{ytdSalary:20000, ytdDividends:5000}` for `2026-2027`. Both annual strategy
   objects are identical, including Baseline Mix salary `12570`; the second result's
-  `availableForExtraction` is `55000`. The local UI showed these YTD fields beside an unchanged
-  annual salary breakdown. This is not evidence that paid salary was lost from storage.
+  `availableForExtraction` is `55000`. The original reviewer also reported a corresponding
+  local UI state, but the capture is not available for independent inspection. The source
+  reproduction does not imply that paid salary was lost from storage.
 - `calculateSafeMonthlyDraw({annualTakeHome:0, monthsRemaining:6, cashInBank:0,
   minimumMonthlyDraw:900, runwayMonths:3, monthlyExpenses:300})` returns `safeMonthlyDraw:900`,
   `taxBasedMonthlyDraw:0`, `cashBasedCeiling:0` and `shortfall:3600`. Existing
@@ -204,13 +208,20 @@ No unallocated-credit entitlement, universal optimum or next-year statutory poli
 | `bun run test:no-coverage --runInBand --testPathPatterns='director\|Director\|strategyComparison\|variableIncome\|employerNI\|employeeNI'` | Passed: 237 suites, 3,938 tests. Jest matches absolute paths; the worktree name contains `director`, so this filter ran all suites rather than a narrow slice. |
 | `bun run build:ci` | Passed; production build/static generation completed with source maps disabled. |
 | Local server: `bun run start --port 3217` | Started after allowing a local listening socket; distinct from the other agent's ports/output directory. No `.env.local` or production secret was copied. |
-| Chrome local route and public empty state | Confirmed the input contradiction; local annual results, Full Inputs/YTD and existing breakdowns inspected. Captured synthetic-data screenshots. Local console warning/error capture returned none during this sample. |
+| Chrome local route and public empty state | **Historical reviewer's report only:** sampled empty state, annual results, Full Inputs/YTD and breakdowns, with no console warnings in that sample. The screenshots and console logs were not preserved in an accessible artifact; do not treat this row as independently verified browser evidence. Source-level DI-26/DI-27 reproductions and the linked audit addendum remain inspectable. |
 | New browser E2E / production email delivery | Not run; this branch changes documentation only. Existing E2E files were read, and no production email was sent. |
 
-Local screenshots are in ignored `audit-outputs/director-intelligence-review/`:
-`public-empty-state.jpg` and `annual-ytd.jpg`. The former shows public instructions beside
-actual labels; the latter shows paid-to-date inputs beside an unchanged annual salary result.
-They are review evidence, not visual-regression baselines or committed source.
+**Unretained historical screenshots:** The original reviewer named `public-empty-state.jpg`
+and `annual-ytd.jpg` under the ignored local path `audit-outputs/director-intelligence-review/`.
+Neither file was committed or attached, and **no original SHA-256 hashes are available**; do
+not imply those files can be inspected, recovered or independently authenticated. The reported
+views were, respectively, instructions beside input labels and YTD fields beside an annual
+salary result. This summary preserves only the historical claim, **not screenshot evidence**.
+The actual independently inspectable evidence for the requirements is the source-level
+reproductions recorded above and the [18 October audit](director-intelligence-audit-2026-10-18.md)
+and [19 October addendum](director-intelligence-audit-addendum-2026-10-19.md). Any new
+implementation PR must collect fresh browser evidence and retain it under the current
+`AGENTS.md` evidence rules.
 
 No workflows, required checks, branch protections, environment contracts, secrets or deployments
 changed. The practical safety net is a source-backed gap map and a narrow next PR, avoiding
