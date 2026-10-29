@@ -69,10 +69,9 @@ export const INPUT_TOOLTIPS = {
 
   // Pension Inputs
   pensionContribution: {
-    title: 'Pension (Salary Sacrifice Only)',
-    description:
-      'Enter contributions made by salary sacrifice, not another workplace pension method.',
-    note: 'The calculation reduces the pay used for Income Tax and National Insurance. Net pay and relief at source are not supported.',
+    title: 'Pension (Modelled as Salary Sacrifice)',
+    description: 'Enter your pension contribution even if you use net pay or relief at source.',
+    note: 'The estimate uses salary sacrifice, reducing pay for Income Tax, National Insurance and any Student Loan repayments. Other pension methods may produce lower take-home than shown.',
   },
 
   pensionType: {
