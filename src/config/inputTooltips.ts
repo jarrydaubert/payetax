@@ -241,9 +241,10 @@ export const INPUT_TOOLTIPS = {
   },
 
   directorPensionDeducted: {
-    title: 'Pension Already Deducted',
-    description: 'Whether your profit figure already includes pension costs',
-    note: 'Check this to avoid deducting the pension twice',
+    title: 'Pension Included in Business Expenses',
+    description:
+      'Select if the employer pension contribution is already included in the Business Expenses or Monthly Business Expenses entered above.',
+    note: 'This prevents the same pension cost being deducted twice',
   },
 
   directorCompanyCar: {
