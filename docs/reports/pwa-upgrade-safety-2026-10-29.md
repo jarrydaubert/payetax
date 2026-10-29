@@ -2,13 +2,21 @@
 
 Date: 29 October 2026. Branch: `fix/pwa-upgrade-safety`.
 Base: `27dd3da9c438e9005e9fcdd4f24389cd7cdfb86e` (`origin/main`, fetched before work).
-Status: local implementation; independent Claude review pending. No merge or deployment authorised.
+Status: historical evidence for `c25ba70e`; superseded by the
+[review corrections and mutation evidence](pwa-upgrade-safety-review-2026-10-29.md).
+The migration test below had a synchronisation false positive: its earlier passing result
+did not prove resistance to the legacy `SKIP_WAITING` message. The follow-up replaces that
+evidence and removes the waiting-update banner. Claude APPROVE is now maintainer-reported;
+the follow-up report records the narrow delayed-activation amendment. No merge or deployment
+is authorised.
 
 ## Scope and delivery order
 
 1. This slice: service-worker routing, offline shell, registration and safe legacy upgrades.
 2. Follow-up PR: stable build identity shared by the document, worker and deployment metadata;
-   distinguish it from the human-facing package version and isolate caches by build.
+   distinguish it from the human-facing package version and cache schema. Future build SHAs
+   must not automatically rename caches; invalidate caches only for an explicit compatibility
+   or cache-policy requirement.
 3. Follow-up PR: uncached live production identity verification, with current/older/unverified
    states, offline and failure behaviour, and stale-session tests. A waiting worker alone is
    not evidence that the open document is the latest production build.
@@ -152,8 +160,8 @@ Browser plugin unavailable; installed Playwright Chromium used.
 
 ## Review focus and remaining limits
 
-- Independent Claude review has not happened. Review cache routing, offline bundle discovery,
-  failure handling and the migration from the pinned legacy scripts before approving this slice.
+- Claude APPROVE for the review corrections is maintainer-reported in the follow-up report.
+  This initial report does not claim separate final-head review or deployment approval.
 - No hosted PR is opened before deployment-safe publication is established: Vercel's Git
   integration normally deploys pushed branches, and this task explicitly prohibits deployment.
 - No live production deployment, CDN headers, production freshness or Sentry source-map release

@@ -125,9 +125,23 @@ describe('service worker cache and upgrade safety', () => {
       '/_next/static/offline.js',
       '/_next/static/offline.css',
     ]);
+    expect(h.addAll.mock.calls[1][0].every((r) => r.cache === 'default')).toBe(true);
     expect(h.stores.get('payetax-static-v5.1.4')?.get(`${ORIGIN}/`)).toBeDefined();
     expect(h.caches.delete).not.toHaveBeenCalled();
     expect(h.skipWaiting).not.toHaveBeenCalled();
+  });
+
+  it('refreshes shell documents but reuses immutable assets already in the isolated shell', async () => {
+    const h = workerHarness();
+    h.seed(STATIC, '/_next/static/offline.js', 'immutable script');
+    await h.dispatch('install');
+    expect(h.addAll.mock.calls[0][0].every((r) => r.cache === 'reload')).toBe(true);
+    expect(h.addAll.mock.calls[1][0].map((r) => new URL(r.url).pathname)).toEqual([
+      '/_next/static/offline.css',
+    ]);
+    expect(await h.stores.get(STATIC)?.get(`${ORIGIN}/_next/static/offline.js`)?.text()).toBe(
+      'immutable script',
+    );
   });
 
   it('rejects a failed precache so the working legacy worker is retained', async () => {

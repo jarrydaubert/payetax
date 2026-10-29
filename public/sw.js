@@ -1,5 +1,7 @@
 // Offline support. This namespace isolates the upgrade from v5.1.4's mixed caches.
 // It is a cache schema revision, not proof of the running production build.
+// Future build SHAs must not automatically rename caches; revise the schema only
+// when cache compatibility or invalidation requirements need it.
 const CACHE_NAME = 'payetax-v5.1.4-pwa1';
 const STATIC_CACHE_NAME = 'payetax-static-v5.1.4-pwa1';
 const STATIC_RUNTIME_CACHE_NAME = `${STATIC_CACHE_NAME}-runtime`;
@@ -39,11 +41,13 @@ self.addEventListener('install', (event) => {
           assets.add(match[1].replaceAll('&amp;', '&'));
         }
       }
-      await cache.addAll(
-        [...assets].map(
-          (path) => new Request(new URL(path, self.location.origin), { cache: 'reload' }),
-        ),
-      );
+      const missing = [];
+      for (const path of assets) {
+        // Hashed Next assets are immutable: reuse this shell or the HTTP cache.
+        const request = new Request(new URL(path, self.location.origin));
+        if (!(await cache.match(request))) missing.push(request);
+      }
+      await cache.addAll(missing);
     }),
   );
 });
@@ -108,10 +112,10 @@ self.addEventListener('fetch', (event) => {
   // Everything else uses the browser's normal network behaviour.
 });
 
-async function matchCurrentCaches(request, options) {
+async function matchCurrentCaches(request) {
   for (const name of [CACHE_NAME, STATIC_CACHE_NAME]) {
     const cache = await caches.open(name);
-    const response = await cache.match(request, options);
+    const response = await cache.match(request);
     if (response) return response;
   }
 }

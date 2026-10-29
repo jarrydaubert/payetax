@@ -110,12 +110,12 @@ describe('PWA public assets', () => {
     expect(serviceWorker).not.toContain('showNotification');
   });
 
-  it('keeps service-worker prompts aligned with the light PWA shell', () => {
+  it('keeps connectivity toasts aligned with the light PWA shell', () => {
     const registrationScript = readPublicText('register-sw.js');
 
-    expect(registrationScript).toContain('Update available');
+    expect(registrationScript).toContain('Offline mode');
     expect(registrationScript).toContain('#f8f5ed');
-    expect(registrationScript).toContain('#123a66');
+    expect(registrationScript).toContain('#1f7a4d');
     expect(registrationScript).not.toContain('#1f2937');
     expect(registrationScript).not.toContain('Update Available');
     expect(registrationScript).not.toContain(String.fromCodePoint(0x1f680));
