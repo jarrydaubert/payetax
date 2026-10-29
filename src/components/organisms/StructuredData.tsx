@@ -463,7 +463,7 @@ const HOW_TO_DATA: HowToSchema = {
     {
       '@type': 'HowToStep',
       name: 'Add Pension Contributions',
-      text: 'Enter your pension contributions as either a percentage or fixed amount. Choose between salary sacrifice or relief at source.',
+      text: 'Enter your pension contribution as a percentage or fixed amount, regardless of scheme method. The calculator currently models every contribution as salary sacrifice, not net pay or relief at source.',
     },
     {
       '@type': 'HowToStep',
