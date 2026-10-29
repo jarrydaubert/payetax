@@ -135,7 +135,9 @@ describe('BasicInputs Component', () => {
     it('should render pension combined type + amount', () => {
       render(<BasicInputs />);
       expect(screen.getByText('Pension (salary sacrifice)')).toBeInTheDocument();
-      expect(screen.getByText(/Only enter pension contributions made through salary sacrifice/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Only enter pension contributions made through salary sacrifice/),
+      ).toBeInTheDocument();
       expect(screen.getByText(/Net pay and relief at source/)).toBeInTheDocument();
     });
 

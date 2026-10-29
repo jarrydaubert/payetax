@@ -606,9 +606,10 @@ export function BasicInputs() {
 
       <div className='xl:col-span-3'>
         <p className='mb-3 text-muted-foreground text-xs' id={`${pensionId}-method`}>
-          Only enter pension contributions made through salary sacrifice. Net pay and relief at source
-          are not supported and may give different take-home figures. Changing between % and £
-          resets the contribution to 0; enter it again. £ amounts are for your selected pay period.
+          Only enter pension contributions made through salary sacrifice. Net pay and relief at
+          source are not supported and may give different take-home figures. Changing between % and
+          £ resets the contribution to 0; enter it again. £ amounts are for your selected pay
+          period.
         </p>
         <IncomeSourceList />
       </div>

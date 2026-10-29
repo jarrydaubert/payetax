@@ -109,7 +109,10 @@ export function ResultsSummaryCards({
         </motion.div>
       </motion.section>
       {results.pensionContribution.annually > 0 && (
-        <p className='mt-2 text-muted-foreground text-xs leading-relaxed' data-testid='pension-method-result-note'>
+        <p
+          className='mt-2 text-muted-foreground text-xs leading-relaxed'
+          data-testid='pension-method-result-note'
+        >
           Pension is modelled as salary sacrifice in these results. This reduces the pay used for
           Income Tax and National Insurance. Net pay and relief-at-source arrangements are not
           supported, so take-home may differ if your pension uses either method.
