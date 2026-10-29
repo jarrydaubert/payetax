@@ -28,7 +28,7 @@ sources, not in backlog prose.
 
 Current correctness and architecture sequence (ahead of further layout work):
 
-1. **Explicit pension-method handling.** First, label input and result assumptions as salary sacrifice only; do not change calculations in this disclosure slice. Then implement net pay with independent statutory fixtures. Relief at source needs a separate gross-versus-net contribution decision and explicit higher-rate-relief, adjusted-net-income and tax-trap treatment before implementation.
+1. **Explicit pension-method handling.** #151 supplies the on-screen salary-sacrifice-only disclosure without changing calculations. Next, implement net pay with independent statutory fixtures. Relief at source needs a separate gross-versus-net contribution decision and explicit higher-rate-relief, adjusted-net-income and tax-trap treatment before implementation. Email-results disclosure and the existing FAQ example remain the bounded follow-ups below.
 2. **Transparent calculation results.** Expose selected policy, pay bases, pension method and individual deductions from their existing owners rather than re-deriving them in consumers.
 3. **Independent fixture/test-portfolio completion and Foundation reconciliation.** Finish the independent coverage and reduce architectural ownership debt in focused, verified slices, not a broad refactor.
 
@@ -88,7 +88,7 @@ below.
 
 | Concern | Desired outcome | Current status | Evidence or completion reference |
 | --- | --- | --- | --- |
-| Explicit pension-method handling | Salary-sacrifice, net-pay and relief-at-source are handled explicitly, with the method exposed in the result. | Open | The shared pay-basis owner currently models the pension input as salary sacrifice. |
+| Explicit pension-method handling | Salary-sacrifice, net-pay and relief-at-source are handled explicitly, with the method exposed in the result. | Partial | #151 discloses the existing salary-sacrifice-only assumption in inputs and results. Net pay remains unimplemented; relief at source still needs a product decision and independent fixtures. |
 | A transparent result that clearly exposes the selected policy, calculation basis, relevant pay bases and individual deductions | One result exposes the policy selected, the calculation basis, the relevant pay bases and each individual deduction, without callers reassembling them. | Partial | Tax-code basis is exposed after PRs #111/#112. Selected policy, relevant pay bases and pension method remain incomplete. |
 | Compact independent full-calculation fixture set | A small set of JSON fixtures, derived independently of production code, covers representative full-calculation interactions. | Partial | Representative PAYE and tax-code fixtures now include Month 1 Cvalue/exact-threshold and final-penny cases. Supported-year, wider boundary and per-scenario provenance gaps remain below. Director extraction calculations have no independent fixtures yet; DI-19 introduces the first minimal set. |
 | Balanced test portfolio and updated `TESTING.md` | JSON fixtures, TypeScript rule and boundary tests, and Playwright journeys are balanced, with `TESTING.md` describing the split. | Partial | The three-layer split exists; the final coverage balance and documentation reconciliation remain open. |
@@ -134,7 +134,7 @@ Small mobile payslip PRs from current `main` own the remaining scope; #128 is cl
 ### Tax correctness and product semantics
 
 - [ ] K-code overriding limit base: the 50% cap uses gross-minus-pension including non-employment income the engine also PAYE-taxes monthly. DoD: documented decision on the payment base for mixed-income users, engine behaviour matching it, and mixed-income K-code fixtures.
-- [ ] Pension method semantics: the engine treats every pension input as salary sacrifice (reduces NI). DoD: explicit salary-sacrifice / net-pay / relief-at-source handling, or the assumption disclosed at the input and in results; tests assert whichever is chosen.
+- [ ] Pension-method follow-ups after #151's on-screen disclosure: add the same salary-sacrifice-only assumption, employee-NI qualification and unmodelled employer-NI savings caveat to emailed PAYE results, with tests for pension-present and pension-absent output. Correct the existing FAQ pension example to include the employee-NI saving, using an independently derived example matched to its tax year and pay basis. The former input/results disclosure alternative DoD is satisfied by #151; net-pay implementation and the relief-at-source product/fixture decision remain with the Foundation pension-method owner above.
 - [ ] State Pension age transition: engine and `BasicInputs` hardcode 66 while SPA moves to 67 during 2026–2028. DoD: date-of-birth-aware rule or clearly framed self-declaration replaces the fixed age, with tests at the transition boundary.
 - [ ] Marriage Allowance treatment: modelled as +£1,260 allowance rather than a 20% tax reducer; deviates for Scottish taxpayers and edge cases. DoD: documented decision, implementation matching it, and fixtures including Scottish cases.
 - [ ] Personal Allowance taper parameterisation: `taxableThresholdToTotalIncome` hardcodes the £1-per-£2 taper shape instead of consuming `personalAllowanceReductionRate` (PR #83 review note). DoD: the function consumes the policy rate; a test pins behaviour for a non-default rate.
