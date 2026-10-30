@@ -33,32 +33,32 @@ describe('LabelTooltip Component', () => {
   });
 
   describe('Tooltip Content', () => {
-    it('shows pension input guidance on keyboard focus, without asserting touch support', async () => {
+    it('opens help with field instructions while retaining keyboard focus', async () => {
       const user = userEvent.setup();
       render(<LabelTooltip fieldName='pensionContribution' />);
 
       expect(screen.queryByTestId('tooltip-content-pensionContribution')).not.toBeInTheDocument();
       await user.tab();
       expect(screen.getByRole('button', { name: 'Help for Pension' })).toHaveFocus();
+      expect(screen.queryByRole('region')).not.toBeInTheDocument();
+      await user.keyboard('{Enter}');
       const content = await screen.findByTestId('tooltip-content-pensionContribution');
-      expect(content).toHaveTextContent(
-        /Enter your contribution even for net pay or relief at source/,
-      );
-      expect(content).toHaveTextContent(/% of gross salary or £ per pay period/);
-      expect(content).toHaveTextContent(/All contributions are estimated as salary sacrifice/);
-      expect(content).toHaveTextContent(/take-home may be too high/);
-      expect(content).toHaveTextContent(/How pension affects your estimate/);
+      expect(content).toHaveTextContent(/Enter your own contribution/);
+      expect(content).toHaveTextContent(/% of gross salary or £ for the selected pay period/);
+      expect(content).toHaveTextContent(/We use salary sacrifice/);
+      expect(content).toHaveTextContent(/Changing between % and £ resets it to 0/);
+      expect(content).toHaveAccessibleDescription(/We use salary sacrifice/);
       await user.keyboard('{Escape}');
       expect(screen.queryByTestId('tooltip-content-pensionContribution')).not.toBeInTheDocument();
     });
 
-    it('should show tooltip on hover', async () => {
+    it('should open help on click', async () => {
       const user = userEvent.setup();
 
       render(<LabelTooltip fieldName='salary' />);
 
       const trigger = screen.getByTestId('tooltip-trigger-salary');
-      await user.hover(trigger);
+      await user.click(trigger);
 
       await waitFor(() => {
         const tooltipContent = screen.getByTestId('tooltip-content-salary');
@@ -73,7 +73,7 @@ describe('LabelTooltip Component', () => {
       render(<LabelTooltip fieldName='salary' />);
 
       const trigger = screen.getByTestId('tooltip-trigger-salary');
-      await user.hover(trigger);
+      await user.click(trigger);
 
       await waitFor(() => {
         const tooltipContent = screen.getByTestId('tooltip-content-salary');
@@ -92,12 +92,12 @@ describe('LabelTooltip Component', () => {
       render(<LabelTooltip fieldName='studentLoanPlan' />);
 
       const trigger = screen.getByTestId('tooltip-trigger-studentLoanPlan');
-      await user.hover(trigger);
+      await user.click(trigger);
 
       await waitFor(() => {
         const tooltipContent = screen.getByTestId('tooltip-content-studentLoanPlan');
-        expect(tooltipContent).toHaveTextContent(/Plan 1:/i);
-        expect(tooltipContent).toHaveTextContent(/Plan 2:/i);
+        expect(tooltipContent).toHaveTextContent(/plan shown in your student loan account/i);
+        expect(tooltipContent).toHaveTextContent(/postgraduate loan/i);
       });
     });
 
@@ -106,7 +106,7 @@ describe('LabelTooltip Component', () => {
       render(<LabelTooltip fieldName='salary' />);
 
       const trigger = screen.getByTestId('tooltip-trigger-salary');
-      await user.hover(trigger);
+      await user.click(trigger);
 
       await waitFor(() => {
         // Verify tooltip appears (positioning is handled by Radix UI)
@@ -128,7 +128,7 @@ describe('LabelTooltip Component', () => {
       render(<LabelTooltip fieldName='salary' customContent={customContent} />);
 
       const trigger = screen.getByTestId('tooltip-trigger-salary');
-      await user.hover(trigger);
+      await user.click(trigger);
 
       await waitFor(() => {
         const tooltipContent = screen.getByTestId('tooltip-content-salary');
@@ -149,7 +149,7 @@ describe('LabelTooltip Component', () => {
       render(<LabelTooltip fieldName='salary' customContent={customContent} />);
 
       const trigger = screen.getByTestId('tooltip-trigger-salary');
-      await user.hover(trigger);
+      await user.click(trigger);
 
       await waitFor(() => {
         const tooltipContent = screen.getByTestId('tooltip-content-salary');

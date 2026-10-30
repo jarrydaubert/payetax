@@ -293,6 +293,39 @@ export function DirectorDashboard() {
             {/* Results */}
             {hasComparison ? (
               <div className='space-y-6'>
+                {(formData.includesVat ||
+                  formData.hasOtherPAYEEmployment ||
+                  formData.pensionContribution > 0) && (
+                  <section
+                    aria-label='About this estimate'
+                    className='space-y-2 rounded-sm border border-border bg-card p-4 text-muted-foreground text-sm'
+                    data-testid='director-estimate-notes'
+                  >
+                    {formData.includesVat && (
+                      <p>
+                        VAT has not been removed from the revenue you entered, so this estimate may
+                        be too high.
+                      </p>
+                    )}
+                    {formData.hasOtherPAYEEmployment && (
+                      <p>
+                        In the suggested pay options, selecting other PAYE employment means we
+                        estimate employee National Insurance from the first pound of director
+                        salary. Jobs with separate employers usually have separate thresholds, so
+                        this may overstate your NI. Check with your payroll provider.
+                      </p>
+                    )}
+                    {formData.pensionContribution > 0 && (
+                      <p>
+                        Company pension contributions count towards your annual allowance across all
+                        your pensions. Going over your available allowance may mean a personal tax
+                        charge, which is not included in this estimate. Unused allowance from the
+                        previous three tax years may help; high income or some pension withdrawals
+                        can reduce your allowance.
+                      </p>
+                    )}
+                  </section>
+                )}
                 {isSurvivalMode ? (
                   <>
                     <section data-director-section='director-survival' aria-label='Survival plan'>

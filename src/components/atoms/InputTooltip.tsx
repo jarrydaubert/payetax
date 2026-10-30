@@ -1,32 +1,7 @@
-/**
- * InputTooltip Component
- *
- * Reusable wrapper that adds HMRC-style tooltips to any input field.
- * Displays helpful guidance on hover (desktop) or tap (mobile).
- *
- * Features:
- * - Automatic content loading from central config
- * - Accessible (aria-describedby injected into child, keyboard navigation)
- * - Responsive (hover on desktop, tap on mobile)
- * - Consistent styling across all inputs
- *
- * Note: Parent component should wrap with TooltipProvider for optimal performance.
- * This component will work standalone but creates provider overhead per instance.
- *
- * @module components/atoms/InputTooltip
- */
+/** Input and on-demand help; existing validation descriptions are left intact. */
 
 import { HelpCircle } from 'lucide-react';
-import {
-  Children,
-  cloneElement,
-  isValidElement,
-  memo,
-  type ReactElement,
-  type ReactNode,
-  useId,
-} from 'react';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { memo, type ReactNode } from 'react';
 import {
   getTooltipContent,
   type TooltipContent as TooltipData,
@@ -34,11 +9,12 @@ import {
 } from '@/config/inputTooltips';
 import { formatTooltipText } from '@/lib/tooltipUtils';
 import { cn } from '@/lib/utils';
+import { HelpPopover } from './HelpPopover';
 
 interface InputTooltipProps {
   /** The field name (matches key in INPUT_TOOLTIPS config) */
   fieldName: TooltipFieldName | (string & {});
-  /** The input element to wrap (single element preferred for aria-describedby injection) */
+  /** The input element to wrap */
   children: ReactNode;
   /** Optional custom tooltip content (overrides config) */
   customContent?: TooltipData;
@@ -47,10 +23,9 @@ interface InputTooltipProps {
 }
 
 /**
- * InputTooltip - Wraps input fields with helpful HMRC-style tooltips
+ * InputTooltip - Wraps input fields with helpful field tooltips
  *
- * Accessibility: Automatically injects aria-describedby into single child elements.
- * For multiple children, caller should manually wire aria-describedby.
+ * Existing input descriptions, including validation errors, are left intact.
  *
  * @example
  * ```tsx
@@ -65,9 +40,6 @@ export const InputTooltip = memo(function InputTooltip({
   customContent,
   className,
 }: InputTooltipProps) {
-  const reactId = useId();
-  const tooltipId = `tooltip-${fieldName}-${reactId}`;
-
   // Get tooltip content from config or use custom
   const tooltipContent = customContent || getTooltipContent(fieldName);
 
@@ -79,52 +51,27 @@ export const InputTooltip = memo(function InputTooltip({
     return <>{children}</>;
   }
 
-  // Inject aria-describedby into single child element when possible
-  let wrappedChildren = children;
-  const childArray = Children.toArray(children);
-
-  if (childArray.length === 1 && isValidElement(childArray[0])) {
-    const child = childArray[0] as ReactElement<{ 'aria-describedby'?: string }>;
-    const existing = child.props['aria-describedby'];
-    const describedBy = existing ? `${existing} ${tooltipId}` : tooltipId;
-
-    wrappedChildren = cloneElement(child, {
-      'aria-describedby': describedBy,
-    });
-  }
-
   return (
-    <Tooltip>
-      <div className={cn('flex items-center gap-2', className)}>
-        {/* Input element with injected aria-describedby */}
-        <div className='flex-1'>{wrappedChildren}</div>
-
-        {/* Help icon trigger */}
-        <TooltipTrigger asChild>
+    <div className={cn('flex items-center gap-2', className)}>
+      <div className='flex-1'>{children}</div>
+      <HelpPopover
+        label={`Help for ${tooltipContent.title}`}
+        side='right'
+        align='start'
+        testId={`tooltip-content-${fieldName}`}
+        trigger={
           <button
             type='button'
-            className={cn(
-              'flex min-h-6 min-w-6 flex-shrink-0 items-center justify-center p-1 text-muted-foreground transition-colors hover:text-foreground',
-              'rounded-full focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1',
-            )}
+            className='flex min-h-8 min-w-8 flex-shrink-0 items-center justify-center rounded-full p-1 text-muted-foreground transition-colors hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1'
             aria-label={`Help for ${tooltipContent.title}`}
             data-testid={`tooltip-trigger-${fieldName}`}
           >
             <HelpCircle className='size-4' aria-hidden='true' />
           </button>
-        </TooltipTrigger>
-      </div>
-
-      {/* Tooltip content with id for aria-describedby */}
-      <TooltipContent
-        id={tooltipId}
-        side='right'
-        align='start'
-        className='max-w-xs'
-        data-testid={`tooltip-content-${fieldName}`}
+        }
       >
         {formatTooltipText(tooltipContent)}
-      </TooltipContent>
-    </Tooltip>
+      </HelpPopover>
+    </div>
   );
 });

@@ -30,252 +30,214 @@ export const TooltipContentSchema = z.object({
 export type TooltipContent = z.infer<typeof TooltipContentSchema>;
 
 export const INPUT_TOOLTIPS = {
-  // Basic Inputs
   salary: {
     title: 'Gross Salary',
-    description: 'Your total earnings before tax and deductions',
-    note: 'Include salary, bonuses, and commission',
+    description: 'Your total earnings before tax and deductions, for the pay period selected.',
+    note: 'Include salary, bonuses and commission.',
   },
-
   payPeriod: {
     title: 'Pay Period',
-    description: 'How often you receive your salary',
-    note: 'Choose the frequency shown on your payslip',
+    description: 'Choose the period your salary figure covers, such as a month or a year.',
   },
-
   taxYear: {
     title: 'Tax Year',
-    description: 'The HMRC tax year to use for calculations',
-    note: 'Tax year runs from 6 April to 5 April',
+    description:
+      'Choose the year you want to calculate. A UK tax year runs from 6 April to 5 April the following year.',
   },
-
   taxCode: {
     title: 'Tax Code',
-    description: 'Your HMRC tax code (e.g., 1257L)',
-    note: 'Found on your payslip or P45. Determines your tax-free allowance',
+    description: 'Use the code on your payslip, P45 or HMRC account, such as 1257L.',
+    note: 'You can leave this blank to estimate using the allowances for your income, region and selected tax year.',
   },
-
   region: {
     title: 'Tax Region',
-    description: 'Your tax region based on residency status',
-    note: 'Scottish taxpayers have different income tax bands',
+    description: 'Choose where you live for tax purposes. Scotland has different Income Tax bands.',
   },
-
   hoursPerWeek: {
     title: 'Hours Worked',
-    description: 'Average hours you work each week',
-    note: 'Used to calculate your hourly rate',
+    description: 'Your usual weekly working hours, used to work out hourly pay.',
   },
-
-  // Pension Inputs
   pensionContribution: {
     title: 'Pension',
     description:
-      'Enter your contribution even for net pay or relief at source. Use % of gross salary or £ per pay period.',
-    note: "All contributions are estimated as salary sacrifice, so take-home may be too high. Open 'How pension affects your estimate' for the assumptions.",
+      'Enter your own contribution as % of gross salary or £ for the selected pay period. Changing between % and £ resets it to 0.',
+    note: 'We use salary sacrifice to estimate pension deductions.',
   },
-
   pensionType: {
     title: 'Contribution Type',
-    description: 'How you want to specify your pension',
-    note: 'Percentage applies to gross salary, amount is a fixed £ value',
+    description:
+      'Choose % of your gross salary or a £ amount for the selected pay period. Changing between them resets your contribution to 0.',
   },
-
-  // Deductions & Allowances
   studentLoanPlan: {
     title: 'Student Loan Plan',
-    description: 'Your student loan repayment plan type',
-    note: "Plan 1: Before Sept 2012 (England/Wales)\nPlan 2: After Sept 2012 (England/Wales)\nPlan 4: Scotland\nPostgraduate: Master's or PhD loan",
+    description:
+      'Choose the plan shown in your student loan account. If you also repay a postgraduate loan, add it using the checkbox.',
   },
-
   niCategory: {
     title: 'National Insurance Category',
-    description: 'Your NI contribution category',
-    note: 'Category A: Standard (most employees)\nCategory B: Married women (reduced rate)\nCategory C: Over state pension age\nCategory H: Apprentices under 25',
+    description:
+      'Use the National Insurance category letter on your payslip. A is the standard category for most employees.',
   },
-
   marriageAllowance: {
     title: 'Marriage Allowance',
-    description: 'Transfer unused Personal Allowance to your partner',
-    note: 'You may be eligible if you have unused Personal Allowance and your partner is not a higher-rate taxpayer',
+    description:
+      "Select if you are married or in a civil partnership. Enter your partner's annual pay so we can check whether a Marriage Allowance transfer could apply.",
   },
-
   partnerGrossWage: {
     title: "Partner's Gross Wage",
-    description: "Your partner's annual salary before tax",
-    note: 'Required to calculate Marriage Allowance eligibility',
+    description:
+      "Your partner's yearly pay before tax, used to check Marriage Allowance eligibility.",
   },
-
   blindAllowance: {
     title: "Blind Person's Allowance",
-    description: 'Additional tax-free allowance if registered blind',
-    note: 'You may be entitled to an additional tax-free allowance if registered blind or severely sight impaired',
+    description:
+      "Select if you qualify for Blind Person's Allowance, which increases the income you can receive before paying Income Tax.",
   },
-
   age: {
     title: 'Age',
-    description: 'Your age range for NI calculations',
-    note: 'Over State Pension age: No National Insurance contributions\nUnder State Pension age: Full NI rates apply',
+    description:
+      'Choose whether you have reached your State Pension age. This affects employee National Insurance.',
   },
-
   payNoNI: {
     title: 'No National Insurance',
-    description: 'Check if you do not pay National Insurance',
-    note: 'Usually applies if you are over State Pension age',
+    description:
+      'Select if you are exempt from employee National Insurance, for example because you have reached State Pension age.',
   },
-
   allowancesDeductions: {
     title: 'Non-taxable Allowance(s)',
-    description: 'Extra pay shown as non-taxable on your payslip',
-    note: "Only include items your employer marks as non-taxable (e.g., reimbursed expenses or 'Home Base'). This adds to take-home but does not reduce taxable income.",
+    description: 'Extra pay your employer marks as non-taxable, for the selected pay period.',
+    note: 'For example, reimbursed expenses. This is added to take-home pay; it does not reduce your taxable salary.',
   },
-
-  // Director Intelligence Inputs
   directorRevenue: {
     title: 'Annual Revenue',
-    description: 'Total company revenue for the year before expenses',
-    note: 'Use your expected turnover or last 12 months of sales',
+    description:
+      "Your company's total sales for the year, before business expenses. Enter revenue, not profit.",
   },
-
   directorIncludesVat: {
     title: 'Revenue Includes VAT',
-    description: 'Indicate if your revenue figure includes VAT',
-    note: 'We do not remove VAT in calculations; it only affects VAT warnings',
+    description: 'Select if your revenue figure includes VAT.',
+    note: 'This changes VAT warnings. VAT is not subtracted from your revenue.',
   },
-
   directorExpenses: {
     title: 'Business Expenses',
-    description:
-      'Business costs excluding the director salary and employer NI modelled in the comparison',
-    note: 'Include overheads, contractors, software, rent, and other costs',
+    description: 'Your yearly business costs, such as rent, software and contractors.',
+    note: 'Leave out your own salary and the employer National Insurance on it: we calculate these separately.',
   },
-
   directorMonthlyIncome: {
     title: 'Monthly Contract Income',
-    description: 'Typical gross monthly invoicing for your current contract(s)',
-    note: 'Used to project annual revenue for the remaining tax-year months',
+    description: 'What you expect to invoice each month, before business expenses.',
+    note: 'We assume this stays the same from your selected start month through March.',
   },
-
   directorMonthlyExpenses: {
     title: 'Monthly Business Expenses',
-    description:
-      'Typical monthly company costs excluding the director salary and employer NI modelled in the comparison',
-    note: 'Used with runway and cash buffer logic to estimate a safe monthly draw',
+    description: 'Your usual monthly business costs, such as rent, software and contractors.',
+    note: 'Leave out your own salary and the employer National Insurance on it: we calculate these separately.',
   },
-
   directorContractStartMonth: {
     title: 'Contract Start Month',
-    description: 'Month your current revenue level started in this tax year',
-    note: 'We project from this month through March using a flat monthly assumption',
+    description:
+      'Choose the month your current level of income started. We assume the same monthly income from then through March.',
   },
-
   directorCashInBank: {
     title: 'Cash In Bank',
-    description: 'Current company cash available to fund operations and drawings',
-    note: 'Use real cash, not retained earnings from accounts',
+    description:
+      "The money currently in your company's bank account, available for bills and paying yourself. Use the bank balance rather than profit shown in your accounts.",
   },
-
   directorMinimumMonthlyDraw: {
     title: 'Minimum Monthly Draw',
-    description: 'Minimum monthly amount you need personally',
-    note: 'Used as the personal floor when balancing buffer safety and tax outputs',
+    description:
+      'The minimum amount you need to take from the company each month for your personal spending. This helps set your cash reserve target.',
   },
-
   directorRunwayMonths: {
     title: 'Runway Target',
-    description: 'Number of months of coverage you want in reserve',
-    note: 'Required buffer = runway months × (minimum draw + monthly expenses)',
+    description:
+      'How many months of business costs and minimum personal withdrawals you want to keep in reserve.',
+    note: 'The target reserve is this number multiplied by your monthly expenses plus your minimum monthly draw.',
   },
-
   directorYearEnd: {
     title: 'Company Year-End',
-    description: 'Your company accounting period end date',
-    note: 'Used to estimate corporation tax deadlines and key dates',
+    description:
+      "The date your company's accounting year ends. Check Companies House or ask your accountant if you are unsure.",
   },
-
+  directorYearEndCustom: {
+    title: 'Custom Year-End Date',
+    description: 'Enter the month and day as MM-DD. For example, 06-30 means 30 June.',
+  },
   directorYtdSalary: {
-    title: 'YTD Salary',
-    description: 'Salary already paid to you in this tax year',
-    note: 'We subtract this from your remaining salary allowance',
+    title: 'Salary Already Taken',
+    description:
+      'Your gross salary paid through PAYE since 6 April. This is included when we work out how much you have already taken from the company.',
   },
-
   directorYtdDividends: {
-    title: 'YTD Dividends',
-    description: 'Dividends already declared this tax year',
-    note: 'Reduces the remaining dividend headroom for the year',
+    title: 'Dividends Already Taken',
+    description:
+      'Dividends declared since 6 April. These are included when we work out how much you have already taken from the company.',
   },
-
   directorYtdDrawings: {
     title: 'Other Drawings',
-    description: 'Withdrawals not treated as salary or dividends',
-    note: "Often director's loan account movements or ad-hoc withdrawals",
+    description:
+      "Money you have taken from the company since 6 April that was not salary or dividends, such as withdrawals through your director's loan account.",
   },
-
   directorOtherIncome: {
     title: 'Other Personal Income',
-    description: 'Personal income outside the company',
-    note: 'Employment, rental, or investment income affects dividend tax bands',
+    description:
+      'Your yearly personal income from outside this company, such as another job or rental income. This can affect the tax on your dividends.',
   },
-
   directorOtherPAYE: {
     title: 'Other PAYE Employment',
-    description: 'Whether you have another PAYE job elsewhere',
-    note: 'If yes, NI calculations may differ from these estimates',
+    description: 'Select if you also have a PAYE job elsewhere.',
   },
-
   directorEmploymentAllowance: {
     title: 'Employment Allowance',
-    description: 'Claim the Employment Allowance against Employer NI',
-    note: "Not available if you're the only director/employee in most cases",
+    description:
+      'Select only if your company qualifies for this reduction in employer National Insurance. A company with just one director and no other employees usually cannot claim.',
   },
-
   directorStudentLoans: {
     title: 'Student Loans',
-    description: 'Student loan plans you repay via Self Assessment',
-    note: "Plan 1: Before Sept 2012 (England/Wales)\nPlan 2: After Sept 2012 (England/Wales)\nPlan 4: Scotland\nPostgraduate: Master's or PhD loan",
+    description:
+      'Select the repayment plans shown in your student loan account. We include an estimate of repayments through Self Assessment.',
+    note: 'Plan 5 is not supported in Director Intelligence.',
   },
-
   directorPension: {
     title: 'Employer Pension',
-    description: 'Company pension contributions paid on your behalf',
-    note: 'These reduce company profit and corporation tax',
+    description:
+      'The yearly amount your company pays directly into your pension. We use this to reduce company profit before Corporation Tax.',
   },
-
   directorPensionDeducted: {
     title: 'Pension Included in Business Expenses',
     description:
-      'Select if the employer pension contribution is already included in the Business Expenses or Monthly Business Expenses entered above.',
-    note: 'This prevents the same pension cost being deducted twice',
+      'Select if the company pension contribution is already in the business expenses you entered. This stops us deducting it twice.',
   },
-
   directorCompanyCar: {
     title: 'Company Car BIK',
-    description: 'Taxable Benefit-in-Kind value of a company car',
-    note: 'Use the P11D benefit amount for the year',
+    description:
+      "The yearly taxable benefit for your company car, shown on your P11D or provided by your employer. Enter the benefit value, not the car's price.",
   },
-
+  directorAssociatedCompanies: {
+    title: 'Associated Companies',
+    description:
+      'The total number of associated companies, including this one. These are generally companies under common control.',
+    note: 'This number affects the profit thresholds used for Corporation Tax. Ask your accountant if you are unsure.',
+  },
   directorLosses: {
     title: 'Losses Brought Forward',
-    description: 'Trading losses carried forward from prior years',
-    note: 'Offsets taxable profit before corporation tax',
+    description:
+      "Trading losses from earlier years that can be used against this year's taxable company profit.",
   },
-
   directorMinimumSalary: {
     title: 'Minimum Salary',
-    description: 'Minimum salary you want to take regardless of tax efficiency',
-    note: 'Useful for mortgage, visa, or income proof requirements',
+    description:
+      'The lowest yearly salary you want to consider, even if a lower salary would save tax.',
   },
-
   directorYourSalary: {
     title: 'Your Current Salary',
-    description: 'Your existing annual salary from the company',
-    note: 'Used to compare your mix against the recommended option',
+    description:
+      'Your yearly gross salary from the company. Enter it here, then choose Apply to compare your setup with the suggested options.',
   },
-
   directorYourDividends: {
     title: 'Your Current Dividends',
-    description: 'Your existing annual dividends from the company',
-    note: 'Used to compare your mix against the recommended option',
+    description:
+      'Your yearly dividends from the company. Enter them here, then choose Apply to compare your setup with the suggested options.',
   },
 } as const;
 

@@ -4,11 +4,10 @@
  */
 'use client';
 
-import { Info } from 'lucide-react';
 import { useId } from 'react';
+import { LabelTooltip } from '@/components/atoms/LabelTooltip';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useDirectorFormValue, useDirectorGuideActions } from '@/store/directorGuideStore';
 
 export function OtherIncomeInput() {
@@ -22,16 +21,7 @@ export function OtherIncomeInput() {
     <div className='space-y-2'>
       <div className='flex items-center gap-1'>
         <Label htmlFor={inputId}>Other Personal Income</Label>
-        <Tooltip>
-          <TooltipTrigger>
-            <Info className='size-4 text-muted-foreground' />
-          </TooltipTrigger>
-          <TooltipContent>
-            <p className='max-w-xs'>
-              Employment salary, rental income, etc. Affects your dividend tax bands.
-            </p>
-          </TooltipContent>
-        </Tooltip>
+        <LabelTooltip fieldName='directorOtherIncome' />
       </div>
       <div className='flex items-center gap-2'>
         <span className='text-muted-foreground'>£</span>

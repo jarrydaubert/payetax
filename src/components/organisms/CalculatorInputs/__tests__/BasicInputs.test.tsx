@@ -136,16 +136,9 @@ describe('BasicInputs Component', () => {
       render(<BasicInputs />);
       const pension = screen.getByLabelText('Pension');
       expect(pension).toBe(screen.getByTestId('pension-input'));
-      expect(pension).toHaveAccessibleDescription(
-        /Enter your contribution, including net pay or relief at source/,
-      );
-      expect(pension).toHaveAccessibleDescription(
-        /estimate all contributions as salary sacrifice, so take-home may be too high/,
-      );
-      expect(pension).toHaveAccessibleDescription(/£ amounts are for your selected pay period/);
-      expect(pension).toHaveAccessibleDescription(
-        /Switching between % and £ resets this field to 0/,
-      );
+      expect(pension).not.toHaveAttribute('aria-describedby');
+      expect(screen.queryByText(/We estimate all contributions/)).not.toBeInTheDocument();
+      expect(screen.queryByText('How pension affects your estimate')).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Help for Pension' })).toBeInTheDocument();
     });
 

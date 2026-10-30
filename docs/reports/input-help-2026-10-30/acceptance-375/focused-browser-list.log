@@ -1,0 +1,34 @@
+Listing tests:
+  [chromium] › calculator-critical.spec.ts:32:7 › Pension modelling guidance @critical › pension help works by touch and keyboard without permanent guidance
+  [chromium] › calculator-critical.spec.ts:63:7 › Pension modelling guidance @critical › narrow-screen pension help stays on screen and can scroll with the keyboard
+  [chromium] › calculator-critical.spec.ts:97:7 › Pension modelling guidance @critical › desktop mouse can reopen help after focus returns to its trigger
+  [chromium] › calculator-critical.spec.ts:114:7 › Pension modelling guidance @critical › every PAYE input help control works at 375px
+  [chromium] › calculator-critical.spec.ts:121:7 › Pension modelling guidance @critical › pension and additional-income warnings appear with calculated results
+  [chromium] › director-guide-critical.spec.ts:596:7 › Director input help @critical › help works in annual, full and monthly inputs, including the mobile drawer
+  [chromium] › director-guide-critical.spec.ts:646:7 › Director input help @critical › every Director input help control works at 375px in annual and monthly modes
+  [chromium] › director-guide-critical.spec.ts:679:7 › Director input help @critical › material Director estimate warnings appear with results
+  [webkit] › calculator-critical.spec.ts:32:7 › Pension modelling guidance @critical › pension help works by touch and keyboard without permanent guidance
+  [webkit] › calculator-critical.spec.ts:63:7 › Pension modelling guidance @critical › narrow-screen pension help stays on screen and can scroll with the keyboard
+  [webkit] › calculator-critical.spec.ts:97:7 › Pension modelling guidance @critical › desktop mouse can reopen help after focus returns to its trigger
+  [webkit] › calculator-critical.spec.ts:114:7 › Pension modelling guidance @critical › every PAYE input help control works at 375px
+  [webkit] › calculator-critical.spec.ts:121:7 › Pension modelling guidance @critical › pension and additional-income warnings appear with calculated results
+  [webkit] › director-guide-critical.spec.ts:596:7 › Director input help @critical › help works in annual, full and monthly inputs, including the mobile drawer
+  [webkit] › director-guide-critical.spec.ts:646:7 › Director input help @critical › every Director input help control works at 375px in annual and monthly modes
+  [webkit] › director-guide-critical.spec.ts:679:7 › Director input help @critical › material Director estimate warnings appear with results
+  [Mobile Chrome] › calculator-critical.spec.ts:32:7 › Pension modelling guidance @critical › pension help works by touch and keyboard without permanent guidance
+  [Mobile Chrome] › calculator-critical.spec.ts:63:7 › Pension modelling guidance @critical › narrow-screen pension help stays on screen and can scroll with the keyboard
+  [Mobile Chrome] › calculator-critical.spec.ts:97:7 › Pension modelling guidance @critical › desktop mouse can reopen help after focus returns to its trigger
+  [Mobile Chrome] › calculator-critical.spec.ts:114:7 › Pension modelling guidance @critical › every PAYE input help control works at 375px
+  [Mobile Chrome] › calculator-critical.spec.ts:121:7 › Pension modelling guidance @critical › pension and additional-income warnings appear with calculated results
+  [Mobile Chrome] › director-guide-critical.spec.ts:596:7 › Director input help @critical › help works in annual, full and monthly inputs, including the mobile drawer
+  [Mobile Chrome] › director-guide-critical.spec.ts:646:7 › Director input help @critical › every Director input help control works at 375px in annual and monthly modes
+  [Mobile Chrome] › director-guide-critical.spec.ts:679:7 › Director input help @critical › material Director estimate warnings appear with results
+  [Mobile Safari] › calculator-critical.spec.ts:32:7 › Pension modelling guidance @critical › pension help works by touch and keyboard without permanent guidance
+  [Mobile Safari] › calculator-critical.spec.ts:63:7 › Pension modelling guidance @critical › narrow-screen pension help stays on screen and can scroll with the keyboard
+  [Mobile Safari] › calculator-critical.spec.ts:97:7 › Pension modelling guidance @critical › desktop mouse can reopen help after focus returns to its trigger
+  [Mobile Safari] › calculator-critical.spec.ts:114:7 › Pension modelling guidance @critical › every PAYE input help control works at 375px
+  [Mobile Safari] › calculator-critical.spec.ts:121:7 › Pension modelling guidance @critical › pension and additional-income warnings appear with calculated results
+  [Mobile Safari] › director-guide-critical.spec.ts:596:7 › Director input help @critical › help works in annual, full and monthly inputs, including the mobile drawer
+  [Mobile Safari] › director-guide-critical.spec.ts:646:7 › Director input help @critical › every Director input help control works at 375px in annual and monthly modes
+  [Mobile Safari] › director-guide-critical.spec.ts:679:7 › Director input help @critical › material Director estimate warnings appear with results
+Total: 32 tests in 2 files

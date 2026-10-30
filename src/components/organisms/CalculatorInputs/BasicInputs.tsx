@@ -551,21 +551,21 @@ export function BasicInputs() {
             >
               <SelectValue>
                 {input.pensionContributionType === 'percentage' ? (
-                  <Percent className='size-4' />
+                  <Percent className='size-4' aria-hidden='true' />
                 ) : (
-                  <PoundSterling className='size-4' />
+                  <PoundSterling className='size-4' aria-hidden='true' />
                 )}
               </SelectValue>
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value='percentage'>
+              <SelectItem value='percentage' aria-label='Percentage of gross salary'>
                 <div className='flex items-center justify-center'>
-                  <Percent className='size-4' />
+                  <Percent className='size-4' aria-hidden='true' />
                 </div>
               </SelectItem>
-              <SelectItem value='amount'>
+              <SelectItem value='amount' aria-label='Pounds per pay period'>
                 <div className='flex items-center justify-center'>
-                  <PoundSterling className='size-4' />
+                  <PoundSterling className='size-4' aria-hidden='true' />
                 </div>
               </SelectItem>
             </SelectContent>
@@ -578,7 +578,6 @@ export function BasicInputs() {
           {/* Input field */}
           <NumberInput
             onDraftChange={invalidateResults}
-            aria-describedby={`${pensionId}-method`}
             id={pensionId}
             value={input.pensionContribution}
             onChange={setPensionContribution}
@@ -605,22 +604,6 @@ export function BasicInputs() {
       </div>
 
       <div className='xl:col-span-3'>
-        <p className='mb-3 text-muted-foreground text-xs' id={`${pensionId}-method`}>
-          Enter your contribution, including net pay or relief at source. We estimate all
-          contributions as salary sacrifice, so take-home may be too high. £ amounts are for your
-          selected pay period. Switching between % and £ resets this field to 0.
-        </p>
-        <details className='mb-3 text-muted-foreground text-xs'>
-          <summary className='min-h-11 w-fit cursor-pointer py-3 font-medium text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'>
-            How pension affects your estimate
-          </summary>
-          <p className='max-w-prose pb-2 leading-relaxed'>
-            We use salary-sacrifice calculations, reducing the pay used for Income Tax, employee
-            National Insurance and student loan repayments. Net pay and relief at source aren't
-            calculated separately, so take-home may be too high. Employer NI stays based on gross
-            employment pay; savings aren't included.
-          </p>
-        </details>
         <IncomeSourceList />
       </div>
     </motion.div>

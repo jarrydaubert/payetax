@@ -4,6 +4,7 @@
 
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useId } from 'react';
 import { setNodeEnv } from '@/test/env';
 import { InputTooltip } from '../InputTooltip';
 
@@ -44,7 +45,7 @@ describe('InputTooltip Component', () => {
   });
 
   describe('Tooltip Content', () => {
-    it('should show tooltip on hover', async () => {
+    it('should open help on click', async () => {
       const user = userEvent.setup();
 
       render(
@@ -54,7 +55,7 @@ describe('InputTooltip Component', () => {
       );
 
       const trigger = screen.getByTestId('tooltip-trigger-salary');
-      await user.hover(trigger);
+      await user.click(trigger);
 
       await waitFor(() => {
         // Use getByTestId to target specific tooltip content
@@ -74,7 +75,7 @@ describe('InputTooltip Component', () => {
       );
 
       const trigger = screen.getByTestId('tooltip-trigger-salary');
-      await user.hover(trigger);
+      await user.click(trigger);
 
       await waitFor(() => {
         const tooltipContent = screen.getByTestId('tooltip-content-salary');
@@ -97,12 +98,12 @@ describe('InputTooltip Component', () => {
       );
 
       const trigger = screen.getByTestId('tooltip-trigger-studentLoanPlan');
-      await user.hover(trigger);
+      await user.click(trigger);
 
       await waitFor(() => {
         const tooltipContent = screen.getByTestId('tooltip-content-studentLoanPlan');
-        expect(tooltipContent).toHaveTextContent(/Plan 1:/i);
-        expect(tooltipContent).toHaveTextContent(/Plan 2:/i);
+        expect(tooltipContent).toHaveTextContent(/plan shown in your student loan account/i);
+        expect(tooltipContent).toHaveTextContent(/postgraduate loan/i);
       });
     });
   });
@@ -123,7 +124,7 @@ describe('InputTooltip Component', () => {
       );
 
       const trigger = screen.getByTestId('tooltip-trigger-salary');
-      await user.hover(trigger);
+      await user.click(trigger);
 
       await waitFor(() => {
         const titles = screen.getAllByText('Custom Title');
@@ -142,6 +143,32 @@ describe('InputTooltip Component', () => {
 
       const trigger = screen.getByLabelText('Help for Gross Salary');
       expect(trigger).toBeInTheDocument();
+    });
+
+    it('preserves input validation descriptions without adding an unmounted tooltip ID', async () => {
+      const user = userEvent.setup();
+      function Field() {
+        const errorId = useId();
+        return (
+          <>
+            <InputTooltip fieldName='salary'>
+              <input aria-label='Salary' aria-describedby={errorId} />
+            </InputTooltip>
+            <span id={errorId}>Check this amount</span>
+          </>
+        );
+      }
+      render(<Field />);
+      expect(screen.getByRole('textbox')).toHaveAttribute(
+        'aria-describedby',
+        screen.getByText('Check this amount').id,
+      );
+      expect(screen.getByRole('textbox')).toHaveAccessibleDescription('Check this amount');
+      await user.click(screen.getByRole('button', { name: 'Help for Gross Salary' }));
+      expect(
+        screen.getByRole('region', { name: 'Help for Gross Salary' }),
+      ).toHaveAccessibleDescription(/total earnings before tax/);
+      expect(screen.getByRole('textbox')).toHaveAccessibleDescription('Check this amount');
     });
 
     it('should be keyboard accessible', async () => {

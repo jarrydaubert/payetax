@@ -1,0 +1,1128 @@
+[
+  {
+    "engine": "chromium",
+    "layout": "desktop",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "reviewedLabels": [
+      "Salary",
+      "Tax Year",
+      "Tax Code",
+      "Region",
+      "Married",
+      "Blind",
+      "No NI",
+      "Partner's Gross Wage",
+      "Age",
+      "Student Loan",
+      "Non-taxable allowance(s)",
+      "Pension",
+      "Annual Revenue",
+      "Business Expenses",
+      "Revenue includes VAT",
+      "Income Tax Region",
+      "Company Year-End",
+      "Custom Year-End Date (MM-DD)",
+      "YTD Salary",
+      "YTD Dividends",
+      "Other Drawings",
+      "Other Personal Income",
+      "Other PAYE employment?",
+      "Employment Allowance",
+      "Plan 1",
+      "Plan 2",
+      "Plan 4",
+      "Postgrad",
+      "Employer Pension",
+      "Already included in business expenses",
+      "Company Car BIK",
+      "Associated Companies",
+      "Losses Brought Forward",
+      "Minimum Salary",
+      "Your Current Salary",
+      "Your Current Dividends",
+      "Monthly Contract Income",
+      "Monthly Business Expenses",
+      "Contract Start Month",
+      "Cash In Bank",
+      "Minimum Monthly Draw",
+      "Runway Target (months)"
+    ],
+    "annualHelp": [
+      {
+        "id": "tooltip-trigger-directorRevenue",
+        "name": "Help for Annual Revenue"
+      },
+      {
+        "id": "tooltip-trigger-directorExpenses",
+        "name": "Help for Business Expenses"
+      },
+      {
+        "id": "tooltip-trigger-directorIncludesVat",
+        "name": "Help for Revenue Includes VAT"
+      },
+      {
+        "id": "tooltip-trigger-region",
+        "name": "Help for Tax Region"
+      },
+      {
+        "id": "tooltip-trigger-directorYearEnd",
+        "name": "Help for Company Year-End"
+      },
+      {
+        "id": "tooltip-trigger-directorYearEndCustom",
+        "name": "Help for Custom Year-End Date"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdSalary",
+        "name": "Help for Salary Already Taken"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdDividends",
+        "name": "Help for Dividends Already Taken"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdDrawings",
+        "name": "Help for Other Drawings"
+      },
+      {
+        "id": "tooltip-trigger-directorOtherIncome",
+        "name": "Help for Other Personal Income"
+      },
+      {
+        "id": "tooltip-trigger-directorOtherPAYE",
+        "name": "Help for Other PAYE Employment"
+      },
+      {
+        "id": "tooltip-trigger-directorEmploymentAllowance",
+        "name": "Help for Employment Allowance"
+      },
+      {
+        "id": "tooltip-trigger-directorStudentLoans",
+        "name": "Help for Student Loans"
+      },
+      {
+        "id": "tooltip-trigger-directorPension",
+        "name": "Help for Employer Pension"
+      },
+      {
+        "id": "tooltip-trigger-directorPensionDeducted",
+        "name": "Help for Pension Included in Business Expenses"
+      },
+      {
+        "id": "tooltip-trigger-directorCompanyCar",
+        "name": "Help for Company Car BIK"
+      },
+      {
+        "id": "tooltip-trigger-directorAssociatedCompanies",
+        "name": "Help for Associated Companies"
+      },
+      {
+        "id": "tooltip-trigger-directorLosses",
+        "name": "Help for Losses Brought Forward"
+      },
+      {
+        "id": "tooltip-trigger-directorMinimumSalary",
+        "name": "Help for Minimum Salary"
+      },
+      {
+        "id": "tooltip-trigger-directorYourSalary",
+        "name": "Help for Your Current Salary"
+      },
+      {
+        "id": "tooltip-trigger-directorYourDividends",
+        "name": "Help for Your Current Dividends"
+      }
+    ],
+    "monthlyHelp": [
+      {
+        "id": "tooltip-trigger-directorMonthlyIncome",
+        "name": "Help for Monthly Contract Income"
+      },
+      {
+        "id": "tooltip-trigger-directorMonthlyExpenses",
+        "name": "Help for Monthly Business Expenses"
+      },
+      {
+        "id": "tooltip-trigger-directorContractStartMonth",
+        "name": "Help for Contract Start Month"
+      },
+      {
+        "id": "tooltip-trigger-directorCashInBank",
+        "name": "Help for Cash In Bank"
+      },
+      {
+        "id": "tooltip-trigger-directorMinimumMonthlyDraw",
+        "name": "Help for Minimum Monthly Draw"
+      },
+      {
+        "id": "tooltip-trigger-directorRunwayMonths",
+        "name": "Help for Runway Target"
+      },
+      {
+        "id": "tooltip-trigger-directorIncludesVat",
+        "name": "Help for Revenue Includes VAT"
+      },
+      {
+        "id": "tooltip-trigger-region",
+        "name": "Help for Tax Region"
+      },
+      {
+        "id": "tooltip-trigger-directorYearEnd",
+        "name": "Help for Company Year-End"
+      },
+      {
+        "id": "tooltip-trigger-directorYearEndCustom",
+        "name": "Help for Custom Year-End Date"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdSalary",
+        "name": "Help for Salary Already Taken"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdDividends",
+        "name": "Help for Dividends Already Taken"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdDrawings",
+        "name": "Help for Other Drawings"
+      },
+      {
+        "id": "tooltip-trigger-directorOtherIncome",
+        "name": "Help for Other Personal Income"
+      },
+      {
+        "id": "tooltip-trigger-directorOtherPAYE",
+        "name": "Help for Other PAYE Employment"
+      },
+      {
+        "id": "tooltip-trigger-directorEmploymentAllowance",
+        "name": "Help for Employment Allowance"
+      },
+      {
+        "id": "tooltip-trigger-directorStudentLoans",
+        "name": "Help for Student Loans"
+      },
+      {
+        "id": "tooltip-trigger-directorPension",
+        "name": "Help for Employer Pension"
+      },
+      {
+        "id": "tooltip-trigger-directorPensionDeducted",
+        "name": "Help for Pension Included in Business Expenses"
+      },
+      {
+        "id": "tooltip-trigger-directorCompanyCar",
+        "name": "Help for Company Car BIK"
+      },
+      {
+        "id": "tooltip-trigger-directorAssociatedCompanies",
+        "name": "Help for Associated Companies"
+      },
+      {
+        "id": "tooltip-trigger-directorLosses",
+        "name": "Help for Losses Brought Forward"
+      },
+      {
+        "id": "tooltip-trigger-directorMinimumSalary",
+        "name": "Help for Minimum Salary"
+      },
+      {
+        "id": "tooltip-trigger-directorYourSalary",
+        "name": "Help for Your Current Salary"
+      },
+      {
+        "id": "tooltip-trigger-directorYourDividends",
+        "name": "Help for Your Current Dividends"
+      }
+    ],
+    "resultHelpNames": [
+      "ANNUAL TAKE-HOME\n\n£30,963.72",
+      "MONTHLY TAKE-HOME\n\n£2,580.31",
+      "TOTAL TAX & NI\n\n£7,136.28",
+      "EFFECTIVE TAX RATE\n\n17.8%",
+      "MARGINAL TAX RATE\n\n26.9%"
+    ],
+    "directorHelpCount": 27,
+    "captures": [
+      "chromium-desktop-paye-whole-form.png",
+      "chromium-desktop-paye-help.png",
+      "chromium-desktop-paye-validation.png",
+      "chromium-desktop-paye-results-warnings.png",
+      "chromium-desktop-paye-additional-income-warning.png",
+      "chromium-desktop-director-quick-start.png",
+      "chromium-desktop-director-company-year-end.png",
+      "chromium-desktop-director-already-taken.png",
+      "chromium-desktop-director-situation.png",
+      "chromium-desktop-director-advanced-pension.png",
+      "chromium-desktop-director-advanced-company-car.png",
+      "chromium-desktop-director-advanced-salary.png",
+      "chromium-desktop-director-compare-setup.png",
+      "chromium-desktop-director-monthly-income.png",
+      "chromium-desktop-director-monthly-cash.png",
+      "chromium-desktop-director-help.png",
+      "chromium-desktop-director-validation.png",
+      "chromium-desktop-director-results-warnings.png"
+    ],
+    "payeAxe": [],
+    "directorAxe": [],
+    "pageErrors": [],
+    "consoleMessages": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/speed-insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/speed-insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled."
+    ]
+  },
+  {
+    "engine": "chromium",
+    "layout": "mobile",
+    "viewport": {
+      "width": 375,
+      "height": 812
+    },
+    "reviewedLabels": [
+      "Salary",
+      "Tax Year",
+      "Tax Code",
+      "Region",
+      "Married",
+      "Blind",
+      "No NI",
+      "Partner's Gross Wage",
+      "Age",
+      "Student Loan",
+      "Non-taxable allowance(s)",
+      "Pension",
+      "Annual Revenue",
+      "Business Expenses",
+      "Revenue includes VAT",
+      "Income Tax Region",
+      "Company Year-End",
+      "Custom Year-End Date (MM-DD)",
+      "YTD Salary",
+      "YTD Dividends",
+      "Other Drawings",
+      "Other Personal Income",
+      "Other PAYE employment?",
+      "Employment Allowance",
+      "Plan 1",
+      "Plan 2",
+      "Plan 4",
+      "Postgrad",
+      "Employer Pension",
+      "Already included in business expenses",
+      "Company Car BIK",
+      "Associated Companies",
+      "Losses Brought Forward",
+      "Minimum Salary",
+      "Your Current Salary",
+      "Your Current Dividends",
+      "Monthly Contract Income",
+      "Monthly Business Expenses",
+      "Contract Start Month",
+      "Cash In Bank",
+      "Minimum Monthly Draw",
+      "Runway Target (months)"
+    ],
+    "annualHelp": [
+      {
+        "id": "tooltip-trigger-directorRevenue",
+        "name": "Help for Annual Revenue"
+      },
+      {
+        "id": "tooltip-trigger-directorExpenses",
+        "name": "Help for Business Expenses"
+      },
+      {
+        "id": "tooltip-trigger-directorIncludesVat",
+        "name": "Help for Revenue Includes VAT"
+      },
+      {
+        "id": "tooltip-trigger-region",
+        "name": "Help for Tax Region"
+      },
+      {
+        "id": "tooltip-trigger-directorYearEnd",
+        "name": "Help for Company Year-End"
+      },
+      {
+        "id": "tooltip-trigger-directorYearEndCustom",
+        "name": "Help for Custom Year-End Date"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdSalary",
+        "name": "Help for Salary Already Taken"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdDividends",
+        "name": "Help for Dividends Already Taken"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdDrawings",
+        "name": "Help for Other Drawings"
+      },
+      {
+        "id": "tooltip-trigger-directorOtherIncome",
+        "name": "Help for Other Personal Income"
+      },
+      {
+        "id": "tooltip-trigger-directorOtherPAYE",
+        "name": "Help for Other PAYE Employment"
+      },
+      {
+        "id": "tooltip-trigger-directorEmploymentAllowance",
+        "name": "Help for Employment Allowance"
+      },
+      {
+        "id": "tooltip-trigger-directorStudentLoans",
+        "name": "Help for Student Loans"
+      },
+      {
+        "id": "tooltip-trigger-directorPension",
+        "name": "Help for Employer Pension"
+      },
+      {
+        "id": "tooltip-trigger-directorPensionDeducted",
+        "name": "Help for Pension Included in Business Expenses"
+      },
+      {
+        "id": "tooltip-trigger-directorCompanyCar",
+        "name": "Help for Company Car BIK"
+      },
+      {
+        "id": "tooltip-trigger-directorAssociatedCompanies",
+        "name": "Help for Associated Companies"
+      },
+      {
+        "id": "tooltip-trigger-directorLosses",
+        "name": "Help for Losses Brought Forward"
+      },
+      {
+        "id": "tooltip-trigger-directorMinimumSalary",
+        "name": "Help for Minimum Salary"
+      },
+      {
+        "id": "tooltip-trigger-directorYourSalary",
+        "name": "Help for Your Current Salary"
+      },
+      {
+        "id": "tooltip-trigger-directorYourDividends",
+        "name": "Help for Your Current Dividends"
+      }
+    ],
+    "monthlyHelp": [
+      {
+        "id": "tooltip-trigger-directorMonthlyIncome",
+        "name": "Help for Monthly Contract Income"
+      },
+      {
+        "id": "tooltip-trigger-directorMonthlyExpenses",
+        "name": "Help for Monthly Business Expenses"
+      },
+      {
+        "id": "tooltip-trigger-directorContractStartMonth",
+        "name": "Help for Contract Start Month"
+      },
+      {
+        "id": "tooltip-trigger-directorCashInBank",
+        "name": "Help for Cash In Bank"
+      },
+      {
+        "id": "tooltip-trigger-directorMinimumMonthlyDraw",
+        "name": "Help for Minimum Monthly Draw"
+      },
+      {
+        "id": "tooltip-trigger-directorRunwayMonths",
+        "name": "Help for Runway Target"
+      },
+      {
+        "id": "tooltip-trigger-directorIncludesVat",
+        "name": "Help for Revenue Includes VAT"
+      },
+      {
+        "id": "tooltip-trigger-region",
+        "name": "Help for Tax Region"
+      },
+      {
+        "id": "tooltip-trigger-directorYearEnd",
+        "name": "Help for Company Year-End"
+      },
+      {
+        "id": "tooltip-trigger-directorYearEndCustom",
+        "name": "Help for Custom Year-End Date"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdSalary",
+        "name": "Help for Salary Already Taken"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdDividends",
+        "name": "Help for Dividends Already Taken"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdDrawings",
+        "name": "Help for Other Drawings"
+      },
+      {
+        "id": "tooltip-trigger-directorOtherIncome",
+        "name": "Help for Other Personal Income"
+      },
+      {
+        "id": "tooltip-trigger-directorOtherPAYE",
+        "name": "Help for Other PAYE Employment"
+      },
+      {
+        "id": "tooltip-trigger-directorEmploymentAllowance",
+        "name": "Help for Employment Allowance"
+      },
+      {
+        "id": "tooltip-trigger-directorStudentLoans",
+        "name": "Help for Student Loans"
+      },
+      {
+        "id": "tooltip-trigger-directorPension",
+        "name": "Help for Employer Pension"
+      },
+      {
+        "id": "tooltip-trigger-directorPensionDeducted",
+        "name": "Help for Pension Included in Business Expenses"
+      },
+      {
+        "id": "tooltip-trigger-directorCompanyCar",
+        "name": "Help for Company Car BIK"
+      },
+      {
+        "id": "tooltip-trigger-directorAssociatedCompanies",
+        "name": "Help for Associated Companies"
+      },
+      {
+        "id": "tooltip-trigger-directorLosses",
+        "name": "Help for Losses Brought Forward"
+      },
+      {
+        "id": "tooltip-trigger-directorMinimumSalary",
+        "name": "Help for Minimum Salary"
+      },
+      {
+        "id": "tooltip-trigger-directorYourSalary",
+        "name": "Help for Your Current Salary"
+      },
+      {
+        "id": "tooltip-trigger-directorYourDividends",
+        "name": "Help for Your Current Dividends"
+      }
+    ],
+    "resultHelpNames": [
+      "ANNUAL TAKE-HOME\n\n£30,963.72",
+      "TOTAL TAX & NI\n\n£7,136.28",
+      "EFFECTIVE TAX RATE\n\n17.8%",
+      "MARGINAL TAX RATE\n\n26.9%"
+    ],
+    "directorHelpCount": 27,
+    "captures": [
+      "chromium-mobile-paye-whole-form.png",
+      "chromium-mobile-paye-help.png",
+      "chromium-mobile-paye-validation.png",
+      "chromium-mobile-paye-results-warnings.png",
+      "chromium-mobile-paye-additional-income-warning.png",
+      "chromium-mobile-director-quick-start.png",
+      "chromium-mobile-director-company-year-end.png",
+      "chromium-mobile-director-already-taken.png",
+      "chromium-mobile-director-situation.png",
+      "chromium-mobile-director-advanced-pension.png",
+      "chromium-mobile-director-advanced-company-car.png",
+      "chromium-mobile-director-advanced-salary.png",
+      "chromium-mobile-director-compare-setup.png",
+      "chromium-mobile-director-monthly-income.png",
+      "chromium-mobile-director-monthly-cash.png",
+      "chromium-mobile-director-help.png",
+      "chromium-mobile-director-validation.png",
+      "chromium-mobile-director-results-warnings.png"
+    ],
+    "payeAxe": [],
+    "directorAxe": [],
+    "pageErrors": [],
+    "consoleMessages": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/speed-insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/speed-insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled."
+    ]
+  },
+  {
+    "engine": "webkit",
+    "layout": "desktop",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "reviewedLabels": [
+      "Salary",
+      "Tax Year",
+      "Tax Code",
+      "Region",
+      "Married",
+      "Blind",
+      "No NI",
+      "Partner's Gross Wage",
+      "Age",
+      "Student Loan",
+      "Non-taxable allowance(s)",
+      "Pension",
+      "Annual Revenue",
+      "Business Expenses",
+      "Revenue includes VAT",
+      "Income Tax Region",
+      "Company Year-End",
+      "Custom Year-End Date (MM-DD)",
+      "YTD Salary",
+      "YTD Dividends",
+      "Other Drawings",
+      "Other Personal Income",
+      "Other PAYE employment?",
+      "Employment Allowance",
+      "Plan 1",
+      "Plan 2",
+      "Plan 4",
+      "Postgrad",
+      "Employer Pension",
+      "Already included in business expenses",
+      "Company Car BIK",
+      "Associated Companies",
+      "Losses Brought Forward",
+      "Minimum Salary",
+      "Your Current Salary",
+      "Your Current Dividends",
+      "Monthly Contract Income",
+      "Monthly Business Expenses",
+      "Contract Start Month",
+      "Cash In Bank",
+      "Minimum Monthly Draw",
+      "Runway Target (months)"
+    ],
+    "annualHelp": [
+      {
+        "id": "tooltip-trigger-directorRevenue",
+        "name": "Help for Annual Revenue"
+      },
+      {
+        "id": "tooltip-trigger-directorExpenses",
+        "name": "Help for Business Expenses"
+      },
+      {
+        "id": "tooltip-trigger-directorIncludesVat",
+        "name": "Help for Revenue Includes VAT"
+      },
+      {
+        "id": "tooltip-trigger-region",
+        "name": "Help for Tax Region"
+      },
+      {
+        "id": "tooltip-trigger-directorYearEnd",
+        "name": "Help for Company Year-End"
+      },
+      {
+        "id": "tooltip-trigger-directorYearEndCustom",
+        "name": "Help for Custom Year-End Date"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdSalary",
+        "name": "Help for Salary Already Taken"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdDividends",
+        "name": "Help for Dividends Already Taken"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdDrawings",
+        "name": "Help for Other Drawings"
+      },
+      {
+        "id": "tooltip-trigger-directorOtherIncome",
+        "name": "Help for Other Personal Income"
+      },
+      {
+        "id": "tooltip-trigger-directorOtherPAYE",
+        "name": "Help for Other PAYE Employment"
+      },
+      {
+        "id": "tooltip-trigger-directorEmploymentAllowance",
+        "name": "Help for Employment Allowance"
+      },
+      {
+        "id": "tooltip-trigger-directorStudentLoans",
+        "name": "Help for Student Loans"
+      },
+      {
+        "id": "tooltip-trigger-directorPension",
+        "name": "Help for Employer Pension"
+      },
+      {
+        "id": "tooltip-trigger-directorPensionDeducted",
+        "name": "Help for Pension Included in Business Expenses"
+      },
+      {
+        "id": "tooltip-trigger-directorCompanyCar",
+        "name": "Help for Company Car BIK"
+      },
+      {
+        "id": "tooltip-trigger-directorAssociatedCompanies",
+        "name": "Help for Associated Companies"
+      },
+      {
+        "id": "tooltip-trigger-directorLosses",
+        "name": "Help for Losses Brought Forward"
+      },
+      {
+        "id": "tooltip-trigger-directorMinimumSalary",
+        "name": "Help for Minimum Salary"
+      },
+      {
+        "id": "tooltip-trigger-directorYourSalary",
+        "name": "Help for Your Current Salary"
+      },
+      {
+        "id": "tooltip-trigger-directorYourDividends",
+        "name": "Help for Your Current Dividends"
+      }
+    ],
+    "monthlyHelp": [
+      {
+        "id": "tooltip-trigger-directorMonthlyIncome",
+        "name": "Help for Monthly Contract Income"
+      },
+      {
+        "id": "tooltip-trigger-directorMonthlyExpenses",
+        "name": "Help for Monthly Business Expenses"
+      },
+      {
+        "id": "tooltip-trigger-directorContractStartMonth",
+        "name": "Help for Contract Start Month"
+      },
+      {
+        "id": "tooltip-trigger-directorCashInBank",
+        "name": "Help for Cash In Bank"
+      },
+      {
+        "id": "tooltip-trigger-directorMinimumMonthlyDraw",
+        "name": "Help for Minimum Monthly Draw"
+      },
+      {
+        "id": "tooltip-trigger-directorRunwayMonths",
+        "name": "Help for Runway Target"
+      },
+      {
+        "id": "tooltip-trigger-directorIncludesVat",
+        "name": "Help for Revenue Includes VAT"
+      },
+      {
+        "id": "tooltip-trigger-region",
+        "name": "Help for Tax Region"
+      },
+      {
+        "id": "tooltip-trigger-directorYearEnd",
+        "name": "Help for Company Year-End"
+      },
+      {
+        "id": "tooltip-trigger-directorYearEndCustom",
+        "name": "Help for Custom Year-End Date"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdSalary",
+        "name": "Help for Salary Already Taken"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdDividends",
+        "name": "Help for Dividends Already Taken"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdDrawings",
+        "name": "Help for Other Drawings"
+      },
+      {
+        "id": "tooltip-trigger-directorOtherIncome",
+        "name": "Help for Other Personal Income"
+      },
+      {
+        "id": "tooltip-trigger-directorOtherPAYE",
+        "name": "Help for Other PAYE Employment"
+      },
+      {
+        "id": "tooltip-trigger-directorEmploymentAllowance",
+        "name": "Help for Employment Allowance"
+      },
+      {
+        "id": "tooltip-trigger-directorStudentLoans",
+        "name": "Help for Student Loans"
+      },
+      {
+        "id": "tooltip-trigger-directorPension",
+        "name": "Help for Employer Pension"
+      },
+      {
+        "id": "tooltip-trigger-directorPensionDeducted",
+        "name": "Help for Pension Included in Business Expenses"
+      },
+      {
+        "id": "tooltip-trigger-directorCompanyCar",
+        "name": "Help for Company Car BIK"
+      },
+      {
+        "id": "tooltip-trigger-directorAssociatedCompanies",
+        "name": "Help for Associated Companies"
+      },
+      {
+        "id": "tooltip-trigger-directorLosses",
+        "name": "Help for Losses Brought Forward"
+      },
+      {
+        "id": "tooltip-trigger-directorMinimumSalary",
+        "name": "Help for Minimum Salary"
+      },
+      {
+        "id": "tooltip-trigger-directorYourSalary",
+        "name": "Help for Your Current Salary"
+      },
+      {
+        "id": "tooltip-trigger-directorYourDividends",
+        "name": "Help for Your Current Dividends"
+      }
+    ],
+    "resultHelpNames": [
+      "ANNUAL TAKE-HOME\n\n£30,963.72",
+      "MONTHLY TAKE-HOME\n\n£2,580.31",
+      "TOTAL TAX & NI\n\n£7,136.28",
+      "EFFECTIVE TAX RATE\n\n17.8%",
+      "MARGINAL TAX RATE\n\n26.9%"
+    ],
+    "directorHelpCount": 27,
+    "captures": [
+      "webkit-desktop-paye-whole-form.png",
+      "webkit-desktop-paye-help.png",
+      "webkit-desktop-paye-validation.png",
+      "webkit-desktop-paye-results-warnings.png",
+      "webkit-desktop-paye-additional-income-warning.png",
+      "webkit-desktop-director-quick-start.png",
+      "webkit-desktop-director-company-year-end.png",
+      "webkit-desktop-director-already-taken.png",
+      "webkit-desktop-director-situation.png",
+      "webkit-desktop-director-advanced-pension.png",
+      "webkit-desktop-director-advanced-company-car.png",
+      "webkit-desktop-director-advanced-salary.png",
+      "webkit-desktop-director-compare-setup.png",
+      "webkit-desktop-director-monthly-income.png",
+      "webkit-desktop-director-monthly-cash.png",
+      "webkit-desktop-director-help.png",
+      "webkit-desktop-director-validation.png",
+      "webkit-desktop-director-results-warnings.png"
+    ],
+    "payeAxe": [],
+    "directorAxe": [],
+    "pageErrors": [],
+    "consoleMessages": [
+      "Viewport argument key \"interactive-widget\" not recognized and ignored.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute http://localhost:3102/_vercel/insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Refused to execute http://localhost:3102/_vercel/speed-insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Viewport argument key \"interactive-widget\" not recognized and ignored.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute http://localhost:3102/_vercel/insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Refused to execute http://localhost:3102/_vercel/speed-insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type."
+    ]
+  },
+  {
+    "engine": "webkit",
+    "layout": "mobile",
+    "viewport": {
+      "width": 375,
+      "height": 812
+    },
+    "reviewedLabels": [
+      "Salary",
+      "Tax Year",
+      "Tax Code",
+      "Region",
+      "Married",
+      "Blind",
+      "No NI",
+      "Partner's Gross Wage",
+      "Age",
+      "Student Loan",
+      "Non-taxable allowance(s)",
+      "Pension",
+      "Annual Revenue",
+      "Business Expenses",
+      "Revenue includes VAT",
+      "Income Tax Region",
+      "Company Year-End",
+      "Custom Year-End Date (MM-DD)",
+      "YTD Salary",
+      "YTD Dividends",
+      "Other Drawings",
+      "Other Personal Income",
+      "Other PAYE employment?",
+      "Employment Allowance",
+      "Plan 1",
+      "Plan 2",
+      "Plan 4",
+      "Postgrad",
+      "Employer Pension",
+      "Already included in business expenses",
+      "Company Car BIK",
+      "Associated Companies",
+      "Losses Brought Forward",
+      "Minimum Salary",
+      "Your Current Salary",
+      "Your Current Dividends",
+      "Monthly Contract Income",
+      "Monthly Business Expenses",
+      "Contract Start Month",
+      "Cash In Bank",
+      "Minimum Monthly Draw",
+      "Runway Target (months)"
+    ],
+    "annualHelp": [
+      {
+        "id": "tooltip-trigger-directorRevenue",
+        "name": "Help for Annual Revenue"
+      },
+      {
+        "id": "tooltip-trigger-directorExpenses",
+        "name": "Help for Business Expenses"
+      },
+      {
+        "id": "tooltip-trigger-directorIncludesVat",
+        "name": "Help for Revenue Includes VAT"
+      },
+      {
+        "id": "tooltip-trigger-region",
+        "name": "Help for Tax Region"
+      },
+      {
+        "id": "tooltip-trigger-directorYearEnd",
+        "name": "Help for Company Year-End"
+      },
+      {
+        "id": "tooltip-trigger-directorYearEndCustom",
+        "name": "Help for Custom Year-End Date"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdSalary",
+        "name": "Help for Salary Already Taken"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdDividends",
+        "name": "Help for Dividends Already Taken"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdDrawings",
+        "name": "Help for Other Drawings"
+      },
+      {
+        "id": "tooltip-trigger-directorOtherIncome",
+        "name": "Help for Other Personal Income"
+      },
+      {
+        "id": "tooltip-trigger-directorOtherPAYE",
+        "name": "Help for Other PAYE Employment"
+      },
+      {
+        "id": "tooltip-trigger-directorEmploymentAllowance",
+        "name": "Help for Employment Allowance"
+      },
+      {
+        "id": "tooltip-trigger-directorStudentLoans",
+        "name": "Help for Student Loans"
+      },
+      {
+        "id": "tooltip-trigger-directorPension",
+        "name": "Help for Employer Pension"
+      },
+      {
+        "id": "tooltip-trigger-directorPensionDeducted",
+        "name": "Help for Pension Included in Business Expenses"
+      },
+      {
+        "id": "tooltip-trigger-directorCompanyCar",
+        "name": "Help for Company Car BIK"
+      },
+      {
+        "id": "tooltip-trigger-directorAssociatedCompanies",
+        "name": "Help for Associated Companies"
+      },
+      {
+        "id": "tooltip-trigger-directorLosses",
+        "name": "Help for Losses Brought Forward"
+      },
+      {
+        "id": "tooltip-trigger-directorMinimumSalary",
+        "name": "Help for Minimum Salary"
+      },
+      {
+        "id": "tooltip-trigger-directorYourSalary",
+        "name": "Help for Your Current Salary"
+      },
+      {
+        "id": "tooltip-trigger-directorYourDividends",
+        "name": "Help for Your Current Dividends"
+      }
+    ],
+    "monthlyHelp": [
+      {
+        "id": "tooltip-trigger-directorMonthlyIncome",
+        "name": "Help for Monthly Contract Income"
+      },
+      {
+        "id": "tooltip-trigger-directorMonthlyExpenses",
+        "name": "Help for Monthly Business Expenses"
+      },
+      {
+        "id": "tooltip-trigger-directorContractStartMonth",
+        "name": "Help for Contract Start Month"
+      },
+      {
+        "id": "tooltip-trigger-directorCashInBank",
+        "name": "Help for Cash In Bank"
+      },
+      {
+        "id": "tooltip-trigger-directorMinimumMonthlyDraw",
+        "name": "Help for Minimum Monthly Draw"
+      },
+      {
+        "id": "tooltip-trigger-directorRunwayMonths",
+        "name": "Help for Runway Target"
+      },
+      {
+        "id": "tooltip-trigger-directorIncludesVat",
+        "name": "Help for Revenue Includes VAT"
+      },
+      {
+        "id": "tooltip-trigger-region",
+        "name": "Help for Tax Region"
+      },
+      {
+        "id": "tooltip-trigger-directorYearEnd",
+        "name": "Help for Company Year-End"
+      },
+      {
+        "id": "tooltip-trigger-directorYearEndCustom",
+        "name": "Help for Custom Year-End Date"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdSalary",
+        "name": "Help for Salary Already Taken"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdDividends",
+        "name": "Help for Dividends Already Taken"
+      },
+      {
+        "id": "tooltip-trigger-directorYtdDrawings",
+        "name": "Help for Other Drawings"
+      },
+      {
+        "id": "tooltip-trigger-directorOtherIncome",
+        "name": "Help for Other Personal Income"
+      },
+      {
+        "id": "tooltip-trigger-directorOtherPAYE",
+        "name": "Help for Other PAYE Employment"
+      },
+      {
+        "id": "tooltip-trigger-directorEmploymentAllowance",
+        "name": "Help for Employment Allowance"
+      },
+      {
+        "id": "tooltip-trigger-directorStudentLoans",
+        "name": "Help for Student Loans"
+      },
+      {
+        "id": "tooltip-trigger-directorPension",
+        "name": "Help for Employer Pension"
+      },
+      {
+        "id": "tooltip-trigger-directorPensionDeducted",
+        "name": "Help for Pension Included in Business Expenses"
+      },
+      {
+        "id": "tooltip-trigger-directorCompanyCar",
+        "name": "Help for Company Car BIK"
+      },
+      {
+        "id": "tooltip-trigger-directorAssociatedCompanies",
+        "name": "Help for Associated Companies"
+      },
+      {
+        "id": "tooltip-trigger-directorLosses",
+        "name": "Help for Losses Brought Forward"
+      },
+      {
+        "id": "tooltip-trigger-directorMinimumSalary",
+        "name": "Help for Minimum Salary"
+      },
+      {
+        "id": "tooltip-trigger-directorYourSalary",
+        "name": "Help for Your Current Salary"
+      },
+      {
+        "id": "tooltip-trigger-directorYourDividends",
+        "name": "Help for Your Current Dividends"
+      }
+    ],
+    "resultHelpNames": [
+      "ANNUAL TAKE-HOME\n\n£30,963.72",
+      "TOTAL TAX & NI\n\n£7,136.28",
+      "EFFECTIVE TAX RATE\n\n17.8%",
+      "MARGINAL TAX RATE\n\n26.9%"
+    ],
+    "directorHelpCount": 27,
+    "captures": [
+      "webkit-mobile-paye-whole-form.png",
+      "webkit-mobile-paye-help.png",
+      "webkit-mobile-paye-validation.png",
+      "webkit-mobile-paye-results-warnings.png",
+      "webkit-mobile-paye-additional-income-warning.png",
+      "webkit-mobile-director-quick-start.png",
+      "webkit-mobile-director-company-year-end.png",
+      "webkit-mobile-director-already-taken.png",
+      "webkit-mobile-director-situation.png",
+      "webkit-mobile-director-advanced-pension.png",
+      "webkit-mobile-director-advanced-company-car.png",
+      "webkit-mobile-director-advanced-salary.png",
+      "webkit-mobile-director-compare-setup.png",
+      "webkit-mobile-director-monthly-income.png",
+      "webkit-mobile-director-monthly-cash.png",
+      "webkit-mobile-director-help.png",
+      "webkit-mobile-director-validation.png",
+      "webkit-mobile-director-results-warnings.png"
+    ],
+    "payeAxe": [],
+    "directorAxe": [],
+    "pageErrors": [],
+    "consoleMessages": [
+      "Viewport argument key \"interactive-widget\" not recognized and ignored.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute http://localhost:3102/_vercel/insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Refused to execute http://localhost:3102/_vercel/speed-insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Viewport argument key \"interactive-widget\" not recognized and ignored.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute http://localhost:3102/_vercel/insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Refused to execute http://localhost:3102/_vercel/speed-insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type."
+    ]
+  }
+]

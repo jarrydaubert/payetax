@@ -18,6 +18,7 @@ import {
   ensureCalculatorVisible,
   openCalculatorForAmountEntry,
 } from './helpers/calculator-ui';
+import { checkVisibleInputHelp } from './helpers/input-help';
 
 function parsePercent(text: string): number {
   const match = text.match(/(\d+(\.\d+)?)%/);
@@ -26,49 +27,135 @@ function parsePercent(text: string): number {
 }
 
 test.describe('Pension modelling guidance @critical', () => {
-  test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
+  test.use({ hasTouch: true, viewport: { width: 375, height: 812 } });
 
-  test('pension assumptions open by touch and keyboard without a tooltip', async ({ page }) => {
+  test('pension help works by touch and keyboard without permanent guidance', async ({ page }) => {
     await page.goto('/#tax-calculator');
-    await page.waitForLoadState('networkidle');
     await dismissCookieBannerIfPresent(page);
-
     const pension = page.getByTestId('pension-input');
-    await expect(pension).toHaveAccessibleDescription(
-      /Enter your contribution, including net pay or relief at source/,
-    );
-    await expect(pension).toHaveAccessibleDescription(
-      /estimate all contributions as salary sacrifice, so take-home may be too high/,
-    );
-    const summary = page
-      .locator('summary')
-      .filter({ hasText: 'How pension affects your estimate' });
-    const details = summary.locator('..');
-    const explanation = details.locator('p');
-    await expect(details).not.toHaveAttribute('open');
-    await expect(explanation).toBeHidden();
+    const help = page.getByRole('button', { name: 'Help for Pension', exact: true });
+    const content = page.getByRole('region', { name: 'Help for Pension', exact: true });
+    await expect(pension).not.toHaveAttribute('aria-describedby');
+    await expect(page.getByText('How pension affects your estimate')).toHaveCount(0);
+    await expect(content).toHaveCount(0);
+    await help.tap();
+    await expect(content).toBeVisible();
+    await expect(help).toHaveAttribute('aria-expanded', 'true');
+    await expect(help).toHaveAccessibleDescription(/salary sacrifice/);
+    await content.getByRole('button', { name: 'Close help' }).tap();
+    await expect(content).toHaveCount(0);
+    await expect(help).toBeFocused();
+    await help.press('Enter');
+    await expect(help).toBeFocused();
+    await help.press('Escape');
+    await expect(content).toHaveCount(0);
+    await expect(help).toBeFocused();
+    await help.press('Space');
+    await expect(content).toBeVisible();
+    await help.press('Space');
+    await expect(content).toHaveCount(0);
+    await expect(help).toBeFocused();
+    await help.press('Tab');
+    await expect(page.getByTestId('pension-type-select')).toBeFocused();
+    await expect(pension).toHaveValue('0.00');
+  });
 
-    await summary.tap();
-    await expect(details).toHaveAttribute('open', '');
-    await expect(explanation).toBeVisible();
-    await expect(explanation).toContainText(
-      'Income Tax, employee National Insurance and student loan repayments',
-    );
-    await expect(explanation).toContainText('Employer NI stays based on gross employment pay');
-    await expect(explanation).toContainText(
-      "Net pay and relief at source aren't calculated separately",
-    );
-    await expect(explanation).toContainText('take-home may be too high');
-    await expect(page.getByRole('tooltip')).toHaveCount(0);
-    await summary.tap();
-    await expect(explanation).toBeHidden();
+  test('narrow-screen pension help stays on screen and can scroll with the keyboard', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 320, height: 280 });
+    await page.goto('/#tax-calculator');
+    await dismissCookieBannerIfPresent(page);
+    const help = page.getByRole('button', { name: 'Help for Pension', exact: true });
+    const content = page.getByRole('region', { name: 'Help for Pension', exact: true });
+    await help.tap();
+    await expect(content).toBeVisible();
+    await expect
+      .poll(async () => {
+        const box = await content.boundingBox();
+        return (
+          box !== null &&
+          box.x >= 0 &&
+          box.y >= 0 &&
+          box.x + box.width <= 320 &&
+          box.y + box.height <= 280
+        );
+      })
+      .toBe(true);
+    await help.focus();
+    await help.press('ArrowDown');
+    await expect(content).toBeFocused();
+    await content.press('End');
+    await expect.poll(() => content.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+    await content.press('Home');
+    await expect.poll(() => content.evaluate((element) => element.scrollTop)).toBe(0);
+    await content.press('Escape');
+    await expect(content).toHaveCount(0);
+    await expect(help).toBeFocused();
+  });
 
+  test('desktop mouse can reopen help after focus returns to its trigger', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1000 });
-    await summary.focus();
-    await summary.press('Enter');
+    await page.goto('/#tax-calculator');
+    await dismissCookieBannerIfPresent(page);
+    const help = page.getByRole('button', { name: 'Help for Pension', exact: true });
+    const content = page.getByRole('region', { name: 'Help for Pension', exact: true });
+    await help.focus();
+    for (let opening = 0; opening < 3; opening += 1) {
+      await help.click();
+      await expect(help).toBeFocused();
+      await content.getByRole('button', { name: 'Close help' }).click();
+      await expect(help).toBeFocused();
+    }
+    await help.press('Tab');
+    await expect(page.getByTestId('pension-type-select')).toBeFocused();
+  });
+
+  test('every PAYE input help control works at 375px', async ({ page }) => {
+    await openCalculatorForAmountEntry(page, true);
+    const tested = await checkVisibleInputHelp(page);
+    expect(tested).toContain('tooltip-trigger-partnerGrossWage');
+    expect(tested).toHaveLength(12);
+  });
+
+  test('pension and additional-income warnings appear with calculated results', async ({
+    page,
+  }) => {
+    await openCalculatorForAmountEntry(page, true);
+    await page.getByTestId('salary-input').fill('40000');
+    await page.getByTestId('salary-input').press('Tab');
+    await expect(page.getByTestId('salary-input')).toHaveValue('40,000.00');
+    await page.getByTestId('pension-input').fill('5');
+    await page
+      .getByRole('button', { name: 'Additional Income Sources', exact: true })
+      .press('Enter');
+    await page.getByTestId('add-income-source').press('Enter');
+    await page.getByTestId('income-source-0-amount').fill('100');
+    await expect(page.getByTestId('pension-method-result-note')).toHaveCount(0);
+    await expect(page.getByTestId('additional-income-result-note')).toHaveCount(0);
+    await page.getByTestId('calculate-button').press('Enter');
+    const results = page.getByRole('region', {
+      name: 'Tax calculation results summary',
+      exact: true,
+    });
+    await expect(results.getByTestId('pension-method-result-note')).toContainText(
+      'take-home may be too high',
+    );
+    await expect(results.getByTestId('pension-method-result-note')).toContainText(
+      'Employer National Insurance savings are not included',
+    );
+    await expect(results.getByTestId('additional-income-result-note')).toBeVisible();
+    await expect(
+      page.getByTestId('calculator-section').locator('input[aria-invalid="true"]'),
+    ).toHaveCount(0);
+    const takeHomeHelp = results.getByRole('button', { name: /Annual Take-Home/ });
+    await takeHomeHelp.tap();
+    const explanation = page.getByRole('region', { name: 'Help for Annual Take-Home' });
     await expect(explanation).toBeVisible();
-    await summary.press('Space');
-    await expect(explanation).toBeHidden();
+    // Touching an amount field may focus it without emitting a later click in Safari.
+    await page.getByTestId('salary-input').tap();
+    await expect(explanation).toHaveCount(0);
+    await expect(page.getByTestId('salary-input')).toBeFocused();
   });
 });
 
@@ -350,11 +437,6 @@ test.describe('MC-03 input integrity @critical', () => {
     await expect(page.getByTestId('tax-results')).toHaveCount(0);
     await typeAmount(pension, '5');
     await pension.press('Tab');
-    const pensionExplanation = page
-      .locator('summary')
-      .filter({ hasText: 'How pension affects your estimate' });
-    await expect(pensionExplanation).toBeFocused();
-    await pensionExplanation.press('Tab');
     const additionalIncome = page.getByRole('button', { name: /Additional Income Sources/ });
     await expect(additionalIncome).toBeFocused();
     await additionalIncome.press('Tab');
@@ -513,7 +595,12 @@ test.describe('MC-02 pension units and restoration @critical', () => {
       if (recovery === 'amount') {
         await switchPensionUnit(page, 'amount');
         await expect(pension).toHaveValue('0.00');
-        await expect(page.getByText(/Switching between % and £ resets/)).toBeVisible();
+        const pensionHelp = page.getByRole('button', { name: 'Help for Pension', exact: true });
+        await pensionHelp.press('Enter');
+        await expect(
+          page.getByRole('region', { name: 'Help for Pension', exact: true }),
+        ).toHaveAccessibleDescription(/Changing between % and £ resets it to 0/);
+        await page.keyboard.press('Escape');
       }
       await typePension(pension, recovery === 'amount' ? '5000' : '5.25');
       await expect(pension).not.toHaveAttribute('aria-invalid');
@@ -545,7 +632,12 @@ test.describe('MC-02 pension units and restoration @critical', () => {
       await expect(page.getByTestId('tax-results')).toBeVisible();
       await switchPensionUnit(page, from === 'amount' ? 'percentage' : 'amount');
       await expect(pension).toHaveValue('0.00');
-      await expect(page.getByText(/Switching between % and £ resets/)).toBeVisible();
+      const pensionHelp = page.getByRole('button', { name: 'Help for Pension', exact: true });
+      await pensionHelp.press('Enter');
+      await expect(
+        page.getByRole('region', { name: 'Help for Pension', exact: true }),
+      ).toHaveAccessibleDescription(/Changing between % and £ resets it to 0/);
+      await page.keyboard.press('Escape');
       await expect(page.getByTestId('tax-results')).toHaveCount(0);
       await typePension(pension, from === 'amount' ? '100.01' : '10000000.01');
       await expect(pension).toHaveAttribute('aria-invalid', 'true');

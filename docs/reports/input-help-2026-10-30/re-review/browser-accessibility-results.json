@@ -1,0 +1,762 @@
+[
+  {
+    "engine": "chromium",
+    "layout": "desktop",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "paye": {
+      "before": {
+        "dom": {
+          "name": "Help for Pension",
+          "expanded": "false",
+          "controls": null,
+          "describedby": null,
+          "explanation": null,
+          "focused": true
+        },
+        "chromiumAX": {
+          "role": "button",
+          "name": "Help for Pension",
+          "description": null,
+          "ignored": false,
+          "properties": [
+            {
+              "name": "focused",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": true
+              }
+            },
+            {
+              "name": "expanded",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": false
+              }
+            }
+          ]
+        }
+      },
+      "open": {
+        "dom": {
+          "name": "Help for Pension",
+          "expanded": "true",
+          "controls": "radix-_R_1belijlfjlb_",
+          "describedby": "_R_belijlfjlb_",
+          "explanation": "PensionEnter your own contribution as % of gross salary or £ for the selected pay period. Changing between % and £ resets it to 0.We use salary sacrifice to estimate pension deductions.",
+          "focused": true
+        },
+        "chromiumAX": {
+          "role": "button",
+          "name": "Help for Pension",
+          "description": "Pension Enter your own contribution as % of gross salary or £ for the selected pay period. Changing between % and £ resets it to 0. We use salary sacrifice to estimate pension deductions.",
+          "ignored": false,
+          "properties": [
+            {
+              "name": "focused",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": true
+              }
+            },
+            {
+              "name": "expanded",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": true
+              }
+            },
+            {
+              "name": "describedby",
+              "value": {
+                "type": "idrefList",
+                "value": "_R_belijlfjlb_",
+                "relatedNodes": [
+                  {
+                    "backendDOMNodeId": 866,
+                    "idref": "_R_belijlfjlb_"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "controls",
+              "value": {
+                "type": "idrefList",
+                "value": "radix-_R_1belijlfjlb_",
+                "relatedNodes": [
+                  {
+                    "backendDOMNodeId": 868,
+                    "idref": "radix-_R_1belijlfjlb_"
+                  }
+                ]
+              }
+            }
+          ],
+          "explanationRegion": {
+            "role": "region",
+            "name": "Help for Pension",
+            "ignored": false
+          }
+        }
+      },
+      "closed": {
+        "dom": {
+          "name": "Help for Pension",
+          "expanded": "false",
+          "controls": null,
+          "describedby": null,
+          "explanation": null,
+          "focused": true
+        },
+        "chromiumAX": {
+          "role": "button",
+          "name": "Help for Pension",
+          "description": null,
+          "ignored": false,
+          "properties": [
+            {
+              "name": "focused",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": true
+              }
+            },
+            {
+              "name": "expanded",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": false
+              }
+            }
+          ]
+        }
+      },
+      "drawerContainment": null,
+      "axeViolations": []
+    },
+    "director": {
+      "before": {
+        "dom": {
+          "name": "Help for Other PAYE Employment",
+          "expanded": "false",
+          "controls": null,
+          "describedby": null,
+          "explanation": null,
+          "focused": true
+        },
+        "chromiumAX": {
+          "role": "button",
+          "name": "Help for Other PAYE Employment",
+          "description": null,
+          "ignored": false,
+          "properties": [
+            {
+              "name": "focused",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": true
+              }
+            },
+            {
+              "name": "expanded",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": false
+              }
+            }
+          ]
+        }
+      },
+      "open": {
+        "dom": {
+          "name": "Help for Other PAYE Employment",
+          "expanded": "true",
+          "controls": "radix-_r_r_",
+          "describedby": "_r_q_",
+          "explanation": "Other PAYE EmploymentSelect if you also have a PAYE job elsewhere.",
+          "focused": true
+        },
+        "chromiumAX": {
+          "role": "button",
+          "name": "Help for Other PAYE Employment",
+          "description": "Other PAYE Employment Select if you also have a PAYE job elsewhere.",
+          "ignored": false,
+          "properties": [
+            {
+              "name": "focused",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": true
+              }
+            },
+            {
+              "name": "expanded",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": true
+              }
+            },
+            {
+              "name": "describedby",
+              "value": {
+                "type": "idrefList",
+                "value": "_r_q_",
+                "relatedNodes": [
+                  {
+                    "backendDOMNodeId": 2589,
+                    "idref": "_r_q_"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "controls",
+              "value": {
+                "type": "idrefList",
+                "value": "radix-_r_r_",
+                "relatedNodes": [
+                  {
+                    "backendDOMNodeId": 2591,
+                    "idref": "radix-_r_r_"
+                  }
+                ]
+              }
+            }
+          ],
+          "explanationRegion": {
+            "role": "region",
+            "name": "Help for Other PAYE Employment",
+            "ignored": false
+          }
+        }
+      },
+      "closed": {
+        "dom": {
+          "name": "Help for Other PAYE Employment",
+          "expanded": "false",
+          "controls": null,
+          "describedby": null,
+          "explanation": null,
+          "focused": true
+        },
+        "chromiumAX": {
+          "role": "button",
+          "name": "Help for Other PAYE Employment",
+          "description": null,
+          "ignored": false,
+          "properties": [
+            {
+              "name": "focused",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": true
+              }
+            },
+            {
+              "name": "expanded",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": false
+              }
+            }
+          ]
+        }
+      },
+      "drawerContainment": null,
+      "axeViolations": []
+    },
+    "resultWarnings": "VAT has not been removed from the revenue you entered, so this estimate may be too high.\n\nIn the suggested pay options, selecting other PAYE employment means we estimate employee National Insurance from the first pound of director salary. Jobs with separate employers usually have separate thresholds, so this may overstate your NI. Check with your payroll provider.\n\nCompany pension contributions count towards your annual allowance across all your pensions. Going over your available allowance may mean a personal tax charge, which is not included in this estimate. Unused allowance from the previous three tax years may help; high income or some pension withdrawals can reduce your allowance.",
+    "pageErrors": [],
+    "consoleMessages": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/speed-insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/speed-insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled."
+    ],
+    "limitation": "Automated DOM, browser accessibility-tree and axe evidence only. No live screen-reader speech or physical-device test."
+  },
+  {
+    "engine": "chromium",
+    "layout": "mobile",
+    "viewport": {
+      "width": 375,
+      "height": 812
+    },
+    "paye": {
+      "before": {
+        "dom": {
+          "name": "Help for Pension",
+          "expanded": "false",
+          "controls": null,
+          "describedby": null,
+          "explanation": null,
+          "focused": true
+        },
+        "chromiumAX": {
+          "role": "button",
+          "name": "Help for Pension",
+          "description": null,
+          "ignored": false,
+          "properties": [
+            {
+              "name": "focused",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": true
+              }
+            },
+            {
+              "name": "expanded",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": false
+              }
+            }
+          ]
+        }
+      },
+      "open": {
+        "dom": {
+          "name": "Help for Pension",
+          "expanded": "true",
+          "controls": "radix-_R_1belijlfjlb_",
+          "describedby": "_R_belijlfjlb_",
+          "explanation": "PensionEnter your own contribution as % of gross salary or £ for the selected pay period. Changing between % and £ resets it to 0.We use salary sacrifice to estimate pension deductions.",
+          "focused": true
+        },
+        "chromiumAX": {
+          "role": "button",
+          "name": "Help for Pension",
+          "description": "Pension Enter your own contribution as % of gross salary or £ for the selected pay period. Changing between % and £ resets it to 0. We use salary sacrifice to estimate pension deductions.",
+          "ignored": false,
+          "properties": [
+            {
+              "name": "focused",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": true
+              }
+            },
+            {
+              "name": "expanded",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": true
+              }
+            },
+            {
+              "name": "describedby",
+              "value": {
+                "type": "idrefList",
+                "value": "_R_belijlfjlb_",
+                "relatedNodes": [
+                  {
+                    "backendDOMNodeId": 864,
+                    "idref": "_R_belijlfjlb_"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "controls",
+              "value": {
+                "type": "idrefList",
+                "value": "radix-_R_1belijlfjlb_",
+                "relatedNodes": [
+                  {
+                    "backendDOMNodeId": 866,
+                    "idref": "radix-_R_1belijlfjlb_"
+                  }
+                ]
+              }
+            }
+          ],
+          "explanationRegion": {
+            "role": "region",
+            "name": "Help for Pension",
+            "ignored": false
+          }
+        }
+      },
+      "closed": {
+        "dom": {
+          "name": "Help for Pension",
+          "expanded": "false",
+          "controls": null,
+          "describedby": null,
+          "explanation": null,
+          "focused": true
+        },
+        "chromiumAX": {
+          "role": "button",
+          "name": "Help for Pension",
+          "description": null,
+          "ignored": false,
+          "properties": [
+            {
+              "name": "focused",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": true
+              }
+            },
+            {
+              "name": "expanded",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": false
+              }
+            }
+          ]
+        }
+      },
+      "drawerContainment": null,
+      "axeViolations": []
+    },
+    "director": {
+      "before": {
+        "dom": {
+          "name": "Help for Other PAYE Employment",
+          "expanded": "false",
+          "controls": null,
+          "describedby": null,
+          "explanation": null,
+          "focused": true
+        },
+        "chromiumAX": {
+          "role": "button",
+          "name": "Help for Other PAYE Employment",
+          "description": null,
+          "ignored": false,
+          "properties": [
+            {
+              "name": "focused",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": true
+              }
+            },
+            {
+              "name": "expanded",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": false
+              }
+            }
+          ]
+        }
+      },
+      "open": {
+        "dom": {
+          "name": "Help for Other PAYE Employment",
+          "expanded": "true",
+          "controls": "radix-_r_1o_",
+          "describedby": "_r_1n_",
+          "explanation": "Other PAYE EmploymentSelect if you also have a PAYE job elsewhere.",
+          "focused": true
+        },
+        "chromiumAX": {
+          "role": "button",
+          "name": "Help for Other PAYE Employment",
+          "description": "Other PAYE Employment Select if you also have a PAYE job elsewhere.",
+          "ignored": false,
+          "properties": [
+            {
+              "name": "focused",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": true
+              }
+            },
+            {
+              "name": "expanded",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": true
+              }
+            },
+            {
+              "name": "describedby",
+              "value": {
+                "type": "idrefList",
+                "value": "_r_1n_",
+                "relatedNodes": [
+                  {
+                    "backendDOMNodeId": 2674,
+                    "idref": "_r_1n_"
+                  }
+                ]
+              }
+            },
+            {
+              "name": "controls",
+              "value": {
+                "type": "idrefList",
+                "value": "radix-_r_1o_",
+                "relatedNodes": [
+                  {
+                    "backendDOMNodeId": 2676,
+                    "idref": "radix-_r_1o_"
+                  }
+                ]
+              }
+            }
+          ],
+          "explanationRegion": {
+            "role": "region",
+            "name": "Help for Other PAYE Employment",
+            "ignored": false
+          }
+        }
+      },
+      "closed": {
+        "dom": {
+          "name": "Help for Other PAYE Employment",
+          "expanded": "false",
+          "controls": null,
+          "describedby": null,
+          "explanation": null,
+          "focused": true
+        },
+        "chromiumAX": {
+          "role": "button",
+          "name": "Help for Other PAYE Employment",
+          "description": null,
+          "ignored": false,
+          "properties": [
+            {
+              "name": "focused",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": true
+              }
+            },
+            {
+              "name": "expanded",
+              "value": {
+                "type": "booleanOrUndefined",
+                "value": false
+              }
+            }
+          ]
+        }
+      },
+      "drawerContainment": true,
+      "axeViolations": []
+    },
+    "resultWarnings": "VAT has not been removed from the revenue you entered, so this estimate may be too high.\n\nIn the suggested pay options, selecting other PAYE employment means we estimate employee National Insurance from the first pound of director salary. Jobs with separate employers usually have separate thresholds, so this may overstate your NI. Check with your payroll provider.\n\nCompany pension contributions count towards your annual allowance across all your pensions. Going over your available allowance may mean a personal tax charge, which is not included in this estimate. Unused allowance from the previous three tax years may help; high income or some pension withdrawals can reduce your allowance.",
+    "pageErrors": [],
+    "consoleMessages": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/speed-insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/speed-insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled."
+    ],
+    "limitation": "Automated DOM, browser accessibility-tree and axe evidence only. No live screen-reader speech or physical-device test."
+  },
+  {
+    "engine": "webkit",
+    "layout": "desktop",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "paye": {
+      "before": {
+        "dom": {
+          "name": "Help for Pension",
+          "expanded": "false",
+          "controls": null,
+          "describedby": null,
+          "explanation": null,
+          "focused": true
+        },
+        "chromiumAX": null
+      },
+      "open": {
+        "dom": {
+          "name": "Help for Pension",
+          "expanded": "true",
+          "controls": "radix-_R_1belijlfjlb_",
+          "describedby": "_R_belijlfjlb_",
+          "explanation": "PensionEnter your own contribution as % of gross salary or £ for the selected pay period. Changing between % and £ resets it to 0.We use salary sacrifice to estimate pension deductions.",
+          "focused": true
+        },
+        "chromiumAX": null
+      },
+      "closed": {
+        "dom": {
+          "name": "Help for Pension",
+          "expanded": "false",
+          "controls": null,
+          "describedby": null,
+          "explanation": null,
+          "focused": true
+        },
+        "chromiumAX": null
+      },
+      "drawerContainment": null,
+      "axeViolations": []
+    },
+    "director": {
+      "before": {
+        "dom": {
+          "name": "Help for Other PAYE Employment",
+          "expanded": "false",
+          "controls": null,
+          "describedby": null,
+          "explanation": null,
+          "focused": true
+        },
+        "chromiumAX": null
+      },
+      "open": {
+        "dom": {
+          "name": "Help for Other PAYE Employment",
+          "expanded": "true",
+          "controls": "radix-_r_r_",
+          "describedby": "_r_q_",
+          "explanation": "Other PAYE EmploymentSelect if you also have a PAYE job elsewhere.",
+          "focused": true
+        },
+        "chromiumAX": null
+      },
+      "closed": {
+        "dom": {
+          "name": "Help for Other PAYE Employment",
+          "expanded": "false",
+          "controls": null,
+          "describedby": null,
+          "explanation": null,
+          "focused": true
+        },
+        "chromiumAX": null
+      },
+      "drawerContainment": null,
+      "axeViolations": []
+    },
+    "resultWarnings": "VAT has not been removed from the revenue you entered, so this estimate may be too high.\n\nIn the suggested pay options, selecting other PAYE employment means we estimate employee National Insurance from the first pound of director salary. Jobs with separate employers usually have separate thresholds, so this may overstate your NI. Check with your payroll provider.\n\nCompany pension contributions count towards your annual allowance across all your pensions. Going over your available allowance may mean a personal tax charge, which is not included in this estimate. Unused allowance from the previous three tax years may help; high income or some pension withdrawals can reduce your allowance.",
+    "pageErrors": [],
+    "consoleMessages": [
+      "Viewport argument key \"interactive-widget\" not recognized and ignored.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute http://localhost:3102/_vercel/insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Refused to execute http://localhost:3102/_vercel/speed-insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Viewport argument key \"interactive-widget\" not recognized and ignored.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute http://localhost:3102/_vercel/insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Refused to execute http://localhost:3102/_vercel/speed-insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type."
+    ],
+    "limitation": "Automated DOM, browser accessibility-tree and axe evidence only. No live screen-reader speech or physical-device test."
+  },
+  {
+    "engine": "webkit",
+    "layout": "mobile",
+    "viewport": {
+      "width": 375,
+      "height": 812
+    },
+    "paye": {
+      "before": {
+        "dom": {
+          "name": "Help for Pension",
+          "expanded": "false",
+          "controls": null,
+          "describedby": null,
+          "explanation": null,
+          "focused": true
+        },
+        "chromiumAX": null
+      },
+      "open": {
+        "dom": {
+          "name": "Help for Pension",
+          "expanded": "true",
+          "controls": "radix-_R_1belijlfjlb_",
+          "describedby": "_R_belijlfjlb_",
+          "explanation": "PensionEnter your own contribution as % of gross salary or £ for the selected pay period. Changing between % and £ resets it to 0.We use salary sacrifice to estimate pension deductions.",
+          "focused": true
+        },
+        "chromiumAX": null
+      },
+      "closed": {
+        "dom": {
+          "name": "Help for Pension",
+          "expanded": "false",
+          "controls": null,
+          "describedby": null,
+          "explanation": null,
+          "focused": true
+        },
+        "chromiumAX": null
+      },
+      "drawerContainment": null,
+      "axeViolations": []
+    },
+    "director": {
+      "before": {
+        "dom": {
+          "name": "Help for Other PAYE Employment",
+          "expanded": "false",
+          "controls": null,
+          "describedby": null,
+          "explanation": null,
+          "focused": true
+        },
+        "chromiumAX": null
+      },
+      "open": {
+        "dom": {
+          "name": "Help for Other PAYE Employment",
+          "expanded": "true",
+          "controls": "radix-_r_1o_",
+          "describedby": "_r_1n_",
+          "explanation": "Other PAYE EmploymentSelect if you also have a PAYE job elsewhere.",
+          "focused": true
+        },
+        "chromiumAX": null
+      },
+      "closed": {
+        "dom": {
+          "name": "Help for Other PAYE Employment",
+          "expanded": "false",
+          "controls": null,
+          "describedby": null,
+          "explanation": null,
+          "focused": true
+        },
+        "chromiumAX": null
+      },
+      "drawerContainment": true,
+      "axeViolations": []
+    },
+    "resultWarnings": "VAT has not been removed from the revenue you entered, so this estimate may be too high.\n\nIn the suggested pay options, selecting other PAYE employment means we estimate employee National Insurance from the first pound of director salary. Jobs with separate employers usually have separate thresholds, so this may overstate your NI. Check with your payroll provider.\n\nCompany pension contributions count towards your annual allowance across all your pensions. Going over your available allowance may mean a personal tax charge, which is not included in this estimate. Unused allowance from the previous three tax years may help; high income or some pension withdrawals can reduce your allowance.",
+    "pageErrors": [],
+    "consoleMessages": [
+      "Viewport argument key \"interactive-widget\" not recognized and ignored.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute http://localhost:3102/_vercel/insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Refused to execute http://localhost:3102/_vercel/speed-insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Viewport argument key \"interactive-widget\" not recognized and ignored.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute http://localhost:3102/_vercel/insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Refused to execute http://localhost:3102/_vercel/speed-insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type."
+    ],
+    "limitation": "Automated DOM, browser accessibility-tree and axe evidence only. No live screen-reader speech or physical-device test."
+  }
+]

@@ -4,11 +4,10 @@
  */
 'use client';
 
-import { Info } from 'lucide-react';
 import { useId } from 'react';
+import { LabelTooltip } from '@/components/atoms/LabelTooltip';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useDirectorFormSlice, useDirectorGuideActions } from '@/store/directorGuideStore';
 
 export function AlreadyTakenInputs() {
@@ -30,14 +29,7 @@ export function AlreadyTakenInputs() {
       <div className='space-y-2'>
         <div className='flex items-center gap-1'>
           <Label htmlFor={ytdSalaryId}>YTD Salary</Label>
-          <Tooltip>
-            <TooltipTrigger>
-              <Info className='size-4 text-muted-foreground' />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className='max-w-xs'>Gross salary paid via PAYE this tax year</p>
-            </TooltipContent>
-          </Tooltip>
+          <LabelTooltip fieldName='directorYtdSalary' />
         </div>
         <div className='flex items-center gap-2'>
           <span className='text-muted-foreground'>£</span>
@@ -55,14 +47,7 @@ export function AlreadyTakenInputs() {
       <div className='space-y-2'>
         <div className='flex items-center gap-1'>
           <Label htmlFor={ytdDividendsId}>YTD Dividends</Label>
-          <Tooltip>
-            <TooltipTrigger>
-              <Info className='size-4 text-muted-foreground' />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className='max-w-xs'>Dividends declared this tax year</p>
-            </TooltipContent>
-          </Tooltip>
+          <LabelTooltip fieldName='directorYtdDividends' />
         </div>
         <div className='flex items-center gap-2'>
           <span className='text-muted-foreground'>£</span>
@@ -80,16 +65,7 @@ export function AlreadyTakenInputs() {
       <div className='space-y-2'>
         <div className='flex items-center gap-1'>
           <Label htmlFor={ytdDrawingsId}>Other Drawings</Label>
-          <Tooltip>
-            <TooltipTrigger>
-              <Info className='size-4 text-muted-foreground' />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className='max-w-xs'>
-                Director&apos;s loan or other withdrawals (not salary/dividends)
-              </p>
-            </TooltipContent>
-          </Tooltip>
+          <LabelTooltip fieldName='directorYtdDrawings' />
         </div>
         <div className='flex items-center gap-2'>
           <span className='text-muted-foreground'>£</span>

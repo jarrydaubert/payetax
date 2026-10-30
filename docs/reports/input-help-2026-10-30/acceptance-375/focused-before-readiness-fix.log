@@ -1,0 +1,132 @@
+✅ Cookie consent accepted with a valid timestamp
+✅ Storage state saved to playwright/.auth/storageState.json
+
+Running 32 tests using 1 worker
+
+
+
+(node:28864) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[1/32] [chromium] › e2e\calculator-critical.spec.ts:32:7 › Pension modelling guidance @critical › pension help works by touch and keyboard without permanent guidance
+[2/32] [chromium] › e2e\calculator-critical.spec.ts:63:7 › Pension modelling guidance @critical › narrow-screen pension help stays on screen and can scroll with the keyboard
+[3/32] [chromium] › e2e\calculator-critical.spec.ts:97:7 › Pension modelling guidance @critical › desktop mouse can reopen help after focus returns to its trigger
+[4/32] [chromium] › e2e\calculator-critical.spec.ts:114:7 › Pension modelling guidance @critical › every PAYE input help control works at 375px
+[5/32] [chromium] › e2e\calculator-critical.spec.ts:123:7 › Pension modelling guidance @critical › pension and additional-income warnings appear with calculated results
+[6/32] [chromium] › e2e\director-guide-critical.spec.ts:596:7 › Director input help @critical › help works in annual, full and monthly inputs, including the mobile drawer
+[7/32] [chromium] › e2e\director-guide-critical.spec.ts:646:7 › Director input help @critical › every Director input help control works at 375px in annual and monthly modes
+[8/32] [chromium] › e2e\director-guide-critical.spec.ts:679:7 › Director input help @critical › material Director estimate warnings appear with results
+(node:28232) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[9/32] [webkit] › e2e\calculator-critical.spec.ts:32:7 › Pension modelling guidance @critical › pension help works by touch and keyboard without permanent guidance
+[10/32] [webkit] › e2e\calculator-critical.spec.ts:63:7 › Pension modelling guidance @critical › narrow-screen pension help stays on screen and can scroll with the keyboard
+[11/32] [webkit] › e2e\calculator-critical.spec.ts:97:7 › Pension modelling guidance @critical › desktop mouse can reopen help after focus returns to its trigger
+[12/32] [webkit] › e2e\calculator-critical.spec.ts:114:7 › Pension modelling guidance @critical › every PAYE input help control works at 375px
+  1) [webkit] › e2e\calculator-critical.spec.ts:114:7 › Pension modelling guidance @critical › every PAYE input help control works at 375px
+
+    Error: locator.check: Clicking the checkbox did not change its state
+    Call log:
+      - waiting for getByTestId('married-checkbox')
+        - locator resolved to <button value="on" type="button" role="checkbox" id="_R_5ijlfjlbH5_" aria-checked="false" data-state="unchecked" data-testid="married-checkbox" class="peer size-6 shrink-0 rounded-sm border shadow border-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foregrou…></button>
+      - attempting click action
+        2 × waiting for element to be visible, enabled and stable
+          - element is not stable
+        - retrying click action
+        - waiting 20ms
+        - waiting for element to be visible, enabled and stable
+        - element is not stable
+      - retrying click action
+        - waiting 100ms
+        - waiting for element to be visible, enabled and stable
+        - element is visible, enabled and stable
+        - scrolling into view if needed
+        - done scrolling
+        - performing click action
+        - <div class="flex flex-wrap items-center gap-x-4 gap-y-3 sm:flex-nowrap">…</div> intercepts pointer events
+      - retrying click action
+        - waiting 100ms
+        - waiting for element to be visible, enabled and stable
+        - element is not stable
+      - retrying click action
+        - waiting 500ms
+        - waiting for element to be visible, enabled and stable
+        - element is visible, enabled and stable
+        - scrolling into view if needed
+        - done scrolling
+        - <a href="/" data-testid="nav-logo" class="group inline-flex min-h-11 items-center">…</a> from <header>…</header> subtree intercepts pointer events
+      - retrying click action
+        - waiting 500ms
+        - waiting for element to be visible, enabled and stable
+        - element is visible, enabled and stable
+        - scrolling into view if needed
+        - done scrolling
+        - performing click action
+        - click action done
+        - waiting for scheduled navigations to finish
+        - navigations have finished
+
+
+      115 |     await page.goto('/#tax-calculator');
+      116 |     await dismissCookieBannerIfPresent(page);
+    > 117 |     await page.getByTestId('married-checkbox').check();
+          |                                                ^
+      118 |     const tested = await checkVisibleInputHelp(page);
+      119 |     expect(tested).toContain('tooltip-trigger-partnerGrossWage');
+      120 |     expect(tested).toHaveLength(12);
+        at C:\Users\JGF Desktop\Desktop\payetax-worktrees\input-help-v5.2.2\e2e\calculator-critical.spec.ts:117:48
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    audit-outputs\input-help-focused\calculator-critical-Pensio-69bd9-help-control-works-at-375px-webkit\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    audit-outputs\input-help-focused\calculator-critical-Pensio-69bd9-help-control-works-at-375px-webkit\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: audit-outputs\input-help-focused\calculator-critical-Pensio-69bd9-help-control-works-at-375px-webkit\error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    audit-outputs\input-help-focused\calculator-critical-Pensio-69bd9-help-control-works-at-375px-webkit\trace.zip
+    Usage:
+
+        npx playwright show-trace audit-outputs\input-help-focused\calculator-critical-Pensio-69bd9-help-control-works-at-375px-webkit\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+
+(node:22256) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[13/32] [webkit] › e2e\calculator-critical.spec.ts:123:7 › Pension modelling guidance @critical › pension and additional-income warnings appear with calculated results
+[14/32] [webkit] › e2e\director-guide-critical.spec.ts:596:7 › Director input help @critical › help works in annual, full and monthly inputs, including the mobile drawer
+[15/32] [webkit] › e2e\director-guide-critical.spec.ts:646:7 › Director input help @critical › every Director input help control works at 375px in annual and monthly modes
+[16/32] [webkit] › e2e\director-guide-critical.spec.ts:679:7 › Director input help @critical › material Director estimate warnings appear with results
+
+(node:22456) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[17/32] [Mobile Chrome] › e2e\calculator-critical.spec.ts:32:7 › Pension modelling guidance @critical › pension help works by touch and keyboard without permanent guidance
+[18/32] [Mobile Chrome] › e2e\calculator-critical.spec.ts:63:7 › Pension modelling guidance @critical › narrow-screen pension help stays on screen and can scroll with the keyboard
+[19/32] [Mobile Chrome] › e2e\calculator-critical.spec.ts:97:7 › Pension modelling guidance @critical › desktop mouse can reopen help after focus returns to its trigger
+[20/32] [Mobile Chrome] › e2e\calculator-critical.spec.ts:114:7 › Pension modelling guidance @critical › every PAYE input help control works at 375px
+[21/32] [Mobile Chrome] › e2e\calculator-critical.spec.ts:123:7 › Pension modelling guidance @critical › pension and additional-income warnings appear with calculated results
+[22/32] [Mobile Chrome] › e2e\director-guide-critical.spec.ts:596:7 › Director input help @critical › help works in annual, full and monthly inputs, including the mobile drawer
+[23/32] [Mobile Chrome] › e2e\director-guide-critical.spec.ts:646:7 › Director input help @critical › every Director input help control works at 375px in annual and monthly modes
+[24/32] [Mobile Chrome] › e2e\director-guide-critical.spec.ts:679:7 › Director input help @critical › material Director estimate warnings appear with results
+
+(node:22664) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+[25/32] [Mobile Safari] › e2e\calculator-critical.spec.ts:32:7 › Pension modelling guidance @critical › pension help works by touch and keyboard without permanent guidance
+[26/32] [Mobile Safari] › e2e\calculator-critical.spec.ts:63:7 › Pension modelling guidance @critical › narrow-screen pension help stays on screen and can scroll with the keyboard
+[27/32] [Mobile Safari] › e2e\calculator-critical.spec.ts:97:7 › Pension modelling guidance @critical › desktop mouse can reopen help after focus returns to its trigger
+[28/32] [Mobile Safari] › e2e\calculator-critical.spec.ts:114:7 › Pension modelling guidance @critical › every PAYE input help control works at 375px
+[29/32] [Mobile Safari] › e2e\calculator-critical.spec.ts:123:7 › Pension modelling guidance @critical › pension and additional-income warnings appear with calculated results
+[30/32] [Mobile Safari] › e2e\director-guide-critical.spec.ts:596:7 › Director input help @critical › help works in annual, full and monthly inputs, including the mobile drawer
+[31/32] [Mobile Safari] › e2e\director-guide-critical.spec.ts:646:7 › Director input help @critical › every Director input help control works at 375px in annual and monthly modes
+[32/32] [Mobile Safari] › e2e\director-guide-critical.spec.ts:679:7 › Director input help @critical › material Director estimate warnings appear with results
+  1 failed
+    [webkit] › e2e\calculator-critical.spec.ts:114:7 › Pension modelling guidance @critical › every PAYE input help control works at 375px
+  31 passed (4.1m)

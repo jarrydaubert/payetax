@@ -1,0 +1,66 @@
+✅ Cookie consent accepted with a valid timestamp
+✅ Storage state saved to playwright/.auth/storageState.json
+
+Running 32 tests using 2 workers
+
+
+
+(node:24600) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:34232) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/32] [chromium] › e2e\calculator-critical.spec.ts:63:7 › Pension modelling guidance @critical › narrow-screen pension help stays on screen and can scroll with the keyboard
+[2/32] [chromium] › e2e\calculator-critical.spec.ts:32:7 › Pension modelling guidance @critical › pension help works by touch and keyboard without permanent guidance
+[3/32] [chromium] › e2e\calculator-critical.spec.ts:97:7 › Pension modelling guidance @critical › desktop mouse can reopen help after focus returns to its trigger
+[4/32] [chromium] › e2e\calculator-critical.spec.ts:114:7 › Pension modelling guidance @critical › every PAYE input help control works at 375px
+[5/32] [chromium] › e2e\calculator-critical.spec.ts:121:7 › Pension modelling guidance @critical › pension and additional-income warnings appear with calculated results
+[6/32] [chromium] › e2e\director-guide-critical.spec.ts:596:7 › Director input help @critical › help works in annual, full and monthly inputs, including the mobile drawer
+[7/32] [chromium] › e2e\director-guide-critical.spec.ts:646:7 › Director input help @critical › every Director input help control works at 375px in annual and monthly modes
+[8/32] [chromium] › e2e\director-guide-critical.spec.ts:679:7 › Director input help @critical › material Director estimate warnings appear with results
+(node:24580) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[9/32] [webkit] › e2e\calculator-critical.spec.ts:32:7 › Pension modelling guidance @critical › pension help works by touch and keyboard without permanent guidance
+[10/32] [webkit] › e2e\calculator-critical.spec.ts:63:7 › Pension modelling guidance @critical › narrow-screen pension help stays on screen and can scroll with the keyboard
+[11/32] [webkit] › e2e\calculator-critical.spec.ts:97:7 › Pension modelling guidance @critical › desktop mouse can reopen help after focus returns to its trigger
+[12/32] [webkit] › e2e\calculator-critical.spec.ts:114:7 › Pension modelling guidance @critical › every PAYE input help control works at 375px
+[13/32] [webkit] › e2e\calculator-critical.spec.ts:121:7 › Pension modelling guidance @critical › pension and additional-income warnings appear with calculated results
+
+(node:34372) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[14/32] [webkit] › e2e\director-guide-critical.spec.ts:596:7 › Director input help @critical › help works in annual, full and monthly inputs, including the mobile drawer
+[15/32] [webkit] › e2e\director-guide-critical.spec.ts:646:7 › Director input help @critical › every Director input help control works at 375px in annual and monthly modes
+[16/32] [webkit] › e2e\director-guide-critical.spec.ts:679:7 › Director input help @critical › material Director estimate warnings appear with results
+(node:15928) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[17/32] [Mobile Chrome] › e2e\calculator-critical.spec.ts:32:7 › Pension modelling guidance @critical › pension help works by touch and keyboard without permanent guidance
+[18/32] [Mobile Chrome] › e2e\calculator-critical.spec.ts:63:7 › Pension modelling guidance @critical › narrow-screen pension help stays on screen and can scroll with the keyboard
+[19/32] [Mobile Chrome] › e2e\calculator-critical.spec.ts:97:7 › Pension modelling guidance @critical › desktop mouse can reopen help after focus returns to its trigger
+[20/32] [Mobile Chrome] › e2e\calculator-critical.spec.ts:114:7 › Pension modelling guidance @critical › every PAYE input help control works at 375px
+[21/32] [Mobile Chrome] › e2e\calculator-critical.spec.ts:121:7 › Pension modelling guidance @critical › pension and additional-income warnings appear with calculated results
+[22/32] [Mobile Chrome] › e2e\director-guide-critical.spec.ts:596:7 › Director input help @critical › help works in annual, full and monthly inputs, including the mobile drawer
+[23/32] [Mobile Chrome] › e2e\director-guide-critical.spec.ts:646:7 › Director input help @critical › every Director input help control works at 375px in annual and monthly modes
+[24/32] [Mobile Chrome] › e2e\director-guide-critical.spec.ts:679:7 › Director input help @critical › material Director estimate warnings appear with results
+(node:31192) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[25/32] [Mobile Safari] › e2e\calculator-critical.spec.ts:32:7 › Pension modelling guidance @critical › pension help works by touch and keyboard without permanent guidance
+
+(node:12908) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[26/32] [Mobile Safari] › e2e\calculator-critical.spec.ts:63:7 › Pension modelling guidance @critical › narrow-screen pension help stays on screen and can scroll with the keyboard
+[27/32] [Mobile Safari] › e2e\calculator-critical.spec.ts:97:7 › Pension modelling guidance @critical › desktop mouse can reopen help after focus returns to its trigger
+[28/32] [Mobile Safari] › e2e\calculator-critical.spec.ts:114:7 › Pension modelling guidance @critical › every PAYE input help control works at 375px
+[29/32] [Mobile Safari] › e2e\calculator-critical.spec.ts:121:7 › Pension modelling guidance @critical › pension and additional-income warnings appear with calculated results
+[30/32] [Mobile Safari] › e2e\director-guide-critical.spec.ts:596:7 › Director input help @critical › help works in annual, full and monthly inputs, including the mobile drawer
+[31/32] [Mobile Safari] › e2e\director-guide-critical.spec.ts:646:7 › Director input help @critical › every Director input help control works at 375px in annual and monthly modes
+[32/32] [Mobile Safari] › e2e\director-guide-critical.spec.ts:679:7 › Director input help @critical › material Director estimate warnings appear with results
+  32 passed (2.6m)

@@ -1,10 +1,9 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { AlertTriangle, ChevronRight, Plus, Trash2 } from 'lucide-react';
+import { ChevronRight, Plus, Trash2 } from 'lucide-react';
 import * as React from 'react';
 import NumberInput from '@/components/atoms/NumberInput';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -104,27 +103,8 @@ export function IncomeSourceList() {
           )}
         </CollapsibleTrigger>
       </div>
-      <p className={cn('mt-1 text-muted-foreground', 'text-xs')}>
-        Add other income here if you have anything besides your main salary.
-      </p>
 
       <CollapsibleContent className={cn('pt-3', 'space-y-3')}>
-        {incomeSources.length === 0 && (
-          <p className={cn('text-muted-foreground', 'text-sm')}>
-            Add pension income, rental income, or other sources
-          </p>
-        )}
-        {incomeSources.length > 0 && (
-          <Alert variant='warning'>
-            <AlertTriangle className={'size-4'} aria-hidden='true' />
-            <AlertTitle>Additional income accuracy</AlertTitle>
-            <AlertDescription>
-              Multiple income sources can affect personal allowance, tax bands, and student loans.
-              We&apos;re verifying these edge cases, so totals may be understated.
-            </AlertDescription>
-          </Alert>
-        )}
-
         <AnimatePresence mode='popLayout'>
           {incomeSources.map((source, index) => (
             <motion.div

@@ -1,0 +1,8 @@
+{
+  "src/components/organisms/DirectorGuide/DirectorDashboard.tsx": "a60f1676845f11d5ea9e8cfbe3bf41623bea69a3999db51087b40afd7b1f3891",
+  "src/components/organisms/DirectorGuide/__tests__/DirectorDashboard.render.test.tsx": "92265c34314c0cd3f5bd46ee06500ba6e12465fab9b799ead632a58fccd0d743",
+  "e2e/director-guide-critical.spec.ts": "49fea07b211b6e5ac1f76276466fc8fcce07ab23d303f297169ae6c0296a0d6a",
+  "src/components/atoms/HelpPopover.tsx": "d81621b69176c2167860baa394cf1302f27240519b4b7b44b91ec90f71fe6d3a",
+  "src/components/atoms/__tests__/HelpPopover.test.tsx": "70e95bd29fd1c306211ec7b26fa46dd81ce2b99f4c0c9191143b75065ef56b89",
+  "src/components/molecules/DirectorGuide/dashboard/EducationPanel.tsx": "9ca6e3e87ec5c8320ef4ac1c40dfd04cb29d9332fb14a2255e5642395f002627"
+}
