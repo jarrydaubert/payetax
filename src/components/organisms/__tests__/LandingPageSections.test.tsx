@@ -34,6 +34,20 @@ describe('LandingPageSections', () => {
     expect(screen.getByText('Can I use it offline?')).toBeInTheDocument();
   });
 
+  it('explains pension support limits with a link to official guidance', () => {
+    render(<LandingPageSections />);
+    expect(
+      screen.getByText(/Enter your pension contribution even for net pay or relief at source/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/we estimate it as salary sacrifice, which may overstate take-home/),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Pension arrangements explained' })).toHaveAttribute(
+      'href',
+      'https://www.gov.uk/workplace-pensions/managing-your-pension',
+    );
+  });
+
   it('renders the tools directory linking to every tool', () => {
     render(<LandingPageSections />);
 

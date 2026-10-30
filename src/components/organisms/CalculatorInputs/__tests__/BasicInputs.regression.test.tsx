@@ -107,7 +107,7 @@ describe('BasicInputs - Regression Tests', () => {
       render(<BasicInputs />);
 
       // The section retains its accessible pension label and amount input after the method disclosure.
-      expect(screen.getByText('Pension (modelled as salary sacrifice)')).toBeInTheDocument();
+      expect(screen.getByLabelText('Pension')).toBeInTheDocument();
 
       // Input field exists (width fix prevents truncation)
       const pensionInput = screen.getByPlaceholderText('5.00');

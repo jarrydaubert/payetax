@@ -454,13 +454,15 @@ export function CalculatorContainer() {
             Calculate your take-home pay
           </h2>
           <p className='mt-2 max-w-2xl text-muted-foreground text-sm md:text-base'>
-            Enter a salary, choose the tax year and region, then check the period-by-period
-            breakdown against official HMRC rates.
+            Enter your salary to see what you could take home. Adjust the details to explore your
+            pay.
           </p>
         </div>
         <p className='border-border border-t pt-3 text-muted-foreground text-xs leading-relaxed lg:border-t-0 lg:border-l lg:pl-5'>
-          <strong className='font-semibold text-foreground'>Illustrative only.</strong> Not
-          financial or tax advice. Based on HMRC rates for {input.taxYear}, which may change.
+          Estimates, not financial or tax advice.{' '}
+          <Link href='/#faq' className='underline underline-offset-2'>
+            About these estimates
+          </Link>
         </p>
       </div>
 

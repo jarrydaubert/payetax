@@ -168,7 +168,7 @@ describe('CalculatorContainer Component', () => {
       render(<CalculatorContainer />);
 
       expect(
-        screen.getByText(/check the period-by-period breakdown against official HMRC rates/i),
+        screen.getByText(/Enter your salary to see what you could take home/i),
       ).toBeInTheDocument();
     });
 

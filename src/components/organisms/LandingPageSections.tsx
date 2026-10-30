@@ -28,7 +28,7 @@ export const faqs: FAQ[] = [
   {
     question: 'How accurate is this compared to my payslip?',
     answer:
-      "PayeTax uses the official HMRC tax tables your employer's payroll runs on, so the annual figures line up. Small differences usually come from pay-period timing, benefits in kind, or employer-specific deductions we can't see.",
+      "PayeTax estimates your pay using the selected tax year's rates. Your payslip can differ because of pay timing, pension arrangements, benefits in kind or employer-specific deductions.",
     links: [{ label: 'HMRC income tax rates', href: HMRC_INCOME_TAX_RATES_URL, external: true }],
   },
   {
@@ -51,7 +51,14 @@ export const faqs: FAQ[] = [
   {
     question: 'What does the calculation include?',
     answer:
-      'Income tax by band, National Insurance, student loan repayments across all five plans, and pension contributions with tax relief - broken down across every pay period.',
+      'Income Tax, National Insurance, student loan repayments and pension contributions, broken down by pay period. Enter your pension contribution even for net pay or relief at source; we estimate it as salary sacrifice, which may overstate take-home.',
+    links: [
+      {
+        label: 'Pension arrangements explained',
+        href: 'https://www.gov.uk/workplace-pensions/managing-your-pension',
+        external: true,
+      },
+    ],
   },
   {
     question: 'Can I use it offline?',

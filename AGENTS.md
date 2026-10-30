@@ -24,6 +24,8 @@ Before editing, inspect Git state, project guidance and affected code. Work on a
 
 Implement the change, verify the relevant behaviour with tests and direct inspection where appropriate, and update documentation only when necessary. Commit and push only when requested (including when needed to open a requested PR).
 
+When GitHub CLI (`gh`) is available and authenticated, use it for GitHub operations where appropriate; never print authentication tokens. Report relevant PR and check links, and leave ongoing CI monitoring to the maintainer unless requested.
+
 Match verification effort to risk. Financial correctness, security and consequential user interactions require stronger evidence than routine changes.
 
 Report what changed, what passed, what remains unverified and any meaningful trade-offs. Obtain independent review before merging. Merge and deployment each require explicit maintainer approval; passing checks or review does not grant it.

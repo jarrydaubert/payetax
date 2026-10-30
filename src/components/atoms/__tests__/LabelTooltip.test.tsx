@@ -33,6 +33,25 @@ describe('LabelTooltip Component', () => {
   });
 
   describe('Tooltip Content', () => {
+    it('shows pension input guidance on keyboard focus, without asserting touch support', async () => {
+      const user = userEvent.setup();
+      render(<LabelTooltip fieldName='pensionContribution' />);
+
+      expect(screen.queryByTestId('tooltip-content-pensionContribution')).not.toBeInTheDocument();
+      await user.tab();
+      expect(screen.getByRole('button', { name: 'Help for Pension' })).toHaveFocus();
+      const content = await screen.findByTestId('tooltip-content-pensionContribution');
+      expect(content).toHaveTextContent(
+        /Enter your contribution even for net pay or relief at source/,
+      );
+      expect(content).toHaveTextContent(/% of gross salary or £ per pay period/);
+      expect(content).toHaveTextContent(/All contributions are estimated as salary sacrifice/);
+      expect(content).toHaveTextContent(/take-home may be too high/);
+      expect(content).toHaveTextContent(/How pension affects your estimate/);
+      await user.keyboard('{Escape}');
+      expect(screen.queryByTestId('tooltip-content-pensionContribution')).not.toBeInTheDocument();
+    });
+
     it('should show tooltip on hover', async () => {
       const user = userEvent.setup();
 
