@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { createServer, type Server } from 'node:http';
+import { createServer, get, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { join } from 'node:path';
 import { type BrowserContext, expect, type Page, test } from '@playwright/test';
@@ -72,8 +72,28 @@ test.describe('PWA upgrade safety', () => {
   let legacy: boolean;
 
   test.beforeAll(async ({ baseURL }) => {
-    server = createServer(async (request, response) => {
-      const url = new URL(request.url ?? '/', baseURL);
+    // This lifecycle harness uses the local production server, even when other
+    // Playwright suites are configured against a preview URL.
+    const application = new URL(baseURL ?? 'http://localhost:3100');
+    if (
+      application.protocol !== 'http:' ||
+      !['localhost', '127.0.0.1'].includes(application.hostname) ||
+      application.username ||
+      application.password ||
+      application.pathname !== '/' ||
+      application.search ||
+      application.hash
+    ) {
+      throw new Error('PWA upgrade tests require a local HTTP application baseURL');
+    }
+    server = createServer((request, response) => {
+      const target = request.url ?? '/';
+      if (!target.startsWith('/') || target.startsWith('//') || target.includes('\\')) {
+        response.writeHead(400);
+        response.end('Invalid test proxy target');
+        return;
+      }
+      const url = new URL(target, 'http://127.0.0.1');
       if (url.pathname === '/sw.js' || url.pathname === '/register-sw.js') {
         response.writeHead(200, {
           'Content-Type': 'application/javascript',
@@ -90,17 +110,19 @@ test.describe('PWA upgrade safety', () => {
         );
         return;
       }
-      try {
-        const upstream = await fetch(url, { redirect: 'manual' });
-        const headers = Object.fromEntries(upstream.headers);
-        for (const header of ['content-encoding', 'content-length', 'transfer-encoding'])
-          delete headers[header];
-        response.writeHead(upstream.status, headers);
-        response.end(Buffer.from(await upstream.arrayBuffer()));
-      } catch {
-        response.writeHead(502);
-        response.end('Test proxy unavailable');
-      }
+      // Request data supplies only the path. The destination is fixed to the
+      // local app port; Node's HTTP client never follows upstream redirects.
+      get({ hostname: '127.0.0.1', port: application.port || 80, path: target }, (upstream) => {
+        response.writeHead(upstream.statusCode ?? 502, upstream.headers);
+        upstream.on('error', () => response.destroy());
+        upstream.pipe(response);
+      }).on('error', () => {
+        if (response.headersSent) response.destroy();
+        else {
+          response.writeHead(502);
+          response.end('Test proxy unavailable');
+        }
+      });
     });
     await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
     origin = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
@@ -125,6 +147,46 @@ test.describe('PWA upgrade safety', () => {
     await expect(page.getByTestId('salary-input')).toBeVisible();
     return page;
   }
+
+  test('proxy rejects authority overrides and ignores the incoming Host header', async () => {
+    let trapRequests = 0;
+    const trap = createServer((_request, response) => {
+      trapRequests += 1;
+      response.end('Unexpected destination');
+    });
+    await new Promise<void>((resolve) => trap.listen(0, '127.0.0.1', resolve));
+    const authority = `127.0.0.1:${(trap.address() as AddressInfo).port}`;
+    const requestTarget = (path: string) =>
+      new Promise<{ status: number | undefined; body: string }>((resolve, reject) => {
+        get(
+          { hostname: '127.0.0.1', port: new URL(origin).port, path, headers: { Host: authority } },
+          (response) => {
+            let body = '';
+            response.setEncoding('utf8');
+            response.on('data', (chunk) => (body += chunk));
+            response.on('end', () => resolve({ status: response.statusCode, body }));
+            response.on('error', reject);
+          },
+        ).on('error', reject);
+      });
+    try {
+      for (const target of [
+        `http://${authority}/manifest.json`,
+        `//${authority}/manifest.json`,
+        `/\\${authority}/manifest.json`,
+        `http://localhost@${authority}/manifest.json`,
+        'http://[malformed',
+      ]) {
+        expect((await requestTarget(target)).status).toBe(400);
+      }
+      const ordinary = await requestTarget('/manifest.json?proxy-security-control=1');
+      expect(ordinary.status).toBe(200);
+      expect(JSON.parse(ordinary.body).name).toContain('PayeTax');
+      expect(trapRequests).toBe(0);
+    } finally {
+      await new Promise<void>((resolve) => trap.close(() => resolve()));
+    }
+  });
 
   test('v5.1.4 cached standalone bootstrap cannot replace either tab controller or erase unfinished amounts', async ({
     browser,

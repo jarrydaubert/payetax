@@ -83,9 +83,11 @@ The check exports the Git index to a temporary directory and scans that snapshot
 the template. Unstaged edits, untracked files, local environment files and Git history are not
 scanned. Stage changes before running it locally. Scanner failure is blocking; findings are
 fully redacted and only their count is printed. No baseline, inline suppression or repository
-ignore file exempts secrets. The only project false-positive exception matches the public
+ignore file exempts secrets. Project false-positive exceptions match only the public
 `payetax-api-v<version>` cache namespace value in `public/sw.js`, for the generic API-key rule;
-other values and findings in that file are scanned. Temporary exports and redacted reports are
+the pinned `e2e/fixtures/pwa-v5.1.4/sw.js.txt` has a separate exception for exactly its v5.1.4
+namespace under the same rule. Other values, rules and paths remain scanned, including other
+findings in these files. Temporary exports and redacted reports are
 removed after the check.
 
 The old Linear integration is retired. No replacement key or workspace is required for PayeTax.
