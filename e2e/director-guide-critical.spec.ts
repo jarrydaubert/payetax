@@ -17,6 +17,7 @@ import type { TaxYear } from '../src/constants/taxRates';
 import { calculateStrategyComparison } from '../src/lib/tax/strategyComparison';
 import { formatCurrency } from '../src/lib/utils';
 import type { DirectorEmailInput } from '../src/lib/validation/emailValidation';
+import { checkVisibleInputHelp } from './helpers/input-help';
 
 const DIRECTOR_WELCOME_DISMISS_KEY = 'directorGuideWelcome:dismissed:v1';
 
@@ -586,5 +587,134 @@ test.describe('Director Intelligence currency inputs @critical', () => {
     await expect(recommendation).toHaveCount(0);
     await expect(emailCta).toHaveCount(0);
     await expect(sidebarEmail).toBeDisabled();
+  });
+});
+
+test.describe('Director input help @critical', () => {
+  test.use({ hasTouch: true });
+
+  test('help works in annual, full and monthly inputs, including the mobile drawer', async ({
+    page,
+  }) => {
+    await openDirectorGuide(page);
+    const visibleButton = (name: string) =>
+      page.getByRole('button', { name, exact: true }).filter({ visible: true });
+    const help = visibleButton('Help for Business Expenses');
+    const content = page.getByTestId('tooltip-content-directorExpenses');
+    await expect(content).toHaveCount(0);
+    await help.tap();
+    await expect(content).toBeVisible();
+    await expect(content).toHaveAccessibleDescription(/Leave out your own salary/);
+    const drawer = page.getByRole('dialog', { name: 'Your Numbers' });
+    if (await drawer.isVisible()) {
+      await expect(drawer.getByTestId('tooltip-content-directorExpenses')).toBeVisible();
+    }
+    await help.press('Escape');
+    await expect(content).toHaveCount(0);
+    await expect(help).toBeFocused();
+    await help.press('Enter');
+    await expect(content).toBeVisible();
+    await content.getByRole('button', { name: 'Close help' }).press('Enter');
+    await expect(content).toHaveCount(0);
+    await help.tap();
+    await visibleInputByTestId(page, 'director-expenses-input').tap();
+    await expect(content).toHaveCount(0);
+    await expect(visibleInputByTestId(page, 'director-expenses-input')).toBeFocused();
+    await visibleButton('Full Inputs').click();
+    await visibleButton('Advanced Options').click();
+    await visibleButton('Help for Employer Pension').tap();
+    await expect(page.getByTestId('tooltip-content-directorPension')).toBeVisible();
+    await page
+      .getByRole('region', { name: 'Help for Employer Pension' })
+      .getByRole('button', { name: 'Close help' })
+      .tap();
+    await expect(page.getByTestId('tooltip-content-directorPension')).toHaveCount(0);
+    await visibleButton('Monthly').click();
+    await visibleButton('Help for Monthly Business Expenses').tap();
+    await expect(page.getByTestId('tooltip-content-directorMonthlyExpenses')).toBeVisible();
+    await expect(
+      page.getByRole('region', { name: 'Help for Monthly Business Expenses' }),
+    ).toHaveAccessibleDescription(/Leave out your own salary/);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('aside [id$="-hint"]')).toHaveCount(0);
+    await expect(page.getByText('Typical gross invoicing per month')).toHaveCount(0);
+    await expect(page.getByText('Excluding modelled director salary and employer NI')).toHaveCount(
+      0,
+    );
+  });
+
+  test('every Director input help control works at 375px in annual and monthly modes', async ({
+    page,
+  }) => {
+    test.setTimeout(120000);
+    await page.setViewportSize({ width: 375, height: 812 });
+    await openDirectorGuide(page);
+    const visibleButton = (name: string) =>
+      page.getByRole('button', { name, exact: true }).filter({ visible: true });
+    await visibleButton('Full Inputs').click();
+    await visibleButton('Advanced Options').click();
+    await fillCurrencyInput(
+      page
+        .getByRole('textbox', { name: 'Employer Pension', exact: true })
+        .filter({ visible: true }),
+      1000,
+    );
+    await selectDropdownOption(
+      page,
+      page
+        .getByRole('combobox', { name: 'Company Year-End', exact: true })
+        .filter({ visible: true }),
+      'Other',
+    );
+    const annual = await checkVisibleInputHelp(page);
+    expect(annual).toContain('tooltip-trigger-directorPensionDeducted');
+    expect(annual).toContain('tooltip-trigger-directorYearEndCustom');
+    await visibleButton('Monthly').click();
+    const monthly = await checkVisibleInputHelp(page);
+    expect(monthly).toContain('tooltip-trigger-directorRunwayMonths');
+    expect(new Set([...annual, ...monthly]).size).toBe(27);
+    await expect(page.getByRole('dialog', { name: 'Your Numbers' })).toBeVisible();
+  });
+
+  test('material Director estimate warnings appear with results', async ({ page }) => {
+    await openDirectorGuide(page);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 100000);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 20000);
+    await selectEngland(page);
+    await page.locator('[data-testid="director-includes-vat-checkbox"]:visible').check();
+    await page
+      .getByRole('button', { name: 'Full Inputs', exact: true })
+      .filter({ visible: true })
+      .click();
+    await page
+      .getByLabel('Other PAYE employment?', { exact: true })
+      .filter({ visible: true })
+      .check();
+    await page
+      .getByRole('button', { name: 'Advanced Options', exact: true })
+      .filter({ visible: true })
+      .click();
+    await fillCurrencyInput(
+      page
+        .getByRole('textbox', { name: 'Employer Pension', exact: true })
+        .filter({ visible: true }),
+      1000,
+    );
+    await closeInputsPanelIfOpen(page);
+    const notes = page.getByTestId('director-estimate-notes');
+    await expect(notes).toContainText('VAT has not been removed');
+    await expect(notes).toContainText('employee National Insurance from the first pound');
+    await expect(notes).toContainText(
+      'Jobs with separate employers usually have separate thresholds',
+    );
+    await expect(notes).toContainText('may overstate your NI');
+    await expect(notes).toContainText('Check with your payroll provider');
+    await expect(notes).toContainText('annual allowance across all your pensions');
+    await expect(notes).toContainText('may mean a personal tax charge, which is not included');
+    await expect(notes).toContainText(
+      'Unused allowance from the previous three tax years may help',
+    );
+    await expect(notes).toContainText('high income or some pension withdrawals can reduce');
+    await expect(notes).not.toContainText('restrict the relief');
   });
 });

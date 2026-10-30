@@ -1,0 +1,87 @@
+$ bun run lint && bun run typecheck && bun run typecheck:tests && bun run check-version && bun run check:tracked-env && bun run check:env-contract && bun run check:analytics-events && bun run check:test-skips && bun run check:tax-imports && bun run check:tax-facts && bun run check:blog-guidance && bun run check:rate-freshness
+$ biome check .
+Checked 649 files in 471ms. No fixes applied.
+$ tsc --noEmit
+$ tsc -p tsconfig.jest.json --noEmit && tsc -p tsconfig.e2e.json --noEmit
+$ bun scripts/check-version.ts
+package.json: 5.2.2 (stable SemVer)
+Format checked only. Use --base <git-ref> to enforce the PR version bump.
+$ bun --no-env-file scripts/check-secrets.ts --env-only
+Tracked environment-file guard passed.
+$ bun scripts/check-analytics-env-sync.ts
+🔎 Checking env contract sync...
+   Runtime env keys discovered in src/: 22
+   - Public keys: 8
+   - Server keys: 14
+   Critical public keys:
+   - NEXT_PUBLIC_SITE_URL
+   - NEXT_PUBLIC_ENABLE_ANALYTICS
+   - NEXT_PUBLIC_GA_ID
+   Critical server keys:
+   - BREVO_API_KEY
+
+✅ Runtime env usage is in sync across .env.template, env schemas, and validation mappings
+$ bun scripts/check-analytics-events.ts
+🔎 Checking analytics event contract...
+   - source files checked: 298
+   - analytics actions allowed: 24
+   - seo actions allowed: 7
+
+✅ Analytics event names match the contract
+$ bun scripts/check-test-skips.ts
+🔎 Checking test skip/todo guardrails...
+   - test files scanned: 280
+   - total skip: 0
+   - total todo: 0
+
+✅ Test skip/todo debt is within allowlisted baseline
+$ bun scripts/check-tax-imports.ts
+🔎 Checking tax-domain import boundary...
+   - supported application imports: @/lib/tax, @/lib/tax-code-decoder
+   - existing direct imports baselined: 66
+✅ No new tax-domain import violations
+$ bun scripts/check-tax-facts.ts
+🔎 Checking for hardcoded tax facts...
+   - files scanned: 649
+   - baseline findings: 380
+   - new findings: 0
+   - mode: report-only
+
+   Explicit exception model:
+   - canonical-policy [approved-location]: 509 occurrence(s) — The legacy canonical policy record remains approved until the policy split.
+   - tax-domain-implementation [approved-location]: 571 occurrence(s) — Tax-domain implementation files may contain policy-derived mechanics.
+   - tax-fact-control [approved-location]: 48 occurrence(s) — The scanner implementation contains matching vocabulary, not application facts.
+   - verification-fixtures [fixture]: 1056 occurrence(s) — Pinned independent fixtures and executable verification tests need literal expectations.
+   - pinned-historical-content [pinned-history]: 999 occurrence(s) — Dated blog filenames intentionally preserve the tax facts for their named period.
+   - official-quotation [official-quotation]: 0 occurrence(s) — A line marked `tax-fact-scan: official-quotation` is an explicit sourced quotation.
+
+   Baselined finding entries:
+   - policy-value: 58
+   - rate: 66
+   - tax-year: 33
+   - run with --verbose for file and line details
+
+   Reduced baseline debt:
+   - src/app/tools/tax-code-decoder/TaxCodeDecoderClient.tsx rate=20: 0/1
+   - src/app/tools/tax-code-decoder/TaxCodeDecoderClient.tsx rate=40: 0/1
+   - src/app/tools/tax-code-decoder/TaxCodeDecoderClient.tsx rate=45: 0/1
+   - src/components/molecules/DirectorGuide/inputs/EmploymentAllowanceInput.tsx policy-value=10500: 0/1
+   - src/components/molecules/DirectorGuide/inputs/PensionInput.tsx policy-value=60000: 0/1
+   - src/lib/sentry.ts tax-year=2025-2026: 1/4
+   - src/lib/taxCalculator.ts policy-value=1000: 0/2
+   - src/lib/taxCalculator.ts policy-value=37700: 1/2
+   - src/lib/taxCalculator.ts policy-value=50000: 0/1
+   - src/lib/taxCalculator.ts rate=20: 4/7
+   - src/lib/taxCalculator.ts rate=40: 5/7
+
+✅ Tax-fact inventory completed without rewriting files
+$ bun scripts/check-current-blog-guidance.ts
+🔎 Checking current-facing blog guidance...
+   - files checked: 5
+   - stale findings: 0
+✅ Current-facing blog guidance contains no guarded expired figures
+$ bun scripts/check-rate-freshness.ts
+🔎 Checking current-year rate freshness...
+   - current tax year: 2026-2027
+   - verifiedOn: 2026-07-01 (121 days ago)
+✅ Current-year rates are present and verified within the freshness window

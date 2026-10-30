@@ -1,0 +1,111 @@
+const { chromium, webkit, expect } = require('@playwright/test');
+const AxeBuilder = require('@axe-core/playwright').default;
+const fs = require('node:fs');
+const path = require('node:path');
+const dir = path.resolve(process.env.HELP_QA_DIR || 'docs/reports/input-help-2026-10-30');
+const baseURL = process.env.HELP_QA_URL || 'http://localhost:3102';
+const results = [];
+async function main() {
+  for (const [engine, type] of Object.entries({ chromium, webkit })) {
+    const browser = await type.launch();
+    for (const [device, viewport] of Object.entries({ desktop: { width: 1440, height: 1000 }, mobile: { width: 393, height: 852 }, narrow: { width: 320, height: 640 }, short: { width: 320, height: 400 } })) {
+      console.log(engine, device, 'start');
+      const context = await browser.newContext({ viewport, hasTouch: device !== 'desktop', reducedMotion: 'reduce' });
+      const page = await context.newPage();
+      const activate = locator => device === 'desktop' ? locator.click() : locator.tap();
+      const errors = [], failedResponses = [];
+      page.on('pageerror', e => errors.push(String(e)));
+      page.on('console', m => { if (['error', 'warning'].includes(m.type())) errors.push(m.text()); });
+      page.on('response', r => { if(r.status() >= 400) failedResponses.push({url:r.url(),status:r.status()}); });
+      await page.addInitScript(() => {
+        localStorage.setItem('directorGuideWelcome:dismissed:v1', 'true');
+        localStorage.setItem('cookie-consent', JSON.stringify({ necessary: true, analytics: false, version: '1.0' }));
+        localStorage.setItem('cookie-consent-timestamp', new Date().toISOString());
+      });
+      await page.goto(baseURL + '/');
+      await page.waitForLoadState('networkidle');
+      await expect(page).toHaveTitle(/PayeTax/);
+      const mainTitle = await page.title();
+      const help = page.getByRole('button', { name: 'Help for Pension', exact: true });
+      const content = page.getByRole('dialog', { name: 'Help for Pension', exact: true });
+      await help.scrollIntoViewIfNeeded();
+      await page.screenshot({path:path.join(dir, `after-calculator-${engine}-${device}.png`)});
+      if (device === 'desktop') {
+        await help.hover();
+        await expect(content).toHaveCount(0);
+        await help.click();
+        await expect(content).toBeVisible();
+        await page.mouse.move(1350, 100);
+        await expect(content).toBeVisible();
+        await content.getByRole('button',{name:'Close help'}).click();
+        await expect(content).toHaveCount(0);
+        await expect(help).toBeFocused();
+      }
+      await activate(help);
+      await expect(content).toBeFocused();
+      await expect(content).toHaveAccessibleDescription(/take-home may be too high/);
+      await expect(help).toHaveAttribute('aria-expanded', 'true');
+      await expect.poll(async () => { const b=await content.boundingBox(); return b && b.x >= 0 && b.y >= 0 && b.x+b.width <= viewport.width && b.y+b.height <= viewport.height; }).toBe(true);
+      const box = await content.boundingBox();
+      const overflow = await content.evaluate(e=>({scroll:e.scrollHeight,client:e.clientHeight}));
+      await page.screenshot({path:path.join(dir, `pension-help-${engine}-${device}.png`)});
+      if(overflow.scroll > overflow.client) {
+        await content.press('End');
+        await expect.poll(()=>content.evaluate(e=>e.scrollTop)).toBeGreaterThan(0);
+        await content.press('Home');
+        await expect.poll(()=>content.evaluate(e=>e.scrollTop)).toBe(0);
+      }
+      const axe = await new AxeBuilder({page}).include('[data-testid="calculator-section"]').include('[data-radix-popper-content-wrapper]').analyze();
+      await page.keyboard.press('Escape');
+      await expect(content).toHaveCount(0);
+      await expect(help).toBeFocused();
+      await help.press('Space');
+      await expect(content).toBeFocused();
+      await content.press('Tab');
+      await expect(content.getByRole('button',{name:'Close help'})).toBeFocused();
+      await page.keyboard.press('Enter');
+      await expect(content).toHaveCount(0);
+      await expect(help).toBeFocused();
+      await help.press('Tab');
+      await expect(page.getByTestId('pension-type-select')).toBeFocused();
+      await page.getByTestId('salary-input').fill('40000');
+      await page.getByTestId('tax-code-input').fill('1257L');
+      await page.getByTestId('calculate-button').press('Enter');
+      await expect(page.getByTestId('tax-results')).toContainText('32,322.04');
+      await page.goto(baseURL + '/tools/director-guide');
+      await expect(page).toHaveTitle(/Director/);
+      const directorTitle = await page.title();
+      if(device !== 'desktop') await page.getByRole('button',{name:'Open calculator inputs',exact:true}).click();
+      const revenue = page.locator('[data-testid="director-revenue-input"]:visible').first();
+      await expect(revenue).toBeVisible();
+      await page.screenshot({path:path.join(dir, `after-director-${engine}-${device}.png`)});
+      const expenseHelp = page.locator('[data-testid="tooltip-trigger-directorExpenses"]:visible').first();
+      await activate(expenseHelp);
+      const expenseContent = page.getByRole('dialog',{name:'Help for Business Expenses',exact:true});
+      await expect(expenseContent).toBeFocused();
+      await expect(expenseContent).toHaveAccessibleDescription(/Leave out your own salary/);
+      if(device !== 'desktop') await expect(page.getByRole('dialog',{name:'Your Numbers'})).toContainText('Leave out your own salary');
+      await page.screenshot({path:path.join(dir, `director-help-${engine}-${device}.png`)});
+      const directorAxe = await new AxeBuilder({page}).include('aside').include('[data-radix-popper-content-wrapper]').analyze();
+      await page.keyboard.press('Escape');
+      await expect(expenseContent).toHaveCount(0);
+      if(device !== 'desktop') await expect(page.getByRole('dialog',{name:'Your Numbers'})).toBeVisible();
+      await page.getByRole('button',{name:'Full Inputs',exact:true}).filter({visible:true}).click();
+      await page.getByRole('button',{name:'Advanced Options',exact:true}).filter({visible:true}).click();
+      await activate(page.locator('[data-testid="tooltip-trigger-directorPension"]:visible').first());
+      await expect(page.getByRole('dialog',{name:'Help for Employer Pension'})).toBeVisible();
+      await page.keyboard.press('Escape');
+      await page.getByRole('button',{name:'Monthly',exact:true}).filter({visible:true}).click();
+      await activate(page.locator('[data-testid="tooltip-trigger-directorMonthlyExpenses"]:visible').first());
+      await expect(page.getByRole('dialog',{name:'Help for Monthly Business Expenses'})).toBeVisible();
+      await page.keyboard.press('Escape');
+      const simplify = scan => scan.violations.map(v=>({id:v.id,impact:v.impact,targets:v.nodes.map(n=>n.target)}));
+      results.push({engine,device,viewport,mainTitle,directorTitle,pensionBox:box,overflow,axeViolations:simplify(axe),directorAxeViolations:simplify(directorAxe),errors,failedResponses});
+      fs.writeFileSync(path.join(dir,'ui-results.json'),JSON.stringify(results,null,2)+'\n');
+      await context.close();
+      console.log(engine, device, 'PASS');
+    }
+    await browser.close();
+  }
+}
+main().catch(e=>{console.error(e.stack);process.exit(1)});

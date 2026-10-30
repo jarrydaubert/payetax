@@ -1,0 +1,130 @@
+const { chromium, webkit, expect } = require('@playwright/test');
+const AxeBuilder = require('@axe-core/playwright').default;
+const fs = require('node:fs');
+const path = require('node:path');
+const output = path.resolve('docs/reports/input-help-2026-10-30/re-review');
+const results = [];
+async function main() {
+ for (const [engine, browserType] of Object.entries({chromium, webkit})) {
+  const browser = await browserType.launch();
+  for (const [layout, viewport] of Object.entries({desktop:{width:1440,height:1000},mobile:{width:375,height:812}})) {
+   const context = await browser.newContext({viewport,hasTouch:layout==='mobile',reducedMotion:'reduce'});
+   const page = await context.newPage();
+   const pageErrors=[], consoleMessages=[];
+   page.on('pageerror',e=>pageErrors.push(String(e)));
+   page.on('console',m=>{if(['warning','error'].includes(m.type())) consoleMessages.push(m.text())});
+   await page.addInitScript(()=>{
+    localStorage.setItem('cookie-consent',JSON.stringify({necessary:true,analytics:false,version:'1.0'}));
+    localStorage.setItem('cookie-consent-timestamp',new Date().toISOString());
+    localStorage.setItem('directorGuideWelcome:dismissed:v1','true');
+   });
+   const visible=l=>l.filter({visible:true}).first();
+   const button=name=>visible(page.getByRole('button',{name,exact:true}));
+   const cdp=engine==='chromium'?await context.newCDPSession(page):null;
+   if(cdp) await cdp.send('Accessibility.enable');
+   async function snapshot(testId) {
+    const trigger=visible(page.getByTestId(testId));
+    const dom=await trigger.evaluate(el=>({
+     name:el.getAttribute('aria-label'),expanded:el.getAttribute('aria-expanded'),
+     controls:el.getAttribute('aria-controls'),describedby:el.getAttribute('aria-describedby'),
+     explanation:document.getElementById(el.getAttribute('aria-describedby'))?.textContent??null,
+     focused:document.activeElement===el,
+    }));
+    let chromiumAX=null;
+    if(cdp) {
+     const selector=JSON.stringify(`button[data-testid="${testId}"]`);
+     const ref=await cdp.send('Runtime.evaluate',{expression:`Array.from(document.querySelectorAll(${selector})).find(el=>el.getClientRects().length)`,returnByValue:false});
+     const tree=await cdp.send('Accessibility.getPartialAXTree',{objectId:ref.result.objectId,fetchRelatives:false});
+     const node=tree.nodes.find(n=>n.role?.value==='button');
+     expect(node).toBeTruthy();
+     chromiumAX={role:node.role?.value,name:node.name?.value,description:node.description?.value??null,
+      ignored:node.ignored,properties:node.properties?.filter(p=>['expanded','focused','controls','describedby'].includes(p.name))};
+    }
+    return {dom,chromiumAX};
+   }
+   async function checkHelp(testId,label,expectText,captureName,drawer) {
+    const trigger=visible(page.getByTestId(testId));
+    await trigger.focus();
+    const before=await snapshot(testId);
+    expect(before.dom.expanded).toBe('false');
+    expect(before.dom.explanation).toBeNull();
+    await trigger.press('Enter');
+    const help=page.getByRole('region',{name:label,exact:true});
+    await expect(help).toBeVisible();
+    await expect(trigger).toBeFocused();
+    await expect(trigger).toHaveAccessibleDescription(expectText);
+    const open=await snapshot(testId);
+    expect(open.dom.expanded).toBe('true');
+    expect(open.dom.explanation).toMatch(expectText);
+    if(cdp) {
+     expect(open.chromiumAX.description).toMatch(expectText);
+     const fullTree=await cdp.send('Accessibility.getFullAXTree');
+     const explanationRegion=fullTree.nodes.find(n=>n.role?.value==='region'&&n.name?.value===label&&!n.ignored);
+     expect(explanationRegion).toBeTruthy();
+     open.chromiumAX.explanationRegion={role:explanationRegion.role.value,name:explanationRegion.name.value,ignored:explanationRegion.ignored};
+
+     expect(open.chromiumAX.properties.find(p=>p.name==='expanded').value.value).toBe(true);
+     expect(open.chromiumAX.properties.find(p=>p.name==='focused').value.value).toBe(true);
+    }
+    const contained=drawer?await help.evaluate(el=>!!el.closest('[role="dialog"]')):null;
+    if(drawer) expect(contained).toBe(true);
+    await page.screenshot({path:path.join(output,`${engine}-${layout}-${captureName}.png`)});
+    const axe=await new AxeBuilder({page}).include(drawer?'[role="dialog"]':'[data-testid="calculator-section"]').include('[data-radix-popper-content-wrapper]').analyze();
+    await trigger.press('Escape');
+    await expect(help).toHaveCount(0);
+    await expect(trigger).toBeFocused();
+    if(drawer) await expect(page.getByRole('dialog',{name:'Your Numbers',exact:true})).toBeVisible();
+    const closed=await snapshot(testId);
+    expect(closed.dom.expanded).toBe('false');
+    expect(closed.dom.explanation).toBeNull();
+    if(cdp) expect(closed.chromiumAX.description).toBeNull();
+    return {before,open,closed,drawerContainment:contained,axeViolations:axe.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.map(n=>n.target)}))};
+   }
+   await page.goto('http://localhost:3102');
+   await page.waitForLoadState('networkidle');
+   await page.getByTestId('married-checkbox').check();
+   await expect(page.getByTestId('partner-salary-input')).toBeVisible();
+   await page.getByTestId('married-checkbox').uncheck();
+   const paye=await checkHelp('tooltip-trigger-pensionContribution','Help for Pension',/salary sacrifice/,'paye-help',false);
+   await page.getByTestId('salary-input').fill('40000');
+   await page.getByTestId('salary-input').blur();
+   await page.getByTestId('tax-code-input').fill('1257L');
+   await page.getByTestId('calculate-button').press('Enter');
+   await expect(page.getByTestId('tax-results')).toContainText('32,322.04');
+   await page.goto('http://localhost:3102/tools/director-guide');
+   await page.waitForLoadState('networkidle');
+   if(layout==='mobile') await button('Open calculator inputs').click();
+   const panel=visible(page.locator('aside').filter({has:page.getByRole('button',{name:'Annual',exact:true})}));
+   const revenue=panel.getByTestId('director-revenue-input'), expenses=panel.getByTestId('director-expenses-input');
+   await revenue.fill('100000');await revenue.blur();
+   await expenses.fill('20000');await expenses.blur();
+   await panel.getByRole('combobox',{name:'Income Tax Region',exact:true}).click();
+   await page.getByRole('option',{name:/England/}).press('Enter');
+   await panel.getByTestId('director-includes-vat-checkbox').check();
+   await button('Full Inputs').press('Enter');
+   await panel.getByLabel('Other PAYE employment?',{exact:true}).check();
+   await button('Advanced Options').press('Enter');
+   await panel.getByRole('textbox',{name:'Employer Pension',exact:true}).fill('1000');
+   await panel.getByRole('textbox',{name:'Employer Pension',exact:true}).blur();
+   const director=await checkHelp('tooltip-trigger-directorOtherPAYE','Help for Other PAYE Employment',/PAYE job elsewhere/,'director-help',layout==='mobile');
+   if(layout==='mobile') await button('Close your numbers panel').click();
+   const notes=page.getByRole('region',{name:'About this estimate',exact:true});
+   await expect(notes).toContainText('from the first pound of director salary');
+   await expect(notes).toContainText('Jobs with separate employers usually have separate thresholds');
+   await expect(notes).toContainText('may overstate your NI');
+   await expect(notes).toContainText('personal tax charge, which is not included in this estimate');
+   await expect(notes).toContainText('Unused allowance from the previous three tax years may help');
+   await expect(notes).toContainText('high income or some pension withdrawals can reduce');
+   await notes.scrollIntoViewIfNeeded();
+   await page.screenshot({path:path.join(output,`${engine}-${layout}-director-result-warnings.png`)});
+   expect(pageErrors).toEqual([]);
+   results.push({engine,layout,viewport,paye,director,resultWarnings:await notes.innerText(),pageErrors,consoleMessages,
+    limitation:'Automated DOM, browser accessibility-tree and axe evidence only. No live screen-reader speech or physical-device test.'});
+   fs.writeFileSync(path.join(output,'browser-accessibility-results.json'),JSON.stringify(results,null,2)+'\n');
+   console.log(engine,layout,'PASS');
+   await context.close();
+  }
+  await browser.close();
+ }
+}
+main().catch(e=>{console.error(e.stack);process.exit(1)});

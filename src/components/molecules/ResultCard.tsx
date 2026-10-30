@@ -4,8 +4,8 @@
 import { motion } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
 import { memo } from 'react';
+import { HelpPopover } from '@/components/atoms/HelpPopover';
 import { Card } from '@/components/ui/card';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   ANIMATION_GESTURES,
   ANIMATION_TRANSITIONS,
@@ -164,13 +164,9 @@ export const ResultCard = memo(function ResultCard({
   return (
     <motion.div {...animationProps} {...gestureProps} className={className}>
       {tooltip ? (
-        // Note: Parent must wrap with TooltipProvider for this to work
-        <Tooltip>
-          <TooltipTrigger asChild>{cardContent}</TooltipTrigger>
-          <TooltipContent className='max-w-xs' side='top'>
-            <p>{tooltip}</p>
-          </TooltipContent>
-        </Tooltip>
+        <HelpPopover label={`Help for ${label}`} trigger={cardContent}>
+          <p>{tooltip}</p>
+        </HelpPopover>
       ) : (
         cardContent
       )}

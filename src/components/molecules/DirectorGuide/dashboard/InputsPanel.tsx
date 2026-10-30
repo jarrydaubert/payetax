@@ -47,8 +47,6 @@ const INPUT_CLASS =
 const SECTION_HEADING_CLASS =
   'mb-4 font-semibold text-muted-foreground text-xs uppercase tracking-[0.08em]';
 
-const getHintId = (id?: string) => (id ? `${id}-hint` : undefined);
-
 /** Currency fields inside Advanced Options. */
 const ADVANCED_CURRENCY_FIELDS: readonly DirectorInputField[] = [
   'pensionContribution',
@@ -352,10 +350,6 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             </button>
           </div>
         </fieldset>
-        <p className='text-muted-foreground text-xs'>
-          Quick Start shows minimum fields first. Full Inputs unlocks YTD, personal, and advanced
-          detail.
-        </p>
       </Section>
 
       {/* Section: Core Inputs */}
@@ -364,7 +358,6 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           <>
             <Field
               label='Monthly Contract Income'
-              hint='Typical gross invoicing per month'
               id={ids.monthlyIncome}
               tooltipFieldName='directorMonthlyIncome'
             >
@@ -377,13 +370,11 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 invalidDraft={inputErrors.monthlyIncome}
                 placeholder='£0'
                 className={INPUT_CLASS}
-                aria-describedby={getHintId(ids.monthlyIncome)}
               />
             </Field>
 
             <Field
               label='Monthly Business Expenses'
-              hint='Excluding modelled director salary and employer NI'
               id={ids.monthlyExpenses}
               tooltipFieldName='directorMonthlyExpenses'
             >
@@ -396,13 +387,11 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 invalidDraft={inputErrors.monthlyExpenses}
                 placeholder='£0'
                 className={INPUT_CLASS}
-                aria-describedby={getHintId(ids.monthlyExpenses)}
               />
             </Field>
 
             <Field
               label='Contract Start Month'
-              hint='Used to project months remaining in this tax year'
               id={ids.contractStartMonth}
               tooltipFieldName='directorContractStartMonth'
             >
@@ -413,7 +402,6 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 <SelectTrigger
                   id={ids.contractStartMonth}
                   className='border-border/40 bg-card text-foreground'
-                  aria-describedby={getHintId(ids.contractStartMonth)}
                 >
                   <SelectValue placeholder='Select month' />
                 </SelectTrigger>
@@ -434,12 +422,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               </Select>
             </Field>
 
-            <Field
-              label='Cash In Bank'
-              hint='Current company cash available'
-              id={ids.cashInBank}
-              tooltipFieldName='directorCashInBank'
-            >
+            <Field label='Cash In Bank' id={ids.cashInBank} tooltipFieldName='directorCashInBank'>
               <CurrencyInput
                 key='cashInBank'
                 id={ids.cashInBank}
@@ -449,13 +432,11 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 invalidDraft={inputErrors.cashInBank}
                 placeholder='£0'
                 className={INPUT_CLASS}
-                aria-describedby={getHintId(ids.cashInBank)}
               />
             </Field>
 
             <Field
               label='Minimum Monthly Draw'
-              hint='Your personal monthly floor'
               id={ids.minimumMonthlyDraw}
               tooltipFieldName='directorMinimumMonthlyDraw'
             >
@@ -468,13 +449,11 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 invalidDraft={inputErrors.minimumMonthlyDraw}
                 placeholder='£0'
                 className={INPUT_CLASS}
-                aria-describedby={getHintId(ids.minimumMonthlyDraw)}
               />
             </Field>
 
             <Field
               label='Runway Target (months)'
-              hint='How long you want cash to last'
               id={ids.runwayMonths}
               tooltipFieldName='directorRunwayMonths'
             >
@@ -487,18 +466,12 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 onChange={(e) => actions.setRunwayMonths(Number(e.target.value))}
                 placeholder='3'
                 className={INPUT_CLASS}
-                aria-describedby={getHintId(ids.runwayMonths)}
               />
             </Field>
           </>
         ) : (
           <>
-            <Field
-              label='Annual Revenue'
-              hint='Total invoiced before expenses'
-              id={ids.revenue}
-              tooltipFieldName='directorRevenue'
-            >
+            <Field label='Annual Revenue' id={ids.revenue} tooltipFieldName='directorRevenue'>
               <CurrencyInput
                 key='revenue'
                 id={ids.revenue}
@@ -509,16 +482,10 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 invalidDraft={inputErrors.revenue}
                 placeholder='£0'
                 className={INPUT_CLASS}
-                aria-describedby={getHintId(ids.revenue)}
               />
             </Field>
 
-            <Field
-              label='Business Expenses'
-              hint='Excluding modelled director salary and employer NI'
-              id={ids.expenses}
-              tooltipFieldName='directorExpenses'
-            >
+            <Field label='Business Expenses' id={ids.expenses} tooltipFieldName='directorExpenses'>
               <CurrencyInput
                 key='expenses'
                 id={ids.expenses}
@@ -529,7 +496,6 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 invalidDraft={inputErrors.expenses}
                 placeholder='£0'
                 className={INPUT_CLASS}
-                aria-describedby={getHintId(ids.expenses)}
               />
             </Field>
           </>
@@ -549,18 +515,12 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           <LabelTooltip fieldName='directorIncludesVat' />
         </div>
 
-        <Field
-          label='Income Tax Region'
-          hint='Scotland has different tax bands'
-          id={ids.region}
-          tooltipFieldName='region'
-        >
+        <Field label='Income Tax Region' id={ids.region} tooltipFieldName='region'>
           <Select value={selectedRegion} onValueChange={(v) => actions.setRegion(v as Region)}>
             <SelectTrigger
               id={ids.region}
               data-testid='director-region-select'
               className='border-border/40 bg-card text-foreground'
-              aria-describedby={getHintId(ids.region)}
             >
               <SelectValue placeholder='Select region' />
             </SelectTrigger>
@@ -571,12 +531,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           </Select>
         </Field>
 
-        <Field
-          label='Company Year-End'
-          hint='For key tax dates'
-          id={ids.yearEnd}
-          tooltipFieldName='directorYearEnd'
-        >
+        <Field label='Company Year-End' id={ids.yearEnd} tooltipFieldName='directorYearEnd'>
           <Select
             value={formData.yearEndMonth}
             onValueChange={(v) => {
@@ -587,11 +542,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               }
             }}
           >
-            <SelectTrigger
-              id={ids.yearEnd}
-              className='border-border/40 bg-card text-foreground'
-              aria-describedby={getHintId(ids.yearEnd)}
-            >
+            <SelectTrigger id={ids.yearEnd} className='border-border/40 bg-card text-foreground'>
               <SelectValue placeholder='Select year-end' />
             </SelectTrigger>
             <SelectContent className='border-border bg-card'>
@@ -605,10 +556,9 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 
         {formData.yearEndMonth === 'other' ? (
           <Field
-            label='Custom Year-End Date'
-            hint='Use MM-DD, for example 06-30'
+            label='Custom Year-End Date (MM-DD)'
             id={ids.yearEndCustom}
-            tooltipFieldName='directorYearEnd'
+            tooltipFieldName='directorYearEndCustom'
           >
             <Input
               id={ids.yearEndCustom}
@@ -618,7 +568,6 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               onChange={(e) => actions.setYearEndCustom(e.target.value)}
               placeholder='06-30'
               className={INPUT_CLASS}
-              aria-describedby={getHintId(ids.yearEndCustom)}
             />
           </Field>
         ) : null}
@@ -626,10 +575,6 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 
       {quickStartMode ? (
         <div className='mb-5 rounded-sm border border-primary/20 bg-primary/5 p-4'>
-          <p className='text-primary text-xs'>
-            You can calculate with just company inputs + region. Add more detail any time for better
-            accuracy.
-          </p>
           <button
             type='button'
             onClick={() => setQuickStartMode(false)}
@@ -681,12 +626,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
         <>
           {/* Section: Already Taken */}
           <Section title='Already Taken This Year'>
-            <Field
-              label='YTD Salary'
-              hint='Gross salary via PAYE'
-              id={ids.ytdSalary}
-              tooltipFieldName='directorYtdSalary'
-            >
+            <Field label='YTD Salary' id={ids.ytdSalary} tooltipFieldName='directorYtdSalary'>
               <CurrencyInput
                 key='ytdSalary'
                 id={ids.ytdSalary}
@@ -696,13 +636,11 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 invalidDraft={inputErrors.ytdSalary}
                 placeholder='£0'
                 className={INPUT_CLASS}
-                aria-describedby={getHintId(ids.ytdSalary)}
               />
             </Field>
 
             <Field
               label='YTD Dividends'
-              hint='Dividends declared'
               id={ids.ytdDividends}
               tooltipFieldName='directorYtdDividends'
             >
@@ -715,13 +653,11 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 invalidDraft={inputErrors.ytdDividends}
                 placeholder='£0'
                 className={INPUT_CLASS}
-                aria-describedby={getHintId(ids.ytdDividends)}
               />
             </Field>
 
             <Field
               label='Other Drawings'
-              hint='Non-dividend withdrawals (e.g. director loan)'
               id={ids.ytdDrawings}
               tooltipFieldName='directorYtdDrawings'
             >
@@ -734,7 +670,6 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 invalidDraft={inputErrors.ytdDrawings}
                 placeholder='£0'
                 className={INPUT_CLASS}
-                aria-describedby={getHintId(ids.ytdDrawings)}
               />
             </Field>
           </Section>
@@ -743,7 +678,6 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           <Section title='Your Situation'>
             <Field
               label='Other Personal Income'
-              hint='Employment, rental, etc.'
               id={ids.otherIncome}
               tooltipFieldName='directorOtherIncome'
             >
@@ -756,7 +690,6 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 invalidDraft={inputErrors.otherIncome}
                 placeholder='£0'
                 className={INPUT_CLASS}
-                aria-describedby={getHintId(ids.otherIncome)}
               />
             </Field>
 
@@ -844,12 +777,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 </fieldset>
 
                 {/* Pension Contribution */}
-                <Field
-                  label='Employer Pension'
-                  hint='Reduces taxable profit'
-                  id={ids.pension}
-                  tooltipFieldName='directorPension'
-                >
+                <Field label='Employer Pension' id={ids.pension} tooltipFieldName='directorPension'>
                   <CurrencyInput
                     key='pensionContribution'
                     id={ids.pension}
@@ -859,7 +787,6 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                     invalidDraft={inputErrors.pensionContribution}
                     placeholder='£0'
                     className={INPUT_CLASS}
-                    aria-describedby={getHintId(ids.pension)}
                   />
                 </Field>
                 {formData.pensionContribution > 0 && (
@@ -885,7 +812,6 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 {/* Company Car BIK */}
                 <Field
                   label='Company Car BIK'
-                  hint='Taxable benefit amount'
                   id={ids.carBik}
                   tooltipFieldName='directorCompanyCar'
                 >
@@ -898,13 +824,12 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                     invalidDraft={inputErrors.companyCarBIK}
                     placeholder='£0'
                     className={INPUT_CLASS}
-                    aria-describedby={getHintId(ids.carBik)}
                   />
                 </Field>
 
                 <Field
                   label='Associated Companies'
-                  hint='Total associated companies including this one (affects CT thresholds)'
+                  tooltipFieldName='directorAssociatedCompanies'
                   id={ids.associatedCompanies}
                 >
                   <Input
@@ -916,14 +841,12 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                     onChange={(e) => actions.setAssociatedCompaniesCount(Number(e.target.value))}
                     placeholder='1'
                     className={INPUT_CLASS}
-                    aria-describedby={getHintId(ids.associatedCompanies)}
                   />
                 </Field>
 
                 {/* Losses Brought Forward */}
                 <Field
                   label='Losses Brought Forward'
-                  hint='Trading losses from prior years'
                   id={ids.losses}
                   tooltipFieldName='directorLosses'
                 >
@@ -936,14 +859,12 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                     invalidDraft={inputErrors.lossesBroughtForward}
                     placeholder='£0'
                     className={INPUT_CLASS}
-                    aria-describedby={getHintId(ids.losses)}
                   />
                 </Field>
 
                 {/* Minimum Salary Requirement */}
                 <Field
                   label='Minimum Salary'
-                  hint='Floor for mortgage or visa applications'
                   id={ids.minSalary}
                   tooltipFieldName='directorMinimumSalary'
                 >
@@ -958,7 +879,6 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                     invalidDraft={inputErrors.minimumSalaryRequirement}
                     placeholder='£0'
                     className={INPUT_CLASS}
-                    aria-describedby={getHintId(ids.minSalary)}
                   />
                 </Field>
               </div>
@@ -967,12 +887,8 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 
           {/* Section: Compare My Setup */}
           <Section title='Compare My Setup'>
-            <p className='mb-3 text-muted-foreground text-xs'>
-              Edit values first, then apply. Your setup is only compared when you click Apply.
-            </p>
             <Field
               label='Your Current Salary'
-              hint='Annual gross salary'
               id={ids.yourSalary}
               tooltipFieldName='directorYourSalary'
             >
@@ -987,12 +903,10 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 invalidDraft={yourSetupDraftErrors.salary}
                 placeholder='£0'
                 className={INPUT_CLASS}
-                aria-describedby={getHintId(ids.yourSalary)}
               />
             </Field>
             <Field
               label='Your Current Dividends'
-              hint='Annual dividends'
               id={ids.yourDividends}
               tooltipFieldName='directorYourDividends'
             >
@@ -1007,7 +921,6 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 invalidDraft={yourSetupDraftErrors.dividends}
                 placeholder='£0'
                 className={INPUT_CLASS}
-                aria-describedby={getHintId(ids.yourDividends)}
               />
             </Field>
             <div className='space-y-2 pt-1'>
@@ -1094,19 +1007,15 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function Field({
   label,
-  hint,
   id,
   tooltipFieldName,
   children,
 }: {
   label: string;
-  hint?: string;
   id?: string;
   tooltipFieldName?: string;
   children: React.ReactNode;
 }) {
-  const hintId = hint ? getHintId(id) : undefined;
-
   return (
     <div className='space-y-2'>
       <div className='flex items-center gap-2'>
@@ -1116,11 +1025,6 @@ function Field({
         {tooltipFieldName && <LabelTooltip fieldName={tooltipFieldName} />}
       </div>
       {children}
-      {hint && (
-        <p id={hintId} className='text-muted-foreground/80 text-xs leading-relaxed'>
-          {hint}
-        </p>
-      )}
     </div>
   );
 }

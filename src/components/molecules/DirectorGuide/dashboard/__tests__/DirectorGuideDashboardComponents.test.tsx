@@ -241,12 +241,10 @@ describe('Director Intelligence dashboard components', () => {
       expect(mobileDrawer.querySelector('div.flex-1.overflow-y-auto')).toHaveClass(
         'pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)]',
       );
-      expect(
-        screen.getByText('Results are ready. Close this view to see your dashboard.').parentElement,
-      ).not.toHaveClass('backdrop-blur-sm');
-      expect(
-        screen.getByText('Results are ready. Close this view to see your dashboard.'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Results are ready.').parentElement).not.toHaveClass(
+        'backdrop-blur-sm',
+      );
+      expect(screen.getByText('Results are ready.')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'View results' })).toBeInTheDocument();
 
       fireEvent.click(screen.getByLabelText('Close your numbers panel'));

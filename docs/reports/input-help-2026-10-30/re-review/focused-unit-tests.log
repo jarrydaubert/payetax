@@ -1,0 +1,9 @@
+$ jest --no-coverage --runInBand --runTestsByPath src/components/organisms/DirectorGuide/__tests__/DirectorDashboard.render.test.tsx src/components/atoms/__tests__/HelpPopover.test.tsx src/components/atoms/__tests__/InputTooltip.test.tsx src/components/atoms/__tests__/LabelTooltip.test.tsx src/lib/tax/__tests__/directorCalculator.strategy.spec.ts src/lib/tax/__tests__/directorCalculator.validationWarnings.spec.ts
+[@sentry/nextjs] Importing `withSentryConfig` from `@sentry/nextjs` is deprecated and will stop working in v11. Import it from `@sentry/nextjs/config` instead:
+  import { withSentryConfig } from '@sentry/nextjs/config';
+
+Test Suites: 6 passed, 6 total
+Tests:       124 passed, 124 total
+Snapshots:   0 total
+Time:        5.504 s, estimated 8 s
+Ran all test suites within paths "src/components/organisms/DirectorGuide/__tests__/DirectorDashboard.render.test.tsx", "src/components/atoms/__tests__/HelpPopover.test.tsx", "src/components/atoms/__tests__/InputTooltip.test.tsx", "src/components/atoms/__tests__/LabelTooltip.test.tsx", "src/lib/tax/__tests__/directorCalculator.strategy.spec.ts", "src/lib/tax/__tests__/directorCalculator.validationWarnings.spec.ts".

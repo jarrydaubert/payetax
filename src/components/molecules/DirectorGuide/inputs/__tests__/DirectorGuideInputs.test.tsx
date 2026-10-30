@@ -124,7 +124,11 @@ describe('Director Intelligence input components', () => {
 
     fireEvent.click(screen.getByText("I don't know"));
     expect(useDirectorGuideStore.getState().formData.yearEndMonth).toBe('unknown');
-    expect(screen.getByText(/Check Companies House/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Check Companies House/i)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Help for Company Year-End' }));
+    expect(screen.getByRole('region', { name: 'Help for Company Year-End' })).toHaveTextContent(
+      /Check Companies House/i,
+    );
   });
 
   it('updates already taken values', () => {

@@ -99,11 +99,6 @@ const BASELINE_ENTRIES = [
     ['type:StrategyComparison'],
   ],
   [
-    'src/components/molecules/DirectorGuide/inputs/EmploymentAllowanceInput.tsx',
-    '@/constants/taxRates',
-    ['CURRENT_TAX_YEAR_DISPLAY'],
-  ],
-  [
     'src/components/molecules/DirectorGuide/inputs/StudentLoanInputs.tsx',
     '@/constants/taxRates',
     ['CURRENT_TAX_YEAR', 'TAX_RATES', 'type:StudentLoanPlan'],

@@ -1,0 +1,10 @@
+import path from 'node:path';
+import { defineConfig } from '@playwright/test';
+import base from '../../payetax-worktrees/input-help-v5.2.2/playwright.config';
+export default defineConfig({
+  ...base,
+  testDir: path.resolve('e2e'),
+  globalSetup: path.resolve('e2e/global-setup.ts'),
+  webServer: undefined,
+  use: { ...base.use, baseURL: 'http://localhost:3102', storageState: path.resolve('playwright/.auth/storageState.json') },
+});

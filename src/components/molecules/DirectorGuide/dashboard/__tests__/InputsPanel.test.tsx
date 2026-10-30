@@ -118,10 +118,10 @@ describe('DirectorGuide InputsPanel', () => {
 
     expect(screen.getByLabelText('Annual Revenue')).toBeInTheDocument();
     expect(screen.getByLabelText('Business Expenses')).toBeInTheDocument();
-    expect(screen.getByText('Total invoiced before expenses')).toBeInTheDocument();
+    expect(screen.queryByText('Total invoiced before expenses')).not.toBeInTheDocument();
     expect(
-      screen.getByText('Excluding modelled director salary and employer NI'),
-    ).toBeInTheDocument();
+      screen.queryByText('Excluding modelled director salary and employer NI'),
+    ).not.toBeInTheDocument();
     expect(screen.queryByLabelText('Monthly Contract Income')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Monthly' }));
@@ -129,10 +129,10 @@ describe('DirectorGuide InputsPanel', () => {
     expect(useDirectorGuideStore.getState().formData.mode).toBe('monthly');
     expect(screen.getByLabelText('Monthly Contract Income')).toBeInTheDocument();
     expect(screen.getByLabelText('Monthly Business Expenses')).toBeInTheDocument();
-    expect(screen.getByText('Typical gross invoicing per month')).toBeInTheDocument();
+    expect(screen.queryByText('Typical gross invoicing per month')).not.toBeInTheDocument();
     expect(
-      screen.getByText('Excluding modelled director salary and employer NI'),
-    ).toBeInTheDocument();
+      screen.queryByText('Excluding modelled director salary and employer NI'),
+    ).not.toBeInTheDocument();
     expect(screen.queryByLabelText('Annual Revenue')).not.toBeInTheDocument();
   });
 
@@ -151,7 +151,7 @@ describe('DirectorGuide InputsPanel', () => {
     });
     expect(included).not.toBeChecked();
     expect(getTooltipContent('directorPensionDeducted')?.description).toContain(
-      'Business Expenses or Monthly Business Expenses',
+      'business expenses you entered',
     );
     expect(getTooltipContent('directorPensionDeducted')?.description).not.toMatch(/profit figure/);
     fireEvent.click(included);
@@ -200,7 +200,7 @@ describe('DirectorGuide InputsPanel', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Other' }));
 
-    const input = screen.getByLabelText('Custom Year-End Date');
+    const input = screen.getByLabelText('Custom Year-End Date (MM-DD)');
     expect(input).toBeInTheDocument();
 
     fireEvent.change(input, { target: { value: '06-30' } });
@@ -386,9 +386,7 @@ describe('DirectorGuide InputsPanel', () => {
       expect(input).toHaveValue('-500');
       expect(input).toHaveAttribute('aria-invalid', 'true');
       const error = screen.getByText(CURRENCY_INPUT_ERRORS.negative);
-      expect(input.getAttribute('aria-describedby')?.split(' ')).toEqual(
-        expect.arrayContaining([error.id, `${input.id}-hint`]),
-      );
+      expect(input.getAttribute('aria-describedby')?.split(' ')).toEqual([error.id]);
     });
 
     it.each([

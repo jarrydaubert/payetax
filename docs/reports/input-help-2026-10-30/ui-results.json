@@ -1,0 +1,410 @@
+[
+  {
+    "engine": "chromium",
+    "device": "desktop",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "mainTitle": "UK PAYE Tax Calculator 2026-27 | HMRC Rates | PayeTax",
+    "directorTitle": "Director Pay Dashboard | Salary & Dividend Calculator 2026-27 | PayeTax",
+    "pensionBox": {
+      "x": 803,
+      "y": 160,
+      "width": 320,
+      "height": 316
+    },
+    "overflow": {
+      "scroll": 314,
+      "client": 314
+    },
+    "axeViolations": [],
+    "directorAxeViolations": [],
+    "errors": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/speed-insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/speed-insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled."
+    ],
+    "failedResponses": [
+      {
+        "url": "http://localhost:3102/_vercel/insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/speed-insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/speed-insights/script.js",
+        "status": 404
+      }
+    ]
+  },
+  {
+    "engine": "chromium",
+    "device": "mobile",
+    "viewport": {
+      "width": 393,
+      "height": 852
+    },
+    "mainTitle": "UK PAYE Tax Calculator 2026-27 | HMRC Rates | PayeTax",
+    "directorTitle": "Director Pay Dashboard | Salary & Dividend Calculator 2026-27 | PayeTax",
+    "pensionBox": {
+      "x": 12,
+      "y": 86,
+      "width": 320,
+      "height": 316
+    },
+    "overflow": {
+      "scroll": 314,
+      "client": 314
+    },
+    "axeViolations": [],
+    "directorAxeViolations": [],
+    "errors": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/speed-insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/speed-insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled."
+    ],
+    "failedResponses": [
+      {
+        "url": "http://localhost:3102/_vercel/insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/speed-insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/speed-insights/script.js",
+        "status": 404
+      }
+    ]
+  },
+  {
+    "engine": "chromium",
+    "device": "narrow",
+    "viewport": {
+      "width": 320,
+      "height": 640
+    },
+    "mainTitle": "UK PAYE Tax Calculator 2026-27 | HMRC Rates | PayeTax",
+    "directorTitle": "Director Pay Dashboard | Salary & Dividend Calculator 2026-27 | PayeTax",
+    "pensionBox": {
+      "x": 12,
+      "y": 12,
+      "width": 296,
+      "height": 284.1875
+    },
+    "overflow": {
+      "scroll": 337,
+      "client": 282
+    },
+    "axeViolations": [],
+    "directorAxeViolations": [],
+    "errors": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/speed-insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/speed-insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled."
+    ],
+    "failedResponses": [
+      {
+        "url": "http://localhost:3102/_vercel/insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/speed-insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/speed-insights/script.js",
+        "status": 404
+      }
+    ]
+  },
+  {
+    "engine": "chromium",
+    "device": "short",
+    "viewport": {
+      "width": 320,
+      "height": 400
+    },
+    "mainTitle": "UK PAYE Tax Calculator 2026-27 | HMRC Rates | PayeTax",
+    "directorTitle": "Director Pay Dashboard | Salary & Dividend Calculator 2026-27 | PayeTax",
+    "pensionBox": {
+      "x": 12,
+      "y": 12,
+      "width": 296,
+      "height": 164.1875
+    },
+    "overflow": {
+      "scroll": 337,
+      "client": 162
+    },
+    "axeViolations": [],
+    "directorAxeViolations": [],
+    "errors": [
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/speed-insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute script from 'http://localhost:3102/_vercel/speed-insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled."
+    ],
+    "failedResponses": [
+      {
+        "url": "http://localhost:3102/_vercel/insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/speed-insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/speed-insights/script.js",
+        "status": 404
+      }
+    ]
+  },
+  {
+    "engine": "webkit",
+    "device": "desktop",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "mainTitle": "UK PAYE Tax Calculator 2026-27 | HMRC Rates | PayeTax",
+    "directorTitle": "Director Pay Dashboard | Salary & Dividend Calculator 2026-27 | PayeTax",
+    "pensionBox": {
+      "x": 813,
+      "y": 160,
+      "width": 320,
+      "height": 316
+    },
+    "overflow": {
+      "scroll": 314,
+      "client": 314
+    },
+    "axeViolations": [],
+    "directorAxeViolations": [],
+    "errors": [
+      "Viewport argument key \"interactive-widget\" not recognized and ignored.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute http://localhost:3102/_vercel/insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Refused to execute http://localhost:3102/_vercel/speed-insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Viewport argument key \"interactive-widget\" not recognized and ignored.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute http://localhost:3102/_vercel/insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Refused to execute http://localhost:3102/_vercel/speed-insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type."
+    ],
+    "failedResponses": [
+      {
+        "url": "http://localhost:3102/_vercel/insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/speed-insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/speed-insights/script.js",
+        "status": 404
+      }
+    ]
+  },
+  {
+    "engine": "webkit",
+    "device": "mobile",
+    "viewport": {
+      "width": 393,
+      "height": 852
+    },
+    "mainTitle": "UK PAYE Tax Calculator 2026-27 | HMRC Rates | PayeTax",
+    "directorTitle": "Director Pay Dashboard | Salary & Dividend Calculator 2026-27 | PayeTax",
+    "pensionBox": {
+      "x": 12,
+      "y": 85,
+      "width": 320,
+      "height": 316
+    },
+    "overflow": {
+      "scroll": 314,
+      "client": 314
+    },
+    "axeViolations": [],
+    "directorAxeViolations": [],
+    "errors": [
+      "Viewport argument key \"interactive-widget\" not recognized and ignored.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute http://localhost:3102/_vercel/insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Refused to execute http://localhost:3102/_vercel/speed-insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Viewport argument key \"interactive-widget\" not recognized and ignored.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute http://localhost:3102/_vercel/insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Refused to execute http://localhost:3102/_vercel/speed-insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type."
+    ],
+    "failedResponses": [
+      {
+        "url": "http://localhost:3102/_vercel/insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/speed-insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/speed-insights/script.js",
+        "status": 404
+      }
+    ]
+  },
+  {
+    "engine": "webkit",
+    "device": "narrow",
+    "viewport": {
+      "width": 320,
+      "height": 640
+    },
+    "mainTitle": "UK PAYE Tax Calculator 2026-27 | HMRC Rates | PayeTax",
+    "directorTitle": "Director Pay Dashboard | Salary & Dividend Calculator 2026-27 | PayeTax",
+    "pensionBox": {
+      "x": 12,
+      "y": 343,
+      "width": 296,
+      "height": 284.828125
+    },
+    "overflow": {
+      "scroll": 337,
+      "client": 283
+    },
+    "axeViolations": [],
+    "directorAxeViolations": [],
+    "errors": [
+      "Viewport argument key \"interactive-widget\" not recognized and ignored.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute http://localhost:3102/_vercel/insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Refused to execute http://localhost:3102/_vercel/speed-insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Viewport argument key \"interactive-widget\" not recognized and ignored.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute http://localhost:3102/_vercel/insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Refused to execute http://localhost:3102/_vercel/speed-insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type."
+    ],
+    "failedResponses": [
+      {
+        "url": "http://localhost:3102/_vercel/insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/speed-insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/speed-insights/script.js",
+        "status": 404
+      }
+    ]
+  },
+  {
+    "engine": "webkit",
+    "device": "short",
+    "viewport": {
+      "width": 320,
+      "height": 400
+    },
+    "mainTitle": "UK PAYE Tax Calculator 2026-27 | HMRC Rates | PayeTax",
+    "directorTitle": "Director Pay Dashboard | Salary & Dividend Calculator 2026-27 | PayeTax",
+    "pensionBox": {
+      "x": 12,
+      "y": 223,
+      "width": 296,
+      "height": 164.828125
+    },
+    "overflow": {
+      "scroll": 337,
+      "client": 163
+    },
+    "axeViolations": [],
+    "directorAxeViolations": [],
+    "errors": [
+      "Viewport argument key \"interactive-widget\" not recognized and ignored.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute http://localhost:3102/_vercel/insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Refused to execute http://localhost:3102/_vercel/speed-insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Viewport argument key \"interactive-widget\" not recognized and ignored.",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Failed to load resource: the server responded with a status of 404 (Not Found)",
+      "Refused to execute http://localhost:3102/_vercel/insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type.",
+      "Refused to execute http://localhost:3102/_vercel/speed-insights/script.js as script because \"X-Content-Type-Options: nosniff\" was given and its Content-Type is not a script MIME type."
+    ],
+    "failedResponses": [
+      {
+        "url": "http://localhost:3102/_vercel/insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/speed-insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/insights/script.js",
+        "status": 404
+      },
+      {
+        "url": "http://localhost:3102/_vercel/speed-insights/script.js",
+        "status": 404
+      }
+    ]
+  }
+]

@@ -6,8 +6,8 @@
  */
 'use client';
 
-import { Info } from 'lucide-react';
 import { useId } from 'react';
+import { LabelTooltip } from '@/components/atoms/LabelTooltip';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -19,7 +19,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import type { Region } from '@/lib/validation/directorValidation';
 import {
   useDirectorFormSlice,
@@ -82,14 +81,7 @@ export function CoreInputs() {
           <div className='space-y-2'>
             <div className='flex items-center gap-1'>
               <Label htmlFor={expensesId}>Business Expenses</Label>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Info className='size-4 text-muted-foreground' />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className='max-w-xs'>Exclude director salary - we calculate that separately</p>
-                </TooltipContent>
-              </Tooltip>
+              <LabelTooltip fieldName='directorExpenses' />
             </div>
             <div className='flex items-center gap-2'>
               <span className='text-muted-foreground'>£</span>
@@ -121,14 +113,7 @@ export function CoreInputs() {
           <div className='space-y-2'>
             <div className='flex items-center gap-1'>
               <Label htmlFor={yearEndId}>Financial Year End</Label>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Info className='size-4 text-muted-foreground' />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className='max-w-xs'>Used to calculate key tax deadlines</p>
-                </TooltipContent>
-              </Tooltip>
+              <LabelTooltip fieldName='directorYearEnd' />
             </div>
             <Select
               value={formData.yearEndMonth}
@@ -152,11 +137,6 @@ export function CoreInputs() {
                 placeholder='MM-DD (e.g. 06-30)'
                 className='mt-2'
               />
-            )}
-            {formData.yearEndMonth === 'unknown' && (
-              <p className='text-muted-foreground text-xs'>
-                Check Companies House or your accountant
-              </p>
             )}
           </div>
         </div>

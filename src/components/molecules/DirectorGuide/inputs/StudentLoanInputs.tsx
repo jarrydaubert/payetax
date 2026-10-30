@@ -4,10 +4,9 @@
  */
 'use client';
 
-import { Info } from 'lucide-react';
+import { LabelTooltip } from '@/components/atoms/LabelTooltip';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { CURRENT_TAX_YEAR, type StudentLoanPlan, TAX_RATES } from '@/constants/taxRates';
 import { getAvailableDirectorStudentLoanPlans } from '@/lib/tax/studentLoanPlans';
 import { useDirectorFormValue, useDirectorGuideActions } from '@/store/directorGuideStore';
@@ -43,20 +42,7 @@ export function StudentLoanInputs() {
     <div className='space-y-2'>
       <div className='flex items-center gap-1'>
         <Label>Student Loan</Label>
-        <Tooltip>
-          <TooltipTrigger>
-            <Info className='size-4 text-muted-foreground' />
-          </TooltipTrigger>
-          <TooltipContent>
-            <p className='max-w-xs'>
-              <strong>Directors pay student loans on TOTAL income</strong> (salary + dividends) via
-              Self Assessment — not just salary.
-              <span className='mt-1 block text-warning'>
-                This is different from employees where student loans only come from salary via PAYE.
-              </span>
-            </p>
-          </TooltipContent>
-        </Tooltip>
+        <LabelTooltip fieldName='directorStudentLoans' />
       </div>
       <div className='space-y-2 pt-1'>
         {plans.map((plan) => (

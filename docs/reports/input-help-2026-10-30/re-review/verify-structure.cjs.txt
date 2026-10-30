@@ -1,0 +1,19 @@
+const ts=require('typescript');
+const fs=require('node:fs');
+const assert=require('node:assert/strict');
+const folder='docs/reports/input-help-2026-10-30/re-review/';
+const before=ts.createSourceFile('before.tsx',fs.readFileSync(folder+'director-notes-before.tsx.txt','utf8'),ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+const after=ts.createSourceFile('after.tsx',fs.readFileSync('src/components/organisms/DirectorGuide/DirectorDashboard.tsx','utf8'),ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
+function structure(node){
+ if(ts.isJsxText(node)) return null;
+ const children=[];ts.forEachChild(node,n=>{const value=structure(n);if(value)children.push(value)});
+ return {kind:node.kind,...(typeof node.text==='string'&&!ts.isSourceFile(node)?{text:node.text}:{}),children};
+}
+assert.deepEqual(structure(before),structure(after));
+function textNodes(root){const values=[];function visit(n){if(ts.isJsxText(n)){const value=n.text.replace(/\s+/g,' ').trim();if(value)values.push(value)}else ts.forEachChild(n,visit)}visit(root);return values}
+const original=textNodes(before),current=textNodes(after);
+assert.equal(original.length,current.length);
+const edits=original.flatMap((text,index)=>text===current[index]?[]:[{before:text,after:current[index]}]);
+assert.equal(edits.length,2);
+fs.writeFileSync(folder+'production-structure-check.json',JSON.stringify({identicalExceptJsxText:true,changedTextNodes:edits.length,edits},null,2)+'\n');
+console.log('Production AST unchanged except two JSX text nodes');

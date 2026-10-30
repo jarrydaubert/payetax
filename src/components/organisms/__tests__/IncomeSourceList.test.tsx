@@ -67,9 +67,7 @@ describe('IncomeSourceList Component', () => {
       await user.click(trigger);
 
       // After expansion, the empty state message should be in the document
-      expect(
-        screen.getByText('Add pension income, rental income, or other sources'),
-      ).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Add Income Source' })).toBeInTheDocument();
     });
 
     it('should show "Add Income Source" button when expanded', async () => {
@@ -94,9 +92,7 @@ describe('IncomeSourceList Component', () => {
 
       // Expand
       await user.click(trigger);
-      expect(
-        screen.getByText('Add pension income, rental income, or other sources'),
-      ).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Add Income Source' })).toBeInTheDocument();
 
       // Collapse
       await user.click(trigger);
@@ -161,10 +157,7 @@ describe('IncomeSourceList Component', () => {
       const trigger = screen.getByText('Additional Income Sources');
       await user.click(trigger);
 
-      expect(screen.getByText('Additional income accuracy')).toBeInTheDocument();
-      expect(
-        screen.getByText(/Multiple income sources can affect personal allowance/i),
-      ).toBeInTheDocument();
+      expect(screen.queryByText('Additional income accuracy')).not.toBeInTheDocument();
     });
 
     it('should display all income sources when expanded', async () => {

@@ -1,0 +1,9 @@
+$ jest --no-coverage --runInBand
+[@sentry/nextjs] Importing `withSentryConfig` from `@sentry/nextjs` is deprecated and will stop working in v11. Import it from `@sentry/nextjs/config` instead:
+  import { withSentryConfig } from '@sentry/nextjs/config';
+
+Test Suites: 258 passed, 258 total
+Tests:       4600 passed, 4600 total
+Snapshots:   0 total
+Time:        188.106 s
+Ran all test suites.

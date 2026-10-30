@@ -163,6 +163,60 @@ describe('DirectorDashboard (normal mode)', () => {
     expect(screen.getByText(/Save this breakdown for your records/i)).toBeInTheDocument();
   });
 
+  it('describes other PAYE as a modelling assumption and qualifies the real NI position', () => {
+    setCurrentResult(80000, { hasOtherPAYEEmployment: true });
+    render(<DirectorDashboard />);
+    const notes = screen.getByRole('region', { name: 'About this estimate' });
+    expect(notes).toHaveTextContent('In the suggested pay options');
+    expect(notes).toHaveTextContent(
+      'employee National Insurance from the first pound of director salary',
+    );
+    expect(notes).toHaveTextContent(
+      'Jobs with separate employers usually have separate thresholds',
+    );
+    expect(notes).toHaveTextContent('may overstate your NI');
+    expect(notes).toHaveTextContent('Check with your payroll provider');
+    expect(notes).not.toHaveTextContent('annual allowance');
+  });
+
+  it.each([
+    false,
+    true,
+  ])('warns about a personal pension tax charge, including when already in expenses (%s)', (alreadyDeducted) => {
+    setCurrentResult(80000, {
+      pensionContribution: 1000,
+      isPensionAlreadyDeducted: alreadyDeducted,
+    });
+    render(<DirectorDashboard />);
+    const notes = screen.getByRole('region', { name: 'About this estimate' });
+    expect(notes).toHaveTextContent('annual allowance across all your pensions');
+    expect(notes).toHaveTextContent(
+      'Going over your available allowance may mean a personal tax charge',
+    );
+    expect(notes).toHaveTextContent('not included in this estimate');
+    expect(notes).toHaveTextContent('Unused allowance from the previous three tax years may help');
+    expect(notes).toHaveTextContent(
+      'high income or some pension withdrawals can reduce your allowance',
+    );
+    expect(notes).not.toHaveTextContent('restrict the relief');
+    expect(notes).not.toHaveTextContent('other PAYE employment');
+  });
+
+  it('keeps estimate notes hidden when their existing input conditions are absent', () => {
+    setCurrentResult(80000);
+    render(<DirectorDashboard />);
+    expect(screen.queryByRole('region', { name: 'About this estimate' })).not.toBeInTheDocument();
+  });
+
+  it('does not show estimate notes without a result, even with relevant inputs', () => {
+    const current = useDirectorGuideStore.getState();
+    useDirectorGuideStore.setState({
+      formData: { ...current.formData, hasOtherPAYEEmployment: true, pensionContribution: 1000 },
+    });
+    render(<DirectorDashboard />);
+    expect(screen.queryByRole('region', { name: 'About this estimate' })).not.toBeInTheDocument();
+  });
+
   it('shows monthly safe draw callout in monthly mode', () => {
     setCurrentResult(80000, { mode: 'monthly', monthlyIncome: 3000, monthlyExpenses: 1000 });
     useDirectorGuideStore.setState({

@@ -1,0 +1,75 @@
+✅ Cookie consent accepted with a valid timestamp
+✅ Storage state saved to playwright/.auth/storageState.json
+
+Running 65 tests using 1 worker
+
+
+
+(node:8352) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[1/65] [chromium] › e2e\calculator-critical.spec.ts:32:7 › Pension modelling guidance @critical › pension help works by touch and keyboard without permanent guidance
+[2/65] [chromium] › e2e\calculator-critical.spec.ts:63:7 › Pension modelling guidance @critical › narrow-screen pension help stays on screen and can scroll with the keyboard
+[3/65] [chromium] › e2e\calculator-critical.spec.ts:97:7 › Pension modelling guidance @critical › desktop mouse can reopen help after focus returns to its trigger
+[4/65] [chromium] › e2e\calculator-critical.spec.ts:114:7 › Pension modelling guidance @critical › every PAYE input help control works at 375px
+[5/65] [chromium] › e2e\calculator-critical.spec.ts:123:7 › Pension modelling guidance @critical › pension and additional-income warnings appear with calculated results
+[6/65] [chromium] › e2e\calculator-critical.spec.ts:196:9 › MC-04 submitted pay period @critical › Annually input leads with Monthly take-home
+[7/65] [chromium] › e2e\calculator-critical.spec.ts:196:9 › MC-04 submitted pay period @critical › Monthly input leads with Monthly take-home
+[8/65] [chromium] › e2e\calculator-critical.spec.ts:196:9 › MC-04 submitted pay period @critical › 4-Weekly input leads with 4-Weekly take-home
+[9/65] [chromium] › e2e\calculator-critical.spec.ts:196:9 › MC-04 submitted pay period @critical › Fortnightly input leads with Fortnightly take-home
+[10/65] [chromium] › e2e\calculator-critical.spec.ts:196:9 › MC-04 submitted pay period @critical › Weekly input leads with Weekly take-home
+[11/65] [chromium] › e2e\calculator-critical.spec.ts:196:9 › MC-04 submitted pay period @critical › Daily input leads with Daily take-home
+[12/65] [chromium] › e2e\calculator-critical.spec.ts:196:9 › MC-04 submitted pay period @critical › Hourly input leads with Hourly take-home
+[13/65] [chromium] › e2e\calculator-critical.spec.ts:228:7 › MC-04 submitted pay period @critical › display selection survives resizing and a new Calculate reapplies the submitted period
+[14/65] [chromium] › e2e\calculator-critical.spec.ts:287:7 › MC-03 input integrity @critical › first use and keyboard Reset offer Calculate without results or result actions
+[15/65] [chromium] › e2e\calculator-critical.spec.ts:322:7 › MC-03 input integrity @critical › valid salary edit and blur require Calculate, then email matches the displayed inputs
+[16/65] [chromium] › e2e\calculator-critical.spec.ts:367:7 › MC-03 input integrity @critical › invalid drafts stay blocked through recovery until explicit Calculate
+[17/65] [chromium] › e2e\calculator-critical.spec.ts:398:7 › MC-03 input integrity @critical › pension edit removes stale suggestions; applying a fresh suggestion only edits input
+[18/65] [chromium] › e2e\calculator-critical.spec.ts:423:7 › MC-03 input integrity @critical › invalid pension is described and keyboard correction can return to Calculate
+[19/65] [chromium] › e2e\calculator-critical.spec.ts:457:7 › MC-03 input integrity @critical › an already-open email form cannot send after a concurrent input edit
+[20/65] [chromium] › e2e\calculator-critical.spec.ts:554:9 › MC-02 pension units and restoration @critical › valid restored 5.25 percentage keeps its meaning
+[21/65] [chromium] › e2e\calculator-critical.spec.ts:554:9 › MC-02 pension units and restoration @critical › valid restored 5000.25 amount keeps its meaning
+[22/65] [chromium] › e2e\calculator-critical.spec.ts:567:9 › MC-02 pension units and restoration @critical › legacy 5000% is preserved, blocked and recoverable as percentage
+[23/65] [chromium] › e2e\calculator-critical.spec.ts:567:9 › MC-02 pension units and restoration @critical › legacy 5000% is preserved, blocked and recoverable as amount
+[24/65] [chromium] › e2e\calculator-critical.spec.ts:625:9 › MC-02 pension units and restoration @critical › switching 50 amount explains reset and validates the new unit
+[25/65] [chromium] › e2e\calculator-critical.spec.ts:625:9 › MC-02 pension units and restoration @critical › switching 5000 amount explains reset and validates the new unit
+[26/65] [chromium] › e2e\calculator-critical.spec.ts:625:9 › MC-02 pension units and restoration @critical › switching 5.25 percentage explains reset and validates the new unit
+[27/65] [chromium] › e2e\calculator-critical.spec.ts:625:9 › MC-02 pension units and restoration @critical › switching 100 percentage explains reset and validates the new unit
+[28/65] [chromium] › e2e\calculator-critical.spec.ts:807:9 › MC-09 pension suggestion @critical › Annually, £5,000: annual addition, existing pension and explicit Calculate
+[29/65] [chromium] › e2e\calculator-critical.spec.ts:807:9 › MC-09 pension suggestion @critical › Monthly, £14,000: annual addition, existing pension and explicit Calculate
+[30/65] [chromium] › e2e\calculator-critical.spec.ts:807:9 › MC-09 pension suggestion @critical › Weekly, £4,000: annual addition, existing pension and explicit Calculate
+[31/65] [chromium] › e2e\calculator-critical.spec.ts:807:9 › MC-09 pension suggestion @critical › Hourly, £4,000: annual addition, existing pension and explicit Calculate
+[32/65] [chromium] › e2e\calculator-critical.spec.ts:807:9 › MC-09 pension suggestion @critical › Monthly, £12,000: annual addition, existing pension and explicit Calculate
+[33/65] [chromium] › e2e\calculator-critical.spec.ts:908:7 › Calculator critical @critical › Age select text is not visually truncated in the side panel @critical
+[34/65] [chromium] › e2e\calculator-critical.spec.ts:922:7 › Calculator critical @critical › State Pension Age selection removes employee NI and increases net pay @critical
+[35/65] [chromium] › e2e\calculator-critical.spec.ts:949:7 › Calculator critical @critical › Marriage allowance prompt toggles with married + partner wage thresholds @critical
+[36/65] [chromium] › e2e\calculator-critical.spec.ts:970:7 › Calculator critical @critical › Breakdown table renders and marginal responds to student loan @critical
+[37/65] [chromium] › e2e\calculator-critical.spec.ts:1001:7 › Calculator critical @critical › Non-taxable allowances increase annual net pay by the same amount @critical
+[38/65] [chromium] › e2e\calculator-critical.spec.ts:1021:7 › Calculator critical @critical › Additional rental income shows as "Other Income (No NI)" and is included in gross @critical
+[39/65] [chromium] › e2e\calculator-critical.spec.ts:1050:7 › Calculator critical @critical › Additional income keeps its pence instead of being scaled up @critical
+[40/65] [chromium] › e2e\calculator-critical.spec.ts:1076:7 › Calculator critical @critical › Rejected amounts show an error, remove old results and are never calculated @critical
+[41/65] [chromium] › e2e\calculator-critical.spec.ts:1158:7 › Calculator critical @critical › Plan 2 + Postgrad UI applies both loans @critical
+[42/65] [chromium] › e2e\calculator-critical.spec.ts:1180:5 › focus, drafts, empty fields and pension unit changes preserve result integrity @critical
+[43/65] [chromium] › e2e\director-guide-critical.spec.ts:140:7 › Director Intelligence critical @critical › DI-05: only matching scenarios can email, with recovery after each divergence @critical
+[44/65] [chromium] › e2e\director-guide-critical.spec.ts:244:7 › Director Intelligence critical @critical › DI-05: an open dialog rejects a submit in the same task as an input edit @critical
+[45/65] [chromium] › e2e\director-guide-critical.spec.ts:277:7 › Director Intelligence critical @critical › DI-05: year-end changes recover and monthly cash projections stay blocked @critical
+[46/65] [chromium] › e2e\director-guide-critical.spec.ts:327:7 › Director Intelligence critical @critical › Normal mode: calculates and can email results @critical
+[47/65] [chromium] › e2e\director-guide-critical.spec.ts:376:7 › Director Intelligence critical @critical › Survival mode: shows Survival panel and VAT warning (ungated) @critical
+[48/65] [chromium] › e2e\director-guide-critical.spec.ts:474:7 › Director Intelligence currency inputs @critical › pasted and typed pence give an independently derived taxable profit @critical
+[49/65] [chromium] › e2e\director-guide-critical.spec.ts:512:7 › Director Intelligence currency inputs @critical › a mid-string edit keeps the caret and the amount @critical
+[50/65] [chromium] › e2e\director-guide-critical.spec.ts:538:7 › Director Intelligence currency inputs @critical › invalid or empty required inputs remove the result and disable email @critical
+[51/65] [chromium] › e2e\director-guide-critical.spec.ts:596:7 › Director input help @critical › help works in annual, full and monthly inputs, including the mobile drawer
+[52/65] [chromium] › e2e\director-guide-critical.spec.ts:646:7 › Director input help @critical › every Director input help control works at 375px in annual and monthly modes
+[53/65] [chromium] › e2e\director-guide-critical.spec.ts:679:7 › Director input help @critical › material Director estimate warnings appear with results
+[54/65] [chromium] › e2e\homepage-portal-stability.spec.ts:5:7 › Homepage portal stability › mobile homepage interactions do not raise runtime page errors
+[55/65] [chromium] › e2e\payslip-regression.spec.ts:65:7 › Payslip regression @rounding › Monthly breakdown matches known example inputs @rounding
+[56/65] [chromium] › e2e\payslip-regression.spec.ts:98:7 › Payslip regression @rounding › Monthly and hourly breakdown match latest 2026-27 payslip @rounding
+[57/65] [chromium] › e2e\smoke.spec.ts:46:7 › Smoke Tests › Homepage loads and "Open Calculator" works @smoke
+[58/65] [chromium] › e2e\smoke.spec.ts:55:7 › Smoke Tests › Blog page loads with posts @smoke
+[59/65] [chromium] › e2e\smoke.spec.ts:63:7 › Smoke Tests › Tools landing page loads @smoke
+[60/65] [chromium] › e2e\smoke.spec.ts:70:7 › Smoke Tests › Scottish calculator CTA opens the main calculator with Scotland selected @smoke
+[61/65] [chromium] › e2e\smoke.spec.ts:87:7 › Smoke Tests › About page loads @smoke
+[62/65] [chromium] › e2e\smoke.spec.ts:92:7 › Smoke Tests › Privacy page loads @smoke
+[63/65] [chromium] › e2e\smoke.spec.ts:97:7 › Smoke Tests › Compliance page loads @smoke
+[64/65] [chromium] › e2e\smoke.spec.ts:102:7 › Smoke Tests › Navigation links work @smoke
+[65/65] [chromium] › e2e\smoke.spec.ts:123:7 › Smoke Tests › No CSP errors in console @smoke
+  65 passed (4.5m)

@@ -1,0 +1,58 @@
+$ PAYETAX_ENABLE_SENTRY_SOURCEMAPS=false next build --webpack
+▲ Next.js 16.4.1 (webpack)
+[@sentry/nextjs] Importing `withSentryConfig` from `@sentry/nextjs` is deprecated and will stop working in v11. Import it from `@sentry/nextjs/config` instead:
+  import { withSentryConfig } from '@sentry/nextjs/config';
+⚠ `experimental.useCache` is deprecated. Please use the top-level `cacheComponents` option instead in next.config.ts.
+✓ Running next.config.ts took 488ms
+- Experiments (use with caution):
+  · clientTraceMetadata
+  · optimizePackageImports
+  ✓ useCache
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 7.5s
+  Running TypeScript ...
+  Finished TypeScript in 4.5s ...
+  Collecting page data using 19 workers ...
+  Generating static pages using 19 workers (0/64) ...
+  Generating static pages using 19 workers (16/64)
+  Generating static pages using 19 workers (32/64)
+  Generating static pages using 19 workers (48/64)
+✓ Generating static pages using 19 workers (64/64) in 2.1s
+  Finalizing page optimization ...
+  Collecting build traces ...
+
+Route (app)                                       Revalidate  Expire
+┌ ○ /
+├ ○ /_not-found
+├ ○ /about
+├ ƒ /api/og
+├ ƒ /api/ops/rate-limit-health
+├ ƒ /api/send-director-results
+├ ƒ /api/send-results
+├ ○ /api/tax-rates                                        1d      1y
+├ ƒ /blog
+├   /blog/[slug]
+│ ├ ● /blog/budget-2026-uk-tax-changes-explained          1h      1d
+│ ├ ● /blog/electric-car-salary-sacrifice-guide           1h      1d
+│ ├ ● /blog/making-tax-digital-income-tax-2026            1h      1d
+│ └ ● [+30 more paths]
+├ ƒ /blog/category/[slug]
+├ ○ /compliance
+├ ○ /install
+├ ○ /llms.txt                                             1h      1d
+├ ○ /offline
+├ ○ /privacy
+├ ○ /robots.txt
+├ ○ /sitemap.xml                                          1h      1d
+├ ○ /tools
+├ ○ /tools/director-guide
+├ ○ /tools/marriage-allowance-calculator
+├ ○ /tools/national-insurance-calculator
+├ ○ /tools/scottish-tax-calculator
+└ ○ /tools/tax-code-decoder
+
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand

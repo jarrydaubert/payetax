@@ -1,0 +1,265 @@
+[
+  {
+    "key": "salary",
+    "title": "Gross Salary",
+    "description": "Your total earnings before tax and deductions, for the pay period selected.",
+    "note": "Include salary, bonuses and commission.",
+    "characters": 128
+  },
+  {
+    "key": "payPeriod",
+    "title": "Pay Period",
+    "description": "Choose the period your salary figure covers, such as a month or a year.",
+    "characters": 82
+  },
+  {
+    "key": "taxYear",
+    "title": "Tax Year",
+    "description": "Choose the year you want to calculate. A UK tax year runs from 6 April to 5 April the following year.",
+    "characters": 110
+  },
+  {
+    "key": "taxCode",
+    "title": "Tax Code",
+    "description": "Use the code on your payslip, P45 or HMRC account, such as 1257L.",
+    "note": "You can leave this blank to estimate using the allowances for your income, region and selected tax year.",
+    "characters": 179
+  },
+  {
+    "key": "region",
+    "title": "Tax Region",
+    "description": "Choose where you live for tax purposes. Scotland has different Income Tax bands.",
+    "characters": 91
+  },
+  {
+    "key": "hoursPerWeek",
+    "title": "Hours Worked",
+    "description": "Your usual weekly working hours, used to work out hourly pay.",
+    "characters": 74
+  },
+  {
+    "key": "pensionContribution",
+    "title": "Pension",
+    "description": "Enter your own contribution as % of gross salary or £ for the selected pay period. Changing between % and £ resets it to 0.",
+    "note": "We use salary sacrifice to estimate pension deductions.",
+    "characters": 187
+  },
+  {
+    "key": "pensionType",
+    "title": "Contribution Type",
+    "description": "Choose % of your gross salary or a £ amount for the selected pay period. Changing between them resets your contribution to 0.",
+    "characters": 143
+  },
+  {
+    "key": "studentLoanPlan",
+    "title": "Student Loan Plan",
+    "description": "Choose the plan shown in your student loan account. If you also repay a postgraduate loan, add it using the checkbox.",
+    "characters": 135
+  },
+  {
+    "key": "niCategory",
+    "title": "National Insurance Category",
+    "description": "Use the National Insurance category letter on your payslip. A is the standard category for most employees.",
+    "characters": 134
+  },
+  {
+    "key": "marriageAllowance",
+    "title": "Marriage Allowance",
+    "description": "Select if you are married or in a civil partnership. Enter your partner's annual pay so we can check whether a Marriage Allowance transfer could apply.",
+    "characters": 170
+  },
+  {
+    "key": "partnerGrossWage",
+    "title": "Partner's Gross Wage",
+    "description": "Your partner's yearly pay before tax, used to check Marriage Allowance eligibility.",
+    "characters": 104
+  },
+  {
+    "key": "blindAllowance",
+    "title": "Blind Person's Allowance",
+    "description": "Select if you qualify for Blind Person's Allowance, which increases the income you can receive before paying Income Tax.",
+    "characters": 145
+  },
+  {
+    "key": "age",
+    "title": "Age",
+    "description": "Choose whether you have reached your State Pension age. This affects employee National Insurance.",
+    "characters": 101
+  },
+  {
+    "key": "payNoNI",
+    "title": "No National Insurance",
+    "description": "Select if you are exempt from employee National Insurance, for example because you have reached State Pension age.",
+    "characters": 136
+  },
+  {
+    "key": "allowancesDeductions",
+    "title": "Non-taxable Allowance(s)",
+    "description": "Extra pay your employer marks as non-taxable, for the selected pay period.",
+    "note": "For example, reimbursed expenses. This is added to take-home pay; it does not reduce your taxable salary.",
+    "characters": 205
+  },
+  {
+    "key": "directorRevenue",
+    "title": "Annual Revenue",
+    "description": "Your company's total sales for the year, before business expenses. Enter revenue, not profit.",
+    "characters": 108
+  },
+  {
+    "key": "directorIncludesVat",
+    "title": "Revenue Includes VAT",
+    "description": "Select if your revenue figure includes VAT.",
+    "note": "This changes VAT warnings. VAT is not subtracted from your revenue.",
+    "characters": 132
+  },
+  {
+    "key": "directorExpenses",
+    "title": "Business Expenses",
+    "description": "Your yearly business costs, such as rent, software and contractors.",
+    "note": "Leave out your own salary and the employer National Insurance on it: we calculate these separately.",
+    "characters": 185
+  },
+  {
+    "key": "directorMonthlyIncome",
+    "title": "Monthly Contract Income",
+    "description": "What you expect to invoice each month, before business expenses.",
+    "note": "We assume this stays the same from your selected start month through March.",
+    "characters": 164
+  },
+  {
+    "key": "directorMonthlyExpenses",
+    "title": "Monthly Business Expenses",
+    "description": "Your usual monthly business costs, such as rent, software and contractors.",
+    "note": "Leave out your own salary and the employer National Insurance on it: we calculate these separately.",
+    "characters": 200
+  },
+  {
+    "key": "directorContractStartMonth",
+    "title": "Contract Start Month",
+    "description": "Choose the month your current level of income started. We assume the same monthly income from then through March.",
+    "characters": 134
+  },
+  {
+    "key": "directorCashInBank",
+    "title": "Cash In Bank",
+    "description": "The money currently in your company's bank account, available for bills and paying yourself. Use the bank balance rather than profit shown in your accounts.",
+    "characters": 169
+  },
+  {
+    "key": "directorMinimumMonthlyDraw",
+    "title": "Minimum Monthly Draw",
+    "description": "The minimum amount you need to take from the company each month for your personal spending. This helps set your cash reserve target.",
+    "characters": 153
+  },
+  {
+    "key": "directorRunwayMonths",
+    "title": "Runway Target",
+    "description": "How many months of business costs and minimum personal withdrawals you want to keep in reserve.",
+    "note": "The target reserve is this number multiplied by your monthly expenses plus your minimum monthly draw.",
+    "characters": 211
+  },
+  {
+    "key": "directorYearEnd",
+    "title": "Company Year-End",
+    "description": "The date your company's accounting year ends. Check Companies House or ask your accountant if you are unsure.",
+    "characters": 126
+  },
+  {
+    "key": "directorYearEndCustom",
+    "title": "Custom Year-End Date",
+    "description": "Enter the month and day as MM-DD. For example, 06-30 means 30 June.",
+    "characters": 88
+  },
+  {
+    "key": "directorYtdSalary",
+    "title": "Salary Already Taken",
+    "description": "Your gross salary paid through PAYE since 6 April. This is included when we work out how much you have already taken from the company.",
+    "characters": 155
+  },
+  {
+    "key": "directorYtdDividends",
+    "title": "Dividends Already Taken",
+    "description": "Dividends declared since 6 April. These are included when we work out how much you have already taken from the company.",
+    "characters": 143
+  },
+  {
+    "key": "directorYtdDrawings",
+    "title": "Other Drawings",
+    "description": "Money you have taken from the company since 6 April that was not salary or dividends, such as withdrawals through your director's loan account.",
+    "characters": 158
+  },
+  {
+    "key": "directorOtherIncome",
+    "title": "Other Personal Income",
+    "description": "Your yearly personal income from outside this company, such as another job or rental income. This can affect the tax on your dividends.",
+    "characters": 157
+  },
+  {
+    "key": "directorOtherPAYE",
+    "title": "Other PAYE Employment",
+    "description": "Select if you also have a PAYE job elsewhere.",
+    "characters": 67
+  },
+  {
+    "key": "directorEmploymentAllowance",
+    "title": "Employment Allowance",
+    "description": "Select only if your company qualifies for this reduction in employer National Insurance. A company with just one director and no other employees usually cannot claim.",
+    "characters": 187
+  },
+  {
+    "key": "directorStudentLoans",
+    "title": "Student Loans",
+    "description": "Select the repayment plans shown in your student loan account. We include an estimate of repayments through Self Assessment.",
+    "note": "Plan 5 is not supported in Director Intelligence.",
+    "characters": 188
+  },
+  {
+    "key": "directorPension",
+    "title": "Employer Pension",
+    "description": "The yearly amount your company pays directly into your pension. We use this to reduce company profit before Corporation Tax.",
+    "characters": 141
+  },
+  {
+    "key": "directorPensionDeducted",
+    "title": "Pension Included in Business Expenses",
+    "description": "Select if the company pension contribution is already in the business expenses you entered. This stops us deducting it twice.",
+    "characters": 163
+  },
+  {
+    "key": "directorCompanyCar",
+    "title": "Company Car BIK",
+    "description": "The yearly taxable benefit for your company car, shown on your P11D or provided by your employer. Enter the benefit value, not the car's price.",
+    "characters": 159
+  },
+  {
+    "key": "directorAssociatedCompanies",
+    "title": "Associated Companies",
+    "description": "The total number of associated companies, including this one. These are generally companies under common control.",
+    "note": "This number affects the profit thresholds used for Corporation Tax. Ask your accountant if you are unsure.",
+    "characters": 241
+  },
+  {
+    "key": "directorLosses",
+    "title": "Losses Brought Forward",
+    "description": "Trading losses from earlier years that can be used against this year's taxable company profit.",
+    "characters": 117
+  },
+  {
+    "key": "directorMinimumSalary",
+    "title": "Minimum Salary",
+    "description": "The lowest yearly salary you want to consider, even if a lower salary would save tax.",
+    "characters": 100
+  },
+  {
+    "key": "directorYourSalary",
+    "title": "Your Current Salary",
+    "description": "Your yearly gross salary from the company. Enter it here, then choose Apply to compare your setup with the suggested options.",
+    "characters": 145
+  },
+  {
+    "key": "directorYourDividends",
+    "title": "Your Current Dividends",
+    "description": "Your yearly dividends from the company. Enter them here, then choose Apply to compare your setup with the suggested options.",
+    "characters": 147
+  }
+]

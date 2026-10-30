@@ -2,9 +2,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Calendar, Percent, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
+import { AlertTriangle, Calendar, Percent, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
 import { useMemo } from 'react';
 import { ResultCard } from '@/components/molecules/ResultCard';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { ANIMATION_CONTAINER_VARIANTS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
 import { TAX_YEARS, type TaxYear } from '@/constants/taxRates';
@@ -48,9 +49,21 @@ export function ResultsSummaryCards({
           className='mb-3 text-muted-foreground text-sm leading-relaxed'
           data-testid='pension-method-result-note'
         >
-          All pension contributions are estimated as salary sacrifice. Net pay or relief at source
-          may give overstated take-home. Employer NI excludes salary-sacrifice savings.
+          We estimate all pension contributions as salary sacrifice, reducing pay used for Income
+          Tax, employee National Insurance and student loan repayments. If your pension uses net pay
+          or relief at source, take-home may be too high. Employer National Insurance savings are
+          not included.
         </p>
+      )}
+      {Boolean(input?.incomeSources?.length) && (
+        <Alert variant='warning' className='mb-3' data-testid='additional-income-result-note'>
+          <AlertTriangle className='size-4' aria-hidden='true' />
+          <AlertTitle>Additional income accuracy</AlertTitle>
+          <AlertDescription>
+            Other income can affect your tax-free allowance, tax bands and student loan repayments.
+            These estimates may understate what you owe.
+          </AlertDescription>
+        </Alert>
       )}
       <MobileTakeHomeCard results={results} submittedPeriod={input?.payPeriod ?? 'annually'} />
       <motion.section
@@ -69,7 +82,7 @@ export function ResultsSummaryCards({
             icon={Wallet}
             variant='success'
             delay={0}
-            tooltip='Your total yearly salary after income tax, National Insurance, and other deductions have been taken out.'
+            tooltip='Your yearly pay after Income Tax, National Insurance, pension contributions and student loan repayments.'
           />
         </motion.div>
         <motion.div
@@ -82,7 +95,7 @@ export function ResultsSummaryCards({
             icon={Calendar}
             variant='info'
             delay={0.05}
-            tooltip='The amount you receive in your bank account each month after income tax, National Insurance, and other deductions.'
+            tooltip='Your estimated yearly take-home pay divided by 12. Your actual monthly payslip may vary.'
           />
         </motion.div>
         <motion.div variants={shouldReduceMotion ? undefined : ANIMATION_VARIANTS.fadeInUp}>
@@ -92,7 +105,7 @@ export function ResultsSummaryCards({
             icon={TrendingDown}
             variant='warning'
             delay={0.1}
-            tooltip='The combined total of income tax and National Insurance contributions you pay annually. This money funds public services like the NHS and state pension.'
+            tooltip='Your yearly Income Tax and employee National Insurance combined. Pension contributions and student loan repayments are separate.'
           />
         </motion.div>
         <motion.div variants={shouldReduceMotion ? undefined : ANIMATION_VARIANTS.fadeInUp}>
@@ -102,7 +115,7 @@ export function ResultsSummaryCards({
             icon={Percent}
             variant='default'
             delay={0.15}
-            tooltip='The overall percentage of your gross salary that goes to tax and NI. This is your total tax divided by your gross salary.'
+            tooltip='The share of your gross pay that goes towards Income Tax and employee National Insurance.'
           />
         </motion.div>
         <motion.div variants={shouldReduceMotion ? undefined : ANIMATION_VARIANTS.fadeInUp}>
@@ -113,7 +126,7 @@ export function ResultsSummaryCards({
             variant='info'
             delay={0.2}
             className='md:col-span-2 lg:col-span-1'
-            tooltip="An estimate of the tax/NI (and student loan, if applicable) you'd pay on additional salary. Calculated by increasing your salary by £100/year and measuring the change."
+            tooltip='The estimated share of an extra £100 a year that would go towards Income Tax, National Insurance and any student loan repayments.'
           />
         </motion.div>
       </motion.section>

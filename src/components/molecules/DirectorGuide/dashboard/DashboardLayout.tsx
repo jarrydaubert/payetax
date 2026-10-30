@@ -77,7 +77,7 @@ function MobileDrawer({
 
     // Handle Escape key
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && !e.defaultPrevented) {
         onCloseRef.current?.();
       }
     };
@@ -127,11 +127,9 @@ function MobileDrawer({
       </div>
       {showResultsHint && (
         <div className='border-border/40 border-t bg-background px-4 pt-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)]'>
-          <p className='text-center text-muted-foreground text-xs'>
-            {inputsReady
-              ? 'Results are ready. Close this view to see your dashboard.'
-              : 'Enter revenue, expenses, and region. Results appear automatically.'}
-          </p>
+          {inputsReady && (
+            <p className='text-center text-muted-foreground text-xs'>Results are ready.</p>
+          )}
           <button
             type='button'
             onClick={onClose}
