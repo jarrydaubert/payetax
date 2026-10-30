@@ -76,7 +76,8 @@ export default defineConfig({
     // WebKit (Safari engine)
     {
       name: 'webkit',
-      testIgnore: '**/monetary-input-pan.spec.ts',
+      // PWA lifecycle inspection uses Playwright's Chromium-only ServiceWorker API.
+      testIgnore: ['**/monetary-input-pan.spec.ts', '**/pwa-upgrade.spec.ts'],
       use: {
         ...devices['Desktop Safari'],
       },

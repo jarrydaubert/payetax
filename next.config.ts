@@ -210,6 +210,10 @@ const nextConfig: NextConfig = {
     const csp = buildCsp(process.env.NODE_ENV === 'development');
 
     return [
+      ...['/sw.js', '/register-sw.js', '/manifest.json'].map((source) => ({
+        source,
+        headers: [{ key: 'Cache-Control', value: 'no-store' }],
+      })),
       {
         source: '/(.*)',
         headers: [

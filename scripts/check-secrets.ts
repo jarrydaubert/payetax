@@ -16,6 +16,14 @@ condition = "AND"
 regexTarget = "secret"
 paths = ['''(?:^|[/\\])public[/\\]sw\.js$''']
 regexes = ['''^payetax-api-v\d+\.\d+\.\d+$''']
+
+[[allowlists]]
+description = "Pinned v5.1.4 worker's public cache namespace"
+targetRules = ["generic-api-key"]
+condition = "AND"
+regexTarget = "secret"
+paths = ['''(?:^|[/\\])e2e[/\\]fixtures[/\\]pwa-v5\.1\.4[/\\]sw\.js\.txt$''']
+regexes = ['''^payetax-api-v5\.1\.4$''']
 `;
 
 export function trackedEnvironmentFiles(paths: readonly string[]): string[] {

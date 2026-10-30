@@ -1,25 +1,17 @@
-// Service Worker for PayeTax - UK PAYE Tax Calculator
-// Lean offline support for the public calculator and guide surfaces.
-
-const CACHE_NAME = 'payetax-v5.1.4';
-const STATIC_CACHE_NAME = 'payetax-static-v5.1.4';
-const API_CACHE_NAME = 'payetax-api-v5.1.4';
-
-// Max entries per cache (cheaper than size-based eviction)
+// Offline support. This namespace isolates the upgrade from v5.1.4's mixed caches.
+// It is a cache schema revision, not proof of the running production build.
+// Future build SHAs must not automatically rename caches; revise the schema only
+// when cache compatibility or invalidation requirements need it.
+const CACHE_NAME = 'payetax-v5.1.4-pwa1';
+const STATIC_CACHE_NAME = 'payetax-static-v5.1.4-pwa1';
+const STATIC_RUNTIME_CACHE_NAME = `${STATIC_CACHE_NAME}-runtime`;
 const MAX_CACHE_ENTRIES = 100;
 const MAX_STATIC_ENTRIES = 200;
 const OFFLINE_FALLBACK_URL = '/offline';
 
-const isDev = self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1';
-const devLog = (...args) => {
-  if (isDev) console.log('[SW]', ...args);
-};
-
-// Assets to precache on install
 const PRECACHE_ASSETS = [
   '/',
   OFFLINE_FALLBACK_URL,
-  '/manifest.json',
   '/favicon.ico',
   '/android-chrome-192x192.png',
   '/android-chrome-maskable-192x192.png',
@@ -28,280 +20,170 @@ const PRECACHE_ASSETS = [
   '/apple-touch-icon.png',
 ];
 
-// API endpoints with special caching
-const API_ENDPOINTS = [];
-
-// Network-first resources
-const NETWORK_FIRST = ['/blog/category/', '/_next/static/chunks/'];
-
-// Cache-first resources (static assets)
-const CACHE_FIRST = [
-  '/images/',
-  '/icons/',
-  '/_next/static/',
-  '/favicon',
-  '.woff2',
-  '.woff',
-  '.ttf',
-  '.css',
-  '.js',
-];
-
-// Install event - precache essential assets
 self.addEventListener('install', (event) => {
-  devLog(`Installing service worker ${CACHE_NAME}`);
-
+  // Reject installation if the offline shell cannot be prepared; keep the old worker.
   event.waitUntil(
-    (async () => {
-      try {
-        const cache = await caches.open(STATIC_CACHE_NAME);
-        devLog('Precaching core assets');
-        await cache.addAll(PRECACHE_ASSETS);
-        devLog('Precache complete');
-        // Note: NOT calling skipWaiting() - let user control when to activate via prompt
-      } catch (error) {
-        devLog('Precache failed:', error);
+    caches.open(STATIC_CACHE_NAME).then(async (cache) => {
+      await cache.addAll(
+        PRECACHE_ASSETS.map(
+          (path) => new Request(new URL(path, self.location.origin), { cache: 'reload' }),
+        ),
+      );
+      // Next documents need their scripts/styles offline too. Keep the shell and
+      // its bundles outside the evictable runtime cache so the fallback can hydrate.
+      const assets = new Set();
+      for (const path of ['/', OFFLINE_FALLBACK_URL]) {
+        const page = await cache.match(new URL(path, self.location.origin).href);
+        if (!page) throw new Error('Offline shell missing');
+        for (const match of (await page.text()).matchAll(
+          /(?:src|href)=["'](\/_next\/static\/[^"'<>]+)["']/g,
+        )) {
+          assets.add(match[1].replaceAll('&amp;', '&'));
+        }
       }
-    })(),
+      const missing = [];
+      for (const path of assets) {
+        // Hashed Next assets are immutable: reuse this shell or the HTTP cache.
+        const request = new Request(new URL(path, self.location.origin));
+        if (!(await cache.match(request))) missing.push(request);
+      }
+      await cache.addAll(missing);
+    }),
   );
 });
 
-// Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  devLog(`Activating service worker ${CACHE_NAME}`);
-
   event.waitUntil(
     (async () => {
-      // Clean up old caches
-      const cacheNames = await caches.keys();
-      const currentCaches = [CACHE_NAME, STATIC_CACHE_NAME, API_CACHE_NAME];
-
-      const oldCaches = cacheNames.filter(
-        (name) => name.startsWith('payetax-') && !currentCaches.includes(name),
-      );
-
+      const names = await caches.keys();
       await Promise.all(
-        oldCaches.map((cacheName) => {
-          devLog('Deleting old cache:', cacheName);
-          return caches.delete(cacheName);
-        }),
+        names
+          .filter(
+            (name) =>
+              name.startsWith('payetax-') &&
+              ![CACHE_NAME, STATIC_CACHE_NAME, STATIC_RUNTIME_CACHE_NAME].includes(name),
+          )
+          .map((name) => caches.delete(name)),
       );
-
-      devLog(`Cleaned up ${oldCaches.length} old cache(s)`);
-
-      // Enable navigation preload
-      if (self.registration.navigationPreload) {
-        await self.registration.navigationPreload.enable();
-        devLog('Navigation preload enabled');
+      try {
+        await self.registration.navigationPreload?.enable();
+      } catch {
+        // Navigation also works without preload.
       }
-
-      // Note: NOT calling clients.claim() - new SW waits until user accepts update
-      devLog('Service worker activated');
+      // No clients.claim(): an open page keeps its current controller and inputs.
     })(),
   );
 });
 
-// Fetch event - intelligent caching strategy
 self.addEventListener('fetch', (event) => {
   const { request } = event;
-  const { url, method } = request;
+  const url = new URL(request.url);
+  if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
-  if (method !== 'GET') return;
-  if (!url.startsWith('http')) return;
-  const requestUrl = new URL(url);
-
-  // Never proxy third-party requests through SW cache logic.
-  // This avoids CSP/connect-src conflicts for analytics and monitoring scripts.
-  if (requestUrl.origin !== self.location.origin) return;
-
-  // Skip analytics/tracking domains
-  const skipDomains = ['googletagmanager.com', 'google-analytics.com'];
-
-  if (skipDomains.some((domain) => url.includes(domain))) return;
-
-  // Navigation with preload
-  if (request.mode === 'navigate' && event.preloadResponse) {
-    event.respondWith(handleNavigationWithPreload(request, event));
+  // Bootstrap files must escape both Cache Storage and the browser HTTP cache.
+  if (['/sw.js', '/register-sw.js', '/manifest.json'].includes(url.pathname)) {
+    event.respondWith(fetch(request, { cache: 'no-store' }));
     return;
   }
 
-  // Determine strategy - check API first (before network-first which includes /api/)
-  if (isAPIEndpoint(url)) {
-    event.respondWith(apiCacheStrategy(request));
-  } else if (shouldUseNetworkFirst(url)) {
-    event.respondWith(networkFirstStrategy(request));
-  } else if (shouldUseCacheFirst(url)) {
-    event.respondWith(cacheFirstStrategy(request));
-  } else {
-    event.respondWith(staleWhileRevalidateStrategy(request));
+  // APIs and Next's Flight/prefetch responses are never offline documents.
+  if (
+    url.pathname === '/api' ||
+    url.pathname.startsWith('/api/') ||
+    url.searchParams.has('_rsc') ||
+    ['RSC', 'Next-Router-Prefetch', 'Next-Router-State-Tree'].some((name) =>
+      request.headers.has(name),
+    )
+  ) {
+    return;
   }
+
+  if (request.mode === 'navigate') {
+    event.respondWith(handleNavigation(event));
+  } else if (url.pathname.startsWith('/_next/static/')) {
+    event.respondWith(handleStatic(event));
+  } else if (
+    PRECACHE_ASSETS.includes(url.pathname) &&
+    url.pathname !== '/' &&
+    url.pathname !== OFFLINE_FALLBACK_URL
+  ) {
+    event.respondWith(handleStatic(event));
+  }
+  // Everything else uses the browser's normal network behaviour.
 });
 
-// Navigation with preload
-async function handleNavigationWithPreload(request, event) {
-  try {
-    const preloadResponse = await event.preloadResponse;
-
-    if (preloadResponse) {
-      devLog('Using navigation preload for:', request.url);
-      const responseToCache = preloadResponse.clone();
-      caches.open(CACHE_NAME).then((cache) => cache.put(request, responseToCache));
-      return preloadResponse;
-    }
-
-    const networkResponse = await fetch(request);
-    if (networkResponse.ok) {
-      const cache = await caches.open(CACHE_NAME);
-      cache.put(request, networkResponse.clone());
-    }
-    return networkResponse;
-  } catch (error) {
-    devLog('Navigation failed, trying cache:', error);
-    return getNavigationFallback(request);
+async function matchCurrentCaches(request) {
+  for (const name of [CACHE_NAME, STATIC_CACHE_NAME]) {
+    const cache = await caches.open(name);
+    const response = await cache.match(request);
+    if (response) return response;
   }
 }
 
-// Network-first strategy
-async function networkFirstStrategy(request) {
-  try {
-    const networkResponse = await fetch(request);
-    if (networkResponse.ok) {
-      const cache = await caches.open(CACHE_NAME);
-      cache.put(request, networkResponse.clone());
-      enforceMaxEntries(CACHE_NAME, MAX_CACHE_ENTRIES);
-    }
-    return networkResponse;
-  } catch (error) {
-    devLog('Network failed, trying cache:', request.url);
-    if (request.mode === 'navigate') {
-      return getNavigationFallback(request);
-    }
-
-    const cachedResponse = await caches.match(request);
-    if (cachedResponse) return cachedResponse;
-    throw error;
+function cacheResponse(event, cacheName, response, maxEntries) {
+  if (
+    !response.ok ||
+    response.redirected ||
+    /no-store|private/i.test(response.headers.get('Cache-Control') || '') ||
+    response.headers.get('Content-Type')?.includes('text/x-component')
+  ) {
+    return;
   }
-}
-
-function isRootNavigation(request) {
-  const url = new URL(request.url);
-  return url.origin === self.location.origin && url.pathname === '/';
-}
-
-async function getNavigationFallback(request) {
-  const cachedResponse = await caches.match(request);
-  if (cachedResponse) return cachedResponse;
-
-  if (isRootNavigation(request)) {
-    const rootResponse = await caches.match(request, { ignoreSearch: true });
-    if (rootResponse) return rootResponse;
-  }
-
-  const offlineResponse = await caches.match(OFFLINE_FALLBACK_URL);
-  return offlineResponse || caches.match('/');
-}
-
-// Cache-first strategy
-async function cacheFirstStrategy(request) {
-  const cachedResponse = await caches.match(request);
-  if (cachedResponse) return cachedResponse;
-
-  try {
-    const networkResponse = await fetch(request);
-    if (networkResponse.ok) {
-      const cache = await caches.open(STATIC_CACHE_NAME);
-      cache.put(request, networkResponse.clone());
-      enforceMaxEntries(STATIC_CACHE_NAME, MAX_STATIC_ENTRIES);
-    }
-    return networkResponse;
-  } catch (error) {
-    devLog('Cache-first failed:', error);
-    throw error;
-  }
-}
-
-// Stale-while-revalidate strategy
-async function staleWhileRevalidateStrategy(request) {
-  const cache = await caches.open(CACHE_NAME);
-  const cachedResponse = await cache.match(request);
-
-  const fetchPromise = fetch(request)
-    .then((networkResponse) => {
-      if (networkResponse.ok) {
-        cache.put(request, networkResponse.clone());
-        enforceMaxEntries(CACHE_NAME, MAX_CACHE_ENTRIES);
-      }
-      return networkResponse;
-    })
-    .catch(() => cachedResponse);
-
-  return cachedResponse || fetchPromise;
-}
-
-// API caching strategy
-async function apiCacheStrategy(request) {
-  try {
-    const networkResponse = await fetch(request);
-    if (networkResponse.ok) {
-      const cache = await caches.open(API_CACHE_NAME);
-      cache.put(request, networkResponse.clone());
-    }
-    return networkResponse;
-  } catch (error) {
-    const cachedResponse = await caches.match(request);
-    if (cachedResponse) return cachedResponse;
-    throw error;
-  }
-}
-
-// Enforce max entries (cheap eviction - no blob reading)
-async function enforceMaxEntries(cacheName, maxEntries) {
-  try {
-    const cache = await caches.open(cacheName);
-    const keys = await cache.keys();
-
-    if (keys.length > maxEntries) {
-      // Delete oldest entries (first in cache)
-      const toDelete = keys.slice(0, keys.length - maxEntries);
-      await Promise.all(toDelete.map((key) => cache.delete(key)));
-      devLog(`Evicted ${toDelete.length} entries from ${cacheName}`);
-    }
-  } catch (error) {
-    devLog('Cache eviction failed:', error);
-  }
-}
-
-// Helper functions
-function shouldUseNetworkFirst(url) {
-  return NETWORK_FIRST.some((pattern) =>
-    typeof pattern === 'string' ? url.includes(pattern) : pattern.test(url),
+  const copy = response.clone();
+  event.waitUntil(
+    (async () => {
+      const cache = await caches.open(cacheName);
+      await cache.put(event.request, copy);
+      const keys = await cache.keys();
+      await Promise.all(
+        keys.slice(0, Math.max(0, keys.length - maxEntries)).map((key) => cache.delete(key)),
+      );
+    })().catch(() => {
+      // Quota/storage failure must not discard a successful network response.
+    }),
   );
 }
 
-function shouldUseCacheFirst(url) {
-  return CACHE_FIRST.some((pattern) =>
-    typeof pattern === 'string' ? url.includes(pattern) : pattern.test(url),
-  );
+async function handleNavigation(event) {
+  try {
+    const response = (await event.preloadResponse) || (await fetch(event.request));
+    if (response.headers.get('Content-Type')?.includes('text/html')) {
+      cacheResponse(event, CACHE_NAME, response, MAX_CACHE_ENTRIES);
+    }
+    return response;
+  } catch {
+    const cached = await matchCurrentCaches(event.request);
+    if (cached) return cached;
+    if (new URL(event.request.url).pathname === '/') {
+      const root = await matchCurrentCaches(new URL('/', self.location.origin).href);
+      if (root) return root;
+    }
+    return (
+      (await matchCurrentCaches(new URL(OFFLINE_FALLBACK_URL, self.location.origin).href)) ||
+      Response.error()
+    );
+  }
 }
 
-function isAPIEndpoint(url) {
-  return API_ENDPOINTS.some((endpoint) => url.includes(endpoint));
+async function handleStatic(event) {
+  try {
+    for (const name of [STATIC_CACHE_NAME, STATIC_RUNTIME_CACHE_NAME]) {
+      const cache = await caches.open(name);
+      const cached = await cache.match(event.request);
+      if (cached) return cached;
+    }
+  } catch {
+    // Disabled storage must not prevent loading an online asset.
+  }
+  const response = await fetch(event.request);
+  cacheResponse(event, STATIC_RUNTIME_CACHE_NAME, response, MAX_STATIC_ENTRIES);
+  return response;
 }
 
-// Handle messages from main thread
 self.addEventListener('message', (event) => {
-  try {
-    if (event.data?.type === 'GET_VERSION') {
-      if (event.ports?.[0]) {
-        event.ports[0].postMessage({ version: CACHE_NAME });
-      }
-    } else if (event.data?.type === 'SKIP_WAITING') {
-      // User accepted update - now skip waiting
-      self.skipWaiting();
-    }
-  } catch (err) {
-    devLog('Message handling failed:', err);
+  if (event.data?.type === 'GET_VERSION') {
+    event.ports?.[0]?.postMessage({ version: CACHE_NAME });
   }
+  // Deliberately ignore SKIP_WAITING, including messages from cached v5.1.4 pages.
+  // Activate only after all old controlled windows close; never interrupt a calculation.
 });
-
-devLog(`Service Worker ${CACHE_NAME} loaded`);

@@ -98,18 +98,6 @@ describe('PWA public assets', () => {
 
     expect(serviceWorker).toContain("const OFFLINE_FALLBACK_URL = '/offline';");
     expect(precacheAssets).toEqual(expect.arrayContaining(['/', 'OFFLINE_FALLBACK_URL']));
-    expect(serviceWorker).toContain('function isRootNavigation(request)');
-    expect(serviceWorker).toContain(
-      'const rootResponse = await caches.match(request, { ignoreSearch: true });',
-    );
-    expect(serviceWorker).toContain("return offlineResponse || caches.match('/');");
-
-    const rootFallbackIndex = serviceWorker.indexOf('const rootResponse = await caches.match');
-    const offlineFallbackIndex = serviceWorker.indexOf(
-      'const offlineResponse = await caches.match(OFFLINE_FALLBACK_URL);',
-    );
-    expect(rootFallbackIndex).toBeGreaterThan(-1);
-    expect(offlineFallbackIndex).toBeGreaterThan(rootFallbackIndex);
   });
 
   it('does not keep unused feedback, push, or periodic-sync scaffolding in the service worker', () => {
@@ -122,12 +110,12 @@ describe('PWA public assets', () => {
     expect(serviceWorker).not.toContain('showNotification');
   });
 
-  it('keeps service-worker prompts aligned with the light PWA shell', () => {
+  it('keeps connectivity toasts aligned with the light PWA shell', () => {
     const registrationScript = readPublicText('register-sw.js');
 
-    expect(registrationScript).toContain('Update available');
+    expect(registrationScript).toContain('Offline mode');
     expect(registrationScript).toContain('#f8f5ed');
-    expect(registrationScript).toContain('#123a66');
+    expect(registrationScript).toContain('#1f7a4d');
     expect(registrationScript).not.toContain('#1f2937');
     expect(registrationScript).not.toContain('Update Available');
     expect(registrationScript).not.toContain(String.fromCodePoint(0x1f680));

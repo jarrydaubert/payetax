@@ -428,6 +428,16 @@ These extend existing owners rather than creating a second supporting-pages queu
 
 Work here completes only against deployed behaviour, external services or recorded external evidence — not local tests.
 
+- [ ] **PWA release verification (29 October agreed slices):** after independent review of the
+  [upgrade-safety slice](reports/pwa-upgrade-safety-2026-10-29.md), deliver build identity and live
+  freshness verification as separate PRs. Coordinate actual-build display with the existing
+  C7/C12–C14 owner. DoD: consistent build identification in the document, worker and deployment
+  metadata, independent of cache names. Future build SHAs must not automatically rename
+  service-worker caches; change cache schema versions only for compatibility/invalidation needs.
+  An uncached production comparison distinguishes current, older and
+  unverified/offline states; stale sessions and unsaved inputs are covered without forced reloads.
+  The safety slice is local review evidence, not proof of production deployment or freshness.
+
 - [ ] Production verification of analytics consent withdrawal behaviour (post-PR #78). DoD: dashboard and behaviour evidence recorded in a dated report.
 - [ ] Periodic external oracle cross-check (HMRC test data or an independent calculator sample). DoD: a dated report records the sample, source and outcome.
 
