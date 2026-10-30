@@ -7,7 +7,7 @@ Use this guide for deployment, environment, Vercel-link, and release-validation 
 ## Normal Change Flow
 
 1. Branch from `main`.
-2. Make a focused change.
+2. Make a focused change and apply the version policy below.
 3. Run local validation:
 
 ```bash
@@ -18,10 +18,75 @@ bun run build:ci
 
 4. Run the smallest relevant Jest or Playwright check while developing.
 5. Open a GitHub pull request.
-6. Merge after required checks pass.
-7. Let Vercel deploy from the connected project.
+6. Obtain independent review and explicit maintainer approval before merging.
+7. Production deployment requires separate explicit maintainer approval. Account for Vercel's connected-branch deployment before approving a merge.
 
 Use `bun run build:release` only for release validation that needs Sentry source maps. Vercel production should keep using `bun run build`; production source-map behaviour is controlled by env and `next.config.ts`.
+
+## Version Policy And Tagging
+
+`package.json` is the source of truth for the app version. The existing footer and Compliance
+page consume it through `APP_VERSION`. It identifies the app version in that build, not a unique
+commit, the live deployment or the freshness of an installed/offline session.
+
+Every production-facing PR must include one version bump relative to its current target branch:
+
+| Change | Bump | Example from 5.2.0 |
+| --- | --- | --- |
+| Fixes, dependency updates, maintenance or production copy corrections | Patch | 5.2.1 |
+| New capabilities or tax-year support, retaining compatibility | Minor | 5.3.0 |
+| Breaking supported behaviour, API contracts or stored-data compatibility | Major | 6.0.0 |
+
+Use the highest category represented in the PR. Stable `MAJOR.MINOR.PATCH` versions only;
+minor/major bumps reset the lower components to zero. Do not skip increments. The `5.2.0`
+catch-up groups accumulated app changes after `5.1.4` under a minor release; it is not evidence
+that every intervening change shipped under its own version or that `5.2.0` is deployed.
+
+Documentation, tests, agent guidance and CI-only PRs can leave the version unchanged. The guard
+exempts `docs/`, `.github/`, `.claude/`, `e2e/`, `src/test/`, test/mock directories and test files,
+plus the named guidance/lint/test configuration files in `scripts/check-version.ts`. Other paths
+require a bump, including public blog content, runtime sources/assets, dependencies, build scripts
+and deployment configuration. Reviewers decide the semantic category; the check enforces a valid
+next increment, not whether a code change is breaking.
+
+```bash
+git fetch origin main
+bun run check-version --base origin/main
+```
+
+The base-aware check includes tracked staged/unstaged changes locally; stage new files before
+running it. CI's existing required `CI` job fetches history and compares the PR merge tree with
+the event's exact base SHA. Missing history or an invalid base fails the check. If another PR bumps
+`main` first, update your branch and version, then rerun. `bun run check:repo` includes the plain
+`check-version` command, which validates version format only; it does not replace the PR check.
+No new workflow, label override or secret is needed. Branch protection must keep `CI` required
+and require branches to be up to date before merging, so a previously green check cannot reuse
+a stale base. This change does not modify repository settings or prevent an administrator bypass.
+
+PWA cache names are independent schema/invalidation identifiers. Keep the existing
+`payetax-v5.1.4-pwa1`, `payetax-static-v5.1.4-pwa1` and derived runtime cache names across app
+version bumps. Change them only for an explicit compatibility/invalidation need with PWA tests.
+Do not couple them to SemVer, tags or build SHAs. Worker `GET_VERSION` reports its cache namespace,
+not the app release. Preserve waiting-worker activation, open calculations and offline behaviour.
+
+After an approved merge and separately approved production deployment:
+
+1. Record the exact production deployment URL/id, source commit SHA, app version, UTC check time
+   and verifier in a dated report under `docs/reports/`. Confirm the production alias points to
+   that deployment in Vercel; a green local build or Git tag does not prove deployment.
+2. In a fresh online browser session without a service worker, verify the footer version against
+   `package.json` at that exact SHA and run the Production Validation checks below. Separately
+   check a previously installed PWA: open drafts survive an update and offline relaunch works.
+   Record results, evidence and any blocked/deferred checks. Do not call unverified checks passed.
+3. Only after production verification passes, and with explicit maintainer approval, create an
+   annotated `v<package-version>` tag on the verified source SHA, for example
+   `git tag -a v5.2.0 <verified-source-sha> -m "PayeTax v5.2.0; production evidence: <report-path>"`.
+   Check that the tag does not already exist; never move a published tag. Publish a tag/release
+   only when separately authorised, linking the production evidence and describing actual changes.
+
+SemVer, build identity and production verification are separate. A full build-identity/freshness
+feature remains backlog work. Existing `release:*` helpers are legacy optional tooling, not proof
+of production readiness; their cleanup is separate work. Use this guide for the current process.
 
 ## Vercel Project Shape
 

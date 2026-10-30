@@ -27,9 +27,9 @@ import { cn } from '@/lib/utils';
 export function CompliancePageContent() {
   const integritySnapshot = [
     {
-      label: 'App release',
+      label: 'App version',
       value: `v${APP_VERSION}`,
-      note: 'Version currently deployed from repository release tags.',
+      note: 'App version; production deployment is verified separately.',
     },
     {
       label: 'Tax ruleset',
