@@ -115,13 +115,9 @@ describe('ResultsSummaryCards Component', () => {
       render(<ResultsSummaryCards results={withPension} />);
 
       const note = screen.getByTestId('pension-method-result-note');
-      expect(note).toHaveTextContent(/Pension is modelled as salary sacrifice/);
-      expect(note).toHaveTextContent(/employee National Insurance/);
-      expect(note).toHaveTextContent(/Employer NI savings are not modelled/);
-      expect(note).toHaveTextContent(/employer NI is still calculated on gross employment pay/);
-      expect(note).toHaveTextContent(/Student Loan repayments/);
-      expect(note).toHaveTextContent(/Net pay and relief-at-source arrangements are not/);
-      expect(note).toHaveTextContent(/take-home may be too high/);
+      expect(note).toHaveTextContent(/All pension contributions are estimated as salary sacrifice/);
+      expect(note).toHaveTextContent(/Net pay or relief at source may give overstated take-home/);
+      expect(note).toHaveTextContent(/Employer NI excludes salary-sacrifice savings/);
       expect(
         note.compareDocumentPosition(screen.getByTestId('mobile-take-home')) &
           Node.DOCUMENT_POSITION_FOLLOWING,

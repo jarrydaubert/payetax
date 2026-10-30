@@ -1,0 +1,102 @@
+const { chromium, expect } = require('@playwright/test');
+const fs = require('node:fs');
+const path = require('node:path');
+const baseURL = process.env.COPY_QA_URL || 'http://localhost:3000';
+const phase = process.argv[2] || 'final';
+const evidence = path.resolve('docs/reports/calculator-copy-2026-10-30');
+async function enterAmount(locator, value) {
+  await locator.focus();
+  await locator.press('ControlOrMeta+A');
+  await locator.pressSequentially(value);
+  await locator.press('Tab');
+}
+
+(async () => {
+  const browser = await chromium.launch();
+  const observations = [];
+  for (const mobile of [false, true]) {
+    const name = mobile ? 'mobile-touch' : 'desktop';
+    const viewport = mobile ? { width: 390, height: 844 } : { width: 1440, height: 1000 };
+    const context = await browser.newContext({ viewport, hasTouch: mobile, isMobile: mobile });
+    await context.addInitScript(() => {
+      localStorage.setItem('cookie-consent', JSON.stringify({ analytics: false }));
+      localStorage.setItem('cookie-consent-timestamp', new Date().toISOString());
+    });
+    const page = await context.newPage();
+    page.setDefaultTimeout(15000);
+    const consoleMessages = [];
+    page.on('console', msg => { if (['error', 'warning'].includes(msg.type())) consoleMessages.push({ type: msg.type(), text: msg.text() }); });
+    page.on('pageerror', err => consoleMessages.push({ type: 'pageerror', text: err.message }));
+    await page.goto(`${baseURL}/#tax-calculator`);
+    await page.waitForLoadState('networkidle');
+    await expect(page.getByRole('heading', { name: 'Enter Income Tax Details' }).locator('..')).toHaveCSS('opacity', '1');
+    const pension = page.getByTestId('pension-input');
+    await expect(pension).toHaveAccessibleDescription(/Enter your contribution, including net pay or relief at source/);
+    await expect(pension).toHaveAccessibleDescription(/estimate all contributions as salary sacrifice, so take-home may be too high/);
+    const descriptionId = await pension.getAttribute('aria-describedby');
+    const inputGuidance = await page.locator(`[id="${descriptionId}"]`).innerText();
+    let tooltipText = null;
+    const summary = page.locator('summary').filter({ hasText: 'How pension affects your estimate' });
+    const details = summary.locator('..');
+    const explanation = details.locator('p');
+    await expect(explanation).toBeHidden();
+    await summary.evaluate(el => el.scrollIntoView({ block: 'center', behavior: 'instant' }));
+    await page.screenshot({ path: path.join(evidence, `${phase}-${name}-collapsed.png`), animations: 'disabled' });
+    if (mobile) {
+      await summary.tap();
+    } else {
+      await summary.click();
+    }
+    await expect(details).toHaveAttribute('open', '');
+    await expect(explanation).toBeVisible();
+    await expect(explanation).toContainText('Income Tax, employee National Insurance and student loan repayments');
+    await expect(explanation).toContainText('Employer NI stays based on gross employment pay');
+    await expect(explanation).toContainText("Net pay and relief at source aren't calculated separately");
+    await expect(explanation).toContainText('take-home may be too high');
+    const disclosure = await explanation.innerText();
+    await page.screenshot({ path: path.join(evidence, `${phase}-${name}-expanded.png`), animations: 'disabled' });
+    if (mobile) await summary.tap();
+    else await summary.click();
+    await expect(explanation).toBeHidden();
+    if (!mobile) {
+      await summary.focus();
+      await summary.press('Enter');
+      await expect(explanation).toBeVisible();
+      await summary.press('Space');
+      await expect(explanation).toBeHidden();
+      await page.getByTestId('tooltip-trigger-pensionContribution').focus();
+      await expect(page.getByRole('tooltip')).toBeVisible();
+      tooltipText = await page.getByRole('tooltip').innerText();
+      await page.keyboard.press('Escape');
+      await expect(page.getByRole('tooltip')).toHaveCount(0);
+    }
+    await enterAmount(page.getByTestId('salary-input'), '40000');
+    await page.getByTestId('tax-code-input').fill('1257L');
+    await page.getByTestId('calculate-button').press('Enter');
+    await expect(page.getByTestId('tax-results')).toBeVisible();
+    await expect(page.getByTestId('results-table')).toContainText('£32,322.04');
+    await expect(page.getByTestId('pension-method-result-note')).toHaveCount(0);
+    await enterAmount(pension, '5');
+    await page.getByTestId('calculate-button').press('Enter');
+    await expect(page.getByTestId('results-table')).toContainText('£30,882.92');
+    await expect(page.getByTestId('pension-method-result-note')).toContainText("All pension contributions are estimated as salary sacrifice");
+    await expect(page.getByTestId('pension-method-result-note')).toContainText("overstated take-home");
+    const resultNote = await page.getByTestId('pension-method-result-note').innerText();
+    await enterAmount(pension, '6');
+    await expect(page.getByTestId('tax-results')).toHaveCount(0);
+    await page.getByRole('link', { name: 'About these estimates' }).click();
+    await expect(page).toHaveURL(/\/#faq$/);
+    const faq = page.getByText(/Enter your pension contribution even for net pay or relief at source/);
+    await expect(faq).toBeVisible();
+    const faqText = await faq.innerText();
+    expect((await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ')).toContain("we estimate it as salary sacrifice, which may overstate take-home");
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+    expect(overflow).toBe(false);
+    observations.push({ name, viewport, hasTouch: mobile, isMobile: mobile, url: page.url(), title: await page.title(), browser: browser.version(), tooltipInteraction: mobile ? 'Not tested; no touch usability claim' : 'Keyboard focus and Escape', inputGuidance, disclosure, tooltipText, resultNote, faqText, overflow, consoleMessages });
+    console.log(`${name}: tap/click disclosure, keyboard on desktop, fixture calculations, stale results and FAQ verified`);
+    await context.close();
+  }
+  fs.writeFileSync(path.join(evidence, `${phase}-observations.json`), JSON.stringify(observations, null, 2) + '\n');
+  console.log(JSON.stringify(observations, null, 2));
+  await browser.close();
+})().catch(error => { console.error(error); process.exit(1); });

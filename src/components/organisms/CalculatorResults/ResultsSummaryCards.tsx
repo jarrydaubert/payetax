@@ -48,11 +48,8 @@ export function ResultsSummaryCards({
           className='mb-3 text-muted-foreground text-sm leading-relaxed'
           data-testid='pension-method-result-note'
         >
-          Pension is modelled as salary sacrifice in these results. This reduces the pay used for
-          Income Tax, employee National Insurance and any Student Loan repayments. Employer NI
-          savings are not modelled: employer NI is still calculated on gross employment pay. Net pay
-          and relief-at-source arrangements are not modelled, so estimated take-home may be too high
-          if your pension uses either method.
+          All pension contributions are estimated as salary sacrifice. Net pay or relief at source
+          may give overstated take-home. Employer NI excludes salary-sacrifice savings.
         </p>
       )}
       <MobileTakeHomeCard results={results} submittedPeriod={input?.payPeriod ?? 'annually'} />

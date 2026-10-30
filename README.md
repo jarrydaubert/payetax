@@ -1,97 +1,54 @@
 # PayeTax
 
-PayeTax is a UK PAYE take-home pay calculator and tax-tool R&D project. It is built to test deterministic tax logic, edge cases, API hardening, and public deployment hygiene.
+Your salary is only part of the picture. PayeTax is a free UK take-home pay calculator that helps you see what is left after Income Tax, National Insurance and other deductions.
 
-The repo is public. Real secrets must live in Vercel or local ignored env files only.
+**[Try PayeTax](https://payetax.co.uk/#tax-calculator)** · [Explore the tools](https://payetax.co.uk/tools) · [Read TaxInsights](https://payetax.co.uk/blog)
 
-## Stack
+## Understand your pay
 
-- Next.js, React, TypeScript
-- Bun package manager
-- Jest and Playwright
-- Vercel Web Analytics for cookieless traffic visibility
-- Vercel Speed Insights for real-user performance signals
-- GA4 for consent-based event analytics
-- Sentry for calculator-focused error monitoring
-- Brevo API for transactional results email
+Enter your salary, choose a tax year and region, and adjust the details that matter to you. You can:
 
-## Current Scope
+- See your take-home pay and deductions across yearly, monthly, weekly and other pay periods.
+- Explore how a pension contribution, student loan or tax code changes your estimate.
+- Use Scottish income tax rates where they apply.
+- Compare pay scenarios, then email a copy of your results.
+- Explore director salary and dividend scenarios with Director Intelligence.
+- Find focused tax tools and plain-English guides to help make sense of your payslip.
 
-Kept:
+PayeTax gives estimates, not financial or tax advice. Your payslip can differ because of payroll timing, benefits or employer-specific deductions. Enter your pension contribution even for net pay or relief at source; the main calculator estimates all contributions as salary sacrifice, which may overstate take-home. The calculator's pension disclosure and supporting content explain the assumptions where you need them.
 
-- Main PAYE calculator
-- Director Intelligence calculator
-- Tax tools
-- Blog
-- Email-results flows
-- PWA support
+## Built with care
 
-Removed:
+PayeTax is independently built and maintained, with public source code. Calculations use explicit tax policies and deterministic rules. Tests include hand-derived PAYE fixtures, checks for input and result behaviour, and browser journeys. Each layer provides different evidence; none is a promise that every payslip will match.
 
-- Growth landing-page families
-- Mailing-list setup
-- Partner lead capture
-- Competitor-style SEO pages
-- Extra analytics vendors beyond Vercel Web Analytics, Vercel Speed Insights, and GA4
+If you are curious about the working, start with the [testing guide](docs/guides/TESTING.md). Contributions should follow [AGENTS.md](AGENTS.md), including independent review and proportionate verification.
 
-## Testing And Quality
+## Run it locally
 
-The testing posture is deliberately evidence-led:
-
-> AI-assisted code is allowed. Unverified AI-assisted code is not.
-
-PayeTax tests the project at several layers:
-
-- independent unit oracles for PAYE, NI, student loans, tax codes, thresholds, rounding, and Director calculations
-- component and store tests for UI state, validation, analytics events, and rendering contracts
-- route/config tests for sitemap, robots, `llms.txt`, metadata, env sync, release version policy, and deployment config
-- Playwright E2E for calculator flows, golden-master scenarios, accessibility, blog/navigation, mobile paths, and Director Intelligence
-- CI hard gates for repo checks, dependency audit, production build, and CodeQL JavaScript/TypeScript scanning
-
-The full testing approach is documented in [docs/guides/TESTING.md](docs/guides/TESTING.md), including what is tested, why each layer exists, and the difference between CI gates and local full-suite evidence.
-
-## Common Commands
+PayeTax uses Next.js, React and TypeScript, with Bun for dependencies and scripts. Use the Bun version declared in `package.json`.
 
 ```bash
 bun install --frozen-lockfile
 bun run dev
-bun run check:repo
-bun run test:no-coverage
-bun run test:full
-bun run build:ci
-bun audit
 ```
 
-Use `bun run build:ci` for local and PR build proof. Use `bun run build:release` only when validating release behaviour that needs Sentry source maps. Vercel production should keep using `bun run build`.
+Open [localhost:3000](http://localhost:3000). See the [operations guide](docs/guides/OPERATIONS.md) for environment setup, email and other service configuration, and release procedures. Keep real credentials in ignored local environment files or deployment settings.
 
-Use `bun run dev:turbo` only when explicitly checking the Turbopack dev path.
+Useful checks:
 
-Production-facing PRs must bump `package.json`: patch for fixes/maintenance, minor for new capabilities or tax-year support, major for breaking changes. See the [version and tagging policy](docs/guides/OPERATIONS.md#version-policy-and-tagging).
+```bash
+bun run check:repo
+bun run test:no-coverage
+bun run build:ci
+```
 
-## Environment Variables
+Jest covers calculation and component behaviour; Playwright covers browser journeys. The [testing guide](docs/guides/TESTING.md) explains which checks to run for your change. Production-facing changes follow the [version and tagging policy](docs/guides/OPERATIONS.md#version-policy-and-tagging).
 
-Copy `.env.template` to `.env.local` for local development. Do not commit `.env.local`.
+## Find your way around
 
-Required for production email flows:
-
-- `BREVO_API_KEY`
-- `BREVO_FROM_EMAIL`
-
-Other production controls:
-
-- `NEXT_PUBLIC_GA_ID`
-- `NEXT_PUBLIC_SENTRY_DSN` for PAYE and Director calculator error capture
-- `SENTRY_AUTH_TOKEN`
-- `UPSTASH_REDIS_REST_URL`
-- `UPSTASH_REDIS_REST_TOKEN`
-
-## Docs
-
-- Read-first project handover: [docs/PROJECT_STATE.md](docs/PROJECT_STATE.md)
-- Unresolved work: [docs/BACKLOG.md](docs/BACKLOG.md)
-- Agent contract: [AGENTS.md](AGENTS.md)
-- Product direction: [docs/business/PRODUCT_DIRECTION.md](docs/business/PRODUCT_DIRECTION.md)
-- Docs policy: [docs/README.md](docs/README.md)
-- Testing: [docs/guides/TESTING.md](docs/guides/TESTING.md)
-- Operations: [docs/guides/OPERATIONS.md](docs/guides/OPERATIONS.md)
-- API and abuse controls: [docs/guides/API_AND_ABUSE_CONTROLS.md](docs/guides/API_AND_ABUSE_CONTROLS.md)
+- [Project state](docs/PROJECT_STATE.md) — product and technical handover, with links to evidence.
+- [Backlog](docs/BACKLOG.md) — unresolved work.
+- [Product direction](docs/business/PRODUCT_DIRECTION.md) — what PayeTax aims to help people do.
+- [Documentation map](docs/README.md) — where guidance lives and how it stays useful.
+- [Editorial voice](docs/blog/VOICE_AND_STYLE.md) — clear, helpful writing without losing important qualifications.
+- [API and abuse controls](docs/guides/API_AND_ABUSE_CONTROLS.md) — results-email routes and operational safeguards.

@@ -1,0 +1,76 @@
+[
+  {
+    "name": "desktop",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "hasTouch": false,
+    "isMobile": false,
+    "url": "http://localhost:3100/#faq",
+    "title": "UK PAYE Tax Calculator 2026-27 | HMRC Rates | PayeTax",
+    "browser": "149.0.7827.55",
+    "tooltipInteraction": "Keyboard focus and Escape",
+    "inputGuidance": "Enter your contribution, including net pay or relief at source. We estimate all contributions as salary sacrifice, so take-home may be too high. £ amounts are for your selected pay period. Switching between % and £ resets this field to 0.",
+    "disclosure": "We use salary-sacrifice calculations, reducing the pay used for Income Tax, employee National Insurance and student loan repayments. Net pay and relief at source aren't calculated separately, so take-home may be too high. Employer NI stays based on gross employment pay; savings aren't included.",
+    "tooltipText": "Pension\nEnter your contribution even for net pay or relief at source. Use % of gross salary or £ per pay period.\nAll contributions are estimated as salary sacrifice, so take-home may be too high. Open 'How pension affects your estimate' for the assumptions.",
+    "resultNote": "All pension contributions are estimated as salary sacrifice. Net pay or relief at source may give overstated take-home. Employer NI excludes salary-sacrifice savings.",
+    "faqText": "Income Tax, National Insurance, student loan repayments and pension contributions, broken down by pay period. Enter your pension contribution even for net pay or relief at source; we estimate it as salary sacrifice, which may overstate take-home. Pension arrangements explained.",
+    "overflow": false,
+    "consoleMessages": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      },
+      {
+        "type": "error",
+        "text": "Refused to execute script from 'http://localhost:3100/_vercel/insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled."
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      },
+      {
+        "type": "error",
+        "text": "Refused to execute script from 'http://localhost:3100/_vercel/speed-insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled."
+      }
+    ]
+  },
+  {
+    "name": "mobile-touch",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "hasTouch": true,
+    "isMobile": true,
+    "url": "http://localhost:3100/#faq",
+    "title": "UK PAYE Tax Calculator 2026-27 | HMRC Rates | PayeTax",
+    "browser": "149.0.7827.55",
+    "tooltipInteraction": "Not tested; no touch usability claim",
+    "inputGuidance": "Enter your contribution, including net pay or relief at source. We estimate all contributions as salary sacrifice, so take-home may be too high. £ amounts are for your selected pay period. Switching between % and £ resets this field to 0.",
+    "disclosure": "We use salary-sacrifice calculations, reducing the pay used for Income Tax, employee National Insurance and student loan repayments. Net pay and relief at source aren't calculated separately, so take-home may be too high. Employer NI stays based on gross employment pay; savings aren't included.",
+    "tooltipText": null,
+    "resultNote": "All pension contributions are estimated as salary sacrifice. Net pay or relief at source may give overstated take-home. Employer NI excludes salary-sacrifice savings.",
+    "faqText": "Income Tax, National Insurance, student loan repayments and pension contributions, broken down by pay period. Enter your pension contribution even for net pay or relief at source; we estimate it as salary sacrifice, which may overstate take-home. Pension arrangements explained.",
+    "overflow": false,
+    "consoleMessages": [
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      },
+      {
+        "type": "error",
+        "text": "Refused to execute script from 'http://localhost:3100/_vercel/insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled."
+      },
+      {
+        "type": "error",
+        "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+      },
+      {
+        "type": "error",
+        "text": "Refused to execute script from 'http://localhost:3100/_vercel/speed-insights/script.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled."
+      }
+    ]
+  }
+]

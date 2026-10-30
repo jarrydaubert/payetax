@@ -69,9 +69,10 @@ export const INPUT_TOOLTIPS = {
 
   // Pension Inputs
   pensionContribution: {
-    title: 'Pension (Modelled as Salary Sacrifice)',
-    description: 'Enter your pension contribution even if you use net pay or relief at source.',
-    note: 'The estimate uses salary sacrifice, reducing pay for Income Tax, employee National Insurance and any Student Loan repayments. Employer NI savings are not modelled: employer NI is still calculated on gross employment pay. Other pension methods may produce lower take-home than shown.',
+    title: 'Pension',
+    description:
+      'Enter your contribution even for net pay or relief at source. Use % of gross salary or £ per pay period.',
+    note: "All contributions are estimated as salary sacrifice, so take-home may be too high. Open 'How pension affects your estimate' for the assumptions.",
   },
 
   pensionType: {

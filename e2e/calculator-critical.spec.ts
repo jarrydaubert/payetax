@@ -25,6 +25,53 @@ function parsePercent(text: string): number {
   return Number.parseFloat(match[1] ?? 'NaN');
 }
 
+test.describe('Pension modelling guidance @critical', () => {
+  test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
+
+  test('pension assumptions open by touch and keyboard without a tooltip', async ({ page }) => {
+    await page.goto('/#tax-calculator');
+    await page.waitForLoadState('networkidle');
+    await dismissCookieBannerIfPresent(page);
+
+    const pension = page.getByTestId('pension-input');
+    await expect(pension).toHaveAccessibleDescription(
+      /Enter your contribution, including net pay or relief at source/,
+    );
+    await expect(pension).toHaveAccessibleDescription(
+      /estimate all contributions as salary sacrifice, so take-home may be too high/,
+    );
+    const summary = page
+      .locator('summary')
+      .filter({ hasText: 'How pension affects your estimate' });
+    const details = summary.locator('..');
+    const explanation = details.locator('p');
+    await expect(details).not.toHaveAttribute('open');
+    await expect(explanation).toBeHidden();
+
+    await summary.tap();
+    await expect(details).toHaveAttribute('open', '');
+    await expect(explanation).toBeVisible();
+    await expect(explanation).toContainText(
+      'Income Tax, employee National Insurance and student loan repayments',
+    );
+    await expect(explanation).toContainText('Employer NI stays based on gross employment pay');
+    await expect(explanation).toContainText(
+      "Net pay and relief at source aren't calculated separately",
+    );
+    await expect(explanation).toContainText('take-home may be too high');
+    await expect(page.getByRole('tooltip')).toHaveCount(0);
+    await summary.tap();
+    await expect(explanation).toBeHidden();
+
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await summary.focus();
+    await summary.press('Enter');
+    await expect(explanation).toBeVisible();
+    await summary.press('Space');
+    await expect(explanation).toBeHidden();
+  });
+});
+
 test.describe('MC-04 submitted pay period @critical', () => {
   test.use({ viewport: { width: 393, height: 852 } });
 
@@ -303,6 +350,11 @@ test.describe('MC-03 input integrity @critical', () => {
     await expect(page.getByTestId('tax-results')).toHaveCount(0);
     await typeAmount(pension, '5');
     await pension.press('Tab');
+    const pensionExplanation = page
+      .locator('summary')
+      .filter({ hasText: 'How pension affects your estimate' });
+    await expect(pensionExplanation).toBeFocused();
+    await pensionExplanation.press('Tab');
     const additionalIncome = page.getByRole('button', { name: /Additional Income Sources/ });
     await expect(additionalIncome).toBeFocused();
     await additionalIncome.press('Tab');
@@ -461,7 +513,7 @@ test.describe('MC-02 pension units and restoration @critical', () => {
       if (recovery === 'amount') {
         await switchPensionUnit(page, 'amount');
         await expect(pension).toHaveValue('0.00');
-        await expect(page.getByText(/Changing between % and £ resets/)).toBeVisible();
+        await expect(page.getByText(/Switching between % and £ resets/)).toBeVisible();
       }
       await typePension(pension, recovery === 'amount' ? '5000' : '5.25');
       await expect(pension).not.toHaveAttribute('aria-invalid');
@@ -493,7 +545,7 @@ test.describe('MC-02 pension units and restoration @critical', () => {
       await expect(page.getByTestId('tax-results')).toBeVisible();
       await switchPensionUnit(page, from === 'amount' ? 'percentage' : 'amount');
       await expect(pension).toHaveValue('0.00');
-      await expect(page.getByText(/Changing between % and £ resets/)).toBeVisible();
+      await expect(page.getByText(/Switching between % and £ resets/)).toBeVisible();
       await expect(page.getByTestId('tax-results')).toHaveCount(0);
       await typePension(pension, from === 'amount' ? '100.01' : '10000000.01');
       await expect(pension).toHaveAttribute('aria-invalid', 'true');
