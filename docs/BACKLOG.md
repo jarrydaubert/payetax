@@ -428,6 +428,8 @@ These extend existing owners rather than creating a second supporting-pages queu
 
 Work here completes only against deployed behaviour, external services or recorded external evidence — not local tests.
 
+- [ ] **Release-tooling cleanup:** review obsolete `release:*`, harness and report-template helpers against the lightweight [version/tagging process](guides/OPERATIONS.md#version-policy-and-tagging). Remove or simplify them in a separate change; do not expand the v5.2.0 catch-up into tooling retirement.
+
 - [ ] **PWA release verification (29 October agreed slices):** after independent review of the
   [upgrade-safety slice](reports/pwa-upgrade-safety-2026-10-29.md), deliver build identity and live
   freshness verification as separate PRs. Coordinate actual-build display with the existing
