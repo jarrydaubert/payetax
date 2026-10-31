@@ -158,3 +158,26 @@ threshold change was made.
   relative to PR #158 are maintainer decisions.
 - Only Chromium E2E is part of CI; the WebKit/mobile run is additional local evidence.
 - Vercel's Node.js runtime must be at least 20.19 for Sentry 11; not verified here.
+
+## Independent review follow-ups (open)
+
+Independent review requested changes without finding an introduced financial-calculation or
+privacy regression. These items are recorded for this branch and are not yet resolved:
+
+1. **Correct the tax-fact evidence.** The "byte-identical" row in Results applied only to the
+   tooling commit before formatting. At the branch tip, `check:tax-facts` reports 1,054
+   `verification-fixtures` exempt occurrences versus 1,056 at baseline; every other count and
+   the baseline comparison are unchanged. The whole difference is in
+   `src/lib/__tests__/scottishTaxVertical.test.ts`, where the Biome 2.6 reflow (AST-equivalent to
+   baseline) changed the layout-sensitive occurrence count from 30 to 28. Update the row and
+   evidence accordingly.
+2. **Verify the deployment Node.js version** (Sentry 11 requires 20.19 or later) and Sentry's
+   remaining privacy surfaces beyond the server error event probed here, for example browser
+   events and sessions on a deployed origin, edge runtime events and `onRequestError` captures.
+3. **Track the pre-existing Sentry instrumentation placement defect separately.** The app uses
+   `src/app`, but `instrumentation.ts` and `instrumentation-client.ts` are at the repository
+   root, and neither `main` nor this branch emits `.next/server/instrumentation.js`. API routes
+   import `sentry.server.config` directly, so server init and `onRequestError` registration
+   need their own investigation and fix outside this dependency change.
+
+The glob/minimatch advisory exception is handled on a separate branch from `main`.
