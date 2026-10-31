@@ -2,7 +2,29 @@
 import type { ErrorEvent } from '@sentry/nextjs';
 import { setNodeEnv } from '@/test/env';
 
-jest.mock('@sentry/nextjs', () => ({ init: jest.fn(), breadcrumbsIntegration: jest.fn() }));
+jest.mock('@sentry/nextjs', () => ({
+  init: jest.fn(),
+  breadcrumbsIntegration: jest.fn(() => ({ name: 'Breadcrumbs' })),
+}));
+
+describe('instrumentation-client console breadcrumbs', () => {
+  afterEach(() => setNodeEnv('test'));
+
+  it('removes the Console integration in production', () => {
+    jest.resetModules();
+    setNodeEnv('production');
+    const sentry = require('@sentry/nextjs');
+    require('../../../instrumentation-client');
+    const { integrations } = sentry.init.mock.calls[0][0];
+    const defaults = [{ name: 'Console' }, { name: 'Breadcrumbs' }, { name: 'GlobalHandlers' }];
+    const names = integrations(defaults).map((integration: { name: string }) => integration.name);
+    expect(names).not.toContain('Console');
+    expect(names).toEqual(expect.arrayContaining(['Breadcrumbs', 'GlobalHandlers']));
+    expect(sentry.breadcrumbsIntegration).toHaveBeenCalledWith(
+      expect.objectContaining({ dom: false }),
+    );
+  });
+});
 
 describe.each(['instrumentation-client', 'sentry.server.config', 'sentry.edge.config'])(
   '%s privacy hooks',
@@ -46,7 +68,17 @@ describe.each(['instrumentation-client', 'sentry.server.config', 'sentry.edge.co
         router_kind: 'App Router',
         request_path: '/tools',
       });
-      expect(options.sendDefaultPii).toBe(false);
+      expect(options.dataCollection).toEqual(
+        expect.objectContaining({
+          userInfo: false,
+          cookies: false,
+          httpBodies: [],
+          databaseQueryData: false,
+          genAI: { inputs: false, outputs: false },
+          graphQL: { document: false, variables: false },
+        }),
+      );
+      expect(options.attachStacktrace).toBe(false);
       expect(options.tracesSampleRate).toBe(0);
       expect(
         options.beforeBreadcrumb({

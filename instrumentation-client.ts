@@ -1,6 +1,10 @@
 import * as Sentry from '@sentry/nextjs';
 import { shouldDropClientSentryEvent } from '@/lib/sentryClientFilters';
-import { sanitizeSentryBreadcrumb, sanitizeSentryEvent } from '@/lib/sentryPrivacy';
+import {
+  SENTRY_DATA_COLLECTION,
+  sanitizeSentryBreadcrumb,
+  sanitizeSentryEvent,
+} from '@/lib/sentryPrivacy';
 import { isSentryMonitoredPath, shouldDropSentryEventForUnmonitoredPath } from '@/lib/sentryScope';
 
 Sentry.init({
@@ -10,17 +14,18 @@ Sentry.init({
   environment: process.env.NODE_ENV,
   release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || 'development',
 
-  enableLogs: false,
-  sendDefaultPii: false,
+  dataCollection: SENTRY_DATA_COLLECTION,
+  attachStacktrace: false,
   tracesSampleRate: 0,
 
   // Error-focused client monitoring. Session Replay and Browser Tracing are
   // intentionally disabled to keep Sentry scoped to calculator failures.
   integrations:
     process.env.NODE_ENV === 'production'
-      ? [
+      ? (defaultIntegrations) => [
+          // Don't track console.log (console breadcrumbs come from the Console integration).
+          ...defaultIntegrations.filter((integration) => integration.name !== 'Console'),
           Sentry.breadcrumbsIntegration({
-            console: false, // Don't track console.log
             dom: false, // Manual breadcrumbs avoid selectors containing financial labels
             fetch: true, // Track fetch requests
             history: true, // Track navigation

@@ -1,5 +1,24 @@
-import type { Breadcrumb, Event } from '@sentry/nextjs';
+import type { Breadcrumb, Event, NodeOptions } from '@sentry/nextjs';
 import { sanitizeTelemetryText, sanitizeTelemetryUrl } from '@/lib/telemetryUrl';
+
+const NETWORK_IDENTITY_KEYS = ['forwarded', '-ip', 'remote-', 'via', '-user'];
+
+// Sentry 11 collects user, cookie, header, body and query data unless told otherwise. This is
+// Sentry's documented equivalent of v10 `sendDefaultPii: false`; sanitizeSentryEvent still
+// removes anything else that reaches an event.
+export const SENTRY_DATA_COLLECTION: NonNullable<NodeOptions['dataCollection']> = {
+  userInfo: false,
+  cookies: false,
+  httpHeaders: {
+    request: { deny: NETWORK_IDENTITY_KEYS },
+    response: { deny: NETWORK_IDENTITY_KEYS },
+  },
+  httpBodies: [],
+  urlQueryParams: { deny: NETWORK_IDENTITY_KEYS },
+  genAI: { inputs: false, outputs: false },
+  databaseQueryData: false,
+  graphQL: { document: false, variables: false },
+};
 
 // Custom data is opt-in. Unknown/nested properties (including captured Error properties)
 // must not turn a diagnostic into a copy of calculator state or an email request.
