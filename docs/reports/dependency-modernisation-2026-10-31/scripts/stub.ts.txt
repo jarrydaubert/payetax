@@ -1,0 +1,30 @@
+// Local Sentry ingest stub: records every request to <outDir>/NNN.json. Never forwards anywhere.
+// Usage: bun stub.ts <outDir> [port]
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { gunzipSync } from 'node:zlib';
+
+const outDir = process.argv[2];
+const port = Number(process.argv[3] ?? 9779);
+mkdirSync(outDir, { recursive: true });
+let n = 0;
+
+Bun.serve({
+  hostname: '127.0.0.1',
+  port,
+  async fetch(req) {
+    const raw = Buffer.from(await req.arrayBuffer());
+    let body: string;
+    try {
+      body = req.headers.get('content-encoding') === 'gzip' ? gunzipSync(raw).toString('utf8') : raw.toString('utf8');
+    } catch {
+      body = raw.toString('base64');
+    }
+    const record = { method: req.method, url: req.url, headers: Object.fromEntries(req.headers), body };
+    writeFileSync(join(outDir, `${String(++n).padStart(3, '0')}.json`), JSON.stringify(record, null, 2));
+    return new Response('{"id":"00000000000000000000000000000000"}', {
+      headers: { 'content-type': 'application/json' },
+    });
+  },
+});
+console.log(`stub listening on 127.0.0.1:${port} -> ${outDir}`);

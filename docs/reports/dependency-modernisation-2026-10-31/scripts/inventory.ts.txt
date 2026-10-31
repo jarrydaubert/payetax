@@ -1,0 +1,29 @@
+// Usage (from repo root): bun inventory.ts — lists class-context strings whose tokens twMerge would drop
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+const root = process.cwd();
+const ts = require(join(root, 'node_modules/@typescript/typescript6'));
+const { twMerge } = require(join(root, 'node_modules/tailwind-merge'));
+const CLASS_FUNCS = new Set(['cn', 'clsx', 'twMerge', 'classNames', 'cva']);
+let total = 0;
+const hits: string[] = [];
+for (const file of new Bun.Glob('src/**/*.{ts,tsx}').scanSync('.')) {
+  const sf = ts.createSourceFile(file, readFileSync(file, 'utf8'), ts.ScriptTarget.Latest, true, file.endsWith('x') ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
+  const ctx = (node: any) => { for (let n = node.parent; n; n = n.parent) { if (ts.isJsxAttribute(n)) return /^class(Name)?$/.test(n.name.getText(sf)) ? 'attr' : null; if (ts.isCallExpression(n) && CLASS_FUNCS.has(n.expression.getText(sf))) return 'call:' + n.expression.getText(sf); } return null; };
+  const visit = (node: any) => {
+    if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node) || ts.isTemplateHead(node) || ts.isTemplateMiddle(node) || ts.isTemplateTail(node)) {
+      const c = ctx(node);
+      if (c) {
+        total++;
+        const toks = node.text.split(/\s+/).filter(Boolean);
+        const kept = twMerge(node.text).split(/\s+/).filter(Boolean);
+        const dropped = toks.filter((t: string) => !kept.includes(t));
+        if (dropped.length) hits.push(`${file.split(String.fromCharCode(92)).join('/')}:${sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1} [${c}] drops "${dropped.join(' ')}" from "${node.text}"`);
+      }
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sf);
+}
+console.log(`class-context fragments: ${total}; with internal twMerge conflicts: ${hits.length}`);
+for (const h of hits) console.log(h);

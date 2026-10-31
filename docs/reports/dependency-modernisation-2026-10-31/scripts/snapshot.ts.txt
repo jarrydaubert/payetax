@@ -1,0 +1,65 @@
+// Usage: bun snapshot.ts <repoRoot> <outFile>
+// Deterministic grid through the production PAYE and Director engines; output is hashed and
+// compared byte-for-byte between baseline and upgraded trees.
+import { writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+const [root, outFile] = process.argv.slice(2);
+const { calculateTax } = await import(join(root, 'src/lib/taxCalculator.ts'));
+const { calculateDirectorScenario } = await import(join(root, 'src/lib/tax/directorCalculator.ts'));
+const { TAX_YEARS } = await import(join(root, 'src/constants/taxRates.ts'));
+
+const salaries = [0, 6500, 12570, 18000, 30000, 49131, 50270, 75000, 100000, 112570, 125140, 160000, 250000];
+const codes = ['1257L', 'S1257L', 'C1257L', 'BR', 'D0', 'D1', 'NT', '0T', 'K500', '1257L M1', 'S0T'];
+const periods = ['annually', 'monthly', 'weekly'];
+const pensions: Array<[number, string]> = [[0, 'percentage'], [5, 'percentage'], [200, 'fixed']];
+const loans = ['none', 'plan1', 'plan2', 'plan4', 'plan5', 'postgraduate'];
+const niCategories = ['A', 'C', 'M'];
+
+const out: unknown[] = [];
+const safe = (fn: () => unknown) => {
+  try {
+    return fn();
+  } catch (e) {
+    return { error: String(e) };
+  }
+};
+for (const taxYear of TAX_YEARS) {
+  for (const salary of salaries) {
+    for (const taxCode of codes) {
+      for (const payPeriod of periods) {
+        for (const [pensionContribution, pensionContributionType] of pensions) {
+          const base = {
+            salary: payPeriod === 'annually' ? salary : payPeriod === 'monthly' ? salary / 12 : salary / 52,
+            payPeriod, taxYear, taxCode, isScottish: taxCode.startsWith('S'), isMarried: false,
+            partnerGrossWage: 0, isBlind: false, payNoNI: false, pensionContribution,
+            pensionContributionType, studentLoanPlans: 'none', niCategory: 'A', hoursPerWeek: 37.5,
+          };
+          out.push({ in: base, out: safe(() => calculateTax(base)) });
+        }
+      }
+    }
+    for (const studentLoanPlans of loans) {
+      for (const niCategory of niCategories) {
+        const base = {
+          salary, payPeriod: 'annually', taxYear, taxCode: '1257L', isScottish: false,
+          isMarried: salary < 12570, partnerGrossWage: salary < 12570 ? 40000 : 0, isBlind: salary === 30000,
+          payNoNI: false, pensionContribution: 3, pensionContributionType: 'percentage',
+          studentLoanPlans, niCategory, hoursPerWeek: 40,
+        };
+        out.push({ in: base, out: safe(() => calculateTax(base)) });
+      }
+    }
+    for (const region of ['rUK', 'scotland']) {
+      const input = {
+        region, revenue: salary * 1.5, includesVat: salary > 90000, expenses: salary * 0.2,
+        alreadyTaken: salary > 50000 ? 5000 : 0, alreadyTakenViaPayroll: null, confirmedSoleIncome: true,
+      };
+      out.push({ director: input, taxYear, out: safe(() => calculateDirectorScenario(input, taxYear)) });
+    }
+  }
+}
+const json = JSON.stringify(out);
+writeFileSync(outFile, json);
+const hash = new Bun.CryptoHasher('sha256').update(json).digest('hex');
+console.log(`${out.length} results, sha256=${hash}`);

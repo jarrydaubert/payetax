@@ -1,0 +1,72 @@
+PNG about-1280.png: 1280x2814 differingPixels=78
+  STYLES elements=208/208 onlyA=0 onlyB=0 classSetDiffs=4 propDiffs=0
+PNG about-390.png: 390x5665 differingPixels=78
+  STYLES elements=208/208 onlyA=0 onlyB=0 classSetDiffs=4 propDiffs=0
+PNG about-768.png: 768x3969 differingPixels=78
+  STYLES elements=208/208 onlyA=0 onlyB=0 classSetDiffs=4 propDiffs=0
+PNG blog-1280.png: 1280x3098 differingPixels=0
+  STYLES elements=361/361 onlyA=0 onlyB=0 classSetDiffs=0 propDiffs=0
+PNG blog-390.png: 390x7134 differingPixels=0
+  STYLES elements=361/361 onlyA=0 onlyB=0 classSetDiffs=0 propDiffs=0
+PNG blog-768.png: 768x4612 differingPixels=0
+  STYLES elements=361/361 onlyA=0 onlyB=0 classSetDiffs=0 propDiffs=0
+PNG calculator-1280.png: 1280x3547 differingPixels=131
+  STYLES elements=387/387 onlyA=0 onlyB=0 classSetDiffs=17 propDiffs=0
+PNG calculator-390.png: 390x5230 differingPixels=131
+  STYLES elements=387/387 onlyA=0 onlyB=0 classSetDiffs=17 propDiffs=0
+PNG calculator-768.png: 768x4250 differingPixels=131
+  STYLES elements=387/387 onlyA=0 onlyB=0 classSetDiffs=17 propDiffs=0
+PNG director-1280.png: 1280x1582 differingPixels=80
+  STYLES elements=324/324 onlyA=0 onlyB=0 classSetDiffs=7 propDiffs=0
+PNG director-390.png: 390x1916 differingPixels=80
+  STYLES elements=324/324 onlyA=0 onlyB=0 classSetDiffs=7 propDiffs=0
+PNG director-768.png: 768x1610 differingPixels=160
+  STYLES elements=324/324 onlyA=0 onlyB=0 classSetDiffs=7 propDiffs=0
+PNG not-found-1280.png: 1280x1101 differingPixels=0
+  STYLES elements=66/66 onlyA=0 onlyB=0 classSetDiffs=1 propDiffs=0
+PNG not-found-390.png: 390x1189 differingPixels=0
+  STYLES elements=66/66 onlyA=0 onlyB=0 classSetDiffs=1 propDiffs=0
+PNG not-found-768.png: 768x1133 differingPixels=0
+  STYLES elements=66/66 onlyA=0 onlyB=0 classSetDiffs=1 propDiffs=0
+PNG offline-1280.png: 1280x1101 differingPixels=0
+  STYLES elements=85/85 onlyA=0 onlyB=0 classSetDiffs=4 propDiffs=0
+PNG offline-390.png: 390x1200 differingPixels=0
+  STYLES elements=85/85 onlyA=0 onlyB=0 classSetDiffs=4 propDiffs=0
+PNG offline-768.png: 768x1133 differingPixels=0
+  STYLES elements=85/85 onlyA=0 onlyB=0 classSetDiffs=4 propDiffs=0
+PNG payslip-1280.png: 1280x3957 differingPixels=346
+  STYLES elements=704/703 onlyA=2 onlyB=1 classSetDiffs=16 propDiffs=0
+    onlyA body:0>div:1>main:0>section:1>div:0>div:4>div:0>div:1>div:2>section:0>table:0>tbody:0>tr:0>th:0>div:0>svg:0>path:2
+    onlyA body:0>div:1>main:0>section:1>div:0>div:4>div:0>div:1>div:2>section:0>table:0>tbody:0>tr:0>th:0>div:0>svg:0>path:3
+    onlyB body:0>div:1>main:0>section:1>div:0>div:4>div:0>div:1>div:2>section:0>table:0>tbody:0>tr:5>th:0>div:0>svg:0>path:0
+PNG payslip-390.png: 390x6428 differingPixels=221
+  STYLES elements=704/703 onlyA=2 onlyB=1 classSetDiffs=16 propDiffs=0
+    onlyA body:0>div:1>main:0>section:1>div:0>div:4>div:0>div:1>div:2>section:0>table:0>tbody:0>tr:0>th:0>div:0>svg:0>path:2
+    onlyA body:0>div:1>main:0>section:1>div:0>div:4>div:0>div:1>div:2>section:0>table:0>tbody:0>tr:0>th:0>div:0>svg:0>path:3
+    onlyB body:0>div:1>main:0>section:1>div:0>div:4>div:0>div:1>div:2>section:0>table:0>tbody:0>tr:5>th:0>div:0>svg:0>path:0
+PNG payslip-768.png: 768x5072 differingPixels=221
+  STYLES elements=704/703 onlyA=2 onlyB=1 classSetDiffs=16 propDiffs=0
+    onlyA body:0>div:1>main:0>section:1>div:0>div:4>div:0>div:1>div:2>section:0>table:0>tbody:0>tr:0>th:0>div:0>svg:0>path:2
+    onlyA body:0>div:1>main:0>section:1>div:0>div:4>div:0>div:1>div:2>section:0>table:0>tbody:0>tr:0>th:0>div:0>svg:0>path:3
+    onlyB body:0>div:1>main:0>section:1>div:0>div:4>div:0>div:1>div:2>section:0>table:0>tbody:0>tr:5>th:0>div:0>svg:0>path:0
+PNG results-1280.png: 1280x3899 differingPixels=346
+  STYLES elements=703/702 onlyA=2 onlyB=1 classSetDiffs=16 propDiffs=0
+    onlyA body:0>div:1>main:0>section:1>div:0>div:4>div:0>div:1>div:2>section:0>table:0>tbody:0>tr:0>th:0>div:0>svg:0>path:2
+    onlyA body:0>div:1>main:0>section:1>div:0>div:4>div:0>div:1>div:2>section:0>table:0>tbody:0>tr:0>th:0>div:0>svg:0>path:3
+    onlyB body:0>div:1>main:0>section:1>div:0>div:4>div:0>div:1>div:2>section:0>table:0>tbody:0>tr:5>th:0>div:0>svg:0>path:0
+PNG results-390.png: 390x6280 differingPixels=221
+  STYLES elements=703/702 onlyA=2 onlyB=1 classSetDiffs=16 propDiffs=0
+    onlyA body:0>div:1>main:0>section:1>div:0>div:4>div:0>div:1>div:2>section:0>table:0>tbody:0>tr:0>th:0>div:0>svg:0>path:2
+    onlyA body:0>div:1>main:0>section:1>div:0>div:4>div:0>div:1>div:2>section:0>table:0>tbody:0>tr:0>th:0>div:0>svg:0>path:3
+    onlyB body:0>div:1>main:0>section:1>div:0>div:4>div:0>div:1>div:2>section:0>table:0>tbody:0>tr:5>th:0>div:0>svg:0>path:0
+PNG results-768.png: 768x4992 differingPixels=221
+  STYLES elements=703/702 onlyA=2 onlyB=1 classSetDiffs=16 propDiffs=0
+    onlyA body:0>div:1>main:0>section:1>div:0>div:4>div:0>div:1>div:2>section:0>table:0>tbody:0>tr:0>th:0>div:0>svg:0>path:2
+    onlyA body:0>div:1>main:0>section:1>div:0>div:4>div:0>div:1>div:2>section:0>table:0>tbody:0>tr:0>th:0>div:0>svg:0>path:3
+    onlyB body:0>div:1>main:0>section:1>div:0>div:4>div:0>div:1>div:2>section:0>table:0>tbody:0>tr:5>th:0>div:0>svg:0>path:0
+PNG tax-code-decoder-1280.png: 1280x2121 differingPixels=0
+  STYLES elements=172/172 onlyA=0 onlyB=0 classSetDiffs=2 propDiffs=0
+PNG tax-code-decoder-390.png: 390x3536 differingPixels=0
+  STYLES elements=172/172 onlyA=0 onlyB=0 classSetDiffs=2 propDiffs=0
+PNG tax-code-decoder-768.png: 768x2281 differingPixels=0
+  STYLES elements=172/172 onlyA=0 onlyB=0 classSetDiffs=2 propDiffs=0

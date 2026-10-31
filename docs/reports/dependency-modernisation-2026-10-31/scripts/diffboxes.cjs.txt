@@ -1,0 +1,27 @@
+// Usage: node diffboxes.cjs <sharpDir> <a.png> <b.png> <cropOutPrefix>
+// Clusters differing pixels into boxes (gap-merged) and writes side-by-side crops.
+const path = require('node:path');
+const [sharpDir, fa, fb, prefix] = process.argv.slice(2);
+const sharp = require(path.join(sharpDir, 'sharp'));
+(async () => {
+  const A = await sharp(fa).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const B = await sharp(fb).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const w = A.info.width, h = A.info.height, boxes = [];
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const i = (y * w + x) * 4;
+    if (A.data[i] === B.data[i] && A.data[i + 1] === B.data[i + 1] && A.data[i + 2] === B.data[i + 2]) continue;
+    let box = boxes.find((bx) => x >= bx.x0 - 12 && x <= bx.x1 + 12 && y >= bx.y0 - 12 && y <= bx.y1 + 12);
+    if (!box) boxes.push((box = { x0: x, x1: x, y0: y, y1: y, n: 0 }));
+    box.x0 = Math.min(box.x0, x); box.x1 = Math.max(box.x1, x); box.y0 = Math.min(box.y0, y); box.y1 = Math.max(box.y1, y); box.n++;
+  }
+  let k = 0;
+  for (const bx of boxes) {
+    const pad = 16, left = Math.max(0, bx.x0 - pad), top = Math.max(0, bx.y0 - pad);
+    const width = Math.min(w - left, bx.x1 - bx.x0 + 1 + 2 * pad), height = Math.min(h - top, bx.y1 - bx.y0 + 1 + 2 * pad);
+    console.log(`box ${k}: x=${bx.x0}-${bx.x1} y=${bx.y0}-${bx.y1} (${bx.x1 - bx.x0 + 1}x${bx.y1 - bx.y0 + 1}) pixels=${bx.n}`);
+    const ca = await sharp(fa).extract({ left, top, width, height }).resize({ width: width * 4, kernel: 'nearest' }).toBuffer();
+    const cb = await sharp(fb).extract({ left, top, width, height }).resize({ width: width * 4, kernel: 'nearest' }).toBuffer();
+    await sharp({ create: { width: width * 8 + 8, height: height * 4, channels: 4, background: '#ff00ff' } })
+      .composite([{ input: ca, left: 0, top: 0 }, { input: cb, left: width * 4 + 8, top: 0 }]).png().toFile(`${prefix}-${k++}.png`);
+  }
+})();

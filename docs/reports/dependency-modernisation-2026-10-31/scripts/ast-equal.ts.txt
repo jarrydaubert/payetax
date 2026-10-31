@@ -1,0 +1,33 @@
+// Usage (from repo root): bun ast-equal.ts <rev> <file>...
+// Compares <rev> vs working tree after parse + re-print, ignoring layout and trailing commas.
+import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+const ts = require(join(process.cwd(), 'node_modules/@typescript/typescript6'));
+const printer = ts.createPrinter({ removeComments: true });
+
+function norm(text: string, f: string): string {
+  const kind = f.endsWith('x') ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
+  const sf = ts.createSourceFile(f, text, ts.ScriptTarget.Latest, true, kind);
+  return printer
+    .printFile(sf)
+    .replace(/,(\s*[\])}])/g, '$1')
+    .replace(/\s+/g, ' ')
+    .replace(/\s*([[\](){},;:])\s*/g, '$1');
+}
+
+const [rev, ...files] = process.argv.slice(2);
+let bad = 0;
+for (const f of files) {
+  const before = execFileSync('git', ['show', `${rev}:${f}`], { encoding: 'utf8' });
+  const a = norm(before, f);
+  const b = norm(readFileSync(f, 'utf8'), f);
+  if (a !== b) {
+    bad++;
+    let i = 0;
+    while (a[i] === b[i]) i++;
+    console.log('DIFF', f, '\n  -', a.slice(i - 60, i + 60), '\n  +', b.slice(i - 60, i + 60));
+  }
+}
+console.log(`${files.length} files checked, ${bad} with AST differences`);

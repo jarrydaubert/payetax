@@ -1,0 +1,26 @@
+// Usage: bun event-diff.ts <baselineRecord.json> <upgradedRecord.json>
+import { readFileSync } from 'node:fs';
+const load = (f: string) => {
+  const r = JSON.parse(readFileSync(f, 'utf8'));
+  const [h, , ev] = r.body.split('\n');
+  return { header: JSON.parse(h), event: JSON.parse(ev) };
+};
+const a = load(process.argv[2]), b = load(process.argv[3]);
+const flat = (o: unknown, p = '', out: Record<string, string> = {}) => {
+  if (o && typeof o === 'object' && !Array.isArray(o)) for (const [k, v] of Object.entries(o)) flat(v, p ? `${p}.${k}` : k, out);
+  else out[p] = JSON.stringify(o);
+  return out;
+};
+const volatile = /^(event_id|timestamp|sent_at|trace\.|contexts\.trace\.|contexts\.server_info\.(uptime|rss|heap|external|arrayBuffers)|modules\.|sdk\.(integrations|version|packages))/;
+for (const part of ['header', 'event'] as const) {
+  const fa = flat(a[part]), fb = flat(b[part]);
+  for (const k of [...new Set([...Object.keys(fa), ...Object.keys(fb)])].sort()) {
+    if (volatile.test(k) || fa[k] === fb[k]) continue;
+    console.log(`${part}.${k}: ${fa[k] ?? '(absent)'} -> ${fb[k] ?? '(absent)'}`);
+  }
+}
+console.log('body keys v10:', Object.keys(a.event).sort().join(','));
+console.log('body keys v11:', Object.keys(b.event).sort().join(','));
+const ia = new Set(a.event.sdk.integrations), ib = new Set(b.event.sdk.integrations);
+console.log('integrations only v10:', [...ia].filter((x) => !ib.has(x)).join(','));
+console.log('integrations only v11:', [...ib].filter((x) => !ia.has(x)).join(','));

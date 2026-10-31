@@ -1,0 +1,24 @@
+// Usage: bun lcov-compare.ts <a.lcov> <b.lcov> — per-file LF/LH/BRF/BRH/FNF/FNH comparison (paths relativised to src/)
+import { readFileSync } from 'node:fs';
+type Rec = Record<string, number>;
+const parse = (f: string) => {
+  const out: Record<string, Rec> = {};
+  let cur = '';
+  for (const line of readFileSync(f, 'utf8').split(/\r?\n/)) {
+    if (line.startsWith('SF:')) { cur = line.slice(3).split(String.fromCharCode(92)).join('/').replace(/^.*?\/src\//, 'src/'); out[cur] = {}; }
+    const m = line.match(/^(LF|LH|BRF|BRH|FNF|FNH):(\d+)$/);
+    if (m && cur) out[cur][m[1]] = Number(m[2]);
+  }
+  return out;
+};
+const a = parse(process.argv[2]), b = parse(process.argv[3]);
+const files = new Set([...Object.keys(a), ...Object.keys(b)]);
+let diffs = 0;
+const tot = { a: {} as Rec, b: {} as Rec };
+for (const f of [...files].sort()) {
+  for (const [side, src] of [['a', a], ['b', b]] as const) for (const [k, v] of Object.entries(src[f] ?? {})) tot[side][k] = (tot[side][k] ?? 0) + v;
+  const sa = JSON.stringify(a[f] ?? null), sb = JSON.stringify(b[f] ?? null);
+  if (sa !== sb) { diffs++; if (diffs <= 25) console.log(f, sa, '->', sb); }
+}
+console.log(`files: ${Object.keys(a).length} vs ${Object.keys(b).length}; differing files: ${diffs}`);
+console.log('totals A', tot.a); console.log('totals B', tot.b);

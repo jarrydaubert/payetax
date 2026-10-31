@@ -1,0 +1,33 @@
+// Usage: bun override-ranges.ts <dir-with-package.json-and-bun.lock>
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+const dir = process.argv[2];
+const pkg = JSON.parse(readFileSync(join(dir, 'package.json'), 'utf8'));
+const lock = Function(`return (${readFileSync(join(dir, 'bun.lock'), 'utf8')})`)();
+const overridden = new Set(Object.keys(pkg.overrides ?? {}));
+// key -> resolved version
+const resolved: Record<string, string> = {};
+for (const [k, v] of Object.entries<any>(lock.packages)) resolved[k] = String(v[0]).slice(String(v[0]).lastIndexOf('@') + 1);
+function resolveFrom(parentKey: string, dep: string): string | undefined {
+  const parts = parentKey.split('/');
+  // walk up the nested-key chain (handles scoped names crudely by trying all suffixes)
+  for (let i = parts.length; i >= 0; i--) {
+    const k = [...parts.slice(0, i), dep].join('/');
+    if (resolved[k]) return k;
+  }
+  return resolved[dep] ? dep : undefined;
+}
+const rows: string[] = [];
+for (const [key, v] of Object.entries<any>(lock.packages)) {
+  const meta = v[2] ?? {};
+  for (const field of ['dependencies', 'optionalDependencies', 'peerDependencies']) {
+    for (const [dep, range] of Object.entries<string>(meta[field] ?? {})) {
+      if (!overridden.has(dep)) continue;
+      const rk = resolveFrom(key, dep);
+      const ver = rk ? resolved[rk] : '(unresolved)';
+      const ok = rk ? Bun.semver.satisfies(ver, range) : field !== 'dependencies';
+      if (!ok) rows.push(`${v[0]} ${field} ${dep}@${range} -> ${ver}`);
+    }
+  }
+}
+console.log(rows.length ? rows.sort().join('\n') : 'all overridden deps in range');
