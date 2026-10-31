@@ -34,18 +34,13 @@ describe('Age and State Pension age', () => {
   });
 
   describe('Age never changes the Personal Allowance (abolished 2016-17)', () => {
-    it.each([
-      [30],
-      [64],
-      [65],
-      [67],
-      [75],
-      [80],
-      [150],
-    ])('age %i gets the standard Personal Allowance only', (age) => {
-      const result = calculateTax(createTestInput(25000, age));
-      expect(result.taxFreeAmount).toBe(STANDARD_PA);
-    });
+    it.each([[30], [64], [65], [67], [75], [80], [150]])(
+      'age %i gets the standard Personal Allowance only',
+      (age) => {
+        const result = calculateTax(createTestInput(25000, age));
+        expect(result.taxFreeAmount).toBe(STANDARD_PA);
+      },
+    );
 
     it('no age specified gets the standard Personal Allowance', () => {
       const result = calculateTax(createTestInput(25000));

@@ -18,6 +18,16 @@ const ThrowError = ({ shouldThrow }: { shouldThrow?: boolean }) => {
   return <div>No error</div>;
 };
 
+// Read at render time so a reset can re-render the same child without throwing.
+const resetScenario = { shouldThrow: true };
+const ResettableThrowError = () => <ThrowError shouldThrow={resetScenario.shouldThrow} />;
+
+const CustomFallback = () => <div>Custom error message</div>;
+
+const ErrorMessageFallback = ({ error }: { error: Error | null }) => (
+  <div>Error: {error?.message}</div>
+);
+
 // Suppress console.error for tests
 beforeAll(() => {
   jest.spyOn(console, 'error').mockImplementation(() => {});
@@ -100,12 +110,11 @@ describe('ErrorBoundary Component', () => {
     });
 
     it('should provide reset functionality', () => {
-      let shouldThrow = true;
-      const TestComponent = () => <ThrowError shouldThrow={shouldThrow} />;
+      resetScenario.shouldThrow = true;
 
       const { rerender } = render(
         <ErrorBoundary>
-          <TestComponent />
+          <ResettableThrowError />
         </ErrorBoundary>,
       );
 
@@ -116,7 +125,7 @@ describe('ErrorBoundary Component', () => {
       const tryAgainButton = screen.getByRole('button', { name: /Try Again/i });
 
       // After reset, don't throw error
-      shouldThrow = false;
+      resetScenario.shouldThrow = false;
       fireEvent.click(tryAgainButton);
 
       // Rerender to show the reset
@@ -133,8 +142,6 @@ describe('ErrorBoundary Component', () => {
 
   describe('Custom Fallback', () => {
     it('should accept custom fallback component', () => {
-      const CustomFallback = () => <div>Custom error message</div>;
-
       render(
         <ErrorBoundary fallback={CustomFallback}>
           <ThrowError shouldThrow={true} />
@@ -145,12 +152,8 @@ describe('ErrorBoundary Component', () => {
     });
 
     it('should pass error info to custom fallback', () => {
-      const CustomFallback = ({ error }: { error: Error | null }) => (
-        <div>Error: {error?.message}</div>
-      );
-
       render(
-        <ErrorBoundary fallback={CustomFallback}>
+        <ErrorBoundary fallback={ErrorMessageFallback}>
           <ThrowError shouldThrow={true} />
         </ErrorBoundary>,
       );

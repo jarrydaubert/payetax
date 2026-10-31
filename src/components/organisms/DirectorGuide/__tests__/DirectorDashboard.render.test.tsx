@@ -179,28 +179,30 @@ describe('DirectorDashboard (normal mode)', () => {
     expect(notes).not.toHaveTextContent('annual allowance');
   });
 
-  it.each([
-    false,
-    true,
-  ])('warns about a personal pension tax charge, including when already in expenses (%s)', (alreadyDeducted) => {
-    setCurrentResult(80000, {
-      pensionContribution: 1000,
-      isPensionAlreadyDeducted: alreadyDeducted,
-    });
-    render(<DirectorDashboard />);
-    const notes = screen.getByRole('region', { name: 'About this estimate' });
-    expect(notes).toHaveTextContent('annual allowance across all your pensions');
-    expect(notes).toHaveTextContent(
-      'Going over your available allowance may mean a personal tax charge',
-    );
-    expect(notes).toHaveTextContent('not included in this estimate');
-    expect(notes).toHaveTextContent('Unused allowance from the previous three tax years may help');
-    expect(notes).toHaveTextContent(
-      'high income or some pension withdrawals can reduce your allowance',
-    );
-    expect(notes).not.toHaveTextContent('restrict the relief');
-    expect(notes).not.toHaveTextContent('other PAYE employment');
-  });
+  it.each([false, true])(
+    'warns about a personal pension tax charge, including when already in expenses (%s)',
+    (alreadyDeducted) => {
+      setCurrentResult(80000, {
+        pensionContribution: 1000,
+        isPensionAlreadyDeducted: alreadyDeducted,
+      });
+      render(<DirectorDashboard />);
+      const notes = screen.getByRole('region', { name: 'About this estimate' });
+      expect(notes).toHaveTextContent('annual allowance across all your pensions');
+      expect(notes).toHaveTextContent(
+        'Going over your available allowance may mean a personal tax charge',
+      );
+      expect(notes).toHaveTextContent('not included in this estimate');
+      expect(notes).toHaveTextContent(
+        'Unused allowance from the previous three tax years may help',
+      );
+      expect(notes).toHaveTextContent(
+        'high income or some pension withdrawals can reduce your allowance',
+      );
+      expect(notes).not.toHaveTextContent('restrict the relief');
+      expect(notes).not.toHaveTextContent('other PAYE employment');
+    },
+  );
 
   it('keeps estimate notes hidden when their existing input conditions are absent', () => {
     setCurrentResult(80000);

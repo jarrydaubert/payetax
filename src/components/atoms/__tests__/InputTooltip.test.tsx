@@ -8,6 +8,18 @@ import { useId } from 'react';
 import { setNodeEnv } from '@/test/env';
 import { InputTooltip } from '../InputTooltip';
 
+function FieldWithValidationMessage() {
+  const errorId = useId();
+  return (
+    <>
+      <InputTooltip fieldName='salary'>
+        <input aria-label='Salary' aria-describedby={errorId} />
+      </InputTooltip>
+      <span id={errorId}>Check this amount</span>
+    </>
+  );
+}
+
 describe('InputTooltip Component', () => {
   describe('Rendering', () => {
     it('should render children without tooltip when fieldName not found', () => {
@@ -147,18 +159,7 @@ describe('InputTooltip Component', () => {
 
     it('preserves input validation descriptions without adding an unmounted tooltip ID', async () => {
       const user = userEvent.setup();
-      function Field() {
-        const errorId = useId();
-        return (
-          <>
-            <InputTooltip fieldName='salary'>
-              <input aria-label='Salary' aria-describedby={errorId} />
-            </InputTooltip>
-            <span id={errorId}>Check this amount</span>
-          </>
-        );
-      }
-      render(<Field />);
+      render(<FieldWithValidationMessage />);
       expect(screen.getByRole('textbox')).toHaveAttribute(
         'aria-describedby',
         screen.getByText('Check this amount').id,

@@ -40,66 +40,45 @@ describe('parseCurrencyInput', () => {
     expect(parseCurrencyInput(text)).toEqual({ status: 'empty' });
   });
 
-  it.each([
-    '-500',
-    '−500',
-    '–500',
-    '-£500',
-    '£-500',
-    '£ - 1,234.56',
-    '- 0.5',
-  ])('rejects negative %j with a specific message', (text) => {
-    expect(parseCurrencyInput(text)).toEqual({
-      status: 'invalid',
-      error: CURRENCY_INPUT_ERRORS.negative,
-    });
-  });
+  it.each(['-500', '−500', '–500', '-£500', '£-500', '£ - 1,234.56', '- 0.5'])(
+    'rejects negative %j with a specific message',
+    (text) => {
+      expect(parseCurrencyInput(text)).toEqual({
+        status: 'invalid',
+        error: CURRENCY_INPUT_ERRORS.negative,
+      });
+    },
+  );
 
-  it.each([
-    '1234.567',
-    '0.001',
-    '1,234.5601',
-  ])('rejects %j with more than 2 pence digits', (text) => {
-    expect(parseCurrencyInput(text)).toEqual({
-      status: 'invalid',
-      error: CURRENCY_INPUT_ERRORS.decimals,
-    });
-  });
+  it.each(['1234.567', '0.001', '1,234.5601'])(
+    'rejects %j with more than 2 pence digits',
+    (text) => {
+      expect(parseCurrencyInput(text)).toEqual({
+        status: 'invalid',
+        error: CURRENCY_INPUT_ERRORS.decimals,
+      });
+    },
+  );
 
-  it.each([
-    '1,23',
-    '12,34.56',
-    '1,2345',
-    '1,,234',
-    '1.234,56',
-    ',123',
-    '1,234,',
-  ])('rejects misplaced commas in %j', (text) => {
-    expect(parseCurrencyInput(text)).toEqual({
-      status: 'invalid',
-      error: CURRENCY_INPUT_ERRORS.commas,
-    });
-  });
+  it.each(['1,23', '12,34.56', '1,2345', '1,,234', '1.234,56', ',123', '1,234,'])(
+    'rejects misplaced commas in %j',
+    (text) => {
+      expect(parseCurrencyInput(text)).toEqual({
+        status: 'invalid',
+        error: CURRENCY_INPUT_ERRORS.commas,
+      });
+    },
+  );
 
-  it.each([
-    'abc',
-    '12a',
-    '$100',
-    '1e5',
-    '1 234',
-    '+500',
-    '12-3',
-    '£',
-    '.',
-    '£.',
-    '(500)',
-    '1..2',
-  ])('rejects malformed %j', (text) => {
-    expect(parseCurrencyInput(text)).toEqual({
-      status: 'invalid',
-      error: CURRENCY_INPUT_ERRORS.malformed,
-    });
-  });
+  it.each(['abc', '12a', '$100', '1e5', '1 234', '+500', '12-3', '£', '.', '£.', '(500)', '1..2'])(
+    'rejects malformed %j',
+    (text) => {
+      expect(parseCurrencyInput(text)).toEqual({
+        status: 'invalid',
+        error: CURRENCY_INPUT_ERRORS.malformed,
+      });
+    },
+  );
 
   it('rejects amounts above the maximum with the limit in the message', () => {
     expect(parseCurrencyInput('100000000.01')).toEqual({
@@ -125,16 +104,15 @@ describe('parseCurrencyInput', () => {
       });
     });
 
-    it.each([
-      '1234.56',
-      '1234.5',
-      '0.01',
-    ])('rejects pence in %j instead of dropping or rounding them', (text) => {
-      expect(parseCurrencyInput(text, { decimals: 0 })).toEqual({
-        status: 'invalid',
-        error: CURRENCY_INPUT_ERRORS.wholePounds,
-      });
-    });
+    it.each(['1234.56', '1234.5', '0.01'])(
+      'rejects pence in %j instead of dropping or rounding them',
+      (text) => {
+        expect(parseCurrencyInput(text, { decimals: 0 })).toEqual({
+          status: 'invalid',
+          error: CURRENCY_INPUT_ERRORS.wholePounds,
+        });
+      },
+    );
   });
 
   describe('percentage fields (unit: percent)', () => {

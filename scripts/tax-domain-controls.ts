@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, extname, join, relative, resolve } from 'node:path';
-import ts from 'typescript';
+// TypeScript 7 ships no compiler API; Microsoft's TypeScript 6 API package provides the parser.
+import ts from '@typescript/typescript6';
 import { CURRENT_TAX_GUIDANCE_PATHS } from '../src/constants/currentTaxGuidance';
 import {
   CT_RATES,

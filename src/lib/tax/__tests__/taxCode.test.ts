@@ -62,36 +62,37 @@ describe('shared tax-code grammar', () => {
     expect(normalizeTaxCode(input, mode)).toBe(expected);
   });
 
-  it.each(
-    VALID_TAX_CODE_FIXTURES,
-  )('parses and explains the independently sourced $code fixture', (fixture) => {
-    const parsed = parseTaxCode(fixture.code, DEFAULT_ALLOWANCE);
-    const decoded = decodeTaxCode(fixture.code);
+  it.each(VALID_TAX_CODE_FIXTURES)(
+    'parses and explains the independently sourced $code fixture',
+    (fixture) => {
+      const parsed = parseTaxCode(fixture.code, DEFAULT_ALLOWANCE);
+      const decoded = decodeTaxCode(fixture.code);
 
-    expect(parsed).toEqual(
-      expect.objectContaining({
-        isValid: true,
-        classification: fixture.classification,
-        prefix: fixture.prefix,
-        suffix: fixture.marker,
-        letter: fixture.letter,
-        allowance: fixture.allowance,
-        kAdjustment: fixture.kAdjustment,
-      }),
-    );
-    expect(decoded).toEqual(
-      expect.objectContaining({
-        isValid: true,
-        prefix: fixture.prefix,
-        suffix: fixture.marker,
-        letter: fixture.letter,
-        amountLabel: fixture.amountLabel,
-        amount: fixture.amount,
-      }),
-    );
-    expect(decoded.meaning).toContain(fixture.meaningIncludes);
-    expect(decoded.details.join(' ')).toContain(fixture.detailIncludes);
-  });
+      expect(parsed).toEqual(
+        expect.objectContaining({
+          isValid: true,
+          classification: fixture.classification,
+          prefix: fixture.prefix,
+          suffix: fixture.marker,
+          letter: fixture.letter,
+          allowance: fixture.allowance,
+          kAdjustment: fixture.kAdjustment,
+        }),
+      );
+      expect(decoded).toEqual(
+        expect.objectContaining({
+          isValid: true,
+          prefix: fixture.prefix,
+          suffix: fixture.marker,
+          letter: fixture.letter,
+          amountLabel: fixture.amountLabel,
+          amount: fixture.amount,
+        }),
+      );
+      expect(decoded.meaning).toContain(fixture.meaningIncludes);
+      expect(decoded.details.join(' ')).toContain(fixture.detailIncludes);
+    },
+  );
 
   it.each(INVALID_TAX_CODE_FIXTURES)('rejects malformed or unsupported code %j', (code) => {
     const parsed = parseTaxCode(code, DEFAULT_ALLOWANCE);
@@ -185,17 +186,12 @@ describe('shared tax-code grammar', () => {
     expect(isTaxCodeEditCandidate(code)).toBe(true);
   });
 
-  it.each([
-    'INVALID123',
-    'SS1257L',
-    'CD2',
-    'D3',
-    '1257P',
-    '1257L!',
-    'K10000',
-  ])('rejects impossible edit state %j', (code) => {
-    expect(isTaxCodeEditCandidate(code)).toBe(false);
-  });
+  it.each(['INVALID123', 'SS1257L', 'CD2', 'D3', '1257P', '1257L!', 'K10000'])(
+    'rejects impossible edit state %j',
+    (code) => {
+      expect(isTaxCodeEditCandidate(code)).toBe(false);
+    },
+  );
 
   it.each([
     ['1257LW1', true],
@@ -304,11 +300,14 @@ describe('calculator and decoder consistency', () => {
   it.each([
     ['757T', { salary: 110_000 }, 7_570],
     ['1570T', { salary: 30_000, isBlind: true }, 15_700],
-  ] as const)('does not reapply coding adjustments already reflected by %s', (code, input, amount) => {
-    const calculated = calculateTax({ ...baseInput, ...input, taxCode: code });
+  ] as const)(
+    'does not reapply coding adjustments already reflected by %s',
+    (code, input, amount) => {
+      const calculated = calculateTax({ ...baseInput, ...input, taxCode: code });
 
-    expect(calculated.taxFreeAmount).toBe(amount);
-  });
+      expect(calculated.taxFreeAmount).toBe(amount);
+    },
+  );
 
   it.each([
     ['1257L', 12_570, null],
@@ -347,37 +346,30 @@ describe('calculator and decoder consistency', () => {
     if (code === 'NT') expect(calculated.incomeTax.annually).toBe(0);
   });
 
-  it.each([
-    'W1',
-    'M1',
-    'X',
-    'NONCUM',
-  ] as const)('makes a steady-pay annual projection for the %s non-cumulative marker', (marker) => {
-    const ordinary = calculateTax(baseInput);
-    const nonCumulative = calculateTax({ ...baseInput, taxCode: `1257L${marker}` });
-    const decoded = decodeTaxCode(`1257L${marker}`);
+  it.each(['W1', 'M1', 'X', 'NONCUM'] as const)(
+    'makes a steady-pay annual projection for the %s non-cumulative marker',
+    (marker) => {
+      const ordinary = calculateTax(baseInput);
+      const nonCumulative = calculateTax({ ...baseInput, taxCode: `1257L${marker}` });
+      const decoded = decodeTaxCode(`1257L${marker}`);
 
-    expect(nonCumulative.incomeTax).toEqual(ordinary.incomeTax);
-    expect(nonCumulative.taxFreeAmount).toBe(ordinary.taxFreeAmount);
-    expect(parseTaxCode(`1257L${marker}`, DEFAULT_ALLOWANCE).isEmergency).toBe(true);
-    expect(decoded.warnings.join(' ')).toContain('current pay period');
-  });
+      expect(nonCumulative.incomeTax).toEqual(ordinary.incomeTax);
+      expect(nonCumulative.taxFreeAmount).toBe(ordinary.taxFreeAmount);
+      expect(parseTaxCode(`1257L${marker}`, DEFAULT_ALLOWANCE).isEmergency).toBe(true);
+      expect(decoded.warnings.join(' ')).toContain('current pay period');
+    },
+  );
 
-  it.each([
-    'INVALID',
-    'D2',
-    'D3',
-    '1257',
-    '1257P',
-    'NONCUM',
-    'K100ABC',
-  ])('keeps unsupported code %j on the calculator fallback amount', (code) => {
-    const result = calculateTax({ ...baseInput, taxCode: code });
+  it.each(['INVALID', 'D2', 'D3', '1257', '1257P', 'NONCUM', 'K100ABC'])(
+    'keeps unsupported code %j on the calculator fallback amount',
+    (code) => {
+      const result = calculateTax({ ...baseInput, taxCode: code });
 
-    expect(parseTaxCode(code, DEFAULT_ALLOWANCE).isValid).toBe(false);
-    expect(decodeTaxCode(code).isValid).toBe(false);
-    expect(result.taxFreeAmount).toBe(DEFAULT_ALLOWANCE);
-  });
+      expect(parseTaxCode(code, DEFAULT_ALLOWANCE).isValid).toBe(false);
+      expect(decodeTaxCode(code).isValid).toBe(false);
+      expect(result.taxFreeAmount).toBe(DEFAULT_ALLOWANCE);
+    },
+  );
 
   it('does not let malformed prefixes silently change the selected region', () => {
     const englandDefault = calculateTax({ ...baseInput, taxCode: '' });

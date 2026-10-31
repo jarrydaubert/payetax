@@ -112,20 +112,16 @@ describe('tax-code decoder semantics', () => {
     );
   });
 
-  it.each([
-    '1257',
-    'K0',
-    'K10000',
-    'CD2',
-    'SNT',
-    '1257L W1 M1',
-  ])('does not confidently decode malformed input %j', (code) => {
-    const result = decodeTaxCode(code);
+  it.each(['1257', 'K0', 'K10000', 'CD2', 'SNT', '1257L W1 M1'])(
+    'does not confidently decode malformed input %j',
+    (code) => {
+      const result = decodeTaxCode(code);
 
-    expect(result.isValid).toBe(false);
-    expect(result.meaning).toBe('Unrecognized or unsupported tax code');
-    expect(result.warnings).not.toHaveLength(0);
-  });
+      expect(result.isValid).toBe(false);
+      expect(result.meaning).toBe('Unrecognized or unsupported tax code');
+      expect(result.warnings).not.toHaveLength(0);
+    },
+  );
 
   it('formats only non-negative user-visible code amounts', () => {
     expect(formatTaxCodeAmount(12_570)).toBe('£12,570');

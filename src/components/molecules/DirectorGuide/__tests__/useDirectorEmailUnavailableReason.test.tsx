@@ -113,40 +113,46 @@ describe('Director email interim guard', () => {
     { revenue: 30000 },
     { otherIncome: 20000 },
     { region: 'scotland' },
-  ] satisfies Partial<DirectorFormData>[])('allows a matching baseline salary with advanced inputs %j', (fields) => {
-    const state = useDirectorGuideStore.getState();
-    useDirectorGuideStore.setState({ formData: { ...state.formData, ...fields } });
-    const comparison = calculateCurrent();
-    state.setSliderSalary(comparison.strategies[comparison.recommended].salary);
-    const { result } = renderHook(useDirectorEmailUnavailableReason);
-    expect(result.current).toBeNull();
-  });
+  ] satisfies Partial<DirectorFormData>[])(
+    'allows a matching baseline salary with advanced inputs %j',
+    (fields) => {
+      const state = useDirectorGuideStore.getState();
+      useDirectorGuideStore.setState({ formData: { ...state.formData, ...fields } });
+      const comparison = calculateCurrent();
+      state.setSliderSalary(comparison.strategies[comparison.recommended].salary);
+      const { result } = renderHook(useDirectorEmailUnavailableReason);
+      expect(result.current).toBeNull();
+    },
+  );
 
   it.each([
     { revenue: 500000, expenses: 0 },
     { hasEmploymentAllowance: true },
-  ] satisfies Partial<DirectorFormData>[])('fails closed when All Salary is recommended but salary controls produce another result %j', (fields) => {
-    const state = useDirectorGuideStore.getState();
-    useDirectorGuideStore.setState({ formData: { ...state.formData, ...fields } });
-    const comparison = calculateCurrent();
-    expect(comparison.recommended).toBe('allSalary');
-    const { result } = renderHook(useDirectorEmailUnavailableReason);
-    expect(result.current).toBeNull();
-    act(() => state.setSelectedStrategy('optimalMix'));
-    expect(result.current).toMatch(/unavailable for this setup/);
-    act(() => {
-      state.setSelectedStrategy('allSalary');
-      state.setSliderSalary(
-        Math.min(
-          TAX_RATES[CURRENT_TAX_YEAR].nationalInsurance.employee.A.upper.threshold,
-          comparison.strategies.allSalary.salary,
-        ),
-      );
-    });
-    expect(result.current).toMatch(/unavailable for this setup/);
-    act(() => state.setSliderSalary(null));
-    expect(result.current).toBeNull();
-  });
+  ] satisfies Partial<DirectorFormData>[])(
+    'fails closed when All Salary is recommended but salary controls produce another result %j',
+    (fields) => {
+      const state = useDirectorGuideStore.getState();
+      useDirectorGuideStore.setState({ formData: { ...state.formData, ...fields } });
+      const comparison = calculateCurrent();
+      expect(comparison.recommended).toBe('allSalary');
+      const { result } = renderHook(useDirectorEmailUnavailableReason);
+      expect(result.current).toBeNull();
+      act(() => state.setSelectedStrategy('optimalMix'));
+      expect(result.current).toMatch(/unavailable for this setup/);
+      act(() => {
+        state.setSelectedStrategy('allSalary');
+        state.setSliderSalary(
+          Math.min(
+            TAX_RATES[CURRENT_TAX_YEAR].nationalInsurance.employee.A.upper.threshold,
+            comparison.strategies.allSalary.salary,
+          ),
+        );
+      });
+      expect(result.current).toMatch(/unavailable for this setup/);
+      act(() => state.setSliderSalary(null));
+      expect(result.current).toBeNull();
+    },
+  );
 
   it('blocks monthly projections because the email cannot reproduce the cash-aware draw', () => {
     const state = useDirectorGuideStore.getState();

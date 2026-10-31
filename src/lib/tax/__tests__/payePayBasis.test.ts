@@ -26,14 +26,17 @@ describe('derivePayePayBasis', () => {
     ['fortnightly', 1_500, 'fortnightly', 39_000],
     ['weekly', 1_000, 'weekly', 52_000],
     ['hourly', 25, 'hourly', 48_750],
-  ] as const)('normalizes %s primary employment pay to one annual and monthly basis', (_label, salary, payPeriod, expectedAnnual) => {
-    const basis = derivePayePayBasis({ ...baseInput, salary, payPeriod });
+  ] as const)(
+    'normalizes %s primary employment pay to one annual and monthly basis',
+    (_label, salary, payPeriod, expectedAnnual) => {
+      const basis = derivePayePayBasis({ ...baseInput, salary, payPeriod });
 
-    expect(basis.primaryEmploymentGross).toEqual({
-      annual: expectedAnnual,
-      monthly: expectedAnnual / 12,
-    });
-  });
+      expect(basis.primaryEmploymentGross).toEqual({
+        annual: expectedAnnual,
+        monthly: expectedAnnual / 12,
+      });
+    },
+  );
 
   it('derives percentage and fixed salary-sacrifice pension deductions from primary employment', () => {
     const percentage = derivePayePayBasis({
@@ -149,16 +152,19 @@ describe('derivePayePayBasis', () => {
     ['negative fixed amount', -100, 'amount', 0],
     ['non-finite percentage', Number.NaN, 'percentage', 0],
     ['existing over-boundary percentage behaviour', 150, 'percentage', 45_000],
-  ] as const)('preserves %s pension handling', (_label, pensionContribution, pensionContributionType, expectedAnnual) => {
-    const basis = derivePayePayBasis({
-      ...baseInput,
-      pensionContribution,
-      pensionContributionType,
-    });
+  ] as const)(
+    'preserves %s pension handling',
+    (_label, pensionContribution, pensionContributionType, expectedAnnual) => {
+      const basis = derivePayePayBasis({
+        ...baseInput,
+        pensionContribution,
+        pensionContributionType,
+      });
 
-    expect(basis.salarySacrificePensionDeduction.annual).toBe(expectedAnnual);
-    expect(basis.adjustedNetIncome.annual).toBe(Math.max(0, 30_000 - expectedAnnual));
-  });
+      expect(basis.salarySacrificePensionDeduction.annual).toBe(expectedAnnual);
+      expect(basis.adjustedNetIncome.annual).toBe(Math.max(0, 30_000 - expectedAnnual));
+    },
+  );
 
   it('caps a fixed pension deduction at primary employment gross', () => {
     const basis = derivePayePayBasis({

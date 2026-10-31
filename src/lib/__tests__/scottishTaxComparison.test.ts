@@ -55,18 +55,21 @@ describe('Scottish annual Income Tax comparison', () => {
     [75_000, 19_482, 17_432, 2_050],
     [100_000, 30_732, 27_432, 3_300],
     [150_000, 59_634, 53_703, 5_931],
-  ])('reproduces the independently worked 2026/27 comparison at £%i', (salary, scottishTax, rukTax, difference) => {
-    // Independent fixtures use the published Scottish and rUK taxable-band widths.
-    // At £150k, for example:
-    // Scotland = 3,967×19% + 12,989×20% + 14,136×21% + 31,338×42%
-    //          + 62,710×45% + 24,860×48% = £59,634.35.
-    // rUK = 37,700×20% + 87,440×40% + 24,860×45% = £53,703.00.
-    expect(calculateAnnualIncomeTaxComparison(salary, '2026-2027')).toEqual({
-      scottishTax,
-      rukTax,
-      difference,
-    });
-  });
+  ])(
+    'reproduces the independently worked 2026/27 comparison at £%i',
+    (salary, scottishTax, rukTax, difference) => {
+      // Independent fixtures use the published Scottish and rUK taxable-band widths.
+      // At £150k, for example:
+      // Scotland = 3,967×19% + 12,989×20% + 14,136×21% + 31,338×42%
+      //          + 62,710×45% + 24,860×48% = £59,634.35.
+      // rUK = 37,700×20% + 87,440×40% + 24,860×45% = £53,703.00.
+      expect(calculateAnnualIncomeTaxComparison(salary, '2026-2027')).toEqual({
+        scottishTax,
+        rukTax,
+        difference,
+      });
+    },
+  );
 
   it('derives the independently worked 2026/27 crossover', () => {
     // At £29,526 gross, Scotland is £39.67 lower: 3,967×19% + 12,989×20%

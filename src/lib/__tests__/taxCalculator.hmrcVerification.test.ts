@@ -161,18 +161,17 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       );
     });
 
-    it.each(scottishHmrcFixtures202526)('Scottish HMRC fixture £$salary ($note)', ({
-      salary,
-      expectedIncomeTax,
-      expectedNI,
-    }) => {
-      const result = calculateTax(
-        createInput({ salary, isScottish: true, taxCode: 'S1257L', taxYear: '2025-2026' }),
-      );
+    it.each(scottishHmrcFixtures202526)(
+      'Scottish HMRC fixture £$salary ($note)',
+      ({ salary, expectedIncomeTax, expectedNI }) => {
+        const result = calculateTax(
+          createInput({ salary, isScottish: true, taxCode: 'S1257L', taxYear: '2025-2026' }),
+        );
 
-      expect(result.incomeTax.annually).toBeCloseTo(expectedIncomeTax, 2);
-      expect(result.nationalInsurance.annually).toBeCloseTo(expectedNI, 2);
-    });
+        expect(result.incomeTax.annually).toBeCloseTo(expectedIncomeTax, 2);
+        expect(result.nationalInsurance.annually).toBeCloseTo(expectedNI, 2);
+      },
+    );
 
     it.each([
       { salary: 30000, taxYear: '2023-2024' as const },

@@ -13,16 +13,13 @@ function expectSafePrototype(value: unknown) {
 }
 
 describe('Jest deepmerge dependency security and compatibility', () => {
-  it.each([
-    null,
-    undefined,
-    0,
-    false,
-    'placeholder',
-  ])('does not poison the returned prototype through a %s placeholder', (placeholder) => {
-    const result = merge({ settings: placeholder }, { settings: poisonedInput() });
-    expectSafePrototype(result.settings);
-  });
+  it.each([null, undefined, 0, false, 'placeholder'])(
+    'does not poison the returned prototype through a %s placeholder',
+    (placeholder) => {
+      const result = merge({ settings: placeholder }, { settings: poisonedInput() });
+      expectSafePrototype(result.settings);
+    },
+  );
 
   it('rejects prototype keys from null-prototype sources and targets', () => {
     expectSafePrototype(merge(Object.create(null), poisonedInput()));

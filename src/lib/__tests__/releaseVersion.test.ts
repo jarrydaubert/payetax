@@ -56,29 +56,24 @@ afterEach(() => {
   rmSync(root, { recursive: true, force: true });
 });
 
-it.each([
-  '5.1.5',
-  '5.2.0',
-  '6.0.0',
-])('accepts the next SemVer bump %s with unchanged caches', (next) => {
-  version(next);
-  expect(check('--base', 'HEAD').status).toBe(0);
-});
+it.each(['5.1.5', '5.2.0', '6.0.0'])(
+  'accepts the next SemVer bump %s with unchanged caches',
+  (next) => {
+    version(next);
+    expect(check('--base', 'HEAD').status).toBe(0);
+  },
+);
 
-it.each([
-  '5.1.4',
-  '5.1.3',
-  '4.9.9',
-  '5.1.6',
-  '5.3.0',
-  '6.1.0',
-])('rejects missing, backward or skipped bumps: %s', (next) => {
-  version(next);
-  write('src/app/page.tsx', 'changed page');
-  const result = check('--base', 'HEAD');
-  expect(result.status).toBe(1);
-  expect(result.output).toContain('Bump package.json from 5.1.4');
-});
+it.each(['5.1.4', '5.1.3', '4.9.9', '5.1.6', '5.3.0', '6.1.0'])(
+  'rejects missing, backward or skipped bumps: %s',
+  (next) => {
+    version(next);
+    write('src/app/page.tsx', 'changed page');
+    const result = check('--base', 'HEAD');
+    expect(result.status).toBe(1);
+    expect(result.output).toContain('Bump package.json from 5.1.4');
+  },
+);
 
 it.each([
   'v5.2.0',

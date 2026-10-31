@@ -64,10 +64,10 @@ describe('TrafficMetrics privacy integration', () => {
     for (const { input, send } of providers) expect(send()).toEqual(input);
   });
 
-  it.each([
-    'javascript:alert(73123)',
-    'https://[invalid?salary=73123',
-  ])('discards unsupported or malformed event URLs from both providers: %s', (url) => {
-    for (const { send } of renderProviders(url)) expect(send()).toBeNull();
-  });
+  it.each(['javascript:alert(73123)', 'https://[invalid?salary=73123'])(
+    'discards unsupported or malformed event URLs from both providers: %s',
+    (url) => {
+      for (const { send } of renderProviders(url)) expect(send()).toBeNull();
+    },
+  );
 });

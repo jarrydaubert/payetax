@@ -138,79 +138,76 @@ function mainEngineInput(salary: number, taxYear: TaxYear, taxCode = '') {
 }
 
 describe('Scottish tax vertical', () => {
-  it.each(statutoryCases)('pins annual statutory output for $taxYear at £$salary', ({
-    taxYear,
-    salary,
-    expectedTax,
-  }) => {
-    const annual = calculateIncomeTax(salary, 'scotland', taxYear);
-    const rates = SCOTTISH_TAX_RATES[taxYear];
-    const sliced = sliceScottishTaxableIncome(
-      annual.taxableIncome,
-      rates.bands.map((band) => ({
-        name: band.name,
-        rate: band.rate,
-        taxableIncomeUpperBound: band.threshold,
-      })),
-    );
+  it.each(statutoryCases)(
+    'pins annual statutory output for $taxYear at £$salary',
+    ({ taxYear, salary, expectedTax }) => {
+      const annual = calculateIncomeTax(salary, 'scotland', taxYear);
+      const rates = SCOTTISH_TAX_RATES[taxYear];
+      const sliced = sliceScottishTaxableIncome(
+        annual.taxableIncome,
+        rates.bands.map((band) => ({
+          name: band.name,
+          rate: band.rate,
+          taxableIncomeUpperBound: band.threshold,
+        })),
+      );
 
-    expect(annual.incomeTax).toBeCloseTo(expectedTax, 2);
-    expect(sliced.incomeTax).toBeCloseTo(expectedTax, 2);
-    expect(annual.personalAllowance).toBe(salary === 100_000 ? 12_570 : salary === 125_139 ? 1 : 0);
+      expect(annual.incomeTax).toBeCloseTo(expectedTax, 2);
+      expect(sliced.incomeTax).toBeCloseTo(expectedTax, 2);
+      expect(annual.personalAllowance).toBe(
+        salary === 100_000 ? 12_570 : salary === 125_139 ? 1 : 0,
+      );
 
-    const topSlice = sliced.slices.find((slice) => slice.name === 'Top rate');
-    if (salary <= STATUTORY_TOP_BOUNDARY) {
-      expect(topSlice).toBeUndefined();
-    } else {
-      expect(topSlice?.taxableIncomeLowerBound).toBe(STATUTORY_TOP_BOUNDARY);
-      expect(topSlice?.taxableAmount).toBe(salary - STATUTORY_TOP_BOUNDARY);
-    }
-  });
+      const topSlice = sliced.slices.find((slice) => slice.name === 'Top rate');
+      if (salary <= STATUTORY_TOP_BOUNDARY) {
+        expect(topSlice).toBeUndefined();
+      } else {
+        expect(topSlice?.taxableIncomeLowerBound).toBe(STATUTORY_TOP_BOUNDARY);
+        expect(topSlice?.taxableAmount).toBe(salary - STATUTORY_TOP_BOUNDARY);
+      }
+    },
+  );
 
-  it.each(annualFixtures)('keeps the £125,140 taxable and total boundary explicit for $taxYear', ({
-    taxYear,
-  }) => {
-    const rates = SCOTTISH_TAX_RATES[taxYear];
-    const advancedBand = rates.bands.find((band) => band.name === 'Advanced rate');
-    const preTopBand = advancedBand ?? rates.bands.find((band) => band.name === 'Higher rate');
+  it.each(annualFixtures)(
+    'keeps the £125,140 taxable and total boundary explicit for $taxYear',
+    ({ taxYear }) => {
+      const rates = SCOTTISH_TAX_RATES[taxYear];
+      const advancedBand = rates.bands.find((band) => band.name === 'Advanced rate');
+      const preTopBand = advancedBand ?? rates.bands.find((band) => band.name === 'Higher rate');
 
-    expect(preTopBand?.threshold).toBe(STATUTORY_TOP_BOUNDARY);
-    expect(
-      taxableThresholdToTotalIncome(
-        preTopBand?.threshold ?? 0,
-        rates.personalAllowance,
-        rates.personalAllowanceReductionThreshold,
-      ),
-    ).toBe(STATUTORY_TOP_BOUNDARY);
-  });
+      expect(preTopBand?.threshold).toBe(STATUTORY_TOP_BOUNDARY);
+      expect(
+        taxableThresholdToTotalIncome(
+          preTopBand?.threshold ?? 0,
+          rates.personalAllowance,
+          rates.personalAllowanceReductionThreshold,
+        ),
+      ).toBe(STATUTORY_TOP_BOUNDARY);
+    },
+  );
 
-  it.each(
-    statutoryCases,
-  )('keeps annual tool and month-1 engine output within documented tolerance for $taxYear at £$salary', ({
-    taxYear,
-    salary,
-    expectedEngineTax,
-  }) => {
-    const toolTax = Math.round(calculateIncomeTax(salary, 'scotland', taxYear).incomeTax);
-    const engineTax = calculateTax(mainEngineInput(salary, taxYear)).incomeTax.annually;
+  it.each(statutoryCases)(
+    'keeps annual tool and month-1 engine output within documented tolerance for $taxYear at £$salary',
+    ({ taxYear, salary, expectedEngineTax }) => {
+      const toolTax = Math.round(calculateIncomeTax(salary, 'scotland', taxYear).incomeTax);
+      const engineTax = calculateTax(mainEngineInput(salary, taxYear)).incomeTax.annually;
 
-    expect(engineTax).toBeCloseTo(expectedEngineTax, 2);
-    expect(Math.abs(toolTax - engineTax)).toBeLessThanOrEqual(TOOL_ENGINE_TOLERANCE);
-  });
+      expect(engineTax).toBeCloseTo(expectedEngineTax, 2);
+      expect(Math.abs(toolTax - engineTax)).toBeLessThanOrEqual(TOOL_ENGINE_TOLERANCE);
+    },
+  );
 
-  it.each(taperEntryCases)('covers the personal-allowance taper entry for $taxYear at £$salary', ({
-    taxYear,
-    salary,
-    expectedToolTax,
-    expectedEngineTax,
-  }) => {
-    const toolTax = Math.round(calculateIncomeTax(salary, 'scotland', taxYear).incomeTax);
-    const engineTax = calculateTax(mainEngineInput(salary, taxYear)).incomeTax.annually;
+  it.each(taperEntryCases)(
+    'covers the personal-allowance taper entry for $taxYear at £$salary',
+    ({ taxYear, salary, expectedToolTax, expectedEngineTax }) => {
+      const toolTax = Math.round(calculateIncomeTax(salary, 'scotland', taxYear).incomeTax);
+      const engineTax = calculateTax(mainEngineInput(salary, taxYear)).incomeTax.annually;
 
-    expect(toolTax).toBe(expectedToolTax);
-    expect(engineTax).toBeCloseTo(expectedEngineTax, 2);
-    expect(Math.abs(toolTax - engineTax)).toBeLessThanOrEqual(TOOL_ENGINE_TOLERANCE);
-  });
+      expect(toolTax).toBe(expectedToolTax);
+      expect(engineTax).toBeCloseTo(expectedEngineTax, 2);
+      expect(Math.abs(toolTax - engineTax)).toBeLessThanOrEqual(TOOL_ENGINE_TOLERANCE);
+    },
+  );
 
   it.each([
     ['2023-2024', 'SBR', 20],
@@ -233,12 +230,15 @@ describe('Scottish tax vertical', () => {
     ['2026-2027', 'SD1', 42],
     ['2026-2027', 'SD2', 45],
     ['2026-2027', 'SD3', 48],
-  ] as const)('preserves $taxCode flat-rate behaviour in $taxYear', (taxYear, taxCode, expectedRate) => {
-    const result = calculateTax(mainEngineInput(30_000, taxYear, taxCode));
+  ] as const)(
+    'preserves $taxCode flat-rate behaviour in $taxYear',
+    (taxYear, taxCode, expectedRate) => {
+      const result = calculateTax(mainEngineInput(30_000, taxYear, taxCode));
 
-    expect(result.taxFreeAmount).toBe(0);
-    expect(result.taxBands).toHaveLength(1);
-    expect(result.taxBands[0]?.rate).toBe(expectedRate);
-    expect(result.incomeTax.annually).toBeCloseTo(30_000 * (expectedRate / 100), 2);
-  });
+      expect(result.taxFreeAmount).toBe(0);
+      expect(result.taxBands).toHaveLength(1);
+      expect(result.taxBands[0]?.rate).toBe(expectedRate);
+      expect(result.incomeTax.annually).toBeCloseTo(30_000 * (expectedRate / 100), 2);
+    },
+  );
 });

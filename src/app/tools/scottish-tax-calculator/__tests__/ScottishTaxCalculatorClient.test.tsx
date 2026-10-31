@@ -19,43 +19,39 @@ describe('ScottishTaxCalculatorClient', () => {
     expect(screen.getByText('+£1,496/year')).toBeInTheDocument();
   });
 
-  it.each([
-    '50000.50',
-    '50,000.50',
-  ])('accepts and consistently formats a valid two-decimal salary %s', async (salary) => {
-    const user = userEvent.setup();
-    render(<ScottishTaxCalculatorClient />);
+  it.each(['50000.50', '50,000.50'])(
+    'accepts and consistently formats a valid two-decimal salary %s',
+    async (salary) => {
+      const user = userEvent.setup();
+      render(<ScottishTaxCalculatorClient />);
 
-    const input = screen.getByRole('textbox', { name: 'Annual salary' });
-    await user.type(input, salary);
-    await user.click(screen.getByRole('button', { name: 'Compare' }));
+      const input = screen.getByRole('textbox', { name: 'Annual salary' });
+      await user.type(input, salary);
+      await user.click(screen.getByRole('button', { name: 'Compare' }));
 
-    expect(input).toHaveValue('50,000.50');
-    expect(await screen.findByText('Scottish Tax')).toBeInTheDocument();
-    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-  });
+      expect(input).toHaveValue('50,000.50');
+      expect(await screen.findByText('Scottish Tax')).toBeInTheDocument();
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    },
+  );
 
-  it.each([
-    '-50000',
-    '50000.500',
-    'salary',
-    '£50,000',
-    '£50,000.50',
-    '50,00',
-  ])('rejects malformed or unsupported salary input %s without showing a result', async (salary) => {
-    const user = userEvent.setup();
-    render(<ScottishTaxCalculatorClient />);
+  it.each(['-50000', '50000.500', 'salary', '£50,000', '£50,000.50', '50,00'])(
+    'rejects malformed or unsupported salary input %s without showing a result',
+    async (salary) => {
+      const user = userEvent.setup();
+      render(<ScottishTaxCalculatorClient />);
 
-    const input = screen.getByRole('textbox', { name: 'Annual salary' });
-    await user.type(input, salary);
-    await user.click(screen.getByRole('button', { name: 'Compare' }));
+      const input = screen.getByRole('textbox', { name: 'Annual salary' });
+      await user.type(input, salary);
+      await user.click(screen.getByRole('button', { name: 'Compare' }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Enter an annual salary from £0 to £10,000,000',
-    );
-    expect(input).toHaveAttribute('aria-invalid', 'true');
-    expect(screen.queryByText('Scottish Tax')).not.toBeInTheDocument();
-  });
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'Enter an annual salary from £0 to £10,000,000',
+      );
+      expect(input).toHaveAttribute('aria-invalid', 'true');
+      expect(screen.queryByText('Scottish Tax')).not.toBeInTheDocument();
+    },
+  );
 
   it('clears a previous result when the salary is edited', async () => {
     const user = userEvent.setup();

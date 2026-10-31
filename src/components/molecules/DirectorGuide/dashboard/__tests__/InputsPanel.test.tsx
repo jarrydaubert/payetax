@@ -350,21 +350,20 @@ describe('DirectorGuide InputsPanel', () => {
       expect(formData().revenue).toBe(1234.56);
     });
 
-    it.each([
-      ['1234.56'],
-      ['1,234.56'],
-      ['£1,234.56'],
-    ])('resolves pasted %j to £1,234.56', async (pasted) => {
-      const user = userEvent.setup();
-      render(<InputsPanel />);
+    it.each([['1234.56'], ['1,234.56'], ['£1,234.56']])(
+      'resolves pasted %j to £1,234.56',
+      async (pasted) => {
+        const user = userEvent.setup();
+        render(<InputsPanel />);
 
-      await user.click(expensesInput());
-      await user.paste(pasted);
-      expect(formData().expenses).toBe(1234.56);
+        await user.click(expensesInput());
+        await user.paste(pasted);
+        expect(formData().expenses).toBe(1234.56);
 
-      await user.tab();
-      expect(expensesInput()).toHaveValue('£1,234.56');
-    });
+        await user.tab();
+        expect(expensesInput()).toHaveValue('£1,234.56');
+      },
+    );
 
     it('rejects an unsupported negative amount with a specific, associated error', async () => {
       const user = userEvent.setup();
