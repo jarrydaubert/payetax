@@ -3,14 +3,15 @@
 
 import { motion } from 'framer-motion';
 import type { LucideIcon } from 'lucide-react';
-import { memo } from 'react';
-import { HelpPopover } from '@/components/atoms/HelpPopover';
+import { memo, useEffect, useRef, useState } from 'react';
 import { Card } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   ANIMATION_GESTURES,
   ANIMATION_TRANSITIONS,
   ANIMATION_VARIANTS,
 } from '@/constants/animationTokens';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { cn } from '@/lib/utils';
 
@@ -33,6 +34,9 @@ interface ResultCardProps {
    * Note: Parent must wrap with TooltipProvider for tooltips to work
    */
   tooltip?: string;
+  /** Optional controlled state so a result row can allow only one explanation. */
+  tooltipOpen?: boolean;
+  onTooltipOpenChange?: (open: boolean) => void;
   /** Enable scroll-triggered reveal animation (default: false for backward compatibility) */
   revealOnScroll?: boolean;
 }
@@ -80,10 +84,26 @@ export const ResultCard = memo(function ResultCard({
   className,
   delay = 0,
   tooltip,
+  tooltipOpen: controlledTooltipOpen,
+  onTooltipOpenChange,
   revealOnScroll = false,
 }: ResultCardProps) {
   const styles = variantStyles[variant];
   const shouldReduceMotion = useMotionPreference();
+  const canHover = useMediaQuery('(hover: hover) and (pointer: fine)');
+  const showTooltip = Boolean(tooltip) && canHover;
+  const [localTooltipOpen, setLocalTooltipOpen] = useState(false);
+  const tooltipOpen = controlledTooltipOpen ?? localTooltipOpen;
+  const setTooltipOpen = onTooltipOpenChange ?? setLocalTooltipOpen;
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const keyboardFocusRef = useRef(false);
+
+  useEffect(() => {
+    if (!canHover) {
+      keyboardFocusRef.current = false;
+      setTooltipOpen(false);
+    }
+  }, [canHover, setTooltipOpen]);
 
   // Card visual content
   const cardVisual = (
@@ -104,11 +124,27 @@ export const ResultCard = memo(function ResultCard({
     </Card>
   );
 
-  // When tooltip exists, wrap in focusable button for keyboard accessibility
-  // The button is unstyled and acts as the tooltip trigger
-  const cardContent = tooltip ? (
+  // Touch cards contain only static content, including before hydration.
+  const cardContent = showTooltip ? (
     <button
+      ref={triggerRef}
       type='button'
+      onFocus={(event) => {
+        keyboardFocusRef.current = event.currentTarget.matches(':focus-visible');
+      }}
+      onPointerDown={() => {
+        keyboardFocusRef.current = false;
+      }}
+      onBlur={() => {
+        keyboardFocusRef.current = false;
+        setTooltipOpen(false);
+      }}
+      onClick={(event) => {
+        // Native Enter/Space and assistive activation produce a click with detail 0.
+        event.preventDefault();
+        keyboardFocusRef.current = event.detail === 0;
+        setTooltipOpen(event.detail === 0 ? !tooltipOpen : false);
+      }}
       className={cn(
         'w-full cursor-help text-left',
         'rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
@@ -152,21 +188,42 @@ export const ResultCard = memo(function ResultCard({
 
   // Gesture animations (PAYTAX-75: Framer Motion Maximization)
   // Disable hover scale when tooltip exists to avoid jitter/position recalculation
-  const gestureProps = shouldReduceMotion
-    ? {}
-    : tooltip
-      ? { whileTap: ANIMATION_GESTURES.tapGentle } // No hover scale with tooltip
-      : {
-          whileHover: ANIMATION_GESTURES.hoverGentle,
-          whileTap: ANIMATION_GESTURES.tapGentle,
-        };
+  const gestureProps =
+    shouldReduceMotion || !canHover
+      ? {}
+      : tooltip
+        ? {} // Avoid a second tab stop on Framer's tap-enabled wrapper.
+        : {
+            whileHover: ANIMATION_GESTURES.hoverGentle,
+            whileTap: ANIMATION_GESTURES.tapGentle,
+          };
 
   return (
     <motion.div {...animationProps} {...gestureProps} className={className}>
-      {tooltip ? (
-        <HelpPopover label={`Help for ${label}`} trigger={cardContent}>
-          <p>{tooltip}</p>
-        </HelpPopover>
+      {showTooltip ? (
+        <Tooltip
+          open={tooltipOpen}
+          onOpenChange={(open) => {
+            // Focus scrolling must not dismiss keyboard help; Escape and blur still do.
+            if (
+              open ||
+              !keyboardFocusRef.current ||
+              document.activeElement !== triggerRef.current
+            ) {
+              setTooltipOpen(open);
+            }
+          }}
+        >
+          <TooltipTrigger asChild>{cardContent}</TooltipTrigger>
+          <TooltipContent
+            className='max-w-xs'
+            side='top'
+            onEscapeKeyDown={() => setTooltipOpen(false)}
+            onPointerDownOutside={() => setTooltipOpen(false)}
+          >
+            <p>{tooltip}</p>
+          </TooltipContent>
+        </Tooltip>
       ) : (
         cardContent
       )}

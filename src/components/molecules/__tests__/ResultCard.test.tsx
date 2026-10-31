@@ -1,9 +1,73 @@
 // src/components/molecules/__tests__/ResultCard.test.tsx
-import { render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Calculator } from 'lucide-react';
 import { ResultCard } from '../ResultCard';
 
 describe('ResultCard Component', () => {
+  describe('Pointer capabilities', () => {
+    const originalMatchMedia = window.matchMedia;
+    afterEach(() => {
+      window.matchMedia = originalMatchMedia;
+    });
+
+    it('renders touch content without a tooltip trigger, hidden button or tab stop', () => {
+      const { container } = render(
+        <ResultCard
+          label='Annual Take-Home'
+          value='£30,000'
+          tooltip='Your yearly take-home pay.'
+        />,
+      );
+      expect(window.matchMedia).toHaveBeenCalledWith('(hover: hover) and (pointer: fine)');
+      expect(container.querySelector('button, [tabindex], [role="button"], [title]')).toBeNull();
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+      expect(screen.getByText('£30,000')).toBeInTheDocument();
+    });
+
+    it('removes desktop focus access and an open tooltip when pointer capabilities change', async () => {
+      const query = '(hover: hover) and (pointer: fine)';
+      const capabilities = new EventTarget();
+      window.matchMedia = jest.fn((media) =>
+        media === query
+          ? {
+              ...originalMatchMedia(media),
+              matches: true,
+              addEventListener: capabilities.addEventListener.bind(capabilities),
+              removeEventListener: capabilities.removeEventListener.bind(capabilities),
+            }
+          : originalMatchMedia(media),
+      );
+      const { container } = render(
+        <ResultCard
+          label='Annual Take-Home'
+          value='£30,000'
+          tooltip='Your yearly take-home pay.'
+        />,
+      );
+      expect(screen.getByRole('button', { name: /Annual Take-Home/ })).toBeInTheDocument();
+      await userEvent.setup().tab();
+      expect(await screen.findByRole('tooltip')).toHaveTextContent('Your yearly take-home pay.');
+      fireEvent.scroll(document);
+      expect(screen.getByRole('tooltip')).toBeInTheDocument();
+      act(() => {
+        capabilities.dispatchEvent(
+          Object.assign(new Event('change'), { matches: false, media: query }),
+        );
+      });
+      expect(container.querySelector('button, [tabindex], [role="button"]')).toBeNull();
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+      expect(screen.getByText('£30,000')).toBeInTheDocument();
+      act(() => {
+        capabilities.dispatchEvent(
+          Object.assign(new Event('change'), { matches: true, media: query }),
+        );
+      });
+      expect(screen.getByRole('button', { name: /Annual Take-Home/ })).toBeInTheDocument();
+      expect(screen.queryByRole('tooltip')).not.toBeInTheDocument();
+    });
+  });
+
   describe('Rendering', () => {
     it('should render with label and value', () => {
       render(<ResultCard label='Net Income' value='£30,000' />);

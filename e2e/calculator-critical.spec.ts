@@ -148,14 +148,12 @@ test.describe('Pension modelling guidance @critical', () => {
     await expect(
       page.getByTestId('calculator-section').locator('input[aria-invalid="true"]'),
     ).toHaveCount(0);
-    const takeHomeHelp = results.getByRole('button', { name: /Annual Take-Home/ });
-    await takeHomeHelp.tap();
-    const explanation = page.getByRole('region', { name: 'Help for Annual Take-Home' });
-    await expect(explanation).toBeVisible();
-    // Touching an amount field may focus it without emitting a later click in Safari.
-    await page.getByTestId('salary-input').tap();
-    await expect(explanation).toHaveCount(0);
-    await expect(page.getByTestId('salary-input')).toBeFocused();
+    const summary = results.getByRole('region', { name: 'Tax calculation summary results' });
+    await expect(summary.getByRole('button')).toHaveCount(0);
+    await summary.getByText('Annual Take-Home', { exact: true }).tap();
+    await expect(page.getByRole('tooltip')).toHaveCount(0);
+    await expect(page.getByRole('region', { name: 'Help for Annual Take-Home' })).toHaveCount(0);
+    await expect(results.getByTestId('summary-result-note')).toBeVisible();
   });
 });
 
@@ -977,7 +975,7 @@ test.describe('Calculator critical @critical', () => {
     await expect(page.getByTestId('results-table')).toBeVisible();
     await expect(page.getByRole('columnheader', { name: 'Breakdown' })).toBeVisible();
 
-    const marginalCard = page.getByRole('button', { name: /Marginal Tax Rate/i });
+    const marginalCard = page.getByText('Marginal Rate Estimate', { exact: true }).locator('../..');
     const baseMarginalText = (await marginalCard.textContent()) ?? '';
     const baseMarginal = parsePercent(baseMarginalText);
 
