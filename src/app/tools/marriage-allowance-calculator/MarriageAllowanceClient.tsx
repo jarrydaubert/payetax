@@ -103,11 +103,11 @@ export function MarriageAllowanceClient() {
       <div className='mb-12 text-center'>
         <div className='mb-4 inline-flex items-center gap-2 rounded-sm border border-primary/35 bg-background px-4 py-2 text-primary'>
           <Heart className={'size-4'} />
-          <span className='font-medium text-sm uppercase tracking-[0.2em]'>Marriage Allowance</span>
+          <span className='text-sm font-medium tracking-[0.2em] uppercase'>Marriage Allowance</span>
         </div>
         <h1
           className={cn(
-            'mb-4 font-display font-semibold text-foreground leading-tight',
+            'font-display mb-4 leading-tight font-semibold text-foreground',
             'text-4xl',
           )}
         >
@@ -125,16 +125,16 @@ export function MarriageAllowanceClient() {
         <CardContent className='pt-6'>
           <div className='grid gap-6 text-center md:grid-cols-3'>
             <div>
-              <p className='mb-1 font-medium text-muted-foreground text-sm'>Amount Transferred</p>
-              <p className='font-bold text-2xl'>{formatCurrency(MARRIAGE_ALLOWANCE, 0)}</p>
+              <p className='mb-1 text-sm font-medium text-muted-foreground'>Amount Transferred</p>
+              <p className='text-2xl font-bold'>{formatCurrency(MARRIAGE_ALLOWANCE, 0)}</p>
             </div>
             <div>
-              <p className='mb-1 font-medium text-muted-foreground text-sm'>Annual Tax Saving</p>
-              <p className='font-bold text-2xl text-success'>{formatCurrency(TAX_SAVING, 0)}</p>
+              <p className='mb-1 text-sm font-medium text-muted-foreground'>Annual Tax Saving</p>
+              <p className='text-2xl font-bold text-success'>{formatCurrency(TAX_SAVING, 0)}</p>
             </div>
             <div>
-              <p className='mb-1 font-medium text-muted-foreground text-sm'>Can Backdate</p>
-              <p className='font-bold text-2xl'>4 Years</p>
+              <p className='mb-1 text-sm font-medium text-muted-foreground'>Can Backdate</p>
+              <p className='text-2xl font-bold'>4 Years</p>
             </div>
           </div>
         </CardContent>
@@ -152,7 +152,7 @@ export function MarriageAllowanceClient() {
           <form onSubmit={handleSubmit} className='space-y-4'>
             <div className='grid gap-4 md:grid-cols-2'>
               <div>
-                <label htmlFor={transferorId} className='mb-2 block font-medium text-sm'>
+                <label htmlFor={transferorId} className='mb-2 block text-sm font-medium'>
                   Lower Earner&apos;s Income
                 </label>
                 <div className='relative'>
@@ -170,12 +170,12 @@ export function MarriageAllowanceClient() {
                     spellCheck={false}
                   />
                 </div>
-                <p className='mt-1 text-muted-foreground text-xs'>
+                <p className='mt-1 text-xs text-muted-foreground'>
                   The person who will transfer their allowance
                 </p>
               </div>
               <div>
-                <label htmlFor={recipientId} className='mb-2 block font-medium text-sm'>
+                <label htmlFor={recipientId} className='mb-2 block text-sm font-medium'>
                   Higher Earner&apos;s Income
                 </label>
                 <div className='relative'>
@@ -193,7 +193,7 @@ export function MarriageAllowanceClient() {
                     spellCheck={false}
                   />
                 </div>
-                <p className='mt-1 text-muted-foreground text-xs'>
+                <p className='mt-1 text-xs text-muted-foreground'>
                   The person who will receive the allowance
                 </p>
               </div>
@@ -223,7 +223,7 @@ export function MarriageAllowanceClient() {
               <div>
                 <h3
                   className={cn(
-                    'mb-2 font-semibold text-lg',
+                    'mb-2 text-lg font-semibold',
                     result.status === 'eligible' ? 'text-success' : '',
                   )}
                 >
@@ -259,7 +259,7 @@ export function MarriageAllowanceClient() {
           <div className='grid gap-4 md:grid-cols-2'>
             <div className='rounded-lg border p-4'>
               <h3 className='mb-2 font-semibold'>The Transferor (Lower Earner)</h3>
-              <ul className='space-y-2 text-muted-foreground text-sm'>
+              <ul className='space-y-2 text-sm text-muted-foreground'>
                 <li>• Must earn less than {formatCurrency(PERSONAL_ALLOWANCE, 0)}</li>
                 <li>
                   • Transfers {formatCurrency(MARRIAGE_ALLOWANCE, 0)} of their Personal Allowance
@@ -273,7 +273,7 @@ export function MarriageAllowanceClient() {
             </div>
             <div className='rounded-lg border p-4'>
               <h3 className='mb-2 font-semibold'>The Recipient (Higher Earner)</h3>
-              <ul className='space-y-2 text-muted-foreground text-sm'>
+              <ul className='space-y-2 text-sm text-muted-foreground'>
                 <li>• Must be a basic rate taxpayer (20%)</li>
                 <li>• Cannot earn more than {formatCurrency(BASIC_RATE_LIMIT, 0)}</li>
                 <li>• Receives {formatCurrency(MARRIAGE_ALLOWANCE, 0)} extra allowance</li>
@@ -288,7 +288,7 @@ export function MarriageAllowanceClient() {
           <div className='rounded-lg border border-primary/30 bg-primary/10 p-4'>
             <div className='flex items-start gap-2'>
               <Info className={cn('size-4', 'mt-0.5 flex-shrink-0 text-primary')} />
-              <div className='text-primary text-sm'>
+              <div className='text-sm text-primary'>
                 <p className='font-medium'>Important Notes:</p>
                 <ul className='mt-1 space-y-1'>
                   <li>• You must be married or in a civil partnership</li>

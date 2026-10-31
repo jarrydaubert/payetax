@@ -44,15 +44,15 @@ export function SurvivalModePanel({ className }: { className?: string }) {
   return (
     <section
       data-testid='director-survival-mode'
-      className={cn('rounded-sm border border-warning/35 border-l-4 bg-card p-6', className)}
+      className={cn('rounded-sm border border-l-4 border-warning/35 bg-card p-6', className)}
     >
       <div className='mb-4 flex items-start gap-3'>
         <div className='mt-0.5 flex size-9 items-center justify-center rounded-sm border border-warning/35 bg-background'>
           <AlertTriangle className='size-5 text-warning' aria-hidden='true' />
         </div>
         <div>
-          <h2 className='font-display font-semibold text-foreground text-xl'>Survival Mode</h2>
-          <p className='mt-1 text-muted-foreground text-sm'>
+          <h2 className='font-display text-xl font-semibold text-foreground'>Survival Mode</h2>
+          <p className='mt-1 text-sm text-muted-foreground'>
             Your company has no distributable profit this year. Dividends aren&apos;t possible.
           </p>
         </div>
@@ -60,7 +60,7 @@ export function SurvivalModePanel({ className }: { className?: string }) {
 
       <div className='rounded-sm border border-border/70 bg-background p-4'>
         <div className='mb-2 font-medium text-foreground'>NI credits threshold (illustrative)</div>
-        <div className='text-muted-foreground text-sm'>
+        <div className='text-sm text-muted-foreground'>
           NI credits typically require earnings around{' '}
           <span className='font-semibold text-foreground'>
             {formatCurrency(niCreditsSalary, 0)}
@@ -71,27 +71,27 @@ export function SurvivalModePanel({ className }: { className?: string }) {
 
         <div className='mt-4 grid gap-3 md:grid-cols-3'>
           <div className='rounded-sm border border-border/70 bg-background p-3'>
-            <div className='text-muted-foreground text-xs'>Company loss (estimate)</div>
+            <div className='text-xs text-muted-foreground'>Company loss (estimate)</div>
             <div className='font-mono font-semibold text-warning'>
               {formatCurrency(Math.round(companyLossIfPaySalary), 0)}
             </div>
           </div>
           <div className='rounded-sm border border-border/70 bg-background p-3'>
-            <div className='text-muted-foreground text-xs'>Take-home (approx)</div>
+            <div className='text-xs text-muted-foreground'>Take-home (approx)</div>
             <div className='font-mono font-semibold text-success'>
               {formatCurrency(Math.round(niCreditsSalary), 0)}
             </div>
           </div>
           <div className='rounded-sm border border-border/70 bg-background p-3'>
-            <div className='text-muted-foreground text-xs'>NI credits</div>
+            <div className='text-xs text-muted-foreground'>NI credits</div>
             <div className='font-mono font-semibold text-foreground'>Yes (qualifying year)</div>
           </div>
         </div>
 
-        {noteIfOtherPAYE && <p className='mt-3 text-muted-foreground text-xs'>{noteIfOtherPAYE}</p>}
+        {noteIfOtherPAYE && <p className='mt-3 text-xs text-muted-foreground'>{noteIfOtherPAYE}</p>}
       </div>
 
-      <div className='mt-4 text-muted-foreground text-xs'>
+      <div className='mt-4 text-xs text-muted-foreground'>
         Alternative: pay{' '}
         <span className='font-semibold text-foreground'>{formatCurrency(0, 0)}</span> salary (no
         additional company loss created by payroll), but you may miss an NI qualifying year.

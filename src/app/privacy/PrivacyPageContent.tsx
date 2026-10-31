@@ -78,7 +78,7 @@ export function PrivacyPageContent() {
       </section>
 
       {/* Privacy Principles */}
-      <section className='border-border/60 border-y bg-primary/5 py-12 md:py-20'>
+      <section className='border-y border-border/60 bg-primary/5 py-12 md:py-20'>
         <div className='container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
           <FeatureGrid
             heading={{
@@ -108,7 +108,7 @@ export function PrivacyPageContent() {
       </section>
 
       {/* Formal policy */}
-      <section className='border-border/60 border-t bg-card py-12 md:py-20'>
+      <section className='border-t border-border/60 bg-card py-12 md:py-20'>
         <div className='container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8'>
           <SectionHeading
             badge={{ icon: Scale, text: 'Full Policy' }}
@@ -123,7 +123,7 @@ export function PrivacyPageContent() {
                 <li key={item.id}>
                   <a
                     href={`#${item.id}`}
-                    className='inline-flex rounded-sm border border-border bg-background px-3 py-1.5 text-muted-foreground text-sm transition-colors hover:border-primary/45 hover:text-foreground'
+                    className='inline-flex rounded-sm border border-border bg-background px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-primary/45 hover:text-foreground'
                   >
                     {item.label}
                   </a>
@@ -164,20 +164,20 @@ export function PrivacyPageContent() {
               <div className='overflow-x-auto rounded-sm border border-border bg-background'>
                 <table className='w-full min-w-3xl border-collapse text-sm'>
                   <thead>
-                    <tr className='border-border/60 border-b text-left'>
-                      <th className='px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
+                    <tr className='border-b border-border/60 text-left'>
+                      <th className='px-4 py-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase'>
                         Category
                       </th>
-                      <th className='px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
+                      <th className='px-4 py-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase'>
                         Data
                       </th>
-                      <th className='px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
+                      <th className='px-4 py-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase'>
                         Purpose
                       </th>
-                      <th className='px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
+                      <th className='px-4 py-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase'>
                         Lawful basis
                       </th>
-                      <th className='px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
+                      <th className='px-4 py-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase'>
                         Retention
                       </th>
                     </tr>
@@ -186,7 +186,7 @@ export function PrivacyPageContent() {
                     {PRIVACY_DATA_CATEGORIES.map((row) => (
                       <tr
                         key={row.category}
-                        className='border-border/40 border-b align-top last:border-0'
+                        className='border-b border-border/40 align-top last:border-0'
                       >
                         <td className='px-4 py-3 font-semibold text-foreground'>{row.category}</td>
                         <td className='px-4 py-3 text-muted-foreground'>{row.data}</td>
@@ -211,14 +211,14 @@ export function PrivacyPageContent() {
               <div className='overflow-x-auto rounded-sm border border-border bg-background'>
                 <table className='w-full min-w-3xl border-collapse text-sm'>
                   <thead>
-                    <tr className='border-border/60 border-b text-left'>
-                      <th className='px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
+                    <tr className='border-b border-border/60 text-left'>
+                      <th className='px-4 py-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase'>
                         Provider
                       </th>
-                      <th className='px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
+                      <th className='px-4 py-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase'>
                         Role
                       </th>
-                      <th className='px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
+                      <th className='px-4 py-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase'>
                         Data involved
                       </th>
                     </tr>
@@ -227,7 +227,7 @@ export function PrivacyPageContent() {
                     {PRIVACY_PROCESSORS.map((row) => (
                       <tr
                         key={row.name}
-                        className='border-border/40 border-b align-top last:border-0'
+                        className='border-b border-border/40 align-top last:border-0'
                       >
                         <td className='px-4 py-3 font-semibold text-foreground'>{row.name}</td>
                         <td className='px-4 py-3 text-muted-foreground'>{row.role}</td>
@@ -258,17 +258,17 @@ export function PrivacyPageContent() {
               <div className='overflow-x-auto rounded-sm border border-border bg-background'>
                 <table className='w-full min-w-3xl border-collapse text-sm'>
                   <thead>
-                    <tr className='border-border/60 border-b text-left'>
-                      <th className='px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
+                    <tr className='border-b border-border/60 text-left'>
+                      <th className='px-4 py-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase'>
                         Name
                       </th>
-                      <th className='px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
+                      <th className='px-4 py-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase'>
                         Type
                       </th>
-                      <th className='px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
+                      <th className='px-4 py-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase'>
                         Purpose
                       </th>
-                      <th className='px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
+                      <th className='px-4 py-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase'>
                         Duration
                       </th>
                     </tr>
@@ -277,7 +277,7 @@ export function PrivacyPageContent() {
                     {PRIVACY_STORAGE_INVENTORY.map((row) => (
                       <tr
                         key={row.name}
-                        className='border-border/40 border-b align-top last:border-0'
+                        className='border-b border-border/40 align-top last:border-0'
                       >
                         <td className='px-4 py-3 font-mono font-semibold text-foreground'>
                           {row.name}

@@ -52,7 +52,7 @@ export function PeriodCheckbox({ period, checked, onCheckedChange }: PeriodCheck
           }
         }}
       />
-      <Label htmlFor={checkboxId} className='cursor-pointer font-normal text-sm'>
+      <Label htmlFor={checkboxId} className='cursor-pointer text-sm font-normal'>
         {period}
       </Label>
     </div>

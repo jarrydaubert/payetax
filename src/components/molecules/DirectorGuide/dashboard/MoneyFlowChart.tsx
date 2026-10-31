@@ -75,7 +75,7 @@ export function MoneyFlowChart() {
     <div className='rounded-sm border border-border/50 bg-card p-4'>
       <div className='mb-3 flex items-center gap-2 text-muted-foreground'>
         <BarChart3 className='size-4' aria-hidden='true' />
-        <span className='font-medium text-sm'>Money Flow</span>
+        <span className='text-sm font-medium'>Money Flow</span>
       </div>
 
       <ul className='space-y-2' aria-label='Profit allocation breakdown'>
@@ -106,7 +106,7 @@ export function MoneyFlowChart() {
       </ul>
 
       {/* Legend for accessibility */}
-      <div className='mt-3 flex flex-wrap gap-3 text-muted-foreground text-xs'>
+      <div className='mt-3 flex flex-wrap gap-3 text-xs text-muted-foreground'>
         <span className='flex items-center gap-1'>
           <span className='inline-block size-2 rounded-sm bg-success' aria-hidden='true' />
           After tax

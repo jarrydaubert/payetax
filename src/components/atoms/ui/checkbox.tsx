@@ -35,7 +35,7 @@ const Checkbox = forwardRef<ElementRef<typeof CheckboxPrimitive.Root>, CheckboxP
         // (border-primary too bright, border-input too dim on dark backgrounds)
         'border-border',
         // Focus styles
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+        'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none',
         // Disabled
         'disabled:cursor-not-allowed disabled:opacity-50',
         // Checked state

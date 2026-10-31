@@ -91,13 +91,13 @@ export default function PWAInstallBanner() {
     <div className='fixed top-[calc(var(--navbar-height)+1rem)] right-4 left-4 z-40 sm:left-auto'>
       <Card className='w-full max-w-sm border-border bg-card'>
         <CardContent className='p-4'>
-          <h2 className='font-semibold text-foreground text-sm'>Install PayeTax</h2>
-          <p className='mt-1 text-muted-foreground text-sm'>
+          <h2 className='text-sm font-semibold text-foreground'>Install PayeTax</h2>
+          <p className='mt-1 text-sm text-muted-foreground'>
             Add PayeTax to your home screen for faster access and better offline support.
           </p>
           <a
             href='/install'
-            className='mt-2 inline-block text-primary text-xs underline underline-offset-2 hover:text-primary/80'
+            className='mt-2 inline-block text-xs text-primary underline underline-offset-2 hover:text-primary/80'
           >
             Manual install instructions
           </a>

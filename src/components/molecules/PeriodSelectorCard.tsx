@@ -36,7 +36,7 @@ export function PeriodSelectorCard({
       className={cn('w-full rounded-sm border-border bg-card shadow-none', 'p-2', 'sm:p-3 md:p-4')}
     >
       <div className='flex flex-col gap-2 lg:flex-row lg:items-center'>
-        <p className='shrink-0 font-semibold text-base text-foreground sm:text-lg'>
+        <p className='shrink-0 text-base font-semibold text-foreground sm:text-lg'>
           Display Periods
         </p>
         <div

@@ -43,19 +43,19 @@ export default function DirectorGuidePage() {
       <StructuredData type='faq' faqs={directorGuideFaqItems} />
       <StructuredData type='dataset' />
       <DirectorDashboard />
-      <section className='border-border/70 border-t bg-background py-12 md:py-16'>
+      <section className='border-t border-border/70 bg-background py-12 md:py-16'>
         <div className='container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8'>
-          <p className='font-semibold text-primary text-xs uppercase tracking-[0.28em]'>
+          <p className='text-xs font-semibold tracking-[0.28em] text-primary uppercase'>
             Director FAQs
           </p>
-          <h2 className='mt-3 font-display font-semibold text-3xl text-foreground leading-tight md:text-4xl'>
+          <h2 className='font-display mt-3 text-3xl leading-tight font-semibold text-foreground md:text-4xl'>
             Common director pay questions
           </h2>
-          <div className='mt-6 divide-y divide-border border-border border-y'>
+          <div className='mt-6 divide-y divide-border border-y border-border'>
             {directorGuideFaqItems.map((item) => (
               <article key={item.question} className='py-5'>
-                <h3 className='font-semibold text-foreground text-lg leading-7'>{item.question}</h3>
-                <p className='mt-2 text-foreground/75 leading-7'>{item.answer}</p>
+                <h3 className='text-lg leading-7 font-semibold text-foreground'>{item.question}</h3>
+                <p className='mt-2 leading-7 text-foreground/75'>{item.answer}</p>
               </article>
             ))}
           </div>

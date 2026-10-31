@@ -85,7 +85,7 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
 
       <section
         ref={containerRef}
-        className='scroll-area-thin cursor-grab touch-pan-x overflow-x-auto scroll-smooth rounded-lg border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:cursor-grabbing'
+        className='scroll-area-thin cursor-grab touch-pan-x overflow-x-auto scroll-smooth rounded-lg border focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none active:cursor-grabbing'
         aria-label='Salary comparison results'
         aria-describedby={scrollHintId}
       >
@@ -97,19 +97,19 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
               </TableHead>
               <TableHead
                 scope='col'
-                className='sticky top-0 z-10 whitespace-nowrap bg-background text-right'
+                className='sticky top-0 z-10 bg-background text-right whitespace-nowrap'
               >
                 Current
               </TableHead>
               <TableHead
                 scope='col'
-                className='sticky top-0 z-10 whitespace-nowrap bg-background text-right'
+                className='sticky top-0 z-10 bg-background text-right whitespace-nowrap'
               >
                 New
               </TableHead>
               <TableHead
                 scope='col'
-                className='sticky top-0 z-10 whitespace-nowrap bg-background text-right'
+                className='sticky top-0 z-10 bg-background text-right whitespace-nowrap'
               >
                 Difference
               </TableHead>
@@ -119,10 +119,10 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
             {/* Gross Salary */}
             <TableRow>
               <TableCell className='font-medium'>Gross Salary</TableCell>
-              <TableCell className='whitespace-nowrap text-right'>
+              <TableCell className='text-right whitespace-nowrap'>
                 {formatCurrency(currentResults.grossSalary.annually, 0)}
               </TableCell>
-              <TableCell className='whitespace-nowrap text-right'>
+              <TableCell className='text-right whitespace-nowrap'>
                 {formatCurrency(newResults.grossSalary.annually, 0)}
               </TableCell>
               <TableCell className='text-right'>{renderDiff(grossDiff, true)}</TableCell>
@@ -131,10 +131,10 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
             {/* Income Tax */}
             <TableRow>
               <TableCell className='font-medium'>Income Tax</TableCell>
-              <TableCell className='whitespace-nowrap text-right'>
+              <TableCell className='text-right whitespace-nowrap'>
                 {formatCurrency(currentResults.incomeTax.annually, 0)}
               </TableCell>
-              <TableCell className='whitespace-nowrap text-right'>
+              <TableCell className='text-right whitespace-nowrap'>
                 {formatCurrency(newResults.incomeTax.annually, 0)}
               </TableCell>
               <TableCell className='text-right'>{renderDiff(taxDiff, false)}</TableCell>
@@ -143,10 +143,10 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
             {/* National Insurance */}
             <TableRow>
               <TableCell className='font-medium'>National Insurance</TableCell>
-              <TableCell className='whitespace-nowrap text-right'>
+              <TableCell className='text-right whitespace-nowrap'>
                 {formatCurrency(currentResults.nationalInsurance.annually, 0)}
               </TableCell>
-              <TableCell className='whitespace-nowrap text-right'>
+              <TableCell className='text-right whitespace-nowrap'>
                 {formatCurrency(newResults.nationalInsurance.annually, 0)}
               </TableCell>
               <TableCell className='text-right'>{renderDiff(niDiff, false)}</TableCell>
@@ -156,10 +156,10 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
             {(studentLoanDiff !== 0 || currentResults.studentLoan.annually > 0) && (
               <TableRow>
                 <TableCell className='font-medium'>Student Loan</TableCell>
-                <TableCell className='whitespace-nowrap text-right'>
+                <TableCell className='text-right whitespace-nowrap'>
                   {formatCurrency(currentResults.studentLoan.annually, 0)}
                 </TableCell>
-                <TableCell className='whitespace-nowrap text-right'>
+                <TableCell className='text-right whitespace-nowrap'>
                   {formatCurrency(newResults.studentLoan.annually, 0)}
                 </TableCell>
                 <TableCell className='text-right'>{renderDiff(studentLoanDiff, false)}</TableCell>
@@ -170,10 +170,10 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
             {(pensionDiff !== 0 || currentResults.pensionContribution.annually > 0) && (
               <TableRow>
                 <TableCell className='font-medium'>Pension</TableCell>
-                <TableCell className='whitespace-nowrap text-right'>
+                <TableCell className='text-right whitespace-nowrap'>
                   {formatCurrency(currentResults.pensionContribution.annually, 0)}
                 </TableCell>
-                <TableCell className='whitespace-nowrap text-right'>
+                <TableCell className='text-right whitespace-nowrap'>
                   {formatCurrency(newResults.pensionContribution.annually, 0)}
                 </TableCell>
                 <TableCell className='text-right'>{renderDiff(pensionDiff, false)}</TableCell>
@@ -183,10 +183,10 @@ export function ComparisonResultsTable({ results, className }: ComparisonResults
             {/* Net Pay (highlighted) - reuses renderDiff for consistency */}
             <TableRow className='border-t-2 bg-muted/30'>
               <TableCell className='font-bold'>Take-Home Pay</TableCell>
-              <TableCell className='whitespace-nowrap text-right font-semibold'>
+              <TableCell className='text-right font-semibold whitespace-nowrap'>
                 {formatCurrency(currentResults.netPay.annually, 0)}
               </TableCell>
-              <TableCell className='whitespace-nowrap text-right font-semibold'>
+              <TableCell className='text-right font-semibold whitespace-nowrap'>
                 {formatCurrency(newResults.netPay.annually, 0)}
               </TableCell>
               <TableCell className='text-right'>

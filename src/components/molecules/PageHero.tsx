@@ -105,7 +105,7 @@ export function PageHero({
             <Badge
               variant={badge.variant || 'outline'}
               className={cn(
-                'mb-6 rounded-sm border-primary/35 bg-background px-5 py-2.5 text-primary uppercase tracking-[0.24em]',
+                'mb-6 rounded-sm border-primary/35 bg-background px-5 py-2.5 tracking-[0.24em] text-primary uppercase',
                 'gap-2',
               )}
             >
@@ -117,7 +117,7 @@ export function PageHero({
           {/* Title */}
           <h1
             className={cn(
-              'font-display font-semibold text-foreground leading-[0.98]',
+              'font-display leading-[0.98] font-semibold text-foreground',
               'mb-6',
               'text-6xl',
             )}
@@ -129,7 +129,7 @@ export function PageHero({
           {subtitles.length > 0 && (
             <div className={cn('mx-auto max-w-3xl', 'space-y-4')}>
               {subtitles.map((text) => (
-                <p key={text} className={cn('text-muted-foreground leading-relaxed', 'text-lg')}>
+                <p key={text} className={cn('leading-relaxed text-muted-foreground', 'text-lg')}>
                   {text}
                 </p>
               ))}

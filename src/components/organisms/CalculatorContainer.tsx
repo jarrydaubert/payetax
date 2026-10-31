@@ -371,7 +371,7 @@ export function CalculatorContainer() {
               {actionMessage.taxCodeLink && (
                 <Link
                   href='/tools/tax-code-decoder'
-                  className='ml-1 inline-flex min-h-11 items-center font-medium underline underline-offset-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                  className='ml-1 inline-flex min-h-11 items-center font-medium underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none'
                 >
                   Check the code
                 </Link>
@@ -442,23 +442,23 @@ export function CalculatorContainer() {
       {/* Header - CSS animation for better mobile LCP (no JS blocking) */}
       <div
         className={cn(
-          'order-1 grid gap-4 border-border border-y py-5 text-left lg:col-span-2 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] lg:items-end lg:py-6',
-          'fade-in slide-in-from-top-4 animate-in duration-500',
+          'order-1 grid gap-4 border-y border-border py-5 text-left lg:col-span-2 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)] lg:items-end lg:py-6',
+          'animate-in duration-500 fade-in slide-in-from-top-4',
         )}
       >
         <div>
-          <p className='mb-2 font-semibold text-primary text-xs uppercase tracking-[0.18em]'>
+          <p className='mb-2 text-xs font-semibold tracking-[0.18em] text-primary uppercase'>
             Calculator
           </p>
-          <h2 className='font-display font-semibold text-3xl text-foreground leading-tight md:text-4xl'>
+          <h2 className='font-display text-3xl leading-tight font-semibold text-foreground md:text-4xl'>
             Calculate your take-home pay
           </h2>
-          <p className='mt-2 max-w-2xl text-muted-foreground text-sm md:text-base'>
+          <p className='mt-2 max-w-2xl text-sm text-muted-foreground md:text-base'>
             Enter your salary to see what you could take home. Adjust the details to explore your
             pay.
           </p>
         </div>
-        <p className='border-border border-t pt-3 text-muted-foreground text-xs leading-relaxed lg:border-t-0 lg:border-l lg:pl-5'>
+        <p className='border-t border-border pt-3 text-xs leading-relaxed text-muted-foreground lg:border-t-0 lg:border-l lg:pl-5'>
           Estimates, not financial or tax advice.{' '}
           <Link href='/#faq' className='underline underline-offset-2'>
             About these estimates

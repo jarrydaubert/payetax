@@ -36,7 +36,7 @@ const Label = forwardRef<ElementRef<typeof LabelPrimitive.Root>, LabelProps>(
         // Layout - supports inline icons/badges
         'flex items-center gap-2',
         // Typography
-        'font-medium text-foreground leading-none',
+        'leading-none font-medium text-foreground',
         'text-sm',
         // Disabled styling hooks
         // peer-disabled: works when label follows an input with .peer class
