@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
   cn(
-    'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-sm font-medium transition-colors',
-    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+    'inline-flex items-center justify-center gap-2 rounded-sm font-medium whitespace-nowrap transition-colors',
+    'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none',
     'disabled:pointer-events-none disabled:opacity-50',
     // aria-disabled support for asChild (links don't support disabled attribute)
     'aria-disabled:pointer-events-none aria-disabled:opacity-50',

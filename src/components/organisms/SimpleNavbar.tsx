@@ -84,7 +84,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
         className={cn(
           'navbar-shell nav-safe-top fixed right-0 left-0 z-50',
           'grid grid-cols-[1fr_auto_1fr] items-center',
-          'border-border border-b bg-background',
+          'border-b border-border bg-background',
           className,
         )}
         aria-label='Main navigation'
@@ -114,7 +114,7 @@ const SimpleNavbar: React.FC<SimpleNavbarProps> = ({ className }) => {
               key={link.href}
               href={link.href}
               onClick={link.label === 'Calculator' ? handleCalculatorClick : undefined}
-              className='inline-flex min-h-11 items-center font-medium text-muted-foreground text-sm transition-colors duration-200 hover:text-primary'
+              className='inline-flex min-h-11 items-center text-sm font-medium text-muted-foreground transition-colors duration-200 hover:text-primary'
             >
               {link.label}
             </Link>

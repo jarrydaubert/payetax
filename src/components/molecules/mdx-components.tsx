@@ -49,8 +49,8 @@ function isExternalHref(href: string | undefined): boolean {
 /** Common styles for heading anchor links */
 const ANCHOR_LINK_CLASSES = cn(
   'text-primary opacity-0 transition-opacity',
-  'hover:text-primary/80 group-hover:opacity-100',
-  'focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2',
+  'group-hover:opacity-100 hover:text-primary/80',
+  'focus-visible:opacity-100 focus-visible:ring-2 focus-visible:outline-none',
   'focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
   'rounded-sm', // For focus ring
 );
@@ -65,7 +65,7 @@ export const mdxComponents = {
     return (
       <h1
         className={cn(
-          'group flex scroll-mt-20 flex-wrap items-center font-display font-semibold text-foreground',
+          'group font-display flex scroll-mt-20 flex-wrap items-center font-semibold text-foreground',
           'mt-8',
           'mb-4',
           'gap-3',
@@ -89,7 +89,7 @@ export const mdxComponents = {
     return (
       <h2
         className={cn(
-          'group flex scroll-mt-20 flex-wrap items-center font-display font-semibold text-foreground',
+          'group font-display flex scroll-mt-20 flex-wrap items-center font-semibold text-foreground',
           'mt-6',
           'mb-3',
           'gap-3',
@@ -113,7 +113,7 @@ export const mdxComponents = {
     return (
       <h3
         className={cn(
-          'group flex scroll-mt-20 flex-wrap items-center font-display font-semibold text-foreground',
+          'group font-display flex scroll-mt-20 flex-wrap items-center font-semibold text-foreground',
           'mt-5',
           'mb-2',
           'gap-2',
@@ -148,7 +148,7 @@ export const mdxComponents = {
   ),
   h5: ({ children, ...props }: React.ComponentPropsWithoutRef<'h5'>) => (
     <h5
-      className={cn('mt-5 font-display font-semibold text-foreground', 'mb-2', 'text-lg')}
+      className={cn('font-display mt-5 font-semibold text-foreground', 'mb-2', 'text-lg')}
       {...props}
     >
       {children}
@@ -165,7 +165,7 @@ export const mdxComponents = {
 
   // Enhanced paragraphs
   p: ({ children, ...props }: React.ComponentPropsWithoutRef<'p'>) => (
-    <p className={cn('text-foreground/90 leading-relaxed', 'mb-6', 'text-base')} {...props}>
+    <p className={cn('leading-relaxed text-foreground/90', 'mb-6', 'text-base')} {...props}>
       {children}
     </p>
   ),
@@ -241,7 +241,7 @@ export const mdxComponents = {
   // Enhanced blockquotes
   blockquote: ({ children, ...props }: React.ComponentPropsWithoutRef<'blockquote'>) => (
     <blockquote
-      className={cn('my-8 border-primary/50 border-l px-5 py-1 [&_p:last-child]:mb-0')}
+      className={cn('my-8 border-l border-primary/50 px-5 py-1 [&_p:last-child]:mb-0')}
       {...props}
     >
       <div className={cn('font-display text-foreground/90 italic', 'text-lg')}>{children}</div>
@@ -294,7 +294,7 @@ export const mdxComponents = {
     </div>
   ),
   thead: ({ children, ...props }: React.ComponentPropsWithoutRef<'thead'>) => (
-    <thead className='border-border border-b bg-muted/45' {...props}>
+    <thead className='border-b border-border bg-muted/45' {...props}>
       {children}
     </thead>
   ),
@@ -311,7 +311,7 @@ export const mdxComponents = {
   th: ({ children, ...props }: React.ComponentPropsWithoutRef<'th'>) => (
     <th
       className={cn(
-        'text-left font-semibold text-muted-foreground uppercase tracking-[0.2em]',
+        'text-left font-semibold tracking-[0.2em] text-muted-foreground uppercase',
         'px-6',
         'py-3',
         'text-sm',
@@ -329,7 +329,7 @@ export const mdxComponents = {
 
   // Enhanced horizontal rule
   hr: ({ ...props }: React.ComponentPropsWithoutRef<'hr'>) => (
-    <hr className='my-12 border-0 border-border border-t' {...props} />
+    <hr className='my-12 border-0 border-t border-border' {...props} />
   ),
 
   // Enhanced images with figure/figcaption semantics

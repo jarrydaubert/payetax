@@ -52,7 +52,7 @@ export function AllPostsGrid({ posts, currentPage, totalPages, totalPosts }: All
           {/* biome-ignore lint/correctness/useUniqueElementIds: Server component rendered once per page */}
           <h2
             id='all-posts-heading'
-            className='font-semibold text-primary text-xs uppercase tracking-[0.28em] sm:text-sm sm:tracking-widest'
+            className='text-xs font-semibold tracking-[0.28em] text-primary uppercase sm:text-sm sm:tracking-widest'
           >
             All Articles
           </h2>
@@ -126,7 +126,7 @@ function PostCard({ post, priority = false }: PostCardProps) {
           />
 
           {/* Category badge */}
-          <span className='absolute top-3 left-3 border border-primary/35 bg-background/90 px-2.5 py-0.5 font-semibold text-primary text-xs uppercase tracking-wider'>
+          <span className='absolute top-3 left-3 border border-primary/35 bg-background/90 px-2.5 py-0.5 text-xs font-semibold tracking-wider text-primary uppercase'>
             {categoryConfig.label}
           </span>
         </div>
@@ -135,7 +135,7 @@ function PostCard({ post, priority = false }: PostCardProps) {
         <div className={'p-4'}>
           <h3
             className={cn(
-              'line-clamp-2 font-display font-semibold text-foreground transition-colors group-hover:text-primary',
+              'font-display line-clamp-2 font-semibold text-foreground transition-colors group-hover:text-primary',
               'mb-2',
               'text-base',
             )}

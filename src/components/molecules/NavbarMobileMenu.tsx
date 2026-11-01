@@ -109,7 +109,7 @@ export function NavbarMobileMenu({
         className={cn(
           'fixed right-0 left-0 z-50 md:hidden',
           'top-[var(--navbar-height)]',
-          'border-border/60 border-b bg-card px-4 py-6',
+          'border-b border-border/60 bg-card px-4 py-6',
         )}
         aria-label='Mobile navigation menu'
       >
@@ -128,7 +128,7 @@ export function NavbarMobileMenu({
                 href={link.href as Route}
                 onClick={() => onLinkClick(link.label)}
                 className={cn(
-                  'block min-h-11 rounded-lg px-4 py-3 font-medium text-sm transition-colors',
+                  'block min-h-11 rounded-lg px-4 py-3 text-sm font-medium transition-colors',
                   isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground',
                 )}
               >

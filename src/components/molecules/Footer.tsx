@@ -29,16 +29,16 @@ export function Footer({ appVersion, className }: FooterProps) {
   }, []);
 
   return (
-    <div className={cn('relative z-[1] border-border/60 border-t px-8 py-12', className)}>
+    <div className={cn('relative z-[1] border-t border-border/60 px-8 py-12', className)}>
       <div className='mx-auto grid max-w-[1100px] grid-cols-1 items-center gap-x-6 gap-y-4 text-center md:grid-cols-[auto_minmax(0,1fr)_auto] md:text-left'>
         {/* Brand - links back to home */}
-        <Link href='/' className='brand-wordmark text-foreground text-xl'>
+        <Link href='/' className='brand-wordmark text-xl text-foreground'>
           paye<span className='text-primary'>tax</span>
         </Link>
 
         {/* Links - no `as Route` casts; routes validated by typedRoutes in next.config */}
         <nav
-          className='flex min-w-0 flex-wrap items-center justify-center gap-x-5 gap-y-2 text-muted-foreground text-sm'
+          className='flex min-w-0 flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground'
           aria-label='Footer navigation'
         >
           <Link className='inline-flex min-h-6 items-center hover:text-primary' href='/blog'>
@@ -75,7 +75,7 @@ export function Footer({ appVersion, className }: FooterProps) {
         </nav>
 
         {/* Copyright & Version */}
-        <div className='whitespace-nowrap text-muted-foreground text-sm md:justify-self-end'>
+        <div className='text-sm whitespace-nowrap text-muted-foreground md:justify-self-end'>
           &copy; 2026 PayeTax
           <span className='ml-2 text-muted-foreground'>v{appVersion}</span>
         </div>

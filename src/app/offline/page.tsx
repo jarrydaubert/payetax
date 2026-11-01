@@ -46,7 +46,7 @@ export default function OfflinePage() {
       }
     >
       <div className='rounded-sm border border-border bg-background p-6'>
-        <h2 className='mb-4 font-display font-semibold text-foreground text-lg'>
+        <h2 className='font-display mb-4 text-lg font-semibold text-foreground'>
           Available offline
         </h2>
         <ul className='grid grid-cols-1 gap-3 sm:grid-cols-2'>

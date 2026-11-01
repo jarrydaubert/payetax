@@ -8,7 +8,7 @@ export function TaxCodeBasisNotice({ basis }: { basis?: TaxCodeCalculationBasis 
 
   return (
     <div
-      className='mb-3 rounded-md border border-primary/30 bg-primary/10 px-3 py-2 text-primary text-sm'
+      className='mb-3 rounded-md border border-primary/30 bg-primary/10 px-3 py-2 text-sm text-primary'
       role='note'
       data-testid='tax-code-basis-notice'
     >

@@ -90,12 +90,12 @@ export function SectionHeading({
   const HeadingTag = level;
 
   const titleClasses = cn(
-    'mb-4 font-display font-semibold text-foreground leading-tight',
+    'font-display mb-4 leading-tight font-semibold text-foreground',
     level === 'h2' ? 'text-4xl' : 'text-3xl',
     alignClass,
   );
 
-  const subtitleClasses = cn('text-muted-foreground leading-relaxed', 'text-lg', alignClass);
+  const subtitleClasses = cn('leading-relaxed text-muted-foreground', 'text-lg', alignClass);
 
   return (
     <div className={cn('mb-8', className)} id={id}>
@@ -105,7 +105,7 @@ export function SectionHeading({
           <Badge
             variant={badge.variant || 'outline'}
             className={cn(
-              'rounded-sm px-4 py-1.5 uppercase tracking-[0.18em]',
+              'rounded-sm px-4 py-1.5 tracking-[0.18em] uppercase',
               'gap-2',
               badge.icon && 'gap-2',
             )}

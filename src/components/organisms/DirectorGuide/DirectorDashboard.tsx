@@ -269,12 +269,12 @@ export function DirectorDashboard() {
           <main className='p-6' data-testid='director-dashboard-main'>
             {/* Header */}
             <div className={inputsCollapsed ? 'mb-6 pl-12' : 'mb-6'}>
-              <h1 className='font-display font-semibold text-3xl text-foreground leading-tight'>
+              <h1 className='font-display text-3xl leading-tight font-semibold text-foreground'>
                 Director Pay <span className='text-primary'>Dashboard</span>
               </h1>
               <nav
                 aria-label='Director Intelligence navigation links'
-                className='mt-2 flex flex-wrap items-center gap-3 text-muted-foreground text-sm'
+                className='mt-2 flex flex-wrap items-center gap-3 text-sm text-muted-foreground'
               >
                 <Link href='/' className='hover:text-foreground'>
                   PAYE Calculator
@@ -298,7 +298,7 @@ export function DirectorDashboard() {
                   formData.pensionContribution > 0) && (
                   <section
                     aria-label='About this estimate'
-                    className='space-y-2 rounded-sm border border-border bg-card p-4 text-muted-foreground text-sm'
+                    className='space-y-2 rounded-sm border border-border bg-card p-4 text-sm text-muted-foreground'
                     data-testid='director-estimate-notes'
                   >
                     {formData.includesVat && (
@@ -339,24 +339,24 @@ export function DirectorDashboard() {
                   <>
                     {isMonthlyMode && monthlyModeOutput && (
                       <section className='rounded-sm border border-success/30 bg-card p-4'>
-                        <h3 className='font-semibold text-sm text-success uppercase tracking-wider'>
+                        <h3 className='text-sm font-semibold tracking-wider text-success uppercase'>
                           Safe Monthly Draw
                         </h3>
                         <div className='mt-2 grid gap-3 md:grid-cols-3'>
                           <div>
-                            <div className='text-muted-foreground text-xs'>Recommended draw</div>
+                            <div className='text-xs text-muted-foreground'>Recommended draw</div>
                             <div className='font-mono font-semibold text-foreground'>
                               £{Math.round(monthlyModeOutput.safeMonthlyDraw).toLocaleString()}/mo
                             </div>
                           </div>
                           <div>
-                            <div className='text-muted-foreground text-xs'>Required buffer</div>
+                            <div className='text-xs text-muted-foreground'>Required buffer</div>
                             <div className='font-mono font-semibold text-foreground'>
                               £{Math.round(monthlyModeOutput.requiredBuffer).toLocaleString()}
                             </div>
                           </div>
                           <div>
-                            <div className='text-muted-foreground text-xs'>Buffer status</div>
+                            <div className='text-xs text-muted-foreground'>Buffer status</div>
                             <div
                               className={cn(
                                 'font-medium',
@@ -427,10 +427,10 @@ export function DirectorDashboard() {
                 <div className='mt-8 rounded-sm border border-primary/25 bg-card p-6'>
                   <div className='flex flex-col items-center justify-between gap-4 sm:flex-row'>
                     <div className='text-center sm:text-left'>
-                      <h3 className='mb-1 font-semibold text-foreground text-lg'>
+                      <h3 className='mb-1 text-lg font-semibold text-foreground'>
                         Save this breakdown for your records
                       </h3>
-                      <p className='text-muted-foreground text-sm'>
+                      <p className='text-sm text-muted-foreground'>
                         Get a full tax strategy report emailed to you - perfect for sharing with
                         your accountant.
                       </p>
@@ -450,7 +450,7 @@ export function DirectorDashboard() {
                     <p
                       id={emailUnavailableId}
                       role='status'
-                      className='mt-3 text-muted-foreground text-sm'
+                      className='mt-3 text-sm text-muted-foreground'
                     >
                       {emailUnavailableReason}
                     </p>
@@ -459,28 +459,28 @@ export function DirectorDashboard() {
               </div>
             ) : (
               /* Empty State */
-              <div className='flex min-h-[calc(100dvh-11rem)] flex-col items-center justify-center rounded-sm border border-border/70 border-dashed bg-background px-5 py-8 sm:min-h-[calc(100dvh-9rem)] sm:px-8 lg:min-h-screen'>
+              <div className='flex min-h-[calc(100dvh-11rem)] flex-col items-center justify-center rounded-sm border border-dashed border-border/70 bg-background px-5 py-8 sm:min-h-[calc(100dvh-9rem)] sm:px-8 lg:min-h-screen'>
                 <div className='mx-auto max-w-xl text-center'>
                   {hasInputErrors ? (
                     <p
                       role='status'
                       data-testid='director-results-paused'
-                      className='mb-6 rounded-sm border border-warning/40 bg-card p-4 text-left text-foreground text-sm'
+                      className='mb-6 rounded-sm border border-warning/40 bg-card p-4 text-left text-sm text-foreground'
                     >
                       Results are paused until every amount is valid. Check the amounts in Your
                       Numbers.
                     </p>
                   ) : null}
-                  <p className='mb-3 font-semibold text-primary/90 text-xs uppercase tracking-[0.28em]'>
+                  <p className='mb-3 text-xs font-semibold tracking-[0.28em] text-primary/90 uppercase'>
                     Start Here
                   </p>
                   <div className='mx-auto mb-5 flex size-20 items-center justify-center rounded-sm border border-primary/25 bg-card'>
                     <Calculator className='size-10 text-primary' />
                   </div>
-                  <h2 className='mb-3 font-display font-semibold text-[1.7rem] text-foreground leading-tight sm:text-[2rem]'>
+                  <h2 className='font-display mb-3 text-[1.7rem] leading-tight font-semibold text-foreground sm:text-[2rem]'>
                     Enter your numbers to compare director pay options
                   </h2>
-                  <p className='mx-auto max-w-2xl text-muted-foreground text-sm leading-7 sm:text-base'>
+                  <p className='mx-auto max-w-2xl text-sm leading-7 text-muted-foreground sm:text-base'>
                     Enter annual revenue and business expenses, or monthly contract income and
                     costs, plus your tax region. Enter revenue before expenses, not profit: the
                     calculator subtracts costs to estimate profit before the director salary being
@@ -503,14 +503,14 @@ export function DirectorDashboard() {
                       },
                     ].map((item) => (
                       <div key={item.title} className='rounded-sm border border-border bg-card p-4'>
-                        <h3 className='mb-1 font-medium text-foreground text-sm'>{item.title}</h3>
-                        <p className='text-muted-foreground text-sm leading-6'>{item.copy}</p>
+                        <h3 className='mb-1 text-sm font-medium text-foreground'>{item.title}</h3>
+                        <p className='text-sm leading-6 text-muted-foreground'>{item.copy}</p>
                       </div>
                     ))}
                   </div>
 
                   <div className='mt-6 space-y-3'>
-                    <p className='hidden text-muted-foreground text-sm lg:block'>
+                    <p className='hidden text-sm text-muted-foreground lg:block'>
                       Use the <span className='font-medium text-foreground'>Your Numbers</span>{' '}
                       panel on the left to start the comparison.
                     </p>
@@ -525,7 +525,7 @@ export function DirectorDashboard() {
                       Open Calculator
                     </Button>
 
-                    <div className='flex items-center justify-center gap-2 text-muted-foreground text-sm'>
+                    <div className='flex items-center justify-center gap-2 text-sm text-muted-foreground'>
                       <span
                         className='size-2 rounded-sm border border-primary/50 bg-primary'
                         aria-hidden='true'

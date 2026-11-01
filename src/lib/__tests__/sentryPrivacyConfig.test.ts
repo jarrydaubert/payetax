@@ -29,11 +29,23 @@ describe('instrumentation-client console breadcrumbs', () => {
 describe.each(['instrumentation-client', 'sentry.server.config', 'sentry.edge.config'])(
   '%s privacy hooks',
   (name) => {
-    afterEach(() => setNodeEnv('test'));
+    afterEach(() => {
+      setNodeEnv('test');
+      jest.restoreAllMocks();
+    });
 
     it('wires sanitisation into the SDK without dropping an actionable error', async () => {
       jest.resetModules();
       setNodeEnv('production');
+      // Live process counters can coincidentally contain the financial-data sentinel.
+      jest.spyOn(process, 'memoryUsage').mockReturnValue({
+        rss: 1000,
+        heapTotal: 800,
+        heapUsed: 400,
+        external: 100,
+        arrayBuffers: 50,
+      });
+      jest.spyOn(process, 'uptime').mockReturnValue(42);
       const sentry = require('@sentry/nextjs');
       require(`../../../${name}`);
       const options = sentry.init.mock.calls[0][0];
@@ -76,10 +88,22 @@ describe.each(['instrumentation-client', 'sentry.server.config', 'sentry.edge.co
           databaseQueryData: false,
           genAI: { inputs: false, outputs: false },
           graphQL: { document: false, variables: false },
+          httpHeaders: {
+            request: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+            response: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+          },
+          urlQueryParams: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
         }),
       );
       expect(options.attachStacktrace).toBe(false);
       expect(options.tracesSampleRate).toBe(0);
+      expect(options.tracesSampler).toBeUndefined();
+      expect(options.replaysSessionSampleRate ?? 0).toBe(0);
+      expect(options.replaysOnErrorSampleRate ?? 0).toBe(0);
+      expect(options.beforeBreadcrumb({ category: 'console', message: 'salary=73123' })).toBeNull();
+      expect(
+        options.beforeBreadcrumb({ category: 'ui.click', message: 'salary=73123' }),
+      ).toBeNull();
       expect(
         options.beforeBreadcrumb({
           category: 'fetch',

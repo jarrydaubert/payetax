@@ -103,10 +103,10 @@ function MobileDrawer({
       aria-labelledby={`drawer-title-${variant}`}
       className={cn('fixed inset-0 z-50 flex flex-col lg:hidden', bgColor)}
     >
-      <div className='relative border-border/40 border-b px-4 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)] pb-3'>
+      <div className='relative border-b border-border/40 px-4 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)] pb-3'>
         <h2
           id={`drawer-title-${variant}`}
-          className='pointer-events-none text-center font-semibold text-foreground text-lg'
+          className='pointer-events-none text-center text-lg font-semibold text-foreground'
         >
           {title}
         </h2>
@@ -115,7 +115,7 @@ function MobileDrawer({
             ref={closeButtonRef}
             type='button'
             onClick={onClose}
-            className='absolute top-1/2 right-2 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent/30 hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary/60'
+            className='absolute top-1/2 right-2 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent/30 hover:text-foreground focus:ring-2 focus:ring-primary/60 focus:outline-none'
             aria-label={`Close ${title.toLowerCase()} panel`}
           >
             <X className='size-5' />
@@ -126,14 +126,14 @@ function MobileDrawer({
         {children}
       </div>
       {showResultsHint && (
-        <div className='border-border/40 border-t bg-background px-4 pt-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)]'>
+        <div className='border-t border-border/40 bg-background px-4 pt-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)]'>
           {inputsReady && (
-            <p className='text-center text-muted-foreground text-xs'>Results are ready.</p>
+            <p className='text-center text-xs text-muted-foreground'>Results are ready.</p>
           )}
           <button
             type='button'
             onClick={onClose}
-            className='mt-2 inline-flex min-h-11 w-full items-center justify-center rounded-md border border-primary/40 bg-primary/10 px-4 py-2 font-medium text-foreground text-sm transition-colors hover:bg-primary/20 focus:outline-none focus:ring-2 focus:ring-primary/60'
+            className='mt-2 inline-flex min-h-11 w-full items-center justify-center rounded-md border border-primary/40 bg-primary/10 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-primary/20 focus:ring-2 focus:ring-primary/60 focus:outline-none'
             aria-label='View results'
           >
             View Results
@@ -183,14 +183,14 @@ export function DashboardLayout({
         {/* Inputs panel - collapsible, desktop only */}
         <div
           className={cn(
-            'relative shrink-0 overflow-hidden border-border/40 border-r bg-background transition-[width] duration-200 ease-out max-lg:hidden',
+            'relative shrink-0 overflow-hidden border-r border-border/40 bg-background transition-[width] duration-200 ease-out max-lg:hidden',
             inputsCollapsed ? 'w-0' : 'w-72',
           )}
           aria-hidden={inputsCollapsed}
           inert={inputsCollapsed ? true : undefined}
         >
           <div className='pointer-events-none absolute inset-x-0 top-4 z-10 flex justify-center'>
-            <h2 className='font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
+            <h2 className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'>
               Your Numbers
             </h2>
           </div>
@@ -213,22 +213,22 @@ export function DashboardLayout({
           className='relative min-w-0 flex-1 overflow-y-auto bg-background'
         >
           {/* Mobile header with logo */}
-          <div className='sticky top-0 z-30 flex items-center justify-between border-border/40 border-b bg-background px-4 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)] pb-3 lg:hidden'>
+          <div className='sticky top-0 z-30 flex items-center justify-between border-b border-border/40 bg-background px-4 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)] pb-3 lg:hidden'>
             <Link href='/' className='group' aria-label='PayeTax Home'>
-              <span className='brand-wordmark text-foreground text-xl'>
+              <span className='brand-wordmark text-xl text-foreground'>
                 paye
                 <span className='text-primary'>tax</span>
               </span>
             </Link>
             <div className='flex items-center gap-2'>
-              <span className='hidden text-muted-foreground text-sm sm:inline'>
+              <span className='hidden text-sm text-muted-foreground sm:inline'>
                 Director Intelligence
               </span>
               {onToggleMobileInputs && (
                 <button
                   type='button'
                   onClick={handleToggleMobileInputs}
-                  className='inline-flex min-h-10 items-center gap-2 rounded-sm border border-primary/35 bg-background px-3 font-medium text-primary text-sm transition-colors hover:border-primary/60 hover:bg-primary/5 focus:outline-none focus:ring-2 focus:ring-primary/60 lg:hidden'
+                  className='inline-flex min-h-10 items-center gap-2 rounded-sm border border-primary/35 bg-background px-3 text-sm font-medium text-primary transition-colors hover:border-primary/60 hover:bg-primary/5 focus:ring-2 focus:ring-primary/60 focus:outline-none lg:hidden'
                   aria-label='Open calculator inputs'
                 >
                   <Calculator className='size-4' aria-hidden='true' />
@@ -239,7 +239,7 @@ export function DashboardLayout({
                 <button
                   type='button'
                   onClick={handleToggleMobileEducation}
-                  className='inline-flex min-h-10 items-center justify-center rounded-sm border border-border/60 bg-background px-3 text-muted-foreground transition-colors hover:border-primary/45 hover:bg-primary/5 hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary/60 lg:hidden'
+                  className='inline-flex min-h-10 items-center justify-center rounded-sm border border-border/60 bg-background px-3 text-muted-foreground transition-colors hover:border-primary/45 hover:bg-primary/5 hover:text-primary focus:ring-2 focus:ring-primary/60 focus:outline-none lg:hidden'
                   aria-label='Show learn panel'
                 >
                   <BookOpen className='size-4' aria-hidden='true' />
@@ -276,14 +276,14 @@ export function DashboardLayout({
         {education && (
           <div
             className={cn(
-              'relative shrink-0 overflow-hidden border-border/40 border-l bg-card transition-[width] duration-200 ease-out max-lg:hidden',
+              'relative shrink-0 overflow-hidden border-l border-border/40 bg-card transition-[width] duration-200 ease-out max-lg:hidden',
               educationCollapsed ? 'w-0' : 'w-80',
             )}
             aria-hidden={educationCollapsed}
             inert={educationCollapsed ? true : undefined}
           >
             <div className='pointer-events-none absolute inset-x-0 top-4 z-10 flex justify-center'>
-              <h2 className='font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
+              <h2 className='text-xs font-semibold tracking-wider text-muted-foreground uppercase'>
                 Learn
               </h2>
             </div>

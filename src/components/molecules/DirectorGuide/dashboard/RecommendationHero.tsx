@@ -36,49 +36,49 @@ export function RecommendationHero({ className }: RecommendationHeroProps) {
       aria-label='Recommended pay strategy'
       className={cn('rounded-sm border border-primary/35 bg-card p-6', className)}
     >
-      <div className='mb-3 font-semibold text-primary text-xs uppercase tracking-[0.22em]'>
+      <div className='mb-3 text-xs font-semibold tracking-[0.22em] text-primary uppercase'>
         Recommended strategy
       </div>
 
       <div className='grid gap-6 lg:grid-cols-[1.3fr_1fr] lg:items-end'>
         <div>
-          <h2 className='font-display font-semibold text-2xl text-foreground leading-tight'>
+          <h2 className='font-display text-2xl leading-tight font-semibold text-foreground'>
             {STRATEGY_LABEL[comparison.recommended]}
           </h2>
-          <p className='mt-1 text-muted-foreground text-sm'>
+          <p className='mt-1 text-sm text-muted-foreground'>
             {formatCurrency(recommended.salary, 0)} salary +{' '}
             {formatCurrency(recommended.dividends, 0)} dividends
           </p>
 
           <div className='mt-4'>
-            <div className='text-muted-foreground text-xs uppercase tracking-wider'>
+            <div className='text-xs tracking-wider text-muted-foreground uppercase'>
               Annual take-home
             </div>
-            <div className='font-mono font-semibold text-4xl text-primary tracking-tight'>
+            <div className='font-mono text-4xl font-semibold tracking-tight text-primary'>
               {formatCurrency(recommended.takeHome, 0)}
             </div>
-            <div className='mt-1 text-muted-foreground text-sm'>
+            <div className='mt-1 text-sm text-muted-foreground'>
               ≈ {formatCurrency(recommended.takeHome / 12, 0)}/mo ·{' '}
               {recommended.effectiveRate.toFixed(1)}% effective tax rate
             </div>
           </div>
         </div>
 
-        <dl className='grid grid-cols-2 gap-4 border-border/60 border-t pt-4 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-6'>
+        <dl className='grid grid-cols-2 gap-4 border-t border-border/60 pt-4 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-6'>
           <div>
-            <dt className='text-muted-foreground text-xs uppercase tracking-wider'>
+            <dt className='text-xs tracking-wider text-muted-foreground uppercase'>
               Total tax to set aside
             </dt>
-            <dd className='mt-1 font-mono font-semibold text-foreground text-xl'>
+            <dd className='mt-1 font-mono text-xl font-semibold text-foreground'>
               {formatCurrency(totalTax, 0)}
             </dd>
           </div>
           {showSavings && (
             <div>
-              <dt className='text-muted-foreground text-xs uppercase tracking-wider'>
+              <dt className='text-xs tracking-wider text-muted-foreground uppercase'>
                 vs all salary
               </dt>
-              <dd className='mt-1 font-mono font-semibold text-success text-xl'>
+              <dd className='mt-1 font-mono text-xl font-semibold text-success'>
                 +{formatCurrency(comparison.savingsVsAllSalary, 0)}
               </dd>
             </div>

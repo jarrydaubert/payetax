@@ -285,7 +285,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       <BlogArticleAnalytics slug={post.slug} category={post.categoryData?.name || post.category} />
 
       <ReadingProgress />
-      <div className='min-h-screen bg-ledger-grid pt-20 md:pt-24'>
+      <div className='bg-ledger-grid min-h-screen pt-20 md:pt-24'>
         <div className='container mx-auto max-w-4xl px-4 pb-12 md:px-6 lg:max-w-5xl lg:px-8 xl:max-w-6xl 2xl:max-w-7xl'>
           <nav aria-label='Breadcrumb' className={cn('mb-8', 'text-sm')}>
             <ol className='flex flex-wrap items-center gap-1 text-muted-foreground'>
@@ -316,7 +316,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <div className='mb-5 flex flex-wrap items-center gap-2.5'>
                 <span
                   className={cn(
-                    'border border-primary/35 bg-background px-3 py-1 font-medium text-primary uppercase tracking-[0.2em]',
+                    'border border-primary/35 bg-background px-3 py-1 font-medium tracking-[0.2em] text-primary uppercase',
                     'text-xs',
                   )}
                 >
@@ -337,7 +337,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
               <h1
                 className={cn(
-                  'mb-5 max-w-4xl font-display font-semibold text-foreground leading-[1.04] md:mb-7',
+                  'font-display mb-5 max-w-4xl leading-[1.04] font-semibold text-foreground md:mb-7',
                   'text-4xl',
                   'md:text-5xl',
                 )}
@@ -347,7 +347,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
               <p
                 className={cn(
-                  'mb-8 text-foreground/80 leading-relaxed md:mb-10',
+                  'mb-8 leading-relaxed text-foreground/80 md:mb-10',
                   'text-lg',
                   'md:text-xl',
                 )}
@@ -357,7 +357,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
               <div
                 className={cn(
-                  'grid gap-3 border-border/70 border-y py-4 text-foreground/60 sm:flex sm:flex-wrap sm:items-start sm:gap-x-6 sm:gap-y-3 md:py-5',
+                  'grid gap-3 border-y border-border/70 py-4 text-foreground/60 sm:flex sm:flex-wrap sm:items-start sm:gap-x-6 sm:gap-y-3 md:py-5',
                   'text-sm',
                 )}
               >
@@ -404,7 +404,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
               <div
                 className={cn(
-                  'prose prose-lg dark:prose-invert min-w-0 max-w-none flex-1',
+                  'prose prose-lg dark:prose-invert max-w-none min-w-0 flex-1',
                   'prose-headings:font-display prose-headings:font-semibold prose-headings:text-foreground',
                   'prose-p:text-foreground/90 prose-p:leading-relaxed',
                   'prose-strong:font-semibold prose-strong:text-foreground',
@@ -423,7 +423,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </div>
             <BlogDisclaimer className='mt-12 md:mt-16' />
             <section className='mt-8 border border-border bg-card p-6 md:p-8'>
-              <h3 className='mb-2 font-display font-semibold text-2xl text-foreground'>
+              <h3 className='font-display mb-2 text-2xl font-semibold text-foreground'>
                 Useful tools for this topic
               </h3>
               <p className={cn('mb-4 text-foreground/70', 'text-sm')}>
@@ -445,7 +445,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             <div className='mt-8 border border-border bg-card p-6 md:p-8'>
               <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
                 <div>
-                  <h3 className='mb-2 font-display font-semibold text-2xl text-foreground'>
+                  <h3 className='font-display mb-2 text-2xl font-semibold text-foreground'>
                     Found this helpful?
                   </h3>
                   <p className={cn('text-foreground/70', 'text-sm')}>
@@ -463,10 +463,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           </article>
 
           {relatedPosts.length > 0 && (
-            <section className='mt-12 border-foreground/10 border-t pt-12 md:mt-16 md:pt-16'>
+            <section className='mt-12 border-t border-foreground/10 pt-12 md:mt-16 md:pt-16'>
               <h2
                 className={cn(
-                  'mb-6 font-display font-semibold text-foreground md:mb-8',
+                  'font-display mb-6 font-semibold text-foreground md:mb-8',
                   'text-2xl',
                 )}
               >
@@ -509,7 +509,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             </section>
           )}
 
-          <div className='mt-12 flex justify-center border-foreground/10 border-t pt-8'>
+          <div className='mt-12 flex justify-center border-t border-foreground/10 pt-8'>
             <Link
               href='/blog'
               className='inline-flex items-center font-medium text-primary transition-colors hover:text-primary/80'

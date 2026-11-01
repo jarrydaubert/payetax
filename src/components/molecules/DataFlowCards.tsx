@@ -113,7 +113,7 @@ function DataFlowCardItem({ card }: DataFlowCardItemProps) {
       </h3>
 
       {/* Description */}
-      <p className='text-muted-foreground leading-relaxed'>{description}</p>
+      <p className='leading-relaxed text-muted-foreground'>{description}</p>
     </Card>
   );
 }

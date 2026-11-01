@@ -112,7 +112,7 @@ export function MarriageAllowanceAlert({
           asChild
           size='sm'
           className={cn(
-            'w-full whitespace-nowrap border border-primary/40 bg-card text-primary hover:bg-primary/10 hover:text-primary sm:w-auto',
+            'w-full border border-primary/40 bg-card whitespace-nowrap text-primary hover:bg-primary/10 hover:text-primary sm:w-auto',
             'gap-2',
           )}
         >

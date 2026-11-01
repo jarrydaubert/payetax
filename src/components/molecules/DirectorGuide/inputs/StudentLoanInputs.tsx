@@ -52,7 +52,7 @@ export function StudentLoanInputs() {
               checked={studentLoanPlans.includes(plan.id)}
               onCheckedChange={() => toggleStudentLoanPlan(plan.id)}
             />
-            <Label htmlFor={plan.id} className='font-normal text-sm'>
+            <Label htmlFor={plan.id} className='text-sm font-normal'>
               {plan.label}
             </Label>
           </div>

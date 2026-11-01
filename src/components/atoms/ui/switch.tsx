@@ -42,7 +42,7 @@ const Switch = forwardRef<ElementRef<typeof SwitchPrimitive.Root>, SwitchProps>(
         // Transitions
         'transition-colors',
         // Focus ring
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+        'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none',
         // Disabled
         'disabled:cursor-not-allowed disabled:opacity-50',
         // State colors

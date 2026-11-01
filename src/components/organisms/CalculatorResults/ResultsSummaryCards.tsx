@@ -53,7 +53,7 @@ export function ResultsSummaryCards({
     <TooltipProvider delayDuration={200}>
       {results.pensionContribution.annually > 0 && (
         <p
-          className='mb-3 text-muted-foreground text-sm leading-relaxed'
+          className='mb-3 text-sm leading-relaxed text-muted-foreground'
           data-testid='pension-method-result-note'
         >
           We estimate all pension contributions as salary sacrifice, reducing pay used for Income
@@ -74,7 +74,7 @@ export function ResultsSummaryCards({
       )}
       <MobileTakeHomeCard results={results} submittedPeriod={input?.payPeriod ?? 'annually'} />
       <motion.section
-        className={cn('grid border-border border-b py-4 md:grid-cols-2 lg:grid-cols-5', 'gap-4')}
+        className={cn('grid border-b border-border py-4 md:grid-cols-2 lg:grid-cols-5', 'gap-4')}
         variants={shouldReduceMotion ? undefined : ANIMATION_CONTAINER_VARIANTS.staggerFast}
         initial='hidden'
         animate='show'
@@ -143,7 +143,7 @@ export function ResultsSummaryCards({
         </motion.div>
       </motion.section>
       <p
-        className='mt-3 text-muted-foreground text-sm leading-relaxed'
+        className='mt-3 text-sm leading-relaxed text-muted-foreground'
         data-testid='summary-result-note'
       >
         Monthly take-home is your yearly estimate divided by 12; actual payslips may vary. Total Tax

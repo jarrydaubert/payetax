@@ -1,4 +1,0 @@
-class-context fragments: 3160; with internal twMerge conflicts: 3
-src/components/molecules/StatusPage.tsx:73 [attr] drops "bg-background" from "grid min-h-dvh place-items-center bg-background bg-ledger-grid px-4 py-20"
-src/app/blog/page.tsx:163 [attr] drops "bg-background" from "min-h-screen bg-background bg-ledger-grid"
-src/app/about/AboutPageContent.tsx:101 [attr] drops "bg-background" from "min-h-screen bg-background bg-ledger-grid"

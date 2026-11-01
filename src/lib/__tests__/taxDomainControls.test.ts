@@ -233,6 +233,51 @@ describe('tax-domain repository controls', () => {
       expect(comparison.newFindings[0]?.count).toBe(1);
     });
 
+    it.each(['src/app/example.ts', 'src/lib/__tests__/example.test.ts'])(
+      'keeps multiline assertion amounts in the inventory for %s',
+      (path) => {
+        const assertion = 'expect(annual.personalAllowance).toBe(salary === 100_000 ? 12_570 : 0);';
+        const formatted =
+          'expect(annual.personalAllowance).toBe(\n  salary === 100_000 ? 12_570 : 0,\n);';
+        const policy = { amounts: [100_000, 12_570], ratePercents: [], taxYears: [] };
+        const facts = (content: string) =>
+          scanTaxFacts([{ path, content }], policy).map(({ kind, value, exceptionId }) => ({
+            kind,
+            value,
+            exceptionId,
+          }));
+
+        expect(facts(formatted)).toEqual(facts(assertion));
+        expect(facts(formatted)).toEqual([
+          {
+            kind: 'policy-value',
+            value: '100000',
+            exceptionId: path.includes('__tests__') ? 'verification-fixtures' : undefined,
+          },
+          {
+            kind: 'policy-value',
+            value: '12570',
+            exceptionId: path.includes('__tests__') ? 'verification-fixtures' : undefined,
+          },
+        ]);
+      },
+    );
+
+    it('does not borrow tax context from unrelated call arguments or callback bodies', () => {
+      expect(
+        scanTaxFacts(
+          [
+            {
+              path: 'src/app/example.ts',
+              content:
+                "example('tax allowance',\n  12570);\nexample('tax', () => {\n  const size = 12570;\n});",
+            },
+          ],
+          catalog,
+        ).filter((entry) => entry.kind === 'policy-value'),
+      ).toEqual([]);
+    });
+
     it('matches complete formatted amounts instead of suffixes inside larger values', () => {
       const occurrences = scanTaxFacts(
         [

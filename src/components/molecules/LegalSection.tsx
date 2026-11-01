@@ -29,11 +29,11 @@ export function LegalSection({ id, title, children, className }: LegalSectionPro
     <section id={id} className={cn('scroll-mt-24', className)} aria-labelledby={`${id}-heading`}>
       <h2
         id={`${id}-heading`}
-        className='font-display font-semibold text-2xl text-foreground tracking-tight md:text-3xl'
+        className='font-display text-2xl font-semibold tracking-tight text-foreground md:text-3xl'
       >
         {title}
       </h2>
-      <div className='mt-4 space-y-4 text-muted-foreground leading-relaxed'>{children}</div>
+      <div className='mt-4 space-y-4 leading-relaxed text-muted-foreground'>{children}</div>
     </section>
   );
 }

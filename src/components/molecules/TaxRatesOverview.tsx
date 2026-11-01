@@ -66,13 +66,13 @@ export function TaxRatesOverview() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: 0.2 }}
-      className='border-border/70 border-y bg-ledger-grid py-16'
+      className='bg-ledger-grid border-y border-border/70 py-16'
     >
       <div className={cn('mx-auto max-w-7xl', 'px-4')}>
         <div className='mb-10 text-center'>
           <h2
             className={cn(
-              'font-display font-semibold text-foreground leading-tight',
+              'font-display leading-tight font-semibold text-foreground',
               'mb-3',
               'text-4xl',
             )}

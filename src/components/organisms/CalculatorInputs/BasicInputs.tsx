@@ -204,7 +204,7 @@ export function BasicInputs() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className='space-y-3 xl:grid xl:grid-cols-3 xl:items-start xl:gap-x-6 xl:gap-y-4 xl:space-y-0 min-[112.5rem]:block min-[112.5rem]:space-y-3'
+      className='space-y-3 xl:grid xl:grid-cols-3 xl:items-start xl:space-y-0 xl:gap-x-6 xl:gap-y-4 min-[112.5rem]:block min-[112.5rem]:space-y-3'
     >
       {/* Heading */}
       <h3 className={cn('font-semibold text-foreground xl:col-span-3', 'text-base', 'sm:text-lg')}>

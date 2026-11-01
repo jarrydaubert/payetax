@@ -107,7 +107,7 @@ export function TaxTrapInlineAlert({
         type='button'
         onClick={handleDismiss}
         className={cn(
-          'absolute top-3 right-3 rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+          'absolute top-3 right-3 rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none',
           'p-2',
         )}
         aria-label='Dismiss tax trap alert'
@@ -139,7 +139,7 @@ export function TaxTrapInlineAlert({
             onClick={handleApplyPension}
             size='sm'
             className={cn(
-              'w-full whitespace-nowrap border border-warning/40 bg-card text-warning shadow-none hover:bg-warning/10 hover:text-warning sm:w-auto',
+              'w-full border border-warning/40 bg-card whitespace-nowrap text-warning shadow-none hover:bg-warning/10 hover:text-warning sm:w-auto',
               'gap-2',
             )}
           >

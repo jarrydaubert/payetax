@@ -1,183 +1,149 @@
-# Dependency modernisation — 31 October 2026
+# Dependency modernisation — v5.2.4
 
-Branch `chore/dependency-refresh` from `de610ada` (v5.2.2). Local commits only; nothing pushed,
-merged or deployed. Supporting evidence is in
-[`dependency-modernisation-2026-10-31/`](dependency-modernisation-2026-10-31/); raw logs,
-screenshots and Sentry envelopes stayed in a local scratch directory and are identified by
-SHA-256 in `raw-artifacts-sha256.txt`. The Sentry envelopes are not committed because they contain
-the local machine name and OS details.
+Completed locally on 1 November 2026 in `chore/dependency-refresh`, integrating
+`origin/main` at `9961062e` (PR #158, v5.2.3). No push, PR, merge to main or deployment.
+This updates the 31 October dependency evidence and corrects its scanner claim.
 
-## Environment
+## Integration
 
-- Windows 11, Node 24.18.0, Bun 1.4.3 locally. CI pins Bun 1.3.13: the final `bun.lock` stays at
-  `lockfileVersion: 1` and Bun 1.3.13 accepts it with `--frozen-lockfile` without changes.
-- Baseline: clean detached worktree at `de610ada`, `bun install --frozen-lockfile`.
-- Playwright differs by design: baseline 1.61.1 (Chromium 149, WebKit 26.5), upgraded 1.64.1
-  (Chromium 156, WebKit 27.2). Pixel and computed-style comparisons drive both servers with the
-  same Chromium 149 build, so browser version is not a variable there.
-- Both trees were built with `build:ci` (source-map upload disabled) and the same environment.
-- Jest ran with `CI=true` (two workers), matching CI.
+- Preserved the reviewed dependency upgrades: Next 16.4.3, React 19.3.1, Sentry 11.10.0,
+  Motion 14.9.0, TypeScript 7.0.2, Biome 2.6.4, Jest 30.5.2 and Playwright 1.64.1.
+  Exact versions and transitive resolutions are in `package.json` and `bun.lock`.
+- Reverted only the original mechanical class-sort commit before merging main (`ddce1bf5`),
+  then regenerated with Biome's `useTailwindSortedClasses` rule against the merged code.
+  PR #158's accessible summary-card interactions, wording, tests and exceptions are retained.
+- The regenerated sort changes 552 class strings in 105 files: all token permutations in
+  className/cn/cva contexts. The three apparent `tailwind-merge` differences are plain
+  className attributes where no merger runs, involving the undefined `bg-ledger-grid` class.
+  See [class-sort analysis](dependency-modernisation-2026-10-31/classsort-analysis.json).
+- Version is 5.2.4 (patch: dependency maintenance and guard repair, no new product behaviour).
+  Public version references derive from `package.json`; historical version references remain.
+- Kept the existing TypeScript 6 compiler-API bridge, Biome migration and test-component
+  hoists. Removed redundant capture/probe/stub scripts and screenshot inventory hashes;
+  retained compact prior comparison summaries and reusable financial/class-sort checks.
 
-## Versions
+## Tax-fact discrepancy
 
-| Package | From | To |
-| --- | --- | --- |
-| `next`, `@next/bundle-analyzer` | 16.4.1, 16.2.10 | 16.4.3 |
-| `react`, `react-dom` | 19.2.7 | 19.3.1 |
-| `@types/react`, `@types/react-dom` | 19.2.17, 19.2.3 | 19.3.0 |
-| `@sentry/nextjs` | 10.75.2 | 11.10.0 |
-| `framer-motion` | 12.42.2 | 14.9.0 |
-| Radix checkbox / collapsible / dialog / label | 1.3.7 / 1.1.16 / 1.1.19 / 2.1.11 | 1.4.1 / 1.2.1 / 1.3.1 / 2.1.17 |
-| Radix select / slider / slot / switch / tooltip | 2.3.3 / 1.4.3 / 1.3.0 / 1.3.3 / 1.2.12 | 2.4.1 / 1.6.1 / 1.5.0 / 1.4.1 / 1.4.1 |
-| `lucide-react` | 1.25.0 | 1.66.0 |
-| `shiki`, `rehype-pretty-code` | 4.3.1, 0.14.4 | 4.5.0, 0.14.5 |
-| `tailwind-merge`, `zustand`, `lru-cache` | 3.6.0, 5.0.14, 11.5.2 | 3.7.0, 5.0.16, 11.5.3 |
-| `typescript` | 6.0.3 | 7.0.2 |
-| `@typescript/typescript6` (new) | — | 6.0.2 |
-| `@biomejs/biome` | 2.4.16 | 2.6.4 |
-| `jest`, `jest-environment-jsdom` | 30.4.2, 30.4.1 | 30.5.2 |
-| `@testing-library/jest-dom` / `react` / `user-event` | 6.9.1 / 16.3.2 / 14.6.1 | 7.0.1 / 16.3.3 / 14.6.8 |
-| `jest-axe` | 10.0.0 | 11.0.0 |
-| `@playwright/test`, `@axe-core/playwright` | 1.61.1, 4.12.1 | 1.64.1, 4.14.0 |
-| `knip`, `tsx`, `@types/node` | 6.27.0, 4.23.1, 26.1.1 | 6.44.1, 4.23.15, 26.6.6 |
-| `@emotion/is-prop-valid` | 1.4.0 | removed (unused since Motion 13) |
-| overrides `rollup` / `yaml` / `picomatch` | 4.60.2 / 2.8.3 / 4.0.4 | 4.64.8 / 2.9.1 / 4.0.7 |
-| overrides `minimatch`, `brace-expansion` | 10.2.5, 5.0.12 | removed |
+The original claim that both tax-control outputs were byte-identical at the formatted branch
+tip was inaccurate. Before formatting, `verification-fixtures` counted 1,056 occurrences;
+formatting reduced that to 1,054. In `src/lib/__tests__/scottishTaxVertical.test.ts`, the
+personal-allowance assertion now has its `100_000` and `12_570` literals on line 158, separate
+from `expect(annual.personalAllowance).toBe(` on line 157. The old scanner required a tax
+keyword on the same line and missed those two literals (file count 30 -> 28).
 
-Held back: `zod` 4.6.6 (4.6.7 available), pinned by the existing override; changing it is reserved
-for the maintainer. No major version was rolled back.
+The assertion remained executable, AST-equivalent to main, and covered by the Scottish unit
+tests. Financial test coverage was not lost, but the scanner's inventory coverage was.
+The scanner now supplements amount context with the enclosing call's callee, using the
+existing compiler parser. It does not borrow tax words from unrelated arguments or callback
+bodies. Regression tests cover wrapped/unwrapped assertions in application and fixture paths,
+and reject unrelated callback context. Rechecking the actual Scottish file gives 30 -> 28 -> 30
+(main / formatted with old scanner / repaired scanner), with both literals correctly classified
+as `verification-fixtures`. These are inventory exceptions, not independent statutory validation.
 
-## Migrations
+The final strict scan has 380 baselined occurrences, zero new findings and 1,064 fixture
+occurrences after main's additions and the new guard tests. No baseline or exception rule was
+relaxed. The tax-import check is unchanged.
 
-- **TypeScript 7** ships no JS compiler API. `scripts/tax-domain-controls.ts` (behind
-  `check:tax-imports`, `check:tax-facts` and `taxDomainControls.test.ts`) now imports
-  Microsoft's `@typescript/typescript6` API package, the side-by-side route documented for 7.0.
-  Without it the import guard crashes and 3 of 21 guard tests fail; with it, both checks print
-  output byte-identical to baseline. Next.js 16 type-checks through the `tsc` CLI
-  (`experimental.useTypeScriptCli` defaults to `true`).
-- **Sentry 11** removed `sendDefaultPii` and `enableLogs`, and an unset `dataCollection` now
-  collects user info, cookies, all HTTP bodies and more. `SENTRY_DATA_COLLECTION` in
-  `src/lib/sentryPrivacy.ts` is Sentry's documented equivalent of v10 `sendDefaultPii: false`,
-  used by the client, server and edge configs. `attachStacktrace: false` keeps v10
-  `captureMessage` payloads. Console breadcrumbs moved to the default Console integration, which
-  is now excluded in production. `withSentryConfig` comes from `@sentry/nextjs/config`.
-- **Biome 2.6**: schema migration (rule presets, `useTailwindSortedClasses`), and
-  `tailwind.stylesheet` now points at `src/app/globals.css`. Without the stylesheet the sorter
-  mis-ranked project theme utilities (1,036 diagnostics; 551 with it). The formatter changed 40
-  test files (AST-equivalent to before). Nine test-local components were hoisted for the new
-  `noComponentHookFactories` rule. No rule was disabled or downgraded.
-- **Framer Motion 14**: no API changes required. Motion 13 stopped loading
-  `@emotion/is-prop-valid`; every prop passed to a motion DOM element is a motion prop or valid
-  DOM/ARIA attribute, so the removed dependency filtered nothing.
-- **Overrides**: `minimatch` and `brace-expansion` pins forced out-of-range majors onto
-  `glob@10` (wants `minimatch ^9.0.4`) and `minimatch@9` (wants `brace-expansion ^2.0.2`).
-  Without the pins every consumer resolves an in-range, patched version. `rollup`, `yaml` and
-  `picomatch` pins were below the minimums of Sentry 11 and knip 6.44 and were raised.
+## Financial preservation
 
-## Results
+The existing deterministic [PAYE/Director grid](dependency-modernisation-2026-10-31/scripts/snapshot.ts.txt)
+was run against an archive of current main `9961062e` using the baseline dependency tree, and
+against the integrated dependency branch. All **6,188 results are byte-identical**:
 
-| Check | Baseline `de610ada` | Upgraded tip |
-| --- | --- | --- |
-| `check:repo` | pass | pass |
-| `test:ci` | 258 suites / 4,605 tests pass | 258 suites / 4,606 tests pass (+1 Sentry test) |
-| Coverage (stmts / branches / funcs / lines) | 94.70 / 85.53 / 86.20 / 94.70 | 94.70 / 85.53 / 86.20 / 94.70 |
-| Per-file v8 coverage (275 files) | — | identical except `sentryPrivacy.ts` (+19 covered lines) |
-| PAYE/Director engine snapshot (6,188 cases) | `b6a9e708…adb2` | identical |
-| `check:tax-imports`, `check:tax-facts` output | — | byte-identical |
-| `test:e2e:critical:ci` (Chromium) | 116 / 116 | 116 / 116, same per-spec counts, 0 flaky |
-| `accessibility-wcag22.spec.ts` (Chromium) | 23 pass, 3 fail | same 3 fail with the same violations |
-| WebKit / Mobile Safari / Mobile Chrome (mobile-critical specs) | 278 / 279 (1 WebKit MC-01 timeout) | run 1: 277 / 279 (Mobile Safari MC-09 ×2); run 2: 279 / 279 |
-| `build:ci` | pass | pass, no warnings |
-| `bun audit` / `audit:deps` | 2 moderate, fails | same 2 moderate, fails |
-| `bun outdated` | — | `zod` only |
+`b6a9e708dce00b9135a5313e6b5c468d89fe7be149724a5972138934c0f4adb2` (SHA-256, both).
 
-The accessibility failures (`link-in-text-block` on the dark-mode privacy page; one target under
-24px) are pre-existing.
+No financial engine/policy source changed. Thirteen changed financial test files are
+AST-equivalent to main. No expected financial outputs, golden fixtures or snapshots were
+regenerated or altered. Existing independent PAYE fixtures passed in the unit run; generated
+golden tests remain a regression check rather than an independent correctness oracle.
 
-The WebKit/mobile run (three projects, two workers, no retries) is flaky locally under load on
-both trees, and the failing tests differ between runs. MC-09 failed when salary-field focus timed
-out after Radix select interaction (12.8s against a typical 7s), but passed 10/10 in isolation
-and in the full rerun. Baseline MC-09 passed 10/10 in isolation. This is evidence against a
-regression, not proof of none.
+## Security recheck — 1 November
 
-## Visual and behavioural differences
+The [glob advisory](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4) and
+[minimatch advisory](https://github.com/advisories/GHSA-g3hv-75wg-m249) still require
+glob 14.0.2+ and minimatch 11.0.1+. The npm registry reports latest glob 14.0.3 and
+minimatch 11.0.3, but no compatible fixed 13.x / 9.x / 10.x releases.
+Latest `jest-config`, `jest-runtime`, `@jest/reporters` (30.5.2) and
+`@sentry/bundler-plugins` (11.10.0) still declare `glob ^13.0.6`; glob 13 wants minimatch
+`^10.2.2`, and the remaining glob 10 consumer wants `^9.0.4`.
 
-Same-browser captures of calculator, results, payslip example, tax-code decoder, Director,
-about, blog, offline and 404 at 390, 768 and 1280px (27 captures; baseline re-capture noise: 0
-pixels):
+Forcing the fixed majors would change matching/ignore semantics and is deferred. The approved
+build/test-only exceptions remain, with `lastChecked` updated to 1 November, weekly review due
+8 November, and the unchanged **14 November 2026 inclusive expiry** (fail from 15 November UTC).
+Audit policy, severities and fail-closed matching/expiry tests are unchanged. `audit:deps` passes
+with only these two exceptions; the underlying dependency audit still reports two moderates.
+Sources: [Jest manifest](https://registry.npmjs.org/jest-runtime/latest),
+[Sentry bundler manifest](https://registry.npmjs.org/@sentry%2Fbundler-plugins/latest).
 
-- Baseline vs upgraded: 0 computed-style differences on every element (80 properties each).
-  Pixel differences are confined to 36 icon-sized boxes in 18 captures (at most 16×15px;
-  `visual-diff-boxes.txt`) from lucide-react artwork updates, for example calendar,
-  pound-sign, wallet and check-circle glyphs. lucide 1.66 also adds alias classes such as `lucide-help-circle`, which no
-  CSS targets.
-- Class ordering alone (pre-sort tip vs sorted): 0 pixels, 0 class-set and 0 computed-style
-  differences.
+## Sentry 11
 
-The class-order commit changes 551 strings in 105 files. All are pure token permutations in
-className/`cn`/`cva` contexts. `tailwind-merge` resolves 548 of them identically. The other 3
-are plain `className` attributes, where no merge runs, and their only conflict involves
-`bg-ledger-grid`, a class with no CSS definition.
+Checked the client/server/edge configs and installed SDK against Sentry's
+[v11 migration guide](https://docs.sentry.io/platforms/javascript/migration/v10-to-v11/).
+The shared `dataCollection` object matches the documented restrictive v10 baseline:
+no user/cookies/bodies, filtered identity headers/query keys, and disabled AI/database/GraphQL
+payload collection. Event and breadcrumb sanitisation, monitored-path filtering and actionable
+errors remain. Production removes Console integration; DOM breadcrumbs remain disabled.
+`tracesSampleRate: 0` is preserved with no sampler override; no Replay integration or sampling
+is enabled. The SDK's default tracing integration is present as before, but sampled trace
+collection remains zero. Removed APIs and the config entrypoint have already been migrated.
 
-## Sentry privacy
+The strengthened configuration tests cover all three init paths, header/query restrictions,
+console/UI breadcrumb rejection and zero trace/replay sampling. A focused run exposed a
+pre-existing test flake: heapUsed happened to contain the salary sentinel `73123`. Fixed by
+mocking process memory/uptime counters in the test; no production privacy check was weakened.
+All 69 focused privacy/scope/filter tests pass. Prior local server-envelope comparison remains
+recorded in the retained Sentry summary/hashes; it was not repeated as a new capture exercise.
 
-Both trees were built and run with `NEXT_PUBLIC_SENTRY_DSN` set to a local stub on `127.0.0.1`.
-No real DSN or Sentry service was contacted, and the build made no upload requests. The same
-probe posted to `/api/send-results` with a forwarded IP, cookie, bearer token, email, salary,
-query string and JSON body, then loaded calculator and decoder pages.
+Separate existing defect: root `instrumentation.ts` / `instrumentation-client.ts` sit outside
+`src/` alongside this `src/app` application. The SDK warns, and the build does not emit
+`.next/server/instrumentation.js`; API routes directly import server config. Placement and
+`onRequestError` registration need their own fix. Deployed-origin client/edge capture and the
+deployment Node runtime remain unverified. Installed Sentry's Node range is
+`>=20.19.0 <22 || >=22.12.0 <23 || >=23.2.0`; local Node 24.18.0 is supported.
 
-- No envelope from either version contained any of those values, `ip_address` or `infer_ip`.
-- Apart from ids, timestamps, process memory and SDK integration names, the Sentry 11 error event
-  and envelope header are identical to Sentry 10 (`sentry-event-diff.txt`).
-- Sentry 11 adds one server process-session "exited" envelope (release, environment and
-  `Node.js` user agent only). With `tracesSampleRate: 0` no span envelopes were sent. The
-  browser sent nothing on localhost in either version, so client capture was verified through
-  unit tests rather than live envelopes.
+## Verification — integrated branch
 
-## Security advisories
+Windows 11, Node 24.18.0, Bun 1.4.3; CI remains pinned to Bun 1.3.13. The prior dependency
+review verified that pin accepts the unchanged lockfile with a frozen install.
 
-`GHSA-3g3m-2fjr-6pw4` (glob ≤14.0.1) and `GHSA-g3hv-75wg-m249` (minimatch <11.0.1), both
-moderate and published 2026-10-30, remain. They also fail `audit:deps` on `main`. The patched
-releases exist only as new majors (glob 14.0.2+, minimatch 11.0.1+, released 27–28 October).
-The latest Jest (`jest-runtime`, `jest-config`, `@jest/reporters` 30.5.2) and
-`@sentry/bundler-plugins` 11.10.0 still declare `glob ^13.0.6`. glob 14 changes how `ignore`
-patterns starting with `/` resolve, adopts minimatch 11 matching, and changes `walk()` return
-types, so forcing it would change behaviour under Jest coverage collection and Sentry source-map
-globbing.
+| Check | Result |
+| --- | --- |
+| `bun install --frozen-lockfile` | pass, no lockfile changes |
+| `bun run check:repo` | pass |
+| `bun run check-version --base origin/main` | pass: 5.2.3 -> 5.2.4 |
+| `bun run check:tax-facts:strict` | pass, zero new findings |
+| `bun run test:no-coverage` | 258 suites / 4,618 tests pass |
+| Focused Sentry/privacy tests after test-only counter fix | 4 suites / 69 tests pass |
+| PAYE/Director comparison to current main | 6,188 identical results |
+| `bun run audit:deps` | pass with two approved, unexpired exceptions |
+| `bun run build:ci` | pass, source-map upload disabled |
+| `bun run test:e2e:critical:ci e2e/summary-cards.spec.ts --retries=0 --reporter=line` | 123/124 pass; existing pension-help focus failure (below) |
 
-Exposure is build and test tooling only. These packages glob repository files with
-developer-controlled patterns and are not in the production request path. Sentry's bundler
-plugin globs only during release builds with source-map upload enabled. No allowlist entry or
-threshold change was made.
+Browser plugin unavailable; existing Playwright workflow used. Direct Chromium check at
+`http://localhost:3100`: desktop 1440x1000 and mobile 390x844, £40,000 / 1257L result matches
+the independent fixture (£32,322.04 annual net). All five cards and the visible explanation
+remain; hover help opens and Escape dismisses it. Screenshots inspected locally, no overlay
+or browser errors/warnings. No new screenshot archive committed.
 
-## Limitations
+Build warns about existing deprecated `experimental.useCache`; instrumentation placement is
+reported above. Prior review recorded pre-existing privacy-page accessibility issues and
+intermittent WebKit/mobile interaction failures; this completion does not close those backlog
+items or claim fresh cross-browser certification. No deployment, source-map upload or live
+Sentry delivery was attempted. Ready for independent Claude CLI review; not an unconditional release-green result.
 
-- The `@parcel/watcher@2.6.0` install script (new via `jest-haste-map` 30.5) is blocked. It only
-  builds from source when `npm_config_build_from_source=true`; the prebuilt binary loads.
-- Version bump, CI Bun version, trusted dependencies, the Zod override and integration timing
-  relative to PR #158 are maintainer decisions.
-- Only Chromium E2E is part of CI; the WebKit/mobile run is additional local evidence.
-- Vercel's Node.js runtime must be at least 20.19 for Sentry 11; not verified here.
+### Critical E2E exception
 
-## Independent review follow-ups (open)
+The no-retry critical run passed 123/124, including all golden financial, summary-card,
+consent, telemetry, PWA and remaining critical tests. The failure is
+`calculator-critical.spec.ts:97`, "desktop mouse can reopen help after focus returns to its
+trigger": the final Tab assertion expects `pension-type-select`, but focus remains on the
+pension help trigger. Isolation reproduced it in 2/3 dependency-branch runs and **1/3 current
+main runs**, using the same Chromium 156 browser against separate production builds (main
+Next 16.4.1 / original dependencies, upgraded Next 16.4.3).
 
-Independent review requested changes without finding an introduced financial-calculation or
-privacy regression. These items are recorded for this branch and are not yet resolved:
-
-1. **Correct the tax-fact evidence.** The "byte-identical" row in Results applied only to the
-   tooling commit before formatting. At the branch tip, `check:tax-facts` reports 1,054
-   `verification-fixtures` exempt occurrences versus 1,056 at baseline; every other count and
-   the baseline comparison are unchanged. The whole difference is in
-   `src/lib/__tests__/scottishTaxVertical.test.ts`, where the Biome 2.6 reflow (AST-equivalent to
-   baseline) changed the layout-sensitive occurrence count from 30 to 28. Update the row and
-   evidence accordingly.
-2. **Verify the deployment Node.js version** (Sentry 11 requires 20.19 or later) and Sentry's
-   remaining privacy surfaces beyond the server error event probed here, for example browser
-   events and sessions on a deployed origin, edge runtime events and `onRequestError` captures.
-3. **Track the pre-existing Sentry instrumentation placement defect separately.** The app uses
-   `src/app`, but `instrumentation.ts` and `instrumentation-client.ts` are at the repository
-   root, and neither `main` nor this branch emits `.next/server/instrumentation.js`. API routes
-   import `sentry.server.config` directly, so server init and `onRequestError` registration
-   need their own investigation and fix outside this dependency change.
-
-The glob/minimatch advisory exception is handled on a separate branch from `main`.
+Both Radix versions schedule close autofocus using a zero-delay timer. The existing test can
+send Tab while that teardown still has a pending trigger refocus. Waiting only for the content
+to unmount was insufficient (1/5 still failed); that attempted test change was removed. No
+retry, skip, timeout increase, weakened focus assertion or production workaround was retained.
+The failure predates this dependency upgrade and remains a separate focus/test-timing defect.
+Its presence is explicit review/release evidence, not a passing critical-suite claim.
