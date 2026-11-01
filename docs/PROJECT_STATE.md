@@ -33,11 +33,12 @@ content must earn its place through user value, evidence and maintainable accura
 
 ## Main calculator: current state and agreed direction
 
-Current verified merged `main` is `1de37c3535122eeb1f20a76aab3faaa748558ee3`, after
-[#139](https://github.com/jarrydaubert/payetax/pull/139) merged on 27 October 2026.
-It retains [#136](https://github.com/jarrydaubert/payetax/pull/136) (`534b8eff`),
-[#127](https://github.com/jarrydaubert/payetax/pull/127) (`51aaf145`) and
-[#137](https://github.com/jarrydaubert/payetax/pull/137) (`e3f85739`).
+Current verified merged `main` is `2bbb2757` (v5.2.4), after
+[#159](https://github.com/jarrydaubert/payetax/pull/159) merged on 1 November 2026.
+It retains #139's Director email safeguard, #137's privacy protections and the earlier calculator
+contracts below. [#158](https://github.com/jarrydaubert/payetax/pull/158) delivered accessible
+summary-card help and the fifth-card wording; #159 delivered dependency modernisation, not a
+Sentry repair. Their dated verification records remain under `docs/reports/`.
 The last independently recorded production baseline remains `44d8d02` (#125/#133/#134 included).
 This reconciliation verifies repository state, not a new production deployment.
 
@@ -92,8 +93,9 @@ accessible recalculation notice accompanies cleared results; invalid submission 
 the fields still needing correction. Its session-only history flag is not persisted. Future mobile
 statements must preserve these states and #127's validated-result action guards.
 
-The remaining calculator work is MC-04's submitted pay-period rule and MC-05's mobile payslip,
-direct Edit and two-period comparison. v5.2.3 implements the fifth-card wording criterion with
+MC-04's submitted pay-period rule shipped in [#143](https://github.com/jarrydaubert/payetax/pull/143).
+The remaining MC-05 work is the mobile payslip, direct Edit and two-period comparison.
+v5.2.3 implements the fifth-card wording criterion with
 "Marginal Rate Estimate" and a visible rounded next-£100 explanation; see the
 [verification record](reports/summary-cards-v5.2.3-rereview-2026-10-31/README.md).
 MC-05 remains open for the mobile work and existing mobile focus issue. MC-06/07 are smaller
@@ -108,6 +110,20 @@ measurement against predeclared windows and a mitigation trigger. Neither #128 n
 work completes the pension-method or transparent-result Foundation work. The backlog owns the
 unchanged detailed delivery order; the [dated reconciliations](reports/project-documentation-reconciliation-2026-10-27.md)
 preserve review history and superseded decisions.
+
+## Post-release follow-ups
+
+The next focused task is basic Sentry error reporting: the root instrumentation files are outside
+`src/` beside a `src/app` application, and normal hook discovery remains broken. Hook registration,
+deployed Node compatibility and live event delivery need verification while preserving existing
+privacy filters and zero trace/replay sampling. See [Verification](BACKLOG.md#verification) for
+this defect and the separately tracked pension-help focus race. Maintainer-reported mobile input
+layout and desktop padding problems remain separate calculator follow-ups, pending reproduction.
+
+The two build/test dependency exceptions remain open: no compatible fixed glob/minimatch releases
+were available at the 1 November recheck. Review by **7 November 2026**; expiry remains
+**14 November inclusive**. The [backlog](BACKLOG.md#security-and-dependencies) explains the later
+automatically calculated review date; no exception has been extended by this housekeeping pass.
 
 ## Director Intelligence email state
 
@@ -381,7 +397,7 @@ desktop, integrity and privacy contracts. The [backlog](BACKLOG.md#active) owns 
 criteria; #128 is closed and retained only as historical reference. Full DI-05 is not moved forward
 merely because the annual-export prototype is promising.
 
-MC-04/05 may proceed alongside
+MC-05 may proceed alongside
 Director urgent slices without pre-empting a ready, verified wrong-money fix; completing the entire
 Director queue is not a main-calculator prerequisite. Keep the Director sequence and Foundation
 insertion points, including Corporation Tax deadlines. The desktop/mobile acceptance changes and

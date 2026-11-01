@@ -48,6 +48,8 @@ When drawing on #128 as reference, retain useful implementation evidence without
 
 The 24 October dependency advisories (Next.js, Sentry, Zod, fast-uri) were patched in [#133](https://github.com/jarrydaubert/payetax/pull/133), which carries the exposure assessment and verification. It was merged and deployed to production as `28f0a63` on 26 October. The items below are its residual findings.
 
+- [ ] **P2 — Retire the two temporary glob/minimatch exceptions from #158.** [#159](https://github.com/jarrydaubert/payetax/pull/159) completed the dependency refresh; these build/test-only advisories remain accepted residual risks. The 1 November upstream recheck still finds fixes only in glob 14.0.2+ and minimatch 11.0.1+, outside the ranges accepted by current Jest/Sentry consumers. Review by **7 November 2026**, retaining the agreed deadline even though `lastChecked: 2026-11-01` plus the seven-day cadence now calculates 8 November. Both entries retain `removeAfter: 2026-11-14` (inclusive UTC; audit fails from 15 November). DoD: adopt compatible upstream fixes with verification and remove the corresponding exceptions; incompatible major upgrades or any renewal require maintainer approval. See the [allowlist](../scripts/dependency-advisory-allowlist.ts) and [release evidence](reports/dependency-modernisation-2026-10-31.md#security-recheck--1-november).
+
 - [ ] P2 — Results-email routes buffer the whole request before the size check. `send-results` and `send-director-results` call `request.text()` and only then compare `rawBody.length` (50 × 1024 *characters*, not bytes) with `MAX_BODY_SIZE`. Zod 4.6.6 now bounds validation work for oversized collections (#133's regressions), but nothing limits how much is read. DoD: record the platform's effective request-body limit for these functions from current Vercel documentation. Then either justify that limit as sufficient, or reject oversized requests before buffering, measured in bytes. Keep the existing 413 response, origin, rate-limit and validation order, with regressions for an oversized body and for a missing or understated `Content-Length`.
 - [ ] P3 — Zod is pinned twice. `package.json` lists `zod` 4.6.6 in both `dependencies` and `overrides`. The override was needed to remove Knip's nested 4.4.3, and it silently wins over the direct pin: in #133's review, a frozen install with a direct pin of 4.6.5 still resolved 4.6.6. DoD: the two cannot drift unnoticed. Either a repo check fails when they differ, or the override is removed once a frozen install proves no vulnerable nested copy remains.
 
@@ -122,6 +124,8 @@ Small mobile payslip PRs from current `main` own the remaining scope; #128 is cl
   **Replacement-slice preservation:** Retain #135's five cards, accessible forward/reverse desktop focus order and intentional What-if scrolling, alongside the current requirement for five selected default periods, seven available periods and all seven normal-table columns fitting on desktop when enabled. Re-verify that retained behaviour after each affected slice at the desktop acceptance widths, breakpoint neighbours and 200% zoom, with readable figures/pence, reduced motion and light/dark themes. This is a regression obligation for those later changes, not an outstanding desktop layout implementation.
 
   **Separate mobile keyboard follow-up (PR #135):** At 393×852 on `c8f21f77`, the delayed Calculate scroll leaves focus on Calculate at roughly 19px, behind the 64px fixed header. Reproduced in Chromium and WebKit with reduced motion; the desktop navigation correction preserves this existing mobile behaviour. Coordinate the mobile scroll and focus destination, then verify forward/reverse keyboard navigation and header clearance in both engines. This remains open independently of the desktop fix.
+
+- [ ] **P2 — Mobile input layout and desktop padding problems.** Maintainer-reported at the v5.2.4 housekeeping handover; exact affected controls, widths and reproduction remain to be recorded. Owner: Main calculator experience. Verify both symptoms and make bounded layout corrections, preserving input/result integrity and summary-card help. Keep this separate from MC-05's payslip redesign and the pension-help focus race; #158/#159 do not close it.
 
 - [ ] **MC-06 · P2 · Follow-up — Make deduction and rounding presentation auditable.** Claude found unsigned deductions, no deduction total and period statements that differ by a penny when rounded displayed rows are added.
 
@@ -344,14 +348,17 @@ Privacy link/table accessibility (P8) stays with [Verification](#verification); 
 
 ### Verification
 
+- [ ] **P2 — Restore normal Sentry instrumentation discovery and verify basic error delivery.** Owner: Observability; next focused task after v5.2.4. Root `instrumentation.ts` / `instrumentation-client.ts` are outside `src/` alongside `src/app`; #159's build did not emit `.next/server/instrumentation.js`. API routes' direct server-config imports do not establish normal hook discovery. Correct entrypoint placement and `onRequestError` registration, check deployed Node compatibility, and verify client/server/edge delivery as applicable. Preserve path filtering, financial-data sanitisation and zero trace/replay sampling. Live capture remains unverified; the dependency upgrade did not fix this defect. See the [Sentry evidence](reports/dependency-modernisation-2026-10-31.md#sentry-11).
+
 - [ ] **P2 — Pension-help close/reopen focus restoration.** Owner: Verification; separate from the v5.2.4 dependency refresh. After three desktop mouse open/close cycles, Tab can leave focus on "Help for Pension" instead of advancing to the pension-type selector (`e2e/calculator-critical.spec.ts:97`). The unchanged assertion failed in 1/3 runs against main `9961062e` with its original dependencies and 2/3 dependency-branch runs using the same Chromium 156 browser. Both Radix versions defer close autofocus; waiting only for content unmount did not eliminate the failure. See the [reproduction evidence](reports/dependency-modernisation-2026-10-31.md#critical-e2e-exception).
 
   **DoD:** Determine and correct the focus-restoration/teardown race in a separate change. Preserve mouse reopening, close/Escape focus return and forward Tab navigation, with repeated production-build verification. Keep the existing focus assertion; do not hide the issue with skips, blanket retries, arbitrary sleeps or relaxed expectations.
 
-- [ ] **P3 — Playwright native-link navigation coverage:** the installed Playwright 1.61.1 /
-  Chromium 149 view-transition regression reproduces on unchanged `main`; installed Chrome 156
-  and WebKit pass the Budget pointer journeys. Revisit bundled-Chromium coverage with a separately
-  scoped dependency update, rather than changing application transitions or weakening assertions.
+- [ ] **P3 — Playwright native-link navigation coverage:** the historical Playwright 1.61.1 /
+  Chromium 149 view-transition regression reproduced on unchanged `main`; Chrome 156 and WebKit
+  passed the Budget pointer journeys. #159 upgraded Playwright to 1.64.1 / Chromium 156.
+  Recheck the affected Budget pointer journeys before closing this coverage gap; the dependency
+  upgrade itself is complete. Preserve application transitions and assertions.
   [Reproduction and limits](reports/budget-2026-final-verification-2026-10-28.md#navigation-investigation).
 
 - [ ] P3 — Reduced-motion results emit a React DOM warning in development. `ResultTableRow` selects the static `TableRow` when reduced motion is enabled but still passes `layout={false}` to the DOM. Reproduced during MC-03 visual QA; the same source exists on base `d2ee3ee8`. DoD: omit motion-only props on the static path and verify reduced-motion results without the non-boolean `layout` warning. This is separate from the existing mobile focus/pointer work.
