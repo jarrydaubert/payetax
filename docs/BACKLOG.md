@@ -344,6 +344,10 @@ Privacy link/table accessibility (P8) stays with [Verification](#verification); 
 
 ### Verification
 
+- [ ] **P2 — Pension-help close/reopen focus restoration.** Owner: Verification; separate from the v5.2.4 dependency refresh. After three desktop mouse open/close cycles, Tab can leave focus on "Help for Pension" instead of advancing to the pension-type selector (`e2e/calculator-critical.spec.ts:97`). The unchanged assertion failed in 1/3 runs against main `9961062e` with its original dependencies and 2/3 dependency-branch runs using the same Chromium 156 browser. Both Radix versions defer close autofocus; waiting only for content unmount did not eliminate the failure. See the [reproduction evidence](reports/dependency-modernisation-2026-10-31.md#critical-e2e-exception).
+
+  **DoD:** Determine and correct the focus-restoration/teardown race in a separate change. Preserve mouse reopening, close/Escape focus return and forward Tab navigation, with repeated production-build verification. Keep the existing focus assertion; do not hide the issue with skips, blanket retries, arbitrary sleeps or relaxed expectations.
+
 - [ ] **P3 — Playwright native-link navigation coverage:** the installed Playwright 1.61.1 /
   Chromium 149 view-transition regression reproduces on unchanged `main`; installed Chrome 156
   and WebKit pass the Budget pointer journeys. Revisit bundled-Chromium coverage with a separately
