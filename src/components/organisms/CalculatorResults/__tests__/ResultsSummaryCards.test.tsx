@@ -70,10 +70,10 @@ describe('ResultsSummaryCards Component', () => {
       render(<ResultsSummaryCards results={mockResults} />);
 
       expect(screen.getByText('Annual Take-Home')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Monthly Take-Home/ })).toBeInTheDocument();
+      expect(screen.getByText('Monthly Take-Home', { selector: 'section p' })).toBeInTheDocument();
       expect(screen.getByText('Total Tax & NI')).toBeInTheDocument();
       expect(screen.getByText('Effective Tax Rate')).toBeInTheDocument();
-      expect(screen.getByText('Marginal Tax Rate')).toBeInTheDocument();
+      expect(screen.getByText('Marginal Rate Estimate')).toBeInTheDocument();
     });
 
     it('should display correct annual take-home value', () => {
@@ -86,7 +86,9 @@ describe('ResultsSummaryCards Component', () => {
       render(<ResultsSummaryCards results={mockResults} />);
 
       expect(
-        within(screen.getByRole('button', { name: /Monthly Take-Home/ })).getByText('£2,040.50'),
+        within(screen.getByRole('region', { name: 'Tax calculation summary results' })).getByText(
+          '£2,040.50',
+        ),
       ).toBeInTheDocument();
     });
 
@@ -131,6 +133,19 @@ describe('ResultsSummaryCards Component', () => {
   });
 
   describe('Accessibility', () => {
+    it('keeps limitations and the marginal estimate explanation visible without card controls', () => {
+      render(<ResultsSummaryCards results={mockResults} />);
+      const summary = screen.getByRole('region', { name: 'Tax calculation summary results' });
+      expect(within(summary).queryByRole('button')).not.toBeInTheDocument();
+      expect(within(summary).getByText('Marginal Rate Estimate')).toBeInTheDocument();
+      const note = screen.getByTestId('summary-result-note');
+      expect(note).toBeVisible();
+      expect(note).toHaveTextContent(/actual payslips may vary/);
+      expect(note).toHaveTextContent(/excluding pension contributions and student loan repayments/);
+      expect(note).toHaveTextContent(/extra £100 a year/);
+      expect(note).toHaveTextContent(/rounded payroll figures; it excludes pension contributions/);
+    });
+
     it('should have proper ARIA labels', () => {
       const { container } = render(<ResultsSummaryCards results={mockResults} />);
 
@@ -181,7 +196,9 @@ describe('ResultsSummaryCards Component', () => {
 
       expect(screen.getByText('£85,000.00')).toBeInTheDocument();
       expect(
-        within(screen.getByRole('button', { name: /Monthly Take-Home/ })).getByText('£7,083.33'),
+        within(screen.getByRole('region', { name: 'Tax calculation summary results' })).getByText(
+          '£7,083.33',
+        ),
       ).toBeInTheDocument();
       expect(screen.getByText('£56,500.00')).toBeInTheDocument(); // Total tax: 50000 + 6500
     });
@@ -221,10 +238,10 @@ describe('ResultsSummaryCards Component', () => {
       // Cards are rendered by ResultCard component
       // We just verify they're present with correct text
       expect(screen.getByText('Annual Take-Home')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Monthly Take-Home/ })).toBeInTheDocument();
+      expect(screen.getByText('Monthly Take-Home', { selector: 'section p' })).toBeInTheDocument();
       expect(screen.getByText('Total Tax & NI')).toBeInTheDocument();
       expect(screen.getByText('Effective Tax Rate')).toBeInTheDocument();
-      expect(screen.getByText('Marginal Tax Rate')).toBeInTheDocument();
+      expect(screen.getByText('Marginal Rate Estimate')).toBeInTheDocument();
     });
 
     it('should render all cards with icons', () => {

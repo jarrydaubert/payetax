@@ -89,7 +89,7 @@ test.describe('Payslip regression @rounding', () => {
 
     // Regression lock: salary sacrifice should reduce marginal tax/NI on the "next £100".
     // For this scenario, marginal should be ~26.9% (not ~28% basic band, and definitely not a higher figure).
-    const marginalCard = page.getByRole('button', { name: /Marginal Tax Rate/i });
+    const marginalCard = page.getByText('Marginal Rate Estimate', { exact: true }).locator('../..');
     const marginalText = (await marginalCard.textContent()) ?? '';
     const marginal = parsePercent(marginalText);
     expect(marginal).toBeCloseTo(26.9, 1);

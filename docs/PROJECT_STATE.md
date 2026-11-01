@@ -93,9 +93,11 @@ the fields still needing correction. Its session-only history flag is not persis
 statements must preserve these states and #127's validated-result action guards.
 
 The remaining calculator work is MC-04's submitted pay-period rule and MC-05's mobile payslip,
-direct Edit and two-period comparison. The fifth card
-still needs honest rounded next-£100 payroll wording, and the existing mobile focus issue remains
-open. MC-06/07 are smaller follow-ups; MC-08 owns the named residual test-portfolio gaps.
+direct Edit and two-period comparison. v5.2.3 implements the fifth-card wording criterion with
+"Marginal Rate Estimate" and a visible rounded next-£100 explanation; see the
+[verification record](reports/summary-cards-v5.2.3-rereview-2026-10-31/README.md).
+MC-05 remains open for the mobile work and existing mobile focus issue. MC-06/07 are smaller
+follow-ups; MC-08 owns the named residual test-portfolio gaps.
 The **DI-05 interim email guard is delivered**. Small mobile payslip PRs are the remaining
 calculator delivery path; full DI-05 retains its later Director position and DI-02/04 dependencies.
 Completing the entire Director queue is not a prerequisite for the calculator.
