@@ -2,62 +2,117 @@
 import type { ErrorEvent } from '@sentry/nextjs';
 import { setNodeEnv } from '@/test/env';
 
-jest.mock('@sentry/nextjs', () => ({ init: jest.fn(), breadcrumbsIntegration: jest.fn() }));
+jest.mock('@sentry/nextjs', () => ({
+  init: jest.fn(),
+  breadcrumbsIntegration: jest.fn(() => ({ name: 'Breadcrumbs' })),
+}));
 
-describe.each([
-  'instrumentation-client',
-  'sentry.server.config',
-  'sentry.edge.config',
-])('%s privacy hooks', (name) => {
+describe('instrumentation-client console breadcrumbs', () => {
   afterEach(() => setNodeEnv('test'));
 
-  it('wires sanitisation into the SDK without dropping an actionable error', async () => {
+  it('removes the Console integration in production', () => {
     jest.resetModules();
     setNodeEnv('production');
     const sentry = require('@sentry/nextjs');
-    require(`../../../${name}`);
-    const options = sentry.init.mock.calls[0][0];
-    const event: ErrorEvent = {
-      type: undefined,
-      request: { url: 'https://payetax.test/?salary=73123', data: { input: { salary: 73123 } } },
-      contexts: {
-        calculator_input: { salaryRange: '73123' },
-        calculator: { stage: 'primary' },
-        error_details: { digest: 'next-42' },
-      },
-      tags: {
-        has_pension: true,
-        region: '73123',
-        error_boundary: 'tools',
-        router_kind: 'App Router',
-        request_path: '/tools?salary=73123',
-      },
-      breadcrumbs: [{ category: 'navigation', data: { from: '/?salary=73123', to: '/#73123' } }],
-      exception: { values: [{ type: 'TypeError', value: 'Calculation failed' }] },
-    };
-    const result = await options.beforeSend(event, {
-      originalException: new Error('Calculation failed'),
-    });
-    expect(result).not.toBeNull();
-    expect(JSON.stringify(result)).not.toContain('73123');
-    expect(result.exception.values[0].value).toBe('Calculation failed');
-    expect(result.contexts.calculator).toEqual({ stage: 'primary' });
-    expect(result.contexts.error_details).toEqual({ digest: 'next-42' });
-    expect(result.tags).toEqual({
-      error_boundary: 'tools',
-      router_kind: 'App Router',
-      request_path: '/tools',
-    });
-    expect(options.sendDefaultPii).toBe(false);
-    expect(options.tracesSampleRate).toBe(0);
-    expect(
-      options.beforeBreadcrumb({
-        category: 'fetch',
-        data: { url: '/api/send-results?email=73123' },
-      }),
-    ).toEqual({
-      category: 'fetch',
-      data: { url: '/api/send-results' },
-    });
+    require('../../../instrumentation-client');
+    const { integrations } = sentry.init.mock.calls[0][0];
+    const defaults = [{ name: 'Console' }, { name: 'Breadcrumbs' }, { name: 'GlobalHandlers' }];
+    const names = integrations(defaults).map((integration: { name: string }) => integration.name);
+    expect(names).not.toContain('Console');
+    expect(names).toEqual(expect.arrayContaining(['Breadcrumbs', 'GlobalHandlers']));
+    expect(sentry.breadcrumbsIntegration).toHaveBeenCalledWith(
+      expect.objectContaining({ dom: false }),
+    );
   });
 });
+
+describe.each(['instrumentation-client', 'sentry.server.config', 'sentry.edge.config'])(
+  '%s privacy hooks',
+  (name) => {
+    afterEach(() => {
+      setNodeEnv('test');
+      jest.restoreAllMocks();
+    });
+
+    it('wires sanitisation into the SDK without dropping an actionable error', async () => {
+      jest.resetModules();
+      setNodeEnv('production');
+      // Live process counters can coincidentally contain the financial-data sentinel.
+      jest.spyOn(process, 'memoryUsage').mockReturnValue({
+        rss: 1000,
+        heapTotal: 800,
+        heapUsed: 400,
+        external: 100,
+        arrayBuffers: 50,
+      });
+      jest.spyOn(process, 'uptime').mockReturnValue(42);
+      const sentry = require('@sentry/nextjs');
+      require(`../../../${name}`);
+      const options = sentry.init.mock.calls[0][0];
+      const event: ErrorEvent = {
+        type: undefined,
+        request: { url: 'https://payetax.test/?salary=73123', data: { input: { salary: 73123 } } },
+        contexts: {
+          calculator_input: { salaryRange: '73123' },
+          calculator: { stage: 'primary' },
+          error_details: { digest: 'next-42' },
+        },
+        tags: {
+          has_pension: true,
+          region: '73123',
+          error_boundary: 'tools',
+          router_kind: 'App Router',
+          request_path: '/tools?salary=73123',
+        },
+        breadcrumbs: [{ category: 'navigation', data: { from: '/?salary=73123', to: '/#73123' } }],
+        exception: { values: [{ type: 'TypeError', value: 'Calculation failed' }] },
+      };
+      const result = await options.beforeSend(event, {
+        originalException: new Error('Calculation failed'),
+      });
+      expect(result).not.toBeNull();
+      expect(JSON.stringify(result)).not.toContain('73123');
+      expect(result.exception.values[0].value).toBe('Calculation failed');
+      expect(result.contexts.calculator).toEqual({ stage: 'primary' });
+      expect(result.contexts.error_details).toEqual({ digest: 'next-42' });
+      expect(result.tags).toEqual({
+        error_boundary: 'tools',
+        router_kind: 'App Router',
+        request_path: '/tools',
+      });
+      expect(options.dataCollection).toEqual(
+        expect.objectContaining({
+          userInfo: false,
+          cookies: false,
+          httpBodies: [],
+          databaseQueryData: false,
+          genAI: { inputs: false, outputs: false },
+          graphQL: { document: false, variables: false },
+          httpHeaders: {
+            request: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+            response: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+          },
+          urlQueryParams: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+        }),
+      );
+      expect(options.attachStacktrace).toBe(false);
+      expect(options.tracesSampleRate).toBe(0);
+      expect(options.tracesSampler).toBeUndefined();
+      expect(options.replaysSessionSampleRate ?? 0).toBe(0);
+      expect(options.replaysOnErrorSampleRate ?? 0).toBe(0);
+      expect(options.beforeBreadcrumb({ category: 'console', message: 'salary=73123' })).toBeNull();
+      expect(
+        options.beforeBreadcrumb({ category: 'ui.click', message: 'salary=73123' }),
+      ).toBeNull();
+      expect(
+        options.beforeBreadcrumb({
+          category: 'fetch',
+          data: { url: '/api/send-results?email=73123' },
+        }),
+      ).toEqual({
+        category: 'fetch',
+        data: { url: '/api/send-results' },
+      });
+    });
+  },
+);

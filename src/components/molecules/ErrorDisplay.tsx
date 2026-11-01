@@ -37,7 +37,7 @@ export function ErrorDisplay({
         </div>
 
         {/* Title */}
-        <h1 className='font-bold font-display text-3xl tracking-tight'>{title}</h1>
+        <h1 className='font-display text-3xl font-bold tracking-tight'>{title}</h1>
 
         {/* Description */}
         <p className='mt-3 text-muted-foreground'>{description}</p>
@@ -75,7 +75,7 @@ export function ErrorDisplay({
         </div>
 
         {/* Error reference - subtle */}
-        <p className='mt-8 font-mono text-muted-foreground/60 text-xs'>
+        <p className='mt-8 font-mono text-xs text-muted-foreground/60'>
           Error ID: {errorId.slice(-8)}
         </p>
 
@@ -94,7 +94,7 @@ export function ErrorDisplay({
             </button>
             {showDebug && (
               <div className='mt-3 rounded-xl border border-warning/20 bg-warning/5 p-4 text-left'>
-                <pre className='overflow-auto whitespace-pre-wrap font-mono text-warning/80 text-xs'>
+                <pre className='overflow-auto font-mono text-xs whitespace-pre-wrap text-warning/80'>
                   {error.message}
                   {'\n\n'}
                   {error.stack}

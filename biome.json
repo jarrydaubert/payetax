@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.16/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.6.4/schema.json",
   "root": true,
   "vcs": {
     "enabled": true,
@@ -9,7 +9,7 @@
   "assist": {
     "actions": {
       "source": {
-        "recommended": true,
+        "preset": "recommended",
         "organizeImports": "on"
       }
     }
@@ -17,7 +17,7 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
       "correctness": {
         "noUnusedVariables": "error",
         "useExhaustiveDependencies": "error",
@@ -126,12 +126,9 @@
         "noGlobalEval": "error"
       },
       "nursery": {
-        "recommended": true,
-        "useSortedClasses": {
-          "level": "error",
-          "options": {
-            "functions": ["cn", "clsx", "twMerge", "classNames"]
-          }
+        "preset": "recommended",
+        "useTailwindSortedClasses": {
+          "level": "error"
         }
       }
     }
@@ -252,5 +249,9 @@
         }
       }
     }
-  ]
+  ],
+  "tailwind": {
+    "stylesheet": "./src/app/globals.css",
+    "mergeFunctions": ["cn", "clsx", "twMerge", "classNames"]
+  }
 }

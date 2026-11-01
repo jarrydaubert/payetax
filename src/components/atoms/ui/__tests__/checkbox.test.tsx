@@ -2,6 +2,11 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { Checkbox } from '../checkbox';
 
+const ControlledCheckbox = () => {
+  const [checked, setChecked] = React.useState(false);
+  return <Checkbox checked={checked} onCheckedChange={(value) => setChecked(value === true)} />;
+};
+
 describe('Checkbox Component', () => {
   describe('Rendering', () => {
     it('should render checkbox', () => {
@@ -59,14 +64,7 @@ describe('Checkbox Component', () => {
     });
 
     it('should work as controlled component', () => {
-      const TestComponent = () => {
-        const [checked, setChecked] = React.useState(false);
-        return (
-          <Checkbox checked={checked} onCheckedChange={(value) => setChecked(value === true)} />
-        );
-      };
-
-      render(<TestComponent />);
+      render(<ControlledCheckbox />);
       const checkbox = screen.getByRole('checkbox');
 
       expect(checkbox).not.toBeChecked();

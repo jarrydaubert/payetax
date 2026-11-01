@@ -1,0 +1,4 @@
+body keys v10: contexts,environment,event_id,fingerprint,level,message,modules,platform,release,sdk,server_name,tags,timestamp,transaction
+body keys v11: contexts,environment,event_id,fingerprint,level,message,modules,platform,release,sdk,server_name,tags,timestamp,transaction
+integrations only v10: InboundFilters,Connect
+integrations only v11: EventFilters,Dedupe,WorkerThreads,Nitro,Knex,Dataloader,Aws,Mastra,PiDurable,Mistral,Groq,TogetherAI,TypeSafe,Neon,McpServer,NextjsUseCache,SpanStreaming

@@ -168,19 +168,22 @@ describe('emailDelivery', () => {
     it.each([
       'Unauthorized API key; request received from IP address 203.0.113.10.',
       'Sender is not verified; source IP address was 203.0.113.10.',
-    ])('does not treat incidental IP details as an IP authorization failure: %s', async (message) => {
-      fetchMock.mockResolvedValue(
-        new Response(JSON.stringify({ code: 'unauthorized', message }), { status: 401 }),
-      );
+    ])(
+      'does not treat incidental IP details as an IP authorization failure: %s',
+      async (message) => {
+        fetchMock.mockResolvedValue(
+          new Response(JSON.stringify({ code: 'unauthorized', message }), { status: 401 }),
+        );
 
-      await sendOutboundEmail(MESSAGE, 'test');
+        await sendOutboundEmail(MESSAGE, 'test');
 
-      expect(consoleErrorMock).toHaveBeenCalledWith('[test] Brevo API error:', {
-        status: 401,
-        category: 'authorization',
-        code: 'unauthorized',
-      });
-    });
+        expect(consoleErrorMock).toHaveBeenCalledWith('[test] Brevo API error:', {
+          status: 401,
+          category: 'authorization',
+          code: 'unauthorized',
+        });
+      },
+    );
 
     it('returns delivery_failed when the network request throws', async () => {
       fetchMock.mockRejectedValue(new TypeError('fetch failed'));

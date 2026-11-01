@@ -180,44 +180,44 @@ describe('Main calculator amount integrity (mounted)', () => {
     }
   });
 
-  it.each([
-    false,
-    true,
-  ])('recovers a saved 5000%% pension (hydrate after mount: %s)', async (afterMount) => {
-    const user = userEvent.setup();
-    if (afterMount) render(<CalculatorContainer />);
-    localStorage.setItem(
-      'tax-calculator-storage',
-      JSON.stringify({
-        state: {
-          input: {
-            salary: 60000,
-            pensionContribution: 5000,
-            pensionContributionType: 'percentage',
+  it.each([false, true])(
+    'recovers a saved 5000%% pension (hydrate after mount: %s)',
+    async (afterMount) => {
+      const user = userEvent.setup();
+      if (afterMount) render(<CalculatorContainer />);
+      localStorage.setItem(
+        'tax-calculator-storage',
+        JSON.stringify({
+          state: {
+            input: {
+              salary: 60000,
+              pensionContribution: 5000,
+              pensionContributionType: 'percentage',
+            },
           },
-        },
-        version: 0,
-      }),
-    );
-    await act(async () => useCalculatorStore.persist.rehydrate());
-    if (!afterMount) render(<CalculatorContainer />);
+          version: 0,
+        }),
+      );
+      await act(async () => useCalculatorStore.persist.rehydrate());
+      if (!afterMount) render(<CalculatorContainer />);
 
-    const pension = screen.getByTestId('pension-input');
-    await waitFor(() => expect(pension).toHaveValue('5000'));
-    expect(pension).toHaveAttribute('aria-invalid', 'true');
-    expect(pension).toHaveAccessibleDescription(expect.stringContaining('no more than 100%'));
-    await calculate(user);
-    expect(screen.getByRole('alert')).toHaveTextContent('Pension');
-    expect(resultsShown()).toBe(false);
-    expect(useCalculatorStore.getState().input.pensionContribution).toBe(5000);
+      const pension = screen.getByTestId('pension-input');
+      await waitFor(() => expect(pension).toHaveValue('5000'));
+      expect(pension).toHaveAttribute('aria-invalid', 'true');
+      expect(pension).toHaveAccessibleDescription(expect.stringContaining('no more than 100%'));
+      await calculate(user);
+      expect(screen.getByRole('alert')).toHaveTextContent('Pension');
+      expect(resultsShown()).toBe(false);
+      expect(useCalculatorStore.getState().input.pensionContribution).toBe(5000);
 
-    await typeInto(user, pension, '5.25');
-    expect(pension).not.toHaveAttribute('aria-invalid');
-    expect(resultsShown()).toBe(false);
-    await calculate(user);
-    await waitFor(() => expect(resultsShown()).toBe(true));
-    expect(useCalculatorStore.getState().results?.pensionContribution.annually).toBe(3150);
-  });
+      await typeInto(user, pension, '5.25');
+      expect(pension).not.toHaveAttribute('aria-invalid');
+      expect(resultsShown()).toBe(false);
+      await calculate(user);
+      await waitFor(() => expect(resultsShown()).toBe(true));
+      expect(useCalculatorStore.getState().results?.pensionContribution.annually).toBe(3150);
+    },
+  );
 
   it('preserves a calculated salary on focus and leave, invalidates on a valid draft and recovers', async () => {
     const user = userEvent.setup();
@@ -248,24 +248,27 @@ describe('Main calculator amount integrity (mounted)', () => {
     expect(resultsShown()).toBe(false);
   });
 
-  it.each([
-    ['1234.56'],
-    ['£1,234.56'],
-  ])('keeps pence in additional income %j instead of scaling it to £123,456', async (text) => {
-    const user = userEvent.setup();
-    render(<CalculatorContainer />);
+  it.each([['1234.56'], ['£1,234.56']])(
+    'keeps pence in additional income %j instead of scaling it to £123,456',
+    async (text) => {
+      const user = userEvent.setup();
+      render(<CalculatorContainer />);
 
-    await typeInto(user, screen.getByTestId('salary-input'), '30000');
-    const incomeAmount = await addIncomeSource(user);
-    await typeInto(user, incomeAmount, text);
+      await typeInto(user, screen.getByTestId('salary-input'), '30000');
+      const incomeAmount = await addIncomeSource(user);
+      await typeInto(user, incomeAmount, text);
 
-    expect(incomeAmount).toHaveValue('1,234.56');
-    expect(useCalculatorStore.getState().input.incomeSources[0]?.amount).toBe(1234.56);
+      expect(incomeAmount).toHaveValue('1,234.56');
+      expect(useCalculatorStore.getState().input.incomeSources[0]?.amount).toBe(1234.56);
 
-    await calculate(user);
-    await waitFor(() => expect(resultsShown()).toBe(true));
-    expect(useCalculatorStore.getState().results?.incomeBreakdown?.total).toBeCloseTo(31234.56, 2);
-  });
+      await calculate(user);
+      await waitFor(() => expect(resultsShown()).toBe(true));
+      expect(useCalculatorStore.getState().results?.incomeBreakdown?.total).toBeCloseTo(
+        31234.56,
+        2,
+      );
+    },
+  );
 
   it('rejects a negative salary visibly, removes the old results and refuses to calculate', async () => {
     const user = userEvent.setup();
@@ -563,50 +566,49 @@ describe('Main calculator amount integrity (mounted)', () => {
     const emailAction = () =>
       screen.queryByRole('button', { name: 'Email tax calculation results' });
 
-    it.each([
-      ['pension-input'],
-      ['non-taxable-allowances-input'],
-      ['salary-input'],
-    ])('discards %s text, so later calculations and email work normally', async (testId) => {
-      const user = userEvent.setup();
-      render(<CalculatorContainer />);
-      await typeInto(user, screen.getByTestId('salary-input'), '30000');
-      await calculate(user);
-      await waitFor(() => expect(resultsShown()).toBe(true));
+    it.each([['pension-input'], ['non-taxable-allowances-input'], ['salary-input']])(
+      'discards %s text, so later calculations and email work normally',
+      async (testId) => {
+        const user = userEvent.setup();
+        render(<CalculatorContainer />);
+        await typeInto(user, screen.getByTestId('salary-input'), '30000');
+        await calculate(user);
+        await waitFor(() => expect(resultsShown()).toBe(true));
 
-      const field = screen.getByTestId(testId);
-      await user.click(field);
-      await user.clear(field);
-      await user.keyboard('abc');
-      expect(useCalculatorStore.getState().inputErrors).not.toEqual({});
+        const field = screen.getByTestId(testId);
+        await user.click(field);
+        await user.clear(field);
+        await user.keyboard('abc');
+        expect(useCalculatorStore.getState().inputErrors).not.toEqual({});
 
-      // Activate Reset without moving focus, so the field receives no blur first.
-      fireEvent.click(screen.getByRole('button', { name: /Reset/i }));
+        // Activate Reset without moving focus, so the field receives no blur first.
+        fireEvent.click(screen.getByRole('button', { name: /Reset/i }));
 
-      // Displayed draft, committed value, validation and store all agree on the reset state.
-      // Reset shows and selects its value, even while the field remains focused.
-      expect(field).toHaveValue('0.00');
-      expect(field).not.toHaveAttribute('aria-invalid');
-      expect(field).not.toHaveAccessibleDescription(/Negative|invalid|Enter an amount/);
-      expect(useCalculatorStore.getState().inputErrors).toEqual({});
-      expect(useCalculatorStore.getState().input.pensionContribution).toBe(0);
-      expect(useCalculatorStore.getState().input.allowancesDeductions).toBe(0);
-      expect(useCalculatorStore.getState().input.salary).toBe(0);
+        // Displayed draft, committed value, validation and store all agree on the reset state.
+        // Reset shows and selects its value, even while the field remains focused.
+        expect(field).toHaveValue('0.00');
+        expect(field).not.toHaveAttribute('aria-invalid');
+        expect(field).not.toHaveAccessibleDescription(/Negative|invalid|Enter an amount/);
+        expect(useCalculatorStore.getState().inputErrors).toEqual({});
+        expect(useCalculatorStore.getState().input.pensionContribution).toBe(0);
+        expect(useCalculatorStore.getState().input.allowancesDeductions).toBe(0);
+        expect(useCalculatorStore.getState().input.salary).toBe(0);
 
-      // Leaving the field afterwards must not resurrect the discarded text.
-      await user.click(field);
-      await user.tab();
-      expect(field).not.toHaveAttribute('aria-invalid');
-      expect(useCalculatorStore.getState().inputErrors).toEqual({});
+        // Leaving the field afterwards must not resurrect the discarded text.
+        await user.click(field);
+        await user.tab();
+        expect(field).not.toHaveAttribute('aria-invalid');
+        expect(useCalculatorStore.getState().inputErrors).toEqual({});
 
-      // A fresh calculation works and is not blocked by an invisible rejection.
-      await typeInto(user, screen.getByTestId('salary-input'), '30000');
-      await calculate(user);
-      await waitFor(() => expect(resultsShown()).toBe(true));
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-      expect(emailAction()).toBeInTheDocument();
-      expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(30000);
-    });
+        // A fresh calculation works and is not blocked by an invisible rejection.
+        await typeInto(user, screen.getByTestId('salary-input'), '30000');
+        await calculate(user);
+        await waitFor(() => expect(resultsShown()).toBe(true));
+        expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+        expect(emailAction()).toBeInTheDocument();
+        expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(30000);
+      },
+    );
 
     it('discards valid text still being typed, so a later blur cannot undo Reset', async () => {
       const user = userEvent.setup();

@@ -111,7 +111,7 @@ export const ResultCard = memo(function ResultCard({
       <div className={cn('space-y-2')}>
         <div className='flex items-center justify-between'>
           <p
-            className={cn('font-medium text-foreground/80 uppercase tracking-[0.12em]', 'text-sm')}
+            className={cn('font-medium tracking-[0.12em] text-foreground/80 uppercase', 'text-sm')}
           >
             {label}
           </p>
@@ -147,7 +147,7 @@ export const ResultCard = memo(function ResultCard({
       }}
       className={cn(
         'w-full cursor-help text-left',
-        'rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        'rounded-lg focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
       )}
     >
       {cardVisual}

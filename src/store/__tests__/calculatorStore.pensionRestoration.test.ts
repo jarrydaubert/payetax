@@ -48,25 +48,28 @@ describe('Pension restoration integrity', () => {
     ['percentage', 5.123, 'Enter a percentage with no more than 2 decimal places'],
     ['amount', -5000, 'Enter an amount of £0 or more.'],
     ['amount', 10000000.01, 'Enter an amount no more than'],
-  ] as const)('preserves invalid restored %s %s with a blocking field error', async (type, value, error) => {
-    await restore(value, type);
-    const state = useCalculatorStore.getState();
-    expect(state.input.salary).toBe(60000);
-    expect(state.input.pensionContribution).toBe(value);
-    expect(state.input.pensionContributionType).toBe(type);
-    expect(state.inputErrors.pensionContribution?.text).toBe(String(value));
-    expect(state.inputErrors.pensionContribution?.error).toContain(error);
-    expect(() => {
-      state.calculate();
-      state.calculatePreviousYear();
-      state.toggleWhatIf();
-      state.calculateWhatIf();
-    }).not.toThrow();
-    const blocked = useCalculatorStore.getState();
-    expect(blocked.results).toBeNull();
-    expect(blocked.previousYearResults).toBeNull();
-    expect(blocked.whatIfResults).toBeNull();
-  });
+  ] as const)(
+    'preserves invalid restored %s %s with a blocking field error',
+    async (type, value, error) => {
+      await restore(value, type);
+      const state = useCalculatorStore.getState();
+      expect(state.input.salary).toBe(60000);
+      expect(state.input.pensionContribution).toBe(value);
+      expect(state.input.pensionContributionType).toBe(type);
+      expect(state.inputErrors.pensionContribution?.text).toBe(String(value));
+      expect(state.inputErrors.pensionContribution?.error).toContain(error);
+      expect(() => {
+        state.calculate();
+        state.calculatePreviousYear();
+        state.toggleWhatIf();
+        state.calculateWhatIf();
+      }).not.toThrow();
+      const blocked = useCalculatorStore.getState();
+      expect(blocked.results).toBeNull();
+      expect(blocked.previousYearResults).toBeNull();
+      expect(blocked.whatIfResults).toBeNull();
+    },
+  );
 
   it('rebuilds the legacy error after unrelated edits and another restoration', async () => {
     await restore(5000);
@@ -80,19 +83,20 @@ describe('Pension restoration integrity', () => {
     expect(useCalculatorStore.getState().results).toBeNull();
   });
 
-  it.each([
-    0, 5.25, 100,
-  ])('recovers by explicitly correcting the percentage to %s', async (value) => {
-    await restore(5000);
-    useCalculatorStore.getState().setPensionContribution(value);
-    expect(useCalculatorStore.getState().inputErrors.pensionContribution).toBeUndefined();
-    expect(useCalculatorStore.getState().results).toBeNull();
-    useCalculatorStore.getState().calculate();
-    expect(useCalculatorStore.getState().results?.pensionContribution.annually).toBe(value * 600);
-    await useCalculatorStore.persist.rehydrate();
-    expect(useCalculatorStore.getState().input.pensionContribution).toBe(value);
-    expect(useCalculatorStore.getState().inputErrors.pensionContribution).toBeUndefined();
-  });
+  it.each([0, 5.25, 100])(
+    'recovers by explicitly correcting the percentage to %s',
+    async (value) => {
+      await restore(5000);
+      useCalculatorStore.getState().setPensionContribution(value);
+      expect(useCalculatorStore.getState().inputErrors.pensionContribution).toBeUndefined();
+      expect(useCalculatorStore.getState().results).toBeNull();
+      useCalculatorStore.getState().calculate();
+      expect(useCalculatorStore.getState().results?.pensionContribution.annually).toBe(value * 600);
+      await useCalculatorStore.persist.rehydrate();
+      expect(useCalculatorStore.getState().input.pensionContribution).toBe(value);
+      expect(useCalculatorStore.getState().inputErrors.pensionContribution).toBeUndefined();
+    },
+  );
 
   it('can recover by a deliberate unit switch and re-entry, without clearing storage', async () => {
     await restore(5000);
@@ -115,16 +119,17 @@ describe('Pension restoration integrity', () => {
     expect(useCalculatorStore.getState().inputErrors).toEqual({});
   });
 
-  it.each([
-    5.25, 5000,
-  ])('rolls over the tax year without changing saved pension %s', async (value) => {
-    const currentYear = useCalculatorStore.getState().input.taxYear;
-    const oldYear = currentYear === '2025-2026' ? '2024-2025' : '2025-2026';
-    await restore(value, 'percentage', { _savedAt: Date.now(), _taxYear: oldYear });
-    expect(useCalculatorStore.getState().input.taxYear).toBe(currentYear);
-    expect(useCalculatorStore.getState().input.pensionContribution).toBe(value);
-    expect(Boolean(useCalculatorStore.getState().inputErrors.pensionContribution)).toBe(
-      value > 100,
-    );
-  });
+  it.each([5.25, 5000])(
+    'rolls over the tax year without changing saved pension %s',
+    async (value) => {
+      const currentYear = useCalculatorStore.getState().input.taxYear;
+      const oldYear = currentYear === '2025-2026' ? '2024-2025' : '2025-2026';
+      await restore(value, 'percentage', { _savedAt: Date.now(), _taxYear: oldYear });
+      expect(useCalculatorStore.getState().input.taxYear).toBe(currentYear);
+      expect(useCalculatorStore.getState().input.pensionContribution).toBe(value);
+      expect(Boolean(useCalculatorStore.getState().inputErrors.pensionContribution)).toBe(
+        value > 100,
+      );
+    },
+  );
 });

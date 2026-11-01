@@ -46,19 +46,18 @@ describe('pension suggestion penny rounding', () => {
     [1000, 3000, 5000, 10000, 12000, 14000, 20000, 25000, 13.2, 1.1].flatMap((annual) =>
       conversions.map(([period, hours]) => ({ annual, period, hours })),
     ),
-  )('keeps $annual/year in $period at $hours hours valid and within one penny/period', ({
-    annual,
-    period,
-    hours,
-  }) => {
-    const raw = convertAnnualToPeriod(annual, period, hours);
-    const amount = roundPensionUpToPence(raw);
-    expect(parseCurrencyInput(String(amount))).toEqual({ status: 'valid', value: amount });
-    const annualised = convertPeriodToAnnual(amount, period, hours);
-    expect(annualised).toBeGreaterThanOrEqual(annual);
-    expect(annualised - annual).toBeLessThan(convertPeriodToAnnual(0.01, period, hours));
-    if (parseCurrencyInput(String(raw)).status === 'valid') expect(amount).toBe(raw);
-  });
+  )(
+    'keeps $annual/year in $period at $hours hours valid and within one penny/period',
+    ({ annual, period, hours }) => {
+      const raw = convertAnnualToPeriod(annual, period, hours);
+      const amount = roundPensionUpToPence(raw);
+      expect(parseCurrencyInput(String(amount))).toEqual({ status: 'valid', value: amount });
+      const annualised = convertPeriodToAnnual(amount, period, hours);
+      expect(annualised).toBeGreaterThanOrEqual(annual);
+      expect(annualised - annual).toBeLessThan(convertPeriodToAnnual(0.01, period, hours));
+      if (parseCurrencyInput(String(raw)).status === 'valid') expect(amount).toBe(raw);
+    },
+  );
 });
 
 describe('pensionOptimizer', () => {

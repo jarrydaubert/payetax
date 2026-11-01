@@ -11,6 +11,22 @@ import {
   DialogTrigger,
 } from '../dialog';
 
+const ControlledDialog = () => {
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger>Open</DialogTrigger>
+      <DialogContent>
+        <DialogTitle>Controlled Dialog</DialogTitle>
+        <button type='button' onClick={() => setOpen(false)}>
+          Close Programmatically
+        </button>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 describe('Dialog Component', () => {
   describe('Rendering', () => {
     it('should render dialog trigger', () => {
@@ -184,23 +200,7 @@ describe('Dialog Component', () => {
 
   describe('Controlled Dialog', () => {
     it('should work as controlled component', async () => {
-      const TestComponent = () => {
-        const [open, setOpen] = React.useState(false);
-
-        return (
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger>Open</DialogTrigger>
-            <DialogContent>
-              <DialogTitle>Controlled Dialog</DialogTitle>
-              <button type='button' onClick={() => setOpen(false)}>
-                Close Programmatically
-              </button>
-            </DialogContent>
-          </Dialog>
-        );
-      };
-
-      render(<TestComponent />);
+      render(<ControlledDialog />);
 
       fireEvent.click(screen.getByText('Open'));
 

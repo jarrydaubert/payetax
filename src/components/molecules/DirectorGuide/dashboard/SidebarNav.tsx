@@ -47,7 +47,7 @@ const getItemClass = (collapsed: boolean, isActive = false) =>
 
 const getLabelClass = (collapsed: boolean) =>
   cn(
-    'block max-w-44 overflow-hidden text-ellipsis whitespace-nowrap font-medium text-sm tracking-tight transition-all duration-200 2xl:max-w-52',
+    'block max-w-44 overflow-hidden text-sm font-medium tracking-tight text-ellipsis whitespace-nowrap transition-all duration-200 2xl:max-w-52',
     collapsed ? 'max-w-0 opacity-0' : 'opacity-100',
   );
 
@@ -266,7 +266,7 @@ export function SidebarNav({
   return (
     <nav
       className={cn(
-        'relative flex h-full flex-col border-border/40 border-r bg-background py-3 transition-[width,padding] duration-200 ease-out 2xl:py-4',
+        'relative flex h-full flex-col border-r border-border/40 bg-background py-3 transition-[width,padding] duration-200 ease-out 2xl:py-4',
         collapsed ? 'w-14 px-2' : 'w-56 px-2.5 xl:w-64 2xl:w-72 2xl:px-3.5',
       )}
       aria-label='Sidebar navigation'
@@ -275,7 +275,7 @@ export function SidebarNav({
       <Link
         href='/'
         className={cn(
-          'mb-4 flex items-center rounded-sm border border-border/70 bg-card text-foreground transition-colors hover:border-primary/45 hover:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+          'mb-4 flex items-center rounded-sm border border-border/70 bg-card text-foreground transition-colors hover:border-primary/45 hover:bg-card focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none',
           collapsed
             ? 'size-10 justify-center p-0'
             : 'mb-3 min-h-11 w-full gap-2.5 px-2.5 py-2 xl:mb-4 xl:min-h-12 xl:gap-3 xl:px-3 xl:py-2.5',
@@ -287,7 +287,7 @@ export function SidebarNav({
         </span>
         <span
           className={cn(
-            'brand-wordmark block max-w-44 overflow-hidden whitespace-nowrap text-foreground text-sm transition-all duration-200 2xl:text-base',
+            'brand-wordmark block max-w-44 overflow-hidden text-sm whitespace-nowrap text-foreground transition-all duration-200 2xl:text-base',
             collapsed ? 'max-w-0 opacity-0' : 'opacity-100',
           )}
         >
@@ -298,8 +298,8 @@ export function SidebarNav({
 
       {!collapsed && (
         <div className='mb-3 rounded-sm border border-primary/25 bg-primary/10 p-2.5 2xl:mb-4 2xl:p-3'>
-          <div className='font-semibold text-primary text-xs uppercase tracking-widest'>Guide</div>
-          <p className='mt-1 text-muted-foreground text-xs leading-relaxed'>
+          <div className='text-xs font-semibold tracking-widest text-primary uppercase'>Guide</div>
+          <p className='mt-1 text-xs leading-relaxed text-muted-foreground'>
             {dashboardVariant
               ? 'Use Workflow to jump between sections instantly.'
               : 'Enter figures in the inputs panel to unlock scenario navigation.'}
@@ -324,7 +324,7 @@ export function SidebarNav({
         {emailUnavailableReason && (
           <p
             id={emailUnavailableId}
-            className={cn('px-2 text-muted-foreground text-xs', collapsed && 'sr-only')}
+            className={cn('px-2 text-xs text-muted-foreground', collapsed && 'sr-only')}
           >
             {emailUnavailableReason}
           </p>

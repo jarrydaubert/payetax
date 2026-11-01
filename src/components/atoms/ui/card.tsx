@@ -51,7 +51,7 @@ const CardTitle = forwardRef<ElementRef<'h3'>, ComponentPropsWithoutRef<'h3'>>(
   ({ className, ...props }, ref) => (
     <h3
       ref={ref}
-      className={cn('font-semibold leading-none tracking-tight', className)}
+      className={cn('leading-none font-semibold tracking-tight', className)}
       {...props}
     />
   ),
@@ -63,7 +63,7 @@ CardTitle.displayName = 'CardTitle';
  */
 const CardDescription = forwardRef<ElementRef<'p'>, ComponentPropsWithoutRef<'p'>>(
   ({ className, ...props }, ref) => (
-    <p ref={ref} className={cn('text-muted-foreground text-sm', className)} {...props} />
+    <p ref={ref} className={cn('text-sm text-muted-foreground', className)} {...props} />
   ),
 );
 CardDescription.displayName = 'CardDescription';

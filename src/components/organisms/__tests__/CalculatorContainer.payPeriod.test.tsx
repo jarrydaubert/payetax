@@ -27,26 +27,29 @@ describe('Submitted pay period presentation (mounted)', () => {
     ['weekly', 'weekly'],
     ['daily', 'daily'],
     ['hourly', 'hourly'],
-  ] as const)('starts %s input in %s using engine period values', async (inputPeriod, displayed) => {
-    const user = userEvent.setup();
-    useCalculatorStore.getState().setInput({
-      salary: inputPeriod === 'hourly' ? 23.45 : 1234.56,
-      payPeriod: inputPeriod,
-      hoursPerWeek: 32,
-    });
-    render(<CalculatorContainer />);
-    await user.click(screen.getByTestId('calculate-button'));
-    const results = useCalculatorStore.getState().results;
-    if (!results) throw new Error('Calculate did not publish results');
-    expect(screen.getByTestId('mobile-take-home')).toHaveTextContent(
-      new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(
-        results.netPay[displayed],
-      ),
-    );
-    expect(screen.getByTestId('mobile-take-home-context')).toHaveTextContent(
-      `${new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(results.netPay.annually)} per year`,
-    );
-  });
+  ] as const)(
+    'starts %s input in %s using engine period values',
+    async (inputPeriod, displayed) => {
+      const user = userEvent.setup();
+      useCalculatorStore.getState().setInput({
+        salary: inputPeriod === 'hourly' ? 23.45 : 1234.56,
+        payPeriod: inputPeriod,
+        hoursPerWeek: 32,
+      });
+      render(<CalculatorContainer />);
+      await user.click(screen.getByTestId('calculate-button'));
+      const results = useCalculatorStore.getState().results;
+      if (!results) throw new Error('Calculate did not publish results');
+      expect(screen.getByTestId('mobile-take-home')).toHaveTextContent(
+        new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(
+          results.netPay[displayed],
+        ),
+      );
+      expect(screen.getByTestId('mobile-take-home-context')).toHaveTextContent(
+        `${new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' }).format(results.netPay.annually)} per year`,
+      );
+    },
+  );
 
   it('switches only the presentation, resets on Calculate and hides stale values after edits', async () => {
     const user = userEvent.setup();

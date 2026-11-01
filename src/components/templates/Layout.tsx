@@ -39,10 +39,10 @@ export function Layout({ appVersion, children }: LayoutProps): React.ReactElemen
   return (
     <div className='relative flex min-h-screen flex-col bg-background'>
       <div
-        className='pointer-events-none fixed inset-0 z-0 overflow-hidden bg-elements'
+        className='bg-elements pointer-events-none fixed inset-0 z-0 overflow-hidden'
         aria-hidden='true'
       >
-        <div className='absolute inset-0 bg-grid' />
+        <div className='bg-grid absolute inset-0' />
       </div>
 
       {/* Skip to main content for screen readers */}

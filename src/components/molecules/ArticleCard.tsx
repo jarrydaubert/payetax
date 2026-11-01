@@ -138,12 +138,12 @@ export function ArticleCardLarge({ post, className, priority = false }: ArticleC
             {post.title}
           </h3>
 
-          <p className='mb-3 line-clamp-3 text-muted-foreground text-sm leading-6 sm:mb-4 sm:line-clamp-2'>
+          <p className='mb-3 line-clamp-3 text-sm leading-6 text-muted-foreground sm:mb-4 sm:line-clamp-2'>
             {post.excerpt}
           </p>
 
           {/* Meta */}
-          <div className='flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground text-xs'>
+          <div className='flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground'>
             <span>{post.readTime}</span>
             <span aria-hidden='true'>|</span>
             <time dateTime={post.publishedAt}>{formattedDate}</time>
@@ -178,7 +178,7 @@ export function ArticleCardSmall({ post, className }: ArticleCardProps) {
           />
 
           {/* Category badge overlay */}
-          <span className='absolute bottom-1 left-1 border border-primary/35 bg-background/90 px-1.5 py-0.5 font-semibold text-[10px] text-primary uppercase sm:text-xs'>
+          <span className='absolute bottom-1 left-1 border border-primary/35 bg-background/90 px-1.5 py-0.5 text-[10px] font-semibold text-primary uppercase sm:text-xs'>
             {categoryConfig.label.split(' ')[0]}
           </span>
         </div>
@@ -190,7 +190,7 @@ export function ArticleCardSmall({ post, className }: ArticleCardProps) {
           </h3>
 
           {/* Meta */}
-          <div className='flex flex-wrap items-center gap-x-2 gap-y-1 text-muted-foreground text-xs'>
+          <div className='flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground'>
             <span>{post.readTime}</span>
             <span aria-hidden='true'>|</span>
             <time dateTime={post.publishedAt}>{formattedDateShort}</time>
@@ -232,10 +232,10 @@ export function ArticleCardDeepDive({ post, className }: ArticleCardProps) {
         <div className='p-4'>
           <h3 className={cn('mb-2 line-clamp-2 text-base', cardTitle)}>{post.title}</h3>
 
-          <p className='mb-3 line-clamp-2 text-muted-foreground text-sm'>{post.excerpt}</p>
+          <p className='mb-3 line-clamp-2 text-sm text-muted-foreground'>{post.excerpt}</p>
 
           {/* Meta */}
-          <div className='flex items-center gap-2 text-muted-foreground text-xs'>
+          <div className='flex items-center gap-2 text-xs text-muted-foreground'>
             <span>{post.readTime}</span>
             <span aria-hidden='true'>|</span>
             <time dateTime={post.publishedAt}>{formattedDateShort}</time>

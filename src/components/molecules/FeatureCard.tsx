@@ -102,7 +102,7 @@ export function FeatureCard({ feature, variant = 'default', className }: Feature
 
       <CardContent>
         {/* Description */}
-        <p className={cn('text-muted-foreground leading-relaxed', 'mb-4', 'text-base')}>
+        <p className={cn('leading-relaxed text-muted-foreground', 'mb-4', 'text-base')}>
           {description}
         </p>
 

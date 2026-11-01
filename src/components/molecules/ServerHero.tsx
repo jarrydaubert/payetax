@@ -26,19 +26,19 @@ export default function ServerHero({ className }: ServerHeroProps) {
         className,
       )}
     >
-      <p className='mb-4 rounded-sm border border-primary/25 bg-background px-4 py-1.5 font-medium text-primary text-sm uppercase tracking-[0.2em]'>
+      <p className='mb-4 rounded-sm border border-primary/25 bg-background px-4 py-1.5 text-sm font-medium tracking-[0.2em] text-primary uppercase'>
         Updated for {taxYearLabel}
       </p>
 
       {/* Heading */}
-      <h1 className='mx-auto mb-5 max-w-4xl font-display font-semibold text-5xl text-foreground leading-[0.98] tracking-tight sm:text-6xl lg:text-[4.75rem]'>
+      <h1 className='font-display mx-auto mb-5 max-w-4xl text-5xl leading-[0.98] font-semibold tracking-tight text-foreground sm:text-6xl lg:text-[4.75rem]'>
         UK PAYE tax calculator
         <br />
         <span className='text-primary'>See your take-home pay</span>
       </h1>
 
       {/* Tagline */}
-      <p className='mx-auto mb-8 max-w-2xl text-lg text-muted-foreground leading-relaxed'>
+      <p className='mx-auto mb-8 max-w-2xl text-lg leading-relaxed text-muted-foreground'>
         Estimate your take-home pay with official HMRC rates for income tax, National Insurance,
         student loans, and pensions.
       </p>
@@ -69,14 +69,14 @@ export default function ServerHero({ className }: ServerHeroProps) {
       </div>
 
       {/* Trust Strip */}
-      <div className='flex max-w-4xl flex-wrap justify-center gap-5 border-border border-t py-6 sm:gap-8'>
+      <div className='flex max-w-4xl flex-wrap justify-center gap-5 border-t border-border py-6 sm:gap-8'>
         {[
           { icon: CheckCircle, text: 'Official HMRC rates' },
           { icon: CheckCircle, text: 'Fast in-browser results' },
           { icon: Shield, text: 'Your data stays private' },
           { icon: Shield, text: 'No signup needed' },
         ].map(({ icon: Icon, text }) => (
-          <div key={text} className='flex items-center gap-2 text-muted-foreground text-sm'>
+          <div key={text} className='flex items-center gap-2 text-sm text-muted-foreground'>
             <Icon aria-hidden='true' className='size-4 flex-shrink-0 text-primary' />
             <span>{text}</span>
           </div>

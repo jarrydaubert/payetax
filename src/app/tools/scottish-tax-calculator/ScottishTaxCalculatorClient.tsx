@@ -86,13 +86,13 @@ export function ScottishTaxCalculatorClient() {
       <div className='mb-12 text-center'>
         <div className='mb-4 inline-flex items-center gap-2 rounded-sm border border-primary/35 bg-background px-4 py-2 text-primary'>
           <MapPin className={'size-4'} />
-          <span className='font-medium text-sm uppercase tracking-[0.2em]'>
+          <span className='text-sm font-medium tracking-[0.2em] uppercase'>
             Scottish Income Tax
           </span>
         </div>
         <h1
           className={cn(
-            'mb-4 font-display font-semibold text-foreground leading-tight',
+            'font-display mb-4 leading-tight font-semibold text-foreground',
             'text-4xl',
           )}
         >
@@ -153,12 +153,12 @@ export function ScottishTaxCalculatorClient() {
               Compare
             </Button>
           </form>
-          <p id={helpId} className='mt-2 text-muted-foreground text-sm'>
+          <p id={helpId} className='mt-2 text-sm text-muted-foreground'>
             Use digits, optional commas and up to 2 decimal places, for example 50000.50 or
             50,000.50.
           </p>
           {salaryError && (
-            <p id={errorId} className='mt-2 text-destructive text-sm' role='alert'>
+            <p id={errorId} className='mt-2 text-sm text-destructive' role='alert'>
               {salaryError}
             </p>
           )}
@@ -175,7 +175,7 @@ export function ScottishTaxCalculatorClient() {
                   className={cn(
                     'rounded-full border border-border/50 px-3 py-1 font-mono text-sm transition-colors',
                     'hover:border-primary hover:bg-primary/5',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
+                    'focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none',
                   )}
                 >
                   £{exampleSalary.toLocaleString()}
@@ -192,14 +192,14 @@ export function ScottishTaxCalculatorClient() {
           <CardContent className='pt-6'>
             <div className='grid gap-4 md:grid-cols-3'>
               <div className='rounded-lg border border-primary/30 bg-primary/10 p-4'>
-                <p className='mb-1 font-medium text-primary text-sm'>Scottish Tax</p>
-                <p className='font-bold text-2xl text-foreground'>
+                <p className='mb-1 text-sm font-medium text-primary'>Scottish Tax</p>
+                <p className='text-2xl font-bold text-foreground'>
                   {formatCurrency(comparison.scottishTax, 0)}
                 </p>
               </div>
               <div className='rounded-lg border border-border/50 bg-card p-4'>
-                <p className='mb-1 font-medium text-muted-foreground text-sm'>Rest of UK Tax</p>
-                <p className='font-bold text-2xl'>{formatCurrency(comparison.rukTax, 0)}</p>
+                <p className='mb-1 text-sm font-medium text-muted-foreground'>Rest of UK Tax</p>
+                <p className='text-2xl font-bold'>{formatCurrency(comparison.rukTax, 0)}</p>
               </div>
               <div
                 className={cn(
@@ -211,7 +211,7 @@ export function ScottishTaxCalculatorClient() {
                       : 'bg-card',
                 )}
               >
-                <p className='mb-1 font-medium text-sm'>
+                <p className='mb-1 text-sm font-medium'>
                   {comparison.difference > 0
                     ? 'You pay more in Scotland'
                     : comparison.difference < 0
@@ -220,7 +220,7 @@ export function ScottishTaxCalculatorClient() {
                 </p>
                 <p
                   className={cn(
-                    'font-bold text-2xl',
+                    'text-2xl font-bold',
                     comparison.difference > 0
                       ? 'text-warning'
                       : comparison.difference < 0
@@ -237,7 +237,7 @@ export function ScottishTaxCalculatorClient() {
             <div className='mt-6 rounded-lg border border-primary/30 bg-primary/10 p-4'>
               <div className='flex items-start gap-2'>
                 <Info className={cn('size-4', 'mt-0.5 flex-shrink-0 text-primary')} />
-                <p className='text-primary text-sm'>
+                <p className='text-sm text-primary'>
                   This is an annual Income Tax comparison, not a payslip or take-home calculation.
                   Scottish taxpayers usually have an &quot;S&quot; prefix in their tax code (for
                   example, S1257L).
@@ -264,14 +264,14 @@ export function ScottishTaxCalculatorClient() {
           <div className='overflow-x-auto'>
             <table className='w-full'>
               <thead>
-                <tr className='border-border/50 border-b'>
+                <tr className='border-b border-border/50'>
                   <th className='px-4 py-3 text-left font-medium'>Band</th>
                   <th className='px-4 py-3 text-left font-medium'>Rate</th>
                   <th className='px-4 py-3 text-left font-medium'>Income Range</th>
                 </tr>
               </thead>
               <tbody>
-                <tr className='border-border/50 border-b'>
+                <tr className='border-b border-border/50'>
                   <td className='px-4 py-3'>Personal Allowance</td>
                   <td className='px-4 py-3 font-mono'>0%</td>
                   <td className='px-4 py-3 text-muted-foreground'>
@@ -300,9 +300,9 @@ export function ScottishTaxCalculatorClient() {
                         );
 
                   return (
-                    <tr key={band.name} className='border-border/50 border-b last:border-0'>
+                    <tr key={band.name} className='border-b border-border/50 last:border-0'>
                       <td className='px-4 py-3'>{band.name}</td>
-                      <td className='px-4 py-3 font-medium font-mono'>{band.rate}%</td>
+                      <td className='px-4 py-3 font-mono font-medium'>{band.rate}%</td>
                       <td className='px-4 py-3 text-muted-foreground'>
                         {endIncome
                           ? `£${startIncome.toLocaleString()} to £${endIncome.toLocaleString()}`
@@ -329,7 +329,7 @@ export function ScottishTaxCalculatorClient() {
           <div className='grid gap-4 md:grid-cols-2'>
             <div className='space-y-3'>
               <h3 className='font-semibold'>Scotland ({scottishRates.bands.length} bands)</h3>
-              <ul className='space-y-2 text-muted-foreground text-sm'>
+              <ul className='space-y-2 text-sm text-muted-foreground'>
                 {scottishRates.bands.map((band) => (
                   <li key={band.name}>
                     • {band.name}: {band.rate}%
@@ -339,7 +339,7 @@ export function ScottishTaxCalculatorClient() {
             </div>
             <div className='space-y-3'>
               <h3 className='font-semibold'>Rest of UK ({rukRates.bands.length} bands)</h3>
-              <ul className='space-y-2 text-muted-foreground text-sm'>
+              <ul className='space-y-2 text-sm text-muted-foreground'>
                 {rukRates.bands.map((band) => (
                   <li key={band.name}>
                     • {band.name}: {band.rate}%

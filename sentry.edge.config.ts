@@ -1,5 +1,9 @@
 import * as Sentry from '@sentry/nextjs';
-import { sanitizeSentryBreadcrumb, sanitizeSentryEvent } from '@/lib/sentryPrivacy';
+import {
+  SENTRY_DATA_COLLECTION,
+  sanitizeSentryBreadcrumb,
+  sanitizeSentryEvent,
+} from '@/lib/sentryPrivacy';
 import { shouldDropSentryEventForUnmonitoredPath } from '@/lib/sentryScope';
 
 Sentry.init({
@@ -9,8 +13,8 @@ Sentry.init({
   environment: process.env.NODE_ENV,
   release: process.env.VERCEL_GIT_COMMIT_SHA || 'development',
 
-  enableLogs: false,
-  sendDefaultPii: false,
+  dataCollection: SENTRY_DATA_COLLECTION,
+  attachStacktrace: false,
   tracesSampleRate: 0,
 
   // Do not attach arbitrary properties from caught Error objects.

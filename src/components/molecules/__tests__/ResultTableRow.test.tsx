@@ -10,6 +10,8 @@ const TableWrapper = ({ children }: { children: React.ReactNode }) => (
   </table>
 );
 
+const TestIcon = () => <div data-testid='test-icon' />;
+
 describe('ResultTableRow Component', () => {
   const defaultProps = {
     category: 'Income Tax',
@@ -237,8 +239,6 @@ describe('ResultTableRow Component', () => {
 
   describe('Icons', () => {
     it('should render different icon types', () => {
-      const TestIcon = () => <div data-testid='test-icon' />;
-
       const { container } = render(<ResultTableRow {...defaultProps} icon={TestIcon} />, {
         wrapper: TableWrapper,
       });

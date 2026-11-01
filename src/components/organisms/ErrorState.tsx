@@ -91,7 +91,7 @@ export function ErrorState({
         </>
       }
       footer={
-        <span className='font-mono text-muted-foreground/70 text-xs'>
+        <span className='font-mono text-xs text-muted-foreground/70'>
           Error ID: {displayId.length > 12 ? displayId.slice(-12) : displayId}
         </span>
       }
@@ -117,7 +117,7 @@ export function ErrorState({
               id={debugPanelId}
               className='mt-3 rounded-sm border border-warning/20 bg-warning/5 p-4 text-left'
             >
-              <pre className='overflow-auto whitespace-pre-wrap font-mono text-warning/80 text-xs'>
+              <pre className='overflow-auto font-mono text-xs whitespace-pre-wrap text-warning/80'>
                 {error.message}
                 {'\n\n'}
                 {error.stack}

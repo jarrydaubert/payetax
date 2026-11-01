@@ -1,0 +1,18 @@
+src/lib/sentryPrivacy.ts {"FNF":3,"FNH":3,"LF":163,"LH":158,"BRF":56,"BRH":50} -> {"FNF":3,"FNH":3,"LF":182,"LH":177,"BRF":56,"BRH":50}
+files: 275 vs 275; differing files: 1
+totals A {
+  FNF: 986,
+  FNH: 850,
+  LF: 45909,
+  LH: 43479,
+  BRF: 4723,
+  BRH: 4040,
+}
+totals B {
+  FNF: 986,
+  FNH: 850,
+  LF: 45928,
+  LH: 43498,
+  BRF: 4723,
+  BRH: 4040,
+}

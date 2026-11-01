@@ -29,31 +29,32 @@ import { extractFAQs, extractHowToSteps, getPostBySlug } from '@/lib/mdx';
 import { BlogFrontmatterSchema } from '@/lib/validation';
 
 describe('current-facing tax guidance', () => {
-  it.each(
-    CURRENT_TAX_GUIDANCE_SLUGS,
-  )('%s has current metadata and FAQ copy that feeds structured data', (slug) => {
-    const post = getPostBySlug(slug);
+  it.each(CURRENT_TAX_GUIDANCE_SLUGS)(
+    '%s has current metadata and FAQ copy that feeds structured data',
+    (slug) => {
+      const post = getPostBySlug(slug);
 
-    expect(post).toBeDefined();
-    expect(post?.updatedAt).toBe('2026-07-29');
-    expect(post?.title).toContain('2026/27');
-    expect(post?.seoTitle).toContain('2026/27');
-    expect(post?.seoDescription).toContain('2026/27');
-    expect(extractFAQs(post?.content ?? '')).not.toHaveLength(0);
-  });
+      expect(post).toBeDefined();
+      expect(post?.updatedAt).toBe('2026-07-29');
+      expect(post?.title).toContain('2026/27');
+      expect(post?.seoTitle).toContain('2026/27');
+      expect(post?.seoDescription).toContain('2026/27');
+      expect(extractFAQs(post?.content ?? '')).not.toHaveLength(0);
+    },
+  );
 
-  it.each(CURRENT_TAX_GUIDANCE)('$slug has a valid dedicated factual-review date', ({
-    slug,
-    reviewedAt,
-  }) => {
-    const post = getPostBySlug(slug);
+  it.each(CURRENT_TAX_GUIDANCE)(
+    '$slug has a valid dedicated factual-review date',
+    ({ slug, reviewedAt }) => {
+      const post = getPostBySlug(slug);
 
-    expect(reviewedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-    expect(Number.isNaN(Date.parse(reviewedAt))).toBe(false);
-    expect(new Date(post?.updatedAt ?? 0).getTime()).toBeGreaterThanOrEqual(
-      new Date(reviewedAt).getTime(),
-    );
-  });
+      expect(reviewedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(Number.isNaN(Date.parse(reviewedAt))).toBe(false);
+      expect(new Date(post?.updatedAt ?? 0).getTime()).toBeGreaterThanOrEqual(
+        new Date(reviewedAt).getTime(),
+      );
+    },
+  );
 
   it.each([
     'beginners-guide-to-uk-taxation',

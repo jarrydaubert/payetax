@@ -8,6 +8,10 @@ import { ErrorState } from '../ErrorState';
 
 jest.mock('@sentry/nextjs', () => ({ captureException: jest.fn(), withScope: jest.fn() }));
 
+function FailedChild(): never {
+  throw new Error('Technical boundary failure');
+}
+
 describe('production Sentry diagnostic producers', () => {
   let reported: Event[];
   let tags: NonNullable<Event['tags']>;
@@ -53,9 +57,6 @@ describe('production Sentry diagnostic producers', () => {
 
   it('keeps ErrorBoundary identification and a useful React component stack', () => {
     const consoleError = jest.spyOn(console, 'error').mockImplementation(() => {});
-    function FailedChild(): never {
-      throw new Error('Technical boundary failure');
-    }
     try {
       render(
         <ErrorBoundary>
@@ -73,20 +74,20 @@ describe('production Sentry diagnostic producers', () => {
     }
   });
 
-  it.each([
-    'App Router',
-    'Pages Router',
-  ] as const)('keeps onRequestError %s tags and cleans the request path', async (routerKind) => {
-    await onRequestError(
-      new Error('Technical request failure'),
-      { path: '/tools/director-guide?salary=73123#email' },
-      { routerKind },
-    );
-    expect(reported[0]?.tags).toEqual({
-      router_kind: routerKind,
-      request_path: '/tools/director-guide',
-    });
-    expect(reported[0]?.contexts?.request).toEqual({ url: '/tools/director-guide' });
-    expect(JSON.stringify(reported)).not.toContain('73123');
-  });
+  it.each(['App Router', 'Pages Router'] as const)(
+    'keeps onRequestError %s tags and cleans the request path',
+    async (routerKind) => {
+      await onRequestError(
+        new Error('Technical request failure'),
+        { path: '/tools/director-guide?salary=73123#email' },
+        { routerKind },
+      );
+      expect(reported[0]?.tags).toEqual({
+        router_kind: routerKind,
+        request_path: '/tools/director-guide',
+      });
+      expect(reported[0]?.contexts?.request).toEqual({ url: '/tools/director-guide' });
+      expect(JSON.stringify(reported)).not.toContain('73123');
+    },
+  );
 });

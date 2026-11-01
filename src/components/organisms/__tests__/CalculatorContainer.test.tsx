@@ -277,27 +277,30 @@ describe('CalculatorContainer Component', () => {
     it.each([
       ['S1257L', 'England', 'S', 'Scotland'],
       ['C1257L', 'Scotland', 'C', 'Wales'],
-    ])('explains that %s overrides a conflicting %s selection', (taxCode, region, prefix, effectiveRegion) => {
-      (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
-      (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-        selector({
-          previousYearResults: null,
-          input: {
-            studentLoanPlans: 'none',
-            allowancesDeductions: 0,
-            taxCode,
-            region,
-          },
-        }),
-      );
-      render(<CalculatorContainer />);
+    ])(
+      'explains that %s overrides a conflicting %s selection',
+      (taxCode, region, prefix, effectiveRegion) => {
+        (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
+        (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
+          selector({
+            previousYearResults: null,
+            input: {
+              studentLoanPlans: 'none',
+              allowancesDeductions: 0,
+              taxCode,
+              region,
+            },
+          }),
+        );
+        render(<CalculatorContainer />);
 
-      fireEvent.click(screen.getByRole('button', { name: /Calculate/i }));
+        fireEvent.click(screen.getByRole('button', { name: /Calculate/i }));
 
-      expect(screen.getByRole('status')).toHaveTextContent(
-        `The ${prefix} prefix assigns ${effectiveRegion} tax rates`,
-      );
-    });
+        expect(screen.getByRole('status')).toHaveTextContent(
+          `The ${prefix} prefix assigns ${effectiveRegion} tax rates`,
+        );
+      },
+    );
 
     it('explains why separate allowance controls are not added to a valid code', () => {
       (useCalculatorResults as jest.Mock).mockReturnValue({

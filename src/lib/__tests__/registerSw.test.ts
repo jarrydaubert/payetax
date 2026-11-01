@@ -76,46 +76,45 @@ describe('register-sw script', () => {
     expect(script).not.toContain("localStorage.getItem('cookie-consent')");
   });
 
-  it.each([
-    'loading',
-    'interactive',
-    'complete',
-  ])('registers once when loaded during document state %s, including lazyOnload', async (state) => {
-    const h = harness(state);
-    h.run();
-    if (state !== 'complete') {
-      expect(h.register).not.toHaveBeenCalled();
-      h.windowEvents.get('load')?.();
-      h.windowEvents.get('load')?.();
-    }
-    await waitFor(() => expect(h.register).toHaveBeenCalledTimes(1));
-    expect(h.register).toHaveBeenCalledWith('/sw.js', { scope: '/', updateViaCache: 'none' });
-  });
+  it.each(['loading', 'interactive', 'complete'])(
+    'registers once when loaded during document state %s, including lazyOnload',
+    async (state) => {
+      const h = harness(state);
+      h.run();
+      if (state !== 'complete') {
+        expect(h.register).not.toHaveBeenCalled();
+        h.windowEvents.get('load')?.();
+        h.windowEvents.get('load')?.();
+      }
+      await waitFor(() => expect(h.register).toHaveBeenCalledTimes(1));
+      expect(h.register).toHaveBeenCalledWith('/sw.js', { scope: '/', updateViaCache: 'none' });
+    },
+  );
 
-  it.each([
-    false,
-    true,
-  ])('keeps a waiting update quiet without activation/reload or input mutation (standalone=%s)', async (standalone) => {
-    document.body.innerHTML =
-      '<input id="draft" value="1234.invalid"><input id="email" value="unfinished@">';
-    const h = harness('complete', standalone);
-    h.run();
-    await waitFor(() => expect(h.documentEvents.has('visibilitychange')).toBe(true));
-    h.documentEvents.get('visibilitychange')?.();
-    h.documentEvents.get('visibilitychange')?.();
-    await waitFor(() => expect(h.registration.update).toHaveBeenCalledTimes(2));
-    expect(document.getElementById('sw-update-btn')).not.toBeInTheDocument();
-    jest.advanceTimersByTime(60000);
-    expect(document.getElementById('sw-update-notification')).not.toBeInTheDocument();
-    expect(document.getElementById('draft')).toHaveValue('1234.invalid');
-    expect(document.getElementById('email')).toHaveValue('unfinished@');
-    expect(h.worker.postMessage).not.toHaveBeenCalled();
-    expect(h.reload).not.toHaveBeenCalled();
-    expect(h.serviceWorker.addEventListener).not.toHaveBeenCalledWith(
-      'controllerchange',
-      expect.anything(),
-    );
-  });
+  it.each([false, true])(
+    'keeps a waiting update quiet without activation/reload or input mutation (standalone=%s)',
+    async (standalone) => {
+      document.body.innerHTML =
+        '<input id="draft" value="1234.invalid"><input id="email" value="unfinished@">';
+      const h = harness('complete', standalone);
+      h.run();
+      await waitFor(() => expect(h.documentEvents.has('visibilitychange')).toBe(true));
+      h.documentEvents.get('visibilitychange')?.();
+      h.documentEvents.get('visibilitychange')?.();
+      await waitFor(() => expect(h.registration.update).toHaveBeenCalledTimes(2));
+      expect(document.getElementById('sw-update-btn')).not.toBeInTheDocument();
+      jest.advanceTimersByTime(60000);
+      expect(document.getElementById('sw-update-notification')).not.toBeInTheDocument();
+      expect(document.getElementById('draft')).toHaveValue('1234.invalid');
+      expect(document.getElementById('email')).toHaveValue('unfinished@');
+      expect(h.worker.postMessage).not.toHaveBeenCalled();
+      expect(h.reload).not.toHaveBeenCalled();
+      expect(h.serviceWorker.addEventListener).not.toHaveBeenCalledWith(
+        'controllerchange',
+        expect.anything(),
+      );
+    },
+  );
 
   it('leaves an installing worker alone through registration and resume', async () => {
     const h = harness();
@@ -174,14 +173,13 @@ describe('register-sw script', () => {
     expect(h.reload).not.toHaveBeenCalled();
   });
 
-  it.each([
-    '',
-    '?pwa=10',
-    '?other=pwa=1',
-  ])('leaves local development uncontrolled unless explicitly opted in: %s', (search) => {
-    const h = harness();
-    h.fakeWindow.location.search = search;
-    h.run();
-    expect(h.register).not.toHaveBeenCalled();
-  });
+  it.each(['', '?pwa=10', '?other=pwa=1'])(
+    'leaves local development uncontrolled unless explicitly opted in: %s',
+    (search) => {
+      const h = harness();
+      h.fakeWindow.location.search = search;
+      h.run();
+      expect(h.register).not.toHaveBeenCalled();
+    },
+  );
 });

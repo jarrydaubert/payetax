@@ -34,7 +34,7 @@ export function HowToStepCard({ step, title, description }: HowToStepCardProps) 
         <h3 className={cn('font-display font-semibold text-foreground', 'mb-3', 'text-xl')}>
           {title}
         </h3>
-        <p className='text-muted-foreground leading-relaxed'>{description}</p>
+        <p className='leading-relaxed text-muted-foreground'>{description}</p>
       </div>
     </Card>
   );

@@ -32,13 +32,12 @@ describe('sentryScope', () => {
     expect(isSentryMonitoredPath(path)).toBe(true);
   });
 
-  it.each([
-    '/calculator',
-    '/about',
-    '/privacy',
-  ])('treats non-calculator path %s as unmonitored', (path) => {
-    expect(isSentryMonitoredPath(path)).toBe(false);
-  });
+  it.each(['/calculator', '/about', '/privacy'])(
+    'treats non-calculator path %s as unmonitored',
+    (path) => {
+      expect(isSentryMonitoredPath(path)).toBe(false);
+    },
+  );
 
   it('drops events for unmonitored request paths', () => {
     const event: Event = {

@@ -180,22 +180,22 @@ describe('Case Study: Recruiter (Feast or Famine Director)', () => {
       { salary: 50270, expectedNI: 6790.5, pensionCredits: true },
     ];
 
-    it.each(salaryBreakpoints)('should calculate correct NI for £$salary salary', ({
-      salary,
-      expectedNI,
-    }) => {
-      const employerNI = calculateEmployerNI(salary);
-      expect(employerNI).toBeCloseTo(expectedNI, 2);
-    });
+    it.each(salaryBreakpoints)(
+      'should calculate correct NI for £$salary salary',
+      ({ salary, expectedNI }) => {
+        const employerNI = calculateEmployerNI(salary);
+        expect(employerNI).toBeCloseTo(expectedNI, 2);
+      },
+    );
 
-    it.each(salaryBreakpoints)('should determine pension credit eligibility for £$salary salary', ({
-      salary,
-      pensionCredits,
-    }) => {
-      const lel = NI_THRESHOLDS.lowerEarningsLimit;
-      const qualifiesForPension = salary >= lel;
-      expect(qualifiesForPension).toBe(pensionCredits);
-    });
+    it.each(salaryBreakpoints)(
+      'should determine pension credit eligibility for £$salary salary',
+      ({ salary, pensionCredits }) => {
+        const lel = NI_THRESHOLDS.lowerEarningsLimit;
+        const qualifiesForPension = salary >= lel;
+        expect(qualifiesForPension).toBe(pensionCredits);
+      },
+    );
   });
 
   describe('Cash Buffer vs Retained Earnings', () => {

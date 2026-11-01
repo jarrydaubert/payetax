@@ -85,15 +85,14 @@ describe('secret check orchestration', () => {
     >;
   }
 
-  it.each([
-    'nested/.env.local\0',
-    '.gitleaksignore\0',
-    '.GITLEAKSIGNORE\0',
-  ])('rejects forbidden path %j before export', (paths) => {
-    spawn.mockReturnValue(commandResult(0, paths));
-    expect(runSecretCheck()).toBe(1);
-    expect(spawn).toHaveBeenCalledTimes(1);
-  });
+  it.each(['nested/.env.local\0', '.gitleaksignore\0', '.GITLEAKSIGNORE\0'])(
+    'rejects forbidden path %j before export',
+    (paths) => {
+      spawn.mockReturnValue(commandResult(0, paths));
+      expect(runSecretCheck()).toBe(1);
+      expect(spawn).toHaveBeenCalledTimes(1);
+    },
+  );
 
   it('checks names without invoking the scanner in environment-only mode', () => {
     spawn.mockReturnValue(commandResult(0, '.env.template\0src/env.ts\0'));

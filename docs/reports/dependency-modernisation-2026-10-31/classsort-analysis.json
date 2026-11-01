@@ -1,0 +1,17 @@
+{
+  "files": 105,
+  "changedFragments": 552,
+  "byContext": {
+    "attr:className": 418,
+    "call:cn": 133,
+    "call:cva": 1
+  },
+  "notPermutation": [],
+  "mergeConflicts": [
+    "src/app/about/AboutPageContent.tsx:101 [attr:className] \"min-h-screen bg-background bg-ledger-grid\" -> \"bg-ledger-grid min-h-screen bg-background\"\n    twMerge: \"min-h-screen bg-ledger-grid\" vs \"min-h-screen bg-background\"",
+    "src/app/blog/page.tsx:163 [attr:className] \"min-h-screen bg-background bg-ledger-grid\" -> \"bg-ledger-grid min-h-screen bg-background\"\n    twMerge: \"min-h-screen bg-ledger-grid\" vs \"min-h-screen bg-background\"",
+    "src/components/molecules/StatusPage.tsx:73 [attr:className] \"grid min-h-dvh place-items-center bg-background bg-ledger-grid px-4 py-20\" -> \"bg-ledger-grid grid min-h-dvh place-items-center bg-background px-4 py-20\"\n    twMerge: \"grid min-h-dvh place-items-center bg-ledger-grid px-4 py-20\" vs \"grid min-h-dvh place-items-center bg-background px-4 py-20\""
+  ],
+  "outsideClassContext": [],
+  "internalConflictsSameResult": []
+}

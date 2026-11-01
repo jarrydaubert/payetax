@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, extname, join, relative, resolve } from 'node:path';
-import ts from 'typescript';
+// TypeScript 7 ships no compiler API; Microsoft's TypeScript 6 API package provides the parser.
+import ts from '@typescript/typescript6';
 import { CURRENT_TAX_GUIDANCE_PATHS } from '../src/constants/currentTaxGuidance';
 import {
   CT_RATES,
@@ -431,6 +432,24 @@ function factException(path: string, lineText: string): string | undefined {
   return TAX_FACT_EXCEPTION_RULES.find((rule) => rule.applies(path, lineText))?.id;
 }
 
+function enclosingCalleeText(sourceFile: ts.SourceFile, index: number): string | undefined {
+  let containingNode: ts.Node = sourceFile;
+  function visit(node: ts.Node): void {
+    if (index < node.getStart(sourceFile) || index >= node.end) return;
+    containingNode = node;
+    ts.forEachChild(node, visit);
+  }
+  visit(sourceFile);
+  for (let node: ts.Node | undefined = containingNode; node; node = node.parent) {
+    if (ts.isCallExpression(node)) {
+      if (node.arguments.some((argument) => ts.isFunctionLike(argument))) return undefined;
+      return node.expression.getText(sourceFile);
+    }
+    if (ts.isStatement(node) || ts.isFunctionLike(node)) break;
+  }
+  return undefined;
+}
+
 function addOccurrence(
   output: TaxFactOccurrence[],
   seen: Set<string>,
@@ -439,9 +458,15 @@ function addOccurrence(
   index: number,
   kind: TaxFactKind,
   value: string,
+  sourceFile?: ts.SourceFile,
 ): void {
   const location = lineAndColumn(source.content, index, lineStarts);
-  const normalizedLine = location.lineText.replace(/tax-fact-scan: official-quotation/g, '');
+  // A formatter may put an assertion's literal arguments on a separate line from its tax field.
+  const context = sourceFile ? enclosingCalleeText(sourceFile, index) : undefined;
+  const normalizedLine = `${location.lineText} ${context ?? ''}`.replace(
+    /tax-fact-scan: official-quotation/g,
+    '',
+  );
   const operationalRateLimitContext =
     /\b(?:api|client|distributed|email|endpoint|ip|redis|request|requests|upstash)[-_ ]?rate[-_ ]?limit\b/i.test(
       normalizedLine,
@@ -532,6 +557,9 @@ export function scanTaxFacts(
 
   for (const source of sources) {
     const lineStarts = sourceLineStarts(source.content);
+    const sourceFile = CODE_EXTENSIONS.has(extname(source.path))
+      ? ts.createSourceFile(source.path, source.content, ts.ScriptTarget.Latest, true)
+      : undefined;
     const numericTokenRegex = /(?<![\d.])(?:£\s*)?(\d+(?:[,_]\d+)*)(?![\d.])/g;
     for (const match of source.content.matchAll(numericTokenRegex)) {
       const token = match[1];
@@ -546,6 +574,7 @@ export function scanTaxFacts(
         match.index,
         'policy-value',
         normalizedValue,
+        sourceFile,
       );
     }
 

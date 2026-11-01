@@ -87,7 +87,7 @@ export function IncomeSourceList() {
       <div className='flex items-center justify-between'>
         <CollapsibleTrigger
           className={cn(
-            'group flex min-h-6 items-center rounded-md py-1 font-medium transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+            'group flex min-h-6 items-center rounded-md py-1 font-medium transition-colors hover:text-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
             'gap-2',
             'text-sm',
           )}

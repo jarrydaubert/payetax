@@ -110,40 +110,43 @@ describe('National Insurance vertical', () => {
       },
     ] as const;
 
-    it.each(
-      thresholdFixtures,
-    )('matches HMRC published weekly and monthly thresholds for $taxYear', (fixture) => {
-      const weekly = getClass1PeriodThresholds(fixture.taxYear, 'A', 'weekly');
-      const monthly = getClass1PeriodThresholds(fixture.taxYear, 'A', 'monthly');
+    it.each(thresholdFixtures)(
+      'matches HMRC published weekly and monthly thresholds for $taxYear',
+      (fixture) => {
+        const weekly = getClass1PeriodThresholds(fixture.taxYear, 'A', 'weekly');
+        const monthly = getClass1PeriodThresholds(fixture.taxYear, 'A', 'monthly');
 
-      expect(weekly.primary).toBe(fixture.weeklyPrimary);
-      expect(weekly.upper).toBe(fixture.weeklyUpper);
-      expect(weekly.secondary).toBe(fixture.weeklySecondary);
-      expect(monthly.primary).toBe(fixture.monthlyPrimary);
-      expect(monthly.upper).toBe(fixture.monthlyUpper);
-      expect(monthly.secondary).toBe(fixture.monthlySecondary);
-    });
+        expect(weekly.primary).toBe(fixture.weeklyPrimary);
+        expect(weekly.upper).toBe(fixture.weeklyUpper);
+        expect(weekly.secondary).toBe(fixture.weeklySecondary);
+        expect(monthly.primary).toBe(fixture.monthlyPrimary);
+        expect(monthly.upper).toBe(fixture.monthlyUpper);
+        expect(monthly.secondary).toBe(fixture.monthlySecondary);
+      },
+    );
 
-    it.each(
-      thresholdFixtures,
-    )('keeps the published monthly secondary threshold distinct from annual/12 for $taxYear', (fixture) => {
-      // The reason this vertical stores period thresholds rather than dividing:
-      // £5,000/12 is £416.67, but HMRC publishes £417.
-      const annual = calculateEmployerNI(0, fixture.taxYear).threshold;
-      expect(fixture.monthlySecondary).not.toBeCloseTo(annual / 12, 2);
-    });
+    it.each(thresholdFixtures)(
+      'keeps the published monthly secondary threshold distinct from annual/12 for $taxYear',
+      (fixture) => {
+        // The reason this vertical stores period thresholds rather than dividing:
+        // £5,000/12 is £416.67, but HMRC publishes £417.
+        const annual = calculateEmployerNI(0, fixture.taxYear).threshold;
+        expect(fixture.monthlySecondary).not.toBeCloseTo(annual / 12, 2);
+      },
+    );
 
     // Under-21 (M, Z) and apprentice-under-25 (H) categories use the upper
     // secondary threshold, so the employer 0% band runs far higher.
     const upperSecondaryCategories: NICategory[] = ['H', 'M', 'Z'];
 
-    it.each(
-      upperSecondaryCategories,
-    )('applies the upper secondary threshold to employer NI for category %s', (niCategory) => {
-      expect(getClass1PeriodThresholds('2026-2027', niCategory, 'monthly').secondary).toBe(4189);
-      expect(getClass1PeriodThresholds('2026-2027', niCategory, 'weekly').secondary).toBe(967);
-      expect(calculateEmployerNI(0, '2026-2027', { niCategory }).threshold).toBe(50270);
-    });
+    it.each(upperSecondaryCategories)(
+      'applies the upper secondary threshold to employer NI for category %s',
+      (niCategory) => {
+        expect(getClass1PeriodThresholds('2026-2027', niCategory, 'monthly').secondary).toBe(4189);
+        expect(getClass1PeriodThresholds('2026-2027', niCategory, 'weekly').secondary).toBe(967);
+        expect(calculateEmployerNI(0, '2026-2027', { niCategory }).threshold).toBe(50270);
+      },
+    );
 
     it('charges no employer NI below the upper secondary threshold for under-21 deferment (Z)', () => {
       // Category Z is under 21 with deferment. HMRC gives it the same employer
@@ -170,22 +173,20 @@ describe('National Insurance vertical', () => {
       { earnings: 967.01, expected: 58.0002 },
     ] as const;
 
-    it.each(
-      weeklyBoundaries,
-    )('slices weekly earnings of £$earnings at the 2026-27 primary and upper limits', ({
-      earnings,
-      expected,
-    }) => {
-      const thresholds = getClass1PeriodThresholds('2026-2027', 'A', 'weekly');
-      const result = sliceClass1EmployeeEarnings(earnings, {
-        primaryThreshold: thresholds.primary,
-        upperEarningsLimit: thresholds.upper,
-        primaryRate: 8,
-        upperRate: 2,
-      });
+    it.each(weeklyBoundaries)(
+      'slices weekly earnings of £$earnings at the 2026-27 primary and upper limits',
+      ({ earnings, expected }) => {
+        const thresholds = getClass1PeriodThresholds('2026-2027', 'A', 'weekly');
+        const result = sliceClass1EmployeeEarnings(earnings, {
+          primaryThreshold: thresholds.primary,
+          upperEarningsLimit: thresholds.upper,
+          primaryRate: 8,
+          upperRate: 2,
+        });
 
-      expect(result.employeeNI).toBeCloseTo(expected, 4);
-    });
+        expect(result.employeeNI).toBeCloseTo(expected, 4);
+      },
+    );
 
     const monthlyBoundaries = [
       { earnings: 1047.99, expected: 0 },
@@ -196,22 +197,20 @@ describe('National Insurance vertical', () => {
       { earnings: 4189.01, expected: 251.2802 },
     ] as const;
 
-    it.each(
-      monthlyBoundaries,
-    )('slices monthly earnings of £$earnings at the 2026-27 primary and upper limits', ({
-      earnings,
-      expected,
-    }) => {
-      const thresholds = getClass1PeriodThresholds('2026-2027', 'A', 'monthly');
-      const result = sliceClass1EmployeeEarnings(earnings, {
-        primaryThreshold: thresholds.primary,
-        upperEarningsLimit: thresholds.upper,
-        primaryRate: 8,
-        upperRate: 2,
-      });
+    it.each(monthlyBoundaries)(
+      'slices monthly earnings of £$earnings at the 2026-27 primary and upper limits',
+      ({ earnings, expected }) => {
+        const thresholds = getClass1PeriodThresholds('2026-2027', 'A', 'monthly');
+        const result = sliceClass1EmployeeEarnings(earnings, {
+          primaryThreshold: thresholds.primary,
+          upperEarningsLimit: thresholds.upper,
+          primaryRate: 8,
+          upperRate: 2,
+        });
 
-      expect(result.employeeNI).toBeCloseTo(expected, 4);
-    });
+        expect(result.employeeNI).toBeCloseTo(expected, 4);
+      },
+    );
 
     it('charges the upper rate only above the upper earnings limit', () => {
       const thresholds = getClass1PeriodThresholds('2026-2027', 'A', 'monthly');
@@ -235,19 +234,17 @@ describe('National Insurance vertical', () => {
       { earnings: 1000, expected: 87.45 },
     ] as const;
 
-    it.each(
-      employerBoundaries,
-    )('charges employer NI above the monthly secondary threshold at £$earnings', ({
-      earnings,
-      expected,
-    }) => {
-      const result = sliceClass1EmployerEarnings(earnings, {
-        secondaryThreshold: getClass1PeriodThresholds('2026-2027', 'A', 'monthly').secondary,
-        secondaryRate: 15,
-      });
+    it.each(employerBoundaries)(
+      'charges employer NI above the monthly secondary threshold at £$earnings',
+      ({ earnings, expected }) => {
+        const result = sliceClass1EmployerEarnings(earnings, {
+          secondaryThreshold: getClass1PeriodThresholds('2026-2027', 'A', 'monthly').secondary,
+          secondaryRate: 15,
+        });
 
-      expect(result.employerNI).toBeCloseTo(expected, 4);
-    });
+        expect(result.employerNI).toBeCloseTo(expected, 4);
+      },
+    );
   });
 
   // ==========================================================================
@@ -273,13 +270,14 @@ describe('National Insurance vertical', () => {
 
     const unchangedCategories: NICategory[] = ['C', 'J', 'Z'];
 
-    it.each(
-      unchangedCategories,
-    )('returns a single full-year segment for category %s, which did not change', (niCategory) => {
-      const segments = getEmployeeClass1MonthSegments('2023-2024', niCategory);
-      expect(segments).toHaveLength(1);
-      expect(segments[0]?.months).toBe(12);
-    });
+    it.each(unchangedCategories)(
+      'returns a single full-year segment for category %s, which did not change',
+      (niCategory) => {
+        const segments = getEmployeeClass1MonthSegments('2023-2024', niCategory);
+        expect(segments).toHaveLength(1);
+        expect(segments[0]?.months).toBe(12);
+      },
+    );
 
     const payDateFixtures = [
       { payDate: '2023-04-06', expected: 12 },
@@ -289,14 +287,14 @@ describe('National Insurance vertical', () => {
       { payDate: '2024-04-05', expected: 10 },
     ] as const;
 
-    it.each(payDateFixtures)('uses the rate in force on pay date $payDate', ({
-      payDate,
-      expected,
-    }) => {
-      expect(
-        getEmployeeClass1RateForPayDate('2023-2024', 'A', new Date(`${payDate}T00:00:00Z`)),
-      ).toBe(expected);
-    });
+    it.each(payDateFixtures)(
+      'uses the rate in force on pay date $payDate',
+      ({ payDate, expected }) => {
+        expect(
+          getEmployeeClass1RateForPayDate('2023-2024', 'A', new Date(`${payDate}T00:00:00Z`)),
+        ).toBe(expected);
+      },
+    );
 
     it('never averages the two rates for a single pay period', () => {
       const rates = payDateFixtures.map((fixture) =>
@@ -367,12 +365,12 @@ describe('National Insurance vertical', () => {
       { niCategory: 'C', expected: 0 },
     ] as const;
 
-    it.each(blendedRateFixtures)('uses HMRC published blended rate for category $niCategory', ({
-      niCategory,
-      expected,
-    }) => {
-      expect(getDirectorsAnnualPrimaryRate('2023-2024', niCategory)).toBe(expected);
-    });
+    it.each(blendedRateFixtures)(
+      'uses HMRC published blended rate for category $niCategory',
+      ({ niCategory, expected }) => {
+        expect(getDirectorsAnnualPrimaryRate('2023-2024', niCategory)).toBe(expected);
+      },
+    );
 
     it('charges the blended rate against annual thresholds', () => {
       // £50,270 - £12,570 = £37,700 x 11.5% = £4,335.50
@@ -422,27 +420,24 @@ describe('National Insurance vertical', () => {
       { taxYear: '2023-2024', salary: 60000, expected: 4529.22 },
     ] as const;
 
-    it.each(engineFixtures)('returns £$expected for £$salary in $taxYear', ({
-      taxYear,
-      salary,
-      expected,
-    }) => {
-      const result = calculateTax(createInput({ salary, taxYear }));
-      expect(result.nationalInsurance.annually).toBeCloseTo(expected, 2);
-    });
+    it.each(engineFixtures)(
+      'returns £$expected for £$salary in $taxYear',
+      ({ taxYear, salary, expected }) => {
+        const result = calculateTax(createInput({ salary, taxYear }));
+        expect(result.nationalInsurance.annually).toBeCloseTo(expected, 2);
+      },
+    );
 
-    it.each([
-      '2026-2027',
-      '2025-2026',
-      '2024-2025',
-      '2023-2024',
-    ] as const)('keeps monthly x 12 consistent with the annual figure in %s', (taxYear) => {
-      const result = calculateTax(createInput({ salary: 30000, taxYear }));
-      expect(result.nationalInsurance.monthly * 12).toBeCloseTo(
-        result.nationalInsurance.annually,
-        2,
-      );
-    });
+    it.each(['2026-2027', '2025-2026', '2024-2025', '2023-2024'] as const)(
+      'keeps monthly x 12 consistent with the annual figure in %s',
+      (taxYear) => {
+        const result = calculateTax(createInput({ salary: 30000, taxYear }));
+        expect(result.nationalInsurance.monthly * 12).toBeCloseTo(
+          result.nationalInsurance.annually,
+          2,
+        );
+      },
+    );
   });
 
   // ==========================================================================
@@ -467,17 +462,15 @@ describe('National Insurance vertical', () => {
       expect(STATE_PENSION_AGE_NI_EXEMPTION).toBe(66);
     });
 
-    it.each([
-      '2026-2027',
-      '2025-2026',
-      '2024-2025',
-      '2023-2024',
-    ] as const)('exempts the employee but still charges the employer in %s', (taxYear) => {
-      const result = calculateTax(createInput({ salary: 50000, taxYear, age: 67 }));
+    it.each(['2026-2027', '2025-2026', '2024-2025', '2023-2024'] as const)(
+      'exempts the employee but still charges the employer in %s',
+      (taxYear) => {
+        const result = calculateTax(createInput({ salary: 50000, taxYear, age: 67 }));
 
-      expect(result.nationalInsurance.annually).toBe(0);
-      expect(result.employerNI).toBeGreaterThan(0);
-    });
+        expect(result.nationalInsurance.annually).toBe(0);
+        expect(result.employerNI).toBeGreaterThan(0);
+      },
+    );
 
     it('charges employer NI at the same amount whether or not the employee is exempt', () => {
       const working = calculateTax(createInput({ salary: 50000, age: 40 }));
@@ -501,15 +494,16 @@ describe('National Insurance vertical', () => {
 
     const consistencySalaries = [15000, 30000, 45000, 60000, 100000] as const;
 
-    it.each(
-      consistencySalaries,
-    )('keeps the annual module and engine within tolerance at £%s', (salary) => {
-      const engine = calculateTax(createInput({ salary, taxYear: '2026-2027' })).nationalInsurance
-        .annually;
-      const annualModule = getEmployeeNI(salary, '2026-2027');
+    it.each(consistencySalaries)(
+      'keeps the annual module and engine within tolerance at £%s',
+      (salary) => {
+        const engine = calculateTax(createInput({ salary, taxYear: '2026-2027' })).nationalInsurance
+          .annually;
+        const annualModule = getEmployeeNI(salary, '2026-2027');
 
-      expect(Math.abs(annualModule - engine)).toBeLessThanOrEqual(TOOL_ENGINE_TOLERANCE);
-    });
+        expect(Math.abs(annualModule - engine)).toBeLessThanOrEqual(TOOL_ENGINE_TOLERANCE);
+      },
+    );
 
     it.each(consistencySalaries)('matches employer NI between tool and engine at £%s', (salary) => {
       const engine = calculateTax(createInput({ salary, taxYear: '2026-2027' })).employerNI;
@@ -571,12 +565,12 @@ describe('National Insurance vertical', () => {
       { salary: 60000.55, expected: 3210.61 },
     ] as const;
 
-    it.each(penceFixtures)('rounds annual employee NI to pence at £$salary', ({
-      salary,
-      expected,
-    }) => {
-      expect(getEmployeeNI(salary, '2026-2027')).toBeCloseTo(expected, 2);
-    });
+    it.each(penceFixtures)(
+      'rounds annual employee NI to pence at £$salary',
+      ({ salary, expected }) => {
+        expect(getEmployeeNI(salary, '2026-2027')).toBeCloseTo(expected, 2);
+      },
+    );
 
     it('rounds half up at an exact half-penny', () => {
       // £12,570.50 - £12,570 = £0.50 x 8% = £0.04 exactly.
@@ -589,15 +583,15 @@ describe('National Insurance vertical', () => {
       { salary: 30000, expected: 1394 },
       { salary: 45000, expected: 2594 },
       { salary: 60000, expected: 3211 },
-    ] as const)('rounds to whole pounds for tool display at £$salary without changing the underlying pence', ({
-      salary,
-      expected,
-    }) => {
-      const pence = getEmployeeNI(salary, '2026-2027');
-      expect(Math.round(pence)).toBe(expected);
-      // The shared result stays pence-accurate; only display rounds.
-      expect(Number.isInteger(pence)).toBe(false);
-    });
+    ] as const)(
+      'rounds to whole pounds for tool display at £$salary without changing the underlying pence',
+      ({ salary, expected }) => {
+        const pence = getEmployeeNI(salary, '2026-2027');
+        expect(Math.round(pence)).toBe(expected);
+        // The shared result stays pence-accurate; only display rounds.
+        expect(Number.isInteger(pence)).toBe(false);
+      },
+    );
 
     it('keeps engine period conversions consistent with the annual figure', () => {
       const result = calculateTax(createInput({ salary: 30000, taxYear: '2026-2027' }));

@@ -59,8 +59,8 @@ export function ResultTableRow({
   return (
     <RowComponent
       className={cn(
-        'border-border/80 border-b transition-colors hover:bg-secondary/60',
-        isHighlight && 'border-primary/40 border-y bg-primary/10 hover:bg-primary/10',
+        'border-b border-border/80 transition-colors hover:bg-secondary/60',
+        isHighlight && 'border-y border-primary/40 bg-primary/10 hover:bg-primary/10',
       )}
       layout={!shouldReduceMotion}
       transition={!shouldReduceMotion ? ANIMATION_TRANSITIONS.layout : undefined}
@@ -70,7 +70,7 @@ export function ResultTableRow({
         className={cn(
           color,
           isHighlight && 'font-bold',
-          'sticky left-0 z-10 min-w-[10.5rem] border-border/80 border-r bg-card px-2 py-2.5 text-left font-normal xl:min-w-[11.5rem]',
+          'sticky left-0 z-10 min-w-[10.5rem] border-r border-border/80 bg-card px-2 py-2.5 text-left font-normal xl:min-w-[11.5rem]',
         )}
       >
         <div className={cn('flex items-start', 'gap-1.5', isSubRow && 'pl-3 sm:pl-4')}>
@@ -82,7 +82,7 @@ export function ResultTableRow({
       </th>
       <TableCell
         className={cn(
-          'border-border/60 border-r px-2 py-2.5 text-right font-mono tabular-nums',
+          'border-r border-border/60 px-2 py-2.5 text-right font-mono tabular-nums',
           'text-[0.8125rem] xl:text-sm',
           color,
           isHighlight && 'font-bold',
@@ -105,7 +105,7 @@ export function ResultTableRow({
             <React.Fragment key={period}>
               <TableCell
                 className={cn(
-                  'min-w-[8.5rem] whitespace-nowrap bg-primary/10 px-2 py-2.5 text-right font-mono tabular-nums',
+                  'min-w-[8.5rem] bg-primary/10 px-2 py-2.5 text-right font-mono whitespace-nowrap tabular-nums',
                   'text-[0.8125rem] xl:text-sm',
                   color,
                   isHighlight && 'font-bold',
@@ -115,7 +115,7 @@ export function ResultTableRow({
               </TableCell>
               <TableCell
                 className={cn(
-                  'min-w-[8.5rem] whitespace-nowrap bg-success/10 px-2 py-2.5 text-right font-mono tabular-nums',
+                  'min-w-[8.5rem] bg-success/10 px-2 py-2.5 text-right font-mono whitespace-nowrap tabular-nums',
                   'text-[0.8125rem] xl:text-sm',
                   color,
                   isHighlight && 'font-bold',
@@ -132,7 +132,7 @@ export function ResultTableRow({
           <TableCell
             key={period}
             className={cn(
-              'min-w-[8.5rem] whitespace-nowrap px-1.5 py-2.5 text-right font-mono tabular-nums xl:px-2',
+              'min-w-[8.5rem] px-1.5 py-2.5 text-right font-mono whitespace-nowrap tabular-nums xl:px-2',
               'text-[0.8125rem] xl:text-sm',
               color,
               isHighlight && 'font-bold',

@@ -67,17 +67,18 @@ it('supports repeated touch, a close button and outside input interaction', asyn
   expect(screen.getByRole('textbox')).toHaveFocus();
 });
 
+function Drawer() {
+  const titleId = useId();
+  return (
+    <div role='dialog' aria-labelledby={titleId} aria-modal='true'>
+      <h2 id={titleId}>Your Numbers</h2>
+      <Example />
+    </div>
+  );
+}
+
 it('keeps help within a containing dialog for assistive technology', async () => {
   const user = userEvent.setup();
-  function Drawer() {
-    const titleId = useId();
-    return (
-      <div role='dialog' aria-labelledby={titleId} aria-modal='true'>
-        <h2 id={titleId}>Your Numbers</h2>
-        <Example />
-      </div>
-    );
-  }
   render(<Drawer />);
   await user.click(screen.getByRole('button', { name: 'Salary help' }));
   const drawer = screen.getByRole('dialog', { name: 'Your Numbers' });

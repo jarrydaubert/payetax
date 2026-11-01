@@ -133,7 +133,7 @@ export function StrategyComparisonTable() {
             Minimize NI
           </button>
         </div>
-        <p className='mt-2 text-muted-foreground text-sm'>
+        <p className='mt-2 text-sm text-muted-foreground'>
           Compare salary/dividend tradeoffs using your selected objective. Switch objective to see
           how the recommended strategy changes.
         </p>
@@ -196,7 +196,7 @@ export function StrategyComparisonTable() {
             >
               {/* Objective badge */}
               {isRecommended && (
-                <span className='absolute -top-2 right-3 rounded-sm bg-success px-2 py-0.5 font-medium text-success-foreground text-xs'>
+                <span className='absolute -top-2 right-3 rounded-sm bg-success px-2 py-0.5 text-xs font-medium text-success-foreground'>
                   {objective === 'maximizeTakeHome' ? 'Highest Take-Home' : 'Lowest NI'}
                 </span>
               )}
@@ -215,7 +215,7 @@ export function StrategyComparisonTable() {
                 </div>
                 <div>
                   <h4 className='font-medium text-foreground'>{data.name}</h4>
-                  <p className='text-muted-foreground text-xs'>{description}</p>
+                  <p className='text-xs text-muted-foreground'>{description}</p>
                 </div>
               </div>
 
@@ -241,7 +241,7 @@ export function StrategyComparisonTable() {
                   <span className='text-muted-foreground'>Total NI</span>
                   <span className='font-mono text-foreground/90'>{formatCurrency(totalNI, 0)}</span>
                 </div>
-                <div className='mt-2 flex justify-between border-border/40 border-t pt-2'>
+                <div className='mt-2 flex justify-between border-t border-border/40 pt-2'>
                   <span className='font-medium text-muted-foreground'>Take-Home</span>
                   <span className='font-mono font-semibold text-success'>
                     {formatCurrency(data.takeHome, 0)}
@@ -270,7 +270,7 @@ export function StrategyComparisonTable() {
                         : `${niDelta > 0 ? '+' : '-'}${formatCurrency(Math.abs(niDelta), 0)}`}
                   </span>
                 </div>
-                <div className='text-right text-muted-foreground text-xs'>
+                <div className='text-right text-xs text-muted-foreground'>
                   {objective === 'maximizeTakeHome' ? 'Tax delta' : 'NI delta'}:{' '}
                   {objective === 'maximizeTakeHome'
                     ? totalTax > objectiveReferenceTotalTax
@@ -287,7 +287,7 @@ export function StrategyComparisonTable() {
               </div>
 
               {/* Effective Rate */}
-              <div className='mt-2 text-right text-muted-foreground text-xs'>
+              <div className='mt-2 text-right text-xs text-muted-foreground'>
                 {data.effectiveRate.toFixed(1)}% effective rate
               </div>
             </button>
@@ -328,10 +328,10 @@ function YourSetupCard({
           </div>
           <div>
             <h4 className='font-medium text-foreground'>Your Setup</h4>
-            <p className='text-muted-foreground text-xs'>Your current arrangement</p>
+            <p className='text-xs text-muted-foreground'>Your current arrangement</p>
           </div>
         </div>
-        <div className='rounded-sm bg-muted/20 p-3 text-foreground/80 text-sm'>
+        <div className='rounded-sm bg-muted/20 p-3 text-sm text-foreground/80'>
           <span className='font-medium text-foreground'>Not set.</span> Add your salary and
           dividends in Full Inputs to compare your current setup against your selected objective.
         </div>
@@ -357,7 +357,7 @@ function YourSetupCard({
     >
       {/* DLA Warning Badge */}
       {yourSetup.exceedsProfit && (
-        <span className='absolute -top-2 right-3 flex items-center gap-1 rounded-sm bg-destructive px-2 py-0.5 font-medium text-destructive-foreground text-xs'>
+        <span className='absolute -top-2 right-3 flex items-center gap-1 rounded-sm bg-destructive px-2 py-0.5 text-xs font-medium text-destructive-foreground'>
           <AlertTriangle className='size-3' />
           Exceeds Profit
         </span>
@@ -370,7 +370,7 @@ function YourSetupCard({
         </div>
         <div>
           <h4 className='font-medium text-foreground'>Your Setup</h4>
-          <p className='text-muted-foreground text-xs'>Your current arrangement</p>
+          <p className='text-xs text-muted-foreground'>Your current arrangement</p>
         </div>
       </div>
 
@@ -396,7 +396,7 @@ function YourSetupCard({
           <span className='text-muted-foreground'>Total NI</span>
           <span className='font-mono text-foreground/90'>{formatCurrency(totalNI, 0)}</span>
         </div>
-        <div className='mt-2 flex justify-between border-border/40 border-t pt-2'>
+        <div className='mt-2 flex justify-between border-t border-border/40 pt-2'>
           <span className='font-medium text-muted-foreground'>Take-Home</span>
           <span className='font-mono font-semibold text-success'>
             {formatCurrency(yourSetup.takeHome, 0)}
@@ -438,7 +438,7 @@ function YourSetupCard({
       {yourSetup.exceedsProfit && (
         <div className='mt-3 flex items-start gap-2 rounded-sm border border-destructive/40 bg-destructive/10 p-3'>
           <AlertTriangle className='mt-0.5 size-4 shrink-0 text-destructive' />
-          <p className='text-destructive/90 text-xs'>
+          <p className='text-xs text-destructive/90'>
             Your salary + dividends exceeds available profit. This may create or increase a
             Director&apos;s Loan Account balance. Speak to your accountant.
           </p>
@@ -446,7 +446,7 @@ function YourSetupCard({
       )}
 
       {/* Effective Rate */}
-      <div className='mt-2 text-right text-muted-foreground text-xs'>
+      <div className='mt-2 text-right text-xs text-muted-foreground'>
         {yourSetup.effectiveRate.toFixed(1)}% effective rate
       </div>
     </div>

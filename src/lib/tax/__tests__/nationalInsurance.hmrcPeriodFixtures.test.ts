@@ -80,7 +80,10 @@ describe('HMRC per-period Class 1 NI fixtures (2025-26, category A)', () => {
     ['weekly', 800, 44.64],
     ['fortnightly', 1_600, 89.28],
     ['fourWeekly', 3_200, 178.56],
-  ] as const)('matches HMRC %s NI on the weekly-derived threshold basis', (period, gross, expected) => {
-    expect(periodEmployeeNI(gross, period, 2)).toBe(expected);
-  });
+  ] as const)(
+    'matches HMRC %s NI on the weekly-derived threshold basis',
+    (period, gross, expected) => {
+      expect(periodEmployeeNI(gross, period, 2)).toBe(expected);
+    },
+  );
 });

@@ -129,121 +129,130 @@ describe('Tax-trap pension suggestion (mounted real inputs, store and engine)', 
       ['no pension', 'amount', 0, 20000],
       ['existing £ pension', 'amount', 6000, 14000],
       ['existing % pension', 'percentage', 5, 14000],
-    ] as const)('adds the annual suggestion to %s and waits for Calculate', async (_label, pensionContributionType, pension, addition) => {
+    ] as const)(
+      'adds the annual suggestion to %s and waits for Calculate',
+      async (_label, pensionContributionType, pension, addition) => {
+        const user = userEvent.setup();
+        useCalculatorStore.getState().setInput({
+          salary: 120000 / periodsPerYear,
+          payPeriod,
+          taxYear: '2026-2027',
+          taxCode: '',
+          pensionContributionType,
+          pensionContribution:
+            pensionContributionType === 'amount' ? pension / periodsPerYear : pension,
+        });
+        render(<CalculatorContainer />);
+        await user.click(screen.getByTestId('calculate-button'));
+        const apply = await screen.findByRole('button', {
+          name: `Add £${addition.toLocaleString('en-GB')} to Pension`,
+        });
+
+        // Seed all result variants: applying must invalidate each, including email and suggestions.
+        act(() => {
+          useCalculatorStore.setState({ whatIfResults: useCalculatorStore.getState().results });
+        });
+        await user.click(apply);
+
+        const state = useCalculatorStore.getState();
+        expect(state.input.pensionContributionType).toBe('amount');
+        expect(parseCurrencyInput(String(state.input.pensionContribution))).toEqual({
+          status: 'valid',
+          value: storedAmount,
+        });
+        expect(state.input.pensionContribution).toBe(storedAmount);
+        expect(screen.getByTestId('pension-input')).toHaveValue(
+          storedAmount.toLocaleString('en-GB', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }),
+        );
+        expect(state.results).toBeNull();
+        expect(state.previousYearResults).toBeNull();
+        expect(state.whatIfResults).toBeNull();
+        expect(
+          screen.queryByRole('button', { name: 'Email tax calculation results' }),
+        ).not.toBeInTheDocument();
+        await waitFor(() => expect(apply).not.toBeInTheDocument());
+        expect(screen.getByRole('status')).toHaveTextContent(
+          'Calculate again to update your results',
+        );
+        expect(screen.getByRole('heading', { name: /^Calculate again$/ })).toBeVisible();
+        if (pensionContributionType === 'percentage') {
+          expect(screen.getByRole('status')).toHaveTextContent(
+            'Your existing 5% pension was converted to a £ amount',
+          );
+        }
+
+        const annualPension = storedAmount * periodsPerYear;
+        expect(annualPension).toBeGreaterThanOrEqual(20000);
+        expect(annualPension - 20000).toBeLessThan(0.01 * periodsPerYear);
+        if (payPeriod === 'annually') {
+          expect(screen.getByRole('status')).not.toHaveTextContent('Rounded up');
+        } else {
+          expect(screen.getByRole('status')).toHaveTextContent('Rounded up to the next penny');
+        }
+        await expectPersistenceRoundTrip(storedAmount);
+
+        await user.click(screen.getByTestId('calculate-button'));
+        await waitFor(() => expect(useCalculatorStore.getState().results).not.toBeNull());
+        const result = useCalculatorStore.getState().results;
+        if (!result) throw new Error('Calculate did not produce results');
+        expect(result.pensionContribution.annually).toBeCloseTo(annualPension, 2);
+        if (payPeriod === 'annually') {
+          expect(result.taxFreeAmount).toBe(expected.taxFreeAmount);
+          expect(result.incomeTax.annually).toBeCloseTo(expectedTax, 2);
+          expect(result.nationalInsurance.annually).toBeCloseTo(expectedNI, 2);
+          expect(result.netPay.annually).toBeCloseTo(expected.netPayAnnual, 2);
+        } else {
+          expectPayrollForCashPay(result, 120000 - annualPension);
+        }
+        expect(screen.queryByRole('button', { name: /to Pension$/ })).not.toBeInTheDocument();
+        expect(screen.queryByText('Tax Trap Alert')).not.toBeInTheDocument();
+      },
+    );
+  });
+
+  it.each([
+    ['monthly', 112000 / 12, 12000, 1000, 12],
+    ['hourly', 50, 4000, 1.93, 2080],
+  ] as const)(
+    '%s exact/rounded conversion survives rehydration and Calculate',
+    async (payPeriod, salary, target, storedAmount, periodsPerYear) => {
       const user = userEvent.setup();
-      useCalculatorStore.getState().setInput({
-        salary: 120000 / periodsPerYear,
-        payPeriod,
-        taxYear: '2026-2027',
-        taxCode: '',
-        pensionContributionType,
-        pensionContribution:
-          pensionContributionType === 'amount' ? pension / periodsPerYear : pension,
-      });
+      useCalculatorStore
+        .getState()
+        .setInput({ salary, payPeriod, taxCode: '', taxYear: '2026-2027', hoursPerWeek: 40 });
       render(<CalculatorContainer />);
       await user.click(screen.getByTestId('calculate-button'));
-      const apply = await screen.findByRole('button', {
-        name: `Add £${addition.toLocaleString('en-GB')} to Pension`,
-      });
-
-      // Seed all result variants: applying must invalidate each, including email and suggestions.
-      act(() => {
-        useCalculatorStore.setState({ whatIfResults: useCalculatorStore.getState().results });
-      });
-      await user.click(apply);
-
-      const state = useCalculatorStore.getState();
-      expect(state.input.pensionContributionType).toBe('amount');
-      expect(parseCurrencyInput(String(state.input.pensionContribution))).toEqual({
-        status: 'valid',
-        value: storedAmount,
-      });
-      expect(state.input.pensionContribution).toBe(storedAmount);
+      await user.click(
+        await screen.findByRole('button', {
+          name: `Add £${target.toLocaleString('en-GB')} to Pension`,
+        }),
+      );
+      expect(useCalculatorStore.getState().input.pensionContribution).toBe(storedAmount);
+      expect(useCalculatorStore.getState().results).toBeNull();
+      expect(useCalculatorStore.getState().previousYearResults).toBeNull();
+      expect(useCalculatorStore.getState().whatIfResults).toBeNull();
+      expect(screen.getByRole('status')).toHaveTextContent('Calculate again');
+      expect(screen.getByRole('status').textContent?.includes('Rounded up')).toBe(
+        payPeriod === 'hourly',
+      );
+      const annualPension = storedAmount * periodsPerYear;
+      expect(annualPension).toBeGreaterThanOrEqual(target);
+      expect(annualPension - target).toBeLessThan(0.01 * periodsPerYear);
+      await expectPersistenceRoundTrip(storedAmount);
       expect(screen.getByTestId('pension-input')).toHaveValue(
         storedAmount.toLocaleString('en-GB', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         }),
       );
-      expect(state.results).toBeNull();
-      expect(state.previousYearResults).toBeNull();
-      expect(state.whatIfResults).toBeNull();
-      expect(
-        screen.queryByRole('button', { name: 'Email tax calculation results' }),
-      ).not.toBeInTheDocument();
-      await waitFor(() => expect(apply).not.toBeInTheDocument());
-      expect(screen.getByRole('status')).toHaveTextContent(
-        'Calculate again to update your results',
-      );
-      expect(screen.getByRole('heading', { name: /^Calculate again$/ })).toBeVisible();
-      if (pensionContributionType === 'percentage') {
-        expect(screen.getByRole('status')).toHaveTextContent(
-          'Your existing 5% pension was converted to a £ amount',
-        );
-      }
-
-      const annualPension = storedAmount * periodsPerYear;
-      expect(annualPension).toBeGreaterThanOrEqual(20000);
-      expect(annualPension - 20000).toBeLessThan(0.01 * periodsPerYear);
-      if (payPeriod === 'annually') {
-        expect(screen.getByRole('status')).not.toHaveTextContent('Rounded up');
-      } else {
-        expect(screen.getByRole('status')).toHaveTextContent('Rounded up to the next penny');
-      }
-      await expectPersistenceRoundTrip(storedAmount);
-
       await user.click(screen.getByTestId('calculate-button'));
-      await waitFor(() => expect(useCalculatorStore.getState().results).not.toBeNull());
       const result = useCalculatorStore.getState().results;
       if (!result) throw new Error('Calculate did not produce results');
-      expect(result.pensionContribution.annually).toBeCloseTo(annualPension, 2);
-      if (payPeriod === 'annually') {
-        expect(result.taxFreeAmount).toBe(expected.taxFreeAmount);
-        expect(result.incomeTax.annually).toBeCloseTo(expectedTax, 2);
-        expect(result.nationalInsurance.annually).toBeCloseTo(expectedNI, 2);
-        expect(result.netPay.annually).toBeCloseTo(expected.netPayAnnual, 2);
-      } else {
-        expectPayrollForCashPay(result, 120000 - annualPension);
-      }
-      expect(screen.queryByRole('button', { name: /to Pension$/ })).not.toBeInTheDocument();
+      expectPayrollForCashPay(result, salary * periodsPerYear - annualPension);
       expect(screen.queryByText('Tax Trap Alert')).not.toBeInTheDocument();
-    });
-  });
-
-  it.each([
-    ['monthly', 112000 / 12, 12000, 1000, 12],
-    ['hourly', 50, 4000, 1.93, 2080],
-  ] as const)('%s exact/rounded conversion survives rehydration and Calculate', async (payPeriod, salary, target, storedAmount, periodsPerYear) => {
-    const user = userEvent.setup();
-    useCalculatorStore
-      .getState()
-      .setInput({ salary, payPeriod, taxCode: '', taxYear: '2026-2027', hoursPerWeek: 40 });
-    render(<CalculatorContainer />);
-    await user.click(screen.getByTestId('calculate-button'));
-    await user.click(
-      await screen.findByRole('button', {
-        name: `Add £${target.toLocaleString('en-GB')} to Pension`,
-      }),
-    );
-    expect(useCalculatorStore.getState().input.pensionContribution).toBe(storedAmount);
-    expect(useCalculatorStore.getState().results).toBeNull();
-    expect(useCalculatorStore.getState().previousYearResults).toBeNull();
-    expect(useCalculatorStore.getState().whatIfResults).toBeNull();
-    expect(screen.getByRole('status')).toHaveTextContent('Calculate again');
-    expect(screen.getByRole('status').textContent?.includes('Rounded up')).toBe(
-      payPeriod === 'hourly',
-    );
-    const annualPension = storedAmount * periodsPerYear;
-    expect(annualPension).toBeGreaterThanOrEqual(target);
-    expect(annualPension - target).toBeLessThan(0.01 * periodsPerYear);
-    await expectPersistenceRoundTrip(storedAmount);
-    expect(screen.getByTestId('pension-input')).toHaveValue(
-      storedAmount.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
-    );
-    await user.click(screen.getByTestId('calculate-button'));
-    const result = useCalculatorStore.getState().results;
-    if (!result) throw new Error('Calculate did not produce results');
-    expectPayrollForCashPay(result, salary * periodsPerYear - annualPension);
-    expect(screen.queryByText('Tax Trap Alert')).not.toBeInTheDocument();
-  });
+    },
+  );
 });

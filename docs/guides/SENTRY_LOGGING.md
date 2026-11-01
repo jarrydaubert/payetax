@@ -42,7 +42,10 @@ error UI, but their browser errors are filtered before they reach Sentry.
 - Server configuration: `sentry.server.config.ts`.
 - Edge configuration: `sentry.edge.config.ts`.
 - Calculator utility wrappers: `src/lib/sentry.ts`.
-- Shared event/breadcrumb privacy filter: `src/lib/sentryPrivacy.ts`.
+- Shared SDK data-collection policy and event/breadcrumb privacy filter:
+  `src/lib/sentryPrivacy.ts`. Sentry 11 collects user, cookie, header, body and query data by
+  default, so `SENTRY_DATA_COLLECTION` keeps all three runtimes at the v10
+  `sendDefaultPii: false` boundary.
 
 ## Calculation Anomaly Alerts
 

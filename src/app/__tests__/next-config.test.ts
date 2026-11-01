@@ -1,4 +1,4 @@
-jest.mock('@sentry/nextjs', () => ({
+jest.mock('@sentry/nextjs/config', () => ({
   withSentryConfig: (config: unknown) => config,
 }));
 

@@ -171,8 +171,8 @@ const CookieBanner: React.FC = () => {
                   <Cookie className='size-4 text-primary' aria-hidden='true' />
                 </div>
                 <div className='min-w-0'>
-                  <h2 className='font-semibold text-foreground text-sm'>Cookie Preferences</h2>
-                  <p className='mt-1 text-muted-foreground text-xs leading-relaxed'>
+                  <h2 className='text-sm font-semibold text-foreground'>Cookie Preferences</h2>
+                  <p className='mt-1 text-xs leading-relaxed text-muted-foreground'>
                     We use analytics cookies to improve PayeTax. Essential storage for your consent
                     choice is always active. Read our{' '}
                     <Link
@@ -234,12 +234,12 @@ const CookieBanner: React.FC = () => {
             <section className='rounded-lg border border-border/70 p-4'>
               <div className='flex items-center justify-between gap-3'>
                 <div>
-                  <h3 className='font-semibold text-foreground text-sm'>Necessary</h3>
-                  <p className='mt-1 text-muted-foreground text-sm'>
+                  <h3 className='text-sm font-semibold text-foreground'>Necessary</h3>
+                  <p className='mt-1 text-sm text-muted-foreground'>
                     Required for core site operation and remembering your consent choice.
                   </p>
                 </div>
-                <span className='rounded-full bg-muted px-2.5 py-1 font-medium text-muted-foreground text-xs'>
+                <span className='rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground'>
                   Always on
                 </span>
               </div>
@@ -248,8 +248,8 @@ const CookieBanner: React.FC = () => {
             <section className='rounded-lg border border-border/70 p-4'>
               <div className='flex items-center justify-between gap-3'>
                 <div>
-                  <h3 className='font-semibold text-foreground text-sm'>Analytics</h3>
-                  <p className='mt-1 text-muted-foreground text-sm'>
+                  <h3 className='text-sm font-semibold text-foreground'>Analytics</h3>
+                  <p className='mt-1 text-sm text-muted-foreground'>
                     Helps us understand usage and improve journeys. Disabled by default until you
                     opt in.
                   </p>

@@ -200,7 +200,7 @@ export function EmailResultsForm({ input, className, canSend }: EmailResultsForm
           )}
         </Button>
       </form>
-      <p className='text-muted-foreground text-xs'>
+      <p className='text-xs text-muted-foreground'>
         Sending shares your email address and calculator inputs with PayeTax to prepare your
         results, which Brevo delivers by email. See our{' '}
         <Link href='/privacy' className='underline underline-offset-2'>
@@ -209,7 +209,7 @@ export function EmailResultsForm({ input, className, canSend }: EmailResultsForm
         .
       </p>
       {submitError && (
-        <p id={`${formId}-email-error`} className='text-destructive text-sm' role='alert'>
+        <p id={`${formId}-email-error`} className='text-sm text-destructive' role='alert'>
           {submitError}
         </p>
       )}

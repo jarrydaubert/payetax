@@ -204,29 +204,27 @@ describe('service worker cache and upgrade safety', () => {
     expect(h.caches.open).not.toHaveBeenCalled();
   });
 
-  it.each([
-    'RSC',
-    'Next-Router-Prefetch',
-    'Next-Router-State-Tree',
-  ])('bypasses Next requests identified by the %s header', async (header) => {
-    const h = workerHarness();
-    expect(
-      await h.dispatch('fetch', { request: h.request('/', { headers: { [header]: '1' } }) }),
-    ).toBeUndefined();
-  });
+  it.each(['RSC', 'Next-Router-Prefetch', 'Next-Router-State-Tree'])(
+    'bypasses Next requests identified by the %s header',
+    async (header) => {
+      const h = workerHarness();
+      expect(
+        await h.dispatch('fetch', { request: h.request('/', { headers: { [header]: '1' } }) }),
+      ).toBeUndefined();
+    },
+  );
 
-  it.each([
-    '/sw.js',
-    '/register-sw.js?revision=2',
-    '/manifest.json',
-  ])('fetches %s without using either cache layer', async (path) => {
-    const h = workerHarness();
-    h.seed('payetax-static-v5.1.4', path, 'stale bootstrap');
-    const req = h.request(path);
-    expect(await (await h.dispatch('fetch', { request: req }))?.text()).toBe('fresh');
-    expect(h.fetch).toHaveBeenCalledWith(req, { cache: 'no-store' });
-    expect(h.caches.open).not.toHaveBeenCalled();
-  });
+  it.each(['/sw.js', '/register-sw.js?revision=2', '/manifest.json'])(
+    'fetches %s without using either cache layer',
+    async (path) => {
+      const h = workerHarness();
+      h.seed('payetax-static-v5.1.4', path, 'stale bootstrap');
+      const req = h.request(path);
+      expect(await (await h.dispatch('fetch', { request: req }))?.text()).toBe('fresh');
+      expect(h.fetch).toHaveBeenCalledWith(req, { cache: 'no-store' });
+      expect(h.caches.open).not.toHaveBeenCalled();
+    },
+  );
 
   it('uses the network for navigation even without preload, rather than returning a stale session', async () => {
     const h = workerHarness();
@@ -248,24 +246,24 @@ describe('service worker cache and upgrade safety', () => {
     expect(h.fetch).not.toHaveBeenCalled();
   });
 
-  it.each([
-    'reject',
-    'absent',
-  ])('keeps offline root launch parameters and dedicated fallback working with %s preload', async (preload) => {
-    const h = workerHarness();
-    h.seed('payetax-static-v5.1.4', '/', 'legacy must not win');
-    h.seed(STATIC, '/', 'offline calculator');
-    h.seed(STATIC, '/offline', 'offline page');
-    h.fetch.mockRejectedValue(new Error('offline'));
-    const preloadResponse =
-      preload === 'reject' ? Promise.reject(new Error('offline preload')) : undefined;
-    expect(await (await h.navigate('/?source=pwa', preloadResponse))?.text()).toBe(
-      'offline calculator',
-    );
-    expect(await (await h.navigate('/unvisited'))?.text()).toBe('offline page');
-    h.seed(CURRENT, '/tools', 'visited tool');
-    expect(await (await h.navigate('/tools'))?.text()).toBe('visited tool');
-  });
+  it.each(['reject', 'absent'])(
+    'keeps offline root launch parameters and dedicated fallback working with %s preload',
+    async (preload) => {
+      const h = workerHarness();
+      h.seed('payetax-static-v5.1.4', '/', 'legacy must not win');
+      h.seed(STATIC, '/', 'offline calculator');
+      h.seed(STATIC, '/offline', 'offline page');
+      h.fetch.mockRejectedValue(new Error('offline'));
+      const preloadResponse =
+        preload === 'reject' ? Promise.reject(new Error('offline preload')) : undefined;
+      expect(await (await h.navigate('/?source=pwa', preloadResponse))?.text()).toBe(
+        'offline calculator',
+      );
+      expect(await (await h.navigate('/unvisited'))?.text()).toBe('offline page');
+      h.seed(CURRENT, '/tools', 'visited tool');
+      expect(await (await h.navigate('/tools'))?.text()).toBe('visited tool');
+    },
+  );
 
   it('never falls back to mixed legacy caches', async () => {
     const h = workerHarness();

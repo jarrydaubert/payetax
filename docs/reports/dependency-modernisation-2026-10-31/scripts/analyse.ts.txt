@@ -1,0 +1,88 @@
+// Usage (from repo root): bun analyse.ts <rev> <file>...
+// For each file, pairs every string/template fragment in <rev> with the working tree (document
+// order) and, for every fragment that changed:
+//   1. checks the change is a pure permutation of whitespace-separated tokens;
+//   2. checks tailwind-merge resolves the old and new token lists to the same class set
+//      (the only place token order can change effective styles: cn()/twMerge()/cva + cn);
+//   3. reports fragments outside a className/class attribute or cn/clsx/twMerge/cva call.
+import { execFileSync } from 'node:child_process';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+const root = process.cwd();
+const ts = require(join(root, 'node_modules/@typescript/typescript6'));
+const { twMerge } = require(join(root, 'node_modules/tailwind-merge'));
+const CLASS_FUNCS = new Set(['cn', 'clsx', 'twMerge', 'classNames', 'cva']);
+
+type Frag = { text: string; context: string; line: number };
+
+function fragments(code: string, file: string): Frag[] {
+  const kind = file.endsWith('x') ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
+  const sf = ts.createSourceFile(file, code, ts.ScriptTarget.Latest, true, kind);
+  const out: Frag[] = [];
+  const contextOf = (node: any): string => {
+    for (let n = node.parent; n; n = n.parent) {
+      if (ts.isJsxAttribute(n)) return `attr:${n.name.getText(sf)}`;
+      if (ts.isCallExpression(n)) {
+        const callee = n.expression.getText(sf);
+        if (CLASS_FUNCS.has(callee)) return `call:${callee}`;
+      }
+    }
+    return 'other';
+  };
+  const visit = (node: any) => {
+    let text: string | undefined;
+    if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) text = node.text;
+    else if (ts.isTemplateHead(node) || ts.isTemplateMiddle(node) || ts.isTemplateTail(node)) text = node.text;
+    if (text !== undefined && !ts.isImportDeclaration(node.parent) && !ts.isExportDeclaration(node.parent)) {
+      out.push({ text, context: contextOf(node), line: sf.getLineAndCharacterOfPosition(node.getStart(sf)).line + 1 });
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sf);
+  return out;
+}
+
+const tokens = (s: string) => s.split(/\s+/).filter(Boolean);
+const sortedKey = (s: string) => tokens(s).slice().sort().join(' ');
+
+const [rev, ...files] = process.argv.slice(2);
+const report = {
+  files: files.length,
+  changedFragments: 0,
+  byContext: {} as Record<string, number>,
+  notPermutation: [] as string[],
+  mergeConflicts: [] as string[],
+  outsideClassContext: [] as string[],
+  internalConflictsSameResult: [] as string[],
+};
+
+for (const file of files) {
+  const before = fragments(execFileSync('git', ['show', `${rev}:${file}`], { encoding: 'utf8' }), file);
+  const after = fragments(readFileSync(file, 'utf8'), file);
+  if (before.length !== after.length) {
+    report.notPermutation.push(`${file}: fragment count ${before.length} -> ${after.length}`);
+    continue;
+  }
+  before.forEach((b, i) => {
+    const a = after[i];
+    if (b.text === a.text) return;
+    report.changedFragments++;
+    report.byContext[a.context] = (report.byContext[a.context] ?? 0) + 1;
+    const where = `${file}:${a.line} [${a.context}] "${b.text}" -> "${a.text}"`;
+    if (sortedKey(b.text) !== sortedKey(a.text)) report.notPermutation.push(where);
+    if (a.context === 'other') report.outsideClassContext.push(where);
+    const mergedBefore = sortedKey(twMerge(b.text));
+    const mergedAfter = sortedKey(twMerge(a.text));
+    if (mergedBefore !== mergedAfter) report.mergeConflicts.push(`${where}\n    twMerge: "${twMerge(b.text)}" vs "${twMerge(a.text)}"`);
+    else if (mergedBefore !== sortedKey(b.text)) report.internalConflictsSameResult.push(`${where}\n    twMerge drops: ${tokens(b.text).filter((t) => !tokens(twMerge(b.text)).includes(t)).join(' ')}`);
+  });
+}
+
+const text = JSON.stringify(report, null, 2);
+writeFileSync(join(process.env.OUT ?? '.', 'classsort-analysis.json'), text);
+console.log(
+  `files=${report.files} changedFragments=${report.changedFragments} byContext=${JSON.stringify(report.byContext)}\n` +
+    `notPermutation=${report.notPermutation.length} mergeConflicts=${report.mergeConflicts.length} ` +
+    `outsideClassContext=${report.outsideClassContext.length} internalConflictsSameResult=${report.internalConflictsSameResult.length}`,
+);

@@ -252,7 +252,7 @@ export function ResultsTable({
       />
 
       {whatIfResults && (
-        <p className='text-muted-foreground text-sm'>
+        <p className='text-sm text-muted-foreground'>
           Each period compares Current and What If. Scroll horizontally to see all pairs, or choose
           fewer periods above. Row labels stay visible while you scroll.
         </p>
@@ -284,7 +284,7 @@ export function ResultsTable({
           */}
           <section
             ref={containerRef}
-            className='scroll-area-thin w-full cursor-grab overflow-x-auto scroll-smooth focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:cursor-grabbing [&.is-dragging]:cursor-grabbing [&.is-dragging]:select-none [&.is-dragging_*]:select-none'
+            className='scroll-area-thin w-full cursor-grab overflow-x-auto scroll-smooth focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none active:cursor-grabbing [&.is-dragging]:cursor-grabbing [&.is-dragging]:select-none [&.is-dragging_*]:select-none'
             aria-label='Tax calculation results table - scrollable'
             aria-describedby={scrollHintId}
             data-testid='results-table-container'

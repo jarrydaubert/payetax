@@ -59,25 +59,19 @@ describe('tax-policy selector', () => {
       expect(parseSupportedTaxYear(short)).toBe(expected);
     });
 
-    it.each([
-      undefined,
-      null,
-      '',
-      '2026',
-      'garbage',
-      '20xx-yy',
-      'not-a-year',
-    ])('returns null for missing/malformed input: %p', (value) => {
-      expect(parseSupportedTaxYear(value as string | null | undefined)).toBeNull();
-    });
+    it.each([undefined, null, '', '2026', 'garbage', '20xx-yy', 'not-a-year'])(
+      'returns null for missing/malformed input: %p',
+      (value) => {
+        expect(parseSupportedTaxYear(value as string | null | undefined)).toBeNull();
+      },
+    );
 
-    it.each([
-      '2027-2028',
-      '2019-2020',
-      '2022-2023',
-    ])('returns null for an unsupported year: %s', (value) => {
-      expect(parseSupportedTaxYear(value)).toBeNull();
-    });
+    it.each(['2027-2028', '2019-2020', '2022-2023'])(
+      'returns null for an unsupported year: %s',
+      (value) => {
+        expect(parseSupportedTaxYear(value)).toBeNull();
+      },
+    );
 
     it('pins the historical lenient parsing (extra hyphen segments are ignored)', () => {
       // Documented behaviour carried over from the PAYE engine's split-based
