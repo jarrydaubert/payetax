@@ -78,11 +78,36 @@ After an approved merge and separately approved production deployment:
    `package.json` at that exact SHA and run the Production Validation checks below. Separately
    check a previously installed PWA: open drafts survive an update and offline relaunch works.
    Record results, evidence and any blocked/deferred checks. Do not call unverified checks passed.
-3. Only after production verification passes, and with explicit maintainer approval, create an
-   annotated `v<package-version>` tag on the verified source SHA, for example
-   `git tag -a v5.2.0 <verified-source-sha> -m "PayeTax v5.2.0; production evidence: <report-path>"`.
-   Check that the tag does not already exist; never move a published tag. Publish a tag/release
-   only when separately authorised, linking the production evidence and describing actual changes.
+3. Only after production verification passes, the maintainer approves publication by running
+   **Actions → Release → Run workflow** from `main` with the verified source SHA, the expected
+   `package.json` version at that SHA and the evidence record (a `docs/reports/` path committed
+   on `main`, or a PR/issue link in this repository). Leave `publish` unticked for a dry run,
+   which runs every check and previews the release notes. Then rerun with `publish` ticked to
+   create the annotated `v<package-version>` tag on that SHA and its GitHub Release. Nothing is
+   published on merge or deployment; dispatching with `publish` ticked is the approval.
+
+Before writing anything, the workflow requires: a run from `main`; a full SHA on `main`'s
+first-parent history; a stable version matching `package.json` at that SHA; a successful
+`vercel[bot]` `Production` deployment of that SHA; a successful `CI` run for its `main` push; and
+existing evidence. Release notes start with the evidence link and source SHA, followed by
+GitHub's generated pull-request list since the nearest earlier `v*` tag. A release older than an
+existing one does not take the Latest designation.
+
+Tags are never moved or force-pushed. If the tag was pushed but release creation failed, rerun
+with the same inputs: an annotated tag at exactly that SHA is reused and only the release is
+created. Rerunning a completed release is a no-op. Any other existing tag, a lightweight tag, a
+draft/prerelease or tagless release, or the same version published under another tag fails for
+manual review. API errors fail the run; they are never treated as an absent tag or release.
+
+The workflow uses only `GITHUB_TOKEN` (`contents: write`, `actions: read`, `deployments: read`);
+no secret, environment, dependency or branch-protection change is needed. Existing CI, CodeQL,
+non-blocking E2E and Vercel deployment behaviour are unchanged. Its guard tests run before every
+dispatch and on PRs touching the release files: `node --test .github/scripts/release.test.js`.
+It checks recorded deployment and CI state, not the manual checks in steps 1–2.
+
+Historical tags and releases are repaired separately: `v5.20` is package version 5.2.0, and
+5.2.1–5.2.4 have no tags or releases. The workflow refuses to duplicate 5.2.0, and until the
+repair is done, a new release's notes start from `v5.20`.
 
 SemVer, build identity and production verification are separate. A full build-identity/freshness
 feature remains backlog work. Existing `release:*` helpers are legacy optional tooling, not proof

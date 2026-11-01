@@ -1,0 +1,64 @@
+name: Release
+
+on:
+  # Dispatching with publish ticked is the maintainer's approval to publish.
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: Verified production source commit (full 40-character SHA)
+        required: true
+        type: string
+      version:
+        description: Expected package.json version at that commit, e.g. 5.2.5
+        required: true
+        type: string
+      evidence:
+        description: Production verification record (docs/reports/... path on main, or a PR/issue link)
+        required: true
+        type: string
+      publish:
+        description: Create the tag and GitHub Release (leave unticked for a dry run)
+        required: false
+        type: boolean
+        default: false
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/scripts/release*.js
+      - .github/workflows/release.yml
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Release guard tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Test release guards
+        run: node --test .github/scripts/release.test.js
+
+  release:
+    name: Verify and publish release
+    if: github.event_name == 'workflow_dispatch'
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    concurrency:
+      group: release
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      actions: read
+      deployments: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Verify, tag and publish release notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/release.js
