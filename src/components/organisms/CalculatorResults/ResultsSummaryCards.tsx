@@ -3,7 +3,7 @@
 
 import { motion } from 'framer-motion';
 import { AlertTriangle, Calendar, Percent, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { ResultCard } from '@/components/molecules/ResultCard';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -32,6 +32,13 @@ export function ResultsSummaryCards({
   input,
 }: ResultsSummaryCardsProps) {
   const shouldReduceMotion = useMotionPreference();
+  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
+  const tooltipState = (card: string) => ({
+    tooltipOpen: activeTooltip === card,
+    onTooltipOpenChange: (open: boolean) => {
+      setActiveTooltip((current) => (open ? card : current === card ? null : current));
+    },
+  });
 
   const totalTax = results.incomeTax.annually + results.nationalInsurance.annually;
   const effectiveRate =
@@ -78,6 +85,7 @@ export function ResultsSummaryCards({
         <motion.div variants={shouldReduceMotion ? undefined : ANIMATION_VARIANTS.fadeInUp}>
           <ResultCard
             label='Annual Take-Home'
+            {...tooltipState('annual')}
             value={formatCurrency(results.netPay.annually)}
             icon={Wallet}
             variant='success'
@@ -91,6 +99,7 @@ export function ResultsSummaryCards({
         >
           <ResultCard
             label='Monthly Take-Home'
+            {...tooltipState('monthly')}
             value={formatCurrency(results.netPay.monthly)}
             icon={Calendar}
             variant='info'
@@ -101,6 +110,7 @@ export function ResultsSummaryCards({
         <motion.div variants={shouldReduceMotion ? undefined : ANIMATION_VARIANTS.fadeInUp}>
           <ResultCard
             label='Total Tax & NI'
+            {...tooltipState('total')}
             value={formatCurrency(totalTax)}
             icon={TrendingDown}
             variant='warning'
@@ -111,6 +121,7 @@ export function ResultsSummaryCards({
         <motion.div variants={shouldReduceMotion ? undefined : ANIMATION_VARIANTS.fadeInUp}>
           <ResultCard
             label='Effective Tax Rate'
+            {...tooltipState('effective')}
             value={`${effectiveRate.toFixed(1)}%`}
             icon={Percent}
             variant='default'
@@ -120,7 +131,8 @@ export function ResultsSummaryCards({
         </motion.div>
         <motion.div variants={shouldReduceMotion ? undefined : ANIMATION_VARIANTS.fadeInUp}>
           <ResultCard
-            label='Marginal Tax Rate'
+            label='Marginal Rate Estimate'
+            {...tooltipState('marginal')}
             value={`${marginalTaxRate.toFixed(1)}%`}
             icon={TrendingUp}
             variant='info'
@@ -130,6 +142,16 @@ export function ResultsSummaryCards({
           />
         </motion.div>
       </motion.section>
+      <p
+        className='mt-3 text-muted-foreground text-sm leading-relaxed'
+        data-testid='summary-result-note'
+      >
+        Monthly take-home is your yearly estimate divided by 12; actual payslips may vary. Total Tax
+        &amp; NI and the effective rate include Income Tax and employee National Insurance only,
+        excluding pension contributions and student loan repayments. The marginal rate estimates the
+        share of an extra £100 a year taken in Income Tax, employee National Insurance and any
+        student loan repayments, using rounded payroll figures; it excludes pension contributions.
+      </p>
     </TooltipProvider>
   );
 }

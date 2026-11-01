@@ -90,6 +90,7 @@ export default defineConfig({
         ...devices['Pixel 5'],
       },
       testMatch: [
+        '**/summary-cards.spec.ts',
         '**/smoke.spec.ts',
         '**/calculator-critical.spec.ts',
         '**/monetary-input-interaction.spec.ts',
@@ -107,6 +108,7 @@ export default defineConfig({
         ...devices['iPhone 12'],
       },
       testMatch: [
+        '**/summary-cards.spec.ts',
         '**/smoke.spec.ts',
         '**/calculator-critical.spec.ts',
         '**/monetary-input-interaction.spec.ts',
