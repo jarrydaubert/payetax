@@ -117,8 +117,9 @@ The next focused task is basic Sentry error reporting: the root instrumentation 
 `src/` beside a `src/app` application, and normal hook discovery remains broken. Hook registration,
 deployed Node compatibility and live event delivery need verification while preserving existing
 privacy filters and zero trace/replay sampling. See [Verification](BACKLOG.md#verification) for
-this defect and the separately tracked pension-help focus race. Maintainer-reported mobile input
-layout and desktop padding problems remain separate calculator follow-ups, pending reproduction.
+this defect and the separately tracked pension-help focus race. The maintainer-reported input-panel
+layout problems (cramped checkbox row, inconsistent field widths, desktop padding and mobile
+one-line/two-line rows) are a separate calculator follow-up in the [backlog](BACKLOG.md#active).
 
 The two build/test dependency exceptions remain open: no compatible fixed glob/minimatch releases
 were available at the 1 November recheck. Review by **7 November 2026**; expiry remains
