@@ -25,7 +25,7 @@ export function DeepDives({ posts }: DeepDivesProps) {
       {/* biome-ignore lint/correctness/useUniqueElementIds: Server component rendered once per page */}
       <h2
         id='deep-dives-heading'
-        className='font-display mb-6 text-sm font-semibold tracking-widest text-primary uppercase'
+        className='mb-6 font-display font-semibold text-primary text-sm uppercase tracking-widest'
       >
         Deep Dives
       </h2>

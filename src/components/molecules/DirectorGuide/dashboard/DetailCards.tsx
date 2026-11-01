@@ -195,7 +195,7 @@ function DetailCard({ title, badge, rows, total }: DetailCardProps) {
       <div className='mb-4 flex items-center justify-between'>
         <span className='font-semibold text-foreground'>{title}</span>
         {badge && (
-          <span className='rounded border border-primary/30 bg-primary/10 px-2 py-1 text-xs text-primary'>
+          <span className='rounded border border-primary/30 bg-primary/10 px-2 py-1 text-primary text-xs'>
             {badge}
           </span>
         )}
@@ -205,9 +205,9 @@ function DetailCard({ title, badge, rows, total }: DetailCardProps) {
         {rows.map((row) => (
           <div
             key={row.label}
-            className='flex items-center justify-between border-b border-border/50 py-2.5 last:border-b-0'
+            className='flex items-center justify-between border-border/50 border-b py-2.5 last:border-b-0'
           >
-            <span className='text-sm text-muted-foreground'>{row.label}</span>
+            <span className='text-muted-foreground text-sm'>{row.label}</span>
             <span
               className={cn(
                 'font-mono text-sm',
@@ -222,11 +222,11 @@ function DetailCard({ title, badge, rows, total }: DetailCardProps) {
         ))}
       </div>
 
-      <div className='mt-2 flex items-center justify-between border-t border-border/70 pt-3'>
+      <div className='mt-2 flex items-center justify-between border-border/70 border-t pt-3'>
         <span className='font-semibold text-foreground'>{total.label}</span>
         <span
           className={cn(
-            'font-mono text-lg font-semibold',
+            'font-mono font-semibold text-lg',
             total.isError ? 'text-destructive' : 'text-primary',
           )}
         >

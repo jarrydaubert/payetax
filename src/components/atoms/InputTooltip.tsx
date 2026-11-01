@@ -62,7 +62,7 @@ export const InputTooltip = memo(function InputTooltip({
         trigger={
           <button
             type='button'
-            className='flex min-h-8 min-w-8 flex-shrink-0 items-center justify-center rounded-full p-1 text-muted-foreground transition-colors hover:text-foreground focus:ring-2 focus:ring-ring focus:ring-offset-1 focus:outline-none'
+            className='flex min-h-8 min-w-8 flex-shrink-0 items-center justify-center rounded-full p-1 text-muted-foreground transition-colors hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1'
             aria-label={`Help for ${tooltipContent.title}`}
             data-testid={`tooltip-trigger-${fieldName}`}
           >

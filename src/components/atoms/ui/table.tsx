@@ -53,7 +53,7 @@ export type TableHeaderProps = ComponentPropsWithoutRef<'thead'>;
 
 const TableHeader = forwardRef<ElementRef<'thead'>, TableHeaderProps>(
   ({ className, ...props }, ref) => (
-    <thead ref={ref} className={cn('[&_tr]:border-b [&_tr]:border-border', className)} {...props} />
+    <thead ref={ref} className={cn('[&_tr]:border-border [&_tr]:border-b', className)} {...props} />
   ),
 );
 TableHeader.displayName = 'TableHeader';
@@ -86,7 +86,7 @@ const TableRow = forwardRef<ElementRef<'tr'>, TableRowProps>(({ className, ...pr
   <tr
     ref={ref}
     className={cn(
-      'border-b border-border transition-colors',
+      'border-border border-b transition-colors',
       'hover:bg-muted/50',
       'data-[state=selected]:bg-muted',
       className,
@@ -141,7 +141,7 @@ export type TableCaptionProps = ComponentPropsWithoutRef<'caption'>;
 
 const TableCaption = forwardRef<ElementRef<'caption'>, TableCaptionProps>(
   ({ className, ...props }, ref) => (
-    <caption ref={ref} className={cn('mt-4 text-sm text-muted-foreground', className)} {...props} />
+    <caption ref={ref} className={cn('mt-4 text-muted-foreground text-sm', className)} {...props} />
   ),
 );
 TableCaption.displayName = 'TableCaption';

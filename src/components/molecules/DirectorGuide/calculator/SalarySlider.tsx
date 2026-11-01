@@ -70,7 +70,7 @@ export function SalarySlider() {
     <div className='space-y-4 rounded-sm border border-border/50 bg-card p-5'>
       <div className='rounded-sm border border-border/50 bg-background p-3'>
         <div className='flex items-center justify-between gap-2'>
-          <span className='text-sm font-medium text-foreground'>Active Scenario</span>
+          <span className='font-medium text-foreground text-sm'>Active Scenario</span>
           <span
             className={cn(
               'rounded px-2 py-0.5 text-xs',
@@ -80,7 +80,7 @@ export function SalarySlider() {
             {isProfitWhatIfActive ? 'Simulated Company' : 'Current Company'}
           </span>
         </div>
-        <p className='mt-2 text-xs text-muted-foreground'>
+        <p className='mt-2 text-muted-foreground text-xs'>
           Salary slider is editing the {isProfitWhatIfActive ? 'simulated' : 'current'} company
           scenario ({isSalaryCustom ? 'custom salary' : 'baseline salary'}).
         </p>
@@ -106,7 +106,7 @@ export function SalarySlider() {
             Reset
           </button>
         </div>
-        <p className='text-xs text-muted-foreground'>
+        <p className='text-muted-foreground text-xs'>
           {formatCurrency(baseGrossProfitBeforePension, 0)} now
           {' -> '}
           <span className='font-medium text-foreground'>
@@ -130,7 +130,7 @@ export function SalarySlider() {
           <MoveHorizontal className='size-4' />
           <span className='text-sm'>Salary level at this scenario</span>
         </div>
-        <p className='text-xs text-muted-foreground'>
+        <p className='text-muted-foreground text-xs'>
           Exploring salary from £0 to {formatCurrency(maxSalary, 0)} (max affordable under current
           company scenario)
         </p>

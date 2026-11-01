@@ -55,7 +55,7 @@ export function TaxCodeDecoderClient() {
       <div className='mb-12 text-center'>
         <h1
           className={cn(
-            'font-display mb-4 leading-tight font-semibold text-foreground',
+            'mb-4 font-display font-semibold text-foreground leading-tight',
             'text-4xl',
           )}
         >
@@ -113,7 +113,7 @@ export function TaxCodeDecoderClient() {
                   className={cn(
                     'rounded-full border border-border/50 px-3 py-1 font-mono text-sm transition-colors',
                     'hover:border-primary hover:bg-primary/5',
-                    'focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                   )}
                 >
                   {exampleCode}
@@ -157,17 +157,17 @@ export function TaxCodeDecoderClient() {
             {(result.isScottish || result.isWelsh || result.isEmergency) && (
               <div className='flex flex-wrap gap-2'>
                 {result.isScottish && (
-                  <span className='rounded-full bg-primary/15 px-3 py-1 text-sm font-medium text-primary'>
+                  <span className='rounded-full bg-primary/15 px-3 py-1 font-medium text-primary text-sm'>
                     Scottish Tax Rates
                   </span>
                 )}
                 {result.isWelsh && (
-                  <span className='rounded-full bg-destructive/15 px-3 py-1 text-sm font-medium text-destructive'>
+                  <span className='rounded-full bg-destructive/15 px-3 py-1 font-medium text-destructive text-sm'>
                     Welsh Tax Rates
                   </span>
                 )}
                 {result.isEmergency && (
-                  <span className='rounded-full bg-warning/15 px-3 py-1 text-sm font-medium text-foreground'>
+                  <span className='rounded-full bg-warning/15 px-3 py-1 font-medium text-foreground text-sm'>
                     Emergency Code
                   </span>
                 )}
@@ -224,14 +224,14 @@ export function TaxCodeDecoderClient() {
           <div className='flex flex-col gap-1 sm:flex-row sm:flex-wrap sm:gap-x-6'>
             <Link
               href='https://www.gov.uk/guidance/check-what-your-tax-code-means'
-              className='inline-flex min-h-11 items-center gap-2 rounded-md py-2 text-primary hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none'
+              className='inline-flex min-h-11 items-center gap-2 rounded-md py-2 text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
             >
               Use HMRC&apos;s tax-code checker
               <ArrowRight className='size-4' />
             </Link>
             <Link
               href='https://www.gov.uk/tax-codes/how-to-update-your-tax-code'
-              className='inline-flex min-h-11 items-center gap-2 rounded-md py-2 text-primary hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none'
+              className='inline-flex min-h-11 items-center gap-2 rounded-md py-2 text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
             >
               What to do if the code looks wrong
               <ArrowRight className='size-4' />
@@ -255,10 +255,10 @@ export function TaxCodeDecoderClient() {
                 key={letterCode}
                 className='flex items-start gap-3 rounded-lg border border-border/50 p-3 transition-colors hover:bg-muted/50'
               >
-                <span className='rounded bg-primary/10 px-2 py-1 font-mono font-bold text-primary'>
+                <span className='rounded bg-primary/10 px-2 py-1 font-bold font-mono text-primary'>
                   {letterCode}
                 </span>
-                <span className='text-sm text-muted-foreground'>{description}</span>
+                <span className='text-muted-foreground text-sm'>{description}</span>
               </div>
             ))}
           </div>

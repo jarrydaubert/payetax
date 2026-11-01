@@ -68,13 +68,13 @@ export function SalaryComparisonTable() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-100px' }}
       transition={{ duration: 0.5 }}
-      className='border-b border-border/70 bg-background py-16'
+      className='border-border/70 border-b bg-background py-16'
     >
       <div className={cn('mx-auto max-w-6xl', 'px-4')}>
         <div className={cn('text-center', 'mb-10')}>
           <h2
             className={cn(
-              'font-display leading-tight font-semibold text-foreground',
+              'font-display font-semibold text-foreground leading-tight',
               'mb-3',
               'text-4xl',
             )}
@@ -97,8 +97,8 @@ export function SalaryComparisonTable() {
               aria-label='Salary comparison table - scrollable'
             >
               <table className='w-full min-w-160 border-collapse'>
-                <thead className='border-b border-border bg-background'>
-                  <tr className='border-b border-border/20'>
+                <thead className='border-border border-b bg-background'>
+                  <tr className='border-border/20 border-b'>
                     <th className={cn('text-left font-bold text-foreground', 'p-4')}>
                       Gross Salary
                     </th>
@@ -120,7 +120,7 @@ export function SalaryComparisonTable() {
                   {salaryData.map((row, idx) => (
                     <tr
                       key={row.salary}
-                      className={`border-b border-border/10 transition-colors hover:bg-primary/5 ${idx % 2 === 0 ? 'bg-muted/20' : ''}`}
+                      className={`border-border/10 border-b transition-colors hover:bg-primary/5 ${idx % 2 === 0 ? 'bg-muted/20' : ''}`}
                     >
                       <td className={'p-4'}>
                         <Link
@@ -151,7 +151,7 @@ export function SalaryComparisonTable() {
         </div>
 
         <div className={cn('text-center', 'mt-6')}>
-          <p className={`text-sm text-muted-foreground`}>
+          <p className={`text-muted-foreground text-sm`}>
             Based on England/Wales/NI rates for {CURRENT_TAX_YEAR_DISPLAY_SHORT}. Scottish rates
             differ.
           </p>

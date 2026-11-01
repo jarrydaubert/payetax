@@ -109,12 +109,12 @@ function SummaryCard({
       )}
       aria-label={ariaDescription}
     >
-      <div className='mb-2 text-xs font-medium tracking-wider text-muted-foreground uppercase'>
+      <div className='mb-2 font-medium text-muted-foreground text-xs uppercase tracking-wider'>
         {label}
       </div>
       <div
         className={cn(
-          'mb-1 font-mono text-2xl font-semibold tracking-tight break-words sm:text-3xl',
+          'mb-1 break-words font-mono font-semibold text-2xl tracking-tight sm:text-3xl',
           !highlight && 'text-foreground',
           highlight && !isEmpty && 'text-primary',
           isEmpty && 'text-muted-foreground/60',
@@ -122,7 +122,7 @@ function SummaryCard({
       >
         {value}
       </div>
-      <div className={cn('text-xs text-muted-foreground', isEmpty && 'text-muted-foreground/60')}>
+      <div className={cn('text-muted-foreground text-xs', isEmpty && 'text-muted-foreground/60')}>
         {subtext}
       </div>
     </article>

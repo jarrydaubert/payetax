@@ -32,7 +32,7 @@ const Input = forwardRef<ElementRef<'input'>, InputProps>(({ className, ...props
       // Placeholder
       'placeholder:text-muted-foreground',
       // Focus - ring with offset for visibility
-      'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none',
+      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
       // Disabled
       'disabled:cursor-not-allowed disabled:opacity-50',
       // Invalid state (when aria-invalid="true")
@@ -40,7 +40,7 @@ const Input = forwardRef<ElementRef<'input'>, InputProps>(({ className, ...props
       // Transitions
       'transition-colors',
       // File input styling
-      'file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground',
+      'file:border-0 file:bg-transparent file:font-medium file:text-foreground file:text-sm',
       className,
     )}
     {...props}

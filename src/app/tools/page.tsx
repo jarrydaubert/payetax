@@ -154,14 +154,14 @@ export default function ToolsPage() {
                       >
                         {tool.title}
                       </h2>
-                      <p className={cn('mt-2 leading-relaxed text-muted-foreground', 'text-sm')}>
+                      <p className={cn('mt-2 text-muted-foreground leading-relaxed', 'text-sm')}>
                         {tool.description}
                       </p>
                     </div>
 
                     <span
                       className={cn(
-                        'mt-5 inline-flex items-center gap-1 font-medium whitespace-nowrap text-primary',
+                        'mt-5 inline-flex items-center gap-1 whitespace-nowrap font-medium text-primary',
                         'text-sm',
                         'gap-1',
                       )}
@@ -176,16 +176,16 @@ export default function ToolsPage() {
           </div>
         </section>
 
-        <section className='border-y border-border/60 bg-card py-12 md:py-20'>
+        <section className='border-border/60 border-y bg-card py-12 md:py-20'>
           <div className='container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8'>
             <div className='mb-8 max-w-3xl'>
-              <p className='mb-3 text-xs font-semibold tracking-[0.22em] text-primary uppercase'>
+              <p className='mb-3 font-semibold text-primary text-xs uppercase tracking-[0.22em]'>
                 Tool chooser
               </p>
-              <h2 className='font-display text-4xl leading-tight font-semibold text-foreground'>
+              <h2 className='font-display font-semibold text-4xl text-foreground leading-tight'>
                 Which PayeTax tool should I use?
               </h2>
-              <p className='mt-4 leading-relaxed text-muted-foreground'>
+              <p className='mt-4 text-muted-foreground leading-relaxed'>
                 Use the main PAYE calculator when you want a fast take-home estimate from salary.
                 Use the specialist tools when a single part of the calculation needs more context:
                 director extraction, Scottish bands, National Insurance, Marriage Allowance, or an
@@ -197,17 +197,17 @@ export default function ToolsPage() {
               <table className='w-full min-w-[760px] border-collapse text-left text-sm'>
                 <caption className='sr-only'>PayeTax tool chooser by use case</caption>
                 <thead>
-                  <tr className='border-b border-border/60 bg-card'>
-                    <th className='px-4 py-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase'>
+                  <tr className='border-border/60 border-b bg-card'>
+                    <th className='px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
                       Use case
                     </th>
-                    <th className='px-4 py-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase'>
+                    <th className='px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
                       Tool
                     </th>
-                    <th className='px-4 py-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase'>
+                    <th className='px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
                       Includes
                     </th>
-                    <th className='px-4 py-3 text-xs font-semibold tracking-wider text-muted-foreground uppercase'>
+                    <th className='px-4 py-3 font-semibold text-muted-foreground text-xs uppercase tracking-wider'>
                       Does not cover
                     </th>
                   </tr>
@@ -216,7 +216,7 @@ export default function ToolsPage() {
                   {toolGuideRows.map((row) => (
                     <tr
                       key={row.useCase}
-                      className='border-b border-border/50 align-top last:border-b-0'
+                      className='border-border/50 border-b align-top last:border-b-0'
                     >
                       <th scope='row' className='px-4 py-4 font-semibold text-foreground'>
                         {row.useCase}
@@ -230,10 +230,10 @@ export default function ToolsPage() {
                           <ArrowRight className='size-3' aria-hidden='true' />
                         </Link>
                       </td>
-                      <td className='px-4 py-4 leading-relaxed text-muted-foreground'>
+                      <td className='px-4 py-4 text-muted-foreground leading-relaxed'>
                         {row.includes}
                       </td>
-                      <td className='px-4 py-4 leading-relaxed text-muted-foreground'>
+                      <td className='px-4 py-4 text-muted-foreground leading-relaxed'>
                         {row.excludes}
                       </td>
                     </tr>
@@ -247,18 +247,18 @@ export default function ToolsPage() {
         <section className='py-12 md:py-20'>
           <div className='container mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-[minmax(0,0.7fr)_minmax(0,1fr)] lg:px-8'>
             <div>
-              <p className='mb-3 text-xs font-semibold tracking-[0.22em] text-primary uppercase'>
+              <p className='mb-3 font-semibold text-primary text-xs uppercase tracking-[0.22em]'>
                 Coverage
               </p>
-              <h2 className='font-display text-4xl leading-tight font-semibold text-foreground'>
+              <h2 className='font-display font-semibold text-4xl text-foreground leading-tight'>
                 Current coverage and limits
               </h2>
-              <p className='mt-4 leading-relaxed text-muted-foreground'>
+              <p className='mt-4 text-muted-foreground leading-relaxed'>
                 PayeTax keeps the public toolset intentionally narrow. It covers common PAYE-style
                 salary calculations and focused UK tax questions, with source and limitation notes
                 linked from the Compliance page.
               </p>
-              <ul className='mt-6 space-y-3 text-sm leading-relaxed text-muted-foreground'>
+              <ul className='mt-6 space-y-3 text-muted-foreground text-sm leading-relaxed'>
                 <li>
                   <span className='font-medium text-foreground'>Tax year:</span>{' '}
                   {CURRENT_TAX_YEAR_DISPLAY_SHORT} rates and thresholds for the retained
@@ -279,14 +279,14 @@ export default function ToolsPage() {
               </ul>
             </div>
 
-            <div className='border-y border-border'>
+            <div className='border-border border-y'>
               {toolsFaq.map((item) => (
                 <article
                   key={item.question}
-                  className='border-b border-border py-5 last:border-b-0'
+                  className='border-border border-b py-5 last:border-b-0'
                 >
-                  <h3 className='text-lg font-semibold text-foreground'>{item.question}</h3>
-                  <p className='mt-2 text-sm leading-relaxed text-muted-foreground'>
+                  <h3 className='font-semibold text-foreground text-lg'>{item.question}</h3>
+                  <p className='mt-2 text-muted-foreground text-sm leading-relaxed'>
                     {item.answer}
                   </p>
                 </article>

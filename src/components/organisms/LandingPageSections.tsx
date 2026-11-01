@@ -74,30 +74,30 @@ export function FAQSection() {
   return (
     // biome-ignore lint/correctness/useUniqueElementIds: Static ID required for anchor navigation
     <section
-      className='relative z-[1] border-y border-border bg-background px-4 py-16 md:py-24'
+      className='relative z-[1] border-border border-y bg-background px-4 py-16 md:py-24'
       id='faq'
     >
       <div className='mx-auto mb-8 max-w-[960px] text-left'>
-        <div className='mb-3 text-xs font-semibold tracking-[0.18em] text-primary uppercase'>
+        <div className='mb-3 font-semibold text-primary text-xs uppercase tracking-[0.18em]'>
           FAQ
         </div>
-        <h2 className='font-display text-4xl leading-[0.98] font-semibold text-foreground md:text-6xl'>
+        <h2 className='font-display font-semibold text-4xl text-foreground leading-[0.98] md:text-6xl'>
           Common questions
         </h2>
-        <p className='mt-2 text-sm text-muted-foreground'>
+        <p className='mt-2 text-muted-foreground text-sm'>
           Using official HMRC rates for {CURRENT_TAX_YEAR_DISPLAY_SHORT} (verified{' '}
           {ratesVerifiedDisplay}).
         </p>
       </div>
 
-      <div className='mx-auto grid max-w-[960px] border-t border-border md:grid-cols-2 md:gap-x-8'>
+      <div className='mx-auto grid max-w-[960px] border-border border-t md:grid-cols-2 md:gap-x-8'>
         {faqs.map((faq) => (
           <div
             key={faq.question}
-            className='border-b border-border py-5 transition-colors hover:border-foreground'
+            className='border-border border-b py-5 transition-colors hover:border-foreground'
           >
-            <h3 className='mb-3 text-base font-semibold text-foreground'>{faq.question}</h3>
-            <p className='text-sm leading-relaxed text-muted-foreground'>
+            <h3 className='mb-3 font-semibold text-base text-foreground'>{faq.question}</h3>
+            <p className='text-muted-foreground text-sm leading-relaxed'>
               {faq.answer}
               {faq.links?.map((link) => (
                 <span key={`${faq.question}-${link.href}`}>
@@ -125,9 +125,9 @@ export function ProofStrip() {
   const ratesVerifiedDisplay = formatIsoDateForDisplay(RATES_LAST_VERIFIED);
 
   return (
-    <section className='border-y border-border bg-background py-5'>
+    <section className='border-border border-y bg-background py-5'>
       <div className='container mx-auto max-w-6xl px-4'>
-        <div className='flex flex-col items-center gap-x-8 gap-y-2.5 text-center text-sm text-muted-foreground sm:flex-row sm:flex-wrap sm:justify-center'>
+        <div className='flex flex-col items-center gap-x-8 gap-y-2.5 text-center text-muted-foreground text-sm sm:flex-row sm:flex-wrap sm:justify-center'>
           <span className='flex items-center gap-2'>
             <CheckCircle aria-hidden='true' className='size-4 flex-shrink-0 text-primary' />
             HMRC rates verified {ratesVerifiedDisplay}
@@ -165,13 +165,13 @@ export function ToolsDirectory() {
     // biome-ignore lint/correctness/useUniqueElementIds: Static ID required for anchor navigation
     <section className='relative z-[1] bg-background px-4 py-16 md:py-24' id='tools'>
       <div className='mx-auto mb-8 max-w-[960px] text-left'>
-        <div className='mb-3 text-xs font-semibold tracking-[0.18em] text-primary uppercase'>
+        <div className='mb-3 font-semibold text-primary text-xs uppercase tracking-[0.18em]'>
           More tools
         </div>
-        <h2 className='font-display text-4xl leading-[0.98] font-semibold text-foreground md:text-6xl'>
+        <h2 className='font-display font-semibold text-4xl text-foreground leading-[0.98] md:text-6xl'>
           Go deeper than take-home
         </h2>
-        <p className='mt-2 text-sm text-muted-foreground'>
+        <p className='mt-2 text-muted-foreground text-sm'>
           Specialised UK tax tools, built on the same official HMRC rates as the calculator above.
         </p>
       </div>
@@ -187,12 +187,12 @@ export function ToolsDirectory() {
             <Card className='flex h-full flex-col rounded-sm border-border bg-card p-5 transition-colors hover:border-primary/55'>
               <div className='mb-2 flex items-center gap-2'>
                 <tool.icon aria-hidden='true' className='size-4 flex-shrink-0 text-primary' />
-                <h3 className='font-display text-lg font-semibold text-foreground group-hover:text-primary'>
+                <h3 className='font-display font-semibold text-foreground text-lg group-hover:text-primary'>
                   {tool.title}
                 </h3>
               </div>
-              <p className='text-sm leading-relaxed text-muted-foreground'>{tool.description}</p>
-              <span className='mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary'>
+              <p className='text-muted-foreground text-sm leading-relaxed'>{tool.description}</p>
+              <span className='mt-4 inline-flex items-center gap-1 font-medium text-primary text-sm'>
                 Open tool
                 <ArrowRight className='size-4' aria-hidden='true' />
               </span>

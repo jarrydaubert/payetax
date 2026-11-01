@@ -27,7 +27,7 @@ export function formatTooltipText(content: TooltipContent): React.ReactNode {
       <div className='font-semibold'>{content.title}</div>
       <div>{content.description}</div>
       {content.note && (
-        <div className='border-t border-border pt-2 whitespace-pre-line'>{content.note}</div>
+        <div className='whitespace-pre-line border-border border-t pt-2'>{content.note}</div>
       )}
     </div>
   );

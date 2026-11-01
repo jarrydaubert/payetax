@@ -88,11 +88,11 @@ export function NICalculatorClient() {
       <div className='mb-12 text-center'>
         <div className='mb-4 inline-flex items-center gap-2 rounded-sm border border-primary/35 bg-background px-4 py-2 text-primary'>
           <Shield className={'size-4'} />
-          <span className='text-sm font-medium tracking-[0.2em] uppercase'>National Insurance</span>
+          <span className='font-medium text-sm uppercase tracking-[0.2em]'>National Insurance</span>
         </div>
         <h1
           className={cn(
-            'font-display mb-4 leading-tight font-semibold text-foreground',
+            'mb-4 font-display font-semibold text-foreground leading-tight',
             'text-4xl',
           )}
         >
@@ -143,7 +143,7 @@ export function NICalculatorClient() {
 
             {/* NI Category Selection */}
             <fieldset>
-              <legend className='mb-2 block text-sm font-medium'>NI Category</legend>
+              <legend className='mb-2 block font-medium text-sm'>NI Category</legend>
               <div className='flex flex-wrap gap-2'>
                 {NI_CATEGORIES.filter((c) => c.common).map((cat) => (
                   <button
@@ -152,7 +152,7 @@ export function NICalculatorClient() {
                     onClick={() => handleCategoryChange(cat.code)}
                     className={cn(
                       'rounded-lg border px-4 py-2 text-sm transition-colors',
-                      'focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                       category === cat.code
                         ? 'border-primary bg-primary/10 font-medium text-primary'
                         : 'hover:border-primary hover:bg-primary/5',
@@ -165,9 +165,9 @@ export function NICalculatorClient() {
                 <button
                   type='button'
                   className={cn(
-                    'rounded-lg border px-4 py-2 text-sm text-muted-foreground',
+                    'rounded-lg border px-4 py-2 text-muted-foreground text-sm',
                     'hover:border-primary hover:bg-primary/5',
-                    'focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                   )}
                   onClick={() => setShowAllCategories(!showAllCategories)}
                   aria-expanded={showAllCategories}
@@ -193,7 +193,7 @@ export function NICalculatorClient() {
                         onClick={() => handleCategoryChange(cat.code)}
                         className={cn(
                           'rounded-lg border px-3 py-1.5 text-sm transition-colors',
-                          'focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none',
+                          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                           category === cat.code
                             ? 'border-primary bg-primary/10 font-medium text-primary'
                             : 'hover:border-primary hover:bg-primary/5',
@@ -207,7 +207,7 @@ export function NICalculatorClient() {
                 </div>
               )}
 
-              <p className='mt-2 text-sm text-muted-foreground'>
+              <p className='mt-2 text-muted-foreground text-sm'>
                 Most employees are Category A. Check your payslip for your NI category.
               </p>
             </fieldset>
@@ -224,7 +224,7 @@ export function NICalculatorClient() {
                     className={cn(
                       'rounded-full border px-3 py-1 font-mono text-sm transition-colors',
                       'hover:border-primary hover:bg-primary/5',
-                      'focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
                     )}
                   >
                     £{exampleSalary.toLocaleString()}
@@ -242,8 +242,8 @@ export function NICalculatorClient() {
           <CardContent className='pt-6'>
             <div className='grid gap-4 md:grid-cols-3'>
               <div className='rounded-lg border border-success/30 bg-success/10 p-4'>
-                <p className='mb-1 text-sm font-medium text-success'>Your NI (Employee)</p>
-                <p className='text-2xl font-bold text-foreground'>
+                <p className='mb-1 font-medium text-sm text-success'>Your NI (Employee)</p>
+                <p className='font-bold text-2xl text-foreground'>
                   {formatCurrency(result.employee, 0)}
                 </p>
                 <p className='text-sm text-success'>
@@ -251,8 +251,8 @@ export function NICalculatorClient() {
                 </p>
               </div>
               <div className='rounded-lg border border-warning/30 bg-warning/10 p-4'>
-                <p className='mb-1 text-sm font-medium text-warning'>Employer NI</p>
-                <p className='text-2xl font-bold text-foreground'>
+                <p className='mb-1 font-medium text-sm text-warning'>Employer NI</p>
+                <p className='font-bold text-2xl text-foreground'>
                   {formatCurrency(result.employer, 0)}
                 </p>
                 <p className='text-sm text-warning'>
@@ -260,14 +260,14 @@ export function NICalculatorClient() {
                 </p>
               </div>
               <div className='rounded-lg border border-border/50 bg-card p-4'>
-                <p className='mb-1 text-sm font-medium text-muted-foreground'>Total NI Cost</p>
-                <p className='text-2xl font-bold'>{formatCurrency(result.total, 0)}</p>
-                <p className='text-sm text-muted-foreground'>Employment cost to employer</p>
+                <p className='mb-1 font-medium text-muted-foreground text-sm'>Total NI Cost</p>
+                <p className='font-bold text-2xl'>{formatCurrency(result.total, 0)}</p>
+                <p className='text-muted-foreground text-sm'>Employment cost to employer</p>
               </div>
             </div>
 
             {/* Annualized estimate disclosure */}
-            <p className='mt-4 text-center text-xs text-muted-foreground'>
+            <p className='mt-4 text-center text-muted-foreground text-xs'>
               This is an annualized estimate. NI is calculated per pay period in practice, which may
               differ slightly.{' '}
               <Link href='/' className='text-primary hover:underline'>

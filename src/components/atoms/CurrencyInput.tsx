@@ -240,7 +240,7 @@ export function CurrencyInput({
         className={cn(className, showError && 'border-destructive focus:border-destructive')}
       />
       {showError ? (
-        <p id={errorId} className={cn('text-xs leading-relaxed text-destructive', errorClassName)}>
+        <p id={errorId} className={cn('text-destructive text-xs leading-relaxed', errorClassName)}>
           {error}
         </p>
       ) : null}

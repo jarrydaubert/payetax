@@ -247,7 +247,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
                   <span>{copied ? 'Copied' : 'Copy'}</span>
                 </Button>
               </div>
-              <code className={cn('block font-mono break-all', 'text-primary', 'text-xs')}>
+              <code className={cn('block break-all font-mono', 'text-primary', 'text-xs')}>
                 {eventId}
               </code>
               <p className={cn('text-muted-foreground', 'text-xs', 'mt-2')}>
@@ -311,7 +311,7 @@ function DefaultErrorFallback({ error, eventId, resetError }: ErrorInfo) {
                 <h4 className={cn('font-semibold text-warning', 'mb-2')}>Stack Trace:</h4>
                 <pre
                   className={cn(
-                    'max-h-64 overflow-auto rounded whitespace-pre-wrap',
+                    'max-h-64 overflow-auto whitespace-pre-wrap rounded',
                     'border border-destructive/20 bg-card/90',
                     'font-mono text-destructive',
                     'text-xs',

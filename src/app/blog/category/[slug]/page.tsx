@@ -134,7 +134,7 @@ export default async function CategoryPage({
       {/* Header + Filters */}
       <div className='container mx-auto max-w-7xl px-4 pt-12 sm:px-6 lg:px-8'>
         {/* Breadcrumbs */}
-        <nav aria-label='Breadcrumbs' className='mb-4 text-sm text-muted-foreground'>
+        <nav aria-label='Breadcrumbs' className='mb-4 text-muted-foreground text-sm'>
           <ol className='flex items-center gap-2'>
             <li>
               <Link href='/' className='hover:text-foreground'>
@@ -153,10 +153,10 @@ export default async function CategoryPage({
         </nav>
 
         <div className='mb-6 flex items-baseline gap-3'>
-          <h1 className='font-display text-3xl font-bold text-foreground md:text-4xl'>
+          <h1 className='font-bold font-display text-3xl text-foreground md:text-4xl'>
             {category.name}
           </h1>
-          <span className='text-sm text-muted-foreground'>
+          <span className='text-muted-foreground text-sm'>
             {totalCount} {totalCount === 1 ? 'article' : 'articles'}
           </span>
         </div>
@@ -167,7 +167,7 @@ export default async function CategoryPage({
             <li>
               <Link
                 href='/blog'
-                className='block rounded-full border border-border/70 bg-card/70 px-4 py-2 text-center text-sm text-foreground transition hover:border-primary/50 hover:text-foreground'
+                className='block rounded-full border border-border/70 bg-card/70 px-4 py-2 text-center text-foreground text-sm transition hover:border-primary/50 hover:text-foreground'
               >
                 All Articles
               </Link>
@@ -203,7 +203,7 @@ export default async function CategoryPage({
                 key={post.id}
                 className='group rounded-xl border border-border/60 bg-card/70 p-5 transition-colors hover:border-primary/50'
               >
-                <div className='mb-3 flex items-center gap-2 text-xs text-muted-foreground'>
+                <div className='mb-3 flex items-center gap-2 text-muted-foreground text-xs'>
                   <span className='font-medium text-primary'>
                     {post.categoryData?.name || post.category}
                   </span>
@@ -213,8 +213,8 @@ export default async function CategoryPage({
                 <h2 className='mb-2 font-semibold text-foreground group-hover:text-primary'>
                   <Link href={`/blog/${post.slug}`}>{post.title}</Link>
                 </h2>
-                <p className='mb-4 line-clamp-2 text-sm text-muted-foreground'>{post.excerpt}</p>
-                <time className='text-xs text-muted-foreground' dateTime={post.publishedAt}>
+                <p className='mb-4 line-clamp-2 text-muted-foreground text-sm'>{post.excerpt}</p>
+                <time className='text-muted-foreground text-xs' dateTime={post.publishedAt}>
                   {formatDate(post.publishedAt)}
                 </time>
               </article>
@@ -235,18 +235,18 @@ export default async function CategoryPage({
             {currentPage > 1 && (
               <Link
                 href={`/blog/category/${slug}?page=${currentPage - 1}`}
-                className='rounded-lg border border-border/70 bg-card px-4 py-2 text-sm text-foreground hover:bg-card/80'
+                className='rounded-lg border border-border/70 bg-card px-4 py-2 text-foreground text-sm hover:bg-card/80'
               >
                 Previous
               </Link>
             )}
-            <span className='px-4 py-2 text-sm text-muted-foreground'>
+            <span className='px-4 py-2 text-muted-foreground text-sm'>
               Page {currentPage} of {totalPages}
             </span>
             {currentPage < totalPages && (
               <Link
                 href={`/blog/category/${slug}?page=${currentPage + 1}`}
-                className='rounded-lg border border-border/70 bg-card px-4 py-2 text-sm text-foreground hover:bg-card/80'
+                className='rounded-lg border border-border/70 bg-card px-4 py-2 text-foreground text-sm hover:bg-card/80'
               >
                 Next
               </Link>

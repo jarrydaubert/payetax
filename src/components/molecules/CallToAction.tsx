@@ -92,7 +92,7 @@ export default function CallToAction({
     >
       <IconComponent className={cn('mx-auto text-primary', 'mb-6', 'size-12')} aria-hidden='true' />
       <h2 className={cn('font-bold text-foreground', 'mb-6', 'text-3xl')}>{config.title}</h2>
-      <p className={cn('mx-auto mb-8 max-w-2xl leading-relaxed text-muted-foreground', 'text-xl')}>
+      <p className={cn('mx-auto mb-8 max-w-2xl text-muted-foreground leading-relaxed', 'text-xl')}>
         {config.description}
       </p>
 

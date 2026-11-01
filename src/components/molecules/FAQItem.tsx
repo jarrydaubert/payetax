@@ -21,7 +21,7 @@ export function FAQItem({ question, children }: FAQItemProps) {
     >
       <summary
         className={cn(
-          'font-display cursor-pointer font-semibold text-foreground transition-colors hover:text-primary',
+          'cursor-pointer font-display font-semibold text-foreground transition-colors hover:text-primary',
           'text-lg',
         )}
       >

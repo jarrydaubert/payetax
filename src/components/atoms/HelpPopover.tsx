@@ -79,7 +79,7 @@ export function HelpPopover({
           aria-describedby={descriptionId}
           tabIndex={-1}
           data-testid={testId}
-          className='relative z-50 max-h-[var(--radix-popover-content-available-height)] w-80 max-w-[calc(100vw-1.5rem)] overflow-y-auto rounded-md border border-border bg-popover p-3 pr-11 text-sm leading-relaxed text-popover-foreground shadow-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none'
+          className='relative z-50 max-h-[var(--radix-popover-content-available-height)] w-80 max-w-[calc(100vw-1.5rem)] overflow-y-auto rounded-md border border-border bg-popover p-3 pr-11 text-popover-foreground text-sm leading-relaxed shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
           onCloseAutoFocus={(event) => {
             if (dismissedOutside.current) event.preventDefault();
             dismissedOutside.current = false;
@@ -97,7 +97,7 @@ export function HelpPopover({
             onMouseDown={(event) => {
               if (document.activeElement === triggerElement) event.preventDefault();
             }}
-            className='absolute top-1 right-1 inline-flex size-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none'
+            className='absolute top-1 right-1 inline-flex size-8 items-center justify-center rounded-full text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
           >
             <X className='size-4' aria-hidden='true' />
           </Popover.Close>

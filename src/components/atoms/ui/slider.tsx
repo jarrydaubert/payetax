@@ -38,7 +38,7 @@ const Slider = forwardRef<ElementRef<typeof SliderPrimitive.Root>, SliderProps>(
       ref={ref}
       disabled={disabled}
       className={cn(
-        'relative flex w-full items-center select-none',
+        'relative flex w-full select-none items-center',
         // Touch behavior: allow vertical scrolling while capturing horizontal drag
         'touch-pan-y',
         // Disabled state on root (Radix adds data-disabled)
@@ -75,7 +75,7 @@ const Slider = forwardRef<ElementRef<typeof SliderPrimitive.Root>, SliderProps>(
           // Transitions
           'transition-colors',
           // Focus ring
-          'ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
+          'ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
           // Disabled
           'disabled:pointer-events-none disabled:opacity-50',
         )}

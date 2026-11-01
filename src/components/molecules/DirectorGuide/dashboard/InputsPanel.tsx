@@ -326,7 +326,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               type='button'
               onClick={() => setQuickStartMode(true)}
               className={cn(
-                'rounded-md px-3 py-2 text-sm whitespace-nowrap transition-colors',
+                'whitespace-nowrap rounded-md px-3 py-2 text-sm transition-colors',
                 quickStartMode
                   ? 'bg-primary/20 font-medium text-primary'
                   : 'text-muted-foreground hover:text-foreground',
@@ -339,7 +339,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               type='button'
               onClick={() => setQuickStartMode(false)}
               className={cn(
-                'rounded-md px-3 py-2 text-sm whitespace-nowrap transition-colors',
+                'whitespace-nowrap rounded-md px-3 py-2 text-sm transition-colors',
                 !quickStartMode
                   ? 'bg-primary/20 font-medium text-primary'
                   : 'text-muted-foreground hover:text-foreground',
@@ -509,7 +509,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             onCheckedChange={(checked) => actions.setIncludesVat(checked === true)}
             className='border-border data-[state=checked]:bg-primary'
           />
-          <Label htmlFor={ids.includesVat} className='cursor-pointer text-sm text-muted-foreground'>
+          <Label htmlFor={ids.includesVat} className='cursor-pointer text-muted-foreground text-sm'>
             Revenue includes VAT
           </Label>
           <LabelTooltip fieldName='directorIncludesVat' />
@@ -578,22 +578,22 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           <button
             type='button'
             onClick={() => setQuickStartMode(false)}
-            className='mt-3 rounded-md border border-primary/40 bg-primary/10 px-3 py-2 text-xs whitespace-nowrap text-primary transition-colors hover:bg-primary/20'
+            className='mt-3 whitespace-nowrap rounded-md border border-primary/40 bg-primary/10 px-3 py-2 text-primary text-xs transition-colors hover:bg-primary/20'
           >
             Add More Detail
           </button>
           {hasHiddenDetails ? (
-            <div className='mt-4 border-t border-primary/20 pt-4'>
+            <div className='mt-4 border-primary/20 border-t pt-4'>
               {hasHiddenInputErrors ? (
                 <p
-                  className='mb-2 text-xs text-destructive'
+                  className='mb-2 text-destructive text-xs'
                   data-testid='director-hidden-input-error'
                 >
                   A hidden detailed amount is not valid, so results are paused. Review Details to
                   correct it.
                 </p>
               ) : null}
-              <p className='text-xs text-primary'>
+              <p className='text-primary text-xs'>
                 Saved detailed inputs are still active while hidden:{' '}
                 <span className='font-medium'>
                   {hiddenDetailSummary}
@@ -605,14 +605,14 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 <button
                   type='button'
                   onClick={handleReviewHiddenDetails}
-                  className='rounded-md border border-primary/40 bg-primary/10 px-3 py-2 text-xs text-primary transition-colors hover:bg-primary/20'
+                  className='rounded-md border border-primary/40 bg-primary/10 px-3 py-2 text-primary text-xs transition-colors hover:bg-primary/20'
                 >
                   Review Details
                 </button>
                 <button
                   type='button'
                   onClick={handleClearHiddenDetails}
-                  className='rounded-md border border-border/60 bg-background px-3 py-2 text-xs text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary'
+                  className='rounded-md border border-border/60 bg-background px-3 py-2 text-muted-foreground text-xs transition-colors hover:border-primary/40 hover:text-primary'
                 >
                   Clear Details
                 </button>
@@ -696,7 +696,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
             {/* Other PAYE Employment */}
             <div className='flex items-center justify-between'>
               <div className='flex items-center gap-2'>
-                <Label htmlFor={ids.otherPaye} className='text-sm text-muted-foreground'>
+                <Label htmlFor={ids.otherPaye} className='text-muted-foreground text-sm'>
                   Other PAYE employment?
                 </Label>
                 <LabelTooltip fieldName='directorOtherPAYE' />
@@ -717,7 +717,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               onClick={() => setAdvancedOpen(!advancedOpen)}
               aria-expanded={advancedOpen}
               aria-controls={ids.advancedPanel}
-              className='flex w-full items-center justify-between rounded-sm border border-border/40 bg-card px-4 py-3 text-left text-sm text-muted-foreground transition-colors hover:border-border/40 hover:bg-accent/30'
+              className='flex w-full items-center justify-between rounded-sm border border-border/40 bg-card px-4 py-3 text-left text-muted-foreground text-sm transition-colors hover:border-border/40 hover:bg-accent/30'
             >
               <span className='font-medium'>Advanced Options</span>
               {advancedOpen ? <ChevronUp className='size-4' /> : <ChevronDown className='size-4' />}
@@ -733,7 +733,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                   <div className='flex items-center gap-2'>
                     <Label
                       htmlFor={ids.employmentAllowance}
-                      className='text-sm text-muted-foreground'
+                      className='text-muted-foreground text-sm'
                     >
                       Employment Allowance
                     </Label>
@@ -749,7 +749,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 
                 {/* Student Loans */}
                 <fieldset className='space-y-2'>
-                  <legend className='flex items-center gap-2 text-sm text-muted-foreground'>
+                  <legend className='flex items-center gap-2 text-muted-foreground text-sm'>
                     Student Loans
                     <LabelTooltip fieldName='directorStudentLoans' />
                   </legend>
@@ -766,7 +766,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                           />
                           <Label
                             htmlFor={checkboxId}
-                            className='cursor-pointer text-xs text-muted-foreground'
+                            className='cursor-pointer text-muted-foreground text-xs'
                           >
                             {STUDENT_LOAN_PLAN_SHORT_LABELS[plan]}
                           </Label>
@@ -801,7 +801,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                     />
                     <Label
                       htmlFor={ids.pensionDeducted}
-                      className='cursor-pointer text-sm text-muted-foreground'
+                      className='cursor-pointer text-muted-foreground text-sm'
                     >
                       Already included in business expenses
                     </Label>
@@ -965,7 +965,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                   Clear
                 </button>
               </div>
-              <p className='text-xs text-muted-foreground/80'>
+              <p className='text-muted-foreground/80 text-xs'>
                 Applied setup:{' '}
                 <span className='text-muted-foreground'>
                   Salary {formatCurrencyInputValue(formData.yourSetupSalary) || 'Not set'} /
@@ -984,7 +984,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
         <button
           type='button'
           onClick={handleReset}
-          className='flex w-full items-center gap-3 rounded-sm border border-border/40 bg-card px-3 py-2 text-left text-sm text-muted-foreground transition-colors hover:border-border/40 hover:bg-accent/30 hover:text-foreground'
+          className='flex w-full items-center gap-3 rounded-sm border border-border/40 bg-card px-3 py-2 text-left text-muted-foreground text-sm transition-colors hover:border-border/40 hover:bg-accent/30 hover:text-foreground'
         >
           <RotateCcw className='size-4 text-primary' />
           <span className='flex-1'>Reset</span>
@@ -1019,7 +1019,7 @@ function Field({
   return (
     <div className='space-y-2'>
       <div className='flex items-center gap-2'>
-        <Label htmlFor={id} className='text-sm leading-none text-muted-foreground'>
+        <Label htmlFor={id} className='text-muted-foreground text-sm leading-none'>
           {label}
         </Label>
         {tooltipFieldName && <LabelTooltip fieldName={tooltipFieldName} />}

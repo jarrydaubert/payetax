@@ -35,14 +35,14 @@ export function InstallPageContent() {
                 className='rounded-sm border-border bg-card p-6 transition-colors hover:border-primary/45'
               >
                 <div className='mb-4 flex items-center justify-between gap-3'>
-                  <h2 className='font-display text-xl font-semibold text-foreground'>
+                  <h2 className='font-display font-semibold text-foreground text-xl'>
                     {platform.platform}
                   </h2>
                   <Badge variant='outline' className='rounded-sm border-primary/35 text-primary'>
                     {platform.browser}
                   </Badge>
                 </div>
-                <ol className='list-decimal space-y-2 pl-5 leading-relaxed text-muted-foreground'>
+                <ol className='list-decimal space-y-2 pl-5 text-muted-foreground leading-relaxed'>
                   {platform.steps.map((step) => (
                     <li key={step}>{step}</li>
                   ))}
@@ -54,7 +54,7 @@ export function InstallPageContent() {
       </section>
 
       {/* Benefits */}
-      <section className='border-y border-border/60 bg-primary/5 py-12 md:py-20'>
+      <section className='border-border/60 border-y bg-primary/5 py-12 md:py-20'>
         <div className='container mx-auto max-w-3xl px-4 sm:px-6 lg:px-8'>
           <SectionHeading title='What you get' align='center' />
           <Card className='rounded-sm border-success/30 bg-card p-6'>
@@ -65,7 +65,7 @@ export function InstallPageContent() {
                     className='mt-0.5 size-5 flex-shrink-0 text-success'
                     aria-hidden='true'
                   />
-                  <span className='leading-relaxed text-foreground/90'>{benefit}</span>
+                  <span className='text-foreground/90 leading-relaxed'>{benefit}</span>
                 </li>
               ))}
             </ul>
@@ -82,7 +82,7 @@ export function InstallPageContent() {
               <ArrowRight className='size-4' aria-hidden='true' />
             </Link>
           </Button>
-          <p className='mt-4 text-sm text-muted-foreground'>
+          <p className='mt-4 text-muted-foreground text-sm'>
             If install is unavailable, your browser or device might not support PWA installation.
           </p>
         </div>

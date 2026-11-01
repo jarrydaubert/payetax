@@ -175,7 +175,7 @@ export function EmailResultsDialog({
         ) : (
           <form onSubmit={handleSubmit} className='mt-4 space-y-4'>
             <div className='space-y-2'>
-              <label htmlFor={emailInputId} className='text-sm font-medium text-card-foreground'>
+              <label htmlFor={emailInputId} className='font-medium text-card-foreground text-sm'>
                 Email address
               </label>
               <div className='relative'>
@@ -203,12 +203,12 @@ export function EmailResultsDialog({
                   aria-describedby={submitError ? `${emailInputId}-error` : `${emailInputId}-hint`}
                 />
               </div>
-              <p id={`${emailInputId}-hint`} className='text-xs text-muted-foreground'>
+              <p id={`${emailInputId}-hint`} className='text-muted-foreground text-xs'>
                 You&apos;ll receive a director pay and tax breakdown. Company key dates are not
                 included.
               </p>
               {submitError && (
-                <p id={`${emailInputId}-error`} className='text-sm text-destructive' role='alert'>
+                <p id={`${emailInputId}-error`} className='text-destructive text-sm' role='alert'>
                   {submitError}
                 </p>
               )}

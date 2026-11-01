@@ -71,7 +71,7 @@ export function CompliancePageContent() {
       </section>
 
       {/* Integrity Snapshot */}
-      <section className={'border-y border-border/60 bg-card py-12 md:py-20'}>
+      <section className={'border-border/60 border-y bg-card py-12 md:py-20'}>
         <div className={'container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'}>
           <SectionHeading
             badge={{ icon: Shield, text: 'Integrity Snapshot' }}
@@ -83,11 +83,11 @@ export function CompliancePageContent() {
           <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-4'>
             {integritySnapshot.map((item) => (
               <Card key={item.label} className={'border-primary/20 p-6'}>
-                <p className='text-xs font-medium tracking-wide text-muted-foreground uppercase'>
+                <p className='font-medium text-muted-foreground text-xs uppercase tracking-wide'>
                   {item.label}
                 </p>
-                <p className='mt-2 text-xl font-semibold text-foreground'>{item.value}</p>
-                <p className='mt-2 text-sm text-muted-foreground'>{item.note}</p>
+                <p className='mt-2 font-semibold text-foreground text-xl'>{item.value}</p>
+                <p className='mt-2 text-muted-foreground text-sm'>{item.note}</p>
               </Card>
             ))}
           </div>
@@ -95,7 +95,7 @@ export function CompliancePageContent() {
       </section>
 
       {/* Compliance Features */}
-      <section className={'border-y border-border/60 bg-primary/5 py-12 md:py-20'}>
+      <section className={'border-border/60 border-y bg-primary/5 py-12 md:py-20'}>
         <div className={'container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'}>
           <SectionHeading
             title='HMRC Compliance Standards'
@@ -114,7 +114,7 @@ export function CompliancePageContent() {
                     </div>
                     <div>
                       <h3
-                        className={cn('font-display mb-2 font-semibold text-foreground', 'text-xl')}
+                        className={cn('mb-2 font-display font-semibold text-foreground', 'text-xl')}
                       >
                         {feature.title}
                       </h3>
@@ -154,7 +154,7 @@ export function CompliancePageContent() {
                   </ul>
                   <div
                     className={cn(
-                      'mt-6 flex items-center justify-between border-t border-primary/10 pt-4 text-muted-foreground',
+                      'mt-6 flex items-center justify-between border-primary/10 border-t pt-4 text-muted-foreground',
                       'text-xs',
                     )}
                   >
@@ -169,7 +169,7 @@ export function CompliancePageContent() {
       </section>
 
       {/* Source Review Log */}
-      <section className={'border-y border-border/60 bg-card py-12 md:py-20'}>
+      <section className={'border-border/60 border-y bg-card py-12 md:py-20'}>
         <div className={'container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'}>
           <SectionHeading
             badge={{ icon: CheckCircle, text: 'Source Review Log' }}
@@ -183,21 +183,21 @@ export function CompliancePageContent() {
               <Card key={`${note.title}-${note.sourceDate}`} className='border-primary/20 p-6'>
                 <div className='grid gap-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-start'>
                   <div>
-                    <p className='text-xs font-medium tracking-wide text-primary uppercase'>
+                    <p className='font-medium text-primary text-xs uppercase tracking-wide'>
                       Source update: {formatIsoDateForDisplay(note.sourceDate)}
                     </p>
-                    <h3 className='font-display mt-2 text-2xl font-semibold text-foreground'>
+                    <h3 className='mt-2 font-display font-semibold text-2xl text-foreground'>
                       {note.title}
                     </h3>
-                    <p className='mt-3 text-sm leading-relaxed text-muted-foreground'>
+                    <p className='mt-3 text-muted-foreground text-sm leading-relaxed'>
                       {note.summary}
                     </p>
-                    <p className='mt-3 text-sm leading-relaxed text-muted-foreground'>
+                    <p className='mt-3 text-muted-foreground text-sm leading-relaxed'>
                       {note.impact}
                     </p>
                   </div>
                   <div className='flex flex-col gap-3 md:items-end'>
-                    <p className='text-xs text-muted-foreground'>
+                    <p className='text-muted-foreground text-xs'>
                       Reviewed: {formatIsoDateForDisplay(note.reviewedOn)}
                     </p>
                     <Button variant='outline' size='sm' asChild>
@@ -236,7 +236,7 @@ export function CompliancePageContent() {
                 <p className={cn('mb-4 text-muted-foreground', 'text-sm')}>{statement.statement}</p>
                 <div
                   className={cn(
-                    'space-y-2 border-t border-primary/10 pt-4 text-muted-foreground',
+                    'space-y-2 border-primary/10 border-t pt-4 text-muted-foreground',
                     'text-xs',
                   )}
                 >
@@ -250,7 +250,7 @@ export function CompliancePageContent() {
       </section>
 
       {/* Data Sources */}
-      <section className={'border-y border-border/60 bg-card py-12 md:py-20'}>
+      <section className={'border-border/60 border-y bg-card py-12 md:py-20'}>
         <div className={'container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'}>
           <SectionHeading
             badge={{ icon: Award, text: 'Data Sources' }}

@@ -18,13 +18,13 @@ export function CalculatorHowToGuide() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-100px' }}
       transition={{ duration: 0.5 }}
-      className='border-b border-border/70 bg-background py-16'
+      className='border-border/70 border-b bg-background py-16'
     >
       <div className={cn('mx-auto max-w-5xl', 'px-4')}>
         <div className={cn('text-center', 'mb-10')}>
           <h2
             className={cn(
-              'font-display leading-tight font-semibold text-foreground',
+              'font-display font-semibold text-foreground leading-tight',
               'mb-3',
               'text-4xl',
             )}

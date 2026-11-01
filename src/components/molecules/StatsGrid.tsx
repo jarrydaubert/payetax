@@ -109,7 +109,7 @@ function StatCard({ stat, variant }: StatCardProps) {
 
         {/* Value */}
         <div
-          className={cn('text-3xl', 'mb-2 font-mono font-semibold tracking-tight text-foreground')}
+          className={cn('text-3xl', 'mb-2 font-mono font-semibold text-foreground tracking-tight')}
         >
           {value}
         </div>

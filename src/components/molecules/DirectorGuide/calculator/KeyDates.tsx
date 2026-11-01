@@ -135,12 +135,12 @@ export function KeyDates() {
       <div className='mb-3 flex items-center justify-between gap-2'>
         <div className='flex items-center gap-2 text-muted-foreground'>
           <Calendar className='size-4' />
-          <span className='text-sm font-medium'>Key Dates</span>
+          <span className='font-medium text-sm'>Key Dates</span>
         </div>
         <button
           type='button'
           onClick={handleDownloadCalendar}
-          className='inline-flex items-center gap-1.5 rounded-sm border border-primary/30 bg-primary/10 px-2 py-1 text-xs font-medium text-primary transition-colors hover:border-primary/40 hover:bg-primary/20'
+          className='inline-flex items-center gap-1.5 rounded-sm border border-primary/30 bg-primary/10 px-2 py-1 font-medium text-primary text-xs transition-colors hover:border-primary/40 hover:bg-primary/20'
         >
           <Download className='size-3.5' />
           Download .ics

@@ -504,7 +504,7 @@ const NumberInput = memo(
             aria-describedby={describedBy}
             className={cn(
               'flex h-9 w-full rounded-sm border border-input bg-background px-3 py-1 shadow-none',
-              'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
               'disabled:cursor-not-allowed disabled:opacity-50',
               'placeholder:text-muted-foreground',
               'transition-all duration-200',
@@ -601,7 +601,7 @@ const NumberInput = memo(
         {showError ? (
           <p
             id={errorId}
-            className={cn('mt-1 text-xs leading-relaxed text-destructive', errorClassName)}
+            className={cn('mt-1 text-destructive text-xs leading-relaxed', errorClassName)}
           >
             {error}
           </p>

@@ -105,7 +105,7 @@ export function BlogPagination({
           href={getPageUrl(safeCurrent - 1)}
           scroll={false}
           className={cn(
-            'flex h-10 items-center gap-1 rounded-lg px-4 text-sm font-medium',
+            'flex h-10 items-center gap-1 rounded-lg px-4 font-medium text-sm',
             'bg-card/70 text-foreground hover:bg-card/90 hover:text-foreground',
             'border border-border/70 transition-colors',
           )}
@@ -116,7 +116,7 @@ export function BlogPagination({
       ) : (
         <span
           className={cn(
-            'flex h-10 items-center gap-1 rounded-lg px-4 text-sm font-medium',
+            'flex h-10 items-center gap-1 rounded-lg px-4 font-medium text-sm',
             'cursor-not-allowed bg-card/50 text-muted-foreground',
             'border border-border/50',
           )}
@@ -144,7 +144,7 @@ export function BlogPagination({
               href={getPageUrl(page)}
               scroll={false}
               className={cn(
-                'flex h-10 w-10 items-center justify-center rounded-lg text-sm font-medium transition-colors',
+                'flex h-10 w-10 items-center justify-center rounded-lg font-medium text-sm transition-colors',
                 page === safeCurrent
                   ? 'bg-primary text-primary-foreground'
                   : 'border border-border/70 bg-card/70 text-foreground hover:bg-card/90 hover:text-foreground',
@@ -158,7 +158,7 @@ export function BlogPagination({
       </div>
 
       {/* Mobile page indicator */}
-      <span className='flex h-10 items-center px-3 text-sm text-muted-foreground sm:hidden'>
+      <span className='flex h-10 items-center px-3 text-muted-foreground text-sm sm:hidden'>
         Page {safeCurrent} of {totalPages}
       </span>
 
@@ -168,7 +168,7 @@ export function BlogPagination({
           href={getPageUrl(safeCurrent + 1)}
           scroll={false}
           className={cn(
-            'flex h-10 items-center gap-1 rounded-lg px-4 text-sm font-medium',
+            'flex h-10 items-center gap-1 rounded-lg px-4 font-medium text-sm',
             'bg-card/70 text-foreground hover:bg-card/90 hover:text-foreground',
             'border border-border/70 transition-colors',
           )}
@@ -179,7 +179,7 @@ export function BlogPagination({
       ) : (
         <span
           className={cn(
-            'flex h-10 items-center gap-1 rounded-lg px-4 text-sm font-medium',
+            'flex h-10 items-center gap-1 rounded-lg px-4 font-medium text-sm',
             'cursor-not-allowed bg-card/50 text-muted-foreground',
             'border border-border/50',
           )}

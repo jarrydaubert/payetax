@@ -14,18 +14,18 @@ interface ComparisonTableProps {
 function PolicyTable({ label, rows }: { label: string; rows: CrawlableRateBand[] }) {
   return (
     <div>
-      <h3 className='font-display mb-3 text-xl font-semibold text-foreground'>{label}</h3>
+      <h3 className='mb-3 font-display font-semibold text-foreground text-xl'>{label}</h3>
       <div className='overflow-x-auto border border-border bg-card'>
         <table className='w-full min-w-xl bg-card'>
-          <thead className='border-b border-border bg-muted/45'>
+          <thead className='border-border border-b bg-muted/45'>
             <tr>
-              <th className='px-4 py-3 text-left text-sm font-semibold text-muted-foreground'>
+              <th className='px-4 py-3 text-left font-semibold text-muted-foreground text-sm'>
                 Band
               </th>
-              <th className='px-4 py-3 text-left text-sm font-semibold text-muted-foreground'>
+              <th className='px-4 py-3 text-left font-semibold text-muted-foreground text-sm'>
                 Gross income
               </th>
-              <th className='px-4 py-3 text-right text-sm font-semibold text-muted-foreground'>
+              <th className='px-4 py-3 text-right font-semibold text-muted-foreground text-sm'>
                 Rate
               </th>
             </tr>
@@ -57,7 +57,7 @@ export function ScottishTaxBandsTable({ taxYear = CURRENT_TAX_YEAR }: Comparison
     <div className='not-prose my-8 space-y-8' data-testid='scottish-tax-bands-table'>
       <PolicyTable label={`Scotland (${taxYearDisplay})`} rows={facts.scottishIncomeTaxBands} />
       <PolicyTable label={`England (${taxYearDisplay})`} rows={facts.restOfUkIncomeTaxBands} />
-      <p className='text-sm text-muted-foreground'>
+      <p className='text-muted-foreground text-sm'>
         Gross-income ranges assume the standard Personal Allowance. It is reduced when adjusted net
         income exceeds {formatCurrency(policy.ruk.personalAllowanceReductionThreshold, 0)} and is
         nil at {formatCurrency(allowanceNilAt, 0)} or more.
@@ -82,15 +82,15 @@ export function ScottishTaxExamplesTable({ taxYear = CURRENT_TAX_YEAR }: Compari
       data-testid='scottish-tax-examples-table'
     >
       <table className='w-full min-w-3xl bg-card'>
-        <caption className='p-4 text-left text-sm text-muted-foreground'>
+        <caption className='p-4 text-left text-muted-foreground text-sm'>
           Annual Income Tax for {taxYearDisplay}, rounded to the nearest pound
         </caption>
-        <thead className='border-b border-border bg-muted/45'>
+        <thead className='border-border border-b bg-muted/45'>
           <tr>
             {['Salary', 'Scotland', 'England', 'Difference'].map((heading) => (
               <th
                 className={cn(
-                  'px-4 py-3 text-sm font-semibold text-muted-foreground',
+                  'px-4 py-3 font-semibold text-muted-foreground text-sm',
                   heading === 'Salary' ? 'text-left' : 'text-right',
                 )}
                 key={heading}

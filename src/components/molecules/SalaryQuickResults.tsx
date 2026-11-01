@@ -27,7 +27,7 @@ export function SalaryQuickResults({ salary, results, comparisons }: SalaryQuick
         <div className={'space-y-6'}>
           {/* Main Take-Home */}
           <div className='text-center'>
-            <p className={cn('tracking-wide text-muted-foreground uppercase', 'text-sm')}>
+            <p className={cn('text-muted-foreground uppercase tracking-wide', 'text-sm')}>
               Monthly Take-Home Pay
             </p>
             <p className={cn('font-bold text-primary', 'mt-2', 'text-4xl')}>

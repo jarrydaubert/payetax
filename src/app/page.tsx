@@ -15,7 +15,7 @@ const HomePageContent = dynamic(() => import('@/components/pages/HomePageContent
     <output className='flex min-h-96 items-center justify-center p-8' aria-live='polite'>
       <div className='flex flex-col items-center gap-3'>
         <div className='size-8 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent' />
-        <p className='text-sm text-muted-foreground'>Loading calculator...</p>
+        <p className='text-muted-foreground text-sm'>Loading calculator...</p>
       </div>
     </output>
   ),

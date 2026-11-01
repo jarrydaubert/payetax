@@ -27,10 +27,10 @@ export function EditorsPicks({ posts, className }: EditorsPicksProps) {
   return (
     <aside aria-label="Editor's picks" className={cn(className)}>
       <div className='mb-4 flex items-baseline justify-between gap-3 sm:mb-6'>
-        <h2 className='text-xs font-semibold tracking-[0.28em] text-primary uppercase sm:text-sm sm:tracking-widest'>
+        <h2 className='font-semibold text-primary text-xs uppercase tracking-[0.28em] sm:text-sm sm:tracking-widest'>
           Editor&apos;s Picks
         </h2>
-        <p className='text-xs whitespace-nowrap text-muted-foreground'>{countLabel}</p>
+        <p className='whitespace-nowrap text-muted-foreground text-xs'>{countLabel}</p>
       </div>
 
       <div className='overflow-hidden rounded-sm border border-border bg-card'>
@@ -54,18 +54,18 @@ function EditorsPicksList({ posts }: EditorsPicksListProps) {
           <li key={post.slug}>
             <Link
               href={`/blog/${post.slug}`}
-              className='group grid grid-cols-[1.75rem_1fr] gap-3 px-3.5 py-3 transition-colors hover:bg-primary/5 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none sm:px-4'
+              className='group grid grid-cols-[1.75rem_1fr] gap-3 px-3.5 py-3 transition-colors hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:px-4'
               prefetch={false}
             >
-              <span className='flex size-7 items-center justify-center self-center rounded-sm border border-border bg-background font-mono text-[0.68rem] font-semibold text-primary tabular-nums transition-colors group-hover:border-primary/45'>
+              <span className='flex size-7 items-center justify-center self-center rounded-sm border border-border bg-background font-mono font-semibold text-[0.68rem] text-primary tabular-nums transition-colors group-hover:border-primary/45'>
                 {String(index + 1).padStart(2, '0')}
               </span>
 
               <span className='min-w-0'>
-                <span className='line-clamp-2 text-sm leading-5 font-semibold text-foreground transition-colors group-hover:text-primary'>
+                <span className='line-clamp-2 font-semibold text-foreground text-sm leading-5 transition-colors group-hover:text-primary'>
                   {post.title}
                 </span>
-                <span className='mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground'>
+                <span className='mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-muted-foreground text-xs'>
                   <span className='capitalize'>{categoryLabel}</span>
                   {post.readTime && (
                     <>

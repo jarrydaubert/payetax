@@ -31,7 +31,7 @@ export function EmploymentAllowanceInput() {
           checked={hasEmploymentAllowance}
           onCheckedChange={(checked) => setHasEmploymentAllowance(checked === true)}
         />
-        <Label htmlFor={checkboxId} className='text-sm font-normal'>
+        <Label htmlFor={checkboxId} className='font-normal text-sm'>
           Company claims Employment Allowance
         </Label>
       </div>

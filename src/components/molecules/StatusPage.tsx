@@ -70,7 +70,7 @@ export function StatusPage({
   const toneClasses = TONE_CLASSES[tone];
 
   return (
-    <div className='bg-ledger-grid grid min-h-dvh place-items-center bg-background px-4 py-20'>
+    <div className='grid min-h-dvh place-items-center bg-background bg-ledger-grid px-4 py-20'>
       <div className='w-full max-w-2xl text-center'>
         <div className='rounded-sm border border-border bg-card p-8 md:p-12'>
           {/* Icon badge */}
@@ -86,18 +86,18 @@ export function StatusPage({
 
           {/* Eyebrow */}
           {eyebrow && (
-            <p className='mb-2 font-mono text-sm tracking-[0.24em] text-muted-foreground uppercase'>
+            <p className='mb-2 font-mono text-muted-foreground text-sm uppercase tracking-[0.24em]'>
               {eyebrow}
             </p>
           )}
 
           {/* Title */}
-          <h1 className='font-display text-3xl font-semibold tracking-tight text-foreground md:text-4xl'>
+          <h1 className='font-display font-semibold text-3xl text-foreground tracking-tight md:text-4xl'>
             {title}
           </h1>
 
           {/* Description */}
-          <div className='mt-3 leading-relaxed text-muted-foreground'>{description}</div>
+          <div className='mt-3 text-muted-foreground leading-relaxed'>{description}</div>
 
           {/* Extra content */}
           {children && <div className='mt-8 text-left'>{children}</div>}
@@ -109,7 +109,7 @@ export function StatusPage({
         </div>
 
         {/* Footer note */}
-        {footer && <div className='mt-6 text-sm text-muted-foreground'>{footer}</div>}
+        {footer && <div className='mt-6 text-muted-foreground text-sm'>{footer}</div>}
       </div>
     </div>
   );
