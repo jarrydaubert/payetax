@@ -69,7 +69,27 @@ version bumps. Change them only for an explicit compatibility/invalidation need 
 Do not couple them to SemVer, tags or build SHAs. Worker `GET_VERSION` reports its cache namespace,
 not the app release. Preserve waiting-worker activation, open calculations and offline behaviour.
 
-After an approved merge and separately approved production deployment:
+After an approved merge and separately approved production deployment, the **Release** workflow
+automatically publishes an annotated `v<package.json version>` tag and GitHub Release for the
+deployed source SHA once its matching `main`-push `CI` run succeeds. Routine publication needs
+no dispatch, SHA/version entry, evidence link or Publish click.
+
+Successful Vercel `deployment_status` and completed successful `CI` `workflow_run` events both
+recheck the same SHA. If the other record is incomplete, the attempt exits without publishing;
+the other completion rechecks both records and publishes. Jobs share a non-cancelling queue, so different
+commits are serialized and pending completion events are retained (GitHub's queue limit is 100).
+Failed/preview deployments and failed/PR/other-branch CI cannot publish.
+
+Before writing, the script requires a full SHA on `main`'s first-parent history, a stable version
+read from `package.json` at that SHA, a `Production` deployment created by `vercel[bot]` whose
+latest status is success from `vercel[bot]`, and a completed successful `CI` run from `ci.yml`
+for that exact `main` push. It uses the environment name, not Vercel's `production_environment`
+boolean. Release notes link the recorded deployment and CI run and identify the source SHA,
+followed by GitHub's generated notes since the nearest earlier `v*` tag. An older version does
+not take Latest. These records establish successful deployment and CI, **not manual browser/PWA
+verification** or the freshness of an installed session.
+
+Manual post-deployment verification remains separate and follows publication:
 
 1. Record the exact production deployment URL/id, source commit SHA, app version, UTC check time
    and verifier in a dated report under `docs/reports/`. Confirm the production alias points to
@@ -78,32 +98,26 @@ After an approved merge and separately approved production deployment:
    `package.json` at that exact SHA and run the Production Validation checks below. Separately
    check a previously installed PWA: open drafts survive an update and offline relaunch works.
    Record results, evidence and any blocked/deferred checks. Do not call unverified checks passed.
-3. Only after production verification passes, the maintainer approves publication by running
-   **Actions → Release → Run workflow** from `main` with the verified source SHA, the expected
-   `package.json` version at that SHA and the evidence record (a `docs/reports/` path committed
-   on `main`, or a PR/issue link in this repository). Leave `publish` unticked for a dry run,
-   which runs every check and previews the release notes. Then rerun with `publish` ticked to
-   create the annotated `v<package-version>` tag on that SHA and its GitHub Release. Nothing is
-   published on merge or deployment; dispatching with `publish` ticked is the approval.
-
-Before writing anything, the workflow requires: a run from `main`; a full SHA on `main`'s
-first-parent history; a stable version matching `package.json` at that SHA; a successful
-`vercel[bot]` `Production` deployment of that SHA; a successful `CI` run for its `main` push; and
-existing evidence. Release notes start with the evidence link and source SHA, followed by
-GitHub's generated pull-request list since the nearest earlier `v*` tag. A release older than an
-existing one does not take the Latest designation.
 
 Tags are never moved or force-pushed. If the tag was pushed but release creation failed, rerun
-with the same inputs: an annotated tag at exactly that SHA is reused and only the release is
-created. Rerunning a completed release is a no-op. Any other existing tag, a lightweight tag, a
-draft/prerelease or tagless release, or the same version published under another tag fails for
-manual review. API errors fail the run; they are never treated as an absent tag or release.
+the failed job: an annotated tag at exactly that SHA is reused and only the release is created.
+Repeated events are no-ops after publication. A later documentation/CI-only deployment with
+the same version is also a no-op if the released tag is annotated, on its first-parent history,
+and the version stayed unchanged between those commits. Conflicting/lightweight tags, draft,
+prerelease or tagless releases, and versions published under another tag fail for manual review.
+API errors fail the run; they are never treated as absent records.
+
+For recovery, **Actions → Release → Run workflow** from `main` defaults to a dry run against
+current `main`. An optional full `sha` retries an older production commit. Version and deployment/CI
+evidence are derived automatically. Clear `dry_run` only to publish the recovery; routine
+publishing never requires this step. A dry run validates the same guards and previews generated
+notes without creating a tag or release.
 
 The workflow uses only `GITHUB_TOKEN` (`contents: write`, `actions: read`, `deployments: read`);
 no secret, environment, dependency or branch-protection change is needed. Existing CI, CodeQL,
 non-blocking E2E and Vercel deployment behaviour are unchanged. Its guard tests run before every
-dispatch and on PRs touching the release files: `node --test .github/scripts/release.test.js`.
-It checks recorded deployment and CI state, not the manual checks in steps 1–2.
+publication attempt and on PRs touching the release files:
+`node --test .github/scripts/release.test.js`. Manual checks in steps 1–2 are not automated.
 
 Historical tags and releases are repaired separately: `v5.20` is package version 5.2.0, and
 5.2.1–5.2.4 have no tags or releases. The workflow refuses to duplicate 5.2.0, and until the

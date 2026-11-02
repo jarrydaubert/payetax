@@ -12,74 +12,101 @@ const newer = (a, b) => {
   return difference > 0;
 };
 
-// Publishes one maintainer-approved release. Dry run unless `publish` is true.
-function release(event, run = command) {
-  const { inputs = {}, ref, repository } = event;
+// Both completion events must resolve the same deployed commit, never the moving HEAD.
+function candidate(event, eventName, run = command) {
+  const { inputs = {}, repository } = event;
   const main = repository.default_branch;
-  const repo = `repos/${repository.full_name}`;
-  const api = (path) => JSON.parse(run('gh', ['api', path]));
-  const sha = String(inputs.sha ?? '').trim();
-  const version = String(inputs.version ?? '').trim();
-  const evidence = String(inputs.evidence ?? '').trim();
-  const publish = inputs.publish === true || inputs.publish === 'true';
+  let sha;
+  if (eventName === 'deployment_status') {
+    const { deployment, deployment_status: status } = event;
+    if (
+      deployment?.environment !== 'Production' ||
+      deployment.creator?.login !== vercel ||
+      status?.state !== 'success' ||
+      status.creator?.login !== vercel
+    )
+      return null;
+    sha = deployment.sha;
+  } else if (eventName === 'workflow_run') {
+    const ci = event.workflow_run;
+    if (
+      ci?.name !== 'CI' ||
+      ci.path !== '.github/workflows/ci.yml' ||
+      ci.event !== 'push' ||
+      ci.head_branch !== main ||
+      ci.repository?.full_name !== repository.full_name ||
+      ci.status !== 'completed' ||
+      ci.conclusion !== 'success'
+    )
+      return null;
+    sha = ci.head_sha;
+  } else if (eventName === 'workflow_dispatch') {
+    if (event.ref !== `refs/heads/${main}`) {
+      throw new Error(`Run the Release workflow from ${main}.`);
+    }
+    sha = String(inputs.sha ?? '').trim();
+  } else {
+    return null;
+  }
 
-  if (ref !== `refs/heads/${main}`) throw new Error(`Run the Release workflow from ${main}.`);
+  run('git', ['fetch', 'origin', main, '--tags']);
+  if (!sha && eventName === 'workflow_dispatch') {
+    sha = run('git', ['rev-parse', `origin/${main}`]);
+  }
   if (!/^[a-f0-9]{40}$/.test(sha)) throw new Error('sha must be a full 40-character commit SHA.');
+  const history = run('git', ['rev-list', '--first-parent', `origin/${main}`]).split('\n');
+  if (!history.includes(sha)) throw new Error(`${sha} is not on ${main}'s first-parent history.`);
+  const version = JSON.parse(run('git', ['show', `${sha}:package.json`])).version;
   if (!stableVersion.test(version)) {
     throw new Error('version must be a stable MAJOR.MINOR.PATCH value without a v prefix.');
   }
+  return { sha, version, history };
+}
 
-  run('git', ['fetch', 'origin', '--tags']);
-  const history = run('git', ['rev-list', '--first-parent', `origin/${main}`]).split('\n');
-  if (!history.includes(sha)) throw new Error(`${sha} is not on ${main}'s first-parent history.`);
+function release(event, run = command, eventName = process.env.GITHUB_EVENT_NAME) {
+  const selected = candidate(event, eventName, run);
+  if (!selected) return 'Skipped: not a successful Production deployment or main CI completion.';
+  const { sha, version, history } = selected;
+  const { repository, inputs = {} } = event;
+  const main = repository.default_branch;
+  const repo = `repos/${repository.full_name}`;
+  const api = (path) => JSON.parse(run('gh', ['api', path]));
+  const pages = (path) => JSON.parse(run('gh', ['api', '--paginate', '--slurp', path])).flat();
+  const publish =
+    eventName !== 'workflow_dispatch' || inputs.dry_run === false || inputs.dry_run === 'false';
   const versionAt = (commitish) =>
     JSON.parse(run('git', ['show', `${commitish}:package.json`])).version;
-  const packageVersion = versionAt(sha);
-  if (packageVersion !== version) {
-    throw new Error(`package.json at ${sha} is ${packageVersion}, not ${version}.`);
-  }
   const tag = `v${version}`;
 
-  let evidenceLink;
-  const evidenceUrl = `https://github.com/${repository.full_name}/`;
-  if (/^docs\/reports\/[\w./-]+$/.test(evidence) && !evidence.includes('..')) {
-    try {
-      run('git', ['cat-file', '-e', `origin/${main}:${evidence}`]);
-    } catch {
-      throw new Error(`Evidence ${evidence} is not committed on ${main}.`);
-    }
-    evidenceLink = `${evidenceUrl}blob/${run('git', ['rev-parse', `origin/${main}`])}/${evidence}`;
-  } else if (
-    evidence.startsWith(evidenceUrl) &&
-    /^(pull|issues)\/\d+(#[\w-]+)?$/.test(evidence.slice(evidenceUrl.length))
-  ) {
-    evidenceLink = evidence;
-  } else {
-    throw new Error('evidence must be a docs/reports/ path on main or a PR/issue link here.');
-  }
-
-  const deployed = api(`${repo}/deployments?sha=${sha}&environment=Production&per_page=100`).some(
+  const deployed = pages(`${repo}/deployments?sha=${sha}&environment=Production&per_page=100`).find(
     (deployment) =>
       deployment.sha === sha &&
+      deployment.environment === 'Production' &&
       deployment.creator?.login === vercel &&
-      api(`${repo}/deployments/${deployment.id}/statuses?per_page=100`).some(
-        (status) => status.state === 'success' && status.creator?.login === vercel,
+      (eventName !== 'deployment_status' || deployment.id === event.deployment.id) &&
+      // Statuses are newest first. An old success must not mask a later failure.
+      ((status) => status?.state === 'success' && status.creator?.login === vercel)(
+        api(`${repo}/deployments/${deployment.id}/statuses?per_page=1`)[0],
       ),
   );
-  if (!deployed) throw new Error(`No successful Vercel Production deployment for ${sha}.`);
+  if (!deployed) return `Waiting: no successful Vercel Production deployment for ${sha}.`;
 
   const ci = api(
     `${repo}/actions/workflows/ci.yml/runs?event=push&branch=${main}&head_sha=${sha}&per_page=1`,
   ).workflow_runs[0];
   if (
     ci?.head_sha !== sha ||
+    ci.name !== 'CI' ||
+    ci.path !== '.github/workflows/ci.yml' ||
     ci.event !== 'push' ||
     ci.head_branch !== main ||
     ci.status !== 'completed' ||
     ci.conclusion !== 'success'
   ) {
-    throw new Error(`CI has not succeeded for the ${main} push of ${sha}.`);
+    return `Waiting: CI has not succeeded for the ${main} push of ${sha}.`;
   }
+  const evidenceLink = `https://github.com/${repository.full_name}/deployments/${deployed.id}`;
+  const ciLink = `https://github.com/${repository.full_name}/actions/runs/${ci.id}`;
 
   // The remote is authoritative: a local or stale tag cannot satisfy these checks.
   const remoteTag = () => {
@@ -94,15 +121,25 @@ function release(event, run = command) {
     return { annotated: Boolean(peeled), commit: peeled ?? refs.get(`refs/tags/${tag}`) };
   };
   const existingTag = remoteTag();
+  const releases = pages(`${repo}/releases?per_page=100`);
+  const existing = releases.find((item) => item.tag_name === tag);
+  // Docs/CI-only deployments may retain a version released at an earlier main commit.
+  // Require the entire first-parent interval to retain that version before skipping it.
+  const sameVersionDeployment =
+    existingTag?.annotated &&
+    existing &&
+    !existing.draft &&
+    !existing.prerelease &&
+    history.indexOf(existingTag.commit) >= history.indexOf(sha) &&
+    history
+      .slice(history.indexOf(sha), history.indexOf(existingTag.commit) + 1)
+      .every((commit) => versionAt(commit) === version);
+  if (sameVersionDeployment) return `Already released: ${tag} at ${existingTag.commit}.`;
   if (existingTag && (!existingTag.annotated || existingTag.commit !== sha)) {
     const kind = existingTag.annotated ? '' : ' as a lightweight tag';
     throw new Error(`${tag} already exists${kind} at ${existingTag.commit}; review it manually.`);
   }
 
-  const releases = JSON.parse(
-    run('gh', ['api', '--paginate', '--slurp', `${repo}/releases?per_page=100`]),
-  ).flat();
-  const existing = releases.find((item) => item.tag_name === tag);
   if (existing) {
     if (existingTag && !existing.draft && !existing.prerelease) {
       return `Already released: ${tag} at ${sha}.`;
@@ -156,7 +193,7 @@ function release(event, run = command) {
       tag,
       sha,
       '-m',
-      `PayeTax ${tag}\n\nProduction verification: ${evidenceLink}`,
+      `PayeTax ${tag}\n\nProduction deployment: ${evidenceLink}\nCI: ${ciLink}`,
     ]);
     // A non-forced, single-ref push fails if someone publishes a conflicting tag.
     run('git', ['push', 'origin', `refs/tags/${tag}`]);
@@ -175,7 +212,7 @@ function release(event, run = command) {
     '--title',
     `PayeTax ${tag}`,
     '--notes',
-    `Production verification: ${evidenceLink}\nSource commit: ${sha}`,
+    `Production deployment: ${evidenceLink}\nCI: ${ciLink}\nSource commit: ${sha}\n\nBrowser/PWA verification is a separate manual follow-up.`,
     '--generate-notes',
     '--notes-start-tag',
     previous,
@@ -188,7 +225,8 @@ module.exports = { release };
 
 if (require.main === module) {
   try {
-    const message = release(JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8')));
+    const event = JSON.parse(readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
+    const message = release(event);
     process.stdout.write(`${message}\n`);
   } catch (error) {
     console.error(error.message);
