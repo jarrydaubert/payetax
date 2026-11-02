@@ -1,26 +1,23 @@
 name: Release
 
 on:
-  # Dispatching with publish ticked is the maintainer's approval to publish.
+  deployment_status:
+  workflow_run:
+    workflows: [CI]
+    branches: [main]
+    types: [completed]
+  # Recovery only; routine publication uses either completion event above.
   workflow_dispatch:
     inputs:
       sha:
-        description: Verified production source commit (full 40-character SHA)
-        required: true
+        description: Production source SHA to retry (blank uses current main)
+        required: false
         type: string
-      version:
-        description: Expected package.json version at that commit, e.g. 5.2.5
-        required: true
-        type: string
-      evidence:
-        description: Production verification record (docs/reports/... path on main, or a PR/issue link)
-        required: true
-        type: string
-      publish:
-        description: Create the tag and GitHub Release (leave unticked for a dry run)
+      dry_run:
+        description: Validate and preview notes without publishing
         required: false
         type: boolean
-        default: false
+        default: true
   pull_request:
     branches: [main]
     paths:
@@ -42,13 +39,25 @@ jobs:
 
   release:
     name: Verify and publish release
-    if: github.event_name == 'workflow_dispatch'
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'deployment_status' &&
+       github.event.deployment.environment == 'Production' &&
+       github.event.deployment.creator.login == 'vercel[bot]' &&
+       github.event.deployment_status.creator.login == 'vercel[bot]' &&
+       github.event.deployment_status.state == 'success') ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.event == 'push' &&
+       github.event.workflow_run.head_branch == 'main' &&
+       github.event.workflow_run.conclusion == 'success')
     needs: test
     runs-on: ubuntu-latest
     timeout-minutes: 10
     concurrency:
       group: release
       cancel-in-progress: false
+      # Keep completion events for different commits instead of replacing pending runs.
+      queue: max
     permissions:
       contents: write
       actions: read
@@ -56,6 +65,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          # Never execute code from a workflow_run's PR head or a preview deployment.
+          ref: main
           fetch-depth: 0
 
       - name: Verify, tag and publish release notes
