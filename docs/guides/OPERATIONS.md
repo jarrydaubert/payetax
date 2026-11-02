@@ -23,6 +23,41 @@ bun run build:ci
 
 Use `bun run build:release` only for release validation that needs Sentry source maps. Vercel production should keep using `bun run build`; production source-map behaviour is controlled by env and `next.config.ts`.
 
+## Sentry Error Monitoring And Source Maps
+
+Next.js discovers `src/instrumentation.ts` and `src/instrumentation-client.ts` alongside
+`src/app`. The server hook loads the Node or Edge config and forwards only monitored request
+paths to `captureRequestError`, retaining sanitisation and the SDK's serverless flush handling.
+Browser session reporting is removed through Sentry 11's `BrowserSession` integration filter;
+tracing and replay remain disabled. The financial-data and monitored-route policies still apply.
+
+`next.config.ts` inlines the non-secret `VERCEL_ENV` deployment label for all bundles, falling
+back to `NODE_ENV` outside Vercel. This needs no new provider variable. Confirm Preview and
+Production labels after deployment; if Vercel does not expose its system variables, correct that
+provider setting only with separate approval. The SDK uses one shared build release identifier:
+Vercel's commit SHA, or `payetax@<package version>` locally.
+
+Production Vercel builds with an auth token enable source maps by default; the existing
+`PAYETAX_ENABLE_SENTRY_SOURCEMAPS` override still takes precedence. Local/CI builds skip uploads.
+With Next.js 16.4.3 and Sentry 11.10.0, `useRunAfterProductionCompileHook` consolidates uploads
+after compilation (supported since Next.js 15.4.1). The installed SDK uploads the server and
+browser directories in that phase. Release creation, finalisation, commit association and build
+plugin telemetry are disabled. Events retain release correlation; Sentry's explicit release
+finalisation times and commit metadata are no longer populated by these builds.
+
+Upload errors emit a fixed warning and allow the build to continue. Browser maps are deleted
+after the attempt, including failed uploads; server maps remain outside public assets. This
+reduces duplicated work but still awaits the uploader's network attempts and does not impose a
+total timeout. During an outage, deployability takes priority over readable source-mapped stacks.
+Do not assume legacy `sentry-cli` timeout variables control Sentry 11's newer `sentry` CLI adapter.
+An emergency provider-side `PAYETAX_ENABLE_SENTRY_SOURCEMAPS=false` override requires separate
+approval and sacrifices maps while preserving error capture.
+
+After an approved deployment, complete the [Observability acceptance work](../BACKLOG.md#verification).
+Use synthetic, non-financial events without adding permanent error endpoints. Local checks do
+not prove ingestion or production symbolication. The `fix/sentry-reliability` branch alone has
+automatic Vercel deployment disabled in `vercel.json` so PR creation cannot deploy this change.
+
 ## Version Policy And Tagging
 
 `package.json` is the source of truth for the app version. The existing footer and Compliance

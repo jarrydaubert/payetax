@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { withSentryConfig } from '@sentry/nextjs/config';
 import type { NextConfig } from 'next';
+import { version } from './package.json';
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
@@ -87,6 +88,10 @@ function buildCsp(isDevelopment: boolean): string {
 }
 
 const nextConfig: NextConfig = {
+  // Inline only this public deployment label, including in the browser bundle.
+  env: {
+    VERCEL_ENV: process.env.VERCEL_ENV || process.env.NODE_ENV || 'development',
+  },
   reactStrictMode: true,
   typedRoutes: true,
 
@@ -285,6 +290,13 @@ export const sentryConfigOptions = {
   org: 'jgf-projects',
   project: 'payetax',
   silent: !process.env.CI,
+  telemetry: false,
+  useRunAfterProductionCompileHook: sentrySourceMapsEnabled,
+  errorHandler: (_error: Error) => {
+    console.warn(
+      '[Sentry] Source-map upload failed; continuing build without uploaded source maps.',
+    );
+  },
   tunnelRoute: '/monitoring',
   suppressOnRouterTransitionStartWarning: true,
   widenClientFileUpload: sentrySourceMapsEnabled,
@@ -294,8 +306,10 @@ export const sentryConfigOptions = {
     excludeReplayIframe: true,
   },
   release: {
-    create: sentrySourceMapsEnabled,
-    finalize: sentrySourceMapsEnabled,
+    name: process.env.VERCEL_GIT_COMMIT_SHA || `payetax@${version}`,
+    create: false,
+    finalize: false,
+    setCommits: false as const,
   },
   sourcemaps: sentrySourceMapsEnabled
     ? {

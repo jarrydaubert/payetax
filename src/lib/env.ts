@@ -62,6 +62,8 @@ export const ServerEnvSchema = z.object({
     .transform((val) => val === 'true')
     .optional(),
   NODE_ENV: z.enum(['development', 'production', 'test']).optional(),
+  NEXT_RUNTIME: z.enum(['nodejs', 'edge']).optional(),
+  VERCEL_ENV: z.string().min(1).optional(),
 });
 
 export const EnvSchema = z.object({
@@ -121,6 +123,8 @@ export function validatePublicEnv(): PublicEnv {
 
 export function validateServerEnv(): ServerEnv {
   const result = ServerEnvSchema.safeParse({
+    NEXT_RUNTIME: process.env.NEXT_RUNTIME,
+    VERCEL_ENV: process.env.VERCEL_ENV,
     BREVO_API_KEY: process.env.BREVO_API_KEY,
     BREVO_FROM_EMAIL: process.env.BREVO_FROM_EMAIL,
     UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,

@@ -29,6 +29,9 @@ const REQUIRED_SERVER_ENV_KEYS = ['BREVO_API_KEY'] as const;
 const NON_TEMPLATE_RUNTIME_ENV = new Set([
   // Platform/system-provided at runtime
   'NODE_ENV',
+  'NEXT_RUNTIME',
+  // Public deployment label, inlined by next.config.ts for every runtime.
+  'VERCEL_ENV',
   'VERCEL_URL',
   'VERCEL_PROJECT_PRODUCTION_URL',
   'NEXT_PUBLIC_VERCEL_URL',

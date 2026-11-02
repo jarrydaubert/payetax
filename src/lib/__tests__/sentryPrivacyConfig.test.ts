@@ -10,20 +10,29 @@ jest.mock('@sentry/nextjs', () => ({
 describe('instrumentation-client console breadcrumbs', () => {
   afterEach(() => setNodeEnv('test'));
 
-  it('removes the Console integration in production', () => {
-    jest.resetModules();
-    setNodeEnv('production');
-    const sentry = require('@sentry/nextjs');
-    require('../../../instrumentation-client');
-    const { integrations } = sentry.init.mock.calls[0][0];
-    const defaults = [{ name: 'Console' }, { name: 'Breadcrumbs' }, { name: 'GlobalHandlers' }];
-    const names = integrations(defaults).map((integration: { name: string }) => integration.name);
-    expect(names).not.toContain('Console');
-    expect(names).toEqual(expect.arrayContaining(['Breadcrumbs', 'GlobalHandlers']));
-    expect(sentry.breadcrumbsIntegration).toHaveBeenCalledWith(
-      expect.objectContaining({ dom: false }),
-    );
-  });
+  it.each(['production', 'development'])(
+    'removes Console and BrowserSession in %s',
+    (environment) => {
+      jest.resetModules();
+      setNodeEnv(environment);
+      const sentry = require('@sentry/nextjs');
+      require('../../instrumentation-client');
+      const { integrations } = sentry.init.mock.calls[0][0];
+      const defaults = [
+        { name: 'Console' },
+        { name: 'BrowserSession' },
+        { name: 'Breadcrumbs' },
+        { name: 'GlobalHandlers' },
+      ];
+      const names = integrations(defaults).map((integration: { name: string }) => integration.name);
+      expect(names).not.toContain('Console');
+      expect(names).not.toContain('BrowserSession');
+      expect(names).toEqual(expect.arrayContaining(['Breadcrumbs', 'GlobalHandlers']));
+      expect(sentry.breadcrumbsIntegration).toHaveBeenCalledWith(
+        expect.objectContaining({ dom: false }),
+      );
+    },
+  );
 });
 
 describe.each(['instrumentation-client', 'sentry.server.config', 'sentry.edge.config'])(
@@ -47,7 +56,9 @@ describe.each(['instrumentation-client', 'sentry.server.config', 'sentry.edge.co
       });
       jest.spyOn(process, 'uptime').mockReturnValue(42);
       const sentry = require('@sentry/nextjs');
-      require(`../../../${name}`);
+      require(
+        name === 'instrumentation-client' ? '../../instrumentation-client' : `../../../${name}`,
+      );
       const options = sentry.init.mock.calls[0][0];
       const event: ErrorEvent = {
         type: undefined,
@@ -116,3 +127,28 @@ describe.each(['instrumentation-client', 'sentry.server.config', 'sentry.edge.co
     });
   },
 );
+
+describe.each([
+  '../../instrumentation-client',
+  '../../../sentry.server.config',
+  '../../../sentry.edge.config',
+])('%s environment', (name) => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+    setNodeEnv('test');
+  });
+
+  it.each(['preview', 'production', undefined])('labels the deployment %s', (environment) => {
+    jest.resetModules();
+    setNodeEnv('production');
+    jest.replaceProperty(process, 'env', {
+      ...process.env,
+      VERCEL_ENV: environment,
+    });
+    const sentry = require('@sentry/nextjs');
+    require(name);
+    expect(sentry.init.mock.calls[0][0].environment).toBe(environment || 'production');
+    // Let the SDK use withSentryConfig's shared release injection.
+    expect(sentry.init.mock.calls[0][0].release).toBeUndefined();
+  });
+});

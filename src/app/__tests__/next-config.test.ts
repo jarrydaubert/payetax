@@ -185,14 +185,68 @@ describe('next.config Sentry options', () => {
       expect.objectContaining({
         widenClientFileUpload: false,
         release: {
+          name: expect.any(String),
           create: false,
           finalize: false,
+          setCommits: false,
         },
         sourcemaps: {
           disable: true,
         },
       }),
     );
+  });
+
+  it('keeps build failures non-fatal without logging raw CLI errors', async () => {
+    const { sentryConfigOptions } = await import('../../../next.config');
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      expect(() =>
+        sentryConfigOptions.errorHandler(new Error('private build context')),
+      ).not.toThrow();
+      expect(warn).toHaveBeenCalledWith(
+        '[Sentry] Source-map upload failed; continuing build without uploaded source maps.',
+      );
+      expect(sentryConfigOptions.telemetry).toBe(false);
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it('inlines the public Vercel deployment label for browser errors', async () => {
+    jest.resetModules();
+    jest.replaceProperty(process, 'env', { ...process.env, VERCEL_ENV: 'preview' });
+    try {
+      const { default: nextConfig } = await import('../../../next.config');
+      expect(nextConfig.env?.VERCEL_ENV).toBe('preview');
+    } finally {
+      jest.restoreAllMocks();
+      jest.resetModules();
+    }
+  });
+
+  it('consolidates release builds after compilation without release-management requests', async () => {
+    jest.resetModules();
+    jest.replaceProperty(process, 'env', {
+      ...process.env,
+      PAYETAX_ENABLE_SENTRY_SOURCEMAPS: 'true',
+      VERCEL_GIT_COMMIT_SHA: 'test-commit-sha',
+    });
+    try {
+      const { sentryConfigOptions } = await import('../../../next.config');
+      expect(sentryConfigOptions.useRunAfterProductionCompileHook).toBe(true);
+      expect(sentryConfigOptions.release).toEqual({
+        name: 'test-commit-sha',
+        create: false,
+        finalize: false,
+        setCommits: false,
+      });
+      expect(sentryConfigOptions.sourcemaps).toEqual({ deleteSourcemapsAfterUpload: true });
+      expect(sentryConfigOptions.widenClientFileUpload).toBe(true);
+    } finally {
+      jest.restoreAllMocks();
+      jest.resetModules();
+    }
   });
 
   it('enables Sentry source maps for production Vercel builds with an auth token', async () => {

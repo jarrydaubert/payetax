@@ -10,8 +10,7 @@ Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
   // Environment-specific configuration
-  environment: process.env.NODE_ENV,
-  release: process.env.VERCEL_GIT_COMMIT_SHA || 'development',
+  environment: process.env.VERCEL_ENV || process.env.NODE_ENV,
 
   dataCollection: SENTRY_DATA_COLLECTION,
   attachStacktrace: false,
