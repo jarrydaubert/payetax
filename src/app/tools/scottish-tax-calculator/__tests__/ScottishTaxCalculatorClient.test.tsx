@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useCalculatorStore } from '@/store/calculatorStore';
 import { ScottishTaxCalculatorClient } from '../ScottishTaxCalculatorClient';
 
 describe('ScottishTaxCalculatorClient', () => {
@@ -84,5 +85,27 @@ describe('ScottishTaxCalculatorClient', () => {
       'href',
       'https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027',
     );
+  });
+
+  it('renders the calculator CTA as one focusable link with no nested controls', async () => {
+    const user = userEvent.setup();
+    render(<ScottishTaxCalculatorClient />);
+    const link = screen.getByRole('link', { name: 'Open Full Scottish Calculator' });
+    expect(link).toHaveAttribute('href', '/#tax-calculator');
+    expect(link.querySelector('button, a, input, [tabindex]')).toBeNull();
+    expect(
+      screen.queryByRole('button', { name: 'Open Full Scottish Calculator' }),
+    ).not.toBeInTheDocument();
+    link.focus();
+    await user.tab({ shift: true });
+    await user.tab();
+    expect(link).toHaveFocus();
+    useCalculatorStore.getState().setRegion('England');
+    const stopNavigation = (event: MouseEvent) => event.preventDefault();
+    link.addEventListener('click', stopNavigation);
+    await user.keyboard('{Enter}');
+    expect(useCalculatorStore.getState().input.region).toBe('Scotland');
+    link.removeEventListener('click', stopNavigation);
+    useCalculatorStore.getState().setRegion('England');
   });
 });

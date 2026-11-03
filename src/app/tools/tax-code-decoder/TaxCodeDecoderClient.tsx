@@ -270,12 +270,12 @@ export function TaxCodeDecoderClient() {
         <p className={cn('mb-4 text-muted-foreground', 'text-lg')}>
           Want an estimate? Open the calculator and enter the code yourself.
         </p>
-        <Link href='/'>
-          <Button size='lg' variant='outline'>
+        <Button asChild size='lg' variant='outline'>
+          <Link href='/'>
             Open Tax Calculator
             <ArrowRight className={cn('ml-2', 'size-4')} />
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </div>
     </div>
   );

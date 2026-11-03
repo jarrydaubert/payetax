@@ -84,7 +84,7 @@ describe.each(guides)('$slug article contract', (guide) => {
 
   it('preserves the URL and aligns current-facing metadata with the visible answer', () => {
     expect(post).toMatchObject({
-      updatedAt: FACTUAL_REVIEWED_AT,
+      updatedAt: guide.salary === 40_000 ? '2026-11-03' : FACTUAL_REVIEWED_AT,
       canonicalUrl: guide.canonicalUrl,
     });
     expect(post?.title).toContain('2026/27');
@@ -203,10 +203,18 @@ describe('salary-guide claim-specific evidence', () => {
   it('qualifies the £40k comparison to the current ONS ASHE population and value', () => {
     const content = getPostBySlug('what-40k-salary-actually-looks-like-uk-2025')?.content ?? '';
 
-    expect(content).toContain('median gross annual earnings of £39,039 in April 2025');
+    expect(content).toContain('median gross annual earnings of £40,911 in April 2026');
+    expect(content).toContain('22 October 2026');
+    expect(content).toContain('provisional');
+    expect(content).toContain('£40,000 is £911 below the median');
+    expect(content).not.toMatch(/£39,039|£961 above|slightly above the ONS/);
+    const medianFaq = extractFAQs(content).find((faq) => faq.question.includes('median'));
+    expect(medianFaq?.answer).toContain('£911 below');
+    expect(medianFaq?.answer).toContain('April 2026');
+    expect(medianFaq?.answer).toContain('£40,911');
     expect(content).toContain('full-time employees who had been in their jobs for at least a year');
     expect(content).toContain(
-      'https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/annualsurveyofhoursandearnings/2025',
+      'https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/earningsandworkinghours/bulletins/annualsurveyofhoursandearnings/2026',
     );
   });
 
@@ -251,5 +259,76 @@ describe('salary-guide claim-specific evidence', () => {
         `| ${pounds(expected.income, 0)} | ${pounds(expected.personalAllowance, 0)} | ${pounds(expected.incomeTax, 0)} | ${pounds(expected.nationalInsurance, 0)} | ${pounds(expected.netPay, 0)} |`,
       );
     }
+  });
+});
+
+describe('£70k salary-guide rounding', () => {
+  const post = getPostBySlug('what-70k-salary-actually-looks-like-uk-2025');
+  const content = post?.content ?? '';
+  const base = scenario('salary-guide-70k-base').expected ?? {};
+  const plan2 = scenario('salary-guide-70k-plan2').expected ?? {};
+  const sacrifice = scenario('salary-guide-70k-sacrifice').expected ?? {};
+  const scottish = scenario('salary-guide-70k-scottish').expected ?? {};
+  const required = (amount: number | undefined): number => {
+    if (amount === undefined) throw new Error('Missing independent £70k payroll expectation');
+    return amount;
+  };
+  const whole = (amount: number | undefined) => pounds(Math.round(required(amount)), 0);
+
+  it('keeps the canonical URL and records the factual refresh', () => {
+    expect(post).toMatchObject({
+      canonicalUrl: 'https://payetax.co.uk/blog/what-70k-salary-actually-looks-like-uk-2025',
+      updatedAt: '2026-11-03',
+    });
+  });
+
+  it('rounds the headline, every table row and FAQ from independent payroll expectations', () => {
+    const deductions = required(base.incomeTaxAnnual) + required(base.nationalInsuranceAnnual);
+    expect(content).toContain(
+      `about ${whole(base.netPayAnnual)} a year, or ${whole(base.netPayMonthly)} a month`,
+    );
+    expect(content).toContain(
+      `| Annual | £70,000 | ${whole(deductions)} | ${whole(base.netPayAnnual)} |`,
+    );
+    expect(content).toContain(
+      `| Monthly | ${whole(70_000 / 12)} | ${whole(deductions / 12)} | ${whole(base.netPayMonthly)} |`,
+    );
+    expect(content).toContain(
+      `| Weekly equivalent | ${whole(70_000 / 52)} | ${whole(deductions / 52)} | ${whole(required(base.netPayAnnual) / 52)} |`,
+    );
+    expect(content).toContain(`| Income Tax | ${whole(base.incomeTaxAnnual)} |`);
+    expect(content).toContain(
+      `| Employee National Insurance | ${whole(base.nationalInsuranceAnnual)} |`,
+    );
+    expect(content).toContain(`| Total | ${whole(deductions)} |`);
+    const faqs = extractFAQs(content);
+    expect(faqs[0]?.answer).toContain(`${whole(base.netPayAnnual)} annual take-home`);
+    expect(faqs[0]?.answer).toContain(`${whole(base.netPayMonthly)} a month`);
+    const plan2Faq = faqs.find((faq) => faq.question.includes('Plan 2'));
+    expect(plan2Faq?.answer).toContain(`${whole(plan2.netPayAnnual)} a year`);
+    expect(plan2Faq?.answer).toContain(`${whole(plan2.netPayMonthly)} a month`);
+    expect(content).not.toMatch(/£51,163|£15,427|£18,837|£47,515|£4,095/);
+  });
+
+  it('keeps Plan 2, sacrifice and the correct Scottish figures aligned with independent fixtures', () => {
+    expect(content).toContain(`monthly Plan 2 deduction: ${whole(plan2.studentLoanMonthly)}`);
+    expect(content).toContain(
+      `annual Plan 2 deduction across 12 equal monthly pay periods: ${whole(plan2.studentLoanAnnual)}`,
+    );
+    expect(content).toContain(
+      `estimated annual take-home after tax, NI and Plan 2: ${whole(plan2.netPayAnnual)}`,
+    );
+    expect(content).toContain(`estimated monthly take-home: ${whole(plan2.netPayMonthly)}`);
+    expect(content).toContain(
+      `${whole(sacrifice.pensionContributionAnnual)} contributed by the employer`,
+    );
+    expect(content).toContain(`estimated annual take-home: ${whole(sacrifice.netPayAnnual)}`);
+    expect(content).toContain(`estimated monthly take-home: ${whole(sacrifice.netPayMonthly)}`);
+    expect(content).toContain(`Scottish Income Tax: ${whole(scottish.incomeTaxAnnual)}`);
+    expect(content).toContain(
+      `employee National Insurance: ${whole(scottish.nationalInsuranceAnnual)}`,
+    );
+    expect(content).toContain(`annual take-home: ${whole(scottish.netPayAnnual)}`);
+    expect(content).toContain(`monthly take-home: ${whole(scottish.netPayMonthly)}`);
   });
 });

@@ -114,4 +114,17 @@ describe('TaxCodeDecoderClient', () => {
     expect(screen.getByText('CD0 / CD1')).toBeInTheDocument();
     expect(screen.getByText(/Welsh higher or additional rate/)).toBeInTheDocument();
   });
+
+  it('renders the calculator CTA as one focusable link with no nested controls', async () => {
+    const user = userEvent.setup();
+    render(<TaxCodeDecoderClient />);
+    const link = screen.getByRole('link', { name: 'Open Tax Calculator' });
+    expect(link).toHaveAttribute('href', '/');
+    expect(link.querySelector('button, a, input, [tabindex]')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Open Tax Calculator' })).not.toBeInTheDocument();
+    link.focus();
+    await user.tab({ shift: true });
+    await user.tab();
+    expect(link).toHaveFocus();
+  });
 });

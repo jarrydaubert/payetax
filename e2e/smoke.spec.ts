@@ -74,11 +74,10 @@ test.describe('Smoke Tests', () => {
     await page.evaluate(() => window.localStorage.removeItem('tax-calculator-storage'));
     await page.reload();
 
-    const ctaButton = page.getByRole('button', { name: 'Open Full Scottish Calculator' });
-    const ctaLink = ctaButton.locator('xpath=ancestor::a');
+    const ctaLink = page.getByRole('link', { name: 'Open Full Scottish Calculator' });
 
     await expect(ctaLink).toHaveAttribute('href', '/#tax-calculator');
-    await ctaButton.click();
+    await ctaLink.click();
 
     await expect(page).toHaveURL(/\/#tax-calculator$/);
     await expect(page.getByTestId('region-select')).toContainText('Scotland');
