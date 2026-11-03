@@ -6,8 +6,18 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '../../..');
 process.chdir(root);
 const calls = [];
-let failUpload = true;
+let failureMode = 'upload';
 const cliPath = require.resolve('sentry');
+const { SentryError } = require('sentry');
+process.env.SENTRY_AUTH_TOKEN = 'synthetic-offline-token';
+process.env.PAYETAX_ENABLE_SENTRY_SOURCEMAPS = 'true';
+const originalRm = fs.promises.rm;
+fs.promises.rm = async (file, options) => {
+  if (failureMode === 'cleanup' && String(file).endsWith('.map')) {
+    throw Object.assign(new Error('Synthetic private cleanup context'), { code: 'EACCES' });
+  }
+  return originalRm(file, options);
+};
 require.cache[cliPath] = {
   id: cliPath,
   filename: cliPath,
@@ -20,10 +30,14 @@ require.cache[cliPath] = {
         },
       }),
       sourcemap: {
-        inject: async () => { calls.push('inject'); },
+        inject: async () => {
+          calls.push('inject');
+          if (failureMode === 'inject') throw new SentryError('Synthetic PRIVATE_CANARY', 1, 'PRIVATE_CANARY');
+        },
         upload: async ({ directory }) => {
           calls.push(directory);
-          if (failUpload) throw new Error('Synthetic Sentry HTTP 502 / network failure');
+          if (failureMode === 'upload') throw new SentryError('Synthetic HTTP 502 PRIVATE_CANARY', 1, 'PRIVATE_CANARY');
+          if (failureMode === 'unrelated') throw new TypeError('PRIVATE_CANARY');
         },
       },
     }),
@@ -32,11 +46,10 @@ require.cache[cliPath] = {
 
 async function main() {
   const { transpileConfig } = require('next/dist/build/next-config-ts/transpile-config');
-  const { sentryConfigOptions } = await transpileConfig({
+  const { default: config, sentryConfigOptions } = await transpileConfig({
     nextConfigPath: path.join(root, 'next.config.ts'),
     dir: root,
   });
-  const { withSentryConfig } = require('@sentry/nextjs/config');
   const sdkRoot = path.dirname(require.resolve('@sentry/nextjs/package.json'));
   const { getBuildPluginOptions } = require(path.join(sdkRoot, 'build/cjs/config/getBuildPluginOptions.js'));
   const options = {
@@ -53,8 +66,8 @@ async function main() {
   const outputRoot = path.join(root, 'audit-outputs');
   fs.mkdirSync(outputRoot, { recursive: true });
   try {
-    for (const outage of [false, true]) {
-      failUpload = outage;
+    for (const mode of ['success', 'upload', 'cleanup', 'inject', 'unrelated']) {
+      failureMode = mode;
       calls.length = 0;
       warnings.length = 0;
       const distDir = fs.mkdtempSync(path.join(outputRoot, 'sentry-sdk-'));
@@ -78,26 +91,44 @@ async function main() {
           assert.equal(plugin.release.setCommits, false);
           assert.equal(plugin.sourcemaps.filesToDeleteAfterUpload, undefined);
         }
-        const config = withSentryConfig({}, options);
         assert.equal(config.env._sentryRelease, options.release.name);
         assert.equal(typeof config.compiler.runAfterProductionCompile, 'function');
-        await config.compiler.runAfterProductionCompile({ distDir, projectDir: root });
+        const build = config.compiler.runAfterProductionCompile({ distDir, projectDir: root });
+        if (['cleanup', 'inject', 'unrelated'].includes(mode)) {
+          await assert.rejects(build, (error) => {
+            assert.match(error.message, /\[Sentry\].*refusing to continue/);
+            assert.ok(!error.message.includes('PRIVATE_CANARY'));
+            return true;
+          });
+          console.log(`PASS: ${mode} failure rejects the production hook; output cannot be deployed`);
+          continue;
+        }
+        await build;
         assert.equal(calls[0], 'inject');
-        assert.equal(calls.length, outage ? 2 : 3);
-        assert.equal(warnings.length, outage ? 1 : 0);
+        assert.equal(calls.length, mode === 'upload' ? 2 : 3);
+        assert.equal(warnings.length, mode === 'upload' ? 1 : 0);
+        assert.ok(!JSON.stringify(warnings).includes('PRIVATE_CANARY'));
         assert.equal(fs.existsSync(path.join(distDir, 'static/chunks/test.js.map')), false);
         assert.equal(fs.existsSync(path.join(distDir, 'static/chunks/test.js')), true);
         assert.equal(fs.existsSync(path.join(distDir, 'server/test.js')), true);
         assert.equal(fs.existsSync(path.join(distDir, 'server/test.js.map')), true);
-        console.log(`PASS: ${outage ? 'failed' : 'successful'} upload; hook resolves, browser maps removed, bundles retained`);
+        console.log(`PASS: ${mode}; hook resolves, browser maps removed, bundles retained`);
       } finally {
         // Only this test's own mkdtemp directory inside audit-outputs is removed.
         assert.equal(path.dirname(distDir), outputRoot);
         fs.rmSync(distDir, { recursive: true, force: true });
       }
     }
+    failureMode = 'success';
+    const { createSentryBuildPluginManager } = require('@sentry/bundler-plugins/core');
+    assert.throws(() => createSentryBuildPluginManager({
+      ...options,
+      release: { ...options.release, setCommits: { auto: false } },
+    }, { buildTool: 'webpack', loggerPrefix: '[offline test]' }), /Unexpected build integration failure/);
+    console.log('PASS: invalid plugin configuration rejects; no raw CLI diagnostic is logged');
   } finally {
     console.warn = originalWarn;
+    fs.promises.rm = originalRm;
   }
 }
 
@@ -110,6 +141,5 @@ if (require.main === module) {
   // `node --require ./.../verify-build.cjs .../next build --webpack` exercises
   // the complete release build with a synthetic token and a failing CLI stub.
   // These values exist only in this verification process and its children.
-  process.env.SENTRY_AUTH_TOKEN = 'synthetic-offline-token';
-  process.env.PAYETAX_ENABLE_SENTRY_SOURCEMAPS = 'true';
+  failureMode = 'upload';
 }

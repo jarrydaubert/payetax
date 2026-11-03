@@ -114,9 +114,10 @@ preserve review history and superseded decisions.
 ## Post-release follow-ups
 
 v5.2.6 restores Sentry's `src/` instrumentation entrypoints and SDK request-error handling,
-removes browser session reporting, derives environment labels from Vercel and moves best-effort
-source-map uploads after compilation without release-management API calls. Local checks confirm
-hook emission and upload-failure cleanup; Vercel is configured for compatible Node 24.x.
+removes automatic browser/process/request session reporting, derives environment labels from
+Vercel and moves best-effort source-map uploads after compilation without release-management
+API calls. Local checks confirm hook emission, sanitised SDK envelopes and fail-closed cleanup
+verification; Vercel is configured for compatible Node 24.x.
 Actual event delivery, environment labels and production source maps remain unverified until an
 approved deployment. The [verification record](reports/sentry-reliability-2026-11-02/README.md)
 records the evidence and trade-offs; [Verification](BACKLOG.md#verification) retains the live

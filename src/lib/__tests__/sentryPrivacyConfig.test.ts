@@ -5,6 +5,7 @@ import { setNodeEnv } from '@/test/env';
 jest.mock('@sentry/nextjs', () => ({
   init: jest.fn(),
   breadcrumbsIntegration: jest.fn(() => ({ name: 'Breadcrumbs' })),
+  httpIntegration: jest.fn(() => ({ name: 'Http' })),
 }));
 
 describe('instrumentation-client console breadcrumbs', () => {

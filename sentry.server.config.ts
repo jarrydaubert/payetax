@@ -16,8 +16,12 @@ Sentry.init({
   attachStacktrace: false,
   tracesSampleRate: 0,
 
-  // Do not attach arbitrary properties from caught Error objects.
-  integrations: [],
+  integrations: (defaults) => [
+    ...defaults.filter(
+      (integration) => !['ProcessSession', 'Http', 'Http.Server'].includes(integration.name),
+    ),
+    Sentry.httpIntegration({ sessions: false, spans: false, disableIncomingRequestSpans: true }),
+  ],
 
   // Disable debug mode (too verbose in console)
   debug: false,

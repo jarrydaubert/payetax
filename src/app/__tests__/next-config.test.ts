@@ -1,5 +1,8 @@
 jest.mock('@sentry/nextjs/config', () => ({
-  withSentryConfig: (config: unknown) => config,
+  withSentryConfig: (config: object) => ({
+    ...config,
+    compiler: { runAfterProductionCompile: async () => {} },
+  }),
 }));
 
 jest.mock('@next/bundle-analyzer', () => () => (config: unknown) => config);
@@ -197,16 +200,14 @@ describe('next.config Sentry options', () => {
     );
   });
 
-  it('keeps build failures non-fatal without logging raw CLI errors', async () => {
+  it('fails closed for unclassified build errors without logging raw CLI errors', async () => {
     const { sentryConfigOptions } = await import('../../../next.config');
     const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
     try {
-      expect(() =>
-        sentryConfigOptions.errorHandler(new Error('private build context')),
-      ).not.toThrow();
-      expect(warn).toHaveBeenCalledWith(
-        '[Sentry] Source-map upload failed; continuing build without uploaded source maps.',
+      expect(() => sentryConfigOptions.errorHandler(new Error('private build context'))).toThrow(
+        '[Sentry] Unexpected build integration failure; refusing to continue.',
       );
+      expect(warn).not.toHaveBeenCalled();
       expect(sentryConfigOptions.telemetry).toBe(false);
     } finally {
       warn.mockRestore();

@@ -2,6 +2,7 @@ import path from 'node:path';
 import { withSentryConfig } from '@sentry/nextjs/config';
 import type { NextConfig } from 'next';
 import { version } from './package.json';
+import { handleSentryBuildError, verifySentryCleanup } from './scripts/sentry-build';
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
@@ -292,11 +293,7 @@ export const sentryConfigOptions = {
   silent: !process.env.CI,
   telemetry: false,
   useRunAfterProductionCompileHook: sentrySourceMapsEnabled,
-  errorHandler: (_error: Error) => {
-    console.warn(
-      '[Sentry] Source-map upload failed; continuing build without uploaded source maps.',
-    );
-  },
+  errorHandler: handleSentryBuildError,
   tunnelRoute: '/monitoring',
   suppressOnRouterTransitionStartWarning: true,
   widenClientFileUpload: sentrySourceMapsEnabled,
@@ -321,5 +318,13 @@ export const sentryConfigOptions = {
 };
 
 const configWithSentry = withSentryConfig(withBundleAnalyzer(nextConfig), sentryConfigOptions);
+
+if (sentrySourceMapsEnabled) {
+  const compiler = configWithSentry.compiler;
+  if (!compiler?.runAfterProductionCompile) {
+    throw new Error('[Sentry] Missing source-map compilation hook; refusing to continue.');
+  }
+  compiler.runAfterProductionCompile = verifySentryCleanup(compiler.runAfterProductionCompile);
+}
 
 export default configWithSentry;

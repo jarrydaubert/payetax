@@ -28,8 +28,11 @@ Use `bun run build:release` only for release validation that needs Sentry source
 Next.js discovers `src/instrumentation.ts` and `src/instrumentation-client.ts` alongside
 `src/app`. The server hook loads the Node or Edge config and forwards only monitored request
 paths to `captureRequestError`, retaining sanitisation and the SDK's serverless flush handling.
-Browser session reporting is removed through Sentry 11's `BrowserSession` integration filter;
-tracing and replay remain disabled. The financial-data and monitored-route policies still apply.
+Automatic sessions are disabled: filter `BrowserSession` and Node's `ProcessSession`, and
+replace Node's default `Http` integration with `httpIntegration` configured with
+`sessions: false`, `spans: false` and `disableIncomingRequestSpans: true`.
+Current Edge defaults have no session producer.
+Tracing and replay remain disabled. The financial-data and monitored-route policies still apply.
 
 `next.config.ts` inlines the non-secret `VERCEL_ENV` deployment label for all bundles, falling
 back to `NODE_ENV` outside Vercel. This needs no new provider variable. Confirm Preview and
@@ -45,9 +48,13 @@ browser directories in that phase. Release creation, finalisation, commit associ
 plugin telemetry are disabled. Events retain release correlation; Sentry's explicit release
 finalisation times and commit metadata are no longer populated by these builds.
 
-Upload errors emit a fixed warning and allow the build to continue. Browser maps are deleted
-after the attempt, including failed uploads; server maps remain outside public assets. This
-reduces duplicated work but still awaits the uploader's network attempts and does not impose a
+Only recognised CLI source-map upload failures emit a safe warning and allow the build to
+continue. Other integration/configuration errors fail the build. Browser maps are deleted
+after the attempt, including failed uploads; a separate post-hook check rejects the build if
+any public `.map` remains or cleanup cannot be verified. The SDK can swallow individual deletion
+errors, so its successful return alone is insufficient. Failed cleanup output must not deploy.
+Server maps remain outside public assets. This reduces duplicated work but still awaits the
+uploader's network attempts and does not impose a
 total timeout. During an outage, deployability takes priority over readable source-mapped stacks.
 Do not assume legacy `sentry-cli` timeout variables control Sentry 11's newer `sentry` CLI adapter.
 An emergency provider-side `PAYETAX_ENABLE_SENTRY_SOURCEMAPS=false` override requires separate
@@ -55,8 +62,7 @@ approval and sacrifices maps while preserving error capture.
 
 After an approved deployment, complete the [Observability acceptance work](../BACKLOG.md#verification).
 Use synthetic, non-financial events without adding permanent error endpoints. Local checks do
-not prove ingestion or production symbolication. The `fix/sentry-reliability` branch alone has
-automatic Vercel deployment disabled in `vercel.json` so PR creation cannot deploy this change.
+not prove ingestion or production symbolication.
 
 ## Version Policy And Tagging
 

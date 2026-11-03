@@ -16,8 +16,11 @@ Sentry.init({
   attachStacktrace: false,
   tracesSampleRate: 0,
 
-  // Do not attach arbitrary properties from caught Error objects.
-  integrations: [],
+  // Current Edge defaults have no session producer; keep that invariant explicit.
+  integrations: (defaults) =>
+    defaults.filter(
+      (integration) => !['ProcessSession', 'BrowserSession'].includes(integration.name),
+    ),
 
   // Enable debug mode in development
   debug: process.env.NODE_ENV === 'development',
