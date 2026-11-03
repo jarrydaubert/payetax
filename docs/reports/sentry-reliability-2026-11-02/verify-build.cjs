@@ -11,6 +11,11 @@ const cliPath = require.resolve('sentry');
 const { SentryError } = require('sentry');
 process.env.SENTRY_AUTH_TOKEN = 'synthetic-offline-token';
 process.env.PAYETAX_ENABLE_SENTRY_SOURCEMAPS = 'true';
+process.env.VERCEL = '1';
+process.env.VERCEL_ENV = 'preview';
+process.env.VERCEL_TARGET_ENV = 'preview';
+process.env.VERCEL_URL = 'synthetic-preview.invalid';
+process.env.PAYETAX_DISABLE_GOOGLE_FONTS = '1';
 const originalRm = fs.promises.rm;
 fs.promises.rm = async (file, options) => {
   if (failureMode === 'cleanup' && String(file).endsWith('.map')) {
@@ -26,6 +31,7 @@ require.cache[cliPath] = {
     createSentrySDK: () => ({
       release: new Proxy({}, {
         get: (_target, name) => async () => {
+          calls.push(`release:${String(name)}`);
           throw new Error(`Unexpected release-management call: ${String(name)}`);
         },
       }),
@@ -89,6 +95,7 @@ async function main() {
           assert.equal(plugin.release.create, false);
           assert.equal(plugin.release.finalize, false);
           assert.equal(plugin.release.setCommits, false);
+          assert.equal(plugin.release.deploy, false);
           assert.equal(plugin.sourcemaps.filesToDeleteAfterUpload, undefined);
         }
         assert.equal(config.env._sentryRelease, options.release.name);
@@ -121,6 +128,15 @@ async function main() {
     }
     failureMode = 'success';
     const { createSentryBuildPluginManager } = require('@sentry/bundler-plugins/core');
+    calls.length = 0;
+    const withoutDeployOptOut = createSentryBuildPluginManager({
+      ...options,
+      release: { ...options.release, deploy: undefined },
+    }, { buildTool: 'webpack', loggerPrefix: '[offline regression]' });
+    assert.equal(withoutDeployOptOut.normalizedOptions.release.deploy.env, 'preview');
+    await assert.rejects(withoutDeployOptOut.createRelease(), /Unexpected build integration failure/);
+    assert.deepEqual(calls, ['release:deploy']);
+    console.log('PASS: omitting deploy:false reproduces the unexpected Vercel release.deploy call');
     assert.throws(() => createSentryBuildPluginManager({
       ...options,
       release: { ...options.release, setCommits: { auto: false } },

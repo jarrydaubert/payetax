@@ -44,8 +44,10 @@ Production Vercel builds with an auth token enable source maps by default; the e
 `PAYETAX_ENABLE_SENTRY_SOURCEMAPS` override still takes precedence. Local/CI builds skip uploads.
 With Next.js 16.4.3 and Sentry 11.10.0, `useRunAfterProductionCompileHook` consolidates uploads
 after compilation (supported since Next.js 15.4.1). The installed SDK uploads the server and
-browser directories in that phase. Release creation, finalisation, commit association and build
-plugin telemetry are disabled. Events retain release correlation; Sentry's explicit release
+browser directories in that phase. Release creation, finalisation, commit association, deployment
+notifications and build plugin telemetry are disabled. `release.deploy: false` is explicit because
+the SDK otherwise infers deployment calls from Vercel even with release creation disabled.
+Events retain release correlation; Sentry's explicit release
 finalisation times and commit metadata are no longer populated by these builds.
 
 Only recognised CLI source-map upload failures emit a safe warning and allow the build to
@@ -56,6 +58,8 @@ errors, so its successful return alone is insufficient. Failed cleanup output mu
 Server maps remain outside public assets. This reduces duplicated work but still awaits the
 uploader's network attempts and does not impose a
 total timeout. During an outage, deployability takes priority over readable source-mapped stacks.
+The upload-error classifier verifies the installed adapter's module path and supports its Node
+and Bun stack-frame formats. Run both offline harnesses under both runtimes when changing it.
 Do not assume legacy `sentry-cli` timeout variables control Sentry 11's newer `sentry` CLI adapter.
 An emergency provider-side `PAYETAX_ENABLE_SENTRY_SOURCEMAPS=false` override requires separate
 approval and sacrifices maps while preserving error capture.
@@ -235,7 +239,12 @@ namespace under the same rule. Other values, rules and paths remain scanned, inc
 findings in these files. Temporary exports and redacted reports are
 removed after the check.
 
-The old Linear integration is retired. No replacement key or workspace is required for PayeTax.
+The old in-app Linear API integration is retired. No replacement in-app key is required.
+The native Sentry → Linear integration is a separate provider-side workflow, with GitHub PR
+linking through Linear's existing GitHub integration. Link the investigation issue in the PR;
+do not create a duplicate GitHub issue or an app webhook. New production error groups should
+create one Linear ticket; investigate existing linked groups rather than creating per-event
+tickets. Verify native status/link propagation before claiming the workflow complete.
 For the historical exposure and outstanding owner-side revocation/alert actions, see the
 [21 October 2026 incident record](../reports/linear-credential-retirement-2026-10-21.md).
 Removing code or closing a GitHub alert does not revoke a key at its provider.

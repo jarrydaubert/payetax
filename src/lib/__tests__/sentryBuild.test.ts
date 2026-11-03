@@ -4,31 +4,36 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { handleSentryBuildError, verifySentryCleanup } from '../../../scripts/sentry-build';
 
-it('allows only a typed CLI upload failure and logs no raw CLI details', () => {
-  const error = Object.assign(new Error('credential=SECRET_CANARY'), {
-    name: 'SentryError',
-    exitCode: 1,
-    stderr: 'credential=SECRET_CANARY',
-    stack: 'SentryError\n at async SentryCliAdapter.uploadSourcemaps (cli.js:82:9)',
-  });
-  const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
-  try {
-    expect(() => handleSentryBuildError(error)).not.toThrow();
-    expect(warn).toHaveBeenCalledWith(
-      '[Sentry] Source-map upload failed (CLI exit 1); continuing build.',
-    );
-    error.stack = 'at SentryCliAdapter.injectDebugIds';
-    expect(() => handleSentryBuildError(error)).toThrow('Unexpected build integration failure');
-    expect(() => handleSentryBuildError(new Error('Options were not set correctly'))).toThrow(
-      'Unexpected build integration failure',
-    );
-    expect(() => handleSentryBuildError(new TypeError('SECRET_CANARY'))).toThrow(
-      'Unexpected build integration failure',
-    );
-  } finally {
-    warn.mockRestore();
-  }
-});
+it.each(['SentryCliAdapter.uploadSourcemaps', 'uploadSourcemaps'])(
+  'allows the verified Node/Bun adapter frame %s without logging raw CLI details',
+  (frame) => {
+    const error = Object.assign(new Error('credential=SECRET_CANARY'), {
+      name: 'SentryError',
+      exitCode: 1,
+      stderr: 'credential=SECRET_CANARY',
+      stack: `SentryError\n at async ${frame} (/app/node_modules/@sentry/bundler-plugins/build/cjs/core/cli.js:82:9)`,
+    });
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      expect(() => handleSentryBuildError(error)).not.toThrow();
+      expect(warn).toHaveBeenCalledWith(
+        '[Sentry] Source-map upload failed (CLI exit 1); continuing build.',
+      );
+      error.stack = 'at uploadSourcemaps (/app/unrelated/cli.js:82:9)';
+      expect(() => handleSentryBuildError(error)).toThrow('Unexpected build integration failure');
+      error.stack = 'at SentryCliAdapter.injectDebugIds';
+      expect(() => handleSentryBuildError(error)).toThrow('Unexpected build integration failure');
+      expect(() => handleSentryBuildError(new Error('Options were not set correctly'))).toThrow(
+        'Unexpected build integration failure',
+      );
+      expect(() => handleSentryBuildError(new TypeError('SECRET_CANARY'))).toThrow(
+        'Unexpected build integration failure',
+      );
+    } finally {
+      warn.mockRestore();
+    }
+  },
+);
 
 describe('public source-map cleanup gate', () => {
   let distDir: string;

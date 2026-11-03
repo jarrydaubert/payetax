@@ -11,7 +11,9 @@ export function handleSentryBuildError(error: Error): void {
     typeof exitCode === 'number' &&
     Number.isInteger(exitCode) &&
     exitCode > 0 &&
-    /^\s*at (?:async )?SentryCliAdapter\.uploadSourcemaps\s*(?:\(|$)/m.test(error.stack ?? '')
+    /^\s*at (?:async )?(?:SentryCliAdapter\.)?uploadSourcemaps \([^\r\n)]*[\\/]@sentry[\\/]bundler-plugins[\\/]build[\\/](?:cjs|esm)[\\/]core[\\/]cli\.js:\d+:\d+\)/m.test(
+      error.stack ?? '',
+    )
   ) {
     console.warn(`[Sentry] Source-map upload failed (CLI exit ${exitCode}); continuing build.`);
     return;

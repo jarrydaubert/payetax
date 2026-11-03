@@ -307,6 +307,8 @@ export const sentryConfigOptions = {
     create: false,
     finalize: false,
     setCommits: false as const,
+    // Sentry otherwise infers deploy metadata from VERCEL even when create is false.
+    deploy: false as const,
   },
   sourcemaps: sentrySourceMapsEnabled
     ? {

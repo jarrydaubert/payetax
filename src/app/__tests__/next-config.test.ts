@@ -192,6 +192,7 @@ describe('next.config Sentry options', () => {
           create: false,
           finalize: false,
           setCommits: false,
+          deploy: false,
         },
         sourcemaps: {
           disable: true,
@@ -232,6 +233,8 @@ describe('next.config Sentry options', () => {
       ...process.env,
       PAYETAX_ENABLE_SENTRY_SOURCEMAPS: 'true',
       VERCEL_GIT_COMMIT_SHA: 'test-commit-sha',
+      VERCEL: '1',
+      VERCEL_ENV: 'preview',
     });
     try {
       const { sentryConfigOptions } = await import('../../../next.config');
@@ -241,6 +244,7 @@ describe('next.config Sentry options', () => {
         create: false,
         finalize: false,
         setCommits: false,
+        deploy: false,
       });
       expect(sentryConfigOptions.sourcemaps).toEqual({ deleteSourcemapsAfterUpload: true });
       expect(sentryConfigOptions.widenClientFileUpload).toBe(true);

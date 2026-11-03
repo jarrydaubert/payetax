@@ -44,7 +44,9 @@ Work is isolated in branch `fix/sentry-reliability`; the original checkout, its 
   11.10.0 passes configuration, injection, upload and cleanup errors through that same callback,
   without an operation argument. It also catches individual `rm` failures internally. The
   correction allows only typed `SentryError` failures with a positive CLI exit code and an actual
-  `SentryCliAdapter.uploadSourcemaps` stack frame. Unknown errors, injection failures and invalid
+  upload adapter stack frame from the verified `@sentry/bundler-plugins/build/{cjs,esm}/core/cli.js`
+  module. Node names the frame `SentryCliAdapter.uploadSourcemaps`; Bun names it `uploadSourcemaps`.
+  Unknown errors, injection failures and invalid
   plugin configuration fail closed. This is deliberately pinned to the inspected SDK/CLI shape;
   a changed/unrecognised shape fails the build rather than silently broadening the exception.
   The offline harness exercises the installed adapter, not fabricated stack frames alone.
@@ -63,14 +65,11 @@ Work is isolated in branch `fix/sentry-reliability`; the original checkout, its 
 The approximately 12-minute v5.2.5 deployment, previous approximately 50-second compilation,
 and outage/502/timeout evidence are **maintainer-supplied context**, not independently rerun
 benchmarks. No provider setting, stored environment value or credential was changed.
-`vercel.json` disables automatic deployment only for this exact PR branch, following
-[Vercel's documented Git configuration](https://vercel.com/docs/project-configuration/git-configuration#git.deploymentEnabled).
-Other branches retain their existing behaviour. No merge or deployment is performed.
-
-**Required BEFORE merge:** obtain separate maintainer approval for a Vercel **Preview** deployment,
-then remove the temporary `git.deploymentEnabled` block from `vercel.json` on this PR branch and
-push that removal, which enables automatic Preview deployment. Do not merge the temporary rule
-to main. The rule remains in this revision because no Preview approval has been granted.
+The original `f99ca2eb` verification retained temporary Preview suppression. The maintainer
+subsequently removed it at `5775fca8`; it is no longer in `vercel.json` and must not be restored
+or merged to main. That Preview failed. The [3 November release investigation](../sentry-release-readiness-2026-11-03.md)
+records the verified failure path, the focused repair and current validation boundaries.
+Production deployment and merge remain unauthorised.
 
 ## CI evidence and correction
 
@@ -95,6 +94,8 @@ Those results certify the reviewed head; they are not substituted for checks on 
 
 All commands run in the isolated checkout with its own output directories and existing locked
 dependencies reused through a `node_modules` junction; no local secret files were copied.
+The table's "Correction" results refer to **f99ca2eb**. The subsequent Vercel/Bun repair and
+its fresh results are recorded in the [3 November report](../sentry-release-readiness-2026-11-03.md).
 
 | Check | Result |
 | --- | --- |
@@ -113,7 +114,12 @@ dependencies reused through a `node_modules` junction; no local secret files wer
 
 `verify-build.cjs` deliberately stubs the installed CLI SDK boundary; its "successfully uploaded"
 SDK log is simulated. It does not test real network retries, credentials, Sentry ingestion or
-source-map matching. It can also preload a complete production build with a synthetic token and
+source-map matching. It now sets Vercel flags, rejects every unexpected release-management call,
+and proves omitting `deploy: false` reproduces the inferred deployment call. Run it with `node`
+and `bun`. `verify-cli-failure.cjs` separately uses the real installed CLI against a loopback-only
+HTTP 401 fixture and verifies genuine CLI failures are recognised by both runtimes, without
+Sentry requests. The build harness disables remote Google Fonts for its full-build mode.
+It can also preload a complete production build with a synthetic token and
 a failing upload stub:
 
 ```powershell
