@@ -12,8 +12,7 @@
  * - National Insurance: 8% on £12,571-£50,270, 2% above
  * - Marriage Allowance: £1,260 transfer
  * - Blind Person's Allowance: £3,130
- * - Age 65-74 Allowance: £3,660 extra (tapers above £34,600)
- * - Age 75+ Allowance: £3,960 extra (tapers above £34,600)
+ * - Age-related allowances: none (abolished from 2016-17; asserted below)
  *
  * Student Loan Thresholds 2025-26:
  * - Plan 1: £26,065 (9%)
@@ -23,7 +22,7 @@
  * - Postgraduate: £21,000 (6%)
  *
  * Rounding policy reference:
- * - docs/guides/TESTING.md#hmrc-rounding-divergence-policy
+ * - docs/guides/TESTING.md#rounding-and-threshold-policy
  */
 
 import { calculateTax, type TaxCalculationInput } from '../taxCalculator';
@@ -467,7 +466,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       // Reduced rate is 1.85%: £2,500/month - £1,048 primary threshold = £1,452,
       // x 1.85% = £26.86 a month, x 12 = £322.32.
       // Previously asserted £871.20 against a 5% rate that HMRC does not publish.
-      // https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027
+      // https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2025-to-2026
       expect(result.nationalInsurance.annually).toBeCloseTo(322.32, 2);
     });
 
