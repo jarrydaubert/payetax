@@ -19,23 +19,19 @@ jest.mock('@/components/molecules/mdx-components', () => ({
 }));
 
 import { readFileSync } from 'node:fs';
-import {
-  CURRENT_TAX_GUIDANCE,
-  CURRENT_TAX_GUIDANCE_PATHS,
-  CURRENT_TAX_GUIDANCE_SLUGS,
-} from '@/constants/currentTaxGuidance';
+import { CURRENT_TAX_GUIDANCE, CURRENT_TAX_GUIDANCE_PATHS } from '@/constants/currentTaxGuidance';
 import { findCurrentBlogGuidanceProblems } from '@/lib/currentBlogGuidance';
 import { extractFAQs, extractHowToSteps, getPostBySlug } from '@/lib/mdx';
 import { BlogFrontmatterSchema } from '@/lib/validation';
 
 describe('current-facing tax guidance', () => {
-  it.each(CURRENT_TAX_GUIDANCE_SLUGS)(
-    '%s has current metadata and FAQ copy that feeds structured data',
-    (slug) => {
+  it.each(CURRENT_TAX_GUIDANCE)(
+    '$slug has current metadata and FAQ copy that feeds structured data',
+    ({ slug, reviewedAt }) => {
       const post = getPostBySlug(slug);
 
       expect(post).toBeDefined();
-      expect(post?.updatedAt).toBe('2026-07-29');
+      expect(post?.updatedAt).toBe(reviewedAt);
       expect(post?.title).toContain('2026/27');
       expect(post?.seoTitle).toContain('2026/27');
       expect(post?.seoDescription).toContain('2026/27');

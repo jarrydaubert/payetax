@@ -3,7 +3,7 @@ export const CURRENT_TAX_GUIDANCE = [
   { slug: 'how-much-tax-will-i-pay-uk-2025', reviewedAt: '2026-07-29' },
   { slug: 'uk-tax-calculator-2025-complete-guide', reviewedAt: '2026-07-29' },
   { slug: 'what-50k-salary-actually-looks-like-uk-2025', reviewedAt: '2026-07-29' },
-  { slug: 'what-70k-salary-actually-looks-like-uk-2025', reviewedAt: '2026-07-29' },
+  { slug: 'what-70k-salary-actually-looks-like-uk-2025', reviewedAt: '2026-11-03' },
 ] as const;
 
 export const CURRENT_TAX_GUIDANCE_SLUGS = CURRENT_TAX_GUIDANCE.map(({ slug }) => slug);

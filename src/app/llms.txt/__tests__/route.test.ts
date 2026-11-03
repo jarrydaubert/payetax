@@ -43,7 +43,12 @@ describe('llms.txt route', () => {
     const text = await response.text();
 
     expect(response.headers.get('Content-Type')).toBe('text/plain; charset=utf-8');
-    expect(text).toContain('Last updated: 2026-08-01');
+    const expectedContentDate = getLatestContentDate([
+      '2026-08-01T12:00:00Z',
+      RATES_LAST_VERIFIED,
+      ...CURRENT_TAX_GUIDANCE.map(({ reviewedAt }) => reviewedAt),
+    ]);
+    expect(text).toContain(`Last updated: ${expectedContentDate}`);
     expect(text).toContain('## Crawler Policy');
     expect(text).toContain('Search crawlers and AI crawlers are allowed.');
     expect(text).toContain('/_vercel/ remain disallowed in robots.txt');

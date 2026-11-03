@@ -1,0 +1,135 @@
+{
+  "suite": "£70k salary-guide payroll estimates",
+  "source": {
+    "authority": "HMRC and Scottish Government",
+    "urls": [
+      "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027",
+      "https://www.gov.uk/government/publications/payroll-technical-specifications-income-tax",
+      "https://www.gov.uk/government/publications/tables-a-pay-adjustment-tables",
+      "https://www.gov.uk/government/publications/sl3-student-loan-deduction-tables/2026-to-2027-student-and-postgraduate-loan-deduction-tables",
+      "https://www.gov.uk/guidance/special-rules-for-student-loans",
+      "https://www.gov.uk/guidance/salary-sacrifice-and-the-effects-on-paye",
+      "https://www.gov.scot/publications/scottish-income-tax-rates-and-bands/pages/2026-to-2027/"
+    ],
+    "taxYear": "2026-2027",
+    "verifiedOn": "2026-11-03"
+  },
+  "tolerancePence": 0.01,
+  "scenarios": [
+    {
+      "id": "salary-guide-70k-base",
+      "description": "Hand-derived Month 1 projection, 12 equal months: £70,000 / 12 = £5,833.3333 recurring. Tables A 1257L free pay = £214.92 + 2 x £416.67 = £1,048.26. Floor taxable pay to £4,785. PAYE v24.0: £628.3333 + (£4,785 - £3,141.6666) x 40%, truncate to pence = £1,285.66. Category A NI: (£4,189 - £1,048) x 8% + (£5,833.3333 - £4,189) x 2%, nearest penny = £284.17. Annual tax £15,427.92, NI £3,410.04, deductions £18,837.96, net £51,162.04. Whole-pound publication rounds each final figure independently.",
+      "input": {
+        "salary": 70000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": [],
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 12570,
+        "incomeTaxAnnual": 15427.92,
+        "incomeTaxMonthly": 1285.66,
+        "nationalInsuranceAnnual": 3410.04,
+        "nationalInsuranceMonthly": 284.17,
+        "netPayAnnual": 51162.04,
+        "netPayMonthly": 4263.503333333333,
+        "taxBandRates": [20, 40]
+      }
+    },
+    {
+      "id": "salary-guide-70k-plan2",
+      "description": "Same independently derived base, plus Plan 2: floor((£70,000 / 12 - £2,448.75) x 9%) = £304 monthly, £3,648 annually; £51,162.04 - £3,648 = £47,514.04 net.",
+      "input": {
+        "salary": 70000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": ["plan2"],
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "studentLoanAnnual": 3648,
+        "studentLoanMonthly": 304,
+        "netPayAnnual": 47514.04,
+        "netPayMonthly": 3959.5033333333336
+      }
+    },
+    {
+      "id": "salary-guide-70k-sacrifice",
+      "description": "Valid 5% whole-salary sacrifice = £3,500 employer pension, £66,500 cash pay, no loan. Monthly taxable pay floor(£66,500 / 12 - £1,048.26) = £4,493. PAYE v24.0: £628.3333 + (£4,493 - £3,141.6666) x 40%, truncate to pence = £1,168.86. NI: £251.28 + (£66,500 / 12 - £4,189) x 2%, nearest penny = £278.33. Annual net = £66,500 - £14,026.32 - £3,339.96 = £49,133.72; monthly £4,094.4766 recurring rounds to £4,094 whole pounds.",
+      "input": {
+        "salary": 70000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "1257L",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 5,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": [],
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "incomeTaxAnnual": 14026.32,
+        "incomeTaxMonthly": 1168.86,
+        "nationalInsuranceAnnual": 3339.96,
+        "nationalInsuranceMonthly": 278.33,
+        "pensionContributionAnnual": 3500,
+        "pensionContributionMonthly": 291.6666666666667,
+        "netPayAnnual": 49133.72,
+        "netPayMonthly": 4094.476666666667
+      }
+    },
+    {
+      "id": "salary-guide-70k-scottish",
+      "description": "Preserve correct Scottish article figures. S1257L taxable monthly pay £4,785. Accrued higher-rate boundary £31,092 / 12 = £2,591. Tax below boundary: (£3,967 x 19% + £12,989 x 20% + £14,136 x 21%) / 12 = £526.6741 (four decimals). Add (£4,785 - £2,591) x 42% = £921.48; truncate £1,448.1541 to £1,448.15. Annual tax £17,377.80 and unchanged NI £3,410.04 leave £49,212.16 net.",
+      "input": {
+        "salary": 70000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "S1257L",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": [],
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "incomeTaxAnnual": 17377.8,
+        "incomeTaxMonthly": 1448.15,
+        "nationalInsuranceAnnual": 3410.04,
+        "nationalInsuranceMonthly": 284.17,
+        "netPayAnnual": 49212.16,
+        "netPayMonthly": 4101.013333333333,
+        "taxBandRates": [19, 20, 21, 42]
+      }
+    }
+  ]
+}

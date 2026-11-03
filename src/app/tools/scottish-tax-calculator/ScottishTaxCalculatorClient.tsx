@@ -427,12 +427,12 @@ export function ScottishTaxCalculatorClient() {
         <p className={cn('mb-4 text-muted-foreground', 'text-lg')}>
           Get a full breakdown with NI, pension, and student loan calculations.
         </p>
-        <Link href='/#tax-calculator' onClick={() => setRegion('Scotland')}>
-          <Button size='lg' variant='outline'>
+        <Button asChild size='lg' variant='outline'>
+          <Link href='/#tax-calculator' onClick={() => setRegion('Scotland')}>
             Open Full Scottish Calculator
             <ArrowRight className={cn('ml-2', 'size-4')} />
-          </Button>
-        </Link>
+          </Link>
+        </Button>
       </div>
     </div>
   );
