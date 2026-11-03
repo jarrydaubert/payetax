@@ -6,11 +6,23 @@ Verification base: `272fd642d4e09bf13c82121a20acce44e4c2f745` (v5.2.5).
 Before PR creation, main advanced to `e9de1b5a` through a README-only PR #166;
 version comparison against that target still passes. The verification base is preserved.
 Branch: `fix/jgf-6-audit-corrections`. Resulting patch version: **5.2.6**.
-No merge or deployment command was run. To honour the no-deploy review boundary, `vercel.json`
-sets `git.deploymentEnabled["fix/jgf-6-audit-corrections"]` to `false` before the first push.
-This exact-branch rule suppresses automatic previews; unspecified branches, including main and
-Sentry's branch, retain their defaults. See [Vercel's Git configuration](https://vercel.com/docs/project-configuration/git-configuration#git.deploymentenabled).
-No workflow, project setting, secret or branch-protection rule was changed.
+At the original audit head `40023fa4`, no merge or deployment command had been run.
+The temporary exact-branch Vercel guard suppressed automatic previews during review.
+On 3 November 2026 the maintainer subsequently authorised removal of that guard, merge after
+successful final checks, normal Vercel production deployment and live smoke verification.
+The guard has now been removed; `vercel.json` matches main, with existing redirects and install
+settings preserved. No workflow, provider project setting, secret or branch-protection rule changed.
+Sentry PR #164 remains untouched and must move to v5.2.7 after this v5.2.6 PR merges.
+The original test/review evidence below remains labelled to its audited source snapshot.
+
+The pre-merge Next.js advisory check reopened the official blog, advance notice and repository
+security advisories. At this check the latest published advisories were dated 14 October 2026;
+no November advisory or applicable newly published fix was available. The 3 November release
+was still an advance notice. No dependency upgrade was made. Repeat this check before merge;
+the advance notice is not evidence that unpublished advisories are irrelevant.
+
+Production status and live verification must be recorded against the eventual merge SHA and
+actual deployment after those actions complete; the original local evidence is not production proof.
 
 ## Scope and independent verification
 

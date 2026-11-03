@@ -1,9 +1,4 @@
 {
-  "git": {
-    "deploymentEnabled": {
-      "fix/jgf-6-audit-corrections": false
-    }
-  },
   "installCommand": "bun install --frozen-lockfile",
   "redirects": [
     {
