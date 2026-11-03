@@ -10,15 +10,17 @@ Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
   // Environment-specific configuration
-  environment: process.env.NODE_ENV,
-  release: process.env.VERCEL_GIT_COMMIT_SHA || 'development',
+  environment: process.env.VERCEL_ENV || process.env.NODE_ENV,
 
   dataCollection: SENTRY_DATA_COLLECTION,
   attachStacktrace: false,
   tracesSampleRate: 0,
 
-  // Do not attach arbitrary properties from caught Error objects.
-  integrations: [],
+  // Current Edge defaults have no session producer; keep that invariant explicit.
+  integrations: (defaults) =>
+    defaults.filter(
+      (integration) => !['ProcessSession', 'BrowserSession'].includes(integration.name),
+    ),
 
   // Enable debug mode in development
   debug: process.env.NODE_ENV === 'development',

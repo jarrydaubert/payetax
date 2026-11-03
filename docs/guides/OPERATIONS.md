@@ -23,6 +23,51 @@ bun run build:ci
 
 Use `bun run build:release` only for release validation that needs Sentry source maps. Vercel production should keep using `bun run build`; production source-map behaviour is controlled by env and `next.config.ts`.
 
+## Sentry Error Monitoring And Source Maps
+
+Next.js discovers `src/instrumentation.ts` and `src/instrumentation-client.ts` alongside
+`src/app`. The server hook loads the Node or Edge config and forwards only monitored request
+paths to `captureRequestError`, retaining sanitisation and the SDK's serverless flush handling.
+Automatic sessions are disabled: filter `BrowserSession` and Node's `ProcessSession`, and
+replace Node's default `Http` integration with `httpIntegration` configured with
+`sessions: false`, `spans: false` and `disableIncomingRequestSpans: true`.
+Current Edge defaults have no session producer.
+Tracing and replay remain disabled. The financial-data and monitored-route policies still apply.
+
+`next.config.ts` inlines the non-secret `VERCEL_ENV` deployment label for all bundles, falling
+back to `NODE_ENV` outside Vercel. This needs no new provider variable. Confirm Preview and
+Production labels after deployment; if Vercel does not expose its system variables, correct that
+provider setting only with separate approval. The SDK uses one shared build release identifier:
+Vercel's commit SHA, or `payetax@<package version>` locally.
+
+Production Vercel builds with an auth token enable source maps by default; the existing
+`PAYETAX_ENABLE_SENTRY_SOURCEMAPS` override still takes precedence. Local/CI builds skip uploads.
+With Next.js 16.4.3 and Sentry 11.10.0, `useRunAfterProductionCompileHook` consolidates uploads
+after compilation (supported since Next.js 15.4.1). The installed SDK uploads the server and
+browser directories in that phase. Release creation, finalisation, commit association, deployment
+notifications and build plugin telemetry are disabled. `release.deploy: false` is explicit because
+the SDK otherwise infers deployment calls from Vercel even with release creation disabled.
+Events retain release correlation; Sentry's explicit release
+finalisation times and commit metadata are no longer populated by these builds.
+
+Only recognised CLI source-map upload failures emit a safe warning and allow the build to
+continue. Other integration/configuration errors fail the build. Browser maps are deleted
+after the attempt, including failed uploads; a separate post-hook check rejects the build if
+any public `.map` remains or cleanup cannot be verified. The SDK can swallow individual deletion
+errors, so its successful return alone is insufficient. Failed cleanup output must not deploy.
+Server maps remain outside public assets. This reduces duplicated work but still awaits the
+uploader's network attempts and does not impose a
+total timeout. During an outage, deployability takes priority over readable source-mapped stacks.
+The upload-error classifier verifies the installed adapter's module path and supports its Node
+and Bun stack-frame formats. Run both offline harnesses under both runtimes when changing it.
+Do not assume legacy `sentry-cli` timeout variables control Sentry 11's newer `sentry` CLI adapter.
+An emergency provider-side `PAYETAX_ENABLE_SENTRY_SOURCEMAPS=false` override requires separate
+approval and sacrifices maps while preserving error capture.
+
+After an approved deployment, complete the [Observability acceptance work](../BACKLOG.md#verification).
+Use synthetic, non-financial events without adding permanent error endpoints. Local checks do
+not prove ingestion or production symbolication.
+
 ## Version Policy And Tagging
 
 `package.json` is the source of truth for the app version. The existing footer and Compliance
@@ -194,7 +239,12 @@ namespace under the same rule. Other values, rules and paths remain scanned, inc
 findings in these files. Temporary exports and redacted reports are
 removed after the check.
 
-The old Linear integration is retired. No replacement key or workspace is required for PayeTax.
+The old in-app Linear API integration is retired. No replacement in-app key is required.
+The native Sentry → Linear integration is a separate provider-side workflow, with GitHub PR
+linking through Linear's existing GitHub integration. Link the investigation issue in the PR;
+do not create a duplicate GitHub issue or an app webhook. New production error groups should
+create one Linear ticket; investigate existing linked groups rather than creating per-event
+tickets. Verify native status/link propagation before claiming the workflow complete.
 For the historical exposure and outstanding owner-side revocation/alert actions, see the
 [21 October 2026 incident record](../reports/linear-credential-retirement-2026-10-21.md).
 Removing code or closing a GitHub alert does not revoke a key at its provider.

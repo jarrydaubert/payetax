@@ -1,12 +1,16 @@
 import type { Event } from '@sentry/nextjs';
 import * as Sentry from '@sentry/nextjs';
 import { render, screen } from '@testing-library/react';
+import { onRequestError } from '@/instrumentation';
 import { sanitizeSentryEvent } from '@/lib/sentryPrivacy';
-import { onRequestError } from '../../../../instrumentation';
 import { ErrorBoundary } from '../ErrorBoundary';
 import { ErrorState } from '../ErrorState';
 
-jest.mock('@sentry/nextjs', () => ({ captureException: jest.fn(), withScope: jest.fn() }));
+jest.mock('@sentry/nextjs', () => ({
+  captureException: jest.fn(),
+  captureRequestError: jest.fn(),
+  withScope: jest.fn(),
+}));
 
 function FailedChild(): never {
   throw new Error('Technical boundary failure');
@@ -44,6 +48,9 @@ describe('production Sentry diagnostic producers', () => {
         setLevel: jest.fn(),
       });
     });
+    jest.mocked(Sentry.captureRequestError).mockImplementation((error) => {
+      Sentry.captureException(error);
+    });
   });
 
   it('keeps the ErrorState digest shown to a user and its boundary tag', () => {
@@ -79,8 +86,13 @@ describe('production Sentry diagnostic producers', () => {
     async (routerKind) => {
       await onRequestError(
         new Error('Technical request failure'),
-        { path: '/tools/director-guide?salary=73123#email' },
-        { routerKind },
+        { path: '/tools/director-guide?salary=73123#email', method: 'GET', headers: {} },
+        {
+          routerKind,
+          routePath: '/tools/director-guide',
+          routeType: 'render',
+          revalidateReason: undefined,
+        },
       );
       expect(reported[0]?.tags).toEqual({
         router_kind: routerKind,

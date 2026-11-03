@@ -1,5 +1,8 @@
 jest.mock('@sentry/nextjs/config', () => ({
-  withSentryConfig: (config: unknown) => config,
+  withSentryConfig: (config: object) => ({
+    ...config,
+    compiler: { runAfterProductionCompile: async () => {} },
+  }),
 }));
 
 jest.mock('@next/bundle-analyzer', () => () => (config: unknown) => config);
@@ -185,14 +188,70 @@ describe('next.config Sentry options', () => {
       expect.objectContaining({
         widenClientFileUpload: false,
         release: {
+          name: expect.any(String),
           create: false,
           finalize: false,
+          setCommits: false,
+          deploy: false,
         },
         sourcemaps: {
           disable: true,
         },
       }),
     );
+  });
+
+  it('fails closed for unclassified build errors without logging raw CLI errors', async () => {
+    const { sentryConfigOptions } = await import('../../../next.config');
+    const warn = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      expect(() => sentryConfigOptions.errorHandler(new Error('private build context'))).toThrow(
+        '[Sentry] Unexpected build integration failure; refusing to continue.',
+      );
+      expect(warn).not.toHaveBeenCalled();
+      expect(sentryConfigOptions.telemetry).toBe(false);
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it('inlines the public Vercel deployment label for browser errors', async () => {
+    jest.resetModules();
+    jest.replaceProperty(process, 'env', { ...process.env, VERCEL_ENV: 'preview' });
+    try {
+      const { default: nextConfig } = await import('../../../next.config');
+      expect(nextConfig.env?.VERCEL_ENV).toBe('preview');
+    } finally {
+      jest.restoreAllMocks();
+      jest.resetModules();
+    }
+  });
+
+  it('consolidates release builds after compilation without release-management requests', async () => {
+    jest.resetModules();
+    jest.replaceProperty(process, 'env', {
+      ...process.env,
+      PAYETAX_ENABLE_SENTRY_SOURCEMAPS: 'true',
+      VERCEL_GIT_COMMIT_SHA: 'test-commit-sha',
+      VERCEL: '1',
+      VERCEL_ENV: 'preview',
+    });
+    try {
+      const { sentryConfigOptions } = await import('../../../next.config');
+      expect(sentryConfigOptions.useRunAfterProductionCompileHook).toBe(true);
+      expect(sentryConfigOptions.release).toEqual({
+        name: 'test-commit-sha',
+        create: false,
+        finalize: false,
+        setCommits: false,
+        deploy: false,
+      });
+      expect(sentryConfigOptions.sourcemaps).toEqual({ deleteSourcemapsAfterUpload: true });
+      expect(sentryConfigOptions.widenClientFileUpload).toBe(true);
+    } finally {
+      jest.restoreAllMocks();
+      jest.resetModules();
+    }
   });
 
   it('enables Sentry source maps for production Vercel builds with an auth token', async () => {

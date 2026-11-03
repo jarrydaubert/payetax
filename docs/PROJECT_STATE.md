@@ -113,11 +113,15 @@ preserve review history and superseded decisions.
 
 ## Post-release follow-ups
 
-The next focused task is basic Sentry error reporting: the root instrumentation files are outside
-`src/` beside a `src/app` application, and normal hook discovery remains broken. Hook registration,
-deployed Node compatibility and live event delivery need verification while preserving existing
-privacy filters and zero trace/replay sampling. See [Verification](BACKLOG.md#verification) for
-this defect and the separately tracked pension-help focus race. The maintainer-reported input-panel
+v5.2.6 restores Sentry's `src/` instrumentation entrypoints and SDK request-error handling,
+removes automatic browser/process/request session reporting, derives environment labels from
+Vercel and moves best-effort source-map uploads after compilation without release-management
+API calls. Local checks confirm hook emission, sanitised SDK envelopes and fail-closed cleanup
+verification; Vercel is configured for compatible Node 24.x.
+Actual event delivery, environment labels and production source maps remain unverified until an
+approved deployment. The [verification record](reports/sentry-reliability-2026-11-02/README.md)
+records the evidence and trade-offs; [Verification](BACKLOG.md#verification) retains the live
+acceptance work and the separate pension-help focus race. The maintainer-reported input-panel
 layout problems (cramped checkbox row, inconsistent field widths, desktop padding and mobile
 one-line/two-line rows) are a separate calculator follow-up in the [backlog](BACKLOG.md#active).
 
