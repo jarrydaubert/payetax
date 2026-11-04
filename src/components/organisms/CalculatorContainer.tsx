@@ -395,7 +395,7 @@ export function CalculatorContainer() {
       className={cn(
         'order-2 mx-auto w-full max-w-xl xl:col-span-2 xl:mx-0 xl:max-w-none xl:self-start min-[112.5rem]:sticky min-[112.5rem]:top-[calc(var(--navbar-height)+1rem)] min-[112.5rem]:order-3 min-[112.5rem]:col-span-1',
         'p-3',
-        'sm:p-4 md:p-6',
+        'sm:p-4 md:p-6 xl:p-8',
       )}
     >
       <CalculatorInputsSection

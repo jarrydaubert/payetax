@@ -110,7 +110,7 @@ describe('BasicInputs Component', () => {
       render(<BasicInputs />);
       expect(screen.getByText('Married')).toBeInTheDocument();
       expect(screen.getByText('Blind')).toBeInTheDocument();
-      expect(screen.getByText('No NI')).toBeInTheDocument();
+      expect(screen.getByRole('checkbox', { name: 'I pay no NI' })).toBeInTheDocument();
     });
 
     it('should render age dropdown', () => {
