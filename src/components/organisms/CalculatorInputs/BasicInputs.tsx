@@ -176,18 +176,18 @@ export function BasicInputs() {
     setStudentLoanPlans([undergraduateLoan, 'postgrad']);
   };
 
+  // Stack labels on mobile and in desktop grid/rail cells; tablets share a label column.
   const fieldRowClass = cn(
-    'flex flex-col items-start sm:grid sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center',
+    'grid min-w-0 grid-cols-1 items-start sm:grid-cols-[13rem_minmax(0,1fr)] sm:items-center xl:grid-cols-1 xl:items-start',
     'gap-2',
     'sm:gap-3',
   );
   const fieldLabelClass = cn('flex min-w-0 items-center', 'gap-1.5');
-  const fieldControlClass = 'min-w-0 justify-self-start';
-  const selectControlClass = cn(fieldControlClass, 'w-44 max-w-full');
-  const longSelectControlClass = cn(fieldControlClass, 'w-full max-w-64');
-  const numericControlClass = cn(fieldControlClass, 'w-36 max-w-full');
+  const fieldControlClass = 'min-w-0 w-full';
+  const checkboxRowClass = 'flex min-h-11 items-center gap-2';
+  const checkboxLabelClass =
+    'inline-flex min-h-11 cursor-pointer items-center whitespace-nowrap text-sm';
   const fullWidthInputClass = 'w-full';
-  const flexInputWrapperClass = numericControlClass;
 
   /**
    * Normalize tax code input:
@@ -204,7 +204,7 @@ export function BasicInputs() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className='space-y-3 xl:grid xl:grid-cols-3 xl:items-start xl:space-y-0 xl:gap-x-6 xl:gap-y-4 min-[112.5rem]:block min-[112.5rem]:space-y-3'
+      className='space-y-4 xl:grid xl:grid-cols-3 xl:items-start xl:space-y-0 xl:gap-x-8 xl:gap-y-4 min-[112.5rem]:block min-[112.5rem]:space-y-4'
     >
       {/* Heading */}
       <h3 className={cn('font-semibold text-foreground xl:col-span-3', 'text-base', 'sm:text-lg')}>
@@ -222,7 +222,7 @@ export function BasicInputs() {
         <div
           className={cn(
             fieldControlClass,
-            'grid w-full max-w-full grid-cols-[minmax(0,1fr)_7.5rem] items-start sm:w-[17rem]',
+            'grid grid-cols-[minmax(0,1fr)_7.5rem] items-start',
             'gap-2',
           )}
         >
@@ -278,7 +278,7 @@ export function BasicInputs() {
           value={input.taxYear}
           onChange={setTaxYear}
           label=''
-          className={selectControlClass}
+          className={fieldControlClass}
           data-testid='tax-year-select'
         />
       </div>
@@ -291,7 +291,7 @@ export function BasicInputs() {
             Tax Code
           </Label>
         </div>
-        <div className='w-full'>
+        <div className={fieldControlClass}>
           <Input
             id={taxCodeId}
             type='text'
@@ -299,7 +299,7 @@ export function BasicInputs() {
             onChange={handleTaxCodeChange}
             onFocus={() => trackCalculatorFieldFocus('tax_code')}
             placeholder={input.region === 'Scotland' ? 'S1257L' : '1257L'}
-            className={cn(fieldControlClass, 'w-full max-w-full font-mono uppercase sm:w-52')}
+            className='w-full font-mono uppercase'
             maxLength={TAX_CODE_MAX_LENGTH}
             data-testid='tax-code-input'
           />
@@ -321,7 +321,7 @@ export function BasicInputs() {
         <Select value={input.region} onValueChange={setRegion}>
           <SelectTrigger
             id={regionId}
-            className={selectControlClass}
+            className={fieldControlClass}
             aria-labelledby={regionLabelId}
             data-testid='region-select'
           >
@@ -337,13 +337,13 @@ export function BasicInputs() {
         </Select>
       </div>
 
-      {/* 3 Checkboxes on 1 row: Married, Blind, I pay no NI */}
-      <fieldset className='border-0 p-0'>
+      {/* Keep each help/label/checkbox together; wrap whole groups when space is limited. */}
+      <fieldset className='min-w-0 border-0 p-0'>
         <legend className='sr-only'>Tax allowances and exemptions</legend>
-        <div className='flex flex-wrap items-center gap-x-4 gap-y-3 sm:flex-nowrap'>
-          <div className={fieldLabelClass}>
+        <div className='flex flex-wrap items-center gap-x-6 gap-y-2'>
+          <div className={checkboxRowClass}>
             <LabelTooltip fieldName='marriageAllowance' />
-            <Label htmlFor={marriedId} className={cn('whitespace-nowrap', 'text-sm')}>
+            <Label htmlFor={marriedId} className={checkboxLabelClass}>
               Married
             </Label>
             <Checkbox
@@ -354,9 +354,9 @@ export function BasicInputs() {
             />
           </div>
 
-          <div className={fieldLabelClass}>
+          <div className={checkboxRowClass}>
             <LabelTooltip fieldName='blindAllowance' />
-            <Label htmlFor={blindId} className={cn('whitespace-nowrap', 'text-sm')}>
+            <Label htmlFor={blindId} className={checkboxLabelClass}>
               Blind
             </Label>
             <Checkbox
@@ -366,9 +366,9 @@ export function BasicInputs() {
             />
           </div>
 
-          <div className={fieldLabelClass}>
+          <div className={checkboxRowClass}>
             <LabelTooltip fieldName='payNoNI' />
-            <Label htmlFor={payNoNIId} className={cn('whitespace-nowrap', 'text-sm')}>
+            <Label htmlFor={payNoNIId} className={checkboxLabelClass}>
               No NI
             </Label>
             <Checkbox
@@ -401,7 +401,7 @@ export function BasicInputs() {
             placeholder='0.00'
             min={0}
             max={PARTNER_WAGE_MAX}
-            wrapperClassName={flexInputWrapperClass}
+            wrapperClassName={fieldControlClass}
             className={fullWidthInputClass}
             data-testid='partner-salary-input'
           />
@@ -409,7 +409,7 @@ export function BasicInputs() {
       )}
 
       {/* Age - Dropdown for State Pension Age (affects NI) */}
-      <div className={cn(fieldRowClass, 'mt-4 xl:mt-0 min-[112.5rem]:mt-4')}>
+      <div className={fieldRowClass}>
         <div className={cn(fieldLabelClass, 'sm:whitespace-nowrap')}>
           <LabelTooltip fieldName='age' />
           <Label id={ageLabelId} htmlFor={ageId} className={cn('whitespace-nowrap', 'text-sm')}>
@@ -431,7 +431,7 @@ export function BasicInputs() {
         >
           <SelectTrigger
             id={ageId}
-            className={longSelectControlClass}
+            className={fieldControlClass}
             data-testid='age-select'
             aria-labelledby={ageLabelId}
           >
@@ -460,7 +460,7 @@ export function BasicInputs() {
           <Select value={undergraduateLoan} onValueChange={handleUndergraduateLoanChange}>
             <SelectTrigger
               id={studentLoanId}
-              className={longSelectControlClass}
+              className={fieldControlClass}
               aria-labelledby={studentLoanLabelId}
               data-testid='student-loan-select'
             >
@@ -478,14 +478,17 @@ export function BasicInputs() {
 
         {/* Conditional: Show postgraduate add-on if undergraduate loan selected */}
         {undergraduateLoan !== 'none' && undergraduateLoan !== 'postgrad' && (
-          <div className={cn('flex items-center', 'gap-2', 'sm:pl-6')}>
+          <div className='flex min-h-11 items-center gap-2 sm:pl-[13.75rem] xl:pl-0'>
             <Checkbox
               id={postgraduateAddonId}
               checked={hasPostgraduateAddOn}
               onCheckedChange={handlePostgraduateToggle}
               data-testid='postgraduate-addon-checkbox'
             />
-            <Label htmlFor={postgraduateAddonId} className={cn('cursor-pointer', 'text-sm')}>
+            <Label
+              htmlFor={postgraduateAddonId}
+              className='flex min-h-11 cursor-pointer items-center text-sm'
+            >
               I also have a Postgraduate Loan
             </Label>
           </div>
@@ -513,14 +516,14 @@ export function BasicInputs() {
           placeholder='0.00'
           min={0}
           max={ALLOWANCES_MAX}
-          wrapperClassName={flexInputWrapperClass}
+          wrapperClassName={fieldControlClass}
           className={fullWidthInputClass}
           data-testid='non-taxable-allowances-input'
         />
       </div>
 
       {/* Pension - Combined Type + Amount on 1 row */}
-      <div className='flex flex-col items-start gap-2'>
+      <div className={fieldRowClass}>
         <div className={fieldLabelClass}>
           <LabelTooltip fieldName='pensionContribution' />
           <Label htmlFor={pensionId} className='text-sm leading-tight'>
@@ -530,7 +533,7 @@ export function BasicInputs() {
         <div
           className={cn(
             fieldControlClass,
-            'grid w-full max-w-[15rem] grid-cols-[4.75rem_minmax(0,1fr)] items-start sm:grid-cols-[5rem_minmax(0,1fr)]',
+            'grid grid-cols-[4.75rem_minmax(0,1fr)] items-start sm:grid-cols-[5rem_minmax(0,1fr)]',
             'gap-1.5',
           )}
         >
