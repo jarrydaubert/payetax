@@ -10,11 +10,9 @@ It is not a commercial growth site. Keep the product useful, accurate, and simpl
 
 ## Read First
 
-1. Read [work management](docs/guides/WORK_MANAGEMENT.md) for shared Ready/Done, evidence and PR-linking rules.
-2. Open the assigned issue in the [PayeTax Linear project](https://linear.app/jgf-projects/project/payetax-ecec16170865), workspace **JGF Projects**, team **JGF Projects** (key **JGF**). Linear owns planned work, priorities, dependencies, issue-specific acceptance criteria and progress.
-3. Read [product direction](docs/business/PRODUCT_DIRECTION.md), [system ownership](docs/guides/SYSTEM_OVERVIEW.md) and the [testing guide](docs/guides/TESTING.md) for the affected area. GitHub owns engineering standards, architectural decisions, statutory fixture provenance and independently reviewable implementation evidence.
-4. If Linear is unavailable, ask the maintainer for the issue text, acceptance criteria, dependencies and current priority; do not guess missing scope or use retired repository documents as a queue. Repository engineering guidance remains usable without Linear.
-5. Follow dated reports and PRs for historical evidence; verify statutory truth against canonical policy data and current primary official sources. For **blog writing or review**, also follow `docs/blog/README.md` and its combined accuracy/readability standard.
+1. Open the assigned issue in the [PayeTax Linear project](https://linear.app/jgf-projects/project/payetax-ecec16170865); one clear sentence describing “done” suffices for routine work.
+2. Inspect the affected code and tests, then consult only relevant guides: [work management](docs/guides/WORK_MANAGEMENT.md), [testing](docs/guides/TESTING.md), [operations](docs/guides/OPERATIONS.md), [product direction](docs/business/PRODUCT_DIRECTION.md), or [blog](docs/blog/README.md).
+3. If Linear is unavailable and scope was not supplied, ask for a brief outcome. Dated reports are historical; check statutory claims against primary sources.
 
 ## Engineering Approach
 
@@ -30,7 +28,7 @@ Tax correctness, security, privacy, user-data integrity and evidence-backed publ
 
 Match verification effort to risk. Financial correctness, security and consequential user interactions require stronger evidence than routine changes.
 
-Report what changed, what passed, what remains unverified and any meaningful trade-offs. Obtain independent review before merging. Merge and deployment each require explicit maintainer approval; passing checks or review does not grant it.
+Summarise changes, checks and meaningful limitations in the PR. Use the risk-based review rule below. Merge and deployment each require explicit maintainer approval.
 
 ## Scope Guardrails
 
@@ -100,7 +98,7 @@ If a Vercel CLI command cannot retrieve project settings, follow `docs/guides/OP
 - Keep docs aligned with code in the same change.
 - For production-facing PRs, bump `package.json` using the [SemVer policy](docs/guides/OPERATIONS.md#version-policy-and-tagging) and state the category in the PR. Run `bun run check-version --base origin/main` after fetching `main`; cache names are independent of app versions.
 - Keep evergreen docs useful and stable; put dated run evidence in PRs or `docs/reports/*`.
-- Evidence relied upon for a PR must be committed under `docs/reports/` or attached to the PR; it must not be available exclusively through a local or scratch path. If raw artifacts are too large or sensitive, preserve a useful summary and a SHA-256 hash of the original artifact in the report or PR attachment, without committing sensitive data. Distinguish independently accessible results from maintainer reports and record the relevant ref, command and limitations.
+- The PR, diff and CI are the normal record. Do not create separate evidence reports, hashes or Linear completion narratives by default; attach specialist evidence only when it materially helps review, without exposing sensitive data.
 - Verify commands before claiming they pass.
 - When touching frontend UI, inspect and interact with the changed route locally as required by the verification skill; report blocked checks rather than claiming completion.
 - For email, privacy, security, and tax claims, confirm the implementation before changing wording.
@@ -116,21 +114,11 @@ If a Vercel CLI command cannot retrieve project settings, follow `docs/guides/OP
 
 ## Pull Request Expectations
 
-Every implementation slice and non-trivial agent-guidance change requires fresh-context independent review by the **other model**: Claude reviews Codex changes and Codex reviews Claude changes. The reviewer must not have written the change. Reconcile findings against primary evidence and code, address or explicitly defer them, and obtain re-review after material fixes. An issue omitting this rule does not waive it; if the other-model review is unavailable, report the gap and do not merge.
+**Verify in proportion to risk; don't duplicate GitHub evidence in Linear.** The tier is based on affected code and behaviour, not the implementing agent's opinion.
 
-Use the review capability available in the client; no particular slash command is required. The [correctness-critical workflow](docs/guides/WORK_MANAGEMENT.md#correctness-critical-review) adds source and arithmetic reconciliation for consequential work.
+- **Tier 1 — other-model review required:** executable tax/Director calculations, rates, financial outputs, user-input validation, APIs/email, security/privacy, storage, Sentry/analytics, dependencies and release/CI/deployment controls. These include `src/lib/tax/**`, `src/constants/taxRates.ts`, financial stores, `src/lib/security/**`, `src/lib/validation/**`, `src/app/api/**`, `src/lib/sentry*`, `.github/workflows/**`, `vercel.json` and related owners. Changes to published tax/financial/legal facts are also Tier 1 regardless of path.
+- **Tier 2 — relevant checks and CI; review optional:** routine docs, non-statutory copy, styling and layout. Comment-only edits in protected source files are Tier 2 only when they cannot change behaviour, config, tests or consequential factual claims. Mixed-scope work is Tier 1.
 
-For code changes, report:
+For Tier 1, Claude reviews Codex work and Codex reviews Claude work. Re-review only after substantive changes to logic or safety. Changed financial results need independently grounded test expectations; reuse existing verified fixtures where adequate.
 
-- what changed
-- commands run
-- pass/fail status
-- review findings addressed or deferred
-- any unverified follow-up
-
-For CI, docs, or repo-control changes, report:
-
-- workflows or checks affected
-- branch-protection implications
-- environment or secret changes
-- why the change is a practical safety net rather than scaffolding
+Open a focused PR with changes, checks and meaningful limitations. CI, diff and PR discussion suffice; no review transcripts, dated reports or separate administrative sign-offs by default. Stop for the maintainer's explicit merge permission; never auto-merge or deploy.
