@@ -14,6 +14,7 @@ import type { TaxYear } from '@/constants/taxRates';
 jest.mock('@/lib/sentry', () => ({
   addBreadcrumb: jest.fn(),
   captureCalculatorError: jest.fn(),
+  captureCalculatorAnomaly: jest.fn(),
   captureValidationError: jest.fn(),
   setContext: jest.fn(),
   startPerformanceTransaction: jest.fn(() => ({

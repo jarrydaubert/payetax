@@ -68,6 +68,21 @@ After an approved deployment, complete the actual remaining [Sentry acceptance o
 Use synthetic, non-financial events without adding permanent error endpoints. Local checks do
 not prove ingestion or production symbolication.
 
+Calculator correctness anomalies remain warnings and use
+`['calculator-anomaly', stage, stableSortedCodes]`, with sorted, deduplicated allowlisted
+technical codes only. PAYE and Director exception capture helpers use Sentry's default
+type/stack grouping and attach their fixed stage as diagnostic context. Only primary PAYE
+exceptions currently use the PAYE helper; previous-year and what-if throws keep their existing
+caller/global-handler paths without added stage context. Fingerprint changes affect new events
+only: they do not migrate old groups, resolutions or native Linear links. Existing linked
+tickets must not be recreated. Warning anomalies do not match the recorded first-seen/level >= error rule;
+new error-level PAYE and Director groups can match it and create one-time Linear tickets.
+Before rollout, JGF-5 owns the explicit decision on whether anomaly warnings should
+alert and the expected one-time new-group/Linear-ticket effects for anomalies, PAYE and Director
+exceptions. Preserve the existing native integration and production first-seen/error-level rule
+pending separately approved decisions;
+do not introduce a webhook or in-app Linear credential.
+
 ## Version Policy And Tagging
 
 `package.json` is the source of truth for the app version. The existing footer and Compliance

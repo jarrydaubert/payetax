@@ -165,7 +165,7 @@ describe('Director calculation failure Sentry envelopes', () => {
     expect(event.release).toBe('sentry-offline-verification');
     expect(event.tags).toEqual({ error_type: 'calculator', feature: 'director' });
     expect(event.contexts?.calculator).toEqual({ stage: 'director' });
-    expect(event.fingerprint).toEqual(['calculator-error', 'director']);
+    expect(event.fingerprint).toBeUndefined();
     expect(event.request?.url).toBe('https://payetax.test/tools/director-guide');
     expect(event.extra).toBeUndefined();
     expect(event.user).toBeUndefined();
@@ -249,7 +249,7 @@ describe('Director calculation failure Sentry envelopes', () => {
     store.setRegion('rUK');
     store.setRevenue(100000);
     store.setExpenses(20000);
-    // Same call path, so the two events have identical frames, text and fingerprint.
+    // Same call path, so the two events have identical default grouping inputs (frames/text).
     for (let attempt = 0; attempt < 2; attempt += 1) {
       useDirectorGuideStore.getState().calculate();
     }

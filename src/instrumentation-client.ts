@@ -10,7 +10,7 @@ import { isSentryMonitoredPath, shouldDropSentryEventForUnmonitoredPath } from '
 
 type Integration = Parameters<typeof Sentry.addIntegration>[0];
 
-// Director failures share fixed text, frames and fingerprint, so Dedupe would drop every
+// Director failures share fixed text and frames, so Dedupe would drop every
 // repeated failed attempt after the first. Other events keep the default consecutive dedupe.
 function exemptDirectorFailuresFromDedupe(integration: Integration): Integration {
   const { processEvent } = integration;

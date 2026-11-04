@@ -46,7 +46,13 @@ import {
 } from '@/lib/calculatorValidation';
 import { parseCurrencyInput } from '@/lib/currencyInput';
 import { safeStorage } from '@/lib/safeStorage';
-import { addBreadcrumb, captureCalculatorError, startPerformanceTransaction } from '@/lib/sentry';
+import {
+  addBreadcrumb,
+  type CalculationAnomalyCode,
+  captureCalculatorAnomaly,
+  captureCalculatorError,
+  startPerformanceTransaction,
+} from '@/lib/sentry';
 import {
   calculateTax,
   isTaxCodeEditCandidate,
@@ -284,12 +290,6 @@ const getCurrentTaxYear = (): TaxYear => {
   return resolveTaxYear(candidate);
 };
 
-type CalculationAnomalyCode =
-  | 'non_finite_value'
-  | 'negative_component'
-  | 'invalid_effective_rate'
-  | 'negative_net_pay';
-
 interface CalculationAnomaly {
   code: CalculationAnomalyCode;
   detail: string;
@@ -448,10 +448,9 @@ const reportCalculationAnomalies = (
     },
   });
 
-  captureCalculatorError(
-    new Error(`Calculation anomaly detected (${source})`),
+  captureCalculatorAnomaly(
     { stage: source },
-    'warning',
+    anomalies.map((anomaly) => anomaly.code),
   );
 
   logCalculatorWarning('[Calculator] Calculation anomaly detected', {

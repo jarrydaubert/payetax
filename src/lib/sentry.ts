@@ -61,6 +61,39 @@ export interface CalculatorErrorContext {
   stage: 'primary' | 'previous_year' | 'what_if';
 }
 
+const CALCULATION_ANOMALY_CODES = [
+  'non_finite_value',
+  'negative_component',
+  'invalid_effective_rate',
+  'negative_net_pay',
+] as const;
+export type CalculationAnomalyCode = (typeof CALCULATION_ANOMALY_CODES)[number];
+
+/** Group correctness warnings by bounded technical codes, never by result values or fields. */
+export function captureCalculatorAnomaly(
+  context: CalculatorErrorContext,
+  codes: readonly unknown[],
+): string | undefined {
+  if (!['primary', 'previous_year', 'what_if'].includes(context.stage)) return undefined;
+  const stableSortedCodes = [
+    ...new Set(
+      codes.filter((code): code is CalculationAnomalyCode =>
+        CALCULATION_ANOMALY_CODES.some((allowed) => code === allowed),
+      ),
+    ),
+  ]
+    .sort()
+    .join(',');
+  if (!stableSortedCodes) return undefined;
+
+  return Sentry.captureException(new Error(`Calculation anomaly detected (${context.stage})`), {
+    level: 'warning',
+    tags: { error_type: 'calculator' },
+    contexts: { calculator: { stage: context.stage } },
+    fingerprint: ['calculator-anomaly', context.stage, stableSortedCodes],
+  });
+}
+
 export interface ValidationErrorContext {
   /** Field that failed validation */
   field: string;
@@ -182,7 +215,6 @@ export function captureCalculatorError(
     level,
     tags: { error_type: 'calculator' },
     contexts: { calculator: { stage: context.stage } },
-    fingerprint: ['calculator-error', context.stage],
   });
 }
 
@@ -247,7 +279,6 @@ export function captureDirectorCalculationFailure(error: unknown): string | unde
       level: 'error',
       tags: { error_type: 'calculator', feature: 'director' },
       contexts: { calculator: { stage: 'director' } },
-      fingerprint: ['calculator-error', 'director'],
     });
   } catch {
     // Monitoring must never change the calculator's handled-error behaviour.
