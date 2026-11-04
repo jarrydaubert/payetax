@@ -395,7 +395,7 @@ export function CalculatorContainer() {
       className={cn(
         'order-2 mx-auto w-full max-w-xl xl:col-span-2 xl:mx-0 xl:max-w-none xl:self-start min-[112.5rem]:sticky min-[112.5rem]:top-[calc(var(--navbar-height)+1rem)] min-[112.5rem]:order-3 min-[112.5rem]:col-span-1',
         'p-3',
-        'sm:p-4 md:p-6 xl:p-8',
+        'sm:p-4 md:p-6 xl:p-8 min-[112.5rem]:p-6',
       )}
     >
       <CalculatorInputsSection
@@ -429,7 +429,7 @@ export function CalculatorContainer() {
   return (
     <div
       className={cn(
-        'paye-calculator mx-auto flex w-full max-w-[120rem] flex-col sm:px-4 md:py-8 xl:grid xl:grid-cols-[380px_minmax(0,1fr)] xl:px-8',
+        'paye-calculator mx-auto flex w-full max-w-[120rem] flex-col sm:px-4 md:py-8 xl:grid xl:grid-cols-[380px_minmax(0,1fr)] xl:px-8 min-[112.5rem]:grid-cols-[30rem_minmax(0,1fr)]',
         'gap-3',
         'px-4',
         'py-4',

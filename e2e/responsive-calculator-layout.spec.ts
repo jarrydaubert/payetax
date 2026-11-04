@@ -472,6 +472,7 @@ test.describe('Responsive calculator geometry', () => {
   for (const [width, height] of [
     [1280, 800],
     [1440, 900],
+    [1800, 1000],
     [1920, 1080],
     [2560, 1440],
   ]) {

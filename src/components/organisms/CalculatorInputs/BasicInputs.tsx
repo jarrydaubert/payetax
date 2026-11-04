@@ -176,14 +176,17 @@ export function BasicInputs() {
     setStudentLoanPlans([undergraduateLoan, 'postgrad']);
   };
 
-  // Stack labels on mobile and in desktop grid/rail cells; tablets share a label column.
+  // Stack on mobile; otherwise share a label column and size controls to their content.
   const fieldRowClass = cn(
-    'grid min-w-0 grid-cols-1 items-start sm:grid-cols-[13rem_minmax(0,1fr)] sm:items-center xl:grid-cols-1 xl:items-start',
-    'gap-2',
+    'grid min-w-0 grid-cols-1 items-start sm:grid-cols-[var(--label-w)_minmax(0,1fr)] sm:items-center',
+    'gap-1.5',
     'sm:gap-3',
   );
   const fieldLabelClass = cn('flex min-w-0 items-center', 'gap-1.5');
-  const fieldControlClass = 'min-w-0 w-full';
+  const fieldControlClass = 'min-w-0 w-full max-w-full justify-self-start';
+  const amountControlClass = cn(fieldControlClass, 'sm:w-40');
+  const selectControlClass = cn(fieldControlClass, 'sm:w-56');
+  const pairedControlClass = cn(fieldControlClass, 'sm:w-[17rem]');
   const checkboxRowClass = 'flex min-h-11 items-center gap-2';
   const checkboxLabelClass =
     'inline-flex min-h-11 cursor-pointer items-center whitespace-nowrap text-sm';
@@ -204,10 +207,10 @@ export function BasicInputs() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className='space-y-4 xl:grid xl:grid-cols-3 xl:items-start xl:space-y-0 xl:gap-x-8 xl:gap-y-4 min-[112.5rem]:block min-[112.5rem]:space-y-4'
+      className='space-y-3 [--label-w:10rem] xl:grid xl:grid-cols-2 xl:items-start xl:space-y-0 xl:gap-x-10 xl:gap-y-3 min-[112.5rem]:block min-[112.5rem]:space-y-3'
     >
       {/* Heading */}
-      <h3 className={cn('font-semibold text-foreground xl:col-span-3', 'text-base', 'sm:text-lg')}>
+      <h3 className={cn('font-semibold text-foreground xl:col-span-2', 'text-base', 'sm:text-lg')}>
         Enter Income Tax Details
       </h3>
 
@@ -221,7 +224,7 @@ export function BasicInputs() {
         </div>
         <div
           className={cn(
-            fieldControlClass,
+            pairedControlClass,
             'grid grid-cols-[minmax(0,1fr)_7.5rem] items-start',
             'gap-2',
           )}
@@ -278,7 +281,7 @@ export function BasicInputs() {
           value={input.taxYear}
           onChange={setTaxYear}
           label=''
-          className={fieldControlClass}
+          className={selectControlClass}
           data-testid='tax-year-select'
         />
       </div>
@@ -291,7 +294,7 @@ export function BasicInputs() {
             Tax Code
           </Label>
         </div>
-        <div className={fieldControlClass}>
+        <div className={amountControlClass}>
           <Input
             id={taxCodeId}
             type='text'
@@ -321,7 +324,7 @@ export function BasicInputs() {
         <Select value={input.region} onValueChange={setRegion}>
           <SelectTrigger
             id={regionId}
-            className={fieldControlClass}
+            className={selectControlClass}
             aria-labelledby={regionLabelId}
             data-testid='region-select'
           >
@@ -338,9 +341,9 @@ export function BasicInputs() {
       </div>
 
       {/* Keep each help/label/checkbox together; wrap whole groups when space is limited. */}
-      <fieldset className='min-w-0 border-0 p-0'>
+      <fieldset className='min-w-0 border-0 p-0 xl:col-span-2'>
         <legend className='sr-only'>Tax allowances and exemptions</legend>
-        <div className='flex flex-wrap items-center gap-x-6 gap-y-2'>
+        <div className='flex flex-wrap items-center gap-x-5 gap-y-2'>
           <div className={checkboxRowClass}>
             <LabelTooltip fieldName='marriageAllowance' />
             <Label htmlFor={marriedId} className={checkboxLabelClass}>
@@ -384,7 +387,7 @@ export function BasicInputs() {
         <div className={fieldRowClass}>
           <div className={fieldLabelClass}>
             <LabelTooltip fieldName='partnerGrossWage' />
-            <Label htmlFor={partnerWageId} className={cn('sm:whitespace-nowrap', 'text-sm')}>
+            <Label htmlFor={partnerWageId} className='text-sm'>
               Partner's Gross Wage
             </Label>
           </div>
@@ -401,7 +404,7 @@ export function BasicInputs() {
             placeholder='0.00'
             min={0}
             max={PARTNER_WAGE_MAX}
-            wrapperClassName={fieldControlClass}
+            wrapperClassName={amountControlClass}
             className={fullWidthInputClass}
             data-testid='partner-salary-input'
           />
@@ -431,7 +434,7 @@ export function BasicInputs() {
         >
           <SelectTrigger
             id={ageId}
-            className={fieldControlClass}
+            className={selectControlClass}
             data-testid='age-select'
             aria-labelledby={ageLabelId}
           >
@@ -460,7 +463,7 @@ export function BasicInputs() {
           <Select value={undergraduateLoan} onValueChange={handleUndergraduateLoanChange}>
             <SelectTrigger
               id={studentLoanId}
-              className={fieldControlClass}
+              className={selectControlClass}
               aria-labelledby={studentLoanLabelId}
               data-testid='student-loan-select'
             >
@@ -478,7 +481,7 @@ export function BasicInputs() {
 
         {/* Conditional: Show postgraduate add-on if undergraduate loan selected */}
         {undergraduateLoan !== 'none' && undergraduateLoan !== 'postgrad' && (
-          <div className='flex min-h-11 items-center gap-2 sm:pl-[13.75rem] xl:pl-0'>
+          <div className='flex min-h-11 items-center gap-2 sm:pl-[calc(var(--label-w)+0.75rem)]'>
             <Checkbox
               id={postgraduateAddonId}
               checked={hasPostgraduateAddOn}
@@ -499,7 +502,7 @@ export function BasicInputs() {
       <div className={fieldRowClass}>
         <div className={fieldLabelClass}>
           <LabelTooltip fieldName='allowancesDeductions' />
-          <Label htmlFor={allowancesId} className={cn('sm:whitespace-nowrap', 'text-sm')}>
+          <Label htmlFor={allowancesId} className='text-sm'>
             Non-taxable allowance(s)
           </Label>
         </div>
@@ -516,7 +519,7 @@ export function BasicInputs() {
           placeholder='0.00'
           min={0}
           max={ALLOWANCES_MAX}
-          wrapperClassName={fieldControlClass}
+          wrapperClassName={amountControlClass}
           className={fullWidthInputClass}
           data-testid='non-taxable-allowances-input'
         />
@@ -532,7 +535,7 @@ export function BasicInputs() {
         </div>
         <div
           className={cn(
-            fieldControlClass,
+            pairedControlClass,
             'grid grid-cols-[4.75rem_minmax(0,1fr)] items-start sm:grid-cols-[5rem_minmax(0,1fr)]',
             'gap-1.5',
           )}
@@ -606,7 +609,7 @@ export function BasicInputs() {
         </div>
       </div>
 
-      <div className='xl:col-span-3'>
+      <div className='xl:col-span-2'>
         <IncomeSourceList />
       </div>
     </motion.div>
