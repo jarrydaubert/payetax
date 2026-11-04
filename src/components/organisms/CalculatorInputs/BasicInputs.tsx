@@ -369,7 +369,7 @@ export function BasicInputs() {
           <div className={checkboxRowClass}>
             <LabelTooltip fieldName='payNoNI' />
             <Label htmlFor={payNoNIId} className={checkboxLabelClass}>
-              No NI
+              I pay no NI
             </Label>
             <Checkbox
               id={payNoNIId}
