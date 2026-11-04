@@ -186,6 +186,75 @@ export function captureCalculatorError(
   });
 }
 
+const DIRECTOR_CALCULATION_FAILURE_MESSAGE = 'Director calculation failed';
+const BUILT_IN_ERROR_TYPES = new Set([
+  'Error',
+  'TypeError',
+  'RangeError',
+  'ReferenceError',
+  'SyntaxError',
+  'EvalError',
+  'URIError',
+  'AggregateError',
+]);
+// Firefox/Safari frames (`fn@url:line:col`) never include the error message.
+const GECKO_FRAME_PATTERN = /^[^\s@]*@\S+:\d+:\d+$/;
+
+/** Marks the fixed Director diagnostic so the client can exempt it from consecutive-event dedupe. */
+export class DirectorCalculationFailure extends Error {}
+
+/**
+ * Return the original stack frames only when the message text can be removed exactly.
+ * V8 prefixes the stack with `name: message`, which may span lines and contain user values.
+ * Subclasses that assign `name` after construction keep the inherited `Error` prefix.
+ */
+function getSafeStackFrames(error: Error): string | undefined {
+  const { stack, name, message } = error;
+  if (typeof stack !== 'string' || typeof name !== 'string' || typeof message !== 'string') {
+    return undefined;
+  }
+  for (const prefix of new Set([name, 'Error'])) {
+    const header = message ? (prefix ? `${prefix}: ${message}` : message) : prefix;
+    if (stack.startsWith(`${header}\n`)) return stack.slice(header.length + 1);
+  }
+  const lines = stack.split('\n').filter(Boolean);
+  return lines.length > 0 && lines.every((line) => GECKO_FRAME_PATTERN.test(line))
+    ? lines.join('\n')
+    : undefined;
+}
+
+/**
+ * Capture a handled Director engine failure without forwarding the thrown value.
+ *
+ * The original message, properties and cause can contain financial inputs, so the event
+ * carries only fixed text, a built-in error type and the throw-site frames.
+ */
+export function captureDirectorCalculationFailure(error: unknown): string | undefined {
+  try {
+    const type =
+      error instanceof Error
+        ? BUILT_IN_ERROR_TYPES.has(error.name)
+          ? error.name
+          : 'Error'
+        : 'NonErrorThrow';
+    const failure = new DirectorCalculationFailure(DIRECTOR_CALCULATION_FAILURE_MESSAGE);
+    failure.name = type;
+    const frames = error instanceof Error ? getSafeStackFrames(error) : undefined;
+    failure.stack = `${type}: ${DIRECTOR_CALCULATION_FAILURE_MESSAGE}\n${
+      frames ?? failure.stack?.split('\n').slice(1).join('\n') ?? ''
+    }`;
+    return Sentry.captureException(failure, {
+      level: 'error',
+      tags: { error_type: 'calculator', feature: 'director' },
+      contexts: { calculator: { stage: 'director' } },
+      fingerprint: ['calculator-error', 'director'],
+    });
+  } catch {
+    // Monitoring must never change the calculator's handled-error behaviour.
+    return undefined;
+  }
+}
+
 /**
  * Log a validation error as a breadcrumb (NOT as an exception)
  *

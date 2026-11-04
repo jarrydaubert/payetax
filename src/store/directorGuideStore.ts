@@ -19,6 +19,7 @@ import {
   trackSafeDrawCalculated,
 } from '@/lib/directorGuideAnalytics';
 import { safeStorage } from '@/lib/safeStorage';
+import { captureDirectorCalculationFailure } from '@/lib/sentry';
 import { resolveTaxYear } from '@/lib/tax';
 import { calculateDirectorScenario } from '@/lib/tax/directorCalculator';
 import { calculateStrategyComparison, type StrategyComparison } from '@/lib/tax/strategyComparison';
@@ -836,6 +837,7 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
             });
           } catch (error) {
             console.error('Director calculation error:', error);
+            captureDirectorCalculationFailure(error);
             set({
               error: error instanceof Error ? error.message : 'Calculation failed',
               isCalculating: false,

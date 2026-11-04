@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
+import { DirectorCalculationFailure } from '@/lib/sentry';
 import { shouldDropClientSentryEvent } from '@/lib/sentryClientFilters';
 import {
   SENTRY_DATA_COLLECTION,
@@ -6,6 +7,22 @@ import {
   sanitizeSentryEvent,
 } from '@/lib/sentryPrivacy';
 import { isSentryMonitoredPath, shouldDropSentryEventForUnmonitoredPath } from '@/lib/sentryScope';
+
+type Integration = Parameters<typeof Sentry.addIntegration>[0];
+
+// Director failures share fixed text, frames and fingerprint, so Dedupe would drop every
+// repeated failed attempt after the first. Other events keep the default consecutive dedupe.
+function exemptDirectorFailuresFromDedupe(integration: Integration): Integration {
+  const { processEvent } = integration;
+  if (integration.name !== 'Dedupe' || !processEvent) return integration;
+  return {
+    ...integration,
+    processEvent: (event, hint, client) =>
+      hint.originalException instanceof DirectorCalculationFailure
+        ? event
+        : processEvent.call(integration, event, hint, client),
+  };
+}
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
@@ -21,9 +38,9 @@ Sentry.init({
   // intentionally disabled to keep Sentry scoped to calculator failures.
   integrations: (defaultIntegrations) => [
     // Sessions bypass beforeSend, so remove them in every environment.
-    ...defaultIntegrations.filter(
-      (integration) => !['Console', 'BrowserSession'].includes(integration.name),
-    ),
+    ...defaultIntegrations
+      .filter((integration) => !['Console', 'BrowserSession'].includes(integration.name))
+      .map(exemptDirectorFailuresFromDedupe),
     Sentry.breadcrumbsIntegration({
       dom: false, // Manual breadcrumbs avoid selectors containing financial labels
       fetch: true, // Track fetch requests
