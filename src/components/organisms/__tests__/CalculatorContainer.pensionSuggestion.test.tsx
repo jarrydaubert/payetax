@@ -85,7 +85,7 @@ describe('Tax-trap pension suggestion (mounted real inputs, store and engine)', 
     expect(useCalculatorStore.getState().input.pensionContribution).toBe(5);
     expect(useCalculatorStore.getState().input.pensionContributionType).toBe('percentage');
     expect(useCalculatorStore.getState().results).toBeNull();
-    expect(screen.getByRole('status')).toHaveTextContent('Inputs changed — Calculate again');
+    expect(screen.getByRole('status')).toHaveTextContent('Inputs changed, so results were cleared');
     expect(screen.getByRole('status')).not.toHaveTextContent('added to your annual pension');
   });
 

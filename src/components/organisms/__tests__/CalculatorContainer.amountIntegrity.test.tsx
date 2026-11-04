@@ -72,7 +72,9 @@ describe('Main calculator amount integrity (mounted)', () => {
     await typeInto(user, screen.getByTestId('pension-input'), '-5');
     await calculate(user);
     expect(screen.getByRole('alert')).toHaveTextContent('Pension');
-    expect(screen.getByRole('status')).toHaveTextContent('Inputs changed — Calculate again');
+    expect(screen.getByRole('status')).toHaveTextContent(
+      'Inputs changed, so results were cleared. Calculate again to update them.',
+    );
     expect(screen.getByRole('status')).toHaveAttribute('aria-live', 'polite');
     expect(screen.getByRole('status')).toHaveAttribute('aria-atomic', 'true');
     expect(screen.getByTestId('salary-input')).toHaveValue('30,000.00');
@@ -90,7 +92,7 @@ describe('Main calculator amount integrity (mounted)', () => {
     expect(resultsShown()).toBe(false);
     await calculate(user);
     expect(resultsShown()).toBe(true);
-    expect(screen.queryByText(/Inputs changed — Calculate again/)).toBeNull();
+    expect(screen.queryByText(/Inputs changed, so results were cleared/)).toBeNull();
   });
 
   it('updates the invalid submission summary as individual fields are corrected', async () => {

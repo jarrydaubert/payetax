@@ -312,7 +312,7 @@ test.describe('MC-03 input integrity @critical', () => {
       0,
     );
     await expect(emailAction(page)).toHaveCount(0);
-    await expect(page.getByText(/Inputs changed — Calculate again/)).toHaveCount(0);
+    await expect(page.getByText(/Inputs changed, so results were cleared/)).toHaveCount(0);
   });
 
   test('valid salary edit and blur require Calculate, then email matches the displayed inputs', async ({
@@ -329,7 +329,7 @@ test.describe('MC-03 input integrity @critical', () => {
     expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(30000);
     await typeAmount(salary, '40000');
     await expect(salary).toBeFocused();
-    await expect(page.getByRole('status')).toContainText('Inputs changed — Calculate again');
+    await expect(page.getByRole('status')).toContainText('Inputs changed, so results were cleared');
     await expect(page.getByRole('status')).toHaveAttribute('aria-live', 'polite');
     await expect(page.getByRole('heading', { name: 'Calculate again' })).toBeVisible();
     await expect(page.getByRole('region', { name: 'Tax calculation results summary' })).toHaveCount(
@@ -344,7 +344,7 @@ test.describe('MC-03 input integrity @critical', () => {
     expect(sent).toEqual([]);
     await page.getByTestId('calculate-button').press('Enter');
     expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(40000);
-    await expect(page.getByText(/Inputs changed — Calculate again/)).toHaveCount(0);
+    await expect(page.getByText(/Inputs changed, so results were cleared/)).toHaveCount(0);
     await emailAction(page).press('Enter');
     await page.getByLabel('Email address for results').fill('mc03@example.com');
     await page.getByRole('button', { name: /^Email Results$/ }).press('Enter');
@@ -377,7 +377,7 @@ test.describe('MC-03 input integrity @critical', () => {
     await expect(salary).toHaveAttribute('aria-invalid', 'true');
     await expect(salary).toHaveAccessibleDescription(/negative/i);
     await expect(salary).toHaveValue('-500');
-    await expect(page.getByRole('status')).toContainText('Inputs changed — Calculate again');
+    await expect(page.getByRole('status')).toContainText('Inputs changed, so results were cleared');
     await expect(page.getByTestId('tax-results')).toHaveCount(0);
     await expect(emailAction(page)).toHaveCount(0);
     await typeAmount(salary, '40000');
@@ -447,7 +447,7 @@ test.describe('MC-03 input integrity @critical', () => {
     await calculate.press('Enter');
     expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(40000);
     expect(await getYearlyTableValue(page, 'Pension')).toBe(2000);
-    await expect(page.getByText(/Inputs changed — Calculate again/)).toHaveCount(0);
+    await expect(page.getByText(/Inputs changed, so results were cleared/)).toHaveCount(0);
   });
 
   test('an already-open email form cannot send after a concurrent input edit', async ({ page }) => {
