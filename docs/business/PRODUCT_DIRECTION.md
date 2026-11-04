@@ -4,7 +4,7 @@ Owner: Product + Engineering
 
 This document is the strategic compass for PayeTax. Use it before audits, backlog planning, product ideas, marketing work, SEO reviews, and agent skill runs.
 
-It does not replace `docs/BACKLOG.md`. If something is open work, it belongs in the backlog. This document explains how to decide what should be there.
+Planned work, priorities and progress belong in the [PayeTax Linear project](https://linear.app/jgf-projects/project/payetax-ecec16170865). This document owns durable scope decisions and the filter for choosing work; it is not a delivery queue.
 
 ## Short Version
 
@@ -178,3 +178,31 @@ More is not automatically better. A smaller product that users trust beats a lar
 When in doubt, build toward this sentence:
 
 PayeTax is the UK take-home pay calculator that explains payroll reality.
+
+## Protected product and search contracts
+
+Trust has distinct layers: statutory correctness, explainability, independent verification and
+discoverability. Passing one does not prove the others. Source-backed explanations and visible
+assumptions must agree with deterministic results.
+
+- Do not migrate or consolidate retained salary-page URLs without new matched page/query evidence.
+- Protect the £70k article's answer-first, evidence-first pattern; reproduce a concrete defect
+  before changing it, rather than optimising a generic SEO or word-count score.
+- Preserve the Scottish calculator's distinct annual Income Tax comparison purpose unless an
+  explicit product decision changes it.
+- Never cite generated golden masters as independent statutory proof. Link canonical policy,
+  primary sources and reachable fixture workings instead of copying rate tables into prose.
+- Do not remove retired-route redirects, mass-delete/mass-`noindex` URLs or optimise crawl
+  budget without evidence tied to retained canonical pages. An indexed-URL count alone does
+  not establish traffic loss, cannibalisation or a crawl crisis.
+- Homepage changes with a search-protection gate require the unchanged live baseline and technical
+  checks before deployment, then separate post-recrawl measurement against predeclared windows
+  and investigation triggers. Missing evidence keeps the gate open; local tests prove neither
+  search protection nor production delivery.
+- Beginner-guide rewriting remains conditional on post-recrawl matched page/query evidence.
+  Do not conflate a justified contextual-link slice with permission for another content overhaul.
+
+Dated evidence lives in the
+[search audit](../reports/search-discoverability-evidence-audit-2026-08-23.md) and
+[high-value landing-page audit](../reports/high-value-organic-landing-pages-audit-2026-08-23.md).
+Their metrics, causal inferences and deployment observations are historical.

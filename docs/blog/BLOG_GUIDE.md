@@ -13,7 +13,7 @@ The blog is a public trust surface for the calculator. Treat every tax claim, de
 - Visual category styling currently lives in `src/constants/blogCategories.ts`; keep it aligned with `src/config/blog.config.ts` until the two sources are consolidated.
 - Featured images live in `public/images/blog/`.
 - Image workflow and prompt rules live in `docs/blog/IMAGE_WORKFLOW.md` and `docs/blog/ai-image-prompts.json`.
-- Open content work belongs in `docs/BACKLOG.md`, a GitHub issue, or the pull request description. Do not leave loose future-work notes in evergreen docs.
+- Open content work belongs in the [PayeTax Linear project](https://linear.app/jgf-projects/project/payetax-ecec16170865); the public PR restates the claimed acceptance criteria. Do not leave loose future-work notes in evergreen docs.
 
 ## Editorial Position
 
@@ -136,7 +136,7 @@ Use this workflow for audits, tax-year refreshes, or consistency passes:
 6. Rewrite prose against the voice guide, then update examples, metadata, disclaimer and internal links together. Keep material caveats close to claims; remove duplicative defensive text.
 7. Regenerate the featured image if the post image does not match the Ledger style in `docs/blog/IMAGE_WORKFLOW.md`.
 8. Update `updatedAt` only for meaningful factual refreshes.
-9. Record large refresh batches in `docs/BACKLOG.md`, a GitHub issue, or the PR description.
+9. Track selected refresh batches in Linear and restate their bounded scope and acceptance in the public PR.
 
 ## Accuracy and Readability Checklist
 

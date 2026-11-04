@@ -64,7 +64,7 @@ Do not assume legacy `sentry-cli` timeout variables control Sentry 11's newer `s
 An emergency provider-side `PAYETAX_ENABLE_SENTRY_SOURCEMAPS=false` override requires separate
 approval and sacrifices maps while preserving error capture.
 
-After an approved deployment, complete the [Observability acceptance work](../BACKLOG.md#verification).
+After an approved deployment, complete the actual remaining [Sentry acceptance on JGF-5](https://linear.app/jgf-projects/issue/JGF-5). Public PR/release evidence must identify the exact deployed ref and observed delivery/symbolication results; see [external completion](WORK_MANAGEMENT.md#merge-and-external-completion). A merge or tag alone cannot close this gate.
 Use synthetic, non-financial events without adding permanent error endpoints. Local checks do
 not prove ingestion or production symbolication.
 
@@ -164,13 +164,16 @@ non-blocking E2E and Vercel deployment behaviour are unchanged. Its guard tests 
 publication attempt and on PRs touching the release files:
 `node --test .github/scripts/release.test.js`. Manual checks in steps 1–2 are not automated.
 
-Historical tags and releases are repaired separately: `v5.20` is package version 5.2.0, and
-5.2.1–5.2.4 have no tags or releases. The workflow refuses to duplicate 5.2.0, and until the
-repair is done, a new release's notes start from `v5.20`.
+Historical tag/release reconciliation is tracked in [JGF-112](https://linear.app/jgf-projects/issue/JGF-112).
+`v5.20` names package version 5.2.0; the workflow refuses duplicate publication of that version.
+Inspect current remote tags/releases and deployment evidence before proposing any historical repair;
+do not infer missing records from an old release report. No tag may be moved or force-pushed.
 
 SemVer, build identity and production verification are separate. A full build-identity/freshness
-feature remains backlog work. Existing `release:*` helpers are legacy optional tooling, not proof
-of production readiness; their cleanup is separate work. Use this guide for the current process.
+feature is tracked in [JGF-96](https://linear.app/jgf-projects/issue/JGF-96) and
+[JGF-109](https://linear.app/jgf-projects/issue/JGF-109). Existing `release:*` helpers are legacy
+optional tooling, not proof of production readiness; [JGF-95](https://linear.app/jgf-projects/issue/JGF-95)
+owns their separate cleanup. Use this guide for the current process.
 
 ## Vercel Project Shape
 

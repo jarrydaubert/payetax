@@ -28,7 +28,7 @@ If you are curious about the working, start with the [testing guide](docs/guides
 - **Two oracles, not one.** Hand-anchored expectations decide whether an answer is correct. The browser golden master is generated from the engine itself, so it catches UI and regression drift but cannot catch an engine that is wrong yet self-consistent. See [HMRC verification](docs/guides/TESTING.md#hmrc-verification).
 - **Independence comes from the source, not the author.** The Class 1 category B rate was once recorded as 5% in both the rate table and its hand-anchored test, so the suite passed. Re-verifying against HMRC's published employer tables corrected it to 1.85% (noted in [`taxRates.ts`](src/constants/taxRates.ts)). An expectation written from the same misreading is not independent.
 - **Some errors are invisible to the obvious assertion.** Annual thresholds are applied through monthly payroll, so a small drift in a band threshold can leave income tax unchanged. Boundary pairs, such as marriage allowance at £50,270 and £50,271, guard thresholds directly. See the [rounding and threshold policy](docs/guides/TESTING.md#rounding-and-threshold-policy).
-- **Open question:** how to record per-scenario provenance for independent fixtures, so that a misreading shared by policy data and expectations is detectable rather than discovered later. Tracked under independent fixture completion in the [backlog](docs/BACKLOG.md).
+- **Open question:** how to record per-scenario provenance for independent fixtures, so that a misreading shared by policy data and expectations is detectable rather than discovered later. Tracked as [JGF-72](https://linear.app/jgf-projects/issue/JGF-72); the [fixture standard](docs/guides/TESTING.md#calculation-verification-model) remains publicly readable.
 
 ## Run it locally
 
@@ -53,8 +53,9 @@ Jest covers calculation and component behaviour; Playwright covers browser journ
 
 ## Find your way around
 
-- [Project state](docs/PROJECT_STATE.md) — product and technical handover, with links to evidence.
-- [Backlog](docs/BACKLOG.md) — unresolved work.
+- [PayeTax in Linear](https://linear.app/jgf-projects/project/payetax-ecec16170865) — planned work, priorities, dependencies and progress (workspace access required).
+- [Work management](docs/guides/WORK_MANAGEMENT.md) — shared Ready/Done, independent review and public PR evidence.
+- [System overview](docs/guides/SYSTEM_OVERVIEW.md) — architecture, calculation owners and preserved contracts.
 - [Product direction](docs/business/PRODUCT_DIRECTION.md) — what PayeTax aims to help people do.
 - [Documentation map](docs/README.md) — where guidance lives and how it stays useful.
 - [Editorial voice](docs/blog/VOICE_AND_STYLE.md) — clear, helpful writing without losing important qualifications.

@@ -10,11 +10,11 @@ It is not a commercial growth site. Keep the product useful, accurate, and simpl
 
 ## Read First
 
-1. Read `docs/PROJECT_STATE.md` for the current product, architecture, verification and search handover.
-2. Read `docs/BACKLOG.md` for unresolved work only.
-3. Follow dated reports and pull requests for supporting evidence and completed-work history.
-4. For statutory truth, verify canonical policy data against current primary official sources.
-5. For **blog writing or review**, follow `docs/blog/README.md` (including the voice guide and combined accuracy/readability standard), without weakening source checks or the existing release rules.
+1. Read [work management](docs/guides/WORK_MANAGEMENT.md) for shared Ready/Done, evidence and PR-linking rules.
+2. Open the assigned issue in the [PayeTax Linear project](https://linear.app/jgf-projects/project/payetax-ecec16170865), workspace **JGF Projects**, team **JGF Projects** (key **JGF**). Linear owns planned work, priorities, dependencies, issue-specific acceptance criteria and progress.
+3. Read [product direction](docs/business/PRODUCT_DIRECTION.md), [system ownership](docs/guides/SYSTEM_OVERVIEW.md) and the [testing guide](docs/guides/TESTING.md) for the affected area. GitHub owns engineering standards, architectural decisions, statutory fixture provenance and independently reviewable implementation evidence.
+4. If Linear is unavailable, ask the maintainer for the issue text, acceptance criteria, dependencies and current priority; do not guess missing scope or use retired repository documents as a queue. Repository engineering guidance remains usable without Linear.
+5. Follow dated reports and PRs for historical evidence; verify statutory truth against canonical policy data and current primary official sources. For **blog writing or review**, also follow `docs/blog/README.md` and its combined accuracy/readability standard.
 
 ## Engineering Approach
 
@@ -25,6 +25,8 @@ Before editing, inspect Git state, project guidance and affected code. Work on a
 Implement the change, verify the relevant behaviour with tests and direct inspection where appropriate, and update documentation only when necessary. Commit and push only when requested (including when needed to open a requested PR).
 
 When GitHub CLI (`gh`) is available and authenticated, use it for GitHub operations where appropriate; never print authentication tokens. Report relevant PR and check links, and leave ongoing CI monitoring to the maintainer unless requested.
+
+Tax correctness, security, privacy, user-data integrity and evidence-backed public claims take priority. Reconcile new verified risks with Linear's agreed implementation order; a historical audit severity alone does not establish a new delivery queue.
 
 Match verification effort to risk. Financial correctness, security and consequential user interactions require stronger evidence than routine changes.
 
@@ -37,7 +39,7 @@ Report what changed, what passed, what remains unverified and any meaningful tra
 - Keep existing Vercel Web Analytics, Vercel Speed Insights and consent-based GA4; do not add analytics vendors unless explicitly requested.
 - Do not reintroduce the feedback feature or external issue-tracker integrations unless explicitly requested.
 - Do not invent tax behaviour, provider support, production status, usage metrics, or security controls.
-- Do not commit secrets.
+- Never commit secrets, tokens, raw calculator inputs, unredacted analytics payloads or personal data — in fixtures, logs or evidence.
 
 ## Commands
 
@@ -114,7 +116,9 @@ If a Vercel CLI command cannot retrieve project settings, follow `docs/guides/OP
 
 ## Pull Request Expectations
 
-Before merging non-trivial code or agent-guidance changes, obtain a fresh-context review from a reviewer or agent that did not write the change and address or note its findings. Use the review capability available in the client; no particular slash command is required.
+Every implementation slice and non-trivial agent-guidance change requires fresh-context independent review by the **other model**: Claude reviews Codex changes and Codex reviews Claude changes. The reviewer must not have written the change. Reconcile findings against primary evidence and code, address or explicitly defer them, and obtain re-review after material fixes. An issue omitting this rule does not waive it; if the other-model review is unavailable, report the gap and do not merge.
+
+Use the review capability available in the client; no particular slash command is required. The [correctness-critical workflow](docs/guides/WORK_MANAGEMENT.md#correctness-critical-review) adds source and arithmetic reconciliation for consequential work.
 
 For code changes, report:
 

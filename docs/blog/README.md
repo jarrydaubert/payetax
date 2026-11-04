@@ -9,7 +9,7 @@ This folder owns PayeTax's editorial standards. **Read these before creating, re
 3. [BLOG_GUIDE.md](BLOG_GUIDE.md) — primary sources, tax years, calculations, frontmatter, SEO, publishing and verification.
 4. [IMAGE_WORKFLOW.md](IMAGE_WORKFLOW.md) and [ai-image-prompts.json](ai-image-prompts.json) — only when an image is new or being refreshed.
 
-The repo-wide `AGENTS.md`, `docs/PROJECT_STATE.md` and `docs/BACKLOG.md` still govern priorities, evidence and review discipline. If editorial voice conflicts with statutory correctness, **statutory correctness wins**.
+[AGENTS.md](../../AGENTS.md) and [work management](../guides/WORK_MANAGEMENT.md) govern evidence and mandatory other-model review; the [PayeTax Linear project](https://linear.app/jgf-projects/project/payetax-ecec16170865) owns priorities and planned work. If editorial voice conflicts with statutory correctness, **statutory correctness wins**.
 
 ## Research to publication
 
@@ -27,7 +27,7 @@ The repo-wide `AGENTS.md`, `docs/PROJECT_STATE.md` and `docs/BACKLOG.md` still g
 - **Accuracy / tax years / independent evidence:** [BLOG_GUIDE.md](BLOG_GUIDE.md); never substitute style research for primary tax sources.
 - **Voice / formats / editing:** [VOICE_AND_STYLE.md](VOICE_AND_STYLE.md).
 - **Images / alt text / Ledger style:** [IMAGE_WORKFLOW.md](IMAGE_WORKFLOW.md).
-- **Work tracking:** [../BACKLOG.md](../BACKLOG.md) holds unresolved editorial refreshes; individual posts are handled **one at a time or in small independent batches** after higher-priority correctness work. Existing search-evidence triggers still apply.
+- **Work tracking:** the [PayeTax Linear project](https://linear.app/jgf-projects/project/payetax-ecec16170865) tracks unresolved editorial refreshes; individual posts are handled **one at a time or in small independent batches** after higher-priority correctness work. Existing search-evidence triggers still apply.
 - **Quality checks:** follow [BLOG_GUIDE.md](BLOG_GUIDE.md#verification). Keep current frontmatter contracts, slug/redirect guidance, privacy safeguards and existing verification scripts.
 
 Do not turn this guide into a growth-content production schedule. An accurate article that answers a real question is worth more than a large batch of near-identical posts.

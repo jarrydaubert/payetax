@@ -261,8 +261,8 @@ test.describe('MC-04 submitted pay period @critical', () => {
 
 test.describe('MC-03 input integrity @critical', () => {
   // Test input/result integrity through native keyboard activation. Lost Calculate taps during
-  // scrolling and WebKit pension-Apply clicks remain user-facing defects owned by BACKLOG.md
-  // Verification; this suite does not certify pointer delivery.
+  // scrolling and WebKit pension-Apply clicks remain user-facing defects tracked in Linear JGF-77.
+  // This suite does not certify pointer delivery.
   test.beforeEach(async ({ page, isMobile }) => {
     await openCalculatorForAmountEntry(page, isMobile);
     await page.getByTestId('married-checkbox').press('Space');
