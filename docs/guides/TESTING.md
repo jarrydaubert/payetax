@@ -179,6 +179,42 @@ Primary files and scripts:
 - `.github/workflows/ci.yml`
 - `.github/workflows/codeql.yml`
 
+## Calculation verification model
+
+The three calculation-evidence layers have different jobs within the broader test layers below:
+
+1. **Independent full-calculation fixtures.** JSON suites under
+   `src/test/payeVerificationFixtures/` contain hand/independently derived expected results
+   anchored to official sources. They are the statutory correctness oracle for representative
+   full-calculation interactions. Never update expectations by copying `calculateTax()` output,
+   canonical policy objects or generated golden-master values. Resolve disagreements against
+   the fixture derivation and primary evidence before changing either side.
+2. **TypeScript rule and boundary tests.** Pin mechanics, invariants, validation, band edges,
+   rounding, regional behaviour and cross-route consistency. Use statutory numbers independent
+   of stored thresholds where a boundary assertion must detect policy drift.
+3. **Generated golden masters and browser E2E.** Derive from canonical policy and the production
+   engine to catch browser, input, rendering, extraction and presentation regression.
+   UI/engine agreement cannot establish legal correctness.
+
+Keep the portfolio compact and representative, not an exhaustive JSON matrix or test-only
+calculator. Do not claim exhaustive year, band, income-composition or pension-method coverage.
+
+For each added/changed statutory scenario, retain official-figure citations, supported year,
+region, pay basis, rounding and reproducible independent working beside the fixture or in a
+linked committed report. Reviewers must verify the derivation against primary sources rather
+than accepting an engine-generated answer or a shared misreading. Per-suite source metadata
+alone does not establish per-scenario provenance.
+
+The PAYE loader reads every JSON file in `src/test/payeVerificationFixtures/` as a PAYE suite.
+Director fixtures need a separate directory or a suite-type discriminator; introduce the first
+minimal set with the first Director engine slice and reconcile this guide with that change.
+
+Tax-domain (`check:tax-imports` and `check:tax-facts`) baselines, test-skip baselines and advisory
+allowlists are shrink-only. Reduce them in the same PR that removes debt; do not add broad
+exceptions merely to pass. Do not hide failures with skips, blanket retries, arbitrary sleeps
+or relaxed expectations. Approved narrowly scoped
+temporary advisory renewals require explicit maintainer approval and fresh evidence.
+
 ## Test Layers And Oracles
 
 ### Layer 1: Independent Calculation Oracles
@@ -260,7 +296,7 @@ Calculation correctness is guarded by distinct oracle layers. They are not inter
 
 ### Independent Correctness Oracle
 
-`src/lib/__tests__/taxCalculator.hmrcVerification.test.ts` and sibling `taxCalculator.*` / `tax/*` unit suites are the source of truth for engine correctness.
+`src/lib/__tests__/taxCalculator.verification.test.ts` runs the independent JSON full-calculation suites. `taxCalculator.hmrcVerification.test.ts` and sibling `taxCalculator.*` / `tax/*` tests additionally pin hand-anchored mechanics and boundaries. Their source derivations, not production output, establish correctness.
 
 - Expected values are hand-anchored.
 - The tests import `calculateTax`, not `TAX_RATES` as the answer generator.

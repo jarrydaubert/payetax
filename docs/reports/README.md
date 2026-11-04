@@ -4,6 +4,7 @@ Reports are dated evidence, not evergreen guidance.
 
 Audit entry points:
 
+- [3 November Linear/documentation reconciliation](linear-documentation-reconciliation-2026-11-03.md): frozen public source-to-issue index, durable-rule destinations and legacy IDs.
 - [27 October project-documentation reconciliation](project-documentation-reconciliation-2026-10-27.md): merged scope, retained regression criteria, #128 checkpoint and supporting-page owners.
 - [27 October independent supporting-pages audit](payetax-supporting-pages-audit-2026-10-27.md): complete original snapshot; read the reconciliation for subsequent resolutions.
 - [27 October privacy-telemetry verification](privacy-telemetry-minimisation-2026-10-27.md): implementation, outbound-payload evidence and limitations.

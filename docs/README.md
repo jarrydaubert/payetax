@@ -2,56 +2,54 @@
 
 PayeTax docs should help a contributor make a correct decision quickly.
 
-## Source Order
+## Authority and source order
 
-Start with [`PROJECT_STATE.md`](PROJECT_STATE.md) for the current handover, then
-[`BACKLOG.md`](BACKLOG.md) for unresolved work. Follow their links into `docs/reports/*` and pull
-requests for dated evidence. For statutory truth, use canonical policy data and current primary
-official sources rather than a summary document.
+Start at [AGENTS.md](../AGENTS.md) and [work management](guides/WORK_MANAGEMENT.md).
+[Linear: PayeTax](https://linear.app/jgf-projects/project/payetax-ecec16170865) owns planned work, priorities, dependencies,
+issue-specific acceptance and progress. If unavailable, obtain the issue text from the maintainer;
+do not substitute a historical repository queue.
 
-When sources disagree about implemented behaviour, prefer them in this order:
+GitHub owns durable engineering standards, shared Ready/Done, architectural decisions, statutory
+fixture provenance and independently reviewable implementation evidence.
 
-1. Code and tests for implemented behaviour.
-2. `.env.template`, `package.json`, and workflow files for commands and environment names.
-3. `AGENTS.md` for contributor operating rules.
-4. `docs/business/PRODUCT_DIRECTION.md` for product scope decisions.
-5. `docs/blog/*` for public blog content, image, and refresh guidance.
-6. `docs/guides/*` for operational and engineering guidance.
-7. `docs/PROJECT_STATE.md` for the current cross-domain handover.
-8. `docs/BACKLOG.md` for unresolved work only.
-9. `docs/reports/*` and pull requests for dated historical evidence.
+For implemented behaviour and engineering guidance, use:
 
-## Evergreen Rules
+1. Code and tests for implemented behaviour; current primary official sources and canonical
+   policy for statutory facts.
+2. `.env.template`, `package.json` and workflow files for commands and environment names.
+3. [AGENTS.md](../AGENTS.md) and [WORK_MANAGEMENT.md](guides/WORK_MANAGEMENT.md) for contributor,
+   independent review, Ready/Done and public PR evidence.
+4. [Product direction](business/PRODUCT_DIRECTION.md) for scope/protected surfaces.
+5. [System overview](guides/SYSTEM_OVERVIEW.md) for architecture and production owners;
+   [testing](guides/TESTING.md) for statutory fixture provenance and verification.
+6. [Operations](guides/OPERATIONS.md), other guides and [blog guidance](blog/README.md)
+   for their respective engineering/editorial standards.
+7. Dated reports and PRs for historical evidence, interpreted at their recorded refs.
 
-- Keep stable policy in guides; keep dated run output in PRs or release reports.
-- Avoid "recently", "currently", exact suite counts, and coverage percentages in evergreen docs unless the line also says how to refresh it.
-- Prefer command names from `package.json` over prose descriptions of scripts.
-- Use `bun run build:ci` for local and CI-style production-build validation.
-- Use `bun run build:release` only when validating release behaviour that needs Sentry source maps.
-- Keep Vercel production configured to run `bun run build`; production source-map behaviour is controlled by env and `next.config.ts`.
-- Do not keep closed-work summaries in `docs/BACKLOG.md`; use GitHub PRs, release reports, or commit history for completed work.
-- Keep deployment, environment, and release validation guidance in `docs/guides/OPERATIONS.md`.
-- Keep API hardening, bot mitigation, and rate-limit verification guidance in `docs/guides/API_AND_ABUSE_CONTROLS.md`.
-- Merge or retire duplicate process docs instead of creating parallel checklists.
-- For tax, email, privacy, security, analytics, and provider claims, confirm implementation or provider settings before changing wording.
-- Public blog content is allowed to be tax-year specific, but it must carry clear dates and should be refreshed or retired when rates, deadlines, or official guidance change.
+## Evergreen rules
 
-## Usefulness Test
+- Keep standards and technical decisions in the repository; keep work state in Linear and
+  dated run results in PRs or reports. Do not copy issue lists or shared standards between them.
+- Prefer command names from `package.json`. Use `bun run build:ci` locally/in CI;
+  `build:release` only for source-map release validation. Vercel production still runs `bun run build`.
+- Avoid transient release numbers, test totals and freshness promises in evergreen guidance.
+- [OPERATIONS.md](guides/OPERATIONS.md) owns release/environment validation;
+  [API_AND_ABUSE_CONTROLS.md](guides/API_AND_ABUSE_CONTROLS.md) owns API/rate-limit controls.
+- Merge duplicate guidance instead of adding parallel checklists. Verify actual implementation
+  or provider settings before making tax, email, privacy, security or analytics claims.
+- Public tax-year content needs clear dates and refresh/retirement when primary guidance changes.
 
-Keep a doc when it answers at least one of these:
+## Document types and history
 
-- What is the product or technical boundary?
-- What command or workflow should I run?
-- What source of truth should I trust?
-- What risk does this guard against?
-- What evidence must I capture before claiming success?
+- **Entry points:** `AGENTS.md`, the importing `CLAUDE.md` and root `README.md`.
+- **Durable guidance:** `docs/business/*`, `docs/blog/*` and `docs/guides/*`.
+- **Operational queue:** Linear only; public PRs restate their claimed acceptance criteria.
+- **Dated evidence:** `docs/reports/*`, implementation PRs and commit history. Preserve old reports;
+  later guides do not retroactively certify their results.
+- **Public content:** `content/blog/*`, reviewed for stated-year accuracy and reader usefulness.
+- **Compatibility pages:** [BACKLOG.md](BACKLOG.md) and [PROJECT_STATE.md](PROJECT_STATE.md)
+  retain old anchors and point to the [frozen migration provenance](reports/linear-documentation-reconciliation-2026-11-03.md).
+  They contain no live queue or release certificate.
 
-Retire or merge docs that only repeat another source, record old status without historical value, or describe work that is already closed elsewhere.
-
-## Doc Types
-
-- **Evergreen guides:** `README.md`, `AGENTS.md`, `docs/business/*`, `docs/blog/*`, and the canonical guides in `docs/guides/*`.
-- **Current handover:** `docs/PROJECT_STATE.md`, maintained as a concise map to current state and evidence rather than a second policy or architecture implementation.
-- **Working queue:** `docs/BACKLOG.md`, only for active or parked future work.
-- **Historical evidence:** `docs/reports/*`; do not rewrite old reports to match new commands except to correct factual errors.
-- **Public content:** `content/blog/*`; review for tax-year accuracy and reader usefulness separately from engineering docs.
+Keep a document only when it explains a boundary, command/workflow, trusted source, risk or
+required evidence. Retire repetitive status prose once its rules and provenance have a durable home.
