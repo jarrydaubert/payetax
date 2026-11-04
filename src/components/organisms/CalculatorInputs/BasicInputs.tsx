@@ -184,9 +184,10 @@ export function BasicInputs() {
   );
   const fieldLabelClass = cn('flex min-w-0 items-center', 'gap-1.5');
   const fieldControlClass = 'min-w-0 w-full max-w-full justify-self-start';
-  const amountControlClass = cn(fieldControlClass, 'sm:w-40');
-  const selectControlClass = cn(fieldControlClass, 'sm:w-56');
-  const pairedControlClass = cn(fieldControlClass, 'sm:w-[17rem]');
+  // Sized for the longest values: £10,000,000.00, "State Pension Age or over", "Fortnightly".
+  const amountControlClass = cn(fieldControlClass, 'sm:w-36');
+  const selectControlClass = cn(fieldControlClass, 'sm:w-54');
+  const pairedControlClass = cn(fieldControlClass, 'sm:w-64');
   const checkboxRowClass = 'flex min-h-11 items-center gap-2';
   const checkboxLabelClass =
     'inline-flex min-h-11 cursor-pointer items-center whitespace-nowrap text-sm';
@@ -207,7 +208,7 @@ export function BasicInputs() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className='space-y-3 [--label-w:10rem] xl:grid xl:grid-cols-2 xl:items-start xl:space-y-0 xl:gap-x-10 xl:gap-y-3 min-[112.5rem]:block min-[112.5rem]:space-y-3'
+      className='space-y-3 [--label-w:8rem] xl:grid xl:grid-cols-[repeat(2,25rem)] xl:items-start xl:space-y-0 xl:gap-x-16 xl:gap-y-3 min-[112.5rem]:block min-[112.5rem]:space-y-3'
     >
       {/* Heading */}
       <h3 className={cn('font-semibold text-foreground xl:col-span-2', 'text-base', 'sm:text-lg')}>
@@ -225,7 +226,7 @@ export function BasicInputs() {
         <div
           className={cn(
             pairedControlClass,
-            'grid grid-cols-[minmax(0,1fr)_7.5rem] items-start',
+            'grid grid-cols-[minmax(0,1fr)_7.25rem] items-start',
             'gap-2',
           )}
         >
@@ -343,7 +344,7 @@ export function BasicInputs() {
       {/* Keep each help/label/checkbox together; wrap whole groups when space is limited. */}
       <fieldset className='min-w-0 border-0 p-0 xl:col-span-2'>
         <legend className='sr-only'>Tax allowances and exemptions</legend>
-        <div className='flex flex-wrap items-center gap-x-5 gap-y-2'>
+        <div className='flex flex-wrap items-center gap-x-3 gap-y-2'>
           <div className={checkboxRowClass}>
             <LabelTooltip fieldName='marriageAllowance' />
             <Label htmlFor={marriedId} className={checkboxLabelClass}>
@@ -383,8 +384,9 @@ export function BasicInputs() {
         </div>
       </fieldset>
 
+      {/* Own desktop row so toggling Married never moves the fields below between columns. */}
       {input.isMarried && (
-        <div className={fieldRowClass}>
+        <div className={cn(fieldRowClass, 'xl:col-span-2')}>
           <div className={fieldLabelClass}>
             <LabelTooltip fieldName='partnerGrossWage' />
             <Label htmlFor={partnerWageId} className='text-sm'>
