@@ -1,10 +1,5 @@
 {
   "installCommand": "bun install --frozen-lockfile",
-  "git": {
-    "deploymentEnabled": {
-      "docs/technical-contract-corrections": false
-    }
-  },
   "redirects": [
     {
       "source": "/",
