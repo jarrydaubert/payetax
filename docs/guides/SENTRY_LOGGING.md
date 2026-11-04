@@ -21,6 +21,10 @@ error UI, but their browser errors are filtered before they reach Sentry.
 - Blog rendering errors on public article routes.
 - Handled operational failures for PAYE and Director email-results API routes.
 - Calculator anomaly exceptions.
+- Handled Director calculation failures, once per failed attempt, as the fixed message
+  `Director calculation failed` with a built-in error type and throw-site frames. The thrown
+  message, properties and cause are never forwarded. These events are exempt from the SDK's
+  consecutive-duplicate filter so repeated failures stay visible.
 - Validated error digests (the reference shown by `ErrorState`), error-boundary and router-kind
   tags, and request paths with credentials, queries and fragments removed.
 - Source maps for production releases when `SENTRY_AUTH_TOKEN` is configured and the build is a
