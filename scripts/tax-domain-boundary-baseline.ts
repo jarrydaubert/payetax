@@ -191,7 +191,6 @@ const BASELINE_ENTRIES = [
     '@/constants/taxRates',
     ['CURRENT_TAX_YEAR', 'SCOTTISH_TAX_RATES', 'TAX_RATES'],
   ],
-  ['src/lib/email/directorResultsEmail.ts', '@/constants/taxRates', ['CT_RATES', 'TAX_RATES']],
   [
     'src/lib/email/outboundResultsDelivery.ts',
     '@/constants/taxRates',

@@ -165,6 +165,11 @@ describe('Director display → email payload → server → HTML/text audit', ()
         expect(message.text.split('\n')).toContain(`${label}: ${formatCurrency(value)}`);
       expect(message.html).toContain('2026-27');
       expect(message.text).toContain('2026-27');
+      for (const content of [message.html, message.text]) {
+        expect(content).not.toMatch(
+          /Rates used|Personal Allowance|Basic Rate band|Higher Rate band|Dividend Allowance|Small Profits Rate|Main CT Rate/i,
+        );
+      }
       expect(message.html).not.toMatch(/NaN|undefined|Infinity/);
       expect(message.text).not.toMatch(/NaN|undefined|Infinity/);
       if (!sample.blocked) {

@@ -4,10 +4,9 @@
  *
  * Extracted from the API route so we can test:
  * - HTML escaping (injection prevention)
- * - Threshold sourcing from `src/constants/taxRates.ts` (no drift)
+ * - Financial summary and reserve presentation
  */
 
-import { CT_RATES, TAX_RATES } from '@/constants/taxRates';
 import { resolveTaxYear } from '@/lib/tax';
 import { formatCurrency } from '@/lib/utils';
 import type { DirectorStrategy } from '@/lib/validation/emailValidation';
@@ -33,38 +32,6 @@ function formatTaxYearLabel(taxYear?: string): string {
   const normalized = resolveTaxYear(taxYear);
   const [start, end] = normalized.split('-');
   return `${start}-${end?.slice(-2) ?? ''}`;
-}
-
-export function getDirectorEmailThresholds(taxYear?: string) {
-  const year = resolveTaxYear(taxYear);
-  const rates = TAX_RATES[year];
-
-  const personalAllowance = rates.personalAllowance;
-  const basicBand = rates.bands[0]?.threshold ?? 0;
-  const additionalThreshold = rates.bands[1]?.threshold ?? 0;
-
-  const basicRateLimit = personalAllowance + basicBand;
-
-  const niPrimaryThreshold = rates.nationalInsurance.employee.A.primary.threshold;
-  const niUpperLimit = rates.nationalInsurance.employee.A.upper.threshold;
-  const employerNiThreshold = rates.nationalInsurance.employer.A.secondary.threshold;
-  const employerNiRate = rates.nationalInsurance.employer.A.secondary.rate;
-
-  return {
-    taxYear: year,
-    personalAllowance,
-    basicRateLimit,
-    higherRateLimit: additionalThreshold,
-    niPrimaryThreshold,
-    niUpperLimit,
-    employerNiThreshold,
-    employerNiRate,
-    dividendAllowance: rates.dividendAllowance,
-    corpTaxSmallProfitsRate: Math.round(CT_RATES.SMALL_PROFITS_RATE * 100),
-    corpTaxMainRate: Math.round(CT_RATES.MAIN_RATE * 100),
-    corpTaxSmallProfitsLimit: CT_RATES.SMALL_PROFITS_LIMIT,
-    corpTaxUpperLimit: CT_RATES.MAIN_RATE_LIMIT,
-  };
 }
 
 interface AllStrategies {
@@ -145,7 +112,6 @@ export function generateDirectorEmailHtml(args: {
     generatedDate ??
     new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  const thresholds = getDirectorEmailThresholds(taxYear);
   const saDeadline = getSelfAssessmentDeadlineLabel(taxYear);
   const savingsColour = savingsVsAllSalary >= 0 ? '#2f6f4e' : '#a6453c';
 
@@ -275,44 +241,6 @@ export function generateDirectorEmailHtml(args: {
                 <tr>
                   <td style="padding: 12px 0; color: #465468;">Personal tax pot</td>
                   <td style="padding: 12px 0; text-align: right; color: #123a66; font-family: Menlo, Consolas, monospace;">${formatCurrency(strategy.incomeTax + strategy.dividendTax + strategy.studentLoan)}</td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <tr>
-            <td class="email-card" style="padding: 28px 32px; border-right: 1px solid #cec6b7; border-bottom: 1px solid #cec6b7; border-left: 1px solid #cec6b7; background-color: #fffdf7;">
-              <h3 style="margin: 0 0 16px; color: #07111f; font-family: Georgia, 'Times New Roman', serif; font-size: 24px; line-height: 1.1;">Rates used (${safeTaxYear})</h3>
-              <table style="width: 100%; border-collapse: collapse; color: #07111f; font-size: 13px; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">
-                <tr style="background-color: #f2eee4;">
-                  <td colspan="2" style="padding: 10px 12px; color: #536174; font-family: Menlo, Consolas, monospace; font-size: 11px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase;">Income Tax</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #e1dbce;">
-                  <td style="padding: 9px 12px; color: #465468;">Personal Allowance</td>
-                  <td style="padding: 9px 12px; text-align: right; font-family: Menlo, Consolas, monospace;">${formatCurrency(thresholds.personalAllowance)}</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #e1dbce;">
-                  <td style="padding: 9px 12px; color: #465468;">Basic Rate band</td>
-                  <td style="padding: 9px 12px; text-align: right; font-family: Menlo, Consolas, monospace;">to ${formatCurrency(thresholds.basicRateLimit)}</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #e1dbce;">
-                  <td style="padding: 9px 12px; color: #465468;">Higher Rate band</td>
-                  <td style="padding: 9px 12px; text-align: right; font-family: Menlo, Consolas, monospace;">to ${formatCurrency(thresholds.higherRateLimit)}</td>
-                </tr>
-                <tr style="background-color: #f2eee4;">
-                  <td colspan="2" style="padding: 10px 12px; color: #536174; font-family: Menlo, Consolas, monospace; font-size: 11px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase;">Dividends and Corporation Tax</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #e1dbce;">
-                  <td style="padding: 9px 12px; color: #465468;">Dividend Allowance</td>
-                  <td style="padding: 9px 12px; text-align: right; font-family: Menlo, Consolas, monospace;">${formatCurrency(thresholds.dividendAllowance)}</td>
-                </tr>
-                <tr style="border-bottom: 1px solid #e1dbce;">
-                  <td style="padding: 9px 12px; color: #465468;">Small Profits Rate</td>
-                  <td style="padding: 9px 12px; text-align: right; font-family: Menlo, Consolas, monospace;">${thresholds.corpTaxSmallProfitsRate}%</td>
-                </tr>
-                <tr>
-                  <td style="padding: 9px 12px; color: #465468;">Main CT Rate</td>
-                  <td style="padding: 9px 12px; text-align: right; font-family: Menlo, Consolas, monospace;">${thresholds.corpTaxMainRate}%</td>
                 </tr>
               </table>
             </td>
