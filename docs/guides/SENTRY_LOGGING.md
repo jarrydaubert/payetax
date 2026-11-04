@@ -42,7 +42,7 @@ error UI, but their browser errors are filtered before they reach Sentry.
 ## Files
 
 - Scope helper: `src/lib/sentryScope.ts`.
-- Client configuration: `instrumentation-client.ts`.
+- Client configuration: `src/instrumentation-client.ts`.
 - Server configuration: `sentry.server.config.ts`.
 - Edge configuration: `sentry.edge.config.ts`.
 - Calculator utility wrappers: `src/lib/sentry.ts`.

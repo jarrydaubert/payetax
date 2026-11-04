@@ -6,11 +6,11 @@ PayeTax is a deterministic UK tax-calculator R&D project. The test strategy is b
 
 The aim is not to look busy. The aim is to prove that the calculator, surrounding tools, public pages, and deployment controls keep working after AI-assisted or human changes.
 
-## Current Audit Snapshot
+## Verification Expectations
 
-Last audited for strategy: 2026-06-26.
-
-Use this section as the current testing map, not as a frozen release certificate. Exact suite counts, coverage percentages, and generated route counts move as the app changes. Capture those run-specific numbers in PRs or release evidence instead of letting this guide go stale.
+This guide maps verification responsibilities; it is not a release certificate or work queue.
+Record run-specific suite counts, coverage percentages and generated route counts in PRs or
+dated evidence. Planned work and verification gaps belong in Linear.
 
 Current automated evidence expected before broad changes merge:
 
@@ -19,10 +19,6 @@ Current automated evidence expected before broad changes merge:
 - `bun run build:ci`
 - `bun run test:full` for broad calculation, browser, route, or refactor changes
 - `bun audit` or `bun run audit:deps` when dependencies change
-
-Tracked automated hardening gaps:
-
-- None are currently open in this guide.
 
 Manual production confirmations still matter for provider and observability wiring, especially email deliverability and Sentry/Vercel dashboard visibility.
 
@@ -161,7 +157,7 @@ Covered areas include:
 - Email input validation.
 - Env schema and production env contract sync.
 - Analytics event naming contract.
-- Version sync between `package.json` and PWA/service-worker cache versions.
+- Stable SemVer format and base-aware PR version-bump enforcement; PWA cache namespaces are independent of app versions.
 - Secret hygiene in CI through the tracked env guard.
 - Dependency advisory checks.
 - CodeQL JavaScript/TypeScript scanning.
@@ -259,7 +255,7 @@ Examples:
 - Metadata builders.
 - Env contract sync.
 - Analytics event registry.
-- Version sync.
+- Version format and PR version-bump policy.
 - Skip/todo guardrails.
 
 These tests catch drift that would otherwise hide until deployment.
@@ -359,10 +355,14 @@ bun audit                   # Bun advisory check
 
 ```bash
 bun run harness:local       # Repo gate + quick tests + build
-bun run harness:release     # Repo gate + dependency audit + unit tests + build + release status
-bun run release:verify      # Alias for release harness
 bun run bundle:monitor      # Build + bundle threshold analysis
 ```
+
+Follow [Operations](OPERATIONS.md#version-policy-and-tagging) for the release process and
+production evidence. `harness:release`, `release`, `release:*` and the reusable template under
+`docs/reports/releases/` are legacy optional tooling; their report/status checks do not certify
+the current release checklist or production readiness. Their reconciliation belongs to
+[JGF-95](https://linear.app/jgf-projects/issue/JGF-95), not to a routine validation run.
 
 ### Test Hygiene
 
@@ -407,10 +407,10 @@ This repo follows a lean AI-assisted quality standard:
 
 > AI-assisted code is allowed. Unverified AI-assisted code is not.
 
-Current GitHub hard gates:
-
-- `CI`
-- `CodeQL`
+The `Protect main` [repository ruleset](https://github.com/jarrydaubert/payetax/rules/17169482)
+requires `CI` and an up-to-date branch. CodeQL runs separately; a configured workflow is not
+necessarily a required merge check. Inspect the active ruleset before asserting which checks
+GitHub enforces; changing those settings needs separate authorisation.
 
 `CI` does:
 

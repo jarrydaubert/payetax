@@ -109,7 +109,7 @@ export const DirectorInputSchema = z.object({
     message: 'Please enter your annual revenue',
   }),
 
-  /** Whether revenue includes VAT (we'll deduct 20%) */
+  /** Whether revenue includes VAT; warnings/education only, with no revenue adjustment. */
   includesVat: z.boolean(),
 
   /** Business expenses (software, equipment, travel, etc.) */

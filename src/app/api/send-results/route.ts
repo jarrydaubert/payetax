@@ -7,7 +7,7 @@ import { isValidRequestOrigin } from '@/lib/security/origin';
 import { captureOperationalFailureAndFlush } from '@/lib/sentry';
 import { SendResultsRequestSchema } from '@/lib/validation/emailValidation';
 
-const MAX_BODY_SIZE = 50 * 1024; // 50KB
+const MAX_BODY_SIZE = 50 * 1024; // UTF-16 code units, checked after the body is buffered
 const RATE_LIMIT = { max: 5, window: 60000 } as const;
 
 export async function POST(request: NextRequest) {

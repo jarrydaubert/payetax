@@ -7,7 +7,7 @@ The blog is a public trust surface for the calculator. Treat every tax claim, de
 ## Canonical Files
 
 - Posts live in `content/blog/*.mdx`.
-- Slug is the filename unless a post has explicit legacy frontmatter for SEO.
+- The route slug is always the filename without `.mdx`; frontmatter cannot override it. `canonicalUrl` controls canonical metadata, not routing.
 - Frontmatter is validated by `BlogFrontmatterSchema` in `src/lib/validation.ts`.
 - Category data lives in `src/config/blog.config.ts`.
 - Visual category styling currently lives in `src/constants/blogCategories.ts`; keep it aligned with `src/config/blog.config.ts` until the two sources are consolidated.
