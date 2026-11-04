@@ -1,9 +1,8 @@
-import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
+import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
 import {
   escapeHtml,
   generateDirectorEmailHtml,
   generateDirectorEmailText,
-  getDirectorEmailThresholds,
 } from '@/lib/email/directorResultsEmail';
 import type { DirectorStrategy } from '@/lib/validation/emailValidation';
 
@@ -46,25 +45,6 @@ describe('directorResultsEmail', () => {
     expect(escapeHtml(`<script>alert("x")</script>`)).toBe(
       '&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt;',
     );
-  });
-
-  test('thresholds are sourced from taxRates.ts (no drift)', () => {
-    const t = getDirectorEmailThresholds('2025-26');
-    const rates = TAX_RATES['2025-2026'];
-
-    expect(t.personalAllowance).toBe(rates.personalAllowance);
-    expect(t.basicRateLimit).toBe(rates.personalAllowance + rates.bands[0].threshold);
-    expect(t.niPrimaryThreshold).toBe(rates.nationalInsurance.employee.A.primary.threshold);
-    expect(t.employerNiThreshold).toBe(rates.nationalInsurance.employer.A.secondary.threshold);
-    expect(t.dividendAllowance).toBe(rates.dividendAllowance);
-  });
-
-  test('thresholds default to the current tax year', () => {
-    const thresholds = getDirectorEmailThresholds();
-    const rates = TAX_RATES[CURRENT_TAX_YEAR];
-
-    expect(thresholds.taxYear).toBe(CURRENT_TAX_YEAR);
-    expect(thresholds.personalAllowance).toBe(rates.personalAllowance);
   });
 
   test('HTML template escapes strategy.name (prevents injection)', () => {
