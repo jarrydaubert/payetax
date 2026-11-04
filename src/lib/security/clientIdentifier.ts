@@ -16,7 +16,7 @@ interface ClientIdentifierOptions {
  *    becomes a per-request rate-limit-bucket bypass.
  * 2) x-forwarded-for (first IP; platform-set on Vercel)
  * 3) x-real-ip
- * 4) user-agent (hashed fallback)
+ * 4) user-agent (optionally with Accept), base64-encoded and truncated; not a cryptographic hash
  */
 export function getClientIdentifier(
   request: NextRequest,

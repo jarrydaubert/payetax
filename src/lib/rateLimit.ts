@@ -6,7 +6,8 @@
  * - Distributed counters via Upstash Redis REST API.
  *
  * Fallback mode:
- * - In-memory LRU cache (used when distributed config is missing/unavailable).
+ * - The default policy permits in-memory LRU counters when distributed config is missing/unavailable.
+ * - Results-email routes require distributed limiting in production mode and return 503 instead.
  *
  * SECURITY NOTE:
  * - x-forwarded-for must be trusted only behind a proxy/CDN that sanitizes it.

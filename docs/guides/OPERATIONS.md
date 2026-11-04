@@ -42,8 +42,8 @@ Vercel's commit SHA, or `payetax@<package version>` locally.
 
 Production Vercel builds with an auth token enable source maps by default; the existing
 `PAYETAX_ENABLE_SENTRY_SOURCEMAPS` override still takes precedence. Local/CI builds skip uploads.
-With Next.js 16.4.3 and Sentry 11.10.0, `useRunAfterProductionCompileHook` consolidates uploads
-after compilation (supported since Next.js 15.4.1). The installed SDK uploads the server and
+The configured `useRunAfterProductionCompileHook` consolidates uploads
+after compilation (supported since Next.js 15.4.1). The installed Sentry SDK uploads the server and
 browser directories in that phase. Release creation, finalisation, commit association, deployment
 notifications and build plugin telemetry are disabled. `release.deploy: false` is explicit because
 the SDK otherwise infers deployment calls from Vercel even with release creation disabled.
@@ -171,7 +171,7 @@ do not infer missing records from an old release report. No tag may be moved or 
 
 SemVer, build identity and production verification are separate. A full build-identity/freshness
 feature is tracked in [JGF-96](https://linear.app/jgf-projects/issue/JGF-96) and
-[JGF-109](https://linear.app/jgf-projects/issue/JGF-109). Existing `release:*` helpers are legacy
+[JGF-109](https://linear.app/jgf-projects/issue/JGF-109). Existing `release` / `release:*` helpers are legacy
 optional tooling, not proof of production readiness; [JGF-95](https://linear.app/jgf-projects/issue/JGF-95)
 owns their separate cleanup. Use this guide for the current process.
 
@@ -257,6 +257,10 @@ Removing code or closing a GitHub alert does not revoke a key at its provider.
 If Vercel CLI reports that it cannot retrieve project settings, `.vercel/project.json` may point at a stale project id.
 
 Recovery flow:
+
+Run these commands only after explicit maintainer authorisation to relink the project, as
+required by [AGENTS.md](../../AGENTS.md#environment). Confirm the intended account/project
+and that `.vercel.stale` does not already exist before moving the local link metadata.
 
 ```bash
 vercel login

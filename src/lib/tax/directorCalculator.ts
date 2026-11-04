@@ -17,7 +17,7 @@
  *
  * ## Calculation Flow
  *
- * 1. Adjust revenue for VAT (if included)
+ * 1. Use revenue as entered (VAT status is warnings/education only)
  * 2. Calculate gross profit (revenue - expenses)
  * 3. Check for survival mode (profit ≤ personal allowance)
  * 4. If normal: Calculate optimal extraction (salary + dividends)

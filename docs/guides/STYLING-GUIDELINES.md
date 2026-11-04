@@ -42,10 +42,10 @@ Prefer:
 import { Button } from '@/components/ui/button';
 ```
 
-Do not add new imports from the legacy shim surface unless there is a documented reason.
+Import through the canonical surface rather than its underlying implementation paths.
 
 Current rule:
-- `@/components/ui/*` is the canonical source for UI primitives.
+- `@/components/ui/*` is the canonical import surface; it re-exports primitives implemented under `@/components/atoms/ui/*`.
 - Do not add new `@/components/atoms/ui/*` primitive imports.
 
 ### 3. Shared patterns must earn their abstraction
@@ -71,8 +71,10 @@ Use the smallest relevant checks for the change:
 ```bash
 bun run check:repo
 bun run build:ci
-bun run fix-all
 ```
+
+`bun run fix-all` writes across the repository; it is not a verification check. When formatting
+is needed, limit edits to the intended files and inspect the diff for unrelated changes.
 
 For visually risky UI changes, also run the smallest relevant browser check, for example:
 

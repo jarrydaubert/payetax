@@ -43,7 +43,7 @@ export function getDefaultCsrfAllowedHosts(): string[] {
 /**
  * Basic origin/referrer allowlist check for CSRF protection.
  *
- * - Allows requests with no origin/referer (same-origin, non-browser clients).
+ * - Rejects requests with neither origin nor referer unless allowMissingOrigin is explicitly true.
  * - If origin/referer is present, it must be a valid URL whose host matches the allowlist.
  */
 export function isValidRequestOrigin(

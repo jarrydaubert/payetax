@@ -2,6 +2,13 @@
 
 Purpose: canonical business/spec reference for the Director Intelligence experience.
 
+The output and behaviour requirements below remain the product contract, not a claim that
+every path already satisfies them. In particular, monthly draw currently uses the baseline
+optimal mix rather than the active what-if scenario, and `calculateSafeMonthlyDraw()` returns
+the requested minimum when its cash ceiling is zero. Do not present that as proven affordability.
+[JGF-37](https://linear.app/jgf-projects/issue/JGF-37) owns the correction and acceptance criteria;
+these limitations do not relax the required cash, tax, buffer or active-scenario constraints.
+
 Route: `/tools/director-guide`
 
 Tax logic sources:
@@ -67,7 +74,7 @@ Monthly mode adds:
 ## Core Outputs
 
 - Strategy comparison: all salary, balanced mix, all dividends, your setup
-- Unified baseline/what-if output path
+- Unified baseline/what-if output path (required; see the implementation limitation above)
 - Net take-home summary and effective rate
 - Company and personal tax pots
 - Key dates and warnings
@@ -77,7 +84,7 @@ Monthly mode adds:
 ## Key Rules
 
 - All rates and thresholds come from `src/constants/taxRates.ts`.
-- Dashboard and calculator panels consume one active-scenario path so baseline and what-if views stay aligned.
+- Dashboard and calculator panels must consume one active-scenario path so baseline and what-if views stay aligned.
 - Corporation tax thresholds adjust when associated company count is greater than 1.
 - VAT status is education-only and does not change calculations.
 - Employment Allowance is user-declared, not inferred.
@@ -92,7 +99,7 @@ Purpose:
 Model:
 - project annual revenue/expenses from monthly inputs and months remaining in the tax year
 - run the existing annual strategy engine on the projected figures
-- calculate safe monthly draw using both tax-aware and cash-aware constraints
+- calculate safe monthly draw using both tax-aware and cash-aware constraints (required; see JGF-37 above)
 
 Warnings:
 - buffer shortfall

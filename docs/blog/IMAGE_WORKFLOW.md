@@ -67,6 +67,11 @@ Clean daylight, low contrast, 16:10 composition, no text, no labels, no logos, n
 
 ## Recommended Workflow
 
+The checked-in import script requires Bash, `ffmpeg` and macOS's `sips`. The commands below
+describe that macOS workflow; the script does not run unchanged on Windows or Linux. If those
+prerequisites are unavailable, arrange an import on macOS and verify the final asset rather than
+assuming `sips` can be installed on another platform.
+
 1. Read the post title, category, excerpt, and current image.
 2. Choose the closest category prompt from `docs/blog/ai-image-prompts.json`.
 3. Generate one source image using Codex image generation or another approved image source.
@@ -148,7 +153,7 @@ imageAlt: "Best UK tax calculator 2026 guide"
 
 ## Troubleshooting
 
-- If `bun run blog:image:import` fails, check that `ffmpeg` and `sips` are installed.
+- On macOS, if `bun run blog:image:import` fails, check that Bash, `ffmpeg` and `sips` are available. On Windows or Linux, use the platform boundary above.
 - If the import crops out the subject, regenerate or pre-crop the source image with more central framing.
 - If generated text appears on documents, regenerate with stronger "no text, no labels" wording.
 - If the image feels too modern-fintech, add "warm paper, public-authority editorial still life, no glow, no digital dashboard" to the prompt.
