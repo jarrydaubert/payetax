@@ -25,12 +25,15 @@ export interface DependencyAdvisoryAllowlistEntry {
 }
 
 export const DEPENDENCY_ADVISORY_ALLOWLIST: readonly DependencyAdvisoryAllowlistEntry[] = [
+  // JGF-9 rechecked upstream on 5 November; retain the original review schedule and expiry.
+  // Sources: https://github.com/advisories/GHSA-3g3m-2fjr-6pw4
+  // https://github.com/advisories/GHSA-g3hv-75wg-m249 and https://registry.npmjs.org/
   {
     id: 'GHSA-3G3M-2FJR-6PW4',
     package: 'glob',
-    via: 'jest (jest-config, jest-runtime, @jest/reporters, test-exclude) and the @sentry/nextjs webpack/bundler plugin',
+    via: 'jest (jest-config, jest-runtime, @jest/reporters, test-exclude)',
     reason:
-      'Fixed only in glob 14.0.2+; the latest Jest (30.5.2) and Sentry bundler plugins still require glob ^13.0.6, and glob 14 changes ignore-pattern and matching semantics. Build/test tooling only: no glob code is traced into or bundled with the deployed app, no caller passes the AbortSignal the advisory concerns, and patterns come from repository configuration.',
+      'Residual Jest/coverage tooling as of 2026-11-05: glob 13.0.6 and 10.5.0 remain affected; the fix starts at 14.0.2 (latest 14.0.3). Latest Jest 30.5.2 requires ^13.0.6; test-exclude 7.0.2 requires ^10.4.1, and even 8.0.0 requires ^13.0.6. Sentry 11.11.0 adopts patched glob ^14.0.3 through its supported bundler plugin. A global glob 14 override changes ignore-pattern and matching semantics. Remaining callers use repository-controlled test/coverage patterns without AbortSignal. Wait for compatible Jest/coverage releases; incompatible upgrades require maintainer approval before the unchanged expiry.',
     lastChecked: '2026-11-01',
     reviewCadenceDays: 7,
     removeAfter: '2026-11-14',
@@ -38,9 +41,9 @@ export const DEPENDENCY_ADVISORY_ALLOWLIST: readonly DependencyAdvisoryAllowlist
   {
     id: 'GHSA-G3HV-75WG-M249',
     package: 'minimatch',
-    via: 'glob (Jest test/coverage tooling and the @sentry/nextjs webpack/bundler plugin)',
+    via: 'glob and test-exclude (Jest test/coverage tooling)',
     reason:
-      'Fixed only in minimatch 11.0.1+, which glob 13 (^10.2.2) and glob 10 (^9.0.4) do not accept. Build/test tooling only: no minimatch code is traced into or bundled with the deployed app, and match patterns come from repository configuration rather than user input.',
+      'Residual Jest/coverage tooling as of 2026-11-05: minimatch 10.2.5 and 9.0.9 remain affected; the fix starts at 11.0.1 (latest 11.0.4). Glob 13 requires ^10.2.2, glob 10 requires ^9.0.4, and test-exclude 7.0.2/8.0.0 requires ^10.2.2; available 10.2.6 is still affected. Sentry now uses glob 14 with patched minimatch ^11.0.2. Minimatch 11 changes the matching API used by glob 13, so a minimatch-only major override is unsafe. Remaining match patterns come from repository test configuration. Wait for compatible Jest/coverage releases; incompatible upgrades or renewal require maintainer approval.',
     lastChecked: '2026-11-01',
     reviewCadenceDays: 7,
     removeAfter: '2026-11-14',
