@@ -62,12 +62,7 @@ Sentry.init({
     "Failed to read the 'localStorage' property from 'Window'",
     "Failed to read the 'sessionStorage' property from 'Window'",
     'Access is denied for this document',
-    // Hydration errors (often caused by browser extensions modifying DOM)
-    'Hydration failed',
-    'There was an error while hydrating',
-    'Minified React error #418',
-    'Minified React error #423',
-    'Text content does not match server-rendered HTML',
+    // Hydration needs positive injected-script evidence; see beforeSend.
     // Browser extensions (not actionable - user's installed extensions)
     'top.GLOBALS',
     'MetaMask extension not found',
@@ -77,7 +72,8 @@ Sentry.init({
     'ResizeObserver loop completed with undelivered notifications',
     // Network errors (transient)
     'Network request failed',
-    'Failed to fetch',
+    /^(?:TypeError: )?Failed to fetch(?: \([^()\s]+\))?$/,
+    /^(?:TypeError: )?Failed to fetch dynamically imported module: (?:chrome|moz|safari-web)-extension:\/\//,
     'NetworkError',
     'Load failed',
     'TypeError: NetworkError when attempting to fetch resource',
@@ -89,7 +85,6 @@ Sentry.init({
     'InvalidStateError',
     'register-sw.js',
     'sw.js load failed',
-    'Script.*load failed',
     // Cancelled requests (user navigation)
     'AbortError',
     'The operation was aborted',
