@@ -39,6 +39,12 @@ error UI, but their browser errors are filtered before they reach Sentry.
 - Raw user-entered salary, tax code, email, or pension values.
 - Source maps from CI, PR preview, and local builds by default.
 
+First-party dynamic-import and hydration failures remain reportable. Hydration noise is
+suppressed only with identified injected-script stacks (alongside the existing URL filters).
+Retained hydration messages and linked cause text are replaced with fixed diagnostics;
+types and frames remain useful without forwarding rendered text or decoder arguments.
+Bare fetch failures and ordinary named request/navigation cancellations remain suppressed.
+
 ## Files
 
 - Scope helper: `src/lib/sentryScope.ts`.

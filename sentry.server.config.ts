@@ -33,8 +33,7 @@ Sentry.init({
     'EPIPE',
     'ECANCELED',
     // Client navigation cancellations
-    'aborted',
-    'Request aborted',
+    /^(?:Error: )?(?:aborted|Request aborted)$/,
     // Common transient errors
     'getaddrinfo ENOTFOUND',
     'ETIMEDOUT',
@@ -42,6 +41,13 @@ Sentry.init({
   ],
 
   beforeSend(event, _hint) {
+    // Named platform/Next.js cancellations are expected, unlike application
+    // failures whose messages merely contain "aborted".
+    const primaryException = event.exception?.values?.at(-1);
+    if (['AbortError', 'ResponseAborted'].includes(primaryException?.type ?? '')) {
+      return null;
+    }
+
     // Don't send errors from development. Do not depend on Vercel system
     // environment variables here; they may be unavailable when system env
     // exposure is disabled, but production server events should still land.

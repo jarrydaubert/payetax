@@ -1,4 +1,5 @@
 import type { Event, EventHint } from '@sentry/nextjs';
+import { getSafeHydrationMessage } from '@/lib/sentryHydration';
 
 const NON_ACTIONABLE_CLIENT_ERROR_FRAGMENTS = [
   'feature named `hover` was not found',
@@ -129,7 +130,36 @@ function isTranslatedReactRemoveChildError(event: Event): boolean {
   });
 }
 
+function isInjectedHydrationError(event: Event): boolean {
+  if (!collectEventMessages(event).some((message) => getSafeHydrationMessage(message)))
+    return false;
+
+  const frames = (event.exception?.values ?? []).flatMap(
+    (exception) => exception.stacktrace?.frames ?? [],
+  );
+  // in_app alone is unreliable for injected code. Mixed/unknown stacks survive.
+  return (
+    frames.length > 0 &&
+    frames.every((frame) => {
+      const urls = getFrameUrls(frame);
+      return (
+        urls.length > 0 &&
+        urls.every(
+          (url) =>
+            /^(?:chrome-extension|moz-extension):\/\//i.test(url) ||
+            INJECTED_APP_SCRIPT_URL_PATTERN.test(url) ||
+            url === OPENSPAN_INJECTED_SCRIPT_URL,
+        )
+      );
+    })
+  );
+}
+
 export function shouldDropClientSentryEvent(event: Event, hint?: EventHint): boolean {
+  if (isInjectedHydrationError(event)) {
+    return true;
+  }
+
   if (isCustomEventPromiseRejection(event, hint)) {
     return true;
   }

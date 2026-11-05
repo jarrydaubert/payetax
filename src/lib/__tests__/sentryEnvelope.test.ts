@@ -56,6 +56,65 @@ describe.each(['node', 'edge'])('%s outgoing envelopes', (runtime) => {
     mockEnvelopes.length = 0;
   });
 
+  if (runtime === 'node') {
+    it.each([
+      ['Application transaction aborted during commit', 'Error', true],
+      ['Dependency request aborted unexpectedly', 'TypeError', true],
+      ['Request aborted while committing calculation', 'Error', true],
+      ['aborted', 'Error', false],
+      ['Request aborted', 'Error', false],
+      ['This operation was aborted', 'AbortError', false],
+      ['The operation was aborted.', 'AbortError', false],
+      ['', 'ResponseAborted', false],
+      ['ECONNRESET', 'Error', false],
+      ['connect ETIMEDOUT', 'Error', false],
+    ])(
+      'classifies server cancellation without hiding failures: %s (%s)',
+      async (message, type, retained) => {
+        expect(Sentry.getClient()?.getIntegrationByName('EventFilters')).toBeDefined();
+        const error = Object.assign(new Error(message), { name: type, salary: 'PROPERTY_CANARY' });
+        error.stack = `${type}: ${message}\n    at handler (app:///server.js:1:1)`;
+        Sentry.captureException(error, {
+          extra: { salary: 73123.47 },
+          contexts: {
+            calculator_input: { salary: 73123.47 },
+            request: { url: 'https://payetax.test/?salary=73123.47#financial-canary' },
+          },
+        });
+        await Sentry.flush(1000);
+        const events = mockEnvelopes
+          .flatMap<Envelope[1][number]>(([, items]) => items)
+          .filter(([header]) => header.type === 'event');
+        expect(events).toHaveLength(retained ? 1 : 0);
+        if (retained) {
+          const event = events[0][1] as Sentry.ErrorEvent;
+          expect(event.exception?.values?.[0].value).toBe(message);
+          expect(event.contexts?.request?.url).toBe('https://payetax.test/');
+          expect(event.extra).toBeUndefined();
+        }
+        expect(JSON.stringify(mockEnvelopes)).not.toMatch(
+          /73123\.47|financial-canary|PROPERTY_CANARY/,
+        );
+      },
+    );
+
+    it('keeps an application failure whose linked cause is a named cancellation', async () => {
+      const cause = Object.assign(new Error('This operation was aborted'), { name: 'AbortError' });
+      cause.stack =
+        'AbortError: This operation was aborted\n    at dependency (app:///server.js:1:1)';
+      const error = new Error('Application transaction aborted during rollback', { cause });
+      error.stack = `Error: ${error.message}\n    at application (app:///server.js:2:1)`;
+      Sentry.captureException(error);
+      await Sentry.flush(1000);
+      const events = mockEnvelopes
+        .flatMap<Envelope[1][number]>(([, items]) => items)
+        .filter(([header]) => header.type === 'event');
+      expect(events).toHaveLength(1);
+      const event = events[0][1] as Sentry.ErrorEvent;
+      expect(event.exception?.values?.at(-1)?.value).toBe(error.message);
+    });
+  }
+
   it('sends a real captureRequestError envelope with sanitised headers, query and referer', async () => {
     const error = new Error('Synthetic request failure');
     // Keep the SDK's ContextLines integration from quoting hardcoded canaries in this test's source.

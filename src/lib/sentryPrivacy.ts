@@ -1,4 +1,5 @@
 import type { Breadcrumb, Event, NodeOptions } from '@sentry/nextjs';
+import { getSafeHydrationMessage } from '@/lib/sentryHydration';
 import { sanitizeTelemetryText, sanitizeTelemetryUrl } from '@/lib/telemetryUrl';
 
 const NETWORK_IDENTITY_KEYS = ['forwarded', '-ip', 'remote-', 'via', '-user'];
@@ -130,9 +131,16 @@ export function sanitizeSentryBreadcrumb(breadcrumb: Breadcrumb): Breadcrumb | n
 }
 
 export function sanitizeSentryEvent<T extends Event>(event: T): T {
+  const hydrationMessage = [event.message, ...(event.exception?.values ?? []).map((e) => e.value)]
+    .filter((message): message is string => typeof message === 'string')
+    .map(getSafeHydrationMessage)
+    .find(Boolean);
   event.user = undefined;
   event.extra = undefined;
-  if (event.message) event.message = sanitizeTelemetryText(event.message);
+  if (event.message)
+    event.message = hydrationMessage
+      ? (getSafeHydrationMessage(event.message) ?? hydrationMessage)
+      : sanitizeTelemetryText(event.message);
   if (event.request) {
     event.request = {
       url: sanitizeTelemetryUrl(event.request.url),
@@ -169,7 +177,12 @@ export function sanitizeSentryEvent<T extends Event>(event: T): T {
       : sanitizeTelemetryUrl(event.transaction);
   }
   for (const exception of event.exception?.values ?? []) {
-    if (exception.value) exception.value = sanitizeTelemetryText(exception.value);
+    // Linked hydration causes can also contain rendered/user text. Preserve
+    // their type and frames, without forwarding arbitrary cause messages.
+    if (exception.value)
+      exception.value = hydrationMessage
+        ? (getSafeHydrationMessage(exception.value) ?? 'Hydration-related error')
+        : sanitizeTelemetryText(exception.value);
     for (const frame of exception.stacktrace?.frames ?? []) {
       if (frame.filename && /[?#]|^https?:|^app:/.test(frame.filename))
         frame.filename = sanitizeTelemetryUrl(frame.filename);
