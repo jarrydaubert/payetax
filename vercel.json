@@ -1,4 +1,9 @@
 {
+  "git": {
+    "deploymentEnabled": {
+      "fix/jgf-10-results-email-body": false
+    }
+  },
   "installCommand": "bun install --frozen-lockfile",
   "redirects": [
     {

@@ -4,10 +4,11 @@ import { checkRateLimitWithPolicy, createRateLimitHeaders } from '@/lib/rateLimi
 import { detectLikelyBotRequest } from '@/lib/security/botGuard';
 import { getClientIdentifier } from '@/lib/security/clientIdentifier';
 import { isValidRequestOrigin } from '@/lib/security/origin';
+import { readBoundedRequestBody } from '@/lib/security/readBoundedRequestBody';
 import { captureOperationalFailureAndFlush } from '@/lib/sentry';
 import { SendDirectorResultsRequestSchema } from '@/lib/validation/emailValidation';
 
-const MAX_BODY_SIZE = 50 * 1024; // UTF-16 code units, checked after the body is buffered
+const MAX_BODY_SIZE = 50 * 1024; // bytes
 const RATE_LIMIT = { max: 5, window: 60000 } as const;
 
 export async function POST(request: NextRequest) {
@@ -41,14 +42,14 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let rawBody: string;
+  let rawBody: string | null;
   try {
-    rawBody = await request.text();
+    rawBody = await readBoundedRequestBody(request, MAX_BODY_SIZE);
   } catch {
     return NextResponse.json({ error: 'Failed to read request body' }, { status: 400 });
   }
 
-  if (rawBody.length > MAX_BODY_SIZE) {
+  if (rawBody === null) {
     return NextResponse.json({ error: 'Request body too large' }, { status: 413 });
   }
 

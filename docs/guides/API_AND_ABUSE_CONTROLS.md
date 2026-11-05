@@ -6,8 +6,8 @@ This guide is the evergreen source for public API hardening, bot mitigation, and
 
 | Route | Method | Controls |
 | --- | --- | --- |
-| `/api/send-results` | `POST` | Origin check, client identifier, rate limit, buffered-body length check, bot guard, strict Zod schema, shared email-delivery boundary |
-| `/api/send-director-results` | `POST` | Origin check, client identifier, rate limit, buffered-body length check, bot guard, strict Zod schema, shared email-delivery boundary |
+| `/api/send-results` | `POST` | Origin check, client identifier, rate limit, byte-bounded body read, bot guard, strict Zod schema, shared email-delivery boundary |
+| `/api/send-director-results` | `POST` | Origin check, client identifier, rate limit, byte-bounded body read, bot guard, strict Zod schema, shared email-delivery boundary |
 | `/api/ops/rate-limit-health` | `GET` | Shared secret in production mode, Upstash REST health probe |
 
 Email routes send through `src/lib/email/emailDelivery.ts`. Keep provider-specific handling behind that boundary.
@@ -18,7 +18,7 @@ Public mutation routes are protected with:
 
 - origin checks
 - strict schema validation
-- buffered-body length checks
+- byte-bounded body reads
 - client identifiers
 - distributed rate limiting, required in production mode
 
@@ -46,10 +46,18 @@ Invalid payloads should be rejected at the route boundary. Do not make invalid i
   `503` without sending email; it does not fall back to process-local counters. This also applies
   to production builds run locally or as Vercel previews. Development mode permits the in-memory
   fallback, which is not a distributed production safeguard.
-- **Body length:** each route first buffers `request.text()`, then rejects strings longer than
-  `50 * 1024` UTF-16 code units with `413`. This is not an early byte/stream limit and does not
-  bound the body read into memory. [JGF-10](https://linear.app/jgf-projects/issue/JGF-10) owns the
-  bounded-read improvement; do not claim it is already implemented.
+- **Body size:** after origin and quota checks, each route reads at most `50 * 1024` bytes
+  (50 KiB) into an application buffer. The reader rejects a chunk that would cross the limit
+  before copying or decoding it, cancels further reading, and returns `413` with
+  `{ error: 'Request body too large' }`. It counts actual stream bytes independently of
+  `Content-Length`, including when the header is absent or understated. UTF-8 decoding and
+  JSON parsing happen after the bounded read; read failures retain the existing `400` response.
+  This replaces the former UTF-16 length check, so multibyte bodies over 50 KiB are also rejected.
+  Vercel's [Functions limits](https://vercel.com/docs/functions/limitations#request-body-size),
+  checked 5 November 2026, specify a 4.5 MB request/response payload cap and platform `413`
+  (`FUNCTION_PAYLOAD_TOO_LARGE`) above it. These routes use the default Node.js runtime.
+  The platform cap is much larger than this application limit; the reader bounds application
+  retention and decoding, not buffering or individual chunk allocation inside the platform.
 
 The route constants in `src/app/api/send-results/route.ts` and
 `src/app/api/send-director-results/route.ts`, together with `src/lib/rateLimit.ts` and
