@@ -141,6 +141,27 @@ describe('CookieBanner', () => {
     });
   });
 
+  it('returns focus to the external settings control after closing preferences', async () => {
+    (cookieUtils.getConsentPreferences as jest.Mock).mockReturnValue({ analytics: false });
+    render(
+      <>
+        <button
+          type='button'
+          onClick={() => document.dispatchEvent(new Event('openCookiePreferences'))}
+        >
+          Cookie Settings
+        </button>
+        <CookieBanner />
+      </>,
+    );
+    const trigger = screen.getByRole('button', { name: 'Cookie Settings' });
+    trigger.focus();
+    fireEvent.click(trigger);
+    const dialog = await screen.findByRole('dialog', { name: 'Privacy Overview' });
+    fireEvent.keyDown(dialog, { key: 'Escape' });
+    await waitFor(() => expect(trigger).toHaveFocus());
+  });
+
   it('cancels the delayed banner when another tab decides before it appears', () => {
     render(<CookieBanner />);
     jest.advanceTimersByTime(200);
