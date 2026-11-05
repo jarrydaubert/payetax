@@ -21,6 +21,59 @@ import { checkVisibleInputHelp } from './helpers/input-help';
 
 const DIRECTOR_WELCOME_DISMISS_KEY = 'directorGuideWelcome:dismissed:v1';
 
+test.describe('Director privacy controls @critical', () => {
+  test.use({ storageState: { cookies: [], origins: [] } });
+
+  test('direct entry offers consent and keyboard-accessible privacy routes', async ({
+    page,
+    isMobile,
+  }) => {
+    await page.goto('/tools/director-guide');
+    await expect(page.getByTestId('cookie-banner')).toBeVisible();
+    if (isMobile) {
+      await page.getByRole('button', { name: 'Open calculator inputs' }).click();
+      const drawer = page.getByRole('dialog', { name: 'Your Numbers' });
+      await expect(drawer).toBeVisible();
+      await expect(page.getByRole('complementary', { name: 'Cookie preferences' })).toHaveCount(0);
+      await drawer.getByRole('button', { name: 'View results' }).press('Tab');
+      expect(
+        await page.evaluate(
+          () => document.activeElement?.closest('[data-testid="cookie-banner"]') !== null,
+        ),
+      ).toBe(false);
+      await drawer.getByRole('button', { name: 'Close your numbers panel' }).click();
+    }
+    await page.getByTestId('cookie-reject-all').click();
+
+    const navigation = page.getByRole('navigation', { name: 'Privacy and compliance' });
+    const privacy = navigation.getByRole('link', { name: 'Privacy', exact: true });
+    const settings = navigation.getByRole('button', { name: 'Cookie Settings' });
+    const compliance = navigation.getByRole('link', { name: 'Compliance', exact: true });
+    await expect(privacy).toBeInViewport();
+    await expect(settings).toBeInViewport();
+    await expect(compliance).toBeInViewport();
+    await privacy.focus();
+    await page.keyboard.press('Tab');
+    await expect(settings).toBeFocused();
+    await page.keyboard.press('Enter');
+    const dialog = page.getByRole('dialog', { name: 'Privacy Overview' });
+    await expect(dialog).toBeVisible();
+    await expect(
+      dialog.getByRole('switch', { name: 'Enable analytics cookies' }),
+    ).not.toBeChecked();
+    await page.keyboard.press('Escape');
+    await expect(dialog).toBeHidden();
+    await expect(settings).toBeFocused();
+
+    await privacy.click();
+    await expect(page).toHaveURL(/\/privacy$/);
+    await page.goBack();
+    await expect(navigation).toBeVisible();
+    await compliance.click();
+    await expect(page).toHaveURL(/\/compliance$/);
+  });
+});
+
 function parseCurrency(value: string): number {
   return Number.parseFloat(value.replace(/[^0-9.-]/g, '') || '0');
 }

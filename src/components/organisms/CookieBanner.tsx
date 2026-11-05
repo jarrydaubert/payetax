@@ -2,7 +2,7 @@
 
 import { Cookie } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import {
@@ -36,6 +36,7 @@ const CookieBanner: React.FC = () => {
   const [showBanner, setShowBanner] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [analyticsDraft, setAnalyticsDraft] = useState(false);
+  const preferencesTriggerRef = useRef<HTMLElement | null>(null);
 
   const loadCurrentPreferences = useCallback((): ConsentPreferences | null => {
     const consent = getConsentPreferences();
@@ -75,6 +76,8 @@ const CookieBanner: React.FC = () => {
     };
 
     const handleOpenPreferences = () => {
+      preferencesTriggerRef.current =
+        document.activeElement instanceof HTMLElement ? document.activeElement : null;
       cancelBannerTimer();
       loadCurrentPreferences();
       setShowBanner(false);
@@ -222,7 +225,17 @@ const CookieBanner: React.FC = () => {
       )}
 
       <Dialog open={modalOpen} onOpenChange={handleModalOpenChange}>
-        <DialogContent className='max-h-[90vh] max-w-3xl overflow-y-auto'>
+        <DialogContent
+          className='max-h-[90vh] max-w-3xl overflow-y-auto'
+          onCloseAutoFocus={(event) => {
+            const trigger = preferencesTriggerRef.current;
+            preferencesTriggerRef.current = null;
+            if (trigger?.isConnected) {
+              event.preventDefault();
+              trigger.focus();
+            }
+          }}
+        >
           <DialogHeader>
             <DialogTitle>Privacy Overview</DialogTitle>
             <DialogDescription>

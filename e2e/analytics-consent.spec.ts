@@ -192,3 +192,67 @@ test('retries a failed gtag load after withdrawal and re-acceptance without repl
   await expect.poll(() => googleScriptRequests).toBe(2);
   await expect.poll(() => pageViewCount(page)).toBe(1);
 });
+
+test.describe('Director cross-tab withdrawal', () => {
+  for (const withdrawingRoute of ['/tools/director-guide', '/']) {
+    test(`withdrawal from ${withdrawingRoute} stops analytics in both tabs`, async ({
+      context,
+      page,
+    }) => {
+      await context.route('https://www.googletagmanager.com/**', (route) =>
+        route.fulfill({ contentType: 'application/javascript', body: '' }),
+      );
+      const consentState = (tab: Page) =>
+        tab.evaluate(() => ({
+          granted: (window as Window & { consentMode?: { isConsentGiven: boolean } }).consentMode
+            ?.isConsentGiven,
+          disabled: Object.entries(window).find(([key]) => key.startsWith('ga-disable-G-'))?.[1],
+          gaCookies: document.cookie.split(';').filter((cookie) => cookie.trim().startsWith('_ga')),
+        }));
+
+      await page.goto(withdrawingRoute);
+      await page.getByTestId('cookie-accept-all').click();
+      await expect
+        .poll(() => consentState(page))
+        .toEqual({
+          granted: true,
+          disabled: false,
+          gaCookies: [],
+        });
+
+      const otherTab = await context.newPage();
+      await otherTab.goto('/tools/director-guide');
+      await expect
+        .poll(() => consentState(otherTab))
+        .toEqual({
+          granted: true,
+          disabled: false,
+          gaCookies: [],
+        });
+      await context.addCookies([
+        { name: '_ga', value: 'GA1.1.111.222', url: new URL(page.url()).origin },
+      ]);
+      // An open preferences dialog in the receiving tab must also sync on withdrawal.
+      await otherTab.getByRole('button', { name: 'Cookie Settings' }).click();
+      await expect(otherTab.getByRole('dialog', { name: 'Privacy Overview' })).toBeVisible();
+      await page.getByRole('button', { name: 'Cookie Settings' }).click();
+      await page.getByTestId('cookie-modal-reject-all').click();
+
+      for (const tab of [page, otherTab]) {
+        await expect
+          .poll(() => consentState(tab))
+          .toEqual({
+            granted: false,
+            disabled: true,
+            gaCookies: [],
+          });
+        await expect(tab.getByRole('dialog', { name: 'Privacy Overview' })).toBeHidden();
+        await tab.getByRole('button', { name: 'Cookie Settings' }).click();
+        await expect(
+          tab.getByRole('switch', { name: 'Enable analytics cookies' }),
+        ).not.toBeChecked();
+        await tab.keyboard.press('Escape');
+      }
+    });
+  }
+});
