@@ -20,11 +20,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import type { Region } from '@/lib/validation/directorValidation';
-import {
-  useDirectorFormSlice,
-  useDirectorGuideActions,
-  type YearEndMonth,
-} from '@/store/directorGuideStore';
+import { useDirectorFormSlice, useDirectorGuideActions } from '@/store/directorGuideStore';
+import { AccountingPeriodEndInput } from './AccountingPeriodEndInput';
 
 export function CoreInputs() {
   const id = useId();
@@ -33,17 +30,13 @@ export function CoreInputs() {
     includesVat: state.includesVat,
     expenses: state.expenses,
     region: state.region,
-    yearEndMonth: state.yearEndMonth,
-    yearEndCustom: state.yearEndCustom,
   }));
-  const { setRegion, setRevenue, setIncludesVat, setExpenses, setYearEndMonth, setYearEndCustom } =
-    useDirectorGuideActions();
+  const { setRegion, setRevenue, setIncludesVat, setExpenses } = useDirectorGuideActions();
 
   const revenueId = `${id}-revenue`;
   const vatId = `${id}-vat`;
   const expensesId = `${id}-expenses`;
   const regionId = `${id}-region`;
-  const yearEndId = `${id}-yearEnd`;
 
   return (
     <Card>
@@ -109,36 +102,7 @@ export function CoreInputs() {
             </Select>
           </div>
 
-          {/* Year End */}
-          <div className='space-y-2'>
-            <div className='flex items-center gap-1'>
-              <Label htmlFor={yearEndId}>Financial Year End</Label>
-              <LabelTooltip fieldName='directorYearEnd' />
-            </div>
-            <Select
-              value={formData.yearEndMonth}
-              onValueChange={(v) => setYearEndMonth(v as YearEndMonth)}
-            >
-              <SelectTrigger id={yearEndId}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='03'>31 March (most common)</SelectItem>
-                <SelectItem value='12'>31 December</SelectItem>
-                <SelectItem value='other'>Other date</SelectItem>
-                <SelectItem value='unknown'>I don&apos;t know</SelectItem>
-              </SelectContent>
-            </Select>
-            {formData.yearEndMonth === 'other' && (
-              <Input
-                type='text'
-                value={formData.yearEndCustom}
-                onChange={(e) => setYearEndCustom(e.target.value)}
-                placeholder='MM-DD (e.g. 06-30)'
-                className='mt-2'
-              />
-            )}
-          </div>
+          <AccountingPeriodEndInput />
         </div>
       </CardContent>
     </Card>

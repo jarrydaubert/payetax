@@ -69,8 +69,7 @@ export function DirectorDashboard() {
 
   const formData = useDirectorFormSlice((state) => ({
     mode: state.mode,
-    yearEndMonth: state.yearEndMonth,
-    yearEndCustom: state.yearEndCustom,
+    accountingPeriodEnd: state.accountingPeriodEnd,
     region: state.region,
     revenue: state.revenue,
     includesVat: state.includesVat,

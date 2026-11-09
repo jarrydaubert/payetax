@@ -292,8 +292,7 @@ describe('Director Intelligence calculator components', () => {
       setStoreState({
         formData: {
           ...current.formData,
-          yearEndMonth: '03',
-          yearEndCustom: '',
+          accountingPeriodEnd: '2026-12-31',
         },
       });
 

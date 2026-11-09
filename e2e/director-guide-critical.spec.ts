@@ -12,6 +12,7 @@
  *   result or an email action on screen
  */
 
+import { readFile } from 'node:fs/promises';
 import { type BrowserContext, expect, type Locator, type Page, test } from '@playwright/test';
 import type { TaxYear } from '../src/constants/taxRates';
 import { calculateStrategyComparison } from '../src/lib/tax/strategyComparison';
@@ -339,11 +340,10 @@ test.describe('Director Intelligence critical @critical', () => {
     await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 100000);
     await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 20000);
     await selectEngland(page);
-    await selectDropdownOption(
-      page,
-      page.getByRole('combobox', { name: 'Company Year-End' }).filter({ visible: true }),
-      '31 December',
-    );
+    await page
+      .getByRole('textbox', { name: 'Company Accounting Period End' })
+      .filter({ visible: true })
+      .fill('2026-12-31');
     await closeInputsPanelIfOpen(page);
     const email = page.getByRole('button', { name: 'Email My Results' });
     await expect(email).toBeEnabled();
@@ -712,21 +712,69 @@ test.describe('Director input help @critical', () => {
         .filter({ visible: true }),
       1000,
     );
-    await selectDropdownOption(
-      page,
-      page
-        .getByRole('combobox', { name: 'Company Year-End', exact: true })
-        .filter({ visible: true }),
-      'Other',
-    );
     const annual = await checkVisibleInputHelp(page);
     expect(annual).toContain('tooltip-trigger-directorPensionDeducted');
-    expect(annual).toContain('tooltip-trigger-directorYearEndCustom');
+    expect(annual).toContain('tooltip-trigger-directorYearEnd');
     await visibleButton('Monthly').click();
     const monthly = await checkVisibleInputHelp(page);
     expect(monthly).toContain('tooltip-trigger-directorRunwayMonths');
-    expect(new Set([...annual, ...monthly]).size).toBe(27);
+    expect(new Set([...annual, ...monthly]).size).toBe(26);
     await expect(page.getByRole('dialog', { name: 'Your Numbers' })).toBeVisible();
+  });
+
+  test('DI-07: the calendar requires a valid explicit accounting period end @critical', async ({
+    page,
+  }) => {
+    await openDirectorGuide(page);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 100000);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 20000);
+    await selectEngland(page);
+    await closeInputsPanelIfOpen(page);
+
+    const keyDates = page.locator('[data-director-section="director-key-dates"]');
+    const downloadButton = keyDates.getByRole('button', { name: 'Download .ics' });
+    await expect(keyDates).toContainText('Enter your accounting period end');
+    await expect(downloadButton).toHaveCount(0);
+    const personalDate = keyDates
+      .getByText(/Self Assessment \(/)
+      .locator('..')
+      .locator('.font-mono');
+    // The 2026/27 personal tax year ends 5 April 2027. Its standard deadline is 31 January 2028.
+    const expectedPersonalDate = '31 Jan 2028';
+    await expect(personalDate).toHaveText(expectedPersonalDate);
+
+    const periodEnd = page
+      .getByRole('textbox', { name: 'Company Accounting Period End' })
+      .filter({ visible: true });
+    await ensureInputsPanelIsVisible(page);
+    await periodEnd.fill('2026-12-31');
+    await closeInputsPanelIfOpen(page);
+    await expect(keyDates).toContainText('1 Oct 2027');
+    await expect(keyDates).toContainText('31 Dec 2027');
+    await expect(personalDate).toHaveText(expectedPersonalDate);
+
+    const downloadPromise = page.waitForEvent('download');
+    await downloadButton.click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toBe('payetax-key-dates-2026.ics');
+    const calendarPath = await download.path();
+    if (!calendarPath) throw new Error('Missing calendar download');
+    const calendar = await readFile(calendarPath, 'utf8');
+    expect(calendar).toContain('UID:ct-payment-20271001@payetax.co.uk\r\n');
+    expect(calendar).toContain('DTSTART;VALUE=DATE:20271001\r\nDTEND;VALUE=DATE:20271002\r\n');
+    expect(calendar).toContain('UID:ct-return-20271231@payetax.co.uk\r\n');
+    expect(calendar).toContain('DTSTART;VALUE=DATE:20271231\r\nDTEND;VALUE=DATE:20280101\r\n');
+    expect(calendar).toContain('UID:self-assessment-20280131@payetax.co.uk\r\n');
+    expect(calendar).toContain('DTSTART;VALUE=DATE:20280131\r\nDTEND;VALUE=DATE:20280201\r\n');
+
+    await ensureInputsPanelIsVisible(page);
+    await periodEnd.fill('2026-02-29');
+    await expect(periodEnd).toHaveAccessibleDescription(/Enter a valid date/);
+    await closeInputsPanelIfOpen(page);
+    await expect(keyDates).toContainText('Correct the accounting period end');
+    await expect(keyDates).not.toContainText('1 Oct 2027');
+    await expect(downloadButton).toHaveCount(0);
+    await expect(personalDate).toHaveText(expectedPersonalDate);
   });
 
   test('material Director estimate warnings appear with results', async ({ page }) => {

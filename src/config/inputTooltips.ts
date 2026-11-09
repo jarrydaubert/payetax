@@ -155,13 +155,9 @@ export const INPUT_TOOLTIPS = {
     note: 'The target reserve is this number multiplied by your monthly expenses plus your minimum monthly draw.',
   },
   directorYearEnd: {
-    title: 'Company Year-End',
+    title: 'Company Accounting Period End',
     description:
-      "The date your company's accounting year ends. Check Companies House or ask your accountant if you are unsure.",
-  },
-  directorYearEndCustom: {
-    title: 'Custom Year-End Date',
-    description: 'Enter the month and day as MM-DD. For example, 06-30 means 30 June.',
+      'Use the end date of the Corporation Tax accounting period shown in your HMRC business tax account. Your company accounts can cover more than one Corporation Tax accounting period.',
   },
   directorYtdSalary: {
     title: 'Salary Already Taken',

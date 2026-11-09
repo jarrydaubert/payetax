@@ -10,6 +10,7 @@ import { ChevronDown, ChevronUp, RotateCcw } from 'lucide-react';
 import { useEffect, useId, useState } from 'react';
 import { CurrencyInput, type CurrencyInputInvalidDraft } from '@/components/atoms/CurrencyInput';
 import { LabelTooltip } from '@/components/atoms/LabelTooltip';
+import { AccountingPeriodEndInput } from '@/components/molecules/DirectorGuide/inputs/AccountingPeriodEndInput';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,7 +33,6 @@ import {
   useDirectorGuideActions,
   useDirectorInputErrors,
   useDirectorInputRevision,
-  type YearEndMonth,
 } from '@/store/directorGuideStore';
 
 const TAX_YEAR = CURRENT_TAX_YEAR;
@@ -104,8 +104,6 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
     ytdDrawings: formData.ytdDrawings,
     otherIncome: formData.otherIncome,
     hasOtherPAYEEmployment: formData.hasOtherPAYEEmployment,
-    yearEndMonth: formData.yearEndMonth,
-    yearEndCustom: formData.yearEndCustom,
     studentLoanPlans: formData.studentLoanPlans,
     pensionContribution: formData.pensionContribution,
     isPensionAlreadyDeducted: formData.isPensionAlreadyDeducted,
@@ -257,8 +255,6 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
     includesVat: `${baseId}-includes-vat`,
     expenses: `${baseId}-expenses`,
     region: `${baseId}-region`,
-    yearEnd: `${baseId}-year-end`,
-    yearEndCustom: `${baseId}-year-end-custom`,
     ytdSalary: `${baseId}-ytd-salary`,
     ytdDividends: `${baseId}-ytd-dividends`,
     ytdDrawings: `${baseId}-ytd-drawings`,
@@ -531,46 +527,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
           </Select>
         </Field>
 
-        <Field label='Company Year-End' id={ids.yearEnd} tooltipFieldName='directorYearEnd'>
-          <Select
-            value={formData.yearEndMonth}
-            onValueChange={(v) => {
-              const yearEndMonth = v as YearEndMonth;
-              actions.setYearEndMonth(yearEndMonth);
-              if (yearEndMonth !== 'other') {
-                actions.setYearEndCustom('');
-              }
-            }}
-          >
-            <SelectTrigger id={ids.yearEnd} className='border-border/40 bg-card text-foreground'>
-              <SelectValue placeholder='Select year-end' />
-            </SelectTrigger>
-            <SelectContent className='border-border bg-card'>
-              <SelectItem value='03'>31 March</SelectItem>
-              <SelectItem value='12'>31 December</SelectItem>
-              <SelectItem value='other'>Other</SelectItem>
-              <SelectItem value='unknown'>Not sure</SelectItem>
-            </SelectContent>
-          </Select>
-        </Field>
-
-        {formData.yearEndMonth === 'other' ? (
-          <Field
-            label='Custom Year-End Date (MM-DD)'
-            id={ids.yearEndCustom}
-            tooltipFieldName='directorYearEndCustom'
-          >
-            <Input
-              id={ids.yearEndCustom}
-              type='text'
-              inputMode='numeric'
-              value={formData.yearEndCustom}
-              onChange={(e) => actions.setYearEndCustom(e.target.value)}
-              placeholder='06-30'
-              className={INPUT_CLASS}
-            />
-          </Field>
-        ) : null}
+        <AccountingPeriodEndInput className={INPUT_CLASS} />
       </Section>
 
       {quickStartMode ? (

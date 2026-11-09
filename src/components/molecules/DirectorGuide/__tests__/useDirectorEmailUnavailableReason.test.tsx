@@ -71,7 +71,10 @@ describe('Director email interim guard', () => {
     ['other income', () => useDirectorGuideStore.getState().setOtherIncome(5000)],
     ['pension', () => useDirectorGuideStore.getState().setPensionContribution(5000)],
     ['YTD drawings', () => useDirectorGuideStore.getState().setYtdDrawings(1000)],
-    ['year end', () => useDirectorGuideStore.getState().setYearEndMonth('12')],
+    [
+      'accounting period end',
+      () => useDirectorGuideStore.getState().setAccountingPeriodEnd('2026-12-31'),
+    ],
   ] as const)('pauses immediately when %s changes until calculation completes', (_name, change) => {
     calculateCurrent();
     const { result } = renderHook(useDirectorEmailUnavailableReason);

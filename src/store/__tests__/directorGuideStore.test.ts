@@ -237,9 +237,9 @@ describe('DirectorGuideStore', () => {
       expect(useDirectorGuideStore.getState().formData.hasEmploymentAllowance).toBe(true);
     });
 
-    it('should set year-end month', () => {
-      useDirectorGuideStore.getState().setYearEndMonth('12');
-      expect(useDirectorGuideStore.getState().formData.yearEndMonth).toBe('12');
+    it('sets the accounting period end', () => {
+      useDirectorGuideStore.getState().setAccountingPeriodEnd('2026-12-31');
+      expect(useDirectorGuideStore.getState().formData.accountingPeriodEnd).toBe('2026-12-31');
     });
 
     it('should set minimum salary requirement', () => {
@@ -653,6 +653,26 @@ describe('DirectorGuideStore', () => {
   });
 
   describe('Persisted State Hydration Guards', () => {
+    it('restores legacy figures without guessing a year for a saved month and day', async () => {
+      localStorage.setItem(
+        DIRECTOR_STORAGE_KEY,
+        JSON.stringify({
+          state: {
+            formData: { revenue: 45000, yearEndMonth: 'other', yearEndCustom: '06-30' },
+          },
+          version: 4,
+        }),
+      );
+
+      rememberFigures(true);
+      await useDirectorGuideStore.persist.rehydrate();
+
+      expect(useDirectorGuideStore.getState().formData).toMatchObject({
+        revenue: 45000,
+        accountingPeriodEnd: '',
+      });
+    });
+
     it('should ignore tampered persisted form data that fails schema validation', async () => {
       useDirectorGuideStore.getState().setMonthlyIncome(2500);
 

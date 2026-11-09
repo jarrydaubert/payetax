@@ -195,16 +195,17 @@ describe('DirectorGuide InputsPanel', () => {
     expect(state.pensionContribution).toBe(0);
   });
 
-  it('reveals a custom date field when company year-end is other', () => {
+  it('associates impossible accounting dates with an error until corrected', () => {
     render(<InputsPanel />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Other' }));
-
-    const input = screen.getByLabelText('Custom Year-End Date (MM-DD)');
-    expect(input).toBeInTheDocument();
-
-    fireEvent.change(input, { target: { value: '06-30' } });
-    expect(useDirectorGuideStore.getState().formData.yearEndCustom).toBe('06-30');
+    const input = screen.getByLabelText('Company Accounting Period End');
+    fireEvent.change(input, { target: { value: '2026-02-29' } });
+    expect(input).toHaveAttribute('aria-invalid', 'true');
+    expect(input).toHaveAccessibleDescription(/Enter a valid date/);
+    fireEvent.change(input, { target: { value: '2024-02-29' } });
+    expect(input).not.toHaveAttribute('aria-invalid');
+    expect(input).not.toHaveAccessibleDescription(/Enter a valid date/);
+    expect(useDirectorGuideStore.getState().formData.accountingPeriodEnd).toBe('2024-02-29');
   });
 
   it('updates monthly mode values, including contract month selection', () => {
