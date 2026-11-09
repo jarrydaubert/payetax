@@ -359,6 +359,10 @@ const PersistedDirectorStoreSchema = z
 // STORE
 // ============================================================================
 
+function persistedDirectorFigures({ formData, selectedStrategy }: DirectorGuideStore) {
+  return { formData, selectedStrategy, _savedAt: Date.now(), _taxYear: CURRENT_TAX_YEAR };
+}
+
 export const useDirectorGuideStore = create<DirectorGuideStore>()(
   devtools(
     persist(
@@ -863,12 +867,7 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         name: 'director-guide-storage',
         version: 4, // Monthly mode fields + derived outputs
         storage: createJSONStorage(() => figureStorage),
-        partialize: (state) => ({
-          formData: state.formData,
-          selectedStrategy: state.selectedStrategy,
-          _savedAt: Date.now(),
-          _taxYear: CURRENT_TAX_YEAR,
-        }),
+        partialize: persistedDirectorFigures,
         migrate: (persistedState, version) => {
           // Migration from older versions - clear and start fresh
           if (version < 4) {
@@ -926,7 +925,10 @@ registerFigureStore('director-guide-storage', {
   restore: () => {
     useDirectorGuideStore.persist.rehydrate();
   },
-  save: () => useDirectorGuideStore.setState({}),
+  snapshot: () => ({
+    state: persistedDirectorFigures(useDirectorGuideStore.getState()),
+    version: useDirectorGuideStore.persist.getOptions().version,
+  }),
 });
 
 // ============================================================================

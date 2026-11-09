@@ -244,6 +244,49 @@ test('blocked storage keeps calculations usable and reports erasure limits @crit
   await expect(salary(page)).toHaveValue('40,000.00');
 });
 
+test('explicit retry resumes remembering after a transient quota failure without clearing results @critical', async ({
+  page,
+}, testInfo) => {
+  await open(page);
+  await checkbox(page).click();
+  await expect(checkbox(page)).toBeChecked();
+  const consent = await page.evaluate((key) => localStorage.getItem(key), preference);
+  const storage = await page.evaluateHandle((snapshotKey) => {
+    const setItem = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (key, value) {
+      if (key === snapshotKey) throw new DOMException('Full', 'QuotaExceededError');
+      setItem.call(this, key, value);
+    };
+    return () => {
+      Storage.prototype.setItem = setItem;
+    };
+  }, payeKey);
+  const alert = page.getByRole('alert').filter({ hasText: 'cannot save figures reliably' });
+  const controls = page.getByRole('region', { name: 'Remember figures' });
+  await salary(page).fill('40000');
+  await page.getByTestId('tax-code-input').fill('1257L');
+  await expect(checkbox(page)).not.toBeChecked();
+  await expect(alert).toBeVisible();
+  await page.getByTestId('calculate-button').press('Enter');
+  const results = page.getByTestId('results-table');
+  await expect(results).toContainText('£32,322.04');
+  await controls.screenshot({ path: testInfo.outputPath('remembering-unavailable.png') });
+
+  await storage.evaluate((restore) => restore());
+  await storage.dispose();
+  await checkbox(page).click();
+  await expect(checkbox(page)).toBeChecked();
+  await expect(alert).toHaveCount(0);
+  await expect(salary(page)).toHaveValue('40,000.00');
+  await expect(results).toContainText('£32,322.04');
+  await expectSavedSalary(page, 40000);
+  expect(await page.evaluate((key) => localStorage.getItem(key), preference)).toBe(consent);
+  await controls.screenshot({ path: testInfo.outputPath('remembering-recovered.png') });
+  await page.reload({ waitUntil: 'networkidle' });
+  await expect(salary(page)).toHaveValue('40,000.00');
+  await expect(results).toHaveCount(0);
+});
+
 test('remembering controls remain usable on a narrow Director screen and privacy wording matches @critical', async ({
   page,
 }, testInfo) => {

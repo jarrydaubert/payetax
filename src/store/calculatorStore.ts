@@ -529,6 +529,10 @@ const PersistedCalculatorStoreSchema = z
   })
   .passthrough();
 
+function persistedCalculatorFigures({ input }: CalculatorState) {
+  return { input, _savedAt: Date.now(), _taxYear: input.taxYear };
+}
+
 type CalculatorUpdate =
   | Partial<CalculatorState>
   | ((state: CalculatorState) => Partial<CalculatorState>);
@@ -1279,12 +1283,7 @@ export const useCalculatorStore = create<CalculatorState>()(
       {
         name: 'tax-calculator-storage',
         storage: createJSONStorage(() => figureStorage),
-        partialize: (state) => ({
-          input: state.input,
-          _savedAt: Date.now(),
-          _taxYear: state.input.taxYear,
-          // Don't persist calculation results
-        }),
+        partialize: persistedCalculatorFigures,
         merge: (
           persistedState: Partial<CalculatorState> | unknown,
           currentState: CalculatorState,
@@ -1357,7 +1356,10 @@ registerFigureStore('tax-calculator-storage', {
   restore: () => {
     useCalculatorStore.persist.rehydrate();
   },
-  save: () => useCalculatorStore.setState({}),
+  snapshot: () => ({
+    state: persistedCalculatorFigures(useCalculatorStore.getState()),
+    version: useCalculatorStore.persist.getOptions().version,
+  }),
 });
 
 /**

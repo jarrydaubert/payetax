@@ -18,7 +18,8 @@ export const useFigureStorage = create(() => ({
   erasureFailed: false,
 }));
 
-const stores = new Map<FigureKey, { clear: () => void; restore: () => void; save: () => void }>();
+type FigureStore = { clear: () => void; restore: () => void; snapshot: () => Snapshot };
+const stores = new Map<FigureKey, FigureStore>();
 let preference: Preference | null = null;
 let initialized = false;
 let listening = false;
@@ -239,10 +240,7 @@ function startListening() {
   }
 }
 
-export function registerFigureStore(
-  key: FigureKey,
-  store: { clear: () => void; restore: () => void; save: () => void },
-) {
+export function registerFigureStore(key: FigureKey, store: FigureStore) {
   stores.set(key, store);
 }
 
@@ -278,7 +276,7 @@ export const figureStorage: StateStorage = {
         useFigureStorage.getState().legacy
       )
         return;
-      writeSnapshot(name, value, id);
+      writeSnapshot(key, JSON.parse(value), id);
     });
   },
   removeItem: (name) =>
@@ -291,12 +289,11 @@ export const figureStorage: StateStorage = {
     ),
 };
 
-function writeSnapshot(name: string, value: string, id: string) {
-  const snapshot: Snapshot = JSON.parse(value);
+function writeSnapshot(key: FigureKey, snapshot: Snapshot, id: string) {
   snapshot.state._rememberId = id;
   snapshot.state._calendarYear = calendarYear();
-  localStorage.setItem(name, JSON.stringify(snapshot));
-  knownSnapshots.set(name as FigureKey, id);
+  localStorage.setItem(key, JSON.stringify(snapshot));
+  knownSnapshots.set(key, id);
 }
 
 /** One explicit preference covers both calculators; changing it never touches analytics keys. */
@@ -307,12 +304,15 @@ export function rememberFigures(restoreLegacy = false) {
     if (
       !refreshStorage() ||
       preference?.id !== observedId ||
-      (preference?.enabled && !restoreLegacy) ||
       useFigureStorage.getState().legacy !== restoreLegacy
     )
       return;
 
-    const next: Preference = {
+    // Retry under the existing consent so other tabs keep their live figures.
+    const retry = preference?.enabled && !restoreLegacy ? preference : null;
+    if (retry && !disabledAfterFailure) return;
+
+    const next: Preference = retry ?? {
       id: newId(),
       enabled: true,
       // Other open tabs must drop drafts from the quarantine period.
@@ -330,9 +330,14 @@ export function rememberFigures(restoreLegacy = false) {
         migrated.push(key);
       }
     }
-    // Publish consent after migration. Interrupted migration cannot authorize its snapshots.
-    localStorage.setItem(FIGURE_PREFERENCE_KEY, JSON.stringify({ ...next, version: 1 }));
-    preference = next;
+    if (!retry) {
+      // Publish consent after migration. Interrupted migration cannot authorize its snapshots.
+      localStorage.setItem(FIGURE_PREFERENCE_KEY, JSON.stringify({ ...next, version: 1 }));
+      preference = next;
+    }
+    if (!restoreLegacy) {
+      for (const [key, store] of stores) writeSnapshot(key, store.snapshot(), next.id);
+    }
     disabledAfterFailure = false;
     useFigureStorage.setState({
       enabled: true,
@@ -344,8 +349,6 @@ export function rememberFigures(restoreLegacy = false) {
       withoutSaving(() => {
         for (const key of migrated) stores.get(key)?.restore();
       });
-    } else {
-      for (const store of stores.values()) store.save();
     }
   });
 }

@@ -310,6 +310,66 @@ describe('financial storage opt-in and erasure', () => {
     expect(useFigureStorage.getState().legacy).toBe(false);
   });
 
+  it('retries a failed save without resetting live figures or rotating consent', async () => {
+    await rememberFigures();
+    paye.getState().setSalary(54321.98);
+    const consent = localStorage.getItem(FIGURE_PREFERENCE_KEY);
+    const saved = localStorage.getItem(PAYE);
+    const write = jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new DOMException('Full', 'QuotaExceededError');
+    });
+
+    paye.getState().setSalary(40000);
+    await Promise.resolve();
+    paye.getState().calculate();
+    director.getState().setRevenue(87654.32);
+    const results = paye.getState().results;
+    expect(results).not.toBeNull();
+    await rememberFigures();
+    expect(useFigureStorage.getState()).toMatchObject({ enabled: false, unavailable: true });
+    expect(localStorage.getItem(PAYE)).toBe(saved);
+
+    write.mockRestore();
+    syncFigureStorage();
+    expect(useFigureStorage.getState().enabled).toBe(false);
+    await rememberFigures();
+    expect(useFigureStorage.getState()).toMatchObject({ enabled: true, unavailable: false });
+    expect(localStorage.getItem(FIGURE_PREFERENCE_KEY)).toBe(consent);
+    expect(JSON.parse(localStorage.getItem(PAYE) ?? '{}').state.input.salary).toBe(40000);
+    expect(JSON.parse(localStorage.getItem(DIRECTOR) ?? '{}').state.formData.revenue).toBe(
+      87654.32,
+    );
+    expect(paye.getState().results).toBe(results);
+  });
+
+  it('retries when the first opt-in saved consent but the Director snapshot failed', async () => {
+    director.getState().setRevenue(87654.32);
+    const set = Storage.prototype.setItem;
+    const write = jest.spyOn(Storage.prototype, 'setItem').mockImplementation(function (
+      this: Storage,
+      key,
+      value,
+    ) {
+      if (key === DIRECTOR) throw new DOMException('Full', 'QuotaExceededError');
+      set.call(this, key, value);
+    });
+
+    await rememberFigures();
+    const consent = localStorage.getItem(FIGURE_PREFERENCE_KEY);
+    expect(JSON.parse(consent ?? '{}').enabled).toBe(true);
+    expect(useFigureStorage.getState()).toMatchObject({ enabled: false, unavailable: true });
+    expect(localStorage.getItem(DIRECTOR)).toBeNull();
+    expect(director.getState().formData.revenue).toBe(87654.32);
+
+    write.mockRestore();
+    await rememberFigures();
+    expect(useFigureStorage.getState()).toMatchObject({ enabled: true, unavailable: false });
+    expect(localStorage.getItem(FIGURE_PREFERENCE_KEY)).toBe(consent);
+    expect(JSON.parse(localStorage.getItem(DIRECTOR) ?? '{}').state.formData.revenue).toBe(
+      87654.32,
+    );
+  });
+
   it('keeps session inputs usable when writes become blocked, and reports incomplete erasure', async () => {
     rememberFigures();
     paye.getState().setSalary(54321.98);
