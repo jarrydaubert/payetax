@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
 import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
+import { parseCurrencyInput } from '@/lib/currencyInput';
 import { calculateMarriageAllowanceNetSaving } from '@/lib/tax/marriageAllowance';
 import { cn, formatCurrency } from '@/lib/utils';
 
@@ -84,18 +85,35 @@ export function MarriageAllowanceClient() {
   const recipientId = `${id}-recipient`;
   const [transferorIncome, setTransferorIncome] = useState<string>('');
   const [recipientIncome, setRecipientIncome] = useState<string>('');
+  const [transferorError, setTransferorError] = useState<string | null>(null);
+  const [recipientError, setRecipientError] = useState<string | null>(null);
   const [result, setResult] = useState<EligibilityResult | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Normalize: strip everything except digits
-    const transferor = Number(transferorIncome.replace(/[^\d]/g, ''));
-    const recipient = Number(recipientIncome.replace(/[^\d]/g, ''));
+    const transferor = parseCurrencyInput(transferorIncome);
+    const recipient = parseCurrencyInput(recipientIncome);
 
-    setResult(checkEligibility(transferor, recipient));
+    setTransferorError(
+      transferor.status === 'empty'
+        ? 'Enter the lower earner’s annual income, or enter 0 if none.'
+        : transferor.status === 'invalid'
+          ? transferor.error
+          : null,
+    );
+    setRecipientError(
+      recipient.status === 'empty'
+        ? 'Enter the higher earner’s annual income, or enter 0 if none.'
+        : recipient.status === 'invalid'
+          ? recipient.error
+          : null,
+    );
+    setResult(
+      transferor.status === 'valid' && recipient.status === 'valid'
+        ? checkEligibility(transferor.value, recipient.value)
+        : null,
+    );
   };
-
-  const isFormValid = transferorIncome.trim() && recipientIncome.trim();
 
   return (
     <div className={cn('mx-auto max-w-4xl', 'px-4', 'py-12')}>
@@ -162,17 +180,37 @@ export function MarriageAllowanceClient() {
                   <Input
                     id={transferorId}
                     type='text'
+                    inputMode='decimal'
                     placeholder='10,000'
                     value={transferorIncome}
-                    onChange={(e) => setTransferorIncome(e.target.value)}
+                    onChange={(e) => {
+                      setTransferorIncome(e.target.value);
+                      setTransferorError(null);
+                      setResult(null);
+                    }}
+                    aria-invalid={transferorError ? true : undefined}
+                    aria-describedby={
+                      transferorError
+                        ? `${transferorId}-hint ${transferorId}-error`
+                        : `${transferorId}-hint`
+                    }
                     className='pl-7 font-mono'
                     autoComplete='off'
                     spellCheck={false}
                   />
                 </div>
-                <p className='mt-1 text-xs text-muted-foreground'>
+                <p id={`${transferorId}-hint`} className='mt-1 text-xs text-muted-foreground'>
                   The person who will transfer their allowance
                 </p>
+                {transferorError && (
+                  <p
+                    id={`${transferorId}-error`}
+                    role='alert'
+                    className='mt-1 text-sm text-destructive'
+                  >
+                    {transferorError}
+                  </p>
+                )}
               </div>
               <div>
                 <label htmlFor={recipientId} className='mb-2 block text-sm font-medium'>
@@ -185,20 +223,40 @@ export function MarriageAllowanceClient() {
                   <Input
                     id={recipientId}
                     type='text'
+                    inputMode='decimal'
                     placeholder='35,000'
                     value={recipientIncome}
-                    onChange={(e) => setRecipientIncome(e.target.value)}
+                    onChange={(e) => {
+                      setRecipientIncome(e.target.value);
+                      setRecipientError(null);
+                      setResult(null);
+                    }}
+                    aria-invalid={recipientError ? true : undefined}
+                    aria-describedby={
+                      recipientError
+                        ? `${recipientId}-hint ${recipientId}-error`
+                        : `${recipientId}-hint`
+                    }
                     className='pl-7 font-mono'
                     autoComplete='off'
                     spellCheck={false}
                   />
                 </div>
-                <p className='mt-1 text-xs text-muted-foreground'>
+                <p id={`${recipientId}-hint`} className='mt-1 text-xs text-muted-foreground'>
                   The person who will receive the allowance
                 </p>
+                {recipientError && (
+                  <p
+                    id={`${recipientId}-error`}
+                    role='alert'
+                    className='mt-1 text-sm text-destructive'
+                  >
+                    {recipientError}
+                  </p>
+                )}
               </div>
             </div>
-            <Button type='submit' size='lg' className='w-full' disabled={!isFormValid}>
+            <Button type='submit' size='lg' className='w-full'>
               Check Eligibility
             </Button>
           </form>
