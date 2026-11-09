@@ -26,6 +26,94 @@ function parsePercent(text: string): number {
   return Number.parseFloat(match[1] ?? 'NaN');
 }
 
+test('PAYE calculation failure stays inline and a retry restores results @critical', async ({
+  page,
+}, testInfo) => {
+  const failure = 'Controlled PAYE calculation failure';
+  const faultAttribute = 'data-test-paye-failure';
+  const pageErrors: string[] = [];
+  const diagnostics: string[] = [];
+  let injections = 0;
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+  page.on('console', (message) => {
+    if (message.type() !== 'error') return;
+    const text = message.text();
+    // WebKit reports the existing unsupported viewport option as a console error.
+    if (text === 'Viewport argument key "interactive-widget" not recognized and ignored.') return;
+    diagnostics.push(text);
+  });
+
+  // These Vercel scripts are only served on a deployment.
+  await page.route('**/_vercel/{insights,speed-insights}/script.js', (route) =>
+    route.fulfill({ contentType: 'application/javascript', body: '' }),
+  );
+
+  // Inject a single fault inside the real store action's try block in the production bundle.
+  // Assert the anchor matched so changes in the bundler cannot silently disable the regression.
+  await page.route('**/_next/static/**/*.js', async (route) => {
+    const response = await route.fetch();
+    const source = await response.text();
+    const calculationBreadcrumb =
+      /if\((\(0,\w+\.addBreadcrumb\)\("calculator",\{message:"Starting tax calculation",level:"info"\}\)),/g;
+    const body = source.replace(calculationBreadcrumb, (_, breadcrumb) => {
+      injections += 1;
+      const throwOnce = `(()=>{if(document.documentElement.hasAttribute("${faultAttribute}")){document.documentElement.removeAttribute("${faultAttribute}");throw Error("${failure}")}})()`;
+      return `if(${throwOnce},${breadcrumb},`;
+    });
+    await route.fulfill(body === source ? { response } : { response, body });
+  });
+
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await openCalculatorForAmountEntry(page, testInfo.project.use.isMobile ?? false);
+  await page.getByTestId('married-checkbox').press('Space');
+  await expect(page.getByTestId('partner-salary-input')).toBeHidden();
+  const salary = page.getByTestId('salary-input');
+  await salary.fill('40000');
+  await salary.press('Tab');
+  await page.getByTestId('tax-code-input').fill('1257L');
+
+  const calculator = page.getByTestId('calculator-section');
+  const calculate = page.getByTestId('calculate-button');
+  const results = page.getByTestId('tax-results');
+  const email = page.getByRole('button', { name: 'Email tax calculation results' });
+  const netPay = page.getByTestId('results-table').getByRole('row', { name: /^Net Pay/ });
+  const fixture = payrollFixtures.scenarios.find(({ id }) => id === 'salary-guide-40k-base');
+  if (!fixture) throw new Error('Missing the independent £40,000 PAYE fixture');
+  const expectedNetPay = new Intl.NumberFormat('en-GB', {
+    style: 'currency',
+    currency: 'GBP',
+  }).format(fixture.expected.netPayAnnual);
+  await calculate.press('Enter');
+  await expect(results).toBeVisible();
+  await expect(netPay.getByRole('cell', { name: expectedNetPay, exact: true })).toBeVisible();
+  await expect(email).toBeVisible();
+  expect(injections, 'The production PAYE fault anchor must match exactly once').toBe(1);
+  expect(diagnostics).toEqual([]);
+
+  await page
+    .locator('html')
+    .evaluate((html, attribute) => html.setAttribute(attribute, ''), faultAttribute);
+  await calculate.press('Enter');
+  await expect(page.locator('html')).not.toHaveAttribute(faultAttribute);
+  await expect(page.getByRole('heading', { name: 'Something went wrong' })).toHaveCount(0);
+  await expect(calculator.getByRole('alert')).toHaveText(
+    'Unable to calculate your tax. Please try again.',
+  );
+  await expect(calculator.getByText('Tax calculation complete. Results updated.')).toHaveCount(0);
+  await expect(results).toHaveCount(0);
+  await expect(email).toHaveCount(0);
+  await expect(salary).toHaveValue('40,000.00');
+  expect(diagnostics).toEqual([expect.stringContaining('Tax calculation error:')]);
+
+  await calculate.press('Enter');
+  await expect(calculator.getByRole('alert')).toHaveCount(0);
+  await expect(results).toBeVisible();
+  await expect(netPay.getByRole('cell', { name: expectedNetPay, exact: true })).toBeVisible();
+  await expect(email).toBeVisible();
+  expect(pageErrors).toEqual([]);
+  expect(diagnostics).toHaveLength(1);
+});
+
 test.describe('Pension modelling guidance @critical', () => {
   test.use({ hasTouch: true, viewport: { width: 375, height: 812 } });
 
@@ -312,7 +400,7 @@ test.describe('MC-03 input integrity @critical', () => {
       0,
     );
     await expect(emailAction(page)).toHaveCount(0);
-    await expect(page.getByText(/Inputs changed, so results were cleared/)).toHaveCount(0);
+    await expect(page.getByText(/Results were cleared/)).toHaveCount(0);
   });
 
   test('valid salary edit and blur require Calculate, then email matches the displayed inputs', async ({
@@ -329,7 +417,7 @@ test.describe('MC-03 input integrity @critical', () => {
     expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(30000);
     await typeAmount(salary, '40000');
     await expect(salary).toBeFocused();
-    await expect(page.getByRole('status')).toContainText('Inputs changed, so results were cleared');
+    await expect(page.getByRole('status')).toContainText('Results were cleared');
     await expect(page.getByRole('status')).toHaveAttribute('aria-live', 'polite');
     await expect(page.getByRole('heading', { name: 'Calculate again' })).toBeVisible();
     await expect(page.getByRole('region', { name: 'Tax calculation results summary' })).toHaveCount(
@@ -344,7 +432,7 @@ test.describe('MC-03 input integrity @critical', () => {
     expect(sent).toEqual([]);
     await page.getByTestId('calculate-button').press('Enter');
     expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(40000);
-    await expect(page.getByText(/Inputs changed, so results were cleared/)).toHaveCount(0);
+    await expect(page.getByText(/Results were cleared/)).toHaveCount(0);
     await emailAction(page).press('Enter');
     await page.getByLabel('Email address for results').fill('mc03@example.com');
     await page.getByRole('button', { name: /^Email Results$/ }).press('Enter');
@@ -377,7 +465,7 @@ test.describe('MC-03 input integrity @critical', () => {
     await expect(salary).toHaveAttribute('aria-invalid', 'true');
     await expect(salary).toHaveAccessibleDescription(/negative/i);
     await expect(salary).toHaveValue('-500');
-    await expect(page.getByRole('status')).toContainText('Inputs changed, so results were cleared');
+    await expect(page.getByRole('status')).toContainText('Results were cleared');
     await expect(page.getByTestId('tax-results')).toHaveCount(0);
     await expect(emailAction(page)).toHaveCount(0);
     await typeAmount(salary, '40000');
@@ -447,7 +535,7 @@ test.describe('MC-03 input integrity @critical', () => {
     await calculate.press('Enter');
     expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(40000);
     expect(await getYearlyTableValue(page, 'Pension')).toBe(2000);
-    await expect(page.getByText(/Inputs changed, so results were cleared/)).toHaveCount(0);
+    await expect(page.getByText(/Results were cleared/)).toHaveCount(0);
   });
 
   test('an already-open email form cannot send after a concurrent input edit', async ({ page }) => {

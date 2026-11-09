@@ -1150,9 +1150,15 @@ export const useCalculatorStore = create<CalculatorState>()(
           // Only calculate if the previous year is a supported tax year
           if (previousYear) {
             const previousYearInput = { ...input, taxYear: previousYear };
-            const previousResults = calculateTax(previousYearInput);
-            setCalculatorState(set, { previousYearResults: previousResults });
-            reportCalculationAnomalies(previousResults, 'previous_year');
+            try {
+              const previousResults = calculateTax(previousYearInput);
+              setCalculatorState(set, { previousYearResults: previousResults });
+              reportCalculationAnomalies(previousResults, 'previous_year');
+            } catch (error) {
+              console.error('Previous-year tax calculation error:', error);
+              captureCalculatorError(error, { stage: 'previous_year' });
+              throw error;
+            }
           }
         },
         reset: () => {

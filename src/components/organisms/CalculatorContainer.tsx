@@ -80,7 +80,6 @@ export function CalculatorContainer() {
   const effectiveIsScottish =
     codeRegionOverride === 'Scotland' ||
     (codeRegionOverride === null && input.region === 'Scotland');
-  const [, startTransition] = React.useTransition();
   const isDesktop = useMediaQuery('(min-width: 1280px)');
   const [inputsBeforeSummary, setInputsBeforeSummary] = React.useState(false);
   const [visiblePeriods, setSelectedPeriods] = React.useState<string[]>(DEFAULT_PERIODS);
@@ -177,6 +176,7 @@ export function CalculatorContainer() {
 
   const handleCalculate = () => {
     setActionMessage(null);
+    if (calcScrollTimeoutRef.current) clearTimeout(calcScrollTimeoutRef.current);
 
     if (!hasTrackedCalculatorStartRef.current) {
       trackEvent({
@@ -187,12 +187,15 @@ export function CalculatorContainer() {
       hasTrackedCalculatorStartRef.current = true;
     }
 
-    // Use React 18's useTransition to mark calculations as non-urgent
-    // This keeps the UI responsive during heavy computations
-    startTransition(() => {
+    // Run the synchronous store actions where the input form can catch failures.
+    try {
       calculate();
       calculatePreviousYear();
-    });
+    } catch {
+      invalidateResults();
+      setLiveMessage('');
+      throw new Error('Unable to calculate your tax. Please try again.');
+    }
 
     const taxCodeInput = typeof input.taxCode === 'string' ? input.taxCode.trim() : '';
     const parsedTaxCode = parsedInputTaxCode;
@@ -222,9 +225,6 @@ export function CalculatorContainer() {
 
     // Announce for screen readers (event-driven)
     setLiveMessage('Tax calculation complete. Results updated.');
-
-    // Clear any pending scroll timeout
-    if (calcScrollTimeoutRef.current) clearTimeout(calcScrollTimeoutRef.current);
 
     // Only scroll to results on mobile (desktop scrolls when its results commit).
     calcScrollTimeoutRef.current = window.setTimeout(() => {
@@ -419,7 +419,7 @@ export function CalculatorContainer() {
       >
         {needsCalculate && (
           <>
-            Inputs changed, so results were cleared. Calculate again to update them.
+            Results were cleared. Calculate again to update them.
             {actionMessage?.requiresCalculate && ` ${actionMessage.text}`}
           </>
         )}
@@ -529,7 +529,7 @@ export function CalculatorContainer() {
               </h3>
               <p className={cn('text-muted-foreground', 'text-sm')}>
                 {needsCalculate
-                  ? 'Your inputs have changed. Calculate to see your updated take-home pay.'
+                  ? 'Calculate to see your updated take-home pay.'
                   : input.salary > 0
                     ? 'Check your inputs, then select Calculate to see your take-home pay.'
                     : 'Enter your salary, then select Calculate to see your take-home pay.'}
