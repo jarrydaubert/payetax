@@ -2,6 +2,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-libra
 import userEvent from '@testing-library/user-event';
 import type { PayPeriod } from '@/constants/taxRates';
 import { parseCurrencyInput } from '@/lib/currencyInput';
+import { rememberFigures } from '@/lib/figureStorage';
 import type { TaxCalculationResults } from '@/lib/tax';
 import { useCalculatorStore } from '@/store/calculatorStore';
 import payrollFixtures from '@/test/payeVerificationFixtures/salary-guides-payroll-2026-27.json';
@@ -64,6 +65,7 @@ describe('Tax-trap pension suggestion (mounted real inputs, store and engine)', 
   beforeEach(() => {
     window.localStorage.clear();
     useCalculatorStore.getState().reset();
+    rememberFigures();
   });
 
   const periods: [PayPeriod, number, number][] = [

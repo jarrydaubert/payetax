@@ -1,3 +1,4 @@
+import { rememberFigures } from '@/lib/figureStorage';
 /**
  * Calculator Store Validation Tests
  *
@@ -637,6 +638,7 @@ describe('Calculator Store Validation', () => {
         }),
       );
 
+      rememberFigures(true);
       await useCalculatorStore.persist.rehydrate();
 
       const hydrated = useCalculatorStore.getState().input;
@@ -662,6 +664,7 @@ describe('Calculator Store Validation', () => {
         }),
       );
 
+      rememberFigures(true);
       await useCalculatorStore.persist.rehydrate();
 
       const hydrated = useCalculatorStore.getState().input;

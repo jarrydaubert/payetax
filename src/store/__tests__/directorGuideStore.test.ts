@@ -1,3 +1,4 @@
+import { rememberFigures } from '@/lib/figureStorage';
 // src/store/__tests__/directorGuideStore.test.ts
 /**
  * Tests for Director Intelligence Store
@@ -71,6 +72,7 @@ describe('DirectorGuideStore', () => {
   beforeEach(() => {
     localStorage.clear();
     useDirectorGuideStore.getState().reset();
+    rememberFigures();
     mockCalculateDirectorScenario.mockClear();
     mockCalculateStrategyComparison.mockClear();
   });
@@ -671,6 +673,7 @@ describe('DirectorGuideStore', () => {
         }),
       );
 
+      rememberFigures(true);
       await useDirectorGuideStore.persist.rehydrate();
 
       const state = useDirectorGuideStore.getState();
@@ -693,6 +696,7 @@ describe('DirectorGuideStore', () => {
         }),
       );
 
+      rememberFigures(true);
       await useDirectorGuideStore.persist.rehydrate();
 
       expect(useDirectorGuideStore.getState().formData.studentLoanPlans).toEqual(['plan1']);
@@ -715,6 +719,7 @@ describe('DirectorGuideStore', () => {
         }),
       );
 
+      rememberFigures(true);
       await useDirectorGuideStore.persist.rehydrate();
 
       expect(useDirectorGuideStore.getState().formData.revenue).toBe(12345);

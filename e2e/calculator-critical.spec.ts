@@ -541,6 +541,10 @@ test.describe('MC-02 pension units and restoration @critical', () => {
         await expect(page.getByTestId('partner-salary-input')).toBeVisible({ timeout: 1000 });
       else await expect(page.getByTestId('partner-salary-input')).toBeHidden({ timeout: 1000 });
     }).toPass({ timeout: 15000 });
+    if (!reload) {
+      await page.getByRole('button', { name: 'Restore saved figures and remember' }).click();
+      await expect(page.getByTestId('salary-input')).toHaveValue('60,000.00');
+    }
   }
 
   for (const [type, value, display, annual] of [
@@ -804,6 +808,11 @@ test.describe('MC-09 pension suggestion @critical', () => {
       page,
     }) => {
       await gotoCalculator(page);
+      const remember = page.getByRole('checkbox', {
+        name: 'Remember figures on this device (PAYE and Director)',
+      });
+      await remember.click();
+      await expect(remember).toBeChecked();
       await selectOption(
         page,
         page.getByRole('combobox', { name: 'Pay period', exact: true }),

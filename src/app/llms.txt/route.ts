@@ -146,7 +146,7 @@ ${blogSections}
 - Hosting: Vercel
 - Analytics: Vercel Web Analytics and Speed Insights for cookieless visibility and performance signals; GA4 after consent
 - Error monitoring: retained-surface Sentry
-- Privacy: interactive calculations run in-browser; inputs are remembered in local browser storage. Analytics and attached diagnostic context exclude calculator figures and financial attributes. Emailing results sends inputs to the server for email preparation
+- Privacy: interactive calculations run in-browser; inputs are remembered in local browser storage only with explicit opt-in (off by default). Both calculators offer clear-data without changing analytics preferences. Analytics and attached diagnostic context exclude calculator figures and financial attributes. Emailing results sends inputs to the server for email preparation
 - PWA: installable progressive web app
 
 ## Optional

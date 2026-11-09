@@ -37,7 +37,7 @@ export function PrivacyPageContent() {
             <span className='text-foreground'>In Your Browser</span>
           </>
         }
-        subtitle='Calculations run in your browser. We keep calculator figures and financial attributes out of analytics and attached diagnostic context. Your browser currently remembers your inputs on this device. Emailing results sends your inputs to our server and the prepared email to our delivery provider.'
+        subtitle='Calculations run in your browser. We keep calculator figures and financial attributes out of analytics and attached diagnostic context. Remembering inputs on this device is optional and off by default. Emailing results sends your inputs to our server and the prepared email to our delivery provider.'
       />
 
       {/* Last Updated */}
@@ -157,9 +157,9 @@ export function PrivacyPageContent() {
             <LegalSection id='data-we-process' title='Data we process'>
               <p>
                 Your calculator inputs are processed in your browser to produce a result. Your
-                browser remembers them locally. Requesting an email sends your inputs to our server
-                to prepare the results. We do not maintain a calculations database. The table below
-                summarises the data we process.
+                browser remembers them locally only if you opt in. Requesting an email sends your
+                inputs to our server to prepare the results. We do not maintain a calculations
+                database. The table below summarises the data we process.
               </p>
               <div className='overflow-x-auto rounded-sm border border-border bg-background'>
                 <table className='w-full min-w-3xl border-collapse text-sm'>
@@ -251,9 +251,11 @@ export function PrivacyPageContent() {
               </p>
               <p>
                 The site uses the following cookies and browser storage. Calculator inputs are
-                currently remembered automatically, independently of your analytics choice. On a
-                shared device, clear this site’s browser data when finished; this removes saved
-                figures and consent preferences.
+                remembered only with explicit opt-in, independently of your analytics choice. Use
+                “Clear figures and saved data” at either calculator to clear current figures,
+                results and saved inputs without changing analytics preferences. Existing saved
+                figures require an explicit restore-or-clear choice. If browser storage is blocked,
+                erasure may require removing this site’s data in your browser settings.
               </p>
               <div className='overflow-x-auto rounded-sm border border-border bg-background'>
                 <table className='w-full min-w-3xl border-collapse text-sm'>

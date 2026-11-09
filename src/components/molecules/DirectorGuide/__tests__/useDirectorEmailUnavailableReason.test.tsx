@@ -1,4 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
+import { rememberFigures } from '@/lib/figureStorage';
 import { CURRENT_TAX_YEAR, TAX_RATES } from '@/lib/tax';
 import { type DirectorFormData, useDirectorGuideStore } from '@/store/directorGuideStore';
 import { useDirectorEmailUnavailableReason } from '../useDirectorEmailUnavailableReason';
@@ -185,6 +186,7 @@ describe('Director email interim guard', () => {
   });
 
   it('does not persist the calculation reference or objective', () => {
+    rememberFigures();
     calculateCurrent();
     useDirectorGuideStore.getState().setObjective('minimizeNI');
     const saved = JSON.parse(localStorage.getItem('director-guide-storage') ?? '{}').state;

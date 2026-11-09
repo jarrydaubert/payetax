@@ -33,6 +33,7 @@ import {
 } from '@/components/molecules/DirectorGuide/dashboard';
 import { EmailResultsDialog } from '@/components/molecules/DirectorGuide/EmailResultsDialog';
 import { useDirectorEmailUnavailableReason } from '@/components/molecules/DirectorGuide/useDirectorEmailUnavailableReason';
+import { FigureStorageControls } from '@/components/molecules/FigureStorageControls';
 import { Button } from '@/components/ui/button';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import {
@@ -289,6 +290,7 @@ export function DirectorDashboard() {
                 </Link>
               </nav>
             </div>
+            <FigureStorageControls />
 
             {/* Results */}
             {hasComparison ? (

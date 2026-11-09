@@ -24,8 +24,8 @@ import { SITE_CONTACT_EMAIL } from '@/constants/contact';
 import type { FeatureSchema } from '@/lib/validation/pageDataValidation';
 
 /** Update whenever the privacy policy materially changes. */
-export const PRIVACY_LAST_UPDATED_ISO = '2026-10-27';
-export const PRIVACY_LAST_UPDATED = '27 October 2026';
+export const PRIVACY_LAST_UPDATED_ISO = '2026-11-09';
+export const PRIVACY_LAST_UPDATED = '9 November 2026';
 
 /** Controller contact email (matches the address used on the compliance page). */
 export const PRIVACY_CONTACT_EMAIL = SITE_CONTACT_EMAIL;
@@ -56,7 +56,7 @@ export const PRIVACY_PRINCIPLES = [
     icon: Database,
     title: 'Figures Remembered On Your Device',
     description:
-      'Your browser currently remembers calculator inputs on this device, including on shared devices. We do not keep a calculations database. Emailing results creates copies with the email provider and in the recipient’s mailbox.',
+      'Your browser remembers PAYE and Director inputs only when you turn on Remember figures on this device. It is off by default, including on shared devices. We do not keep a calculations database. Emailing results creates copies with the email provider and in the recipient’s mailbox.',
     gradient: {
       icon: 'text-accent',
     },
@@ -115,7 +115,7 @@ export const PRIVACY_DATA_FLOW: DataFlowCard[] = [
     iconColor: 'bg-primary',
     title: 'Your Device',
     description:
-      'Calculations happen here. Your browser remembers your salary, tax code and other input answers after you leave. Clear this site’s browser data to remove saved figures; this also clears your consent choice.',
+      'Calculations happen here. Remembering inputs is optional and off by default. Clear figures and saved data clears current figures, results and saved inputs across PAYE and Director without changing analytics preferences. If storage is blocked, use browser settings to remove any remaining saved data.',
   },
   {
     icon: Globe,
@@ -152,7 +152,7 @@ export const PRIVACY_DATA_CATEGORIES: PrivacyDataCategory[] = [
     purpose: 'Produce your tax breakdown in your browser',
     lawfulBasis: 'Not collected by us — processed locally on your device',
     retention:
-      'Remembered in browser storage on this device; not saved to a PayeTax calculations database',
+      'Kept in memory unless you opt in to remembering on this device; clear figures at either calculator to remove current and saved figures without changing analytics preferences',
   },
   {
     category: 'Emailed results',
@@ -258,20 +258,27 @@ export interface PrivacyStorageItem {
 
 export const PRIVACY_STORAGE_INVENTORY: PrivacyStorageItem[] = [
   {
+    name: 'payetax-remember-figures',
+    type: 'localStorage (remembering preference)',
+    purpose:
+      'Records explicit opt-in or opt-out for both calculators, separately from analytics consent; contains no financial figures',
+    duration: 'Until site data is cleared or the preference is changed',
+  },
+  {
     name: 'tax-calculator-storage',
     type: 'localStorage (calculator inputs)',
     purpose:
-      'Automatically remembers PAYE inputs, including salary, tax code, pension, loan and allowance answers, on this device',
+      'With explicit opt-in, remembers PAYE inputs, including salary, tax code, pension, loan and allowance answers, on this device',
     duration:
-      'Until site data is cleared or overwritten. Snapshots older than 30 days are not restored; this is not scheduled deletion',
+      'Removed on clear-data or opt-out, or when the app next checks an expired 30-day snapshot or tax-year rollover. No background deletion while the site is closed',
   },
   {
     name: 'director-guide-storage',
     type: 'localStorage (calculator inputs)',
     purpose:
-      'Automatically remembers Director company/personal inputs and the selected strategy on this device',
+      'With explicit opt-in, remembers Director company/personal inputs and the selected strategy on this device',
     duration:
-      'Until site data is cleared or overwritten. Snapshots older than 7 days or from another tax year are not restored; this is not scheduled deletion',
+      'Removed on clear-data or opt-out, or when the app next checks an expired 7-day snapshot or tax-year rollover. No background deletion while the site is closed',
   },
   {
     name: 'taxTrapAlertDismissed',

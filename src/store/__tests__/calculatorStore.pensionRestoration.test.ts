@@ -1,3 +1,4 @@
+import { rememberFigures, syncFigureStorage } from '@/lib/figureStorage';
 import { useCalculatorStore } from '@/store/calculatorStore';
 
 const storageKey = 'tax-calculator-storage';
@@ -18,11 +19,16 @@ async function restore(
       version: 0,
     }),
   );
+  rememberFigures(true);
   await useCalculatorStore.persist.rehydrate();
 }
 
 describe('Pension restoration integrity', () => {
-  beforeEach(() => useCalculatorStore.getState().reset());
+  beforeEach(() => {
+    localStorage.clear();
+    syncFigureStorage();
+    useCalculatorStore.getState().reset();
+  });
 
   it.each([
     ['percentage', 0],

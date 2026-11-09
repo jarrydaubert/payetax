@@ -86,6 +86,14 @@ if (typeof window !== 'undefined') {
   window.IntersectionObserver = global.IntersectionObserver;
 }
 
+// Unit tests have one document; Playwright covers actual cross-tab lock scheduling.
+if (typeof window !== 'undefined') {
+  Object.defineProperty(navigator, 'locks', {
+    configurable: true,
+    value: { request: async (_name, callback) => callback() },
+  });
+}
+
 // Mock window.matchMedia (not available in jsdom)
 if (typeof window !== 'undefined') {
   Object.defineProperty(window, 'matchMedia', {

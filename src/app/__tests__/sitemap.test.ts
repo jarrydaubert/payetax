@@ -54,7 +54,7 @@ describe('sitemap', () => {
         }),
         expect.objectContaining({
           url: 'https://example.com/privacy',
-          lastModified: '2026-10-27T00:00:00.000Z',
+          lastModified: '2026-11-09T00:00:00.000Z',
         }),
         expect.objectContaining({
           url: 'https://example.com/install',

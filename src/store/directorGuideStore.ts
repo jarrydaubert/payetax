@@ -18,7 +18,7 @@ import {
   trackModeChanged,
   trackSafeDrawCalculated,
 } from '@/lib/directorGuideAnalytics';
-import { safeStorage } from '@/lib/safeStorage';
+import { figureStorage, registerFigureStore } from '@/lib/figureStorage';
 import { captureDirectorCalculationFailure } from '@/lib/sentry';
 import { resolveTaxYear } from '@/lib/tax';
 import { calculateDirectorScenario } from '@/lib/tax/directorCalculator';
@@ -358,6 +358,10 @@ const PersistedDirectorStoreSchema = z
 // ============================================================================
 // STORE
 // ============================================================================
+
+function persistedDirectorFigures({ formData, selectedStrategy }: DirectorGuideStore) {
+  return { formData, selectedStrategy, _savedAt: Date.now(), _taxYear: CURRENT_TAX_YEAR };
+}
 
 export const useDirectorGuideStore = create<DirectorGuideStore>()(
   devtools(
@@ -862,13 +866,8 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
       {
         name: 'director-guide-storage',
         version: 4, // Monthly mode fields + derived outputs
-        storage: createJSONStorage(() => safeStorage),
-        partialize: (state) => ({
-          formData: state.formData,
-          selectedStrategy: state.selectedStrategy,
-          _savedAt: Date.now(),
-          _taxYear: CURRENT_TAX_YEAR,
-        }),
+        storage: createJSONStorage(() => figureStorage),
+        partialize: persistedDirectorFigures,
         migrate: (persistedState, version) => {
           // Migration from older versions - clear and start fresh
           if (version < 4) {
@@ -902,10 +901,12 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
 
           return {
             ...currentState,
+            ...defaultState,
+            inputRevision: currentState.inputRevision + 1,
             formData: {
-              ...currentState.formData,
+              ...defaultFormData,
               ...formData,
-              studentLoanPlans: sanitizedStudentLoans ?? currentState.formData.studentLoanPlans,
+              studentLoanPlans: sanitizedStudentLoans ?? defaultFormData.studentLoanPlans,
             },
             selectedStrategy: selectedStrategy ?? currentState.selectedStrategy,
           };
@@ -918,6 +919,17 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
     { name: 'DirectorGuideStore' },
   ),
 );
+
+registerFigureStore('director-guide-storage', {
+  clear: () => useDirectorGuideStore.getState().clearStaleState(),
+  restore: () => {
+    useDirectorGuideStore.persist.rehydrate();
+  },
+  snapshot: () => ({
+    state: persistedDirectorFigures(useDirectorGuideStore.getState()),
+    version: useDirectorGuideStore.persist.getOptions().version,
+  }),
+});
 
 // ============================================================================
 // SELECTORS

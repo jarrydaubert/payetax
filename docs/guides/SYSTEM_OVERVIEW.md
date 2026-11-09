@@ -151,6 +151,11 @@ These are regression obligations, not a second backlog:
   eligible; changed, stale, failed or divergent scenarios cannot send, including already-open
   dialogs and same-task edits. Do not bypass a mismatch because controls cannot reproduce a
   recommendation. The client safeguard is not a server security boundary or full active export.
+- Financial inputs are session-only by default. A shared explicit remembering opt-in covers PAYE
+  and Director; legacy snapshots stay quarantined until restore-or-clear. Clear-data and opt-out
+  clear both stores and results without changing analytics preferences. Recheck authority before
+  writes and on cross-tab/lifecycle events; remove expired snapshots when the app is active.
+  Blocked storage can prevent physical erasure and must be reported, never silently treated as success.
 - Preserve financial-telemetry exclusions, sanitised URL boundaries, opt-in GA4 and its withdrawal/
   expiry/cross-tab lifecycle. Do not treat browser expiry guards as physical storage erasure or
   claim opt-in remembering without checking its implementation. Provider history needs separate
