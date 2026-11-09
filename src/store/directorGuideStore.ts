@@ -18,7 +18,7 @@ import {
   trackModeChanged,
   trackSafeDrawCalculated,
 } from '@/lib/directorGuideAnalytics';
-import { safeStorage } from '@/lib/safeStorage';
+import { figureStorage, registerFigureStore } from '@/lib/figureStorage';
 import { captureDirectorCalculationFailure } from '@/lib/sentry';
 import { resolveTaxYear } from '@/lib/tax';
 import { calculateDirectorScenario } from '@/lib/tax/directorCalculator';
@@ -862,7 +862,7 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
       {
         name: 'director-guide-storage',
         version: 4, // Monthly mode fields + derived outputs
-        storage: createJSONStorage(() => safeStorage),
+        storage: createJSONStorage(() => figureStorage),
         partialize: (state) => ({
           formData: state.formData,
           selectedStrategy: state.selectedStrategy,
@@ -902,10 +902,12 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
 
           return {
             ...currentState,
+            ...defaultState,
+            inputRevision: currentState.inputRevision + 1,
             formData: {
-              ...currentState.formData,
+              ...defaultFormData,
               ...formData,
-              studentLoanPlans: sanitizedStudentLoans ?? currentState.formData.studentLoanPlans,
+              studentLoanPlans: sanitizedStudentLoans ?? defaultFormData.studentLoanPlans,
             },
             selectedStrategy: selectedStrategy ?? currentState.selectedStrategy,
           };
@@ -918,6 +920,14 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
     { name: 'DirectorGuideStore' },
   ),
 );
+
+registerFigureStore('director-guide-storage', {
+  clear: () => useDirectorGuideStore.getState().clearStaleState(),
+  restore: () => {
+    useDirectorGuideStore.persist.rehydrate();
+  },
+  save: () => useDirectorGuideStore.setState({}),
+});
 
 // ============================================================================
 // SELECTORS

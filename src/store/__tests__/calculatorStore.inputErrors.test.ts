@@ -1,3 +1,4 @@
+import { clearFigures, rememberFigures } from '@/lib/figureStorage';
 // src/store/__tests__/calculatorStore.inputErrors.test.ts
 import { getBlockingInputErrors, incomeSourceAmountField } from '@/store/calculatorInputErrors';
 import { useCalculatorStore } from '@/store/calculatorStore';
@@ -6,6 +7,8 @@ const rejected = { text: '-500', error: 'Enter an amount of £0 or more.' };
 
 describe('calculatorStore rejected amount text', () => {
   beforeEach(() => {
+    clearFigures();
+    rememberFigures();
     useCalculatorStore.getState().reset();
   });
 

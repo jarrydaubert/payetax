@@ -6,6 +6,7 @@ import { Mail, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 import { EmailResultsForm } from '@/components/molecules/EmailResultsForm';
+import { FigureStorageControls } from '@/components/molecules/FigureStorageControls';
 import { Card } from '@/components/ui/card';
 import {
   Dialog,
@@ -464,6 +465,10 @@ export function CalculatorContainer() {
             About these estimates
           </Link>
         </p>
+      </div>
+
+      <div className='order-1 xl:col-span-2'>
+        <FigureStorageControls />
       </div>
 
       {/* Match the desktop DOM sequence to the input-band and sidebar layouts. */}

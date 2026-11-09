@@ -9,6 +9,7 @@
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CURRENCY_INPUT_ERRORS } from '@/lib/currencyInput';
+import { rememberFigures } from '@/lib/figureStorage';
 import { useCalculatorStore } from '@/store/calculatorStore';
 import { CalculatorContainer } from '../CalculatorContainer';
 
@@ -200,7 +201,10 @@ describe('Main calculator amount integrity (mounted)', () => {
           version: 0,
         }),
       );
-      await act(async () => useCalculatorStore.persist.rehydrate());
+      await act(async () => {
+        rememberFigures(true);
+        await useCalculatorStore.persist.rehydrate();
+      });
       if (!afterMount) render(<CalculatorContainer />);
 
       const pension = screen.getByTestId('pension-input');

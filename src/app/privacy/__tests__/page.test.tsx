@@ -7,12 +7,10 @@ describe('PrivacyPage', () => {
 
     expect(screen.getByText('Your Figures, Calculated')).toBeInTheDocument();
     expect(screen.getByText('In Your Browser')).toBeInTheDocument();
-    expect(screen.getByText('Last updated: 27 October 2026')).toBeInTheDocument();
+    expect(screen.getByText('Last updated: 9 November 2026')).toBeInTheDocument();
     expect(screen.getByText('tax-calculator-storage')).toBeInTheDocument();
     expect(screen.getByText('director-guide-storage')).toBeInTheDocument();
-    expect(
-      screen.getByText(/Calculator inputs are currently remembered automatically/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/remembered only with explicit opt-in/)).toBeInTheDocument();
   });
 
   it('renders the formal UK GDPR policy sections', () => {

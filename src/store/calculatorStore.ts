@@ -45,7 +45,7 @@ import {
   WhatIfTypeSchema,
 } from '@/lib/calculatorValidation';
 import { parseCurrencyInput } from '@/lib/currencyInput';
-import { safeStorage } from '@/lib/safeStorage';
+import { figureStorage, registerFigureStore } from '@/lib/figureStorage';
 import {
   addBreadcrumb,
   type CalculationAnomalyCode,
@@ -1278,7 +1278,7 @@ export const useCalculatorStore = create<CalculatorState>()(
       }),
       {
         name: 'tax-calculator-storage',
-        storage: createJSONStorage(() => safeStorage),
+        storage: createJSONStorage(() => figureStorage),
         partialize: (state) => ({
           input: state.input,
           _savedAt: Date.now(),
@@ -1315,7 +1315,7 @@ export const useCalculatorStore = create<CalculatorState>()(
           }
 
           const input = {
-            ...currentState.input,
+            ...defaultInput,
             ...persistedInput,
             // Ensure new fields have defaults if missing in persisted state
             incomeSources: persistedInput?.incomeSources ?? [],
@@ -1327,8 +1327,7 @@ export const useCalculatorStore = create<CalculatorState>()(
             unit: percentage ? 'percent' : 'pounds',
             max: percentage ? 100 : 10_000_000,
           });
-          const { pensionContribution: _previous, ...otherErrors } = currentState.inputErrors;
-          const inputErrors: CalculatorInputErrors = otherErrors;
+          const inputErrors: CalculatorInputErrors = {};
           if (pension.status === 'invalid') {
             inputErrors.pensionContribution = { text, error: pension.error };
           }
@@ -1337,6 +1336,9 @@ export const useCalculatorStore = create<CalculatorState>()(
             ...currentState,
             input,
             inputErrors,
+            inputRevision: currentState.inputRevision + 1,
+            hasCalculated: false,
+            whatIf: { enabled: false, type: 'percentage', value: 10 },
             results: null,
             previousYearResults: null,
             whatIfResults: null,
@@ -1349,6 +1351,14 @@ export const useCalculatorStore = create<CalculatorState>()(
     ),
   ),
 );
+
+registerFigureStore('tax-calculator-storage', {
+  clear: () => useCalculatorStore.getState().reset(),
+  restore: () => {
+    useCalculatorStore.persist.rehydrate();
+  },
+  save: () => useCalculatorStore.setState({}),
+});
 
 /**
  * Optimized selector hooks to prevent unnecessary re-renders
