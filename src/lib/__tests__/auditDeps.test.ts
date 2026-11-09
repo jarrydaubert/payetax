@@ -1,5 +1,8 @@
 import { runDependencyAudit } from '../../../scripts/audit-deps';
-import type { DependencyAdvisoryAllowlistEntry } from '../../../scripts/dependency-advisory-allowlist';
+import {
+  DEPENDENCY_ADVISORY_ALLOWLIST,
+  type DependencyAdvisoryAllowlistEntry,
+} from '../../../scripts/dependency-advisory-allowlist';
 
 const ENTRY: DependencyAdvisoryAllowlistEntry = {
   id: 'GHSA-1111-2222-3333',
@@ -125,6 +128,7 @@ describe('dependency audit allowlist enforcement', () => {
 
     expect(exitCode).toBe(1);
     expect(reportedErrors(consoleError)).toContain(`other-package (${ENTRY.id})`);
+    expect(reportedErrors(consoleError)).not.toContain(`${ENTRY.package} (${ENTRY.id})`);
   });
 
   it('rejects the retired glob and minimatch advisories before their old expiry', () => {
@@ -147,6 +151,7 @@ describe('dependency audit allowlist enforcement', () => {
   });
 
   it('accepts a clean audit after the retired exceptions would have expired', () => {
+    expect(DEPENDENCY_ADVISORY_ALLOWLIST).toEqual([]);
     expect(runDependencyAudit(auditCommand({}, 0), undefined, new Date('2026-11-15'))).toBe(0);
   });
 });
