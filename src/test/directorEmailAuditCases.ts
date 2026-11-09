@@ -55,7 +55,7 @@ export const DIRECTOR_EMAIL_AUDIT_CASES: readonly DirectorEmailAuditCase[] = [
   },
   {
     id: 'custom-year-end',
-    form: { yearEndMonth: 'other', yearEndCustom: '06-30' },
+    form: { accountingPeriodEnd: '2026-06-30' },
     blocked: false,
   },
   {

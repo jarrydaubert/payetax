@@ -20,7 +20,7 @@ import {
 } from '@/lib/directorGuideAnalytics';
 import { figureStorage, registerFigureStore } from '@/lib/figureStorage';
 import { captureDirectorCalculationFailure } from '@/lib/sentry';
-import { resolveTaxYear } from '@/lib/tax';
+import { parseAccountingPeriodEnd, resolveTaxYear } from '@/lib/tax';
 import { calculateDirectorScenario } from '@/lib/tax/directorCalculator';
 import { calculateStrategyComparison, type StrategyComparison } from '@/lib/tax/strategyComparison';
 import {
@@ -55,9 +55,6 @@ export const DIRECTOR_PROFIT_WHAT_IF_MAX_PERCENT = 100;
 // ============================================================================
 // TYPES
 // ============================================================================
-
-/** Year-end month options */
-export type YearEndMonth = '03' | '12' | 'other' | 'unknown';
 
 /** Taken via payroll options */
 export type TakenViaPayroll = 'yes' | 'no' | 'unsure';
@@ -95,8 +92,7 @@ export interface DirectorFormData {
   hasOtherPAYEEmployment: boolean;
 
   // Year-end
-  yearEndMonth: YearEndMonth;
-  yearEndCustom: string;
+  accountingPeriodEnd: string;
 
   // Advanced inputs
   studentLoanPlans: StudentLoanPlan[];
@@ -204,8 +200,7 @@ interface DirectorGuideActions {
   setHasOtherPAYEEmployment: (has: boolean) => void;
 
   // Year-end setters
-  setYearEndMonth: (month: YearEndMonth) => void;
-  setYearEndCustom: (custom: string) => void;
+  setAccountingPeriodEnd: (date: string) => void;
 
   // Advanced input setters
   setStudentLoanPlans: (plans: StudentLoanPlan[]) => void;
@@ -266,8 +261,7 @@ const defaultFormData: DirectorFormData = {
   ytdDrawings: 0,
   otherIncome: 0,
   hasOtherPAYEEmployment: false,
-  yearEndMonth: '03',
-  yearEndCustom: '',
+  accountingPeriodEnd: '',
   studentLoanPlans: [],
   pensionContribution: 0,
   isPensionAlreadyDeducted: false,
@@ -322,6 +316,8 @@ const PersistedDirectorFormDataSchema = z
     ytdDrawings: CurrencyAmountSchema.optional(),
     otherIncome: CurrencyAmountSchema.optional(),
     hasOtherPAYEEmployment: z.boolean().optional(),
+    accountingPeriodEnd: z.string().max(10).optional(),
+    // Accept older snapshots without restoring their yearless date.
     yearEndMonth: z.enum(['03', '12', 'other', 'unknown']).optional(),
     yearEndCustom: z.string().max(10).optional(),
     studentLoanPlans: z
@@ -344,7 +340,8 @@ const PersistedDirectorFormDataSchema = z
     minimumMonthlyDraw: CurrencyAmountSchema.optional(),
     runwayMonths: z.number().int().min(0).max(36).optional(),
   })
-  .strict();
+  .strict()
+  .transform(({ yearEndMonth: _month, yearEndCustom: _day, ...formData }) => formData);
 
 const PersistedDirectorStoreSchema = z
   .object({
@@ -360,7 +357,16 @@ const PersistedDirectorStoreSchema = z
 // ============================================================================
 
 function persistedDirectorFigures({ formData, selectedStrategy }: DirectorGuideStore) {
-  return { formData, selectedStrategy, _savedAt: Date.now(), _taxYear: CURRENT_TAX_YEAR };
+  const { accountingPeriodEnd } = formData;
+  return {
+    formData: {
+      ...formData,
+      accountingPeriodEnd: parseAccountingPeriodEnd(accountingPeriodEnd) ? accountingPeriodEnd : '',
+    },
+    selectedStrategy,
+    _savedAt: Date.now(),
+    _taxYear: CURRENT_TAX_YEAR,
+  };
 }
 
 export const useDirectorGuideStore = create<DirectorGuideStore>()(
@@ -482,15 +488,9 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         // YEAR-END SETTERS
         // ====================================================================
 
-        setYearEndMonth: (month) => {
+        setAccountingPeriodEnd: (date) => {
           set((state) => ({
-            formData: { ...state.formData, yearEndMonth: month },
-          }));
-        },
-
-        setYearEndCustom: (custom) => {
-          set((state) => ({
-            formData: { ...state.formData, yearEndCustom: custom },
+            formData: { ...state.formData, accountingPeriodEnd: date },
           }));
         },
 
@@ -1053,8 +1053,7 @@ export function useDirectorGuideActions() {
       setOtherIncome: state.setOtherIncome,
       setHasOtherPAYEEmployment: state.setHasOtherPAYEEmployment,
       // Year-end
-      setYearEndMonth: state.setYearEndMonth,
-      setYearEndCustom: state.setYearEndCustom,
+      setAccountingPeriodEnd: state.setAccountingPeriodEnd,
       // Advanced inputs
       setStudentLoanPlans: state.setStudentLoanPlans,
       toggleStudentLoanPlan: state.toggleStudentLoanPlan,

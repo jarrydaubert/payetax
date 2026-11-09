@@ -17,6 +17,7 @@ export {
 } from '@/constants/taxRates';
 export type { TaxCalculationInput, TaxCalculationResults } from '@/lib/taxCalculator';
 export { calculateTax } from '@/lib/taxCalculator';
+export { getCompanyDeadlines, parseAccountingPeriodEnd } from './directorDeadlines';
 export type { EmployeeNIResult } from './employeeNI';
 export { calculateEmployeeNI, getEmployeeNI } from './employeeNI';
 export type { EmployerNIResult } from './employerNI';

@@ -119,7 +119,7 @@ describe('Director display → email payload → server → HTML/text audit', ()
       expect(request.input).not.toHaveProperty('profitWhatIfPercent');
       expect(request.input).not.toHaveProperty('selectedStrategy');
       expect(request.input).not.toHaveProperty('objective');
-      expect(request.input).not.toHaveProperty('yearEndCustom');
+      expect(request.input).not.toHaveProperty('accountingPeriodEnd');
       if (sample.id === 'monthly') {
         expect(request.input.revenue).toBe(72000);
         expect(request.input.expenses).toBe(12000);

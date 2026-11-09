@@ -85,8 +85,7 @@ describe('Director Intelligence input components', () => {
         revenue: undefined,
         expenses: undefined,
         includesVat: false,
-        yearEndMonth: '03',
-        yearEndCustom: '',
+        accountingPeriodEnd: '',
         ytdSalary: 0,
         ytdDividends: 0,
         ytdDrawings: 0,
@@ -99,7 +98,7 @@ describe('Director Intelligence input components', () => {
     });
   });
 
-  it('updates core inputs and shows conditional year-end fields', () => {
+  it('updates core inputs and accepts an explicit accounting period end', () => {
     render(<CoreInputs />);
 
     fireEvent.change(screen.getByLabelText('Annual Revenue'), { target: { value: '100000' } });
@@ -114,21 +113,19 @@ describe('Director Intelligence input components', () => {
     fireEvent.click(screen.getByText('Scotland'));
     expect(useDirectorGuideStore.getState().formData.region).toBe('scotland');
 
-    fireEvent.click(screen.getByText('Other date'));
-    expect(useDirectorGuideStore.getState().formData.yearEndMonth).toBe('other');
-
-    fireEvent.change(screen.getByPlaceholderText('MM-DD (e.g. 06-30)'), {
-      target: { value: '06-30' },
+    const periodEnd = screen.getByLabelText('Company Accounting Period End');
+    expect(periodEnd).toHaveValue('');
+    fireEvent.change(periodEnd, {
+      target: { value: '2026-06-30' },
     });
-    expect(useDirectorGuideStore.getState().formData.yearEndCustom).toBe('06-30');
+    expect(useDirectorGuideStore.getState().formData.accountingPeriodEnd).toBe('2026-06-30');
 
-    fireEvent.click(screen.getByText("I don't know"));
-    expect(useDirectorGuideStore.getState().formData.yearEndMonth).toBe('unknown');
-    expect(screen.queryByText(/Check Companies House/i)).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: 'Help for Company Year-End' }));
-    expect(screen.getByRole('region', { name: 'Help for Company Year-End' })).toHaveTextContent(
-      /Check Companies House/i,
-    );
+    fireEvent.change(periodEnd, { target: { value: '' } });
+    expect(useDirectorGuideStore.getState().formData.accountingPeriodEnd).toBe('');
+    fireEvent.click(screen.getByRole('button', { name: 'Help for Company Accounting Period End' }));
+    expect(
+      screen.getByRole('region', { name: 'Help for Company Accounting Period End' }),
+    ).toHaveTextContent(/HMRC business tax account/i);
   });
 
   it('updates already taken values', () => {
