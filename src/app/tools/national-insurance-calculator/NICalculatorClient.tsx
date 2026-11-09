@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
+import { parseCurrencyInput } from '@/lib/currencyInput';
 import { CURRENT_TAX_YEAR, getEmployeeNI, getEmployerNI, type NICategory } from '@/lib/tax';
 import { cn, formatCurrency } from '@/lib/utils';
 
@@ -41,6 +42,7 @@ function calculateNI(salary: number, category: NICategory): { employee: number; 
 export function NICalculatorClient() {
   const inputId = useId();
   const [salary, setSalary] = useState<string>('');
+  const [salaryError, setSalaryError] = useState<string | null>(null);
   const [category, setCategory] = useState<NICategory>('A');
   const [showAllCategories, setShowAllCategories] = useState(false);
   const [result, setResult] = useState<{
@@ -59,27 +61,32 @@ export function NICalculatorClient() {
     });
   };
 
+  const calculateFromSalary = (selectedCategory: NICategory, requireSalary: boolean) => {
+    const parsed = parseCurrencyInput(salary);
+    if (parsed.status === 'valid') {
+      setSalaryError(null);
+      runCalculation(parsed.value, selectedCategory);
+    } else {
+      setResult(null);
+      if (parsed.status === 'invalid') setSalaryError(parsed.error);
+      else if (requireSalary) setSalaryError('Enter your annual salary, or enter 0 if none.');
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Normalize: strip everything except digits
-    const salaryNum = Number(salary.replace(/[^\d]/g, ''));
-    if (Number.isNaN(salaryNum) || salaryNum < 0) return;
-    runCalculation(salaryNum);
+    calculateFromSalary(category, true);
   };
 
   const handleQuickCalculate = (salaryValue: number) => {
-    setSalary(salaryValue.toLocaleString());
+    setSalary(salaryValue.toLocaleString('en-GB'));
+    setSalaryError(null);
     runCalculation(salaryValue);
   };
 
   const handleCategoryChange = (newCategory: NICategory) => {
     setCategory(newCategory);
-    if (salary) {
-      const salaryNum = Number(salary.replace(/[^\d]/g, ''));
-      if (!Number.isNaN(salaryNum) && salaryNum > 0) {
-        runCalculation(salaryNum, newCategory);
-      }
-    }
+    calculateFromSalary(newCategory, false);
   };
 
   return (
@@ -128,18 +135,30 @@ export function NICalculatorClient() {
                 <Input
                   id={inputId}
                   type='text'
+                  inputMode='decimal'
                   placeholder='50,000'
                   value={salary}
-                  onChange={(e) => setSalary(e.target.value)}
+                  onChange={(e) => {
+                    setSalary(e.target.value);
+                    setSalaryError(null);
+                    setResult(null);
+                  }}
+                  aria-invalid={salaryError ? true : undefined}
+                  aria-describedby={salaryError ? `${inputId}-error` : undefined}
                   className='pl-7 font-mono text-lg'
                   autoComplete='off'
                   spellCheck={false}
                 />
               </div>
-              <Button type='submit' size='lg' disabled={!salary.trim()}>
+              <Button type='submit' size='lg'>
                 Calculate
               </Button>
             </form>
+            {salaryError && (
+              <p id={`${inputId}-error`} role='alert' className='text-sm text-destructive'>
+                {salaryError}
+              </p>
+            )}
 
             {/* NI Category Selection */}
             <fieldset>
