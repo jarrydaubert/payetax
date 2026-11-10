@@ -19,8 +19,6 @@ export function SurvivalModePanel({ className }: { className?: string }) {
   const formData = useDirectorFormSlice((state) => ({
     isPensionAlreadyDeducted: state.isPensionAlreadyDeducted,
     pensionContribution: state.pensionContribution,
-    revenue: state.revenue,
-    expenses: state.expenses,
     hasOtherPAYEEmployment: state.hasOtherPAYEEmployment,
   }));
   const comparison = useStrategyComparison();
@@ -31,8 +29,8 @@ export function SurvivalModePanel({ className }: { className?: string }) {
   const employerNI = getEmployerNI(niCreditsSalary, TAX_YEAR);
 
   const pensionForProfit = formData.isPensionAlreadyDeducted ? 0 : formData.pensionContribution;
-  const profitBeforeSalary =
-    (formData.revenue ?? 0) - (formData.expenses ?? 0) - (pensionForProfit ?? 0);
+  // The comparison's post-pension profit is floored at zero for extraction.
+  const profitBeforeSalary = comparison.grossProfit - pensionForProfit;
 
   // Profit <= 0 means no distributable profit; paying salary can deepen the loss.
   const companyLossIfPaySalary = Math.max(0, -(profitBeforeSalary - niCreditsSalary - employerNI));

@@ -775,6 +775,150 @@ function detailRowValue(page: Page, cardTitle: string, rowLabel: string): Locato
     .locator('xpath=following-sibling::span[1]');
 }
 
+test.describe('Director resolved monthly financials @critical', () => {
+  async function openPensionInputs(page: Page) {
+    await page
+      .getByRole('button', { name: 'Full Inputs', exact: true })
+      .filter({ visible: true })
+      .click();
+    const advanced = page
+      .getByRole('button', { name: 'Advanced Options' })
+      .filter({ visible: true });
+    if ((await advanced.getAttribute('aria-expanded')) === 'false') await advanced.click();
+  }
+
+  test.beforeEach(async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await suppressWelcomeDialog(page);
+    await page.goto('/tools/director-guide', { waitUntil: 'networkidle' });
+    await ensureInputsPanelIsVisible(page);
+    await selectEngland(page);
+  });
+
+  test('DI-06: breakdown follows the projection, pension and mode switches', async ({ page }) => {
+    const mode = (name: string) =>
+      page.getByRole('button', { name, exact: true }).filter({ visible: true });
+    const amount = (name: string) =>
+      page.getByRole('textbox', { name, exact: true }).filter({ visible: true });
+    const company = (label: string) => detailRowValue(page, 'Corporation Tax', label);
+    const allDividends = page
+      .locator('[data-director-section="director-strategy"]')
+      .getByRole('button', { name: /All Dividends/ });
+
+    await mode('Monthly').click();
+    await fillCurrencyInput(amount('Monthly Contract Income'), 4000);
+    await fillCurrencyInput(amount('Monthly Business Expenses'), 1000);
+    await closeInputsPanelIfOpen(page);
+    await allDividends.click();
+
+    // April through March: £48,000 - £12,000 = £36,000. With no payroll, CT is 19%.
+    await expect(company('Revenue')).toHaveText('£48,000');
+    await expect(company('Business Expenses')).toHaveText('-£12,000');
+    await expect(company('Salary + Employer NI')).toHaveText('-£0');
+    await expect(company('Taxable Profit')).toHaveText('£36,000');
+    await expect(company('Corp Tax Due')).toHaveText('£6,840');
+
+    const openInputs = page.getByRole('button', { name: 'Open calculator inputs' });
+    if (await openInputs.isVisible()) await openInputs.click();
+    await selectDropdownOption(
+      page,
+      page.getByRole('combobox', { name: 'Contract Start Month' }).filter({ visible: true }),
+      'October',
+    );
+    await openPensionInputs(page);
+    await fillCurrencyInput(amount('Employer Pension'), 3000);
+    await closeInputsPanelIfOpen(page);
+    await allDividends.click();
+
+    // October through March: £24,000 - £6,000 - £3,000 = £15,000.
+    await expect(company('Revenue')).toHaveText('£24,000');
+    await expect(company('Business Expenses')).toHaveText('-£6,000');
+    await expect(company('Employer Pension')).toHaveText('-£3,000');
+    await expect(company('Taxable Profit')).toHaveText('£15,000');
+    await expect(company('Corp Tax Due')).toHaveText('£2,850');
+
+    if (await openInputs.isVisible()) await openInputs.click();
+    await mode('Annual').click();
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 27000);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 7000);
+    await closeInputsPanelIfOpen(page);
+    await allDividends.click();
+    await expect(company('Revenue')).toHaveText('£27,000');
+    await expect(company('Business Expenses')).toHaveText('-£7,000');
+    await expect(company('Taxable Profit')).toHaveText('£17,000');
+
+    if (await openInputs.isVisible()) await openInputs.click();
+    await mode('Monthly').click();
+    await closeInputsPanelIfOpen(page);
+    await allDividends.click();
+    await expect(company('Revenue')).toHaveText('£24,000');
+    await expect(company('Business Expenses')).toHaveText('-£6,000');
+    await expect(company('Taxable Profit')).toHaveText('£15,000');
+
+    if (await openInputs.isVisible()) await openInputs.click();
+    await openPensionInputs(page);
+    await page
+      .getByRole('checkbox', { name: 'Already included in business expenses' })
+      .filter({ visible: true })
+      .click();
+    await closeInputsPanelIfOpen(page);
+    await allDividends.click();
+    await expect(company('Taxable Profit')).toHaveText('£18,000');
+    await expect(company('Corp Tax Due')).toHaveText('£3,420');
+    await expect(company('Employer Pension')).toHaveCount(0);
+  });
+
+  test('DI-06: survival loss includes the projected trading loss and undeducted pension', async ({
+    page,
+  }) => {
+    await page
+      .getByRole('button', { name: 'Monthly', exact: true })
+      .filter({ visible: true })
+      .click();
+    const income = page
+      .getByRole('textbox', { name: 'Monthly Contract Income' })
+      .filter({ visible: true });
+    const expenses = page
+      .getByRole('textbox', { name: 'Monthly Business Expenses' })
+      .filter({ visible: true });
+    await fillCurrencyInput(income, 2000);
+    await fillCurrencyInput(expenses, 2000);
+    await closeInputsPanelIfOpen(page);
+
+    const survival = page.getByTestId('director-survival-mode');
+    const loss = survival
+      .getByText('Company loss (estimate)', { exact: true })
+      .locator('xpath=following-sibling::div');
+    // No trading loss: £6,708 salary plus (£6,708 - £5,000) × 15% employer NI.
+    await expect(loss).toHaveText('£6,964');
+
+    const openInputs = page.getByRole('button', { name: 'Open calculator inputs' });
+    if (await openInputs.isVisible()) await openInputs.click();
+    await fillCurrencyInput(expenses, 3000);
+    await closeInputsPanelIfOpen(page);
+    // £1,000 monthly trading loss for 12 months plus the same illustrative payroll.
+    await expect(loss).toHaveText('£18,964');
+
+    if (await openInputs.isVisible()) await openInputs.click();
+    await openPensionInputs(page);
+    await fillCurrencyInput(
+      page.getByRole('textbox', { name: 'Employer Pension' }).filter({ visible: true }),
+      3000,
+    );
+    await closeInputsPanelIfOpen(page);
+    await expect(loss).toHaveText('£21,964');
+
+    if (await openInputs.isVisible()) await openInputs.click();
+    await openPensionInputs(page);
+    await page
+      .getByRole('checkbox', { name: 'Already included in business expenses' })
+      .filter({ visible: true })
+      .click();
+    await closeInputsPanelIfOpen(page);
+    await expect(loss).toHaveText('£18,964');
+  });
+});
+
 test.describe('Director Intelligence currency inputs @critical', () => {
   test('pasted and typed pence give an independently derived taxable profit @critical', async ({
     page,
