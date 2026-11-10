@@ -22,10 +22,18 @@ export function escapeHtml(str: string): string {
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://payetax.co.uk';
 
-function getSelfAssessmentDeadlineLabel(taxYear?: string): string {
-  const normalized = resolveTaxYear(taxYear);
-  const startYear = Number.parseInt(normalized.slice(0, 4), 10);
-  return `31 January ${startYear + 2}`;
+const PAYMENTS_ON_ACCOUNT_GUIDANCE =
+  'https://www.gov.uk/understand-self-assessment-bill/payments-on-account';
+const COMPANY_PAYMENT_GUIDANCE = 'https://www.gov.uk/pay-corporation-tax';
+const COMPANY_FILING_GUIDANCE = 'https://www.gov.uk/company-tax-returns';
+const PAYMENTS_ON_ACCOUNT_NOTE =
+  'Payments on account, if required, are normally due on 31 January and 31 July. Check your HMRC account for what you owe and when.';
+const COMPANY_DEADLINES_NOTE =
+  'This report does not include company deadlines. Corporation Tax payment and Company Tax Return filing follow the company accounting period. Instalment rules may change when Corporation Tax is due.';
+
+function getSelfAssessmentReminder(taxYear?: string): string {
+  const endYear = Number(resolveTaxYear(taxYear).split('-')[1]);
+  return `Self Assessment for ${formatTaxYearLabel(taxYear)}: 31 January ${endYear + 1} is the usual deadline to file online and pay any balance due.`;
 }
 
 function formatTaxYearLabel(taxYear?: string): string {
@@ -84,6 +92,16 @@ Student Loan: ${formatCurrency(strategy.studentLoan)}
 Corporation Tax: ${formatCurrency(strategy.corporationTax)}
 Employer NI: ${formatCurrency(strategy.employerNI)}
 
+TAX DATE REMINDER
+-----------------
+${getSelfAssessmentReminder(taxYear)}
+${PAYMENTS_ON_ACCOUNT_NOTE}
+HMRC payments on account: ${PAYMENTS_ON_ACCOUNT_GUIDANCE}
+
+${COMPANY_DEADLINES_NOTE}
+HMRC Corporation Tax payment: ${COMPANY_PAYMENT_GUIDANCE}
+HMRC Company Tax Return filing: ${COMPANY_FILING_GUIDANCE}
+
 DISCLAIMERS
 ----------
 For illustrative purposes only.
@@ -112,7 +130,6 @@ export function generateDirectorEmailHtml(args: {
     generatedDate ??
     new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
 
-  const saDeadline = getSelfAssessmentDeadlineLabel(taxYear);
   const savingsColour = savingsVsAllSalary >= 0 ? '#2f6f4e' : '#a6453c';
 
   return `
@@ -229,11 +246,18 @@ export function generateDirectorEmailHtml(args: {
           <tr>
             <td class="email-card" style="padding: 28px 32px; border-right: 1px solid #cec6b7; border-bottom: 1px solid #cec6b7; border-left: 1px solid #cec6b7; background-color: #fffdf7;">
               <h3 style="margin: 0 0 16px; color: #07111f; font-family: Georgia, 'Times New Roman', serif; font-size: 24px; line-height: 1.1;">Tax dates and pots</h3>
+              <p style="margin: 0 0 12px; color: #465468; font-size: 14px; line-height: 1.5;">
+                <strong style="color: #07111f;">${escapeHtml(getSelfAssessmentReminder(taxYear))}</strong>
+                ${PAYMENTS_ON_ACCOUNT_NOTE}
+                <a href="${PAYMENTS_ON_ACCOUNT_GUIDANCE}" style="color: #123a66;">HMRC payments on account</a>
+              </p>
+              <p style="margin: 0 0 12px; color: #465468; font-size: 14px; line-height: 1.5;">
+                ${COMPANY_DEADLINES_NOTE}
+                <a href="${COMPANY_PAYMENT_GUIDANCE}" style="color: #123a66;">HMRC Corporation Tax payment</a>
+                &middot;
+                <a href="${COMPANY_FILING_GUIDANCE}" style="color: #123a66;">HMRC Company Tax Return filing</a>
+              </p>
               <table style="width: 100%; border-collapse: collapse; color: #07111f; font-size: 14px;">
-                <tr style="border-bottom: 1px solid #e1dbce;">
-                  <td style="padding: 12px 0; color: #07111f; font-weight: 700;">Self Assessment deadline</td>
-                  <td style="padding: 12px 0; text-align: right; color: #a6453c; font-weight: 700;">${escapeHtml(saDeadline)}</td>
-                </tr>
                 <tr style="border-bottom: 1px solid #e1dbce;">
                   <td style="padding: 12px 0; color: #465468;">Company tax pot</td>
                   <td style="padding: 12px 0; text-align: right; color: #123a66; font-family: Menlo, Consolas, monospace;">${formatCurrency(strategy.corporationTax + strategy.employerNI)}</td>
