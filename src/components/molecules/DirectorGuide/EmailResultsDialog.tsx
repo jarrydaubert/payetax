@@ -10,7 +10,7 @@
 
 import { Mail, RotateCcw } from 'lucide-react';
 import Link from 'next/link';
-import { type FormEvent, useEffect, useId, useRef, useState } from 'react';
+import { type FormEvent, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -46,28 +46,46 @@ export function EmailResultsDialog({
   const renderedState = useDirectorGuideStore();
   const emailInputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
+  const requestRef = useRef<AbortController | null>(null);
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [submitError, setSubmitError] = useState('');
+  const [guardError, setGuardError] = useState('');
+  const [requestError, setRequestError] = useState('');
   const [sentEmail, setSentEmail] = useState('');
+  const submitError = guardError || requestError;
+  const canSend = !unavailableReason && !!(comparison && emailInput);
+  const sendableScenario = open && canSend ? comparison : null;
 
   useEffect(() => {
-    if (open) {
-      trackEmailOpened();
-    } else {
-      setEmail('');
-      setIsLoading(false);
-      setSubmitError('');
-      setSentEmail('');
-    }
+    if (open) trackEmailOpened();
   }, [open]);
+
+  // The comparison identifies the calculated scenario; emailInput is rebuilt on each render.
+  // Retire the request before the next dialog state is shown, even if fetch ignores abort.
+  useLayoutEffect(() => {
+    if (!open) {
+      setEmail('');
+      setGuardError('');
+    }
+    setIsLoading(false);
+    setRequestError('');
+    setSentEmail('');
+
+    if (!sendableScenario) return;
+    return () => {
+      const request = requestRef.current;
+      requestRef.current = null;
+      request?.abort();
+    };
+  }, [open, sendableScenario]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!open || requestRef.current) return;
 
     // A store edit and submit can arrive in one task, before React updates the guard props.
     if (useDirectorGuideStore.getState() !== renderedState) {
-      setSubmitError('Results changed. Check the current scenario before emailing.');
+      setGuardError('Results changed. Check the current scenario before emailing.');
       return;
     }
 
@@ -78,13 +96,17 @@ export function EmailResultsDialog({
     }
 
     if (unavailableReason || !(comparison && emailInput)) {
-      setSubmitError(unavailableReason || 'No results to send right now.');
+      setGuardError(unavailableReason || 'No results to send right now.');
       return;
     }
 
     const normalizedEmail = email.trim().toLowerCase();
+    const request = new AbortController();
+    requestRef.current = request;
+    const isCurrentRequest = () => requestRef.current === request;
 
-    setSubmitError('');
+    setGuardError('');
+    setRequestError('');
     setIsLoading(true);
 
     try {
@@ -96,19 +118,22 @@ export function EmailResultsDialog({
           input: emailInput,
           taxYear: TAX_YEAR,
         }),
+        signal: request.signal,
       });
 
+      if (!isCurrentRequest()) return;
       if (!response.ok) {
         // Parse structured error if available
         const errorData = await response.json().catch(() => null);
+        if (!isCurrentRequest()) return;
 
         if (response.status === 429) {
-          setSubmitError('Too many requests. Please wait a minute before trying again.');
+          setRequestError('Too many requests. Please wait a minute before trying again.');
           return;
         }
 
         if (response.status === 400 && errorData?.details) {
-          setSubmitError('Please check your email address and try again.');
+          setRequestError('Please check your email address and try again.');
           return;
         }
 
@@ -119,9 +144,14 @@ export function EmailResultsDialog({
       setSentEmail(normalizedEmail);
       setEmail('');
     } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : 'Please try again later');
+      if (isCurrentRequest()) {
+        setRequestError(error instanceof Error ? error.message : 'Please try again later');
+      }
     } finally {
-      setIsLoading(false);
+      if (isCurrentRequest()) {
+        requestRef.current = null;
+        setIsLoading(false);
+      }
     }
   };
 
@@ -158,10 +188,7 @@ export function EmailResultsDialog({
               <Button
                 type='button'
                 variant='ghost'
-                onClick={() => {
-                  setSentEmail('');
-                  setSubmitError('');
-                }}
+                onClick={() => setSentEmail('')}
                 className='text-muted-foreground hover:text-foreground'
               >
                 <RotateCcw className='mr-2 h-4 w-4' aria-hidden='true' />
@@ -193,7 +220,8 @@ export function EmailResultsDialog({
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);
-                    if (submitError) setSubmitError('');
+                    setGuardError('');
+                    setRequestError('');
                   }}
                   onBlur={(e) => setEmail(e.target.value.trim())}
                   className='border-border/60 bg-background pl-10 text-foreground placeholder:text-muted-foreground'
@@ -230,12 +258,7 @@ export function EmailResultsDialog({
               >
                 Cancel
               </Button>
-              <Button
-                type='submit'
-                disabled={
-                  isLoading || !email.trim() || !!unavailableReason || !comparison || !emailInput
-                }
-              >
+              <Button type='submit' disabled={isLoading || !email.trim() || !canSend}>
                 {isLoading ? 'Sending...' : 'Send Results'}
               </Button>
             </div>
