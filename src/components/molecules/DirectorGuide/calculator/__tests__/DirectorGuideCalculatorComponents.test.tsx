@@ -101,7 +101,10 @@ function createComparison(overrides: Record<string, unknown> = {}) {
 }
 
 function setStoreState(partial: Partial<ReturnType<typeof useDirectorGuideStore.getState>>) {
-  useDirectorGuideStore.setState(partial as never);
+  useDirectorGuideStore.setState((state) => ({
+    ...partial,
+    calculatedFormData: partial.formData ?? state.formData,
+  }));
 }
 
 describe('Director Intelligence calculator components', () => {
@@ -287,7 +290,7 @@ describe('Director Intelligence calculator components', () => {
   });
 
   describe('KeyDates', () => {
-    it('downloads an iCal file and tracks calendar download analytics', () => {
+    it('downloads and tracks the current iCal file, then blocks a same-task click after a date edit', () => {
       const current = useDirectorGuideStore.getState();
       setStoreState({
         formData: {
@@ -317,10 +320,16 @@ describe('Director Intelligence calculator components', () => {
 
       try {
         render(<KeyDates />);
-        fireEvent.click(screen.getByRole('button', { name: /Download \.ics/i }));
+        const download = screen.getByRole('button', { name: /Download \.ics/i });
+        fireEvent.click(download);
 
         expect(createObjectURLMock).toHaveBeenCalledTimes(1);
         expect(revokeObjectURLMock).toHaveBeenCalledWith('blob:payetax-calendar');
+        expect(mockTrackCalendarDownloaded).toHaveBeenCalledTimes(1);
+
+        current.setAccountingPeriodEnd('2027-01-31');
+        fireEvent.click(download);
+        expect(createObjectURLMock).toHaveBeenCalledTimes(1);
         expect(mockTrackCalendarDownloaded).toHaveBeenCalledTimes(1);
       } finally {
         anchorClickSpy.mockRestore();

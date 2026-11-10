@@ -143,7 +143,7 @@ describe('Director calculation failure Sentry envelopes', () => {
     await calculateWithValidInput();
 
     const state = useDirectorGuideStore.getState();
-    expect(state.error).toBe(CANARY_MESSAGE);
+    expect(state.error).toBe('Calculation failed');
     expect(state.isCalculating).toBe(false);
     expect(state.results).toBeNull();
 

@@ -66,8 +66,15 @@ describe('DirectorDashboard (Survival Mode)', () => {
   test('renders Survival Mode state and hides strategy UI when profit <= 0', () => {
     // A displayed result must come from complete inputs, or the dashboard invalidates it.
     const current = useDirectorGuideStore.getState();
+    const formData = {
+      ...current.formData,
+      region: 'rUK' as const,
+      revenue: 90000,
+      expenses: 90000,
+    };
     useDirectorGuideStore.setState({
-      formData: { ...current.formData, region: 'rUK', revenue: 90000, expenses: 90000 },
+      formData,
+      calculatedFormData: formData,
       strategyComparison: createEmptyComparison(0) as never,
     } as never);
 

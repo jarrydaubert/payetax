@@ -1,27 +1,21 @@
 'use client';
 
-import { shallow } from 'zustand/shallow';
-import { useDirectorGuideStore, useHasDirectorInputErrors } from '@/store/directorGuideStore';
+import { useDirectorGuideStore } from '@/store/directorGuideStore';
 import {
   type ActiveDirectorScenario,
   useActiveDirectorScenario,
 } from './calculator/useActiveDirectorScenario';
 
 /** Interim guard for the existing email, which always reports the original recommendation. */
-export function useDirectorEmailUnavailableReason(): string | null {
+export function useDirectorEmailUnavailableReason(
+  noCurrentResultsReason = 'Email is paused until results have updated from complete, valid inputs.',
+): string | null {
   const { baseComparison, activeScenario, selectedStrategy, profitWhatIfPercent } =
     useActiveDirectorScenario();
-  const hasInputErrors = useHasDirectorInputErrors();
-  const isCurrent = useDirectorGuideStore(
-    (state) =>
-      shallow(state.calculatedFormData, state.formData) && !state.isCalculating && !state.error,
-  );
   const objective = useDirectorGuideStore((state) => state.objective);
   const mode = useDirectorGuideStore((state) => state.formData.mode);
 
-  if (!baseComparison || hasInputErrors || !isCurrent) {
-    return 'Email is paused until results have updated from complete, valid inputs.';
-  }
+  if (!baseComparison) return noCurrentResultsReason;
   if (mode === 'monthly') {
     return 'Email is unavailable in monthly mode because the report does not reproduce the cash-aware monthly draw. Use annual mode to email matching results.';
   }

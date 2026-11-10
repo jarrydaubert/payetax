@@ -5,16 +5,18 @@ import { SurvivalModePanel } from '../SurvivalModePanel';
 describe('DirectorGuide SurvivalModePanel', () => {
   beforeEach(() => {
     const current = useDirectorGuideStore.getState();
+    const formData = {
+      ...current.formData,
+      revenue: 0,
+      expenses: 0,
+      pensionContribution: 0,
+      isPensionAlreadyDeducted: false,
+      hasOtherPAYEEmployment: false,
+    };
     useDirectorGuideStore.setState({
       strategyComparison: null,
-      formData: {
-        ...current.formData,
-        revenue: 0,
-        expenses: 0,
-        pensionContribution: 0,
-        isPensionAlreadyDeducted: false,
-        hasOtherPAYEEmployment: false,
-      },
+      formData,
+      calculatedFormData: formData,
     } as never);
   });
 

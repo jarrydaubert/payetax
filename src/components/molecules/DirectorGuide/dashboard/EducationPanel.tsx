@@ -223,8 +223,10 @@ export function EducationPanel({ className }: EducationPanelProps) {
           <AssumptionRow
             label='Trading Period'
             value={
-              isMonthlyMode && monthlyModeOutput
-                ? `Monthly projection (${monthlyModeOutput.monthsRemaining} month${monthlyModeOutput.monthsRemaining === 1 ? '' : 's'} remaining)`
+              isMonthlyMode
+                ? monthlyModeOutput
+                  ? `Monthly projection (${monthlyModeOutput.monthsRemaining} month${monthlyModeOutput.monthsRemaining === 1 ? '' : 's'} remaining)`
+                  : 'Monthly projection'
                 : 'Full Year'
             }
           />

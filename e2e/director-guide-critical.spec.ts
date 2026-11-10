@@ -190,6 +190,167 @@ async function ensureLearnPanelIsVisible(page: Page): Promise<void> {
     .toBe('visible');
 }
 
+test.describe('Director result currentness @critical', () => {
+  async function showScenarioA(page: Page) {
+    await openDirectorGuide(page);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 100000);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 20000);
+    await selectEngland(page);
+    await page
+      .getByRole('textbox', { name: 'Company Accounting Period End' })
+      .filter({ visible: true })
+      .fill('2026-12-31');
+    await closeInputsPanelIfOpen(page);
+    await expect(page.getByRole('button', { name: 'Email My Results' })).toBeEnabled();
+    await expect(page.getByRole('button', { name: 'Download .ics' })).toBeVisible();
+    await expect(profit(page, '£80,000')).toBeVisible();
+  }
+
+  function editScenarioB(page: Page, tryDownloading = false) {
+    // Dispatch the input as one browser task so the paused clock need not run actionability RAFs.
+    return page
+      .getByTestId('director-revenue-input')
+      .first()
+      .evaluate((input, tryDownloading) => {
+        const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+        if (!setter) throw new Error('Missing native input setter');
+        const download = [...document.querySelectorAll('button')].find((button) =>
+          button.textContent?.includes('Download .ics'),
+        );
+        setter.call(input, '120000');
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        if (!tryDownloading) return 0;
+        if (!download) throw new Error('Missing the previous scenario calendar button');
+        let downloads = 0;
+        const createObjectURL = URL.createObjectURL;
+        try {
+          URL.createObjectURL = (blob) => {
+            downloads += 1;
+            return createObjectURL(blob);
+          };
+          download.click();
+        } finally {
+          URL.createObjectURL = createObjectURL;
+        }
+        return downloads;
+      }, tryDownloading);
+  }
+
+  function profit(page: Page, amount: string) {
+    return page.getByRole('listitem', { name: `Gross Profit: ${amount}, 100% of total` });
+  }
+
+  async function expectResultsWithheld(page: Page) {
+    await expect(page.locator('[data-director-section]')).toHaveCount(0);
+    await expect(page.getByText('Save this breakdown for your records')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Email My Results' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Download .ics' })).toHaveCount(0);
+    const sidebarEmail = page.getByRole('button', { name: 'Email Results', exact: true });
+    if (await sidebarEmail.isVisible()) await expect(sidebarEmail).toBeDisabled();
+  }
+
+  async function expectScenarioB(page: Page) {
+    await expect(profit(page, '£100,000')).toBeVisible();
+    await expect(profit(page, '£80,000')).toHaveCount(0);
+    await expect(
+      page.getByRole('status').filter({ hasText: 'Results are up to date.' }),
+    ).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Download .ics' })).toBeVisible();
+    const email = page.getByRole('button', { name: 'Email My Results' });
+    await expect(email).toBeEnabled();
+    await email.click();
+    await page.getByLabel('Email address').fill('director-regression@example.com');
+    const request = page.waitForRequest('**/api/send-director-results');
+    await page.getByRole('button', { name: 'Send Results' }).click();
+    expect((await request).postDataJSON().input).toMatchObject({
+      mode: 'annual',
+      revenue: 120000,
+      expenses: 20000,
+    });
+  }
+
+  test.beforeEach(async ({ page }) => {
+    await page.route('**/_vercel/{insights,speed-insights}/script.js', (route) =>
+      route.fulfill({ contentType: 'application/javascript', body: '' }),
+    );
+    await page.route('/api/send-director-results', (route) =>
+      route.fulfill({ json: { success: true } }),
+    );
+  });
+
+  test('withholds the previous scenario during the debounce', async ({ page }, testInfo) => {
+    await showScenarioA(page);
+    const now = new Date();
+    await page.clock.install({ time: now });
+    await page.clock.pauseAt(new Date(now.getTime() + 1000));
+    const staleDownloads = await editScenarioB(page, true);
+
+    await expectResultsWithheld(page);
+    await expect(page.getByRole('status').filter({ hasText: 'Updating results' })).toBeVisible();
+    expect(staleDownloads).toBe(0);
+
+    await page.clock.runFor(250);
+    await page.clock.resume();
+    await expect(profit(page, '£100,000')).toBeVisible();
+    await testInfo.attach('updated-results', {
+      body: await page.screenshot(),
+      contentType: 'image/png',
+    });
+    await expectScenarioB(page);
+  });
+
+  test('withholds the previous scenario after a calculation exception and can retry', async ({
+    page,
+  }, testInfo) => {
+    const faultAttribute = 'data-test-director-failure';
+    let injections = 0;
+    const pageErrors: string[] = [];
+    const diagnostics: string[] = [];
+    page.on('pageerror', (error) => pageErrors.push(error.message));
+    page.on('console', (message) => {
+      const text = message.text();
+      if (
+        message.type() === 'error' &&
+        text !== 'Viewport argument key "interactive-widget" not recognized and ignored.'
+      )
+        diagnostics.push(text);
+    });
+    await page.route('**/_next/static/chunks/app/tools/director-guide/*.js', async (route) => {
+      const response = await route.fetch();
+      const source = await response.text();
+      // The store's catch sits immediately after the try containing its engine calls.
+      // Inject before the first calculation in that try, without adding a production test switch.
+      const calculation = /try\{(let \w+=\w+\.ytdSalary\+\w+\.ytdDividends\+\w+\.ytdDrawings)/g;
+      const body = source.replace(calculation, (_, firstStatement) => {
+        injections += 1;
+        return `try{if(document.documentElement.hasAttribute("${faultAttribute}")){document.documentElement.removeAttribute("${faultAttribute}");throw Error("Controlled Director failure")} ${firstStatement}`;
+      });
+      await route.fulfill(body === source ? { response } : { response, body });
+    });
+    await showScenarioA(page);
+    expect(injections, 'The production Director fault anchor must match exactly once').toBe(1);
+    await page
+      .locator('html')
+      .evaluate((html, attribute) => html.setAttribute(attribute, ''), faultAttribute);
+    await editScenarioB(page);
+    await expect(page.locator('html')).not.toHaveAttribute(faultAttribute);
+
+    await expectResultsWithheld(page);
+    const alert = page.getByTestId('director-dashboard-main').getByRole('alert');
+    await expect(alert).toContainText('Unable to calculate director pay');
+    await expect(page.getByText('Controlled Director failure')).toHaveCount(0);
+    await testInfo.attach('inline-calculation-failure', {
+      body: await page.screenshot(),
+      contentType: 'image/png',
+    });
+    await page.getByRole('button', { name: 'Try again' }).click();
+    await expect(alert).toHaveCount(0);
+    await expectScenarioB(page);
+    expect(pageErrors).toEqual([]);
+    expect(diagnostics).toEqual(['Director calculation failed.']);
+  });
+});
+
 test.describe('Director Intelligence critical @critical', () => {
   test('DI-05: only matching scenarios can email, with recovery after each divergence @critical', async ({
     page,
@@ -211,7 +372,7 @@ test.describe('Director Intelligence critical @critical', () => {
 
     const email = page.getByRole('button', { name: 'Email My Results', exact: true });
     const sidebarEmail = page.getByRole('button', { name: 'Email Results', exact: true }).first();
-    const reason = page.getByTestId('director-dashboard-main').getByRole('status');
+    const reason = page.getByRole('status', { name: 'Email availability' });
     const strategySection = page.locator('[data-director-section="director-strategy"]');
     const recommended = strategySection
       .getByRole('button')
@@ -322,7 +483,7 @@ test.describe('Director Intelligence critical @critical', () => {
       form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     });
     await expect(page.getByRole('alert')).toHaveText(
-      /Results changed|Email is paused until results have updated/,
+      /Results changed|Email is paused while results update/,
     );
     await expect(page.getByRole('button', { name: 'Send Results' })).toBeEnabled();
     expect(requests).toEqual([]);
@@ -337,6 +498,14 @@ test.describe('Director Intelligence critical @critical', () => {
       await route.fulfill({ json: { success: true } });
     });
     await openDirectorGuide(page);
+    const sidebar = page.getByRole('navigation', { name: 'Sidebar navigation' });
+    if (await sidebar.isVisible()) {
+      await sidebar.getByRole('button', { name: 'Expand sidebar' }).click();
+      await expect(
+        sidebar.getByText('Enter your numbers to calculate results before emailing them.'),
+      ).toBeVisible();
+      await sidebar.getByRole('button', { name: 'Collapse sidebar' }).click();
+    }
     await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 100000);
     await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 20000);
     await selectEngland(page);
@@ -362,7 +531,8 @@ test.describe('Director Intelligence critical @critical', () => {
     );
     await closeInputsPanelIfOpen(page);
     await expect(email).toBeDisabled();
-    await expect(page.getByTestId('director-dashboard-main').getByRole('status')).toHaveText(
+    await expect(page.getByRole('heading', { name: 'Safe Monthly Draw' })).toBeVisible();
+    await expect(page.getByRole('status', { name: 'Email availability' })).toHaveText(
       /cash-aware monthly draw/,
     );
     await email.evaluate((el: HTMLButtonElement) => el.click());
@@ -375,6 +545,7 @@ test.describe('Director Intelligence critical @critical', () => {
       .click();
     await closeInputsPanelIfOpen(page);
     await expect(email).toBeEnabled();
+    await expect(page.getByRole('heading', { name: 'Safe Monthly Draw' })).toHaveCount(0);
   });
 
   test('Normal mode: calculates and can email results @critical', async ({ page }) => {
