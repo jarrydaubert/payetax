@@ -89,7 +89,10 @@ export function TaxCodeDecoderClient() {
               type='text'
               placeholder='e.g., 1257L'
               value={code}
-              onChange={(e) => setCode(e.target.value)}
+              onChange={(e) => {
+                setCode(e.target.value);
+                setResult(null);
+              }}
               className='flex-1 font-mono text-lg uppercase'
               maxLength={TAX_CODE_MAX_LENGTH}
               autoComplete='off'
