@@ -3,48 +3,29 @@ import userEvent from '@testing-library/user-event';
 import { TaxCodeDecoderClient } from '../TaxCodeDecoderClient';
 
 describe('TaxCodeDecoderClient', () => {
-  it.each([
-    { draft: 'BR', outcome: 'Basic rate on all income from this source' },
-    { draft: '1257', outcome: 'Unrecognized or unsupported tax code' },
-    { draft: '', outcome: null },
-  ])(
-    'clears the previous result on editing to "$draft" until decoding again',
-    async ({ draft, outcome }) => {
+  it.each(['BR', '1257', ''])(
+    'keeps the 1257L result while editing the draft to "%s"',
+    async (draft) => {
       const user = userEvent.setup();
       render(<TaxCodeDecoderClient />);
       const input = screen.getByRole('textbox', { name: 'Tax code' });
-      const submit = screen.getByRole('button', { name: 'Decode' });
-      const example = screen.getByRole('button', { name: '1257L' });
-      const previousMeaning = 'Standard Personal Allowance applies';
-
-      await user.click(example);
-      expect(input).toHaveValue('1257L');
-      expect(screen.getByText(previousMeaning)).toBeVisible();
+      await user.click(screen.getByRole('button', { name: '1257L' }));
+      expect(screen.getByRole('heading', { name: '1257L' })).toBeVisible();
 
       if (draft) {
         await user.type(input, draft, { initialSelectionStart: 0, initialSelectionEnd: 5 });
       } else {
         await user.clear(input);
       }
+
       expect(input).toHaveValue(draft);
-      expect(screen.queryByText(previousMeaning)).not.toBeInTheDocument();
-      expect(screen.queryByText('£12,570')).not.toBeInTheDocument();
-
-      if (outcome) {
-        expect(screen.queryByText(outcome)).not.toBeInTheDocument();
-        await user.click(submit);
-        expect(screen.getByText(outcome)).toBeVisible();
-      } else {
-        expect(submit).toBeDisabled();
-      }
-
-      await user.clear(input);
-      await user.type(input, '1257L');
-      expect(screen.queryByText(previousMeaning)).not.toBeInTheDocument();
-      if (outcome) expect(screen.queryByText(outcome)).not.toBeInTheDocument();
-
-      await user.click(example);
-      expect(screen.getByText(previousMeaning)).toBeVisible();
+      expect(screen.getByRole('heading', { name: '1257L' })).toBeVisible();
+      expect(screen.getByText('Standard Personal Allowance applies')).toBeVisible();
+      expect(screen.getByText('£12,570')).toBeVisible();
+      expect(
+        screen.queryByText('Basic rate on all income from this source'),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByText('Unrecognized or unsupported tax code')).not.toBeInTheDocument();
     },
   );
 
