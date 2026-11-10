@@ -193,6 +193,7 @@ async function ensureLearnPanelIsVisible(page: Page): Promise<void> {
 test.describe('Director result currentness @critical', () => {
   async function showScenarioA(page: Page) {
     await openDirectorGuide(page);
+    await page.waitForLoadState('load');
     await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 100000);
     await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 20000);
     await selectEngland(page);
@@ -297,6 +298,86 @@ test.describe('Director result currentness @critical', () => {
       contentType: 'image/png',
     });
     await expectScenarioB(page);
+  });
+
+  test('JGF-137: a delayed send cannot confirm an invalidated scenario', async ({
+    page,
+  }, testInfo) => {
+    const reply = Promise.withResolvers<void>();
+    const handled = Promise.withResolvers<void>();
+    const diagnostics: string[] = [];
+    page.on('pageerror', (error) => diagnostics.push(error.message));
+    page.on('console', (message) => {
+      const text = message.text();
+      // Next dev preloads this stylesheet even when the error page is never used.
+      if (message.type() === 'warning' && /global-error\.css.*was preloaded/.test(text)) return;
+      // WebKit ignores the site's existing virtual-keyboard viewport hint.
+      if (text === 'Viewport argument key "interactive-widget" not recognized and ignored.') return;
+      if (['warning', 'error'].includes(message.type())) diagnostics.push(text);
+    });
+    await page.route(
+      '/api/send-director-results',
+      async (route) => {
+        await reply.promise;
+        try {
+          await route.fulfill({ json: { success: true } });
+          handled.resolve();
+        } catch (error) {
+          handled.reject(error);
+        }
+      },
+      { times: 1 },
+    );
+
+    await showScenarioA(page);
+    await page.getByRole('button', { name: 'Email My Results' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Email Your Results' });
+    await dialog.getByLabel('Email address').fill('scenario-a@example.com');
+    const request = page.waitForRequest('**/api/send-director-results');
+    await dialog.getByRole('button', { name: 'Send Results' }).click();
+    expect((await request).postDataJSON().input.revenue).toBe(100000);
+    await expect(dialog.getByRole('button', { name: 'Sending...' })).toBeDisabled();
+    await testInfo.attach('scenario-a-sending', {
+      body: await page.screenshot(),
+      contentType: 'image/png',
+    });
+
+    // The modal traps user input; drive the underlying input event as the audit did with the store.
+    await page
+      .getByTestId('director-revenue-input')
+      .first()
+      .evaluate((input) => {
+        const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+        if (!setter) throw new Error('Missing native input setter');
+        setter.call(input, '');
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+    await expect(dialog).toBeHidden();
+    await expectResultsWithheld(page);
+    reply.resolve();
+    await handled.promise;
+
+    await ensureInputsPanelIsVisible(page);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 120000);
+    await closeInputsPanelIfOpen(page);
+    await expect(profit(page, '£100,000')).toBeVisible();
+    await page.getByRole('button', { name: 'Email My Results' }).click();
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByText(/Results sent to|scenario-a@example.com/)).toHaveCount(0);
+    await expect(dialog.getByRole('alert')).toHaveCount(0);
+    await expect(dialog.getByLabel('Email address')).toHaveValue('');
+    await testInfo.attach('scenario-b-fresh-form', {
+      body: await page.screenshot(),
+      contentType: 'image/png',
+    });
+    await dialog.getByLabel('Email address').fill('scenario-b@example.com');
+    const nextRequest = page.waitForRequest('**/api/send-director-results');
+    await dialog.getByRole('button', { name: 'Send Results' }).click();
+    expect((await nextRequest).postDataJSON().input.revenue).toBe(120000);
+    await expect(dialog.getByText(/Results sent to scenario-b@example.com/)).toBeVisible();
+    await dialog.getByRole('button', { name: 'Close', exact: true }).last().click();
+    await expect(dialog).toBeHidden();
+    expect(diagnostics).toEqual([]);
   });
 
   test('withholds the previous scenario after a calculation exception and can retry', async ({
