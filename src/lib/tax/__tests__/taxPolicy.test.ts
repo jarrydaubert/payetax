@@ -1,11 +1,17 @@
 import {
   CURRENT_TAX_YEAR,
+  DIVIDEND_TAX_RATES,
   SCOTTISH_TAX_RATES,
   TAX_RATES,
   TAX_YEARS,
   type TaxYear,
 } from '@/constants/taxRates';
-import { parseSupportedTaxYear, resolveTaxYear, selectTaxPolicy } from '../taxPolicy';
+import {
+  getSection455Rate,
+  parseSupportedTaxYear,
+  resolveTaxYear,
+  selectTaxPolicy,
+} from '../taxPolicy';
 
 /**
  * Pre-refactor normaliser lifted verbatim from `taxCalculator.ts` (the historical
@@ -27,6 +33,24 @@ function legacyResolveSupportedTaxYear(taxYear: string | undefined): TaxYear {
 }
 
 describe('tax-policy selector', () => {
+  describe('getSection455Rate', () => {
+    it.each(TAX_YEARS)('uses the canonical dividend upper rate for %s', (year) => {
+      expect(getSection455Rate(year)).toBe(DIVIDEND_TAX_RATES[year].HIGHER_RATE);
+    });
+
+    // HMRC CTM61505 gives the rates on either side of 6 April 2026.
+    it.each([
+      ['2025-2026', 0.3375],
+      ['2026-2027', 0.3575],
+    ])('uses the loan-year rate for %s', (year, expected) => {
+      expect(getSection455Rate(year)).toBe(expected);
+    });
+
+    it.each(['2022-2023', '2099-2100'])('returns no rate for unsupported loan year %s', (year) => {
+      expect(getSection455Rate(year)).toBeNull();
+    });
+  });
+
   describe('policy-map invariant', () => {
     it('has both an rUK and a Scottish record for every supported canonical year', () => {
       expect(TAX_YEARS.length).toBeGreaterThan(0);

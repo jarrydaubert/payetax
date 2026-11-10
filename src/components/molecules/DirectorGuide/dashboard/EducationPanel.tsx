@@ -8,6 +8,7 @@
 import { AlertTriangle } from 'lucide-react';
 import { type ReactNode, useMemo } from 'react';
 import { CURRENT_TAX_YEAR, CURRENT_TAX_YEAR_DISPLAY, TAX_RATES } from '@/constants/taxRates';
+import { getSection455Rate } from '@/lib/tax';
 import { DIRECTOR_GUIDE_BUSINESS_THRESHOLDS } from '@/lib/tax/businessThresholds';
 import { cn } from '@/lib/utils';
 import {
@@ -33,6 +34,11 @@ const PA_TAPER_THRESHOLD = rates.personalAllowanceReductionThreshold;
 const PA_TAPER_END = PA_TAPER_THRESHOLD + PERSONAL_ALLOWANCE * 2; // 100,000 + 25,140 = 125,140
 const SECONDARY_THRESHOLD = rates.nationalInsurance.employer.A.secondary.threshold;
 const LEL = rates.nationalInsurance.lowerEarningsLimit;
+const section455Rate = getSection455Rate(TAX_YEAR);
+const section455Percent = section455Rate?.toLocaleString('en-GB', {
+  style: 'percent',
+  maximumFractionDigits: 2,
+});
 
 const {
   vatRegistration: VAT_THRESHOLD,
@@ -328,7 +334,7 @@ interface WarningContext {
 interface Warning {
   id: string;
   title: string;
-  description: string;
+  description: ReactNode;
   show: boolean;
   isCritical?: boolean;
 }
@@ -386,9 +392,20 @@ function buildWarnings(ctx: WarningContext): Warning[] {
     },
     {
       id: 's455',
-      title: 'S455 Tax Warning',
-      description:
-        "If your Director's Loan is not repaid within 9 months after year-end, the company must pay S455 tax at 33.75%. This is refunded when the loan is repaid, but creates cash flow issues.",
+      title: 'Section 455 Tax Warning',
+      description: (
+        <>
+          {section455Percent === undefined
+            ? 'Section 455 tax may apply to unpaid director’s loans. Check the rate for the tax year the loan was made.'
+            : `For loans made in ${CURRENT_TAX_YEAR_DISPLAY}, your company may owe Section 455 tax at ${section455Percent} on amounts still unpaid nine months after the end of the accounting period.`}{' '}
+          <a
+            href='https://www.gov.uk/hmrc-internal-manuals/company-taxation-manual/ctm61505'
+            className='underline underline-offset-2'
+          >
+            HMRC’s Section 455 guidance
+          </a>
+        </>
+      ),
       // Only show S455 if overdrawn AND there are drawings (don't duplicate with plain overdrawn)
       show: hasDrawings && isOverdrawn,
       isCritical: true,
@@ -567,7 +584,7 @@ function LearnCard({ title, description }: LearnCardProps) {
 
 interface WarningCardProps {
   title: string;
-  description: string;
+  description: ReactNode;
   isCritical?: boolean;
 }
 
