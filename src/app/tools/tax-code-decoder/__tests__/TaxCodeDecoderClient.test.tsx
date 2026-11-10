@@ -3,6 +3,32 @@ import userEvent from '@testing-library/user-event';
 import { TaxCodeDecoderClient } from '../TaxCodeDecoderClient';
 
 describe('TaxCodeDecoderClient', () => {
+  it.each(['BR', '1257', ''])(
+    'keeps the 1257L result while editing the draft to "%s"',
+    async (draft) => {
+      const user = userEvent.setup();
+      render(<TaxCodeDecoderClient />);
+      const input = screen.getByRole('textbox', { name: 'Tax code' });
+      await user.click(screen.getByRole('button', { name: '1257L' }));
+      expect(screen.getByRole('heading', { name: '1257L' })).toBeVisible();
+
+      if (draft) {
+        await user.type(input, draft, { initialSelectionStart: 0, initialSelectionEnd: 5 });
+      } else {
+        await user.clear(input);
+      }
+
+      expect(input).toHaveValue(draft);
+      expect(screen.getByRole('heading', { name: '1257L' })).toBeVisible();
+      expect(screen.getByText('Standard Personal Allowance applies')).toBeVisible();
+      expect(screen.getByText('£12,570')).toBeVisible();
+      expect(
+        screen.queryByText('Basic rate on all income from this source'),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByText('Unrecognized or unsupported tax code')).not.toBeInTheDocument();
+    },
+  );
+
   it('states the tax year used for rate explanations', () => {
     render(<TaxCodeDecoderClient />);
 
