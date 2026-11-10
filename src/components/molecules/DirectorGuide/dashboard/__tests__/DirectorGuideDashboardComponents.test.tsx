@@ -61,7 +61,10 @@ function createComparison(overrides: Record<string, unknown> = {}) {
 }
 
 function setStoreState(partial: Partial<ReturnType<typeof useDirectorGuideStore.getState>>) {
-  useDirectorGuideStore.setState(partial as never);
+  useDirectorGuideStore.setState((state) => ({
+    ...partial,
+    calculatedFormData: partial.formData ?? state.formData,
+  }));
 }
 
 describe('Director Intelligence dashboard components', () => {

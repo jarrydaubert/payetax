@@ -595,6 +595,46 @@ describe('DirectorGuideStore', () => {
       expect(state.formData.revenue).toBe(100000);
     });
 
+    it('clears the previous monthly outputs and calculation snapshot when recalculation throws', () => {
+      const actions = useDirectorGuideStore.getState();
+      actions.setRegion('rUK');
+      actions.setMode('monthly');
+      actions.setMonthlyIncome(5000);
+      actions.setMonthlyExpenses(1000);
+      actions.calculate();
+      expect(useDirectorGuideStore.getState().monthlyModeOutput?.projectedRevenue).toBe(60000);
+
+      actions.setMonthlyIncome(6000);
+      mockCalculateDirectorScenario.mockImplementationOnce(() => {
+        throw new Error('Synthetic Director failure');
+      });
+      const diagnostic = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+      try {
+        actions.calculate();
+        expect(diagnostic).toHaveBeenCalledWith('Director calculation failed.');
+      } finally {
+        diagnostic.mockRestore();
+      }
+      expect(useDirectorGuideStore.getState()).toMatchObject({
+        results: null,
+        strategyComparison: null,
+        monthlyModeOutput: null,
+        calculatedFormData: null,
+        failedFormData: { monthlyIncome: 6000 },
+        isCalculating: false,
+      });
+      const persisted = JSON.parse(localStorage.getItem(DIRECTOR_STORAGE_KEY) ?? '{}').state;
+      expect(persisted).not.toHaveProperty('failedFormData');
+
+      actions.calculate();
+      expect(useDirectorGuideStore.getState()).toMatchObject({
+        monthlyModeOutput: { projectedRevenue: 72000 },
+        calculatedFormData: { monthlyIncome: 6000 },
+        failedFormData: null,
+        error: null,
+      });
+    });
+
     it('reset clears input errors and advances the input revision', () => {
       const before = useDirectorGuideStore.getState().inputRevision;
       useDirectorGuideStore.getState().setInputError('revenue', INVALID);

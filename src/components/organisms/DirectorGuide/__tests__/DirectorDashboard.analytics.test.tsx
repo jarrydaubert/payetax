@@ -21,6 +21,7 @@ jest.mock('@/lib/directorGuideAnalytics', () => ({
 
 jest.mock('@/store/directorGuideStore', () => ({
   useHasDirectorInputErrors: jest.fn(() => false),
+  useDirectorCalculationFailed: jest.fn(() => false),
   useDirectorFormSlice: jest.fn(),
   useStrategyComparison: jest.fn(),
   useMonthlyModeOutput: jest.fn(),

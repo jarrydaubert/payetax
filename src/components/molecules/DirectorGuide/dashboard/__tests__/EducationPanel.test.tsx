@@ -1,11 +1,14 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { useDirectorGuideStore } from '@/store/directorGuideStore';
 import { EducationPanel } from '../EducationPanel';
 
 function setDirectorGuideState(
   partial: Partial<ReturnType<typeof useDirectorGuideStore.getState>>,
 ) {
-  useDirectorGuideStore.setState(partial as never);
+  useDirectorGuideStore.setState((state) => ({
+    ...partial,
+    calculatedFormData: partial.strategyComparison ? (partial.formData ?? state.formData) : null,
+  }));
 }
 
 function createComparison(grossProfit: number) {
@@ -90,7 +93,7 @@ describe('DirectorGuide EducationPanel', () => {
     expect(screen.getByText(/turnover figure includes VAT/i)).toBeInTheDocument();
   });
 
-  test('shows monthly-mode buffer and contract risk warnings', () => {
+  test('shows monthly projection and warnings only while their inputs are current', () => {
     const current = useDirectorGuideStore.getState();
     setDirectorGuideState({
       strategyComparison: createComparison(5000) as never,
@@ -120,6 +123,14 @@ describe('DirectorGuide EducationPanel', () => {
     expect(screen.getByText('Contract-End Risk')).toBeInTheDocument();
     expect(screen.getByText('Mid-Year Projection Assumption')).toBeInTheDocument();
     expect(screen.getByText(/Monthly projection \(2 months remaining\)/i)).toBeInTheDocument();
+
+    act(() => current.setMonthlyIncome(7000));
+
+    expect(screen.queryByText('Cash Buffer Shortfall')).not.toBeInTheDocument();
+    expect(screen.queryByText('Contract-End Risk')).not.toBeInTheDocument();
+    expect(screen.queryByText(/2 months remaining/i)).not.toBeInTheDocument();
+    expect(screen.getByText('Monthly projection', { exact: true })).toBeInTheDocument();
+    expect(screen.queryByText('Full Year')).not.toBeInTheDocument();
   });
 
   test('shows MTD for Income Tax timeline and scope note', () => {

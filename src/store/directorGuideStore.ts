@@ -12,6 +12,7 @@
 import { z } from 'zod';
 import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
+import { shallow } from 'zustand/shallow';
 import type { StudentLoanPlan } from '@/constants/taxRates';
 import {
   trackGuideReset,
@@ -149,7 +150,16 @@ const CLEARED_RESULTS = {
   monthlyModeOutput: null,
   sliderSalary: null,
   calculatedFormData: null,
+  failedFormData: null,
 } as const;
+
+export function hasCurrentDirectorResults(state: DirectorGuideState) {
+  return (
+    !(state.isCalculating || state.error) &&
+    shallow(state.calculatedFormData, state.formData) &&
+    !hasBlockingInputErrors(state)
+  );
+}
 
 /**
  * Store state interface
@@ -161,8 +171,9 @@ interface DirectorGuideState {
   // Calculation results
   results: DirectorCalculationResult | null;
   strategyComparison: StrategyComparison | null;
-  /** In-memory inputs that produced the comparison; used to pause email during updates. */
+  /** In-memory inputs that produced the results; shared by display and email eligibility. */
   calculatedFormData: DirectorFormData | null;
+  failedFormData: DirectorFormData | null;
   monthlyModeOutput: MonthlyModeOutput | null;
   error: string | null;
 
@@ -284,6 +295,7 @@ const defaultState: DirectorGuideState = {
   results: null,
   strategyComparison: null,
   calculatedFormData: null,
+  failedFormData: null,
   monthlyModeOutput: null,
   error: null,
   inputErrors: {},
@@ -707,11 +719,16 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         // ====================================================================
 
         invalidateResults: () => {
-          const { results, strategyComparison, monthlyModeOutput } = get();
-          if (results === null && strategyComparison === null && monthlyModeOutput === null) {
+          const { results, strategyComparison, monthlyModeOutput, error } = get();
+          if (
+            results === null &&
+            strategyComparison === null &&
+            monthlyModeOutput === null &&
+            error === null
+          ) {
             return;
           }
-          set({ ...CLEARED_RESULTS });
+          set({ ...CLEARED_RESULTS, error: null });
         },
 
         calculate: () => {
@@ -751,7 +768,7 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
             return;
           }
 
-          set({ isCalculating: true, error: null });
+          set({ isCalculating: true, error: null, failedFormData: null });
 
           try {
             // Compute total already taken from YTD fields
@@ -840,12 +857,14 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
               sliderSalary: null, // Reset slider on new calculation
             });
           } catch (error) {
-            console.error('Director calculation error:', error);
-            captureDirectorCalculationFailure(error);
             set({
-              error: error instanceof Error ? error.message : 'Calculation failed',
+              ...CLEARED_RESULTS,
+              failedFormData: formData,
+              error: 'Calculation failed',
               isCalculating: false,
             });
+            console.error('Director calculation failed.');
+            captureDirectorCalculationFailure(error);
           }
         },
 
@@ -960,21 +979,31 @@ export function useDirectorFormSlice<T>(selector: (formData: DirectorFormData) =
  * Hook for accessing results
  */
 export function useDirectorResults() {
-  return useDirectorGuideStore((state) => state.results);
+  return useDirectorGuideStore((state) =>
+    hasCurrentDirectorResults(state) ? state.results : null,
+  );
 }
 
 /**
  * Hook for accessing strategy comparison
  */
 export function useStrategyComparison() {
-  return useDirectorGuideStore((state) => state.strategyComparison);
+  return useDirectorGuideStore((state) =>
+    hasCurrentDirectorResults(state) ? state.strategyComparison : null,
+  );
 }
 
 /**
  * Hook for monthly-mode calculated outputs
  */
 export function useMonthlyModeOutput() {
-  return useDirectorGuideStore((state) => state.monthlyModeOutput);
+  return useDirectorGuideStore((state) =>
+    hasCurrentDirectorResults(state) ? state.monthlyModeOutput : null,
+  );
+}
+
+export function useDirectorCalculationFailed() {
+  return useDirectorGuideStore((state) => shallow(state.failedFormData, state.formData));
 }
 
 /**
