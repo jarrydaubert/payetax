@@ -1,4 +1,5 @@
 import { act, render, screen } from '@testing-library/react';
+import { CURRENT_TAX_YEAR, formatTaxYearDisplay, getSection455Rate } from '@/lib/tax';
 import { useDirectorGuideStore } from '@/store/directorGuideStore';
 import { EducationPanel } from '../EducationPanel';
 
@@ -56,8 +57,44 @@ describe('DirectorGuide EducationPanel', () => {
         revenue: undefined,
         expenses: undefined,
         includesVat: false,
+        ytdDrawings: 0,
       },
     });
+  });
+
+  test('shows the policy rate and its loan year when drawings exceed the comparison', () => {
+    setDirectorGuideState({
+      strategyComparison: createComparison(5000),
+      formData: { ...useDirectorGuideStore.getState().formData, ytdDrawings: 1000 },
+    });
+
+    render(<EducationPanel />);
+
+    const rate = getSection455Rate(CURRENT_TAX_YEAR);
+    expect(rate).not.toBeNull();
+    const percent = Number(((rate ?? 0) * 100).toFixed(2));
+    expect(screen.getByText('Section 455 Tax Warning')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        `For loans made in ${formatTaxYearDisplay(CURRENT_TAX_YEAR)}, your company may owe Section 455 tax at ${percent}% on amounts still unpaid nine months after the end of the accounting period.`,
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /HMRC’s Section 455 guidance/ })).toHaveAttribute(
+      'href',
+      'https://www.gov.uk/hmrc-internal-manuals/company-taxation-manual/ctm61505',
+    );
+  });
+
+  test('does not show the Section 455 warning for an overdrawn comparison without drawings', () => {
+    setDirectorGuideState({
+      strategyComparison: createComparison(5000),
+      formData: { ...useDirectorGuideStore.getState().formData, ytdSalary: 1000 },
+    });
+
+    render(<EducationPanel />);
+
+    expect(screen.getByText('Already Taken Too Much')).toBeInTheDocument();
+    expect(screen.queryByText('Section 455 Tax Warning')).not.toBeInTheDocument();
   });
 
   test('shows VAT mandatory warning based on revenue even with no results', () => {

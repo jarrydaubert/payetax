@@ -14,6 +14,7 @@
 
 import {
   CURRENT_TAX_YEAR,
+  DIVIDEND_TAX_RATES,
   SCOTTISH_TAX_RATES,
   TAX_RATES,
   type TaxYear,
@@ -57,6 +58,12 @@ export function parseSupportedTaxYear(value: string | null | undefined): TaxYear
   const normalizedTaxYear = `${start}-${normalizedEnd}`;
 
   return normalizedTaxYear in TAX_RATES ? (normalizedTaxYear as TaxYear) : null;
+}
+
+/** Section 455 uses the dividend upper rate for the year the loan was made. */
+export function getSection455Rate(loanTaxYear: string): number | null {
+  const year = parseSupportedTaxYear(loanTaxYear);
+  return year === null ? null : (DIVIDEND_TAX_RATES[year]?.HIGHER_RATE ?? null);
 }
 
 /**

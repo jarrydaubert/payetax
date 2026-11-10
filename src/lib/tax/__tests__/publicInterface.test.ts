@@ -29,6 +29,7 @@ describe('tax-domain public interface', () => {
       'getEmployerNIThreshold',
       'getMonthlyKCodeAdditionalPay',
       'getPayDateForTaxPeriod',
+      'getSection455Rate',
       'getTaxCodeRegionOverride',
       'hasNonCumulativeTaxCodeMarker',
       'isEmployeeNIExempt',

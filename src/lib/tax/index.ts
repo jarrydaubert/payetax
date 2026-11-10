@@ -82,5 +82,10 @@ export {
   TAX_CODE_NON_CUMULATIVE_MARKERS,
 } from './taxCode';
 export type { RukTaxPolicy, ScottishTaxPolicy, SelectedTaxPolicy } from './taxPolicy';
-export { parseSupportedTaxYear, resolveTaxYear, selectTaxPolicy } from './taxPolicy';
+export {
+  getSection455Rate,
+  parseSupportedTaxYear,
+  resolveTaxYear,
+  selectTaxPolicy,
+} from './taxPolicy';
 export { roundToPence, taxableThresholdToTotalIncome } from './utils';
