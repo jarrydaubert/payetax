@@ -10,7 +10,7 @@
 import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario';
 import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
 import { cn, formatCurrency } from '@/lib/utils';
-import { useDirectorFormValue } from '@/store/directorGuideStore';
+import { useDirectorFormSlice, useMonthlyModeOutput } from '@/store/directorGuideStore';
 
 const TAX_YEAR = CURRENT_TAX_YEAR;
 const DIVIDEND_ALLOWANCE = TAX_RATES[TAX_YEAR].dividendAllowance;
@@ -22,10 +22,23 @@ interface DetailCardsProps {
 export function DetailCards({ className }: DetailCardsProps) {
   const { activeScenario, comparison, isProfitWhatIfActive, scenarioGrossProfitBeforePension } =
     useActiveDirectorScenario();
-  const revenue = useDirectorFormValue((state) => state.revenue) || 0;
-  const expenses = useDirectorFormValue((state) => state.expenses) || 0;
+  const { mode, revenue, expenses, pension } = useDirectorFormSlice((state) => ({
+    mode: state.mode,
+    revenue: state.revenue,
+    expenses: state.expenses,
+    pension: state.isPensionAlreadyDeducted ? 0 : state.pensionContribution,
+  }));
+  const monthlyOutput = useMonthlyModeOutput();
+  const resolvedRevenue = mode === 'monthly' ? monthlyOutput?.projectedRevenue : (revenue ?? 0);
+  const resolvedExpenses = mode === 'monthly' ? monthlyOutput?.projectedExpenses : (expenses ?? 0);
 
-  if (!(activeScenario && comparison)) return null;
+  if (
+    !(activeScenario && comparison) ||
+    resolvedRevenue === undefined ||
+    resolvedExpenses === undefined
+  ) {
+    return null;
+  }
   const taxableProfit =
     (comparison.grossProfitAfterPension ?? comparison.grossProfit) -
     activeScenario.salary -
@@ -113,13 +126,22 @@ export function DetailCards({ className }: DetailCardsProps) {
                 },
               ]
             : [
-                { label: 'Revenue', value: formatCurrency(revenue, 0) },
+                { label: 'Revenue', value: formatCurrency(resolvedRevenue, 0) },
                 {
                   label: 'Business Expenses',
-                  value: expenses > 0 ? `-${formatCurrency(expenses, 0)}` : '£0',
-                  negative: expenses > 0,
+                  value: resolvedExpenses > 0 ? `-${formatCurrency(resolvedExpenses, 0)}` : '£0',
+                  negative: resolvedExpenses > 0,
                 },
               ]),
+          ...(pension > 0
+            ? [
+                {
+                  label: 'Employer Pension',
+                  value: `-${formatCurrency(pension, 0)}`,
+                  negative: true,
+                },
+              ]
+            : []),
           {
             label: 'Salary + Employer NI',
             value: `-${formatCurrency(activeScenario.salary + activeScenario.employerNI, 0)}`,
