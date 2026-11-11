@@ -61,6 +61,18 @@ export const faqs: FAQ[] = [
     ],
   },
   {
+    question: 'How much could pension salary sacrifice save?',
+    answer:
+      'In 2026/27, on £50,000 a year in England, Wales or Northern Ireland, a 5% salary sacrifice puts £2,500 into your pension. Using annual thresholds, the standard Personal Allowance and category A National Insurance, you save £500 in Income Tax and £200 in employee National Insurance. With no student loan or other deductions, your take-home pay falls by £1,800 a year.',
+    links: [
+      {
+        label: 'HMRC 2026/27 rates and thresholds',
+        href: 'https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027',
+        external: true,
+      },
+    ],
+  },
+  {
     question: 'Can I use it offline?',
     answer:
       'Yes. Install PayeTax as an app and it keeps working from cache when your connection drops.',

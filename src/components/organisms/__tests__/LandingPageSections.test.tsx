@@ -61,4 +61,16 @@ describe('LandingPageSections', () => {
     expect(screen.getByTestId('home-tool-national-insurance-calculator')).toBeInTheDocument();
     expect(screen.getByTestId('home-tool-marriage-allowance-calculator')).toBeInTheDocument();
   });
+
+  it('shows the corrected annual salary-sacrifice example in the homepage FAQ', () => {
+    render(<LandingPageSections />);
+
+    // HMRC 2026/27: both salaries are in the 20% Income Tax and 8% category A NI bands.
+    // £50,000 × 5% = £2,500. Income Tax falls £500 and employee NI falls £200.
+    const example = screen.getByText(/£50,000 a year.*5%/);
+    expect(example).toHaveTextContent('2026/27');
+    expect(example).toHaveTextContent(
+      /£2,500.*£500 in Income Tax.*£200 in employee National Insurance.*£1,800/,
+    );
+  });
 });

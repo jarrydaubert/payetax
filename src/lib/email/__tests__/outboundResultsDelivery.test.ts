@@ -57,6 +57,11 @@ describe('sendPayeResultsEmail', () => {
     // Subject embeds the server-computed annual take-home, not client-supplied data.
     expect(payload.subject).toMatch(/^Your UK Tax Calculation - £[\d,]+(\.\d{2})? take-home$/);
     expect(payload.htmlContent).toContain('2026-27');
+    for (const output of [payload.htmlContent, payload.textContent]) {
+      expect(output).not.toMatch(
+        /pension|salary sacrifice|relief at source|employer national insurance/i,
+      );
+    }
   });
 
   it.each([
@@ -86,6 +91,18 @@ describe('sendPayeResultsEmail', () => {
       expect(payload.textContent).toContain(`Pension (${label})`);
       expect(payload.htmlContent).toContain('Relief at source requires a separate calculation.');
       expect(payload.textContent).toContain('Relief at source requires a separate calculation.');
+      for (const output of [payload.htmlContent, payload.textContent]) {
+        if (pensionMethod === 'net-pay') {
+          expect(output).toContain('Employee National Insurance uses pay before the contribution.');
+          expect(output).not.toContain('Employer National Insurance savings');
+        } else {
+          expect(output).toContain('can also reduce employee National Insurance');
+          expect(output).toContain(
+            'This estimate excludes any employer National Insurance savings.',
+          );
+        }
+        expect(output).toMatch(/reduces (cash pay used for|pay subject to) Income Tax/);
+      }
     },
   );
 

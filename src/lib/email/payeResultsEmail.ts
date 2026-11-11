@@ -1,9 +1,16 @@
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { getTaxCodeBasisExplanation } from '@/lib/taxCodeBasisPresenter';
-import { PENSION_METHOD_LABELS } from '@/lib/types/calculator';
+import { PENSION_METHOD_LABELS, type PensionMethod } from '@/lib/types/calculator';
 import { formatCurrency } from '@/lib/utils';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://payetax.co.uk';
+
+const PENSION_METHOD_EXPLANATIONS = {
+  'salary-sacrifice':
+    'Salary sacrifice reduces cash pay used for Income Tax and can also reduce employee National Insurance. This estimate excludes any employer National Insurance savings.',
+  'net-pay':
+    'Your pension contribution reduces pay subject to Income Tax. Employee National Insurance uses pay before the contribution.',
+} satisfies Record<PensionMethod, string>;
 
 export function escapeHtml(str: string): string {
   return str
@@ -48,6 +55,7 @@ National Insurance: -${formatCurrency(results.nationalInsurance.annually)}  (-${
   if (results.pensionContribution.annually > 0) {
     text += `
 Pension (${PENSION_METHOD_LABELS[results.pensionMethod]}): -${formatCurrency(results.pensionContribution.annually)}  (-${formatCurrency(results.pensionContribution.monthly)}/mo)
+${PENSION_METHOD_EXPLANATIONS[results.pensionMethod]}
 Relief at source requires a separate calculation.`;
   }
 
@@ -191,10 +199,13 @@ export function generatePayeEmailHtml(results: TaxCalculationResults, taxYear?: 
           ${
             results.pensionContribution.annually > 0
               ? `
+          <tr>
+            <td style="padding: 14px 0 6px; color: #8a641f;">Pension (${PENSION_METHOD_LABELS[results.pensionMethod]})</td>
+            <td style="padding: 14px 0 6px; text-align: right; color: #8a641f; font-family: Menlo, Consolas, monospace;">-${formatCurrency(results.pensionContribution.annually)}</td>
+            <td class="mobile-hide" style="padding: 14px 0 6px; text-align: right; color: #465468; font-family: Menlo, Consolas, monospace;">-${formatCurrency(results.pensionContribution.monthly)}</td>
+          </tr>
           <tr style="border-bottom: 1px solid #e1dbce;">
-            <td style="padding: 14px 0; color: #8a641f;">Pension (${PENSION_METHOD_LABELS[results.pensionMethod]})<br><span style="font-size: 12px; color: #465468;">Relief at source requires a separate calculation.</span></td>
-            <td style="padding: 14px 0; text-align: right; color: #8a641f; font-family: Menlo, Consolas, monospace;">-${formatCurrency(results.pensionContribution.annually)}</td>
-            <td class="mobile-hide" style="padding: 14px 0; text-align: right; color: #465468; font-family: Menlo, Consolas, monospace;">-${formatCurrency(results.pensionContribution.monthly)}</td>
+            <td colspan="3" style="padding: 0 0 14px; color: #465468; font-size: 12px; line-height: 1.5;">${PENSION_METHOD_EXPLANATIONS[results.pensionMethod]} Relief at source requires a separate calculation.</td>
           </tr>
           `
               : ''
