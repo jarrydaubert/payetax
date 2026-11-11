@@ -51,7 +51,7 @@ export const faqs: FAQ[] = [
   {
     question: 'What does the calculation include?',
     answer:
-      'Income Tax, National Insurance, student loan repayments and pension contributions, broken down by pay period. Enter your pension contribution even for net pay or relief at source; we estimate it as salary sacrifice, which may overstate take-home.',
+      'Income Tax, National Insurance, student loan repayments and pension contributions, broken down by pay period. Choose salary sacrifice or net pay to match your pension scheme. Relief at source requires a separate calculation.',
     links: [
       {
         label: 'Pension arrangements explained',

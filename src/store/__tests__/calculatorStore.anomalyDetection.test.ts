@@ -20,6 +20,7 @@ const createResult = (overrides: Partial<TaxCalculationResults> = {}): TaxCalcul
   incomeTax: createPeriodValue(7486),
   nationalInsurance: createPeriodValue(2994.4),
   studentLoan: createPeriodValue(0),
+  pensionMethod: 'salary-sacrifice',
   pensionContribution: createPeriodValue(0),
   employerNI: 5700,
   netPay: createPeriodValue(39519.6),

@@ -232,6 +232,10 @@ export function CalculatorContent() {
 
             <FAQItem question='How does pension tax relief work?'>
               <p>
+                Choose salary sacrifice or net pay to match your pension scheme. Relief at source
+                requires a separate calculation.
+              </p>
+              <p>
                 Pension tax relief depends on how your pension is set up. With{' '}
                 <strong>salary sacrifice</strong> or <strong>net pay arrangements</strong>,
                 contributions are deducted before tax. With <strong>relief at source</strong>, your

@@ -41,10 +41,23 @@ describe('Pension restoration integrity', () => {
     const state = useCalculatorStore.getState();
     expect(state.input.pensionContribution).toBe(value);
     expect(state.input.pensionContributionType).toBe(type);
+    expect(state.input.pensionMethod).toBe('salary-sacrifice');
     expect(state.inputErrors.pensionContribution).toBeUndefined();
     expect(state.results).toBeNull();
     state.calculate();
     expect(useCalculatorStore.getState().results).not.toBeNull();
+  });
+
+  it('restores the selected method with opted-in figures', async () => {
+    await restore(5);
+    useCalculatorStore.getState().setInput({ pensionMethod: 'net-pay' });
+    await useCalculatorStore.persist.rehydrate();
+    const state = useCalculatorStore.getState();
+    expect(state.input.pensionMethod).toBe('net-pay');
+    expect(state.input.pensionContribution).toBe(5);
+    expect(state.results).toBeNull();
+    state.calculate();
+    expect(useCalculatorStore.getState().results?.pensionMethod).toBe('net-pay');
   });
 
   it.each([

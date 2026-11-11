@@ -29,7 +29,7 @@ const amountFieldLabel = (field: CalculatorAmountField): string =>
     : AMOUNT_FIELD_LABELS[field as keyof typeof AMOUNT_FIELD_LABELS];
 
 interface CalculatorInputsSectionProps {
-  onCalculate: () => void;
+  onCalculate: () => string | undefined;
   onReset?: () => void;
   resultAction?: React.ReactNode;
 }
@@ -112,8 +112,8 @@ export function CalculatorInputsSection({
 
     setIsCalculating(true);
     try {
-      onCalculate();
-      // Success is implicit - results appear on screen
+      const inputIssue = onCalculate();
+      if (inputIssue) setFormMessage({ tone: 'error', text: inputIssue });
     } catch (error) {
       setFormMessage({
         tone: 'error',

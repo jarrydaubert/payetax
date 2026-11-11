@@ -54,11 +54,11 @@ describe('derivePayePayBasis', () => {
       pensionContributionType: 'amount',
     });
 
-    expect(percentage.salarySacrificePensionDeduction).toEqual({
+    expect(percentage.pensionDeduction).toEqual({
       annual: 2_400,
       monthly: 200,
     });
-    expect(fixed.salarySacrificePensionDeduction).toEqual({
+    expect(fixed.pensionDeduction).toEqual({
       annual: 1_200,
       monthly: 100,
     });
@@ -108,7 +108,7 @@ describe('derivePayePayBasis', () => {
     expect(basis.totalEmploymentGross.annual).toBe(58_400);
     expect(basis.nonEmploymentTaxableIncome.annual).toBe(6_000);
     expect(basis.totalGrossIncome.annual).toBe(64_400);
-    expect(basis.salarySacrificePensionDeduction.annual).toBe(2_400);
+    expect(basis.pensionDeduction.annual).toBe(2_400);
     expect(basis.adjustedNetIncome.annual).toBe(62_000);
     expect(basis.payeAdjustedPayment.annual).toBe(62_000);
     expect(basis.niableEmploymentEarnings.annual).toBe(56_000);
@@ -161,7 +161,7 @@ describe('derivePayePayBasis', () => {
         pensionContributionType,
       });
 
-      expect(basis.salarySacrificePensionDeduction.annual).toBe(expectedAnnual);
+      expect(basis.pensionDeduction.annual).toBe(expectedAnnual);
       expect(basis.adjustedNetIncome.annual).toBe(Math.max(0, 30_000 - expectedAnnual));
     },
   );
@@ -174,7 +174,7 @@ describe('derivePayePayBasis', () => {
       pensionContributionType: 'amount',
     });
 
-    expect(basis.salarySacrificePensionDeduction).toEqual({
+    expect(basis.pensionDeduction).toEqual({
       annual: 10_000,
       monthly: 10_000 / 12,
     });
@@ -200,7 +200,7 @@ describe('derivePayePayBasis', () => {
       basis.totalEmploymentGross,
       basis.nonEmploymentTaxableIncome,
       basis.totalGrossIncome,
-      basis.salarySacrificePensionDeduction,
+      basis.pensionDeduction,
       basis.adjustedNetIncome,
       basis.payeAdjustedPayment,
       basis.niableEmploymentEarnings,

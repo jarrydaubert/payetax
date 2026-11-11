@@ -10,7 +10,7 @@ import {
   generatePayeEmailHtml,
   generatePayeEmailText,
 } from '@/lib/email/payeResultsEmail';
-import { resolveTaxYear } from '@/lib/tax';
+import { getPayePensionInputIssue, resolveTaxYear } from '@/lib/tax';
 import { calculateStrategyComparison } from '@/lib/tax/strategyComparison';
 import { calculateTax } from '@/lib/taxCalculator';
 import type { TaxCalculationInput } from '@/lib/types/calculator';
@@ -22,7 +22,9 @@ export type OutboundResultsDeliveryResult = SendOutboundEmailResult;
 export function sendPayeResultsEmail(args: {
   email: string;
   input: PayeEmailInput;
-}): Promise<OutboundResultsDeliveryResult> {
+}): Promise<
+  OutboundResultsDeliveryResult | { ok: false; reason: 'invalid_pension'; message: string }
+> {
   const calculationInput: TaxCalculationInput = {
     ...args.input,
     payPeriod: args.input.payPeriod as PayPeriod,
@@ -37,6 +39,11 @@ export function sendPayeResultsEmail(args: {
   };
 
   const results = calculateTax(calculationInput);
+  const pensionIssue = getPayePensionInputIssue(calculationInput, results);
+  if (pensionIssue) {
+    return Promise.resolve({ ok: false, reason: 'invalid_pension', message: pensionIssue });
+  }
+
   const taxYearLabel = formatTaxYearForEmail(args.input.taxYear);
 
   return sendOutboundEmail(

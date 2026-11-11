@@ -55,6 +55,7 @@ import {
 } from '@/lib/sentry';
 import {
   calculateTax,
+  getPayePensionInputIssue,
   isTaxCodeEditCandidate,
   normalizeTaxCode,
   parseSupportedTaxYear,
@@ -62,10 +63,12 @@ import {
   TAX_CODE_MAX_LENGTH,
 } from '@/lib/tax';
 import {
+  DEFAULT_PENSION_METHOD,
   INCOME_SOURCE_TYPES,
   INCOME_TYPE_LABELS,
   type IncomeSource,
   IncomeSourceUpdateSchema,
+  PensionMethodSchema,
   type TaxCalculationInput,
   type TaxCalculationResults,
 } from '@/lib/types/calculator';
@@ -259,7 +262,7 @@ interface CalculatorState {
   removeIncomeSource: (id: string) => void;
 
   // Calculation actions
-  calculate: () => void;
+  calculate: () => string | undefined;
   calculatePreviousYear: () => void;
   reset: () => void;
   init: () => void;
@@ -479,6 +482,7 @@ const defaultInput: CalculatorInput = {
   studentLoanPlans: 'none',
   pensionContribution: 0,
   pensionContributionType: 'percentage',
+  pensionMethod: DEFAULT_PENSION_METHOD,
   niCategory: 'A',
   hoursPerWeek: 40,
   allowancesDeductions: 0,
@@ -511,6 +515,7 @@ const CalculatorInputPartialSchema = z
     studentLoanPlans: STUDENT_LOAN_SELECTION_SCHEMA.optional(),
     pensionContribution: PENSION_AMOUNT_INPUT_SCHEMA.optional(),
     pensionContributionType: z.enum(['percentage', 'amount']).optional(),
+    pensionMethod: PensionMethodSchema.optional(),
     niCategory: NICategorySchema.optional(),
     hoursPerWeek: HOURS_PER_WEEK_INPUT_SCHEMA.optional(),
     allowancesDeductions: ALLOWANCES_DEDUCTIONS_INPUT_SCHEMA.optional(),
@@ -1103,6 +1108,11 @@ export const useCalculatorStore = create<CalculatorState>()(
             if (!pension.success)
               throw new Error(pension.error.issues[0]?.message ?? 'Invalid pension contribution');
             const results = calculateTax(inputWithNormalizedTaxCode);
+            const pensionIssue = getPayePensionInputIssue(inputWithNormalizedTaxCode, results);
+            if (pensionIssue) {
+              get().invalidateResults();
+              return pensionIssue;
+            }
             setCalculatorState(set, { results, hasCalculated: true });
             reportCalculationAnomalies(results, 'primary');
 
@@ -1152,6 +1162,10 @@ export const useCalculatorStore = create<CalculatorState>()(
             const previousYearInput = { ...input, taxYear: previousYear };
             try {
               const previousResults = calculateTax(previousYearInput);
+              if (getPayePensionInputIssue(previousYearInput, previousResults)) {
+                setCalculatorState(set, { previousYearResults: null });
+                return;
+              }
               setCalculatorState(set, { previousYearResults: previousResults });
               reportCalculationAnomalies(previousResults, 'previous_year');
             } catch (error) {
@@ -1266,6 +1280,10 @@ export const useCalculatorStore = create<CalculatorState>()(
 
           const whatIfInput = { ...input, salary: newSalary };
           const whatIfResults = calculateTax(whatIfInput);
+          if (getPayePensionInputIssue(whatIfInput, whatIfResults)) {
+            setCalculatorState(set, { whatIfResults: null });
+            return;
+          }
 
           setCalculatorState(set, { whatIfResults });
           reportCalculationAnomalies(whatIfResults, 'what_if');

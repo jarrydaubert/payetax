@@ -66,6 +66,7 @@ export function CalculatorContainer() {
       payNoNI: state.input.payNoNI,
       pensionContribution: state.input.pensionContribution,
       pensionContributionType: state.input.pensionContributionType,
+      pensionMethod: state.input.pensionMethod,
       studentLoanPlans: state.input.studentLoanPlans,
       niCategory: state.input.niCategory,
       hoursPerWeek: state.input.hoursPerWeek,
@@ -115,6 +116,7 @@ export function CalculatorContainer() {
     payNoNI: input.payNoNI,
     pensionContribution: input.pensionContribution,
     pensionContributionType: input.pensionContributionType,
+    pensionMethod: input.pensionMethod,
     studentLoanPlans: input.studentLoanPlans,
     niCategory: input.niCategory,
     hoursPerWeek: input.hoursPerWeek,
@@ -189,7 +191,11 @@ export function CalculatorContainer() {
 
     // Run the synchronous store actions where the input form can catch failures.
     try {
-      calculate();
+      const pensionIssue = calculate();
+      if (pensionIssue) {
+        setLiveMessage('');
+        return pensionIssue;
+      }
       calculatePreviousYear();
     } catch {
       invalidateResults();
@@ -265,7 +271,7 @@ export function CalculatorContainer() {
       }
 
       const basis = derivePayePayBasis(current.input);
-      const totalAnnualPension = basis.salarySacrificePensionDeduction.annual + pensionAmount;
+      const totalAnnualPension = basis.pensionDeduction.annual + pensionAmount;
       const perPeriodPension = convertAnnualToPeriod(
         totalAnnualPension,
         current.input.payPeriod,

@@ -28,6 +28,7 @@ describe('MC-03 explicit calculation', () => {
     loans: () => useCalculatorStore.getState().setStudentLoanPlans(['plan2']),
     toggleLoan: () => useCalculatorStore.getState().toggleStudentLoan('plan2'),
     pension: () => useCalculatorStore.getState().setPensionContribution(5),
+    pensionMethod: () => useCalculatorStore.getState().setInput({ pensionMethod: 'net-pay' }),
     pensionUnit: () => useCalculatorStore.getState().setPensionContributionType('amount'),
     niCategory: () => useCalculatorStore.getState().setNiCategory('C'),
     hours: () => useCalculatorStore.getState().setHoursPerWeek(20),
@@ -78,6 +79,26 @@ describe('MC-03 explicit calculation', () => {
     store.setInputError('salary', null);
     store.calculate();
     expect(useCalculatorStore.getState().results).not.toBeNull();
+  });
+
+  it('rejects an unaffordable net-pay contribution and clears every result', () => {
+    const store = useCalculatorStore.getState();
+    store.setInput({
+      salary: 2000,
+      payPeriod: 'monthly',
+      pensionMethod: 'net-pay',
+      pensionContribution: 100,
+    });
+    expect(store.calculate()).toMatch(/Reduce the net-pay pension contribution/);
+    const state = useCalculatorStore.getState();
+    expect(state.input.pensionContribution).toBe(100);
+    expect(state.results).toBeNull();
+    expect(state.previousYearResults).toBeNull();
+    expect(state.whatIfResults).toBeNull();
+
+    store.setPensionContribution(5);
+    expect(store.calculate()).toBeUndefined();
+    expect(useCalculatorStore.getState().results?.pensionMethod).toBe('net-pay');
   });
 
   it('comparison controls reuse the current primary calculation', () => {

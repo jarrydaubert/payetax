@@ -27,7 +27,7 @@ This guide explains what PayeTax models for the tax year from 6 April 2026 to 5 
 - Use gross pay, the complete tax code and the correct pay period.
 - Income Tax and National Insurance are separate calculations.
 - Student Loan thresholds changed for 2026/27.
-- PayeTax's pension input models salary sacrifice, not net pay or relief at source.
+- PayeTax models salary sacrifice and net pay. Relief at source requires a separate calculation.
 - Benefits, cumulative pay, emergency codes and unsupported deductions can make a payslip differ.
 - A PAYE estimate does not determine whether Self Assessment is required.
 
@@ -81,9 +81,9 @@ Use the code on your payslip or HMRC account. `1257L` is common but not universa
 
 Do not infer the plan only from the year you graduated. Use the [official plan guidance](https://www.gov.uk/repaying-your-student-loan/which-repayment-plan-you-are-on) or check your Student Loan account.
 
-### Step 4: Add a pension only if the method matches
+### Step 4: Choose your pension method
 
-The pension control models salary sacrifice. Leave it at zero if your scheme uses net pay or relief at source and you are trying to reproduce a payslip.
+Choose salary sacrifice or net pay and enter your contribution. For a relief-at-source scheme, calculate the pension deduction separately.
 
 ### Step 5: Review deductions separately
 
@@ -179,7 +179,7 @@ No. It is an estimate based on the inputs and supported rules. Cumulative pay, p
 
 ### Does the calculator handle every pension method?
 
-No. Its pension input models salary sacrifice. Net pay and relief at source change take-home differently and should not be represented as salary sacrifice.
+PayeTax supports salary sacrifice and net pay. Relief at source requires a separate calculation.
 
 ### Can I use the calculator for self-employment?
 

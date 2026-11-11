@@ -9,7 +9,7 @@
 import { z } from 'zod';
 import { PERIODS, TAX_YEARS } from '@/constants/taxRates';
 import { isValidTaxCode, TAX_CODE_MAX_LENGTH } from '@/lib/tax';
-import { INCOME_SOURCE_TYPES } from '@/lib/types/calculator';
+import { INCOME_SOURCE_TYPES, PensionMethodSchema } from '@/lib/types/calculator';
 import { CurrencyAmountSchema, DirectorTaxYearSchema, RegionSchema } from './directorValidation';
 
 // ============================================================================
@@ -103,41 +103,47 @@ export const PayeResultsSchema = z.object({
 /**
  * Input schema for PAYE email requests (server recomputes results)
  */
-export const PayeEmailInputSchema = z.object({
-  salary: payeMoneyField,
-  payPeriod: z.enum(payePeriods),
-  taxYear: z.enum(payeTaxYears),
-  taxCode: z
-    .string()
-    .max(TAX_CODE_MAX_LENGTH)
-    .refine((value) => value.trim() === '' || isValidTaxCode(value), {
-      message: 'Enter a complete supported HMRC tax code or leave it blank',
-    }),
-  isScottish: z.boolean(),
-  isMarried: z.boolean(),
-  partnerGrossWage: payeMoneyField,
-  isBlind: z.boolean(),
-  age: z.number().int().min(0).max(120).optional(),
-  payNoNI: z.boolean(),
-  pensionContribution: payeMoneyField,
-  pensionContributionType: z.enum(['percentage', 'amount']),
-  studentLoanPlans: StudentLoanSelectionSchema,
-  niCategory: z.enum(['A', 'B', 'C', 'H', 'J', 'M', 'Z']),
-  hoursPerWeek: z.number().min(1).max(168).finite(),
-  allowancesDeductions: payeAllowanceField,
-  incomeSources: z
-    .array(
-      z.object({
-        type: IncomeSourceTypeSchema,
-        amount: payeMoneyField,
-        period: z.enum(payePeriods),
-        label: z.string().max(100).optional(),
-        id: z.string().max(100).optional(),
+export const PayeEmailInputSchema = z
+  .object({
+    salary: payeMoneyField,
+    payPeriod: z.enum(payePeriods),
+    taxYear: z.enum(payeTaxYears),
+    taxCode: z
+      .string()
+      .max(TAX_CODE_MAX_LENGTH)
+      .refine((value) => value.trim() === '' || isValidTaxCode(value), {
+        message: 'Enter a complete supported HMRC tax code or leave it blank',
       }),
-    )
-    .max(10, 'Maximum 10 income sources allowed')
-    .optional(),
-});
+    isScottish: z.boolean(),
+    isMarried: z.boolean(),
+    partnerGrossWage: payeMoneyField,
+    isBlind: z.boolean(),
+    age: z.number().int().min(0).max(120).optional(),
+    payNoNI: z.boolean(),
+    pensionContribution: payeMoneyField,
+    pensionContributionType: z.enum(['percentage', 'amount']),
+    pensionMethod: PensionMethodSchema.optional(),
+    studentLoanPlans: StudentLoanSelectionSchema,
+    niCategory: z.enum(['A', 'B', 'C', 'H', 'J', 'M', 'Z']),
+    hoursPerWeek: z.number().min(1).max(168).finite(),
+    allowancesDeductions: payeAllowanceField,
+    incomeSources: z
+      .array(
+        z.object({
+          type: IncomeSourceTypeSchema,
+          amount: payeMoneyField,
+          period: z.enum(payePeriods),
+          label: z.string().max(100).optional(),
+          id: z.string().max(100).optional(),
+        }),
+      )
+      .max(10, 'Maximum 10 income sources allowed')
+      .optional(),
+  })
+  .refine(
+    (input) => input.pensionContributionType !== 'percentage' || input.pensionContribution <= 100,
+    { path: ['pensionContribution'], message: 'Enter a percentage no more than 100%.' },
+  );
 
 /**
  * Request body for /api/send-results

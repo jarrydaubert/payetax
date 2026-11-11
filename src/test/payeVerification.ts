@@ -14,7 +14,7 @@
 
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { TaxCalculationInput } from '@/lib/types/calculator';
+import type { PensionMethod, TaxCalculationInput } from '@/lib/types/calculator';
 
 /** Official source metadata for one fixture suite. */
 export interface FixtureSource {
@@ -40,6 +40,8 @@ export interface FixtureExpected {
   nationalInsuranceMonthly?: number;
   studentLoanAnnual?: number;
   studentLoanMonthly?: number;
+  pensionMethod?: PensionMethod;
+  pensionShortfall?: boolean;
   pensionContributionAnnual?: number;
   pensionContributionMonthly?: number;
   netPayAnnual?: number;

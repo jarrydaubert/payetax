@@ -25,6 +25,7 @@ const buildResults = (overrides: Partial<TaxCalculationResults> = {}): TaxCalcul
   incomeTax: { ...zeroByPeriod(), annually: 27432, monthly: 2286 },
   nationalInsurance: { ...zeroByPeriod(), annually: 3510.6, monthly: 292.55 },
   studentLoan: { ...zeroByPeriod(), annually: 0, monthly: 0 },
+  pensionMethod: 'salary-sacrifice',
   pensionContribution: { ...zeroByPeriod(), annually: 0, monthly: 0 },
   employerNI: 0,
   netPay: { ...zeroByPeriod(), annually: 69057.4, monthly: 5754.78 },

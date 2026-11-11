@@ -1,6 +1,10 @@
 import { DEFAULT_HOURS_PER_WEEK, PERIODS } from '@/constants/taxRates';
 import { convertAnnualToPeriod, convertPeriodToAnnual } from '@/lib/periodCalculator';
-import type { TaxCalculationInput } from '@/lib/types/calculator';
+import {
+  DEFAULT_PENSION_METHOD,
+  type PensionMethod,
+  type TaxCalculationInput,
+} from '@/lib/types/calculator';
 
 type PayBasisInput = Pick<
   TaxCalculationInput,
@@ -10,6 +14,7 @@ type PayBasisInput = Pick<
   | 'incomeSources'
   | 'pensionContribution'
   | 'pensionContributionType'
+  | 'pensionMethod'
 >;
 
 export interface AnnualMonthlyPayBasis {
@@ -17,19 +22,15 @@ export interface AnnualMonthlyPayBasis {
   readonly monthly: number;
 }
 
-/**
- * Canonical income and deduction bases consumed by the PAYE engine.
- *
- * The existing pension input is modelled as salary sacrifice for PAYE,
- * employee NI and the primary employment's Student Loan earnings basis.
- */
+/** Canonical income and deduction bases consumed by the PAYE engine. */
 export interface PayePayBasis {
   readonly hoursPerWeek: number;
   readonly primaryEmploymentGross: AnnualMonthlyPayBasis;
   readonly totalEmploymentGross: AnnualMonthlyPayBasis;
   readonly nonEmploymentTaxableIncome: AnnualMonthlyPayBasis;
   readonly totalGrossIncome: AnnualMonthlyPayBasis;
-  readonly salarySacrificePensionDeduction: AnnualMonthlyPayBasis;
+  readonly pensionMethod: PensionMethod;
+  readonly pensionDeduction: AnnualMonthlyPayBasis;
   readonly adjustedNetIncome: AnnualMonthlyPayBasis;
   readonly payeAdjustedPayment: AnnualMonthlyPayBasis;
   readonly niableEmploymentEarnings: AnnualMonthlyPayBasis;
@@ -75,39 +76,39 @@ export function derivePayePayBasis(input: PayBasisInput): PayePayBasis {
     hoursPerWeek,
   );
 
-  let salarySacrificePensionAnnual = 0;
+  let pensionAnnual = 0;
   if (input.pensionContribution > 0) {
     if (input.pensionContributionType === 'percentage') {
-      salarySacrificePensionAnnual =
-        primaryEmploymentGross.annual * (input.pensionContribution / 100);
+      pensionAnnual = primaryEmploymentGross.annual * (input.pensionContribution / 100);
     } else {
       const requestedAnnualPension = convertPeriodToAnnual(
         input.pensionContribution,
         input.payPeriod,
         hoursPerWeek,
       );
-      salarySacrificePensionAnnual = Math.min(
-        requestedAnnualPension,
-        primaryEmploymentGross.annual,
-      );
+      pensionAnnual = Math.min(requestedAnnualPension, primaryEmploymentGross.annual);
     }
   }
 
-  const salarySacrificePensionDeduction = annualMonthly(salarySacrificePensionAnnual, hoursPerWeek);
+  const pensionMethod = input.pensionMethod ?? DEFAULT_PENSION_METHOD;
+  const pensionDeduction = annualMonthly(pensionAnnual, hoursPerWeek);
+  // Net pay reduces taxable pay, while only salary sacrifice reduces NI and loan earnings.
+  const sacrificedPay =
+    pensionMethod === 'salary-sacrifice' ? pensionDeduction : { annual: 0, monthly: 0 };
   const adjustedNetIncome = annualMonthly(
-    Math.max(0, totalGrossIncome.annual - salarySacrificePensionDeduction.annual),
+    Math.max(0, totalGrossIncome.annual - pensionDeduction.annual),
     hoursPerWeek,
   );
   const payeAdjustedPayment = Object.freeze({
-    annual: totalGrossIncome.annual - salarySacrificePensionDeduction.annual,
-    monthly: totalGrossIncome.monthly - salarySacrificePensionDeduction.monthly,
+    annual: totalGrossIncome.annual - pensionDeduction.annual,
+    monthly: totalGrossIncome.monthly - pensionDeduction.monthly,
   });
   const niableEmploymentEarnings = Object.freeze({
-    annual: totalEmploymentGross.annual - salarySacrificePensionDeduction.annual,
-    monthly: totalEmploymentGross.monthly - salarySacrificePensionDeduction.monthly,
+    annual: totalEmploymentGross.annual - sacrificedPay.annual,
+    monthly: totalEmploymentGross.monthly - sacrificedPay.monthly,
   });
   const studentLoanEmploymentEarnings = annualMonthly(
-    Math.max(0, primaryEmploymentGross.annual - salarySacrificePensionDeduction.annual),
+    Math.max(0, primaryEmploymentGross.annual - sacrificedPay.annual),
     hoursPerWeek,
   );
 
@@ -117,7 +118,8 @@ export function derivePayePayBasis(input: PayBasisInput): PayePayBasis {
     totalEmploymentGross,
     nonEmploymentTaxableIncome,
     totalGrossIncome,
-    salarySacrificePensionDeduction,
+    pensionMethod,
+    pensionDeduction,
     adjustedNetIncome,
     payeAdjustedPayment,
     niableEmploymentEarnings,

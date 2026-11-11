@@ -14,6 +14,7 @@
  * @since 2.0.0
  */
 
+import { getPayePensionInputIssue } from '@/lib/tax';
 import type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
 import { calculateTax } from './taxCalculator';
 
@@ -126,12 +127,14 @@ export function calculateComparison(
   if (newSalary === null) return null;
 
   const currentResults = calculateTax(currentInput);
+  if (getPayePensionInputIssue(currentInput, currentResults)) return null;
 
   const newInput: TaxCalculationInput = {
     ...currentInput,
     salary: newSalary,
   };
   const newResults = calculateTax(newInput);
+  if (getPayePensionInputIssue(newInput, newResults)) return null;
 
   const increase = newSalary - comparisonInput.currentSalary;
   const increasePercentage = (increase / comparisonInput.currentSalary) * 100;

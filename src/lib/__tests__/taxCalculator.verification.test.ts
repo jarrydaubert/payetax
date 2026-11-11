@@ -11,6 +11,7 @@
  */
 
 import type { PayPeriod } from '@/constants/taxRates';
+import { getPayePensionInputIssue } from '@/lib/tax';
 import { decodeTaxCode } from '@/lib/tax-code-decoder';
 import {
   type FixtureInvariant,
@@ -93,6 +94,14 @@ describe('PAYE verification fixtures', () => {
           const { expected } = scenario;
 
           if (expected) {
+            if (expected.pensionMethod !== undefined) {
+              expect(result.pensionMethod).toBe(expected.pensionMethod);
+            }
+            if (expected.pensionShortfall !== undefined) {
+              expect(Boolean(getPayePensionInputIssue(scenario.input, result))).toBe(
+                expected.pensionShortfall,
+              );
+            }
             if (expected.taxFreeAmount !== undefined) {
               expect(result.taxFreeAmount).toBe(expected.taxFreeAmount);
             }

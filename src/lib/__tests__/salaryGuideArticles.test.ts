@@ -187,7 +187,7 @@ describe.each(guides)('$slug article contract', (guide) => {
     expect(content).toContain('With [net pay]');
     expect(content).toContain('With relief at source');
     expect(content).toContain('pension contribution value or percentage');
-    expect(content).toContain('pension input currently models salary sacrifice');
+    expect(content).toContain('Choose salary sacrifice or net pay to match your pension scheme.');
     expect(content).toContain(
       'https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027',
     );
