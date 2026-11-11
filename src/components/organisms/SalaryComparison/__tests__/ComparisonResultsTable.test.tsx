@@ -70,6 +70,7 @@ describe('ComparisonResultsTable', () => {
         daily: 0,
         hourly: 0,
       },
+      pensionMethod: 'salary-sacrifice',
       pensionContribution: {
         annually: 0,
         monthly: 0,
@@ -130,6 +131,7 @@ describe('ComparisonResultsTable', () => {
         daily: 0,
         hourly: 0,
       },
+      pensionMethod: 'salary-sacrifice',
       pensionContribution: {
         annually: 0,
         monthly: 0,

@@ -43,6 +43,7 @@ describe('ResultsSummaryCards Component', () => {
       daily: 0,
       hourly: 0,
     },
+    pensionMethod: 'salary-sacrifice',
     pensionContribution: {
       annually: 0,
       monthly: 0,
@@ -117,13 +118,28 @@ describe('ResultsSummaryCards Component', () => {
       render(<ResultsSummaryCards results={withPension} />);
 
       const note = screen.getByTestId('pension-method-result-note');
-      expect(note).toHaveTextContent(/We estimate all pension contributions as salary sacrifice/);
-      expect(note).toHaveTextContent(/net pay or relief at source, take-home may be too high/);
-      expect(note).toHaveTextContent(/Employer National Insurance savings are not included/);
+      expect(note).toHaveTextContent(/Salary sacrifice/);
+      expect(note).toHaveTextContent(/Employer National Insurance savings are excluded/);
       expect(
         note.compareDocumentPosition(screen.getByTestId('mobile-take-home')) &
           Node.DOCUMENT_POSITION_FOLLOWING,
       ).not.toBe(0);
+    });
+
+    it('identifies net pay and explains the gross earnings bases', () => {
+      render(
+        <ResultsSummaryCards
+          results={{
+            ...mockResults,
+            pensionMethod: 'net-pay',
+            pensionContribution: { ...mockResults.pensionContribution, annually: 1500 },
+          }}
+        />,
+      );
+
+      expect(screen.getByTestId('pension-method-result-note')).toHaveTextContent(
+        'Net pay. Your pension reduces the pay used for Income Tax. National Insurance and student loan repayments use pay before the contribution.',
+      );
     });
 
     it('does not show a pension note when no pension is entered', () => {

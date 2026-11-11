@@ -12,6 +12,7 @@
 
 import { expect, type Locator, type Page, test } from '@playwright/test';
 import { parseCurrencyInput } from '../src/lib/currencyInput';
+import pensionFixtures from '../src/test/payeVerificationFixtures/pension-methods-2026-27.json';
 import payrollFixtures from '../src/test/payeVerificationFixtures/salary-guides-payroll-2026-27.json';
 import {
   dismissCookieBannerIfPresent,
@@ -227,10 +228,10 @@ test.describe('Pension modelling guidance @critical', () => {
       exact: true,
     });
     await expect(results.getByTestId('pension-method-result-note')).toContainText(
-      'take-home may be too high',
+      'Salary sacrifice',
     );
     await expect(results.getByTestId('pension-method-result-note')).toContainText(
-      'Employer National Insurance savings are not included',
+      'Employer National Insurance savings are excluded',
     );
     await expect(results.getByTestId('additional-income-result-note')).toBeVisible();
     await expect(
@@ -446,6 +447,84 @@ test.describe('MC-03 input integrity @critical', () => {
         }),
       }),
     ]);
+  });
+
+  test('pension method changes require recalculation and carry through to email', async ({
+    page,
+  }) => {
+    const sent: unknown[] = [];
+    await page.route('**/api/send-results', async (route) => {
+      sent.push(route.request().postDataJSON());
+      await route.fulfill({ json: { success: true } });
+    });
+    await selectOption(
+      page,
+      page.getByRole('combobox', { name: 'Pay period', exact: true }),
+      'Monthly',
+    );
+    await selectOption(page, page.getByTestId('student-loan-select'), /Plan 5/);
+    await typeAmount(page.getByTestId('salary-input'), '4500');
+    const pension = page.getByTestId('pension-input');
+    await typeAmount(pension, '10');
+    const method = page.getByRole('combobox', { name: 'Pension method', exact: true });
+    await expect(method).toHaveText('Salary sacrifice');
+    const note = page.getByTestId('pension-method-result-note');
+    const calculate = page.getByTestId('calculate-button');
+    await calculate.press('Enter');
+    await expect(note).toContainText('Salary sacrifice');
+    const sacrifice = pensionFixtures.scenarios.find(
+      ({ id }) => id === 'salary-sacrifice-monthly-plan5',
+    );
+    const netPay = pensionFixtures.scenarios.find(({ id }) => id === 'net-pay-monthly-plan5');
+    if (!(sacrifice && netPay))
+      throw new Error('Missing the independent 2026/27 pension comparison');
+    expect(await getYearlyTableValue(page, 'Net Pay')).toBe(sacrifice.expected.netPayAnnual);
+
+    await selectOption(page, method, 'Net pay');
+    await expect(pension).toHaveValue('10.00');
+    await expect(page.getByTestId('tax-results')).toHaveCount(0);
+    await expect(emailAction(page)).toHaveCount(0);
+    await calculate.press('Enter');
+    await expect(note).toContainText('Net pay');
+    await expect(note).toContainText('Relief at source requires a separate calculation.');
+    expect(await getYearlyTableValue(page, 'Total Tax Due')).toBe(netPay.expected.incomeTaxAnnual);
+    expect(await getYearlyTableValue(page, 'National Insurance')).toBe(
+      netPay.expected.nationalInsuranceAnnual,
+    );
+    expect(await getYearlyTableValue(page, 'Student Loan')).toBe(netPay.expected.studentLoanAnnual);
+    expect(await getYearlyTableValue(page, 'Pension')).toBe(
+      netPay.expected.pensionContributionAnnual,
+    );
+    expect(await getYearlyTableValue(page, 'Net Pay')).toBe(netPay.expected.netPayAnnual);
+
+    await emailAction(page).press('Enter');
+    await page.getByLabel('Email address for results').fill('net-pay@example.com');
+    await page.getByRole('button', { name: /^Email Results$/ }).press('Enter');
+    await expect(page.getByRole('status').filter({ hasText: 'Results sent' })).toBeVisible();
+    expect(sent).toEqual([
+      expect.objectContaining({
+        input: expect.objectContaining({ pensionMethod: 'net-pay', pensionContribution: 10 }),
+      }),
+    ]);
+  });
+
+  test('an unaffordable net-pay pension prevents results and email', async ({ page }) => {
+    await selectOption(
+      page,
+      page.getByRole('combobox', { name: 'Pay period', exact: true }),
+      'Monthly',
+    );
+    await selectOption(
+      page,
+      page.getByRole('combobox', { name: 'Pension method', exact: true }),
+      'Net pay',
+    );
+    await typeAmount(page.getByTestId('salary-input'), '2000');
+    await typeAmount(page.getByTestId('pension-input'), '100');
+    await page.getByTestId('calculate-button').press('Enter');
+    await expect(page.getByText(/Reduce the net-pay pension contribution/)).toBeVisible();
+    await expect(page.getByTestId('tax-results')).toHaveCount(0);
+    await expect(emailAction(page)).toHaveCount(0);
   });
 
   test('invalid drafts stay blocked through recovery until explicit Calculate', async ({

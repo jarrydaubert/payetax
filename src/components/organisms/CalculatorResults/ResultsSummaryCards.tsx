@@ -11,7 +11,11 @@ import { ANIMATION_CONTAINER_VARIANTS, ANIMATION_VARIANTS } from '@/constants/an
 import { TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { calculateMarginalTaxRate } from '@/lib/calculatorMarginalTax';
-import type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
+import {
+  PENSION_METHOD_LABELS,
+  type TaxCalculationInput,
+  type TaxCalculationResults,
+} from '@/lib/types/calculator';
 import { cn, formatCurrency } from '@/lib/utils';
 import { MobileTakeHomeCard } from './MobileTakeHomeCard';
 
@@ -56,10 +60,11 @@ export function ResultsSummaryCards({
           className='mb-3 text-sm leading-relaxed text-muted-foreground'
           data-testid='pension-method-result-note'
         >
-          We estimate all pension contributions as salary sacrifice, reducing pay used for Income
-          Tax, employee National Insurance and student loan repayments. If your pension uses net pay
-          or relief at source, take-home may be too high. Employer National Insurance savings are
-          not included.
+          <strong>{PENSION_METHOD_LABELS[results.pensionMethod]}.</strong>{' '}
+          {results.pensionMethod === 'net-pay'
+            ? 'Your pension reduces the pay used for Income Tax. National Insurance and student loan repayments use pay before the contribution.'
+            : 'Your pension reduces the pay used for Income Tax, employee National Insurance and student loan repayments. Employer National Insurance savings are excluded.'}{' '}
+          Relief at source requires a separate calculation.
         </p>
       )}
       {Boolean(input?.incomeSources?.length) && (

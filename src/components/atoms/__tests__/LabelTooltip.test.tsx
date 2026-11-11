@@ -45,9 +45,9 @@ describe('LabelTooltip Component', () => {
       const content = await screen.findByTestId('tooltip-content-pensionContribution');
       expect(content).toHaveTextContent(/Enter your own contribution/);
       expect(content).toHaveTextContent(/% of gross salary or £ for the selected pay period/);
-      expect(content).toHaveTextContent(/We use salary sacrifice/);
+      expect(content).toHaveTextContent(/Choose salary sacrifice or net pay/);
       expect(content).toHaveTextContent(/Changing between % and £ resets it to 0/);
-      expect(content).toHaveAccessibleDescription(/We use salary sacrifice/);
+      expect(content).toHaveAccessibleDescription(/Choose salary sacrifice or net pay/);
       await user.keyboard('{Escape}');
       expect(screen.queryByTestId('tooltip-content-pensionContribution')).not.toBeInTheDocument();
     });

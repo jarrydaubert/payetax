@@ -50,6 +50,7 @@ export {
   sliceClass1EmployerEarnings,
 } from './nationalInsurance';
 export { derivePayePayBasis } from './payePayBasis';
+export { getPayePensionInputIssue } from './payePensionValidation';
 export type {
   RukTaxableIncomeBand,
   RukTaxBandCalculation,

@@ -51,7 +51,7 @@ Article length follows complexity. A brief salary answer can be a few hundred wo
 
 Explain the practical effect first, but do not move a crucial exclusion so far away that a reader could act on an incorrect impression. Cite official sources close to contested or changeable claims or with clear references readers can follow; a final Sources section can supplement, not hide, provenance. No detached unsourced numbers.
 
-Tax facts and legal claims follow BLOG_GUIDE's source hierarchy. For every supported-year worked calculation, record the exact engine inputs and outputs in the PR **and** check against independent statutory fixtures or hand-derived evidence. The engine cannot certify itself. Future-year proposals are explained, never presented as calculator results. Current pension modelling assumes salary sacrifice unless a later verified implementation changes that contract.
+Tax facts and legal claims follow BLOG_GUIDE's source hierarchy. For every supported-year worked calculation, record the exact engine inputs and outputs in the PR **and** check against independent statutory fixtures or hand-derived evidence. The engine cannot certify itself. Future-year proposals are explained, never presented as calculator results. Name the pension method used by each worked example. The calculator supports salary sacrifice and net pay.
 
 ## Before and after: examples from our own writing
 

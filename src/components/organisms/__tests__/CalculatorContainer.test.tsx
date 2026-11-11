@@ -95,6 +95,7 @@ describe('CalculatorContainer Component', () => {
       daily: 0,
       hourly: 0,
     },
+    pensionMethod: 'salary-sacrifice',
     pensionContribution: {
       annually: 0,
       monthly: 0,

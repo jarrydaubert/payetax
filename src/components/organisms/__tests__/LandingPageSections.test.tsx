@@ -37,10 +37,10 @@ describe('LandingPageSections', () => {
   it('explains pension support limits with a link to official guidance', () => {
     render(<LandingPageSections />);
     expect(
-      screen.getByText(/Enter your pension contribution even for net pay or relief at source/),
+      screen.getByText(/Choose salary sacrifice or net pay to match your pension scheme/),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/we estimate it as salary sacrifice, which may overstate take-home/),
+      screen.getByText(/Relief at source requires a separate calculation/),
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Pension arrangements explained' })).toHaveAttribute(
       'href',

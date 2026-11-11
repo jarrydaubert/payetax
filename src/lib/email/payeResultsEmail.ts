@@ -1,5 +1,6 @@
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
 import { getTaxCodeBasisExplanation } from '@/lib/taxCodeBasisPresenter';
+import { PENSION_METHOD_LABELS } from '@/lib/types/calculator';
 import { formatCurrency } from '@/lib/utils';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://payetax.co.uk';
@@ -46,7 +47,8 @@ National Insurance: -${formatCurrency(results.nationalInsurance.annually)}  (-${
 
   if (results.pensionContribution.annually > 0) {
     text += `
-Pension:           -${formatCurrency(results.pensionContribution.annually)}  (-${formatCurrency(results.pensionContribution.monthly)}/mo)`;
+Pension (${PENSION_METHOD_LABELS[results.pensionMethod]}): -${formatCurrency(results.pensionContribution.annually)}  (-${formatCurrency(results.pensionContribution.monthly)}/mo)
+Relief at source requires a separate calculation.`;
   }
 
   if (results.studentLoan.annually > 0) {
@@ -190,7 +192,7 @@ export function generatePayeEmailHtml(results: TaxCalculationResults, taxYear?: 
             results.pensionContribution.annually > 0
               ? `
           <tr style="border-bottom: 1px solid #e1dbce;">
-            <td style="padding: 14px 0; color: #8a641f;">Pension</td>
+            <td style="padding: 14px 0; color: #8a641f;">Pension (${PENSION_METHOD_LABELS[results.pensionMethod]})<br><span style="font-size: 12px; color: #465468;">Relief at source requires a separate calculation.</span></td>
             <td style="padding: 14px 0; text-align: right; color: #8a641f; font-family: Menlo, Consolas, monospace;">-${formatCurrency(results.pensionContribution.annually)}</td>
             <td class="mobile-hide" style="padding: 14px 0; text-align: right; color: #465468; font-family: Menlo, Consolas, monospace;">-${formatCurrency(results.pensionContribution.monthly)}</td>
           </tr>

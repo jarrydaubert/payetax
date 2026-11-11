@@ -61,7 +61,7 @@ export const INPUT_TOOLTIPS = {
     title: 'Pension',
     description:
       'Enter your own contribution as % of gross salary or £ for the selected pay period. Changing between % and £ resets it to 0.',
-    note: 'We use salary sacrifice to estimate pension deductions.',
+    note: 'Choose salary sacrifice or net pay to match your scheme. Relief at source requires a separate calculation.',
   },
   pensionType: {
     title: 'Contribution Type',

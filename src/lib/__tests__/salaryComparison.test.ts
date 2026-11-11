@@ -135,6 +135,33 @@ describe('Salary Comparison', () => {
       expect(result?.niDiff).toBeCloseTo(799.92, 0);
     });
 
+    it('uses the same net-pay method in both scenarios and rejects a shortfall', () => {
+      const currentInput: TaxCalculationInput = {
+        ...mockCurrentInput,
+        salary: 4500,
+        payPeriod: 'monthly',
+        taxYear: '2026-2027',
+        pensionMethod: 'net-pay',
+        pensionContributionType: 'amount',
+        pensionContribution: 2000,
+      };
+      const comparison = calculateComparison(currentInput, {
+        mode: 'total',
+        value: 5000,
+        currentSalary: 4500,
+      });
+      expect(comparison?.currentResults.pensionMethod).toBe('net-pay');
+      expect(comparison?.newResults.pensionMethod).toBe('net-pay');
+      expect(comparison?.newResults.nationalInsurance.monthly).toBe(267.5);
+      expect(
+        calculateComparison(currentInput, {
+          mode: 'total',
+          value: 2000,
+          currentSalary: 4500,
+        }),
+      ).toBeNull();
+    });
+
     it('should return null for invalid input', () => {
       const result = calculateComparison(mockCurrentInput, {
         mode: 'percentage',

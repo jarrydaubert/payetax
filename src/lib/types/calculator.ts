@@ -72,6 +72,15 @@ export const IncomeSourceUpdateSchema = z.object({
   period: z.enum(PAY_PERIOD_VALUES).optional(),
 });
 
+export const PensionMethodSchema = z.enum(['salary-sacrifice', 'net-pay']);
+export type PensionMethod = z.infer<typeof PensionMethodSchema>;
+
+export const DEFAULT_PENSION_METHOD = 'salary-sacrifice' satisfies PensionMethod;
+export const PENSION_METHOD_LABELS: Record<PensionMethod, string> = {
+  'salary-sacrifice': 'Salary sacrifice',
+  'net-pay': 'Net pay',
+};
+
 /**
  * Shared input contract for the PAYE calculator engine.
  */
@@ -100,6 +109,8 @@ export interface TaxCalculationInput {
   pensionContribution: number;
   /** Type of pension contribution (percentage or fixed amount) */
   pensionContributionType: 'percentage' | 'amount';
+  /** Missing on legacy inputs, which use salary sacrifice. */
+  pensionMethod?: PensionMethod;
   /** Student loan plans that apply (can be multiple) */
   studentLoanPlans: StudentLoanSelection;
   /** National Insurance category */
@@ -163,6 +174,8 @@ export interface TaxCalculationResults {
   /** Student loan repayments for each period */
   studentLoan: Record<PayPeriod, number>;
 
+  /** Pension method applied to the result. */
+  pensionMethod: PensionMethod;
   /** Pension contributions for each period */
   pensionContribution: Record<PayPeriod, number>;
   /** Employer's NI contribution (annual) */

@@ -21,6 +21,11 @@ import {
 import { PERIODS, type StudentLoanPlan } from '@/constants/taxRates';
 import { trackFormInteraction } from '@/lib/analytics';
 import { normalizeTaxCode, TAX_CODE_MAX_LENGTH } from '@/lib/tax';
+import {
+  DEFAULT_PENSION_METHOD,
+  PENSION_METHOD_LABELS,
+  PensionMethodSchema,
+} from '@/lib/types/calculator';
 import { cn } from '@/lib/utils';
 import type { CalculatorAmountField, CalculatorInvalidAmount } from '@/store/calculatorInputErrors';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
@@ -56,6 +61,7 @@ export function BasicInputs() {
     setStudentLoanPlans,
     setPensionContribution,
     setPensionContributionType,
+    setInput,
     setAllowancesDeductions,
     setInputError,
     invalidateResults,
@@ -81,6 +87,7 @@ export function BasicInputs() {
   const studentLoanLabelId = `${studentLoanId}-label`;
   const postgraduateAddonId = useId();
   const allowancesId = useId();
+  const pensionMethodId = useId();
   const pensionTypeId = useId();
   const pensionTypeLabelId = `${pensionTypeId}-label`;
   const pensionId = useId();
@@ -525,6 +532,30 @@ export function BasicInputs() {
           className={fullWidthInputClass}
           data-testid='non-taxable-allowances-input'
         />
+      </div>
+
+      <div className={fieldRowClass}>
+        <Label htmlFor={pensionMethodId} className={fieldLabelClass}>
+          Pension method
+        </Label>
+        <Select
+          value={input.pensionMethod ?? DEFAULT_PENSION_METHOD}
+          onValueChange={(value) => {
+            const method = PensionMethodSchema.safeParse(value);
+            if (method.success) setInput({ pensionMethod: method.data });
+          }}
+        >
+          <SelectTrigger id={pensionMethodId} className={fullWidthInputClass}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {PensionMethodSchema.options.map((method) => (
+              <SelectItem key={method} value={method}>
+                {PENSION_METHOD_LABELS[method]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Pension - Combined Type + Amount on 1 row */}

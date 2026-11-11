@@ -181,6 +181,54 @@ describe('/api/send-results POST', () => {
     });
   });
 
+  it('passes an explicit net-pay method to server-side calculation', async () => {
+    const POST = await loadRoute();
+    const payload = {
+      ...validPayload,
+      input: { ...validPayload.input, pensionContribution: 10, pensionMethod: 'net-pay' },
+    };
+
+    const response = await POST(buildRequest(payload, { origin: 'https://payetax.co.uk' }));
+
+    expect(response.status).toBe(200);
+    expect(sendResultsEmailMock).toHaveBeenCalledWith(payload);
+  });
+
+  it.each([
+    { pensionMethod: 'relief-at-source', pensionContribution: 10 },
+    { pensionMethod: 'net-pay', pensionContribution: 101 },
+    { pensionMethod: 'salary-sacrifice', pensionContribution: 101 },
+    { pensionContribution: 101 },
+  ])('rejects invalid pension input %j before email delivery', async (pension) => {
+    const POST = await loadRoute();
+    const payload = {
+      ...validPayload,
+      input: { ...validPayload.input, ...pension },
+    };
+
+    const response = await POST(buildRequest(payload, { origin: 'https://payetax.co.uk' }));
+
+    expect(response.status).toBe(400);
+    expect(sendResultsEmailMock).not.toHaveBeenCalled();
+  });
+
+  it('returns an input error for an unaffordable net-pay contribution', async () => {
+    const message =
+      'Reduce the net-pay pension contribution to leave enough pay for your other deductions.';
+    sendResultsEmailMock.mockResolvedValue({ ok: false, reason: 'invalid_pension', message });
+    const POST = await loadRoute();
+    const payload = {
+      ...validPayload,
+      input: { ...validPayload.input, pensionContribution: 100, pensionMethod: 'net-pay' },
+    };
+
+    const response = await POST(buildRequest(payload, { origin: 'https://payetax.co.uk' }));
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ error: message });
+    expect(mockCaptureOperationalFailure).not.toHaveBeenCalled();
+  });
+
   it('rejects invalid JSON payloads', async () => {
     const POST = await loadRoute({ BREVO_API_KEY: 'test' });
     const request = buildRequest('{', { origin: 'https://payetax.co.uk' });

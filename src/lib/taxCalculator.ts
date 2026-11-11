@@ -622,7 +622,6 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     const periodThresholds = getClass1PeriodThresholds(taxYear, input.niCategory, PERIODS.MONTHLY);
     const upperRate = standardRates.nationalInsurance.employee[input.niCategory].upper.rate;
 
-    // NI base: Employment income minus pension (salary sacrifice reduces NI liability)
     for (const segment of getEmployeeClass1MonthSegments(taxYear, input.niCategory)) {
       const segmentMonthlyNI = roundToPence(
         sliceClass1EmployeeEarnings(payBasis.niableEmploymentEarnings.monthly, {
@@ -765,7 +764,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
         incomeTax[period] = annualTax;
         nationalInsuranceByPeriod[period] = annualNationalInsurance;
         studentLoanByPeriod[period] = annualStudentLoan;
-        pensionContributionByPeriod[period] = payBasis.salarySacrificePensionDeduction.annual;
+        pensionContributionByPeriod[period] = payBasis.pensionDeduction.annual;
         netPay[period] = annualNetPay;
         break;
 
@@ -775,7 +774,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
         incomeTax[period] = monthlyTax;
         nationalInsuranceByPeriod[period] = monthlyNationalInsurance;
         studentLoanByPeriod[period] = monthlyStudentLoan;
-        pensionContributionByPeriod[period] = payBasis.salarySacrificePensionDeduction.monthly;
+        pensionContributionByPeriod[period] = payBasis.pensionDeduction.monthly;
         netPay[period] = monthlyNetPay;
         break;
 
@@ -795,11 +794,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
           convertMonthlyToPeriod(monthlyStudentLoan, period, hoursPerWeek),
         );
         pensionContributionByPeriod[period] = roundToPence(
-          convertMonthlyToPeriod(
-            payBasis.salarySacrificePensionDeduction.monthly,
-            period,
-            hoursPerWeek,
-          ),
+          convertMonthlyToPeriod(payBasis.pensionDeduction.monthly, period, hoursPerWeek),
         );
         netPay[period] = roundToPence(convertMonthlyToPeriod(monthlyNetPay, period, hoursPerWeek));
         break;
@@ -851,6 +846,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     incomeTax: incomeTax,
     nationalInsurance: nationalInsuranceByPeriod,
     studentLoan: studentLoanByPeriod,
+    pensionMethod: payBasis.pensionMethod,
     pensionContribution: pensionContributionByPeriod,
     employerNI: annualEmployerNI,
     netPay,

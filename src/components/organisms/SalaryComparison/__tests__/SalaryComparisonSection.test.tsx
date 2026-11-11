@@ -64,6 +64,7 @@ const mockCurrentResults: TaxCalculationResults = {
     daily: 16.2,
     hourly: 2.16,
   },
+  pensionMethod: 'salary-sacrifice',
   pensionContribution: {
     annually: 0,
     monthly: 0,

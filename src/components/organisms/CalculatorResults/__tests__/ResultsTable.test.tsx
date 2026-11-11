@@ -11,6 +11,7 @@ describe('ResultsTable Component', () => {
   const mockOnVisiblePeriodsChange = jest.fn();
 
   const mockResults: TaxCalculationResults = {
+    pensionMethod: 'salary-sacrifice',
     grossSalary: {
       annually: 30000,
       monthly: 2500,
@@ -790,6 +791,7 @@ describe('ResultsTable Component', () => {
 
     it('should handle all zero values', () => {
       const zeroResults: TaxCalculationResults = {
+        pensionMethod: 'salary-sacrifice',
         grossSalary: {
           annually: 0,
           monthly: 0,
@@ -1159,6 +1161,7 @@ describe('ResultsTable Component', () => {
 
     it('should handle high earner with all deductions', () => {
       const highEarnerResults: TaxCalculationResults = {
+        pensionMethod: 'salary-sacrifice',
         grossSalary: {
           annually: 100000,
           monthly: 8333.33,

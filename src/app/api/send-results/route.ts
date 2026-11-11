@@ -76,6 +76,9 @@ export async function POST(request: NextRequest) {
 
   const delivery = await sendPayeResultsEmail(validation.data);
   if (!delivery.ok) {
+    if (delivery.reason === 'invalid_pension') {
+      return NextResponse.json({ error: delivery.message }, { status: 400 });
+    }
     if (delivery.reason === 'not_configured') {
       await captureOperationalFailureAndFlush({
         operation: 'send-results',
