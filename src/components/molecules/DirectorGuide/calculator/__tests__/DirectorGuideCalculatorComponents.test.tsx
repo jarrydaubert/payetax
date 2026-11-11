@@ -222,10 +222,71 @@ describe('Director Intelligence calculator components', () => {
       expect(
         screen.getByText(/Compare salary\/dividend tradeoffs using your selected objective/i),
       ).toBeInTheDocument();
+      expect(screen.getByText(/Salary and dividends are full-year estimates/)).toBeVisible();
       expect(screen.getByText(/Closest to max take-home objective/i)).toBeInTheDocument();
       expect(screen.getByText('-£4,000')).toBeInTheDocument();
       expect(screen.getByText('Highest Take-Home')).toBeInTheDocument();
     });
+
+    it.each([
+      ['equal amounts', 7000, 20000, 7000, 20000, [], []],
+      [
+        'salary 1p over, dividends under',
+        7000.01,
+        1000,
+        7000,
+        20000,
+        ['£7,000.01', '£7,000.00'],
+        [],
+      ],
+      [
+        'dividends 1p over, salary under',
+        1000,
+        20000.01,
+        7000,
+        20000,
+        [],
+        ['£20,000.01', '£20,000.00'],
+      ],
+      [
+        'both over',
+        8000,
+        21000,
+        7000,
+        20000,
+        ['£8,000.00', '£7,000.00'],
+        ['£21,000.00', '£20,000.00'],
+      ],
+      ['zero proposed salary', 0.01, 0, 0, 20000, ['£0.01', '£0.00'], []],
+      ['zero proposed dividends', 0, 0.01, 7000, 0, [], ['£0.01', '£0.00']],
+      ['zero paid and proposed', 0, 0, 0, 0, [], []],
+    ])(
+      'reports only the already-paid conflicts for %s',
+      (_, ytdSalary, ytdDividends, salary, dividends, salaryAmounts, dividendAmounts) => {
+        const comparison = createComparison();
+        setStoreState({
+          formData: { ...useDirectorGuideStore.getState().formData, ytdSalary, ytdDividends },
+          strategyComparison: {
+            ...comparison,
+            strategies: {
+              ...comparison.strategies,
+              optimalMix: createStrategy('Baseline Mix', { salary, dividends }),
+            },
+          } as never,
+        });
+
+        render(<StrategyComparisonTable />);
+
+        expect(
+          screen.queryByText(/Salary already paid .* exceeds/)?.textContent?.match(/£[\d,.]+/g) ??
+            [],
+        ).toEqual(salaryAmounts);
+        expect(
+          screen.queryByText(/Dividends already paid .* exceed/)?.textContent?.match(/£[\d,.]+/g) ??
+            [],
+        ).toEqual(dividendAmounts);
+      },
+    );
 
     it('shows costing message and Your Setup warning when applicable', () => {
       const comparison = createComparison({
