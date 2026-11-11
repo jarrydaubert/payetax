@@ -80,7 +80,9 @@ test.describe('Director Intelligence recruiter regression', () => {
     await expect(page.getByText(/Not set\./i)).toBeVisible();
   });
 
-  test('monthly recruiter case keeps safe draw and buffer shortfall outputs', async ({ page }) => {
+  test('monthly recruiter case separates the draw, spending gap and buffer shortfall', async ({
+    page,
+  }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await suppressWelcomeDialog(page);
     await page.goto('/tools/director-guide', { waitUntil: 'domcontentloaded', timeout: 60000 });
@@ -114,9 +116,17 @@ test.describe('Director Intelligence recruiter regression', () => {
     await selectEnglandRegion(page);
 
     await expect(page.getByRole('heading', { name: 'Choose Your Strategy' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Safe Monthly Draw' })).toBeVisible();
-    await expect(page.getByText('£533/mo')).toBeVisible();
-    await expect(page.getByText('£2,199')).toBeVisible();
-    await expect(page.getByText('Shortfall £1,310')).toBeVisible();
+    await page.getByRole('button', { name: /All Dividends/i }).click();
+    await expect(page.getByRole('heading', { name: 'Monthly Draw Estimate' })).toBeVisible();
+    await expect(
+      page.getByText('Available this month', { exact: true }).locator('..'),
+    ).toContainText('£0/mo');
+    await expect(
+      page.getByText('£533/mo below your spending target', { exact: true }),
+    ).toBeVisible();
+    // With no salary, projected profit is (£859 − £200) × 12 = £7,908.
+    // Its 19% corporation tax reserve (£1,502.52) uses all £889 of current cash.
+    await expect(page.getByText('£2,199', { exact: true })).toBeVisible();
+    await expect(page.getByText('Shortfall £2,199', { exact: true })).toBeVisible();
   });
 });

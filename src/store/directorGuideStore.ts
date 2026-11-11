@@ -21,18 +21,18 @@ import {
 } from '@/lib/directorGuideAnalytics';
 import { figureStorage, registerFigureStore } from '@/lib/figureStorage';
 import { captureDirectorCalculationFailure } from '@/lib/sentry';
-import { parseAccountingPeriodEnd, resolveTaxYear } from '@/lib/tax';
+import {
+  type MonthlyProjectionResult,
+  parseAccountingPeriodEnd,
+  resolveAnnualFinancials,
+  resolveTaxYear,
+} from '@/lib/tax';
 import { calculateDirectorScenario } from '@/lib/tax/directorCalculator';
 import { calculateStrategyComparison, type StrategyComparison } from '@/lib/tax/strategyComparison';
 import {
   isDirectorStudentLoanPlanAvailable,
   sanitizeDirectorStudentLoanPlans,
 } from '@/lib/tax/studentLoanPlans';
-import {
-  calculateSafeMonthlyDraw,
-  resolveAnnualFinancials,
-  type SafeDrawResult,
-} from '@/lib/tax/variableIncome';
 import {
   CurrencyAmountSchema,
   type DirectorCalculationResult,
@@ -63,13 +63,6 @@ export type TakenViaPayroll = 'yes' | 'no' | 'unsure';
 /** Director Intelligence input mode */
 export type DirectorGuideMode = 'annual' | 'monthly';
 export type StrategyObjective = 'maximizeTakeHome' | 'minimizeNI';
-
-/** Monthly-mode derived outputs */
-export interface MonthlyModeOutput extends SafeDrawResult {
-  monthsRemaining: number;
-  projectedRevenue: number;
-  projectedExpenses: number;
-}
 
 /**
  * Form data for the calculator
@@ -174,7 +167,7 @@ interface DirectorGuideState {
   /** In-memory inputs that produced the results; shared by display and email eligibility. */
   calculatedFormData: DirectorFormData | null;
   failedFormData: DirectorFormData | null;
-  monthlyModeOutput: MonthlyModeOutput | null;
+  monthlyModeOutput: MonthlyProjectionResult | null;
   error: string | null;
 
   // Input validity (not persisted): field key → unparsed text that is not a valid amount, kept
@@ -744,7 +737,6 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
             return;
           }
 
-          const isMonthlyMode = formData.mode === 'monthly';
           const annualizedFinancials = resolveAnnualFinancials({
             mode: formData.mode,
             revenue: formData.revenue,
@@ -828,31 +820,15 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
               CURRENT_TAX_YEAR,
             );
 
-            let monthlyModeOutput: MonthlyModeOutput | null = null;
-            if (isMonthlyMode && monthlyProjection) {
-              monthlyModeOutput = {
-                ...calculateSafeMonthlyDraw({
-                  annualTakeHome: strategyComparison.strategies.optimalMix.takeHome,
-                  monthsRemaining: monthlyProjection.monthsRemaining,
-                  cashInBank: formData.cashInBank,
-                  minimumMonthlyDraw: formData.minimumMonthlyDraw,
-                  runwayMonths: formData.runwayMonths,
-                  monthlyExpenses: formData.monthlyExpenses,
-                }),
-                monthsRemaining: monthlyProjection.monthsRemaining,
-                projectedRevenue: monthlyProjection.projectedRevenue,
-                projectedExpenses: monthlyProjection.projectedExpenses,
-              };
-              if (typeof window !== 'undefined') {
-                trackSafeDrawCalculated();
-              }
+            if (monthlyProjection && typeof window !== 'undefined') {
+              trackSafeDrawCalculated();
             }
 
             set({
               results,
               strategyComparison,
               calculatedFormData: formData,
-              monthlyModeOutput,
+              monthlyModeOutput: monthlyProjection,
               isCalculating: false,
               sliderSalary: null, // Reset slider on new calculation
             });

@@ -472,25 +472,6 @@ describe('DirectorGuideStore', () => {
       );
       expect(mockCalculateStrategyComparison).not.toHaveBeenCalled();
     });
-
-    it('should floor safe monthly draw to minimum draw when buffer is short', () => {
-      const store = useDirectorGuideStore.getState();
-      store.setMode('monthly');
-      store.setRegion('rUK');
-      store.setMonthlyIncome(3000);
-      store.setMonthlyExpenses(1000);
-      store.setContractStartMonth(10); // 6 months
-      store.setCashInBank(0);
-      store.setMinimumMonthlyDraw(900);
-      store.setRunwayMonths(3);
-
-      store.calculate();
-
-      const state = useDirectorGuideStore.getState();
-      expect(state.monthlyModeOutput).not.toBeNull();
-      expect(state.monthlyModeOutput?.safeMonthlyDraw).toBe(900);
-      expect(state.monthlyModeOutput?.hasBufferShortfall).toBe(true);
-    });
   });
 
   describe('Result invalidation (DI-02)', () => {

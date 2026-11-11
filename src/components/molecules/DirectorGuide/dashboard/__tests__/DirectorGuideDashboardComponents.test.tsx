@@ -75,6 +75,7 @@ describe('Director Intelligence dashboard components', () => {
       ...current,
       formData: {
         ...current.formData,
+        mode: 'annual',
         region: 'rUK',
         revenue: 100000,
         expenses: 20000,
@@ -116,7 +117,7 @@ describe('Director Intelligence dashboard components', () => {
 
       const { container } = render(<SummaryCards />);
       const summary = screen.getByLabelText('Financial summary');
-      expect(screen.getByText('Safe Monthly Draw')).toBeInTheDocument();
+      expect(screen.getByText('Average Monthly Take-Home')).toBeInTheDocument();
       expect(screen.getByText('Annual Dividends')).toBeInTheDocument();
       expect(summary.className).toContain('auto-fit');
       expect(container.querySelector('.text-gradient-brand')).not.toBeInTheDocument();
@@ -130,27 +131,15 @@ describe('Director Intelligence dashboard components', () => {
       expect(mockCalculateSalaryScenario).toHaveBeenCalled();
     });
 
-    it('uses monthly safe draw output when in monthly mode', () => {
+    it('shows the cash-limited monthly draw, including zero', () => {
       const current = useDirectorGuideStore.getState();
       setStoreState({
         strategyComparison: createComparison() as never,
         formData: { ...current.formData, mode: 'monthly' },
-        monthlyModeOutput: {
-          monthsRemaining: 6,
-          projectedRevenue: 18000,
-          projectedExpenses: 6000,
-          taxBasedMonthlyDraw: 3200,
-          requiredBuffer: 4500,
-          cashBasedCeiling: 2000,
-          safeMonthlyDraw: 2200,
-          shortfall: 0,
-          hasBufferShortfall: false,
-          hasContractEndRisk: false,
-        } as never,
       });
 
-      render(<SummaryCards />);
-      expect(screen.getByText('£2,200')).toBeInTheDocument();
+      render(<SummaryCards monthlyDraw={0} />);
+      expect(screen.getByRole('article', { name: 'Monthly Draw Estimate of £0' })).toBeVisible();
     });
   });
 

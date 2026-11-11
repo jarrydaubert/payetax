@@ -20,6 +20,7 @@ import {
   StrategyComparisonTable,
   TaxPots,
 } from '@/components/molecules/DirectorGuide/calculator';
+import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario';
 import {
   DashboardLayout,
   DetailCards,
@@ -36,13 +37,14 @@ import { useDirectorEmailUnavailableReason } from '@/components/molecules/Direct
 import { FigureStorageControls } from '@/components/molecules/FigureStorageControls';
 import { Button } from '@/components/ui/button';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { formatCurrencyInputValue } from '@/lib/currencyInput';
 import {
   trackCalculationRun,
   trackGuideStarted,
   trackResultsShown,
 } from '@/lib/directorGuideAnalytics';
 import { safeGetItem, safeSetItem } from '@/lib/safeStorage';
-import { resolveAnnualFinancials } from '@/lib/tax/variableIncome';
+import { calculateSafeMonthlyDraw, resolveAnnualFinancials } from '@/lib/tax';
 import { cn } from '@/lib/utils';
 import type { DirectorEmailInput } from '@/lib/validation/emailValidation';
 import {
@@ -72,10 +74,25 @@ export function DirectorDashboard() {
   const formData = useDirectorFormSlice((data) => data);
   const comparison = useStrategyComparison();
   const monthlyModeOutput = useMonthlyModeOutput();
+  const { activeScenario } = useActiveDirectorScenario();
   const hasInputErrors = useHasDirectorInputErrors();
   const calculationFailed = useDirectorCalculationFailed();
   const { calculate, invalidateResults, reset } = useDirectorGuideActions();
   const isMonthlyMode = formData.mode === 'monthly';
+  const monthlyDraw =
+    isMonthlyMode && monthlyModeOutput
+      ? calculateSafeMonthlyDraw({
+          annualTakeHome: activeScenario?.takeHome ?? 0,
+          companyTaxReserve: activeScenario
+            ? activeScenario.corporationTax + activeScenario.employerNI
+            : 0,
+          monthsRemaining: monthlyModeOutput.monthsRemaining,
+          cashInBank: formData.cashInBank,
+          minimumMonthlyDraw: formData.minimumMonthlyDraw,
+          runwayMonths: formData.runwayMonths,
+          monthlyExpenses: formData.monthlyExpenses,
+        })
+      : null;
 
   const annualizedFromInputs = resolveAnnualFinancials({
     mode: formData.mode,
@@ -327,22 +344,24 @@ export function DirectorDashboard() {
                   </>
                 ) : (
                   <>
-                    {isMonthlyMode && monthlyModeOutput && (
+                    {activeScenario && monthlyDraw && (
                       <section className='rounded-sm border border-success/30 bg-card p-4'>
                         <h3 className='text-sm font-semibold tracking-wider text-success uppercase'>
-                          Safe Monthly Draw
+                          Monthly Draw Estimate
                         </h3>
                         <div className='mt-2 grid gap-3 md:grid-cols-3'>
                           <div>
-                            <div className='text-xs text-muted-foreground'>Recommended draw</div>
+                            <div className='text-xs text-muted-foreground'>
+                              Available this month
+                            </div>
                             <div className='font-mono font-semibold text-foreground'>
-                              £{Math.round(monthlyModeOutput.safeMonthlyDraw).toLocaleString()}/mo
+                              {formatCurrencyInputValue(monthlyDraw.safeMonthlyDraw)}/mo
                             </div>
                           </div>
                           <div>
                             <div className='text-xs text-muted-foreground'>Required buffer</div>
                             <div className='font-mono font-semibold text-foreground'>
-                              £{Math.round(monthlyModeOutput.requiredBuffer).toLocaleString()}
+                              {formatCurrencyInputValue(monthlyDraw.requiredBuffer)}
                             </div>
                           </div>
                           <div>
@@ -350,17 +369,26 @@ export function DirectorDashboard() {
                             <div
                               className={cn(
                                 'font-medium',
-                                monthlyModeOutput.hasBufferShortfall
-                                  ? 'text-warning'
-                                  : 'text-success',
+                                monthlyDraw.hasBufferShortfall ? 'text-warning' : 'text-success',
                               )}
                             >
-                              {monthlyModeOutput.hasBufferShortfall
-                                ? `Shortfall £${Math.round(monthlyModeOutput.shortfall).toLocaleString()}`
+                              {monthlyDraw.hasBufferShortfall
+                                ? `Shortfall ${formatCurrencyInputValue(monthlyDraw.shortfall)}`
                                 : 'On track'}
                             </div>
                           </div>
                         </div>
+                        {monthlyDraw.spendingShortfall > 0 && (
+                          <p className='mt-2 text-sm text-foreground'>
+                            {formatCurrencyInputValue(monthlyDraw.spendingShortfall)}/mo below your
+                            spending target
+                          </p>
+                        )}
+                        <p className='mt-2 text-xs text-muted-foreground'>
+                          Uses current cash after the buffer and company tax and employer NI
+                          estimated for the full projection period. Projected monthly take-home caps
+                          the draw.
+                        </p>
                       </section>
                     )}
 
@@ -372,7 +400,9 @@ export function DirectorDashboard() {
                     </section>
 
                     <section data-director-section='director-summary' aria-label='Summary cards'>
-                      <SummaryCards />
+                      <SummaryCards
+                        monthlyDraw={activeScenario ? monthlyDraw?.safeMonthlyDraw : undefined}
+                      />
                     </section>
 
                     <section data-director-section='director-slider' aria-label='Salary slider'>
@@ -533,7 +563,7 @@ export function DirectorDashboard() {
             )}
           </main>
         }
-        education={<EducationPanel />}
+        education={<EducationPanel monthlyDraw={monthlyDraw} />}
         inputsCollapsed={inputsCollapsed}
         educationCollapsed={educationCollapsed}
         onToggleInputs={() => setInputsCollapsed((prev) => !prev)}

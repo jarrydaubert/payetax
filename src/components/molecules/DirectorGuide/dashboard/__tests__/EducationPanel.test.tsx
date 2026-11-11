@@ -138,13 +138,6 @@ describe('DirectorGuide EducationPanel', () => {
         monthsRemaining: 2,
         projectedRevenue: 12000,
         projectedExpenses: 5000,
-        taxBasedMonthlyDraw: 1200,
-        requiredBuffer: 3600,
-        cashBasedCeiling: 0,
-        safeMonthlyDraw: 900,
-        shortfall: 1800,
-        hasBufferShortfall: true,
-        hasContractEndRisk: true,
       } as never,
       formData: {
         ...current.formData,
@@ -154,7 +147,20 @@ describe('DirectorGuide EducationPanel', () => {
       },
     });
 
-    render(<EducationPanel />);
+    render(
+      <EducationPanel
+        monthlyDraw={{
+          taxBasedMonthlyDraw: 1200,
+          requiredBuffer: 3600,
+          cashBasedCeiling: 0,
+          safeMonthlyDraw: 0,
+          spendingShortfall: 900,
+          shortfall: 1800,
+          hasBufferShortfall: true,
+          hasContractEndRisk: true,
+        }}
+      />,
+    );
 
     expect(screen.getByText('Cash Buffer Shortfall')).toBeInTheDocument();
     expect(screen.getByText('Contract-End Risk')).toBeInTheDocument();

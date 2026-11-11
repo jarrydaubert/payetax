@@ -219,26 +219,47 @@ describe('DirectorDashboard (normal mode)', () => {
     expect(screen.queryByRole('region', { name: 'About this estimate' })).not.toBeInTheDocument();
   });
 
-  it('shows monthly safe draw callout in monthly mode', () => {
-    setCurrentResult(80000, { mode: 'monthly', monthlyIncome: 3000, monthlyExpenses: 1000 });
+  it('updates the monthly draw and buffer from the selected scenario', () => {
+    setCurrentResult(80000, {
+      mode: 'monthly',
+      monthlyIncome: 3000,
+      monthlyExpenses: 1000,
+      minimumMonthlyDraw: 900,
+      cashInBank: 11000,
+      runwayMonths: 3,
+    });
+    const comparison = createComparison(80000);
+    comparison.strategies.allSalary.takeHome = 600;
+    comparison.strategies.allDividends.corporationTax = 5000;
+    comparison.strategies.allDividends.employerNI = 0;
     useDirectorGuideStore.setState({
+      strategyComparison: comparison as never,
       monthlyModeOutput: {
         monthsRemaining: 6,
         projectedRevenue: 18000,
         projectedExpenses: 6000,
-        taxBasedMonthlyDraw: 3000,
-        requiredBuffer: 4500,
-        cashBasedCeiling: 2000,
-        safeMonthlyDraw: 2200,
-        shortfall: 0,
-        hasBufferShortfall: false,
-        hasContractEndRisk: false,
-      } as never,
-    } as never);
+      },
+    });
 
     render(<DirectorDashboard />);
-    expect(screen.getByText('Safe Monthly Draw')).toBeInTheDocument();
-    expect(screen.getByText('Recommended draw')).toBeInTheDocument();
+    // The £5,700 buffer leaves £2,300 after the baseline's £3,000 reserve.
+    expect(screen.getByText('£2,300/mo')).toBeInTheDocument();
+    expect(screen.getByText('£5,700')).toBeInTheDocument();
+
+    act(() => useDirectorGuideStore.getState().setSelectedStrategy('allDividends'));
+    // The selected strategy needs a £5,000 reserve. £300 is left, £600 below the target.
+    expect(screen.getByText('£300/mo')).toBeInTheDocument();
+    expect(screen.getByText('£600/mo below your spending target')).toBeInTheDocument();
+    expect(useDirectorGuideStore.getState().selectedStrategy).toBe('allDividends');
+
+    act(() => useDirectorGuideStore.getState().setSelectedStrategy('allSalary'));
+    // The active scenario's £600 over 6 months caps the draw at £100.
+    expect(screen.getByText('£100/mo')).toBeInTheDocument();
+
+    act(() => useDirectorGuideStore.getState().setCashInBank(12000));
+    expect(
+      screen.queryByRole('heading', { name: 'Monthly Draw Estimate' }),
+    ).not.toBeInTheDocument();
   });
 
   it('opens the email dialog when CTA is clicked', () => {

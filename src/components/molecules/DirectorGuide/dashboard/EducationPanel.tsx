@@ -1,14 +1,12 @@
 /**
  * Education Panel - Learn cards, warnings, and assumptions
- *
- * Uses Zustand store hooks instead of props.
  */
 'use client';
 
 import { AlertTriangle } from 'lucide-react';
 import { type ReactNode, useMemo } from 'react';
 import { CURRENT_TAX_YEAR, CURRENT_TAX_YEAR_DISPLAY, TAX_RATES } from '@/constants/taxRates';
-import { getSection455Rate } from '@/lib/tax';
+import { getSection455Rate, type SafeDrawResult } from '@/lib/tax';
 import { DIRECTOR_GUIDE_BUSINESS_THRESHOLDS } from '@/lib/tax/businessThresholds';
 import { cn } from '@/lib/utils';
 import {
@@ -56,6 +54,7 @@ const SECTION_HEADING_CLASS =
 
 interface EducationPanelProps {
   className?: string;
+  monthlyDraw?: SafeDrawResult | null;
 }
 
 type EducationPanelFormData = Pick<
@@ -76,7 +75,7 @@ type EducationPanelFormData = Pick<
   | 'hasOtherPAYEEmployment'
 >;
 
-export function EducationPanel({ className }: EducationPanelProps) {
+export function EducationPanel({ className, monthlyDraw }: EducationPanelProps) {
   const formData = useDirectorFormSlice<EducationPanelFormData>((formData) => ({
     mode: formData.mode,
     region: formData.region,
@@ -167,7 +166,7 @@ export function EducationPanel({ className }: EducationPanelProps) {
       personalTax,
       formData,
       comparison,
-      monthlyModeOutput,
+      monthlyDraw: monthlyModeOutput ? monthlyDraw : null,
       isMonthlyMode,
     }).filter((warning) => warning.show);
 
@@ -184,6 +183,7 @@ export function EducationPanel({ className }: EducationPanelProps) {
     grossExtraction,
     hasResults,
     isMonthlyMode,
+    monthlyDraw,
     monthlyModeOutput,
     optimalSalary,
     personalTax,
@@ -327,7 +327,7 @@ interface WarningContext {
   personalTax: number;
   formData: EducationPanelFormData;
   comparison: ReturnType<typeof useStrategyComparison>;
-  monthlyModeOutput: ReturnType<typeof useMonthlyModeOutput>;
+  monthlyDraw?: SafeDrawResult | null;
   isMonthlyMode: boolean;
 }
 
@@ -350,7 +350,7 @@ function buildWarnings(ctx: WarningContext): Warning[] {
     personalTax,
     formData,
     comparison,
-    monthlyModeOutput,
+    monthlyDraw,
     isMonthlyMode,
   } = ctx;
 
@@ -367,12 +367,12 @@ function buildWarnings(ctx: WarningContext): Warning[] {
     {
       id: 'monthly-buffer-shortfall',
       title: 'Cash Buffer Shortfall',
-      description: monthlyModeOutput
-        ? `Current cash is below your required buffer by £${Math.round(
-            monthlyModeOutput.shortfall,
+      description: monthlyDraw
+        ? `Cash after company tax and employer NI estimated for the full projection period is below your required buffer by £${Math.round(
+            monthlyDraw.shortfall,
           ).toLocaleString()}. Consider reducing drawings or increasing runway cash.`
         : 'Current cash is below your required runway buffer.',
-      show: isMonthlyMode && Boolean(monthlyModeOutput?.hasBufferShortfall),
+      show: isMonthlyMode && Boolean(monthlyDraw?.hasBufferShortfall),
       isCritical: true,
     },
     {
@@ -380,7 +380,7 @@ function buildWarnings(ctx: WarningContext): Warning[] {
       title: 'Contract-End Risk',
       description:
         'Your runway target is at or above months remaining in this tax year. Plan for income gaps now.',
-      show: isMonthlyMode && Boolean(monthlyModeOutput?.hasContractEndRisk),
+      show: isMonthlyMode && Boolean(monthlyDraw?.hasContractEndRisk),
       isCritical: true,
     },
     {
