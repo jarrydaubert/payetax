@@ -433,6 +433,54 @@ test.describe('Director result currentness @critical', () => {
 });
 
 test.describe('Director Intelligence critical @critical', () => {
+  test('DI-27: the already-paid disclosure follows the selected scenario', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await suppressWelcomeDialog(page);
+    await page.goto('/tools/director-guide', { waitUntil: 'networkidle' });
+    await ensureInputsPanelIsVisible(page);
+    await selectEngland(page);
+    const revenue = visibleInputByTestId(page, 'director-revenue-input');
+    await replaceText(revenue, '21000');
+    await revenue.blur();
+    const expenses = visibleInputByTestId(page, 'director-expenses-input');
+    await replaceText(expenses, '1000');
+    await expenses.blur();
+    await page
+      .getByRole('button', { name: 'Full Inputs', exact: true })
+      .filter({ visible: true })
+      .click();
+    await fillCurrencyInput(
+      page.getByRole('textbox', { name: 'YTD Salary' }).filter({ visible: true }),
+      1,
+    );
+    await fillCurrencyInput(
+      page.getByRole('textbox', { name: 'YTD Dividends' }).filter({ visible: true }),
+      0.01,
+    );
+    await closeInputsPanelIfOpen(page);
+
+    const strategies = page.getByRole('region', { name: 'Strategy comparison' });
+    const conflict = strategies.getByRole('status');
+    await strategies.getByRole('button', { name: /All Dividends/ }).click();
+    await expect(conflict).toHaveText(
+      'Salary already paid (£1.00) exceeds this scenario’s full-year salary (£0.00).',
+    );
+
+    await strategies.getByRole('button', { name: /All Salary/ }).click();
+    // The active breakdown still has a small dividend even though the card shows £0.
+    await expect(conflict).toBeEmpty();
+    await page.getByTestId('director-salary-slider').getByRole('slider').press('End');
+    await expect(conflict).toHaveText(
+      'Dividends already paid (£0.01) exceed this scenario’s full-year dividends (£0.00).',
+    );
+
+    await strategies.getByRole('button', { name: /Baseline Mix/ }).click();
+    await expect(conflict).toBeEmpty();
+    await expect(
+      strategies.getByText(/Salary and dividends are full-year estimates/),
+    ).toBeVisible();
+  });
+
   test('DI-05: only matching scenarios can email, with recovery after each divergence @critical', async ({
     page,
   }) => {

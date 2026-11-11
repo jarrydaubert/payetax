@@ -10,10 +10,12 @@
 
 import { AlertTriangle, Banknote, PiggyBank, Split, User } from 'lucide-react';
 import { trackStrategySelected } from '@/lib/directorGuideAnalytics';
+import { roundToPence } from '@/lib/tax';
 import type { YourSetupResult } from '@/lib/tax/strategyComparison';
 import { cn, formatCurrency } from '@/lib/utils';
 import {
   type StrategyObjective,
+  useDirectorFormSlice,
   useDirectorGuideActions,
   useDirectorGuideStore,
   useSelectedStrategy,
@@ -25,10 +27,19 @@ type StrategyKey = 'allSalary' | 'optimalMix' | 'allDividends';
 export function StrategyComparisonTable() {
   const selectedStrategy = useSelectedStrategy();
   const { comparison, activeScenario } = useActiveDirectorScenario();
+  const { ytdSalary, ytdDividends } = useDirectorFormSlice(({ ytdSalary, ytdDividends }) => ({
+    ytdSalary,
+    ytdDividends,
+  }));
   const { setSelectedStrategy, setSliderSalary, setObjective } = useDirectorGuideActions();
   const objective = useDirectorGuideStore((state) => state.objective);
 
   if (!comparison || comparison.grossProfit <= 0) return null;
+
+  const paidSalary = roundToPence(ytdSalary);
+  const paidDividends = roundToPence(ytdDividends);
+  const scenarioSalary = activeScenario && roundToPence(activeScenario.salary);
+  const scenarioDividends = activeScenario && roundToPence(activeScenario.dividends);
 
   const strategies = [
     {
@@ -137,6 +148,24 @@ export function StrategyComparisonTable() {
           Compare salary/dividend tradeoffs using your selected objective. Switch objective to see
           how the recommended strategy changes.
         </p>
+        <p className='mt-2 text-sm text-muted-foreground'>
+          Salary and dividends are full-year estimates calculated without adjusting for amounts
+          already paid.
+        </p>
+        <div role='status' className='text-sm font-medium text-foreground not-empty:mt-2'>
+          {scenarioSalary !== null && paidSalary > scenarioSalary && (
+            <p>
+              Salary already paid ({formatCurrency(paidSalary)}) exceeds this scenario’s full-year
+              salary ({formatCurrency(scenarioSalary)}).
+            </p>
+          )}
+          {scenarioDividends !== null && paidDividends > scenarioDividends && (
+            <p>
+              Dividends already paid ({formatCurrency(paidDividends)}) exceed this scenario’s
+              full-year dividends ({formatCurrency(scenarioDividends)}).
+            </p>
+          )}
+        </div>
         {isNearObjective && (
           <p className='text-sm'>
             <span className='font-medium text-success'>
