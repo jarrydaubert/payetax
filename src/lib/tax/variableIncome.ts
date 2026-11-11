@@ -39,6 +39,7 @@ export interface SafeDrawInput {
   annualTakeHome: number;
   monthsRemaining: number;
   cashInBank: number;
+  companyTaxReserve?: number;
   minimumMonthlyDraw: number;
   runwayMonths: number;
   monthlyExpenses: number | undefined;
@@ -49,6 +50,7 @@ export interface SafeDrawResult {
   requiredBuffer: number;
   cashBasedCeiling: number;
   safeMonthlyDraw: number;
+  spendingShortfall: number;
   shortfall: number;
   hasBufferShortfall: boolean;
   hasContractEndRisk: boolean;
@@ -133,6 +135,7 @@ export function calculateSafeMonthlyDraw(input: SafeDrawInput): SafeDrawResult {
   const monthsRemaining = Math.max(0, Math.floor(input.monthsRemaining));
   const annualTakeHome = sanitizeNonNegative(input.annualTakeHome);
   const cashInBank = sanitizeNonNegative(input.cashInBank);
+  const companyTaxReserve = sanitizeNonNegative(input.companyTaxReserve);
   const minimumMonthlyDraw = sanitizeNonNegative(input.minimumMonthlyDraw);
   const runwayMonths = Math.max(0, Math.floor(input.runwayMonths));
   const monthlyExpenses = sanitizeNonNegative(input.monthlyExpenses);
@@ -140,14 +143,12 @@ export function calculateSafeMonthlyDraw(input: SafeDrawInput): SafeDrawResult {
   const taxBasedMonthlyDraw =
     monthsRemaining > 0 ? roundToPence(annualTakeHome / monthsRemaining) : 0;
   const requiredBuffer = roundToPence(runwayMonths * (minimumMonthlyDraw + monthlyExpenses));
-  const cashBasedCeiling = roundToPence(Math.max(0, cashInBank - requiredBuffer));
-  const safeMonthlyDraw =
-    cashBasedCeiling === 0
-      ? roundToPence(minimumMonthlyDraw)
-      : roundToPence(Math.min(taxBasedMonthlyDraw, cashBasedCeiling + minimumMonthlyDraw));
-
-  const shortfall = roundToPence(Math.max(0, requiredBuffer - cashInBank));
-  const hasBufferShortfall = cashInBank < requiredBuffer;
+  const cashAfterTax = roundToPence(Math.max(0, cashInBank - companyTaxReserve));
+  const cashBasedCeiling = roundToPence(Math.max(0, cashAfterTax - requiredBuffer));
+  const safeMonthlyDraw = Math.min(taxBasedMonthlyDraw, cashBasedCeiling);
+  const spendingShortfall = roundToPence(Math.max(0, minimumMonthlyDraw - safeMonthlyDraw));
+  const shortfall = roundToPence(Math.max(0, requiredBuffer - cashAfterTax));
+  const hasBufferShortfall = shortfall > 0;
   const hasContractEndRisk = monthsRemaining <= runwayMonths;
 
   return {
@@ -155,6 +156,7 @@ export function calculateSafeMonthlyDraw(input: SafeDrawInput): SafeDrawResult {
     requiredBuffer,
     cashBasedCeiling,
     safeMonthlyDraw,
+    spendingShortfall,
     shortfall,
     hasBufferShortfall,
     hasContractEndRisk,

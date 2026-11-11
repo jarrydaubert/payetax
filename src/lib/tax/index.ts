@@ -89,3 +89,5 @@ export {
   selectTaxPolicy,
 } from './taxPolicy';
 export { roundToPence, taxableThresholdToTotalIncome } from './utils';
+export type { MonthlyProjectionResult, SafeDrawResult } from './variableIncome';
+export { calculateSafeMonthlyDraw, resolveAnnualFinancials } from './variableIncome';

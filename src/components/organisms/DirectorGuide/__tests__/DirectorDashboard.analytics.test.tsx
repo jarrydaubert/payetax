@@ -32,6 +32,10 @@ jest.mock('@/components/molecules/DirectorGuide/useDirectorEmailUnavailableReaso
   useDirectorEmailUnavailableReason: () => null,
 }));
 
+jest.mock('@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario', () => ({
+  useActiveDirectorScenario: () => ({ activeScenario: null }),
+}));
+
 jest.mock('@/components/molecules/DirectorGuide/calculator', () => ({
   KeyDates: () => null,
   PensionGapWarning: () => null,

@@ -167,11 +167,6 @@ const BASELINE_ENTRIES = [
     '@/constants/taxRates',
     ['CURRENT_TAX_YEAR', 'TAX_RATES', 'type:TaxYear'],
   ],
-  [
-    'src/components/organisms/DirectorGuide/DirectorDashboard.tsx',
-    '@/lib/tax/variableIncome',
-    ['resolveAnnualFinancials'],
-  ],
   ['src/components/organisms/IncomeSourceList.tsx', '@/constants/taxRates', ['PERIODS']],
   [
     'src/components/organisms/SalaryComparison/SalaryComparisonSection.tsx',
@@ -261,11 +256,6 @@ const BASELINE_ENTRIES = [
     'src/store/directorGuideStore.ts',
     '@/lib/tax/studentLoanPlans',
     ['isDirectorStudentLoanPlanAvailable', 'sanitizeDirectorStudentLoanPlans'],
-  ],
-  [
-    'src/store/directorGuideStore.ts',
-    '@/lib/tax/variableIncome',
-    ['calculateSafeMonthlyDraw', 'resolveAnnualFinancials', 'type:SafeDrawResult'],
   ],
 ] as const;
 

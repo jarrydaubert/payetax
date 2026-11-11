@@ -612,7 +612,7 @@ test.describe('Director Intelligence critical @critical', () => {
     );
     await closeInputsPanelIfOpen(page);
     await expect(email).toBeDisabled();
-    await expect(page.getByRole('heading', { name: 'Safe Monthly Draw' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Monthly Draw Estimate' })).toBeVisible();
     await expect(page.getByRole('status', { name: 'Email availability' })).toHaveText(
       /cash-aware monthly draw/,
     );
@@ -626,7 +626,7 @@ test.describe('Director Intelligence critical @critical', () => {
       .click();
     await closeInputsPanelIfOpen(page);
     await expect(email).toBeEnabled();
-    await expect(page.getByRole('heading', { name: 'Safe Monthly Draw' })).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'Monthly Draw Estimate' })).toHaveCount(0);
   });
 
   test('Normal mode: calculates and can email results @critical', async ({ page }) => {
@@ -917,6 +917,30 @@ test.describe('Director resolved monthly financials @critical', () => {
     await closeInputsPanelIfOpen(page);
     await expect(loss).toHaveText('£18,964');
   });
+});
+
+test('DI-03: projected income cannot fund a withdrawal from zero cash @critical', async ({
+  page,
+}) => {
+  await openDirectorGuide(page);
+  await page.waitForLoadState('networkidle');
+  await selectEngland(page);
+  const amount = (name: string) =>
+    page.getByRole('textbox', { name, exact: true }).filter({ visible: true });
+  await page
+    .getByRole('button', { name: 'Monthly', exact: true })
+    .filter({ visible: true })
+    .click();
+  await fillCurrencyInput(amount('Monthly Contract Income'), 4000);
+  await fillCurrencyInput(amount('Monthly Business Expenses'), 1000);
+  await fillCurrencyInput(amount('Cash In Bank'), 0);
+  await fillCurrencyInput(amount('Minimum Monthly Draw'), 900);
+  await closeInputsPanelIfOpen(page);
+
+  const draw = page.getByText('Available this month', { exact: true }).locator('..');
+  await expect(draw).toContainText('£0/mo');
+  await expect(page.getByText('£900/mo below your spending target')).toBeVisible();
+  await expect(page.getByRole('article', { name: 'Monthly Draw Estimate of £0' })).toBeVisible();
 });
 
 test.describe('Director Intelligence currency inputs @critical', () => {

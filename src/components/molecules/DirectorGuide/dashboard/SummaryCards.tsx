@@ -7,41 +7,43 @@
 'use client';
 
 import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario';
+import { formatCurrencyInputValue } from '@/lib/currencyInput';
 import { cn, formatCurrency } from '@/lib/utils';
-import { useDirectorFormValue, useMonthlyModeOutput } from '@/store/directorGuideStore';
+import { useDirectorFormValue } from '@/store/directorGuideStore';
 
 interface SummaryCardsProps {
   className?: string;
+  monthlyDraw?: number;
 }
 
-export function SummaryCards({ className }: SummaryCardsProps) {
+export function SummaryCards({ className, monthlyDraw }: SummaryCardsProps) {
   const { activeScenario } = useActiveDirectorScenario();
   const mode = useDirectorFormValue((state) => state.mode);
-  const monthlyModeOutput = useMonthlyModeOutput();
   const isMonthlyMode = mode === 'monthly';
 
   const hasResults = activeScenario !== null;
-  const monthlyDrawAmount = hasResults
-    ? isMonthlyMode && monthlyModeOutput
-      ? monthlyModeOutput.safeMonthlyDraw
-      : activeScenario.takeHome / 12
-    : null;
-  const monthlyDrawLabel = monthlyDrawAmount === null ? '—' : formatCurrency(monthlyDrawAmount, 0);
+  const monthlyLabel = isMonthlyMode ? 'Monthly Draw Estimate' : 'Average Monthly Take-Home';
+  const monthlyDrawLabel = isMonthlyMode
+    ? formatCurrencyInputValue(monthlyDraw) || '—'
+    : hasResults
+      ? formatCurrency(activeScenario.takeHome / 12, 0)
+      : '—';
 
   // Calculate net dividends for display (gross dividends - dividend tax)
   const netDividends = hasResults ? activeScenario.dividends - activeScenario.dividendTax : 0;
 
   const cards = [
     {
-      label: 'Safe Monthly Draw',
+      label: monthlyLabel,
       value: monthlyDrawLabel,
       subtext: isMonthlyMode
-        ? 'Cash-aware + tax-aware (projection)'
+        ? 'Based on current cash and projected take-home'
         : 'After all taxes (illustrative)',
       highlight: true,
-      ariaDescription: hasResults
-        ? `Monthly safe draw of ${monthlyDrawLabel}`
-        : 'No results available',
+      ariaDescription:
+        monthlyDrawLabel !== '—'
+          ? `${monthlyLabel} of ${monthlyDrawLabel}`
+          : 'No results available',
     },
     {
       label: 'Annual Salary',

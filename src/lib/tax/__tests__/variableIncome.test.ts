@@ -128,7 +128,7 @@ describe('variableIncome helpers', () => {
       expect(result.hasContractEndRisk).toBe(false);
     });
 
-    it('returns minimum draw with shortfall warning when cash buffer is insufficient', () => {
+    it('protects the buffer when cash falls short of it', () => {
       const result = calculateSafeMonthlyDraw({
         annualTakeHome: 18000,
         monthsRemaining: 6,
@@ -140,25 +140,75 @@ describe('variableIncome helpers', () => {
 
       expect(result.requiredBuffer).toBe(4200);
       expect(result.cashBasedCeiling).toBe(0);
-      expect(result.safeMonthlyDraw).toBe(1000);
+      expect(result.safeMonthlyDraw).toBe(0);
+      expect(result.spendingShortfall).toBe(1000);
       expect(result.shortfall).toBe(3700);
       expect(result.hasBufferShortfall).toBe(true);
       expect(result.hasContractEndRisk).toBe(false);
     });
 
-    it('returns minimum draw even when tax-based draw is zero and cash ceiling is zero', () => {
+    it('cannot fund a £900 spending target from zero cash even with projected income', () => {
       const result = calculateSafeMonthlyDraw({
-        annualTakeHome: 0,
-        monthsRemaining: 6,
+        annualTakeHome: 24000,
+        monthsRemaining: 12,
         cashInBank: 0,
         minimumMonthlyDraw: 900,
         runwayMonths: 3,
-        monthlyExpenses: 300,
+        monthlyExpenses: 1000,
+      });
+
+      expect(result.taxBasedMonthlyDraw).toBe(2000);
+      expect(result.requiredBuffer).toBe(5700);
+      expect(result.cashBasedCeiling).toBe(0);
+      expect(result.safeMonthlyDraw).toBe(0);
+      expect(result.spendingShortfall).toBe(900);
+    });
+
+    it.each([
+      [5700, 0],
+      [6200, 500],
+    ])('caps a £900 spending target with £%i cash at £%i', (cashInBank, safeMonthlyDraw) => {
+      const result = calculateSafeMonthlyDraw({
+        annualTakeHome: 24000,
+        monthsRemaining: 12,
+        cashInBank,
+        minimumMonthlyDraw: 900,
+        runwayMonths: 3,
+        monthlyExpenses: 1000,
+      });
+
+      expect(result.safeMonthlyDraw).toBe(safeMonthlyDraw);
+    });
+
+    it('protects company tax reserves and preserves pence in the cash limit', () => {
+      const result = calculateSafeMonthlyDraw({
+        annualTakeHome: 24000,
+        monthsRemaining: 12,
+        cashInBank: 6500.75,
+        companyTaxReserve: 800.15,
+        minimumMonthlyDraw: 900,
+        runwayMonths: 3,
+        monthlyExpenses: 1000,
+      });
+
+      expect(result.requiredBuffer).toBe(5700);
+      expect(result.safeMonthlyDraw).toBe(0.6);
+      expect(result.spendingShortfall).toBe(899.4);
+    });
+
+    it('has no projected draw outside the projection period', () => {
+      const result = calculateSafeMonthlyDraw({
+        annualTakeHome: 24000,
+        monthsRemaining: 0,
+        cashInBank: 15000,
+        minimumMonthlyDraw: 900,
+        runwayMonths: 3,
+        monthlyExpenses: 1000,
       });
 
       expect(result.taxBasedMonthlyDraw).toBe(0);
-      expect(result.cashBasedCeiling).toBe(0);
-      expect(result.safeMonthlyDraw).toBe(900);
+      expect(result.safeMonthlyDraw).toBe(0);
+      expect(result.spendingShortfall).toBe(900);
     });
 
     it('flags contract-end risk when runway target is longer than months remaining', () => {
