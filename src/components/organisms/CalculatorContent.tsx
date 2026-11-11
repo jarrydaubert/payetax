@@ -242,16 +242,6 @@ export function CalculatorContent() {
                 provider reclaims 20% basic rate automatically (higher rate relief claimed via Self
                 Assessment).
               </p>
-              <p className='font-medium'>
-                Example on £50,000 salary with 5% pension (salary sacrifice):
-              </p>
-              <ul className={`ml-6 list-disc space-y-1`}>
-                <li>Pension contribution: £2,500 (5% of £50,000)</li>
-                <li>Taxable income: £34,930 (£50,000 - £2,500 pension - £12,570 allowance)</li>
-                <li>Tax saved: £500 (20% of £2,500 at basic rate)</li>
-                <li>Net cost of pension: £2,000 (£2,500 - £500 tax relief)</li>
-              </ul>
-              <p>Higher rate taxpayers (40%) save even more - £1,000 on a £2,500 contribution.</p>
             </FAQItem>
 
             <FAQItem question='What tax reliefs are available to reduce my tax bill?'>
