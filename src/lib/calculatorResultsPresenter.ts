@@ -60,7 +60,11 @@ function calculatePercentage(amount: number, total: number): string {
 }
 
 function getGrossAnnual(results: TaxCalculationResults): number {
-  return results.incomeBreakdown?.total ?? results.grossSalary.annually;
+  return (
+    results.calculationBasis?.pay.totalGrossIncome.annual ??
+    results.incomeBreakdown?.total ??
+    results.grossSalary.annually
+  );
 }
 
 function periodDiff(
@@ -89,6 +93,10 @@ export function buildResultsTableRows({
 }: BuildResultsTableRowsInput): ResultsTableRowViewModel[] {
   const grossAnnual = getGrossAnnual(results);
   const whatIfGrossAnnual = whatIfResults ? getGrossAnnual(whatIfResults) : undefined;
+  const loanCount = results.studentLoanDeductions
+    ? Object.keys(results.studentLoanDeductions).length
+    : studentLoans.length;
+  const nonTaxableAllowances = results.nonTaxableAllowances?.annually ?? allowancesDeductions;
   const yearChange = previousYearResults
     ? results.netPay.annually - previousYearResults.netPay.annually
     : 0;
@@ -203,11 +211,11 @@ export function buildResultsTableRows({
     })),
   );
 
-  if (studentLoans.length > 0) {
+  if (loanCount > 0) {
     rows.push({
       id: 'student-loan',
       kind: 'studentLoan',
-      category: `Student Loan${studentLoans.length > 1 ? 's' : ''}`,
+      category: `Student Loan${loanCount > 1 ? 's' : ''}`,
       annual: results.studentLoan.annually,
       whatIfAnnual: whatIfResults?.studentLoan.annually,
       valuesByPeriod: results.studentLoan,
@@ -241,9 +249,13 @@ export function buildResultsTableRows({
       id: 'non-taxable-allowances',
       kind: 'nonTaxableAllowance',
       category: 'Non-taxable allowance(s)',
-      annual: allowancesDeductions,
-      whatIfAnnual: whatIfResults ? allowancesDeductions : undefined,
-      percentage: calculatePercentage(allowancesDeductions, grossAnnual),
+      annual: nonTaxableAllowances,
+      whatIfAnnual: whatIfResults
+        ? (whatIfResults.nonTaxableAllowances?.annually ?? allowancesDeductions)
+        : undefined,
+      valuesByPeriod: results.nonTaxableAllowances,
+      whatIfValuesByPeriod: whatIfResults?.nonTaxableAllowances,
+      percentage: calculatePercentage(nonTaxableAllowances, grossAnnual),
     },
     {
       id: 'net-pay',

@@ -6,7 +6,7 @@
  * `@/lib/tax-code-decoder` so it is not bundled with every calculator route.
  */
 
-export type { NICategory, TaxYear } from '@/constants/taxRates';
+export type { NICategory, StudentLoanPlan, TaxYear } from '@/constants/taxRates';
 export {
   CURRENT_TAX_YEAR,
   formatTaxYearDisplay,
@@ -49,7 +49,7 @@ export {
   sliceClass1EmployeeEarnings,
   sliceClass1EmployerEarnings,
 } from './nationalInsurance';
-export { derivePayePayBasis } from './payePayBasis';
+export { derivePayePayBasis, type PayePayBasis } from './payePayBasis';
 export { getPayePensionInputIssue } from './payePensionValidation';
 export type {
   RukTaxableIncomeBand,

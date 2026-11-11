@@ -1170,7 +1170,7 @@ test.describe('Calculator critical @critical', () => {
     expect(newMarginal).toBeGreaterThan(baseMarginal);
   });
 
-  test('Non-taxable allowances increase annual net pay by the same amount @critical', async ({
+  test('Non-taxable allowances reconcile with annual net pay after monthly rounding @critical', async ({
     page,
   }) => {
     await setLandscapeViewportIfPortrait(page);
@@ -1182,12 +1182,13 @@ test.describe('Calculator critical @critical', () => {
 
     const baseNet = await getYearlyTableValue(page, 'Net Pay');
 
-    // Enter a clear annual amount and re-calc.
-    await page.getByTestId('non-taxable-allowances-input').fill('1200');
+    await page.getByTestId('non-taxable-allowances-input').fill('1200.05');
     await page.getByTestId('calculate-button').click();
 
+    const projectedAllowance = await getYearlyTableValue(page, 'Non-taxable allowance(s)');
     const newNet = await getYearlyTableValue(page, 'Net Pay');
-    expect(newNet).toBeCloseTo(baseNet + 1200, 1);
+    expect(projectedAllowance).toBe(1200);
+    expect(newNet - baseNet).toBeCloseTo(projectedAllowance, 2);
   });
 
   test('Additional rental income shows as "Other Income (No NI)" and is included in gross @critical', async ({

@@ -12,6 +12,7 @@ import {
   type StudentLoanSelection,
   type TaxYear,
 } from '@/constants/taxRates';
+import type { PayePayBasis, StudentLoanPlan } from '@/lib/tax';
 
 /**
  * Shared income source kinds used by the calculator store and tax engine.
@@ -152,10 +153,27 @@ export interface TaxCodeCalculationBasis {
   ignoredAdjustments: Array<'blind-persons-allowance' | 'marriage-allowance'>;
 }
 
+export interface PayeCalculationBasis {
+  taxYear: TaxYear;
+  /** Income Tax regime actually used, including any supplied code override. */
+  incomeTaxRegime: 'rUK' | 'Scotland' | 'Wales';
+  incomeTaxPeriod: 'month-1';
+  nationalInsurancePeriod: 'monthly';
+  studentLoanBasis: 'per-employment';
+  pay: PayePayBasis;
+}
+
 /**
  * Shared output contract for PAYE calculator results.
  */
 export interface TaxCalculationResults {
+  /** Present on engine results. Older result-shaped callers may omit these fields. */
+  calculationBasis?: PayeCalculationBasis;
+  /** Annual payroll deductions by effective plan, including applicable plans with zero due. */
+  studentLoanDeductions?: Partial<Record<StudentLoanPlan, number>>;
+  /** Non-taxable cash included in take-home, on the same period basis as net pay. */
+  nonTaxableAllowances?: Record<PayPeriod, number>;
+
   /** Gross salary across different periods */
   grossSalary: Record<PayPeriod, number>;
   /** Tax-free/code amount used by the PAYE calculation. */

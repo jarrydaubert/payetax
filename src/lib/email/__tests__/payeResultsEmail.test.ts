@@ -128,6 +128,20 @@ describe('payeResultsEmail', () => {
     expect(text).toContain('TAKE-HOME PAY:');
   });
 
+  test('both formats use the resolved policy year and allowances included in net pay', () => {
+    const results = calculateTax({ ...calculationInput, allowancesDeductions: 100 });
+    for (const output of [
+      generatePayeEmailText(results, '2024-25'),
+      generatePayeEmailHtml(results, '2024-25'),
+    ]) {
+      expect(output).toContain('2026-27');
+      expect(output).not.toContain('2024-25');
+      expect(output).toContain('Non-taxable allowances');
+      expect(output).toContain('£99.96');
+      expect(output).toContain('£8.33');
+    }
+  });
+
   test('text and HTML emails disclose an explicit code that differs from the policy amount', () => {
     const results = calculateTax({ ...calculationInput, taxCode: '1257L' });
     const text = generatePayeEmailText(results, '2026-27');

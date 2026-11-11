@@ -5,11 +5,7 @@ import {
   generateDirectorEmailText,
 } from '@/lib/email/directorResultsEmail';
 import { type SendOutboundEmailResult, sendOutboundEmail } from '@/lib/email/emailDelivery';
-import {
-  formatTaxYearForEmail,
-  generatePayeEmailHtml,
-  generatePayeEmailText,
-} from '@/lib/email/payeResultsEmail';
+import { generatePayeEmailHtml, generatePayeEmailText } from '@/lib/email/payeResultsEmail';
 import { getPayePensionInputIssue, resolveTaxYear } from '@/lib/tax';
 import { calculateStrategyComparison } from '@/lib/tax/strategyComparison';
 import { calculateTax } from '@/lib/taxCalculator';
@@ -44,15 +40,13 @@ export function sendPayeResultsEmail(args: {
     return Promise.resolve({ ok: false, reason: 'invalid_pension', message: pensionIssue });
   }
 
-  const taxYearLabel = formatTaxYearForEmail(args.input.taxYear);
-
   return sendOutboundEmail(
     {
       from: process.env.BREVO_FROM_EMAIL || RESULTS_EMAIL_FROM,
       to: args.email,
       subject: `Your UK Tax Calculation - ${formatCurrency(results.netPay.annually)} take-home`,
-      html: generatePayeEmailHtml(results, taxYearLabel),
-      text: generatePayeEmailText(results, taxYearLabel),
+      html: generatePayeEmailHtml(results),
+      text: generatePayeEmailText(results),
     },
     'send-results',
   );

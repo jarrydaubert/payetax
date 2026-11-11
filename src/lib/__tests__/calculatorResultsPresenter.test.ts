@@ -21,6 +21,31 @@ const payslipInput: TaxCalculationInput = {
 };
 
 describe('calculatorResultsPresenter', () => {
+  it('uses the calculated loan plans and rounded allowances for both scenarios', () => {
+    const results = calculateTax({
+      ...payslipInput,
+      studentLoanPlans: ['plan2'],
+      allowancesDeductions: 100,
+    });
+    const whatIfResults = calculateTax({ ...payslipInput, allowancesDeductions: 200 });
+    const rows = buildResultsTableRows({
+      results,
+      whatIfResults,
+      allowancesDeductions: 999,
+      previousYearLabel: '2025',
+    });
+
+    expect(rows.find((row) => row.kind === 'studentLoan')?.annual).toBe(
+      results.studentLoan.annually,
+    );
+    expect(rows.find((row) => row.kind === 'nonTaxableAllowance')).toMatchObject({
+      annual: 99.96,
+      valuesByPeriod: { monthly: 8.33 },
+      whatIfAnnual: 200.04,
+      whatIfValuesByPeriod: { monthly: 16.67 },
+    });
+  });
+
   it('preserves calculator period values for payslip rows', () => {
     const results = calculateTax(payslipInput);
     const rows = buildResultsTableRows({
