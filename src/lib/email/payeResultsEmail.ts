@@ -26,7 +26,15 @@ export function formatTaxYearForEmail(taxYear: string): string {
   return `${start}-${end?.slice(-2) ?? ''}`;
 }
 
-export function generatePayeEmailText(results: TaxCalculationResults, taxYear?: string): string {
+function getPayeEmailYear(results: TaxCalculationResults, fallback?: string): string {
+  const year = results.calculationBasis?.taxYear;
+  return year ? formatTaxYearForEmail(year) : fallback || '2025-26';
+}
+
+export function generatePayeEmailText(
+  results: TaxCalculationResults,
+  fallbackTaxYear?: string,
+): string {
   const effectiveRate =
     results.grossSalary.annually > 0
       ? (
@@ -36,7 +44,7 @@ export function generatePayeEmailText(results: TaxCalculationResults, taxYear?: 
         ).toFixed(1)
       : '0';
 
-  const year = taxYear || '2025-26';
+  const year = getPayeEmailYear(results, fallbackTaxYear);
 
   let text = `
 YOUR UK TAX CALCULATION - PayeTax
@@ -64,6 +72,12 @@ Relief at source requires a separate calculation.`;
 Student Loan:      -${formatCurrency(results.studentLoan.annually)}  (-${formatCurrency(results.studentLoan.monthly)}/mo)`;
   }
 
+  const allowances = results.nonTaxableAllowances;
+  if (allowances?.annually) {
+    text += `
+Non-taxable allowances: ${formatCurrency(allowances.annually)}  (${formatCurrency(allowances.monthly)}/mo)`;
+  }
+
   if (results.taxCodeBasis) {
     text += `
 
@@ -88,8 +102,12 @@ Calculate again: ${BASE_URL}
   return text.trim();
 }
 
-export function generatePayeEmailHtml(results: TaxCalculationResults, taxYear?: string): string {
-  const safeTaxYear = escapeHtml(taxYear || '2025-26');
+export function generatePayeEmailHtml(
+  results: TaxCalculationResults,
+  fallbackTaxYear?: string,
+): string {
+  const safeTaxYear = escapeHtml(getPayeEmailYear(results, fallbackTaxYear));
+  const allowances = results.nonTaxableAllowances;
   const safeTaxCodeBasis = results.taxCodeBasis
     ? escapeHtml(getTaxCodeBasisExplanation(results.taxCodeBasis))
     : null;
@@ -219,6 +237,16 @@ export function generatePayeEmailHtml(results: TaxCalculationResults, taxYear?: 
             <td class="mobile-hide" style="padding: 14px 0; text-align: right; color: #465468; font-family: Menlo, Consolas, monospace;">-${formatCurrency(results.studentLoan.monthly)}</td>
           </tr>
           `
+              : ''
+          }
+          ${
+            allowances?.annually
+              ? `
+          <tr style="border-bottom: 1px solid #e1dbce;">
+            <td style="padding: 14px 0; color: #465468;">Non-taxable allowances</td>
+            <td style="padding: 14px 0; text-align: right; color: #07111f; font-family: Menlo, Consolas, monospace;">${formatCurrency(allowances.annually)}</td>
+            <td class="mobile-hide" style="padding: 14px 0; text-align: right; color: #465468; font-family: Menlo, Consolas, monospace;">${formatCurrency(allowances.monthly)}</td>
+          </tr>`
               : ''
           }
           <tr style="background: #eef4ed; border-top: 2px solid #cec6b7;">

@@ -124,6 +124,7 @@ export function ResultsTable({
   // Generate unique ID for accessibility
   const scrollHintId = React.useId();
   const shouldReduceMotion = useMotionPreference();
+  const currentTaxYear = results.calculationBasis?.taxYear ?? taxYear ?? CURRENT_TAX_YEAR;
 
   // Scroll indicators - recheck when periods change
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -155,7 +156,7 @@ export function ResultsTable({
     if (hasMarriageCode) return false;
 
     // Get tax constants for the current year
-    const taxConstants = TAX_RATES[(taxYear || CURRENT_TAX_YEAR) as TaxYear];
+    const taxConstants = TAX_RATES[currentTaxYear as TaxYear];
     const basicBand = taxConstants?.bands[0];
     if (!(taxConstants && basicBand)) return false;
     const personalAllowance = taxConstants.personalAllowance;
@@ -170,11 +171,9 @@ export function ResultsTable({
 
     // User is eligible!
     return true;
-  }, [isMarried, partnerGrossWage, taxCode, results.grossSalary.annually, taxYear]);
+  }, [isMarried, partnerGrossWage, taxCode, results.grossSalary.annually, currentTaxYear]);
 
   // Extract current year from taxYear to show "Net Change from 2024" instead of "Previous Year"
-  // Default to current tax year if not provided
-  const currentTaxYear = taxYear || CURRENT_TAX_YEAR; // e.g., "2025-2026"
   const currentYearStart = Number.parseInt(currentTaxYear.split('-')[0] || '', 10); // 2025
   const previousYearLabel = currentYearStart - 1; // 2024
 
@@ -354,7 +353,7 @@ export function ResultsTable({
             salary={results.grossSalary.annually}
             suggestedPension={taxTrapOptimization.suggested}
             onApplyPension={onApplyPensionOptimization}
-            taxYear={taxYear as TaxYear}
+            taxYear={currentTaxYear as TaxYear}
           />
         </div>
       )}
@@ -366,7 +365,7 @@ export function ResultsTable({
             userSalary={results.grossSalary.annually}
             partnerSalary={partnerGrossWage}
             hasMarriageCode={false}
-            taxYear={taxYear as TaxYear}
+            taxYear={currentTaxYear as TaxYear}
             isScottish={isScottish}
           />
         </div>

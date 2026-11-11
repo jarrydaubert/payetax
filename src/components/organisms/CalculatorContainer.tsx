@@ -24,7 +24,6 @@ import { trackEvent } from '@/lib/analytics';
 import { roundPensionUpToPence } from '@/lib/pensionOptimizer';
 import { convertAnnualToPeriod } from '@/lib/periodCalculator';
 import {
-  derivePayePayBasis,
   getTaxCodeRegionOverride,
   hasNonCumulativeTaxCodeMarker,
   parseTaxCode,
@@ -270,12 +269,11 @@ export function CalculatorContainer() {
         return;
       }
 
-      const basis = derivePayePayBasis(current.input);
-      const totalAnnualPension = basis.pensionDeduction.annual + pensionAmount;
+      const totalAnnualPension = current.results.pensionContribution.annually + pensionAmount;
       const perPeriodPension = convertAnnualToPeriod(
         totalAnnualPension,
         current.input.payPeriod,
-        basis.hoursPerWeek,
+        current.results.calculationBasis?.pay.hoursPerWeek ?? current.input.hoursPerWeek,
       );
       const pensionContribution = roundPensionUpToPence(perPeriodPension);
       setInput({
@@ -388,7 +386,7 @@ export function CalculatorContainer() {
           {results && (
             <>
               <TaxCodeBasisNotice basis={results.taxCodeBasis} />
-              <ResultsSummaryCards results={results} taxYear={input.taxYear} input={input} />
+              <ResultsSummaryCards results={results} input={input} />
             </>
           )}
         </motion.div>
@@ -502,12 +500,9 @@ export function CalculatorContainer() {
           >
             <ResultsTable
               results={results}
-              studentLoans={input.studentLoanPlans !== 'none' ? input.studentLoanPlans : []}
-              allowancesDeductions={input.allowancesDeductions}
               previousYearResults={previousYearResults}
               visiblePeriods={visiblePeriods}
               onVisiblePeriodsChange={handleVisiblePeriodsChange}
-              taxYear={input.taxYear}
               onApplyPensionOptimization={handleApplyPensionOptimization}
               marriageAllowance={{
                 isMarried: input.isMarried,

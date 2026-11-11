@@ -2,6 +2,7 @@
 // Utility functions for formatting, calculations, and common operations
 
 import { type ClassValue, clsx } from 'clsx';
+import type { FocusEvent } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 /**
@@ -65,7 +66,7 @@ export function formatPercent(value: number, decimals = 1): string {
  *
  * @param e - Focus event from input element
  */
-export function clearOnFocus(e: React.FocusEvent<HTMLInputElement>): void {
+export function clearOnFocus(e: FocusEvent<HTMLInputElement>): void {
   e.target.value = '';
 }
 

@@ -25,6 +25,7 @@ export function calculateMarginalTaxRate({
 
     const bumped = calculateTax({
       ...input,
+      taxYear: results.calculationBasis?.taxYear ?? input.taxYear,
       salary: input.salary + deltaInInputPeriod,
     });
 
@@ -38,7 +39,7 @@ export function calculateMarginalTaxRate({
     return Math.min(100, Math.max(0, ((bumpedTax - baseTax) / deltaAnnual) * 100));
   }
 
-  const taxRates = selectTaxPolicy(taxYear).ruk;
+  const taxRates = selectTaxPolicy(results.calculationBasis?.taxYear ?? taxYear).ruk;
   const basicBandThreshold = taxRates.bands[0]?.threshold ?? 0;
   const higherBandThreshold = taxRates.bands[1]?.threshold ?? basicBandThreshold;
   const personalAllowance = taxRates.personalAllowance;

@@ -154,7 +154,7 @@ function calculateAnnualStudentLoanForEmployment(
   hoursPerWeek: number,
   plans: readonly StudentLoanPlan[],
   annualPolicy: Readonly<Record<StudentLoanPlan, StudentLoanPlanPolicy>>,
-): number {
+): Array<{ plan: StudentLoanPlan; annualDeduction: number }> {
   const payPeriod = Object.values(PERIODS).includes(employment.payPeriod)
     ? employment.payPeriod
     : PERIODS.ANNUALLY;
@@ -204,12 +204,13 @@ function calculateAnnualStudentLoanForEmployment(
     normalizedPlans,
     periodPolicy,
   ).repayments;
-  const wholePoundsPerCalculationPeriod = repayments.reduce(
-    (total, repayment) => total + Math.floor(repayment.repayment),
-    0,
+  const repaymentByPlan = new Map(
+    repayments.map(({ plan, repayment }) => [plan, Math.floor(repayment)]),
   );
-
-  return wholePoundsPerCalculationPeriod * calculationPeriodsPerYear;
+  return normalizedPlans.map((plan) => ({
+    plan,
+    annualDeduction: (repaymentByPlan.get(plan) ?? 0) * calculationPeriodsPerYear,
+  }));
 }
 
 /**
@@ -349,7 +350,15 @@ function resolveBandOverride(
  * console.log(`Income tax: £${result.incomeTax.annually.toFixed(2)}`);
  * ```
  */
-export function calculateTax(input: TaxCalculationInput): TaxCalculationResults {
+export function calculateTax(
+  input: TaxCalculationInput,
+): TaxCalculationResults &
+  Required<
+    Pick<
+      TaxCalculationResults,
+      'calculationBasis' | 'studentLoanDeductions' | 'nonTaxableAllowances'
+    >
+  > {
   // ---------------
   // 1. Prepare input data and tax rates
   // ---------------
@@ -389,6 +398,10 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // Store band override for use in tax calculation section
   // BR = all at basic rate, D0 = all at higher rate, D1 = all at additional rate, NT = no tax
   const taxCodeBandOverride = taxCodeResult.bandOverride;
+  const incomeTaxRegime =
+    codeRegionOverride ?? (!taxCodeBandOverride && isScottish ? 'Scotland' : 'rUK');
+  const usesScottishIncomeTax = incomeTaxRegime === 'Scotland';
+  const incomeTaxBands = usesScottishIncomeTax ? scottishRates.bands : standardRates.bands;
 
   // High Income Personal Allowance Reduction (HMRC "60% Tax Trap")
   // Above £100,000 ADJUSTED NET income, personal allowance is reduced by £1 for every £2 of income
@@ -509,8 +522,8 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     if (taxCodeBandOverride) {
       const override = resolveBandOverride(
         taxCodeBandOverride,
-        taxCodeResult.isScottish,
-        taxCodeResult.isScottish ? scottishRates.bands : standardRates.bands,
+        usesScottishIncomeTax,
+        incomeTaxBands,
       );
       monthlyTax = (monthlyTaxableIncome * override.rate) / 100;
       taxBands.push({
@@ -523,19 +536,19 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     else {
       const month1Calculation = calculateMonth1ProgressiveIncomeTax(
         unroundedMonthlyTaxableIncome,
-        taxRates.bands.map((band) => ({
+        incomeTaxBands.map((band) => ({
           rate: band.rate,
           taxableIncomeUpperBound: band.threshold,
         })),
       );
       monthlyTax = month1Calculation.incomeTaxAtFourDecimals;
 
-      if (isScottish) {
+      if (usesScottishIncomeTax) {
         // The shared slicer supplies result-band allocation only. The PAYE tax
         // amount above comes from HMRC's separate formula-selection routine.
         const calculation = sliceScottishTaxableIncome(
           monthlyTaxableIncome,
-          taxRates.bands.map((band) => ({
+          incomeTaxBands.map((band) => ({
             name: band.name,
             rate: band.rate,
             taxableIncomeUpperBound: getExactMonth1Threshold(band.threshold),
@@ -554,7 +567,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
         // amount above comes from HMRC's separate formula-selection routine.
         const calculation = sliceRukTaxableIncome(
           monthlyTaxableIncome,
-          taxRates.bands.map((band) => ({
+          incomeTaxBands.map((band) => ({
             name: band.name,
             rate: band.rate,
             taxableIncomeUpperBound: getExactMonth1Threshold(band.threshold),
@@ -674,23 +687,30 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // Using total income would double-count income that HMRC handles via SA.
   //
 
-  let annualStudentLoan = 0;
+  const studentLoanDeductions: Partial<Record<StudentLoanPlan, number>> = {};
 
   if (Array.isArray(input.studentLoanPlans) && input.studentLoanPlans.length > 0) {
+    const plans = input.studentLoanPlans;
+    const addEmploymentDeductions = (employment: StudentLoanEmployment) => {
+      const deductions = calculateAnnualStudentLoanForEmployment(
+        employment,
+        hoursPerWeek,
+        plans,
+        standardRates.studentLoan,
+      );
+      for (const { plan, annualDeduction } of deductions) {
+        studentLoanDeductions[plan] = (studentLoanDeductions[plan] ?? 0) + annualDeduction;
+      }
+    };
     const primaryStudentLoanEarnings = convertAnnualToPeriod(
       payBasis.studentLoanEmploymentEarnings.annual,
       input.payPeriod,
       payBasis.hoursPerWeek,
     );
-    annualStudentLoan = calculateAnnualStudentLoanForEmployment(
-      {
-        earnings: primaryStudentLoanEarnings,
-        payPeriod: input.payPeriod,
-      },
-      payBasis.hoursPerWeek,
-      input.studentLoanPlans,
-      standardRates.studentLoan,
-    );
+    addEmploymentDeductions({
+      earnings: primaryStudentLoanEarnings,
+      payPeriod: input.payPeriod,
+    });
 
     // Employers ordinarily calculate Student Loan deductions independently.
     // Additional employment sources therefore receive their own threshold
@@ -698,21 +718,17 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
     for (const source of input.incomeSources ?? []) {
       if (source.type !== 'employment') continue;
 
-      annualStudentLoan += calculateAnnualStudentLoanForEmployment(
-        {
-          earnings: source.amount,
-          payPeriod: source.period,
-        },
-        payBasis.hoursPerWeek,
-        input.studentLoanPlans,
-        standardRates.studentLoan,
-      );
+      addEmploymentDeductions({ earnings: source.amount, payPeriod: source.period });
     }
   }
 
   // The engine's common output basis remains monthly. The annual figure above
   // preserves whole-pound deductions in each employment's actual pay period
   // before conversion to the other display periods.
+  const annualStudentLoan = Object.values(studentLoanDeductions).reduce(
+    (total, deduction) => total + deduction,
+    0,
+  );
   const monthlyStudentLoan = annualStudentLoan / 12;
 
   // ---------------
@@ -753,6 +769,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   const nationalInsuranceByPeriod: Record<PayPeriod, number> = {} as Record<PayPeriod, number>;
   const studentLoanByPeriod: Record<PayPeriod, number> = {} as Record<PayPeriod, number>;
   const pensionContributionByPeriod: Record<PayPeriod, number> = {} as Record<PayPeriod, number>;
+  const nonTaxableAllowances: Record<PayPeriod, number> = {} as Record<PayPeriod, number>;
   const netPay: Record<PayPeriod, number> = {} as Record<PayPeriod, number>;
 
   // Calculate values for each period using monthly values as the base
@@ -765,6 +782,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
         nationalInsuranceByPeriod[period] = annualNationalInsurance;
         studentLoanByPeriod[period] = annualStudentLoan;
         pensionContributionByPeriod[period] = payBasis.pensionDeduction.annual;
+        nonTaxableAllowances[period] = roundToPence(monthlyNonTaxableAllowances * 12);
         netPay[period] = annualNetPay;
         break;
 
@@ -775,6 +793,7 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
         nationalInsuranceByPeriod[period] = monthlyNationalInsurance;
         studentLoanByPeriod[period] = monthlyStudentLoan;
         pensionContributionByPeriod[period] = payBasis.pensionDeduction.monthly;
+        nonTaxableAllowances[period] = monthlyNonTaxableAllowances;
         netPay[period] = monthlyNetPay;
         break;
 
@@ -796,6 +815,9 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
         pensionContributionByPeriod[period] = roundToPence(
           convertMonthlyToPeriod(payBasis.pensionDeduction.monthly, period, hoursPerWeek),
         );
+        nonTaxableAllowances[period] = roundToPence(
+          convertMonthlyToPeriod(monthlyNonTaxableAllowances, period, hoursPerWeek),
+        );
         netPay[period] = roundToPence(convertMonthlyToPeriod(monthlyNetPay, period, hoursPerWeek));
         break;
     }
@@ -805,7 +827,17 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
   // 10. Return results
   // ---------------
 
-  const results: TaxCalculationResults = {
+  return {
+    calculationBasis: {
+      taxYear,
+      incomeTaxRegime,
+      incomeTaxPeriod: 'month-1',
+      nationalInsurancePeriod: 'monthly',
+      studentLoanBasis: 'per-employment',
+      pay: payBasis,
+    },
+    studentLoanDeductions,
+    nonTaxableAllowances,
     grossSalary,
     taxFreeAmount: annualTaxFreeAmount,
     taxFreeAmountByPeriod: {
@@ -861,6 +893,4 @@ export function calculateTax(input: TaxCalculationInput): TaxCalculationResults 
           }
         : undefined,
   };
-
-  return results;
 }
