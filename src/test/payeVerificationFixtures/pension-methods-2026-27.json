@@ -19,7 +19,7 @@
   "scenarios": [
     {
       "id": "net-pay-monthly-plan5",
-      "description": "England, £4,500/month, 10% net pay. PAYE: floor(£4,050 - £1,048.26 Tables A free pay) × 20% = £600.20. NI: (£4,189 - £1,048) × 8% + (£4,500 - £4,189) × 2% = £257.50. Plan 5: floor((£4,500 - £25,000 / 12) × 9%) = £217. Take-home £4,500 - £450 - £600.20 - £257.50 - £217 = £2,975.30.",
+      "description": "England, £4,500/month, 10% net pay. PAYE is floor(£4,050 - £1,048.26 Tables A free pay) × 20% = £600.20. NI is (£4,189 - £1,048) × 8% + (£4,500 - £4,189) × 2% = £257.50. Using the published £2,083.33 monthly Plan 5 threshold, floor((£4,500 - £2,083.33) × 9%) = £217. Take-home £4,500 - £450 - £600.20 - £257.50 - £217 = £2,975.30.",
       "input": {
         "taxYear": "2026-2027",
         "taxCode": "1257L",
@@ -55,7 +55,7 @@
     },
     {
       "id": "salary-sacrifice-monthly-plan5",
-      "description": "England, same £4,500/month and 10% via salary sacrifice. Same taxable pay and £600.20 PAYE. NI: (£4,050 - £1,048) × 8% = £240.16. Plan 5: floor((£4,050 - £25,000 / 12) × 9%) = £177. Take-home £4,050 - £600.20 - £240.16 - £177 = £3,032.64.",
+      "description": "England, same £4,500/month and 10% via salary sacrifice. Same taxable pay and £600.20 PAYE. NI is (£4,050 - £1,048) × 8% = £240.16. Using the published £2,083.33 monthly Plan 5 threshold, floor((£4,050 - £2,083.33) × 9%) = £177. Take-home £4,050 - £600.20 - £240.16 - £177 = £3,032.64.",
       "input": {
         "taxYear": "2026-2027",
         "taxCode": "1257L",
@@ -307,7 +307,7 @@
     },
     {
       "id": "net-pay-primary-shortfall-with-rental-income",
-      "description": "England, same £2,000/month with a 100% net-pay contribution and £1,000/month rental income. PAYE remains zero because £1,000 is below £1,048.26 free pay. Total take-home arithmetic is £1,000 - £76.16 = £923.84. The employer cannot pay a negative £76.16 from the main job. The other income cannot cover that payroll shortfall.",
+      "description": "England, same £2,000/month with a 100% net-pay contribution and £1,000/month rental income. Employment pay after pension is zero for PAYE. In PayeTax's combined estimate the £1,000 is below the £1,048.26 monthly free-pay figure, so combined cash is £1,000 - £76.16 NI = £923.84. The shortfall flag measures the main job's £76.16 cash deficit separately.",
       "input": {
         "taxYear": "2026-2027",
         "taxCode": "1257L",

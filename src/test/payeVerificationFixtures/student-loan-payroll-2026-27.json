@@ -183,7 +183,7 @@
     },
     {
       "id": "multiple-undergrad-lowest-threshold-plus-postgrad",
-      "description": "If Plan 2 and Plan 5 both reach payroll, HMRC uses the undergraduate plan with the lowest threshold: Plan 5 gives £187 monthly at £50,000, plus £145 Postgraduate Loan, for £332 monthly and £3,984 annually.",
+      "description": "When the plan in repayment is unknown, HMRC uses the lowest undergraduate threshold until an SL1 arrives. At £50,000, Plan 5 gives £187 monthly and Postgraduate Loan gives £145, for £332 monthly and £3,984 annually.",
       "input": {
         "salary": 50000,
         "payPeriod": "annually",

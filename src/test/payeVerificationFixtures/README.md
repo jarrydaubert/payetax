@@ -12,10 +12,12 @@ Here, rUK denotes the unprefixed PAYE regime used by these fixtures.
   [Tables A](https://assets.publishing.service.gov.uk/media/5c7fde8be5274a3f90f75580/Tables_A_Pay_adjustment.pdf)
   gives Month 1 free or additional pay. For code numbers above 500, split into £416.67 blocks
   and a residual code of 1–500. For example, 1257 uses two blocks plus the code 257 row
-  (£214.92), giving £1,048.26. For progressive PAYE select the formula using unrounded taxable
-  pay and the rounded selection boundary, then use whole-pound taxable pay and the exact
-  accrued threshold and tax (to four decimals per the routines). Round the resulting tax
-  down to pennies. Flat codes apply the code rate to the whole-pound payment, with no free pay.
+  (£214.92), giving £1,048.26. For progressive PAYE, definitions 9–11.2 give the accrued
+  thresholds and threshold tax (truncated to four decimal places) and the selection
+  boundaries (rounded up to whole pounds). Section 4.4 selects the formula using unrounded
+  taxable pay, then calculates with taxable pay rounded down to whole pounds and the
+  accrued figures. Truncate the resulting tax to pennies. Flat codes apply the code rate to
+  the whole-pound payment, with no free pay.
 - **Annual projection.** The default fixture basis is 12 equal months using Month 1 PAYE
   arithmetic. Annual salary is divided by 12 and monthly deductions are multiplied by 12,
   except where the index specifies a different basis. Subtract annual deductions and any
@@ -36,7 +38,8 @@ Here, rUK denotes the unprefixed PAYE regime used by these fixtures.
   down to pennies before calculating the excess, then round the deduction down to pounds.
   [HMRC's employer guidance](https://www.gov.uk/guidance/special-rules-for-student-loans#plan-and-loan-types-and-thresholds)
   gives Plan 2 thresholds of £2,448.75 monthly and £565.09 weekly at 9%, Plan 5 at £2,083.33
-  monthly at 9%, and Postgraduate Loan at £1,750 monthly at 6%.
+  monthly at 9%, and Postgraduate Loan at £1,750 monthly at 6%. Annual figures in the
+  fixtures project payroll deductions over the stated periods.
 
 ## UK baseline and Scottish flat-rate codes
 
@@ -70,7 +73,7 @@ the cited year's constants.
 | --- | --- |
 | `sd2-30k-2023-24` | [2023–24 HMRC Tax Tables B–D, D4](https://assets.publishing.service.gov.uk/media/641ad9af8fa8f547c00131bd/Taxable_Pay_Tables_2023_to_2024.pdf) maps SD2 to the 47% top rate. [2023–24 primary NI](https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2023-to-2024#employee-primary-contribution-rates-from-6-april-2023-to-5-january-2024) gives 9 months at 12% and 3 at 10% of £2,500 − £1,048, for £2,003.76. |
 | `sd3-30k-2024-25` | [2024–25 HMRC Tax Tables B–D, D5](https://assets.publishing.service.gov.uk/media/65cb8afa73806a000cec779e/Tax_Tables_B-D_2024.pdf) maps SD3 to 48%. Use the 2024–25 NI table above. |
-| `progressive-150k-2024-25` | [2024–25 Scottish Rate Resolution text](https://www.gov.scot/publications/scottish-rate-resolution-2024-25-draft-motion-explanatory-note/) gives cumulative taxable limits £2,306, £13,991, £31,092, £62,430 and £125,140 at 19%, 20%, 21%, 42% and 45%. Sum each band width times its rate and divide by 12 for £3,978.9841 accrued tax. Apply 48% above £125,140 / 12 using formula 6. NI at £12,500/month is £417.50. |
+| `progressive-150k-2024-25` | [2024–25 Scottish Rate Resolution](https://www.parliament.scot/chamber-and-committees/votes-and-motions/S6M-12252) gives cumulative taxable limits £2,306, £13,991, £31,092, £62,430 and £125,140 at 19%, 20%, 21%, 42% and 45%. Sum each band width times its rate and divide by 12 for £3,978.9841 accrued tax. S0T has zero free pay, so apply 48% to the excess of £12,500 over £125,140 / 12 using formula 6. NI at £12,500/month is £417.50. |
 | `sd3-30k-2025-26` | [2025–26 HMRC Tax Tables B–D, D5](https://assets.publishing.service.gov.uk/media/6865408de6557c544c74db53/Tax_Tables_B_D_2025_to_2026.pdf) maps SD3 to 48%. Use the 2025–26 NI table above. |
 | `sd3-30k-2026-27` | Same sources and working as `scot-sd3-30k`. |
 | `progressive-120k-2026-27-no-top-rate`, `progressive-scvalue-selection-boundary-2026-27` | [2026–27 Scottish Resolution](https://www.parliament.scot/chamber-and-committees/votes-and-motions/S6M-20844) gives the £62,430 and £125,140 taxable limits. Tax to the first of these is (£3,967 × 19% + £12,989 × 20% + £14,136 × 21% + £31,338 × 42%) / 12 = £1,623.5041 at four decimals. Formula 5 starts above the rounded selection value £5,203, then uses the exact £5,202.50 limit. For £120,000, Tables A code 257 gives £214.92 free pay and monthly NI on £10,000 is £367.50. |
@@ -81,13 +84,15 @@ These are 2026–27 rUK monthly projections. [HMRC's K-code example](https://www
 publishes the nominal £4,750 adjustment for K475 on £27,000. For payroll use Tables A
 additional pay and PAYE §§4.3–4.5 and 8. The [PAYE Regulations, regulation 2](https://www.legislation.gov.uk/uksi/2003/2682/regulation/2)
 defines the 50% overriding limit, which the PAYE routines round down to pennies.
+The capped figures measure deductions under the Month 1 projection. PAYE §§4.5.2 and 8.3
+explain how actual cumulative and Month 1 payroll treat amounts left undeducted.
 
 | Scenario ID | Sources and working |
 | --- | --- |
 | `k475-27k-tables-a-month-1` | The HMRC example gives £31,750 nominal taxable income. The derived PAYE basis is £2,646 × 12 = £31,752 after Tables A and whole-pound rounding. NI is (£2,250 − £1,048) × 8% = £96.16 monthly. |
 | `k2500-10k-cap-binds`, `k4000-12k-cap-binds` | Tables A uses code 500 (£417.42) plus four or seven £416.67 blocks respectively. Add this to monthly gross and floor to £2,917 or £4,334. Uncapped PAYE is £583.40 or £1,105.26. Half of gross, rounded down to pennies, gives £416.66 or £500.00. Both payments are below the NI primary threshold. |
 | `k600-30k-cap-not-binding` | Tables A gives £416.67 + £84.09 for code 600, leaving whole-pound taxable pay of £3,000. At 20%, the £600 monthly deduction is below the limit. Use the shared £2,500/month NI calculation. |
-| `k2500-150k-survives-pa-taper-range` | [HMRC PAYE11095](https://www.gov.uk/hmrc-internal-manuals/paye-manual/paye11095) explains the K-code adjustment. The fixture pins the supplied code's nominal adjustment and the overriding-limit invariant. |
+| `k2500-150k-survives-pa-taper-range` | [HMRC PAYE11095](https://www.gov.uk/hmrc-internal-manuals/paye-manual/paye11095) explains the K-code adjustment. The supplied K2500 represents a nominal negative allowance of £25,000. The overriding-limit invariant bounds the deduction at £6,250 per month (half of £12,500 gross). |
 | `spa-20k-age67`, `spa-20k-age78`, `spa-36k-age67` | [State Pension age timetable, table 4](https://www.gov.uk/government/publications/state-pension-age-timetable/state-pension-age-timetable#table-4-increase-in-state-pension-age-from-66-to-67-men-and-women) and [HMRC category C guidance](https://www.gov.uk/employee-reaches-state-pension-age) support zero employee NI and continuing employer NI. [Finance Act 2015 §5](https://www.legislation.gov.uk/ukpga/2015/11/section/5) removed age-related allowances. With 1257L, use £1,048.26 free pay and 20% on £618 or £1,951 whole-pound taxable pay. |
 | `spa-20k-under-spa-baseline`, `age65-25k-under-spa` | Same PAYE and allowance sources as the over-age cases. The £25,000 case gives £1,035 whole-pound taxable pay. Category A NI applies on monthly pay above £1,048. The no-age case assumes standard Category A treatment. |
 
@@ -105,10 +110,10 @@ for an effective sacrifice into a registered pension.
 | `net-pay-monthly-plan5`, `salary-sacrifice-monthly-plan5` | England, monthly. Use the relevant pension method above and HMRC Loan guidance on secondary Class 1 earnings. Net pay leaves the £4,500 NI and loan base intact, and sacrifice reduces both to £4,050. Use the published £2,083.33 threshold for the whole-pound calculation. |
 | `net-pay-scotland-annual` | Scottish Resolution, PAYE formula 4 and the net pay sources. £60,000 and £6,000 are converted to £5,000 gross and £500 pension per month. |
 | `net-pay-personal-allowance-taper` | England, annual input projected monthly. [HMRC adjusted net income](https://www.gov.uk/guidance/adjusted-net-income) and Income Tax Act 2007 §35 give £102,000 adjusted income and £11,570 allowance. PayeTax projects numeric code 1157, whose Month 1 free pay is 2 × £416.67 + £131.59 = £964.93. |
-| `net-pay-weekly-below-income-tax-threshold`, `net-pay-subpenny-monthly-shortfall` | England. Convert weekly gross and pension by 52 / 12 before applying monthly PAYE and NI. For the subpenny case, subtract 12 × £89.53 NI from £26,005.20 gross less £24,930.88 pension to get −£0.04 annually, before any display rounding. |
+| `net-pay-weekly-below-income-tax-threshold`, `net-pay-subpenny-monthly-shortfall` | England. PayeTax projects weekly inputs onto a monthly PAYE and NI basis by multiplying gross and pension by 52 / 12. On that basis, subtract 12 × £89.53 NI from £26,005.20 gross less £24,930.88 pension to get the subpenny case's −£0.04 annually, before any display rounding. |
 | `net-pay-zero-at-ni-threshold`, `net-pay-fixed-contribution-capped-to-primary-pay`, `net-pay-contribution-leaves-insufficient-cash-for-ni`, `net-pay-primary-shortfall-with-rental-income` | England, monthly. Apply the published free pay and NI thresholds to the pay bases in the descriptions. The fixed-amount cap and primary-employment shortfall flag are PayeTax behaviours. In the rental case, £923.84 is the combined cash estimate, while the primary employment is short £76.16. [HMRC property income guidance](https://www.gov.uk/renting-out-a-property/paying-tax) covers the separate tax reporting basis. |
 | `plan2-50k-monthly-whole-pound`, `plan2-50k-monthly-with-5-percent-salary-sacrifice` | rUK, monthly projection. Loan constants and method above. For the sacrifice case, apply HMRC's effective sacrifice rule and use the secondary Class 1 earnings basis. |
-| `plan2-692-31-weekly-whole-pound`, `plan2-2769-24-four-weekly`, `plan2-200-daily-uses-full-weekly-threshold`, `plan2-30-hourly-converts-wage-to-weekly-earnings` | rUK. Use [SL3, pay periods other than weekly or monthly](https://www.gov.uk/government/publications/sl3-student-loan-deduction-tables/2026-to-2027-student-and-postgraduate-loan-deduction-tables#pay-periods-other-than-weekly-or-monthly) for the sub-week and four-week cases. Round the weekly deduction first and multiply by four for the four-week payment, then by 13 for the annual figure. The hourly case assumes 40 hours per week and 52 weekly deductions. |
+| `plan2-692-31-weekly-whole-pound`, `plan2-2769-24-four-weekly`, `plan2-200-daily-uses-full-weekly-threshold`, `plan2-30-hourly-converts-wage-to-weekly-earnings` | rUK. Use [SL3, pay periods other than weekly or monthly](https://www.gov.uk/government/publications/sl3-student-loan-deduction-tables/2026-to-2027-student-and-postgraduate-loan-deduction-tables#pay-periods-other-than-weekly-or-monthly) for the sub-week and four-week cases. The four-week fixture uses the table method permitted by [regulation 44(4)–(5)](https://www.legislation.gov.uk/uksi/2009/470/regulation/44). Round the weekly deduction first and multiply by four (£11 × 4), then by 13 for the annual figure. Applying the generic formula directly to the four-week period would give £45 per payment. The hourly case assumes 40 hours per week and 52 weekly deductions. |
 | `plan2-separate-20k-employments-each-use-own-threshold` | rUK, monthly projection. [HMRC separate employment rule](https://www.gov.uk/guidance/special-rules-for-student-loans#employee-has-more-than-one-job). Each £20,000 / 12 is below £2,448.75. |
 | `multiple-undergrad-lowest-threshold-plus-postgrad` | rUK, monthly projection. [HMRC multiple-plan guidance](https://www.gov.uk/new-employee/student-loans) explains using the lowest threshold when the plan in repayment is unknown and taking a postgraduate deduction alongside it. £50,000 / 12 gives floor((gross − £2,083.33) × 9%) = £187 and floor((gross − £1,750) × 6%) = £145. |
 
