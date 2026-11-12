@@ -78,6 +78,36 @@ the cited year's constants.
 | `sd3-30k-2026-27` | Same sources and working as `scot-sd3-30k`. |
 | `progressive-120k-2026-27-no-top-rate`, `progressive-scvalue-selection-boundary-2026-27` | [2026–27 Scottish Resolution](https://www.parliament.scot/chamber-and-committees/votes-and-motions/S6M-20844) gives the £62,430 and £125,140 taxable limits. Tax to the first of these is (£3,967 × 19% + £12,989 × 20% + £14,136 × 21% + £31,338 × 42%) / 12 = £1,623.5041 at four decimals. Formula 5 starts above the rounded selection value £5,203, then uses the exact £5,202.50 limit. For £120,000, Tables A code 257 gives £214.92 free pay and monthly NI on £10,000 is £367.50. |
 
+## Historical Scottish Month 1 band boundaries
+
+Use [HMRC v21.0](https://webarchive.nationalarchives.gov.uk/ukgwa/20230304080113mp_/https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1130691/PAYErout-v21-0.odt) for 2023–24 and
+[HMRC v22.0](https://webarchive.nationalarchives.gov.uk/ukgwa/20240111190136mp_/https://assets.publishing.service.gov.uk/media/659bf68dd7737c000df33528/PAYErout-v22-0.odt) for 2024–25.
+In each, §1.5 gives the monthly divisor of 12, definitions 9.1, 10.1 and 11.1 give the
+accrued threshold, rounded-up selection cutoff (SCvalue) and accrued tax, and §§4.4.3–4.4.4
+give the selection and rounding order. Appendix B gives the Scottish annual figures.
+[S0T](https://www.gov.uk/hmrc-internal-manuals/paye-manual/paye11025) gives zero free pay, so monthly gross equals
+unrounded taxable pay. Both payments in each pair have the same whole-pound taxable pay.
+Truncate the formula result to four decimal places, then round down to pennies and multiply
+the monthly deduction by 12 for the steady-pay projection.
+
+- [2023–24 Scottish Rate Resolution](https://www.parliament.scot/chamber-and-committees/votes-and-motions/S6M-07853).
+  Tax through £31,092 is £2,162 × 19% + £10,956 × 20% + £17,974 × 21% = £6,376.52.
+  Adding £94,048 × 42% gives £45,876.68 through £125,140. Dividing these limits and taxes by
+  12 and truncating to four decimal places gives £2,591.0000 and £531.3766 at the previous
+  limit, and £10,428.3333 and £3,823.0566 at the top-rate cutoff (SCvalue £10,429).
+- [2024–25 Scottish Rate Resolution](https://www.parliament.scot/chamber-and-committees/votes-and-motions/S6M-12252).
+  Tax through £31,092 is £2,306 × 19% + £11,685 × 20% + £17,101 × 21% = £6,366.35.
+  Adding £31,338 × 42% gives £19,528.31 through £62,430. The accrued figures are
+  £2,591.0000 and £530.5291 at the previous limit, and £5,202.5000 and £1,627.3591
+  at the advanced-rate cutoff (SCvalue £5,203).
+
+| Scenario ID | Monthly taxable pay | Month 1 working | Monthly PAYE | 12-month projection |
+| --- | ---: | --- | ---: | ---: |
+| `s0t-2023-24-at-top-scvalue` | £10,429.00 | £531.3766 + (£10,429 − £2,591) × 42% = £3,823.3366 | £3,823.33 | £45,879.96 |
+| `s0t-2023-24-above-top-scvalue` | £10,429.01 | £3,823.0566 + (£10,429 − £10,428.3333) × 47% → £3,823.3699 | £3,823.36 | £45,880.32 |
+| `s0t-2024-25-at-advanced-scvalue` | £5,203.00 | £530.5291 + (£5,203 − £2,591) × 42% = £1,627.5691 | £1,627.56 | £19,530.72 |
+| `s0t-2024-25-above-advanced-scvalue` | £5,203.01 | £1,627.3591 + (£5,203 − £5,202.50) × 45% = £1,627.5841 | £1,627.58 | £19,530.96 |
+
 ## K codes and State Pension age
 
 These are 2026–27 rUK monthly projections. [HMRC's K-code example](https://www.gov.uk/employee-tax-codes/letters#tax-codes-with-the-letter-k)
