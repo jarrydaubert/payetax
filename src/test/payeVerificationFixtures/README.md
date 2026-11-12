@@ -80,18 +80,23 @@ the cited year's constants.
 
 ## Historical Scottish Month 1 band boundaries
 
-Use [HMRC v21.0](https://webarchive.nationalarchives.gov.uk/ukgwa/20230304080113mp_/https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1130691/PAYErout-v21-0.odt) for 2023–24 and
-[HMRC v22.0](https://webarchive.nationalarchives.gov.uk/ukgwa/20240111190136mp_/https://assets.publishing.service.gov.uk/media/659bf68dd7737c000df33528/PAYErout-v22-0.odt) for 2024–25.
+Use [HMRC v21.0](https://webarchive.nationalarchives.gov.uk/ukgwa/20230304080113mp_/https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1130691/PAYErout-v21-0.odt) for 2023–24,
+[HMRC v22.0](https://webarchive.nationalarchives.gov.uk/ukgwa/20240111190136mp_/https://assets.publishing.service.gov.uk/media/659bf68dd7737c000df33528/PAYErout-v22-0.odt) for 2024–25 and
+[HMRC v23.0](https://webarchive.nationalarchives.gov.uk/ukgwa/20250120182838mp_/https://assets.publishing.service.gov.uk/media/678e18a9ea48a571517acf3a/PAYErout-v23-0.odt) for 2025–26.
 In each, §1.5 gives the monthly divisor of 12, definitions 9.1, 10.1 and 11.1 give the
 accrued threshold, rounded-up selection cutoff (SCvalue) and accrued tax, and §§4.4.3–4.4.4
-give the selection and rounding order. Appendix B gives the Scottish annual figures.
+give the selection and rounding order. Section 8.3 applies the first-period calculation
+on a Month 1 basis. Appendix B gives the Scottish annual figures.
 [S0T](https://www.gov.uk/hmrc-internal-manuals/paye-manual/paye11025) gives zero free pay, so monthly gross equals
-unrounded taxable pay. Both payments in each pair have the same whole-pound taxable pay.
+unrounded taxable pay. The top- and advanced-rate pairs keep whole-pound taxable pay fixed
+to test formula selection. At the higher-rate cutoff, £31,092 / 12 is exactly £2,591.
+Pay of £2,590.99 uses formula 3(S) on £2,590, and £2,592 uses formula 4(S) with £1 taxed at 42%.
 Truncate the formula result to four decimal places, then round down to pennies and multiply
 the monthly deduction by 12 for the steady-pay projection.
 
 - [2023–24 Scottish Rate Resolution](https://www.parliament.scot/chamber-and-committees/votes-and-motions/S6M-07853).
-  Tax through £31,092 is £2,162 × 19% + £10,956 × 20% + £17,974 × 21% = £6,376.52.
+  Tax through £13,118 is £2,162 × 19% + £10,956 × 20% = £2,601.98. The accrued threshold
+  and tax are £1,093.1666 and £216.8316. Adding £17,974 × 21% gives £6,376.52 through £31,092.
   Adding £94,048 × 42% gives £45,876.68 through £125,140. Dividing these limits and taxes by
   12 and truncating to four decimal places gives £2,591.0000 and £531.3766 at the previous
   limit, and £10,428.3333 and £3,823.0566 at the top-rate cutoff (SCvalue £10,429).
@@ -100,6 +105,10 @@ the monthly deduction by 12 for the steady-pay projection.
   Adding £31,338 × 42% gives £19,528.31 through £62,430. The accrued figures are
   £2,591.0000 and £530.5291 at the previous limit, and £5,202.5000 and £1,627.3591
   at the advanced-rate cutoff (SCvalue £5,203).
+- [2025–26 Scottish Rate Resolution](https://www.parliament.scot/chamber-and-committees/votes-and-motions/S6M-16531).
+  Tax through £14,921 is £2,827 × 19% + £12,094 × 20% = £2,955.93. The accrued threshold
+  and tax are £1,243.4166 and £246.3275. Adding £16,171 × 21% gives £6,351.84 through £31,092,
+  or £529.3200 in Month 1.
 
 | Scenario ID | Monthly taxable pay | Month 1 working | Monthly PAYE | 12-month projection |
 | --- | ---: | --- | ---: | ---: |
@@ -107,6 +116,10 @@ the monthly deduction by 12 for the steady-pay projection.
 | `s0t-2023-24-above-top-scvalue` | £10,429.01 | £3,823.0566 + (£10,429 − £10,428.3333) × 47% → £3,823.3699 | £3,823.36 | £45,880.32 |
 | `s0t-2024-25-at-advanced-scvalue` | £5,203.00 | £530.5291 + (£5,203 − £2,591) × 42% = £1,627.5691 | £1,627.56 | £19,530.72 |
 | `s0t-2024-25-above-advanced-scvalue` | £5,203.01 | £1,627.3591 + (£5,203 − £5,202.50) × 45% = £1,627.5841 | £1,627.58 | £19,530.96 |
+| `s0t-2023-24-below-higher-scvalue` | £2,590.99 | £216.8316 + (£2,590 − £1,093.1666) × 21% → £531.1666 | £531.16 | £6,373.92 |
+| `s0t-2023-24-first-higher-pound` | £2,592.00 | £531.3766 + (£2,592 − £2,591) × 42% = £531.7966 | £531.79 | £6,381.48 |
+| `s0t-2025-26-below-higher-scvalue` | £2,590.99 | £246.3275 + (£2,590 − £1,243.4166) × 21% → £529.1100 | £529.11 | £6,349.32 |
+| `s0t-2025-26-first-higher-pound` | £2,592.00 | £529.3200 + (£2,592 − £2,591) × 42% = £529.7400 | £529.74 | £6,356.88 |
 
 ## K codes and State Pension age
 

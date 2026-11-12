@@ -1,15 +1,17 @@
 {
-  "suite": "Historical Scottish Month 1 selection cutoffs for top and advanced rates",
+  "suite": "Historical Scottish Month 1 band boundaries",
   "source": {
     "authority": "HMRC and Scottish Parliament",
     "urls": [
       "https://webarchive.nationalarchives.gov.uk/ukgwa/20230304080113mp_/https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1130691/PAYErout-v21-0.odt",
       "https://webarchive.nationalarchives.gov.uk/ukgwa/20240111190136mp_/https://assets.publishing.service.gov.uk/media/659bf68dd7737c000df33528/PAYErout-v22-0.odt",
+      "https://webarchive.nationalarchives.gov.uk/ukgwa/20250120182838mp_/https://assets.publishing.service.gov.uk/media/678e18a9ea48a571517acf3a/PAYErout-v23-0.odt",
       "https://www.parliament.scot/chamber-and-committees/votes-and-motions/S6M-07853",
       "https://www.parliament.scot/chamber-and-committees/votes-and-motions/S6M-12252",
+      "https://www.parliament.scot/chamber-and-committees/votes-and-motions/S6M-16531",
       "https://www.gov.uk/hmrc-internal-manuals/paye-manual/paye11025"
     ],
-    "taxYear": "2023-2025",
+    "taxYear": "2023-2026",
     "verifiedOn": "2026-11-12"
   },
   "tolerancePence": 0.5,
@@ -112,6 +114,106 @@
         "taxFreeAmount": 0,
         "incomeTaxMonthly": 1627.58,
         "incomeTaxAnnual": 19530.96
+      }
+    },
+    {
+      "id": "s0t-2023-24-below-higher-scvalue",
+      "description": "One penny below the £2,591 Month 1 cutoff uses the 21% formula on £2,590 whole-pound taxable pay.",
+      "input": {
+        "salary": 2590.99,
+        "payPeriod": "monthly",
+        "taxYear": "2023-2024",
+        "taxCode": "S0T",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 0,
+        "incomeTaxMonthly": 531.16,
+        "incomeTaxAnnual": 6373.92
+      }
+    },
+    {
+      "id": "s0t-2023-24-first-higher-pound",
+      "description": "At £2,592 of Month 1 taxable pay, the first whole pound above the cutoff is taxed at 42%.",
+      "input": {
+        "salary": 2592,
+        "payPeriod": "monthly",
+        "taxYear": "2023-2024",
+        "taxCode": "S0T",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 0,
+        "incomeTaxMonthly": 531.79,
+        "incomeTaxAnnual": 6381.48
+      }
+    },
+    {
+      "id": "s0t-2025-26-below-higher-scvalue",
+      "description": "One penny below the £2,591 Month 1 cutoff uses the 21% formula on £2,590 whole-pound taxable pay.",
+      "input": {
+        "salary": 2590.99,
+        "payPeriod": "monthly",
+        "taxYear": "2025-2026",
+        "taxCode": "S0T",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 0,
+        "incomeTaxMonthly": 529.11,
+        "incomeTaxAnnual": 6349.32
+      }
+    },
+    {
+      "id": "s0t-2025-26-first-higher-pound",
+      "description": "At £2,592 of Month 1 taxable pay, the first whole pound above the cutoff is taxed at 42%.",
+      "input": {
+        "salary": 2592,
+        "payPeriod": "monthly",
+        "taxYear": "2025-2026",
+        "taxCode": "S0T",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 0,
+        "incomeTaxMonthly": 529.74,
+        "incomeTaxAnnual": 6356.88
       }
     }
   ]
