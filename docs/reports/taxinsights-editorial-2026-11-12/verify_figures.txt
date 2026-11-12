@@ -1,0 +1,48 @@
+Figure                                              Derived  Shown as                 Origin
+Monthly Income Tax                                   457.00  £457                     fixture
+Monthly employee NI                                  182.83  £183                     fixture
+Annual Income Tax                                   5484.00  £5,484 / £5,484.00       fixture
+Annual employee NI                                  2193.96  £2,194 / £2,193.96       fixture
+Annual take-home                                   32322.04  £32,322 / £32,322.04     fixture
+Monthly take-home                                   2693.50  £2,694                   fixture
+Monthly gross                                       3333.33  £3,333                   fixture
+Monthly NI primary threshold                        1048.00  £1,048                   NEW in rewrite
+Deductions as share of gross                          19.19  about 19p in the pound   NEW in rewrite
+Marginal keep per extra £1                            72.00  72p (20p + 8p)           NEW in rewrite
+Check: net gain on +£1,000 (monthly model)           720.88  supports 72p claim       NEW in rewrite
+Basic-rate ceiling                                 50270.00  £50,270                  NEW in rewrite
+Plan 2 monthly deduction                              79.00  £79                      fixture
+Plan 2 annual deduction                              948.00  £948                     fixture
+Plan 2 annual take-home                            31374.04  £31,374                  fixture
+Plan 2 monthly take-home                            2614.50  £2,615                   fixture
+Sacrifice: pension per year                         2000.00  £2,000                   fixture
+Sacrifice: pension per month                         166.67  £167                     NEW in rewrite
+Sacrifice: cash pay                                38000.00  £38,000                  fixture
+Sacrifice annual take-home                         30882.92  £30,883                  fixture
+Sacrifice monthly take-home                         2573.58  £2,574                   fixture
+Sacrifice: monthly take-home drop                    119.93  £120                     NEW in rewrite
+Sacrifice: monthly tax+NI not paid                    46.74  £47                      NEW in rewrite
+Annual illustration: taxable                       27430.00  £27,430                  fixture
+Annual illustration: tax                            5486.00  £5,486.00                fixture
+Annual illustration: NI                             2194.40  £2,194.40                fixture
+Annual illustration: net                           32319.60  £32,319.60               fixture
+Monthly model minus annual                             2.44  £2.44                    NEW in rewrite
+ONS median minus £40,000                             911.00  £911                     article + ONS
+
+Against existing fixture (tolerance 2p):
+  OK  base tax/yr          derived    5484.00  fixture 5484
+  OK  base NI/yr           derived    2193.96  fixture 2193.96
+  OK  base net/yr          derived   32322.04  fixture 32322.04
+  OK  annual illus. net    derived   32319.60  fixture 32319.6
+  OK  plan2 SL/month       derived      79.00  fixture 79
+  OK  plan2 net/yr         derived   31374.04  fixture 31374.04
+  OK  sacrifice tax/yr     derived    5083.20  fixture 5083.2
+  OK  sacrifice NI/yr      derived    2033.88  fixture 2033.88
+  OK  sacrifice net/yr     derived   30882.92  fixture 30882.92
+
+Figures in rewritten body: 35 money, 5 percent, 4 pence
+  money: all verified
+  percent: all verified
+  pence: all verified
+
+RESULT: PASS
