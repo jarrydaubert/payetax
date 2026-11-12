@@ -1,0 +1,118 @@
+{
+  "suite": "Historical Scottish Month 1 selection cutoffs for top and advanced rates",
+  "source": {
+    "authority": "HMRC and Scottish Parliament",
+    "urls": [
+      "https://webarchive.nationalarchives.gov.uk/ukgwa/20230304080113mp_/https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1130691/PAYErout-v21-0.odt",
+      "https://webarchive.nationalarchives.gov.uk/ukgwa/20240111190136mp_/https://assets.publishing.service.gov.uk/media/659bf68dd7737c000df33528/PAYErout-v22-0.odt",
+      "https://www.parliament.scot/chamber-and-committees/votes-and-motions/S6M-07853",
+      "https://www.parliament.scot/chamber-and-committees/votes-and-motions/S6M-12252",
+      "https://www.gov.uk/hmrc-internal-manuals/paye-manual/paye11025"
+    ],
+    "taxYear": "2023-2025",
+    "verifiedOn": "2026-11-12"
+  },
+  "tolerancePence": 0.5,
+  "scenarios": [
+    {
+      "id": "s0t-2023-24-at-top-scvalue",
+      "description": "The 42% formula applies at the £10,429 Month 1 selection cutoff in the five-band schedule.",
+      "input": {
+        "salary": 10429,
+        "payPeriod": "monthly",
+        "taxYear": "2023-2024",
+        "taxCode": "S0T",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 0,
+        "incomeTaxMonthly": 3823.33,
+        "incomeTaxAnnual": 45879.96
+      }
+    },
+    {
+      "id": "s0t-2023-24-above-top-scvalue",
+      "description": "One penny above the £10,429 cutoff selects the 47% formula with the same whole-pound taxable pay.",
+      "input": {
+        "salary": 10429.01,
+        "payPeriod": "monthly",
+        "taxYear": "2023-2024",
+        "taxCode": "S0T",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 0,
+        "incomeTaxMonthly": 3823.36,
+        "incomeTaxAnnual": 45880.32
+      }
+    },
+    {
+      "id": "s0t-2024-25-at-advanced-scvalue",
+      "description": "The 42% formula applies at the £5,203 Month 1 selection cutoff for the new advanced band.",
+      "input": {
+        "salary": 5203,
+        "payPeriod": "monthly",
+        "taxYear": "2024-2025",
+        "taxCode": "S0T",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 0,
+        "incomeTaxMonthly": 1627.56,
+        "incomeTaxAnnual": 19530.72
+      }
+    },
+    {
+      "id": "s0t-2024-25-above-advanced-scvalue",
+      "description": "One penny above the £5,203 cutoff selects the 45% formula with the same whole-pound taxable pay.",
+      "input": {
+        "salary": 5203.01,
+        "payPeriod": "monthly",
+        "taxYear": "2024-2025",
+        "taxCode": "S0T",
+        "isScottish": true,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 0,
+        "incomeTaxMonthly": 1627.58,
+        "incomeTaxAnnual": 19530.96
+      }
+    }
+  ]
+}
