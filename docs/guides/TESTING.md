@@ -196,10 +196,16 @@ Keep the portfolio compact and representative, not an exhaustive JSON matrix or 
 calculator. Do not claim exhaustive year, band, income-composition or pension-method coverage.
 
 For each added/changed statutory scenario, retain official-figure citations, supported year,
-region, pay basis, rounding and reproducible independent working beside the fixture or in a
-linked committed report. Reviewers must verify the derivation against primary sources rather
-than accepting an engine-generated answer or a shared misreading. Per-suite source metadata
-alone does not establish per-scenario provenance.
+region, pay basis, rounding and reproducible independent working. In the
+[PAYE fixture source index](../../src/test/payeVerificationFixtures/README.md), map the scenario
+ID to the exact source tables or sections and reuse shared working where it applies.
+
+Reviewers should start with the fixture inputs and independently look up the figures in the
+primary sources for that year and region. Check what each threshold measures (for example,
+taxable income after allowances or total income), the calculation period, and the order of
+rounding. Recompute the changed expectations before comparing with the fixture or engine.
+Distinguish published figures from derived outputs and calculator conventions. Record any
+unresolved evidence gap in Linear with the scenario ID, owner and next step.
 
 The PAYE loader reads every JSON file in `src/test/payeVerificationFixtures/` as a PAYE suite.
 Director fixtures need a separate directory or a suite-type discriminator; introduce the first
