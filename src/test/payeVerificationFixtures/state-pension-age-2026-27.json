@@ -16,7 +16,7 @@
   "scenarios": [
     {
       "id": "spa-20k-age67",
-      "description": "£20,000 at age 67 (the UI's over-SPA choice). Employee NI is exempt, but the Personal Allowance stays at the standard £12,570 — age-related allowances were abolished from 2016-17 (Finance Act 2015). Tax: taxable floor(1666.67-1048)=618 at 20% = £123.60/mo (£1,483.20/yr).",
+      "description": "£20,000 at age 67 (the UI's over-SPA choice). Employee NI is exempt, but the Personal Allowance stays at the standard £12,570 — age-related allowances were abolished from 2016-17 (Finance Act 2015). Taxable pay is floor(1666.67-1048.26)=618 at 20% = £123.60/mo (£1,483.20/yr).",
       "input": {
         "salary": 20000,
         "payPeriod": "annually",
@@ -135,7 +135,7 @@
     },
     {
       "id": "age65-25k-under-spa",
-      "description": "£25,000 at age 65 — under SPA, so full NI applies (8% of 1035.33 = £82.83/mo, £993.96/yr) and there is no 65-74 allowance. Tax: taxable floor(2083.33-1048)=1035 at 20% = £207/mo (£2,484/yr).",
+      "description": "£25,000 at age 65 — under SPA, so full NI applies (8% of 1035.33 = £82.83/mo, £993.96/yr) and there is no 65-74 allowance. Taxable pay is floor(2083.33-1048.26)=1035 at 20% = £207/mo (£2,484/yr).",
       "input": {
         "salary": 25000,
         "payPeriod": "annually",
