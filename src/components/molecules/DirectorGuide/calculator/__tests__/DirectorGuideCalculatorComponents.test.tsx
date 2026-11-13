@@ -431,11 +431,11 @@ describe('Director Intelligence calculator components', () => {
       expect(screen.getByText(/Illustrative set-aside/i)).toBeInTheDocument();
     });
 
-    it('uses slider scenario values when slider is active', () => {
+    it('keeps the recommended tax pots when a slider value exists', () => {
       setStoreState({ strategyComparison: createComparison() as never, sliderSalary: 20000 });
 
       render(<TaxPots />);
-      expect(mockCalculateSalaryScenario).toHaveBeenCalled();
+      expect(mockCalculateSalaryScenario).not.toHaveBeenCalled();
       expect(screen.getByText('Personal Tax Pot')).toBeInTheDocument();
     });
   });

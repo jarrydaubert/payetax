@@ -13,7 +13,7 @@ import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/
 import { formatCurrency } from '@/lib/utils';
 
 export function MoneyFlowChart() {
-  const { comparison, activeScenario } = useActiveDirectorScenario();
+  const { comparison, activeScenario } = useActiveDirectorScenario(true);
 
   if (!(activeScenario && comparison)) return null;
 

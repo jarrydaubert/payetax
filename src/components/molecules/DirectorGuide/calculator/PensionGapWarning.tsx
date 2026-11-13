@@ -18,7 +18,7 @@ import { formatCurrency } from '@/lib/utils';
 const TAX_YEAR = CURRENT_TAX_YEAR;
 
 export function PensionGapWarning() {
-  const { comparison, activeScenario } = useActiveDirectorScenario();
+  const { comparison, activeScenario } = useActiveDirectorScenario(true);
 
   const currentSalary = useMemo(() => {
     if (!activeScenario) return 0;

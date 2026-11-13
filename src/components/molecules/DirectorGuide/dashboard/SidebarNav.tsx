@@ -57,7 +57,6 @@ const sectionHeaderClass =
 
 const NORMAL_WORKFLOW_ITEMS = [
   { id: 'director-summary', label: 'Summary', icon: BarChart3 },
-  { id: 'director-slider', label: 'Salary Slider', icon: Calculator },
   { id: 'director-strategy', label: 'Strategy Table', icon: FileSearch },
   { id: 'director-details', label: 'Breakdowns', icon: BookOpen },
   { id: 'director-key-dates', label: 'Money Flow', icon: MapPin },

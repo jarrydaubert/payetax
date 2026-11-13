@@ -22,7 +22,7 @@ interface RecommendationHeroProps {
 }
 
 export function RecommendationHero({ className }: RecommendationHeroProps) {
-  const { comparison } = useActiveDirectorScenario();
+  const { comparison } = useActiveDirectorScenario(true);
 
   if (!comparison || comparison.grossProfit <= 0) return null;
 

@@ -10,7 +10,7 @@ import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/
 import { formatCurrency } from '@/lib/utils';
 
 export function TaxPots() {
-  const { activeScenario } = useActiveDirectorScenario();
+  const { activeScenario } = useActiveDirectorScenario(true);
 
   if (!activeScenario) return null;
 

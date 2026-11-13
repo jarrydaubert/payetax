@@ -35,11 +35,19 @@ interface UseActiveDirectorScenarioResult {
   activeScenario: ActiveDirectorScenario | null;
 }
 
-export function useActiveDirectorScenario(): UseActiveDirectorScenarioResult {
+export function useActiveDirectorScenario(
+  recommendationOnly = false,
+): UseActiveDirectorScenarioResult {
   const baseComparison = useStrategyComparison();
-  const selectedStrategy = useSelectedStrategy();
-  const sliderSalary = useSliderSalary();
-  const profitWhatIfPercent = useProfitWhatIfPercent();
+  const storedStrategy = useSelectedStrategy();
+  const storedSalary = useSliderSalary();
+  const storedProfitPercent = useProfitWhatIfPercent();
+  // The dashboard contains what-if output until strategy controls have an explicit submission.
+  const selectedStrategy = recommendationOnly
+    ? (baseComparison?.recommended ?? 'optimalMix')
+    : storedStrategy;
+  const sliderSalary = recommendationOnly ? null : storedSalary;
+  const profitWhatIfPercent = recommendationOnly ? 0 : storedProfitPercent;
   const formData = useDirectorFormSlice((state) => ({
     region: state.region,
     otherIncome: state.otherIncome,
