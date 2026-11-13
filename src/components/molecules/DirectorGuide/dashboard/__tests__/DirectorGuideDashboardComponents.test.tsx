@@ -124,11 +124,11 @@ describe('Director Intelligence dashboard components', () => {
       expect(container.querySelector('[class*="bg-gradient"]')).not.toBeInTheDocument();
     });
 
-    it('uses slider scenario when slider is active', () => {
+    it('keeps the recommendation when a slider value exists', () => {
       setStoreState({ strategyComparison: createComparison() as never, sliderSalary: 20000 });
 
       render(<SummaryCards />);
-      expect(mockCalculateSalaryScenario).toHaveBeenCalled();
+      expect(mockCalculateSalaryScenario).not.toHaveBeenCalled();
     });
 
     it('shows the cash-limited monthly draw, including zero', () => {
@@ -154,11 +154,11 @@ describe('Director Intelligence dashboard components', () => {
       expect(screen.getByText('Tax Summary')).toBeInTheDocument();
     });
 
-    it('uses slider scenario when slider is active', () => {
+    it('keeps the recommendation when a slider value exists', () => {
       setStoreState({ strategyComparison: createComparison() as never, sliderSalary: 20000 });
 
       render(<DetailCards />);
-      expect(mockCalculateSalaryScenario).toHaveBeenCalled();
+      expect(mockCalculateSalaryScenario).not.toHaveBeenCalled();
     });
   });
 
@@ -174,11 +174,11 @@ describe('Director Intelligence dashboard components', () => {
       expect(screen.getByText('Retained')).toBeInTheDocument();
     });
 
-    it('uses slider scenario when slider is active', () => {
+    it('keeps the recommendation when a slider value exists', () => {
       setStoreState({ strategyComparison: createComparison() as never, sliderSalary: 20000 });
 
       render(<MoneyFlowChart />);
-      expect(mockCalculateSalaryScenario).toHaveBeenCalled();
+      expect(mockCalculateSalaryScenario).not.toHaveBeenCalled();
     });
   });
 

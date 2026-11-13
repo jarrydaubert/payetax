@@ -9,9 +9,10 @@ import {
 /** Interim guard for the existing email, which always reports the original recommendation. */
 export function useDirectorEmailUnavailableReason(
   noCurrentResultsReason = 'Email is paused until results have updated from complete, valid inputs.',
+  recommendationOnly = false,
 ): string | null {
   const { baseComparison, activeScenario, selectedStrategy, profitWhatIfPercent } =
-    useActiveDirectorScenario();
+    useActiveDirectorScenario(recommendationOnly);
   const objective = useDirectorGuideStore((state) => state.objective);
   const mode = useDirectorGuideStore((state) => state.formData.mode);
 
@@ -22,10 +23,14 @@ export function useDirectorEmailUnavailableReason(
   if (!activeScenario) {
     return 'Email is unavailable for the survival plan because the email reports a pay strategy.';
   }
+  // Keep the existing email restriction for non-baseline recommendations during containment.
+  if (recommendationOnly && baseComparison.recommended !== 'optimalMix') {
+    return 'Email is unavailable for this setup.';
+  }
   if (profitWhatIfPercent !== 0) {
     return 'Email is unavailable for a what-if company profit. Reset the profit scenario to email results.';
   }
-  if (objective !== 'maximizeTakeHome') {
+  if (!recommendationOnly && objective !== 'maximizeTakeHome') {
     return 'Email does not include the selected objective. Choose Maximize take-home to email results.';
   }
   if (selectedStrategy !== baseComparison.recommended) {

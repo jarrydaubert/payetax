@@ -17,7 +17,7 @@ interface SummaryCardsProps {
 }
 
 export function SummaryCards({ className, monthlyDraw }: SummaryCardsProps) {
-  const { activeScenario } = useActiveDirectorScenario();
+  const { activeScenario } = useActiveDirectorScenario(true);
   const mode = useDirectorFormValue((state) => state.mode);
   const isMonthlyMode = mode === 'monthly';
 

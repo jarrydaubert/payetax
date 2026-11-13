@@ -47,7 +47,7 @@ async function suppressWelcomeDialog(page: Page): Promise<void> {
 
 async function selectEnglandRegion(page: Page): Promise<void> {
   await page.getByTestId('director-region-select').click();
-  await page.getByRole('option', { name: 'England' }).click();
+  await page.getByRole('option', { name: 'England, Wales, or Northern Ireland' }).click();
 }
 
 test.describe('Director Intelligence recruiter regression', () => {
@@ -68,10 +68,10 @@ test.describe('Director Intelligence recruiter regression', () => {
 
     await selectEnglandRegion(page);
 
-    await expect(page.getByRole('heading', { name: 'Choose Your Strategy' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Compare Strategies' })).toBeVisible();
 
-    const allSalaryCard = page.getByRole('button', { name: /All Salary/i });
-    const allDividendsCard = page.getByRole('button', { name: /All Dividends/i });
+    const allSalaryCard = page.getByRole('article').filter({ hasText: 'All Salary' });
+    const allDividendsCard = page.getByRole('article').filter({ hasText: 'All Dividends' });
 
     await expect(allSalaryCard).toContainText(/£7,445/);
     await expect(allDividendsCard).toContainText(/£6,328/);
@@ -115,8 +115,7 @@ test.describe('Director Intelligence recruiter regression', () => {
 
     await selectEnglandRegion(page);
 
-    await expect(page.getByRole('heading', { name: 'Choose Your Strategy' })).toBeVisible();
-    await page.getByRole('button', { name: /All Dividends/i }).click();
+    await expect(page.getByRole('heading', { name: 'Compare Strategies' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Monthly Draw Estimate' })).toBeVisible();
     await expect(
       page.getByText('Available this month', { exact: true }).locator('..'),
@@ -124,9 +123,9 @@ test.describe('Director Intelligence recruiter regression', () => {
     await expect(
       page.getByText('£533/mo below your spending target', { exact: true }),
     ).toBeVisible();
-    // With no salary, projected profit is (£859 − £200) × 12 = £7,908.
-    // Its 19% corporation tax reserve (£1,502.52) uses all £889 of current cash.
+    // The recommendation uses the £7,908 profit for salary and £379.30 employer NI.
+    // The £2,199 buffer is short by £2,199 − (£889 − £379.30) = £1,689.30.
     await expect(page.getByText('£2,199', { exact: true })).toBeVisible();
-    await expect(page.getByText('Shortfall £2,199', { exact: true })).toBeVisible();
+    await expect(page.getByText('Shortfall £1,689.30', { exact: true })).toBeVisible();
   });
 });

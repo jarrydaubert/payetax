@@ -21,7 +21,7 @@ interface DetailCardsProps {
 
 export function DetailCards({ className }: DetailCardsProps) {
   const { activeScenario, comparison, isProfitWhatIfActive, scenarioGrossProfitBeforePension } =
-    useActiveDirectorScenario();
+    useActiveDirectorScenario(true);
   const { mode, revenue, expenses, pension } = useDirectorFormSlice((state) => ({
     mode: state.mode,
     revenue: state.revenue,

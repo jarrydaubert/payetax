@@ -100,29 +100,27 @@ export function EducationPanel({ className, monthlyDraw }: EducationPanelProps) 
   const revenue = isMonthlyMode
     ? (monthlyModeOutput?.projectedRevenue ?? 0)
     : (formData.revenue ?? 0);
-  const optimalSalary = comparison?.strategies?.optimalMix?.salary ?? 0;
+  const recommended = comparison?.strategies[comparison.recommended];
+  const optimalSalary = recommended?.salary ?? 0;
 
   // Calculate total income for PA taper / HICBC warnings
-  const totalIncome = hasResults
-    ? formData.otherIncome +
-      comparison.strategies.optimalMix.salary +
-      comparison.strategies.optimalMix.dividends
-    : 0;
+  const totalIncome =
+    hasResults && recommended
+      ? formData.otherIncome + recommended.salary + recommended.dividends
+      : 0;
 
   // Compute total already taken from YTD fields
   const alreadyTaken = formData.ytdSalary + formData.ytdDividends + formData.ytdDrawings;
 
   // Gross extraction available (salary + dividends from optimal strategy)
-  const grossExtraction = hasResults
-    ? comparison.strategies.optimalMix.salary + comparison.strategies.optimalMix.dividends
-    : 0;
+  const grossExtraction =
+    hasResults && recommended ? recommended.salary + recommended.dividends : 0;
 
   // Personal tax liability
-  const personalTax = hasResults
-    ? comparison.strategies.optimalMix.incomeTax +
-      comparison.strategies.optimalMix.dividendTax +
-      comparison.strategies.optimalMix.studentLoan
-    : 0;
+  const personalTax =
+    hasResults && recommended
+      ? recommended.incomeTax + recommended.dividendTax + recommended.studentLoan
+      : 0;
 
   const visibleLearnCards = useMemo(
     () =>
@@ -137,7 +135,7 @@ export function EducationPanel({ className, monthlyDraw }: EducationPanelProps) 
           title: 'What Are Dividends?',
           description:
             'Payments from company profits to shareholders, taxed at lower rates than salary. Must be paid from retained profits after Corporation Tax.',
-          show: hasResults && (comparison?.strategies.optimalMix.dividends ?? 0) > 0,
+          show: hasResults && (recommended?.dividends ?? 0) > 0,
         },
         {
           title: 'Corporation Tax',
@@ -152,7 +150,7 @@ export function EducationPanel({ className, monthlyDraw }: EducationPanelProps) 
           show: true,
         },
       ].filter((card) => card.show),
-    [comparison, hasResults],
+    [recommended, hasResults],
   );
 
   const sortedWarnings = useMemo(() => {
@@ -357,7 +355,8 @@ function buildWarnings(ctx: WarningContext): Warning[] {
   // Pre-compute conditions
   const isOverdrawn = hasResults && alreadyTaken > grossExtraction;
   const hasDrawings = formData.ytdDrawings > 0;
-  const hasDividends = hasResults && (comparison?.strategies.optimalMix.dividends ?? 0) > 0;
+  const recommended = comparison?.strategies[comparison.recommended];
+  const hasDividends = hasResults && (recommended?.dividends ?? 0) > 0;
   const vatNote = formData.includesVat
     ? ' (If your turnover figure includes VAT, HMRC thresholds use VAT-exclusive taxable turnover — treat this as an estimate.)'
     : '';
@@ -486,7 +485,7 @@ function buildWarnings(ctx: WarningContext): Warning[] {
       title: 'Payroll Administration Required',
       description:
         'Taking a salary means running payroll and submitting RTI to HMRC each payday. Payroll software or an accountant can handle this.',
-      show: hasResults && (comparison?.strategies.optimalMix.salary ?? 0) > 0,
+      show: hasResults && (recommended?.salary ?? 0) > 0,
     },
     {
       id: 'payments-on-account',

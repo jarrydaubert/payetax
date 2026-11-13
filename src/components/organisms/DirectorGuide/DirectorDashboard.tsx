@@ -16,7 +16,6 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import {
   KeyDates,
   PensionGapWarning,
-  SalarySlider,
   StrategyComparisonTable,
   TaxPots,
 } from '@/components/molecules/DirectorGuide/calculator';
@@ -74,7 +73,7 @@ export function DirectorDashboard() {
   const formData = useDirectorFormSlice((data) => data);
   const comparison = useStrategyComparison();
   const monthlyModeOutput = useMonthlyModeOutput();
-  const { activeScenario } = useActiveDirectorScenario();
+  const { activeScenario } = useActiveDirectorScenario(true);
   const hasInputErrors = useHasDirectorInputErrors();
   const calculationFailed = useDirectorCalculationFailed();
   const { calculate, invalidateResults, reset } = useDirectorGuideActions();
@@ -123,6 +122,7 @@ export function DirectorDashboard() {
         : hasInvalidInputs
           ? 'Correct your inputs to email results.'
           : 'Enter your numbers to calculate results before emailing them.',
+    true,
   );
   const canEmail = emailUnavailableReason === null;
 
@@ -405,15 +405,11 @@ export function DirectorDashboard() {
                       />
                     </section>
 
-                    <section data-director-section='director-slider' aria-label='Salary slider'>
-                      <SalarySlider />
-                    </section>
-
                     <section
                       data-director-section='director-strategy'
                       aria-label='Strategy comparison'
                     >
-                      <StrategyComparisonTable />
+                      <StrategyComparisonTable readOnly />
                     </section>
 
                     <section

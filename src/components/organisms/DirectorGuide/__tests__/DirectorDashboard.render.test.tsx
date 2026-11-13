@@ -219,7 +219,7 @@ describe('DirectorDashboard (normal mode)', () => {
     expect(screen.queryByRole('region', { name: 'About this estimate' })).not.toBeInTheDocument();
   });
 
-  it('updates the monthly draw and buffer from the selected scenario', () => {
+  it('keeps the monthly draw and buffer on the recommendation', () => {
     setCurrentResult(80000, {
       mode: 'monthly',
       monthlyIncome: 3000,
@@ -247,14 +247,16 @@ describe('DirectorDashboard (normal mode)', () => {
     expect(screen.getByText('£5,700')).toBeInTheDocument();
 
     act(() => useDirectorGuideStore.getState().setSelectedStrategy('allDividends'));
-    // The selected strategy needs a £5,000 reserve. £300 is left, £600 below the target.
-    expect(screen.getByText('£300/mo')).toBeInTheDocument();
-    expect(screen.getByText('£600/mo below your spending target')).toBeInTheDocument();
-    expect(useDirectorGuideStore.getState().selectedStrategy).toBe('allDividends');
+    expect(screen.getByText('£2,300/mo')).toBeInTheDocument();
+    expect(screen.queryByText('£600/mo below your spending target')).not.toBeInTheDocument();
 
-    act(() => useDirectorGuideStore.getState().setSelectedStrategy('allSalary'));
-    // The active scenario's £600 over 6 months caps the draw at £100.
-    expect(screen.getByText('£100/mo')).toBeInTheDocument();
+    act(() => {
+      const state = useDirectorGuideStore.getState();
+      state.setSliderSalary(50000);
+      state.setProfitWhatIfPercent(-45);
+      state.setObjective('minimizeNI');
+    });
+    expect(screen.getByText('£2,300/mo')).toBeInTheDocument();
 
     act(() => useDirectorGuideStore.getState().setCashInBank(12000));
     expect(

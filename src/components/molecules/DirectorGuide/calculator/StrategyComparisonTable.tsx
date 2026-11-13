@@ -18,21 +18,21 @@ import {
   useDirectorFormSlice,
   useDirectorGuideActions,
   useDirectorGuideStore,
-  useSelectedStrategy,
 } from '@/store/directorGuideStore';
 import { useActiveDirectorScenario } from './useActiveDirectorScenario';
 
 type StrategyKey = 'allSalary' | 'optimalMix' | 'allDividends';
 
-export function StrategyComparisonTable() {
-  const selectedStrategy = useSelectedStrategy();
-  const { comparison, activeScenario } = useActiveDirectorScenario();
+export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boolean }) {
+  const { comparison, activeScenario, selectedStrategy } = useActiveDirectorScenario(readOnly);
   const { ytdSalary, ytdDividends } = useDirectorFormSlice(({ ytdSalary, ytdDividends }) => ({
     ytdSalary,
     ytdDividends,
   }));
   const { setSelectedStrategy, setSliderSalary, setObjective } = useDirectorGuideActions();
-  const objective = useDirectorGuideStore((state) => state.objective);
+  const storedObjective = useDirectorGuideStore((state) => state.objective);
+  const objective = readOnly ? 'maximizeTakeHome' : storedObjective;
+  const StrategyCard = readOnly ? 'article' : 'button';
 
   if (!comparison || comparison.grossProfit <= 0) return null;
 
@@ -63,7 +63,7 @@ export function StrategyComparisonTable() {
   ];
 
   const comparisonStrategies = comparison.strategies;
-  let objectiveReferenceKey: StrategyKey = 'allSalary';
+  let objectiveReferenceKey: StrategyKey = readOnly ? comparison.recommended : 'allSalary';
 
   for (const key of ['optimalMix', 'allDividends'] as const) {
     if (objective === 'maximizeTakeHome') {
@@ -115,39 +115,50 @@ export function StrategyComparisonTable() {
     <div className='space-y-3'>
       {/* Header with dynamic message */}
       <div>
-        <h3 className='font-semibold text-foreground'>Choose Your Strategy</h3>
-        <div className='mt-2 grid grid-cols-2 gap-2 rounded-sm border border-border/40 bg-background p-1'>
-          <button
-            type='button'
-            onClick={() => setObjective('maximizeTakeHome')}
-            className={cn(
-              'rounded-sm px-3 py-2 text-sm transition-colors',
-              objective === 'maximizeTakeHome'
-                ? 'bg-primary/20 font-medium text-primary'
-                : 'text-muted-foreground hover:text-foreground',
-            )}
-            aria-pressed={objective === 'maximizeTakeHome'}
-          >
-            Maximize take-home
-          </button>
-          <button
-            type='button'
-            onClick={() => setObjective('minimizeNI')}
-            className={cn(
-              'rounded-sm px-3 py-2 text-sm transition-colors',
-              objective === 'minimizeNI'
-                ? 'bg-primary/20 font-medium text-primary'
-                : 'text-muted-foreground hover:text-foreground',
-            )}
-            aria-pressed={objective === 'minimizeNI'}
-          >
-            Minimize NI
-          </button>
-        </div>
-        <p className='mt-2 text-sm text-muted-foreground'>
-          Compare salary/dividend tradeoffs using your selected objective. Switch objective to see
-          how the recommended strategy changes.
-        </p>
+        <h3 className='font-semibold text-foreground'>
+          {readOnly ? 'Compare Strategies' : 'Choose Your Strategy'}
+        </h3>
+        {readOnly ? (
+          <p className='mt-2 text-sm text-muted-foreground'>
+            The breakdown shows the highest take-home strategy. Other strategies are shown for
+            comparison.
+          </p>
+        ) : (
+          <>
+            <div className='mt-2 grid grid-cols-2 gap-2 rounded-sm border border-border/40 bg-background p-1'>
+              <button
+                type='button'
+                onClick={() => setObjective('maximizeTakeHome')}
+                className={cn(
+                  'rounded-sm px-3 py-2 text-sm transition-colors',
+                  objective === 'maximizeTakeHome'
+                    ? 'bg-primary/20 font-medium text-primary'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+                aria-pressed={objective === 'maximizeTakeHome'}
+              >
+                Maximize take-home
+              </button>
+              <button
+                type='button'
+                onClick={() => setObjective('minimizeNI')}
+                className={cn(
+                  'rounded-sm px-3 py-2 text-sm transition-colors',
+                  objective === 'minimizeNI'
+                    ? 'bg-primary/20 font-medium text-primary'
+                    : 'text-muted-foreground hover:text-foreground',
+                )}
+                aria-pressed={objective === 'minimizeNI'}
+              >
+                Minimize NI
+              </button>
+            </div>
+            <p className='mt-2 text-sm text-muted-foreground'>
+              Compare salary/dividend tradeoffs using your selected objective. Switch objective to
+              see how the recommended strategy changes.
+            </p>
+          </>
+        )}
         <p className='mt-2 text-sm text-muted-foreground'>
           Salary and dividends are full-year estimates calculated without adjusting for amounts
           already paid.
@@ -166,7 +177,7 @@ export function StrategyComparisonTable() {
             </p>
           )}
         </div>
-        {isNearObjective && (
+        {!readOnly && isNearObjective && (
           <p className='text-sm'>
             <span className='font-medium text-success'>
               {objective === 'maximizeTakeHome'
@@ -212,15 +223,16 @@ export function StrategyComparisonTable() {
               : Math.abs(niDelta) < 0.01;
 
           return (
-            <button
-              type='button'
+            <StrategyCard
               key={key}
-              onClick={() => handleSelectStrategy(key)}
+              {...(!readOnly && {
+                type: 'button' as const,
+                onClick: () => handleSelectStrategy(key),
+              })}
               className={cn(
                 'relative rounded-sm border p-5 text-left transition-colors',
-                isSelected
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border/40 bg-card hover:border-border/70 hover:bg-accent/20',
+                isSelected ? 'border-primary bg-primary/5' : 'border-border/40 bg-card',
+                !readOnly && 'hover:border-border/70 hover:bg-accent/20',
               )}
             >
               {/* Objective badge */}
@@ -319,7 +331,7 @@ export function StrategyComparisonTable() {
               <div className='mt-2 text-right text-xs text-muted-foreground'>
                 {data.effectiveRate.toFixed(1)}% effective rate
               </div>
-            </button>
+            </StrategyCard>
           );
         })}
       </div>
@@ -330,6 +342,7 @@ export function StrategyComparisonTable() {
         objective={objective}
         objectiveReferenceTakeHome={objectiveReferenceTakeHome}
         objectiveReferenceTotalNI={objectiveReferenceTotalNI}
+        readOnly={readOnly}
       />
     </div>
   );
@@ -340,6 +353,7 @@ interface YourSetupCardProps {
   objective: StrategyObjective;
   objectiveReferenceTakeHome: number;
   objectiveReferenceTotalNI: number;
+  readOnly: boolean;
 }
 
 function YourSetupCard({
@@ -347,6 +361,7 @@ function YourSetupCard({
   objective,
   objectiveReferenceTakeHome,
   objectiveReferenceTotalNI,
+  readOnly,
 }: YourSetupCardProps) {
   if (!yourSetup) {
     return (
@@ -362,7 +377,8 @@ function YourSetupCard({
         </div>
         <div className='rounded-sm bg-muted/20 p-3 text-sm text-foreground/80'>
           <span className='font-medium text-foreground'>Not set.</span> Add your salary and
-          dividends in Full Inputs to compare your current setup against your selected objective.
+          dividends in Full Inputs to compare your current setup
+          {readOnly ? '.' : ' against your selected objective.'}
         </div>
       </div>
     );
