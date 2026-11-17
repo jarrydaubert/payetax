@@ -43,7 +43,7 @@ export interface StrategyInput {
   yourSetupSalary?: number; // User's current salary for comparison
   yourSetupDividends?: number; // User's current dividends for comparison
   minimumSalaryRequirement?: number; // Minimum salary needed (e.g., for mortgage)
-  hasOtherPAYEEmployment?: boolean; // If true, NI threshold already used by other employer
+  hasOtherPAYEEmployment?: boolean; // Scenario context only. Other employers have separate NI calculations.
   // Already taken this year (reduces available for optimization)
   ytdSalary?: number; // Gross salary already taken via PAYE
   ytdDividends?: number; // Dividends already declared
@@ -64,7 +64,6 @@ interface StrategyCalcOptions {
   pension: number;
   companyCarBIK: number;
   associatedCompaniesCount: number;
-  hasOtherPAYE: boolean;
   lossesBroughtForward: number;
 }
 
@@ -103,7 +102,7 @@ export interface SalaryScenarioInput {
   pension?: number;
   companyCarBIK?: number;
   associatedCompaniesCount?: number;
-  hasOtherPAYE?: boolean;
+  hasOtherPAYE?: boolean; // Scenario context only. NI is based on this company's salary.
   lossesBroughtForward?: number;
   minimumSalary?: number;
 }
@@ -207,17 +206,6 @@ function normalizeAssociatedCompaniesCount(value: number | undefined): number {
   return normalized > 0 ? normalized : 1;
 }
 
-/**
- * Calculate Employee NI assuming no threshold benefit (for people with other PAYE)
- * When you have another PAYE job, your Primary Threshold is used there,
- * so any salary from this company is subject to NI from the first pound.
- */
-function getEmployeeNIWithNoThreshold(salary: number, taxYear: TaxYear): number {
-  if (salary <= 0) return 0;
-
-  return getEmployeeNI(salary, taxYear, { applyPrimaryThreshold: false });
-}
-
 // ============================================================================
 // MAIN FUNCTION
 // ============================================================================
@@ -252,7 +240,6 @@ export function calculateStrategyComparison(
     pension: pensionContribution,
     companyCarBIK: input.companyCarBIK ?? 0,
     associatedCompaniesCount: normalizeAssociatedCompaniesCount(input.associatedCompaniesCount),
-    hasOtherPAYE: input.hasOtherPAYEEmployment ?? false,
     lossesBroughtForward: input.lossesBroughtForward ?? 0,
   };
 
@@ -307,16 +294,8 @@ export function calculateStrategyComparison(
 // ============================================================================
 
 function calculateAllSalaryStrategy(opts: StrategyCalcOptions, salary: number): StrategyResult {
-  const {
-    grossProfit,
-    region,
-    taxYear,
-    otherIncome,
-    studentLoanPlans,
-    pension,
-    companyCarBIK,
-    hasOtherPAYE,
-  } = opts;
+  const { grossProfit, region, taxYear, otherIncome, studentLoanPlans, pension, companyCarBIK } =
+    opts;
 
   if (grossProfit <= 0) {
     return createEmptyResult('All Salary', opts);
@@ -324,10 +303,7 @@ function calculateAllSalaryStrategy(opts: StrategyCalcOptions, salary: number): 
 
   const budget = calculateCompanyBudget(opts, salary, 0);
 
-  // If other PAYE employment, NI threshold already used - pay NI from first pound
-  const employeeNI = hasOtherPAYE
-    ? getEmployeeNIWithNoThreshold(salary, taxYear)
-    : getEmployeeNI(salary, taxYear);
+  const employeeNI = getEmployeeNI(salary, taxYear);
   // Income tax is on salary + other income + BIK, but we only show the tax portion attributable to salary + BIK
   const adjustedNetIncome = salary + otherIncome + companyCarBIK;
   const totalIncomeTax = getIncomeTax(
@@ -370,23 +346,27 @@ function calculateAllSalaryStrategy(opts: StrategyCalcOptions, salary: number): 
 export function calculateSalaryScenario({
   targetSalary,
   grossProfit,
+  region,
+  taxYear,
+  otherIncome,
+  hasEmploymentAllowance,
   studentLoanPlans = [],
   pension = 0,
   companyCarBIK = 0,
   associatedCompaniesCount = 1,
-  hasOtherPAYE = false,
   lossesBroughtForward = 0,
   minimumSalary = 0,
-  ...options
 }: SalaryScenarioInput): SalaryScenarioResult {
   const opts: StrategyCalcOptions = {
-    ...options,
     grossProfit: roundToPence(grossProfit),
+    region,
+    taxYear,
+    otherIncome,
+    hasEmploymentAllowance,
     studentLoanPlans,
     pension,
     companyCarBIK,
     associatedCompaniesCount: normalizeAssociatedCompaniesCount(associatedCompaniesCount),
-    hasOtherPAYE,
     lossesBroughtForward,
   };
   const salaryFloor = roundToPence(Math.max(0, minimumSalary));
@@ -407,23 +387,13 @@ function calculateSalaryScenarioInternal(
   salary: number,
   opts: StrategyCalcOptions,
 ): SalaryScenarioResult {
-  const {
-    grossProfit,
-    region,
-    taxYear,
-    otherIncome,
-    studentLoanPlans,
-    pension,
-    companyCarBIK,
-    hasOtherPAYE,
-  } = opts;
+  const { grossProfit, region, taxYear, otherIncome, studentLoanPlans, pension, companyCarBIK } =
+    opts;
 
   const budget = calculateCompanyBudget(opts, salary);
   const { dividends } = budget;
 
-  const employeeNI = hasOtherPAYE
-    ? getEmployeeNIWithNoThreshold(salary, taxYear)
-    : getEmployeeNI(salary, taxYear);
+  const employeeNI = getEmployeeNI(salary, taxYear);
 
   const adjustedNetIncome = salary + dividends + otherIncome + companyCarBIK;
 

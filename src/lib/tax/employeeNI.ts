@@ -63,21 +63,18 @@ export interface EmployeeNIResult {
  * @param salary - Annual salary amount
  * @param taxYear - Tax year for rates (defaults to the latest supported tax year)
  * @param options.niCategory - NI category letter (defaults to A)
- * @param options.applyPrimaryThreshold - When false, charge the primary rate from
- *   the first pound. Used where the primary threshold is already consumed by
- *   another employment.
  * @returns Full calculation result with breakdown
  */
 export function calculateEmployeeNI(
   salary: number,
   taxYear: TaxYear = CURRENT_TAX_YEAR,
-  options: { niCategory?: NICategory; applyPrimaryThreshold?: boolean } = {},
+  options: { niCategory?: NICategory } = {},
 ): EmployeeNIResult {
-  const { niCategory = 'A', applyPrimaryThreshold = true } = options;
+  const { niCategory = 'A' } = options;
   const rates = TAX_RATES[taxYear];
   const employeeRates = rates.nationalInsurance.employee[niCategory];
 
-  const primaryThreshold = applyPrimaryThreshold ? employeeRates.primary.threshold : 0;
+  const primaryThreshold = employeeRates.primary.threshold;
   const upperEarningsLimit = employeeRates.upper.threshold;
   const primaryRate = getDirectorsAnnualPrimaryRate(taxYear, niCategory) / 100;
   const upperRate = employeeRates.upper.rate / 100;
@@ -116,7 +113,7 @@ export function calculateEmployeeNI(
 export function getEmployeeNI(
   salary: number,
   taxYear: TaxYear = CURRENT_TAX_YEAR,
-  options: { niCategory?: NICategory; applyPrimaryThreshold?: boolean } = {},
+  options: { niCategory?: NICategory } = {},
 ): number {
   return calculateEmployeeNI(salary, taxYear, options).employeeNI;
 }

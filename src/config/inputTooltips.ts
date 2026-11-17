@@ -181,7 +181,8 @@ export const INPUT_TOOLTIPS = {
   },
   directorOtherPAYE: {
     title: 'Other PAYE Employment',
-    description: 'Select if you also have a PAYE job elsewhere.',
+    description:
+      'Select if you also have a PAYE job elsewhere. The estimate uses separate National Insurance thresholds for this company. Include pay from your other job in Other Personal Income for the Income Tax estimate.',
   },
   directorEmploymentAllowance: {
     title: 'Employment Allowance',

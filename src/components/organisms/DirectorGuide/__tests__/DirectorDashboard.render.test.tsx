@@ -167,19 +167,16 @@ describe('DirectorDashboard (normal mode)', () => {
     expect(screen.getByText(/Save this breakdown for your records/i)).toBeInTheDocument();
   });
 
-  it('describes other PAYE as a modelling assumption and qualifies the real NI position', () => {
+  it('explains the separate PAYE basis and flags when earnings may need to be combined', () => {
     setCurrentResult(80000, { hasOtherPAYEEmployment: true });
     render(<DirectorDashboard />);
     const notes = screen.getByRole('region', { name: 'About this estimate' });
-    expect(notes).toHaveTextContent('In the suggested pay options');
     expect(notes).toHaveTextContent(
-      'employee National Insurance from the first pound of director salary',
+      'annual director National Insurance thresholds to pay from this company',
     );
-    expect(notes).toHaveTextContent(
-      'Jobs with separate employers usually have separate thresholds',
-    );
-    expect(notes).toHaveTextContent('may overstate your NI');
-    expect(notes).toHaveTextContent('Check with your payroll provider');
+    expect(notes).toHaveTextContent('your other job has a separate National Insurance calculation');
+    expect(notes).toHaveTextContent('earnings must be combined');
+    expect(notes).toHaveTextContent('employers carry on business in association');
     expect(notes).not.toHaveTextContent('annual allowance');
   });
 

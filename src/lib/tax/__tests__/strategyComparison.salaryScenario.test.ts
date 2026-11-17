@@ -117,28 +117,76 @@ describe('Strategy Comparison helpers', () => {
     expect(withLosses.dividends).toBeGreaterThan(withoutLosses.dividends);
   });
 
-  it('applies no-threshold employee NI when hasOtherPAYE is true', () => {
-    // Bug caught: slider scenario undercharging employee NI for dual-PAYE directors.
-    const withoutOtherPAYE = calculateSalaryScenario({
-      targetSalary: 20000,
-      grossProfit: 80000,
+  // HMRC CWG2 §3.4.1 and CA44 §§49–52: the unrelated job is a separate payroll.
+  // 2026–27 category A, full-year director: £12,570 PT, £50,270 UEL, 8% then 2%.
+  // At the UEL: (£50,270 − £12,570) × 8% = £3,016. The next pound adds £0.02.
+  // https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027#class-1-national-insurance-thresholds
+  it.each([
+    [12569, 0],
+    [12570, 0],
+    [12571, 0.08],
+    [50269, 3015.92],
+    [50270, 3016],
+    [50271, 3016.02],
+  ])('uses the same director NI at £%p in every path with a separate PAYE job', (salary, ni) => {
+    // Cover employer NI with Employment Allowance and set the salary floor at the
+    // post-pension budget so every salary path uses exactly the same gross pay.
+    const { strategies } = calculateStrategyComparison(
+      {
+        ...baseInput,
+        revenue: salary + 1000,
+        pensionContribution: 1000,
+        otherIncome: 30000,
+        employmentAllowance: true,
+        minimumSalaryRequirement: salary,
+        yourSetupSalary: salary,
+        yourSetupDividends: 0,
+        hasOtherPAYEEmployment: true,
+      },
+      TAX_YEAR_2026,
+    );
+    const slider = calculateSalaryScenario({
+      targetSalary: salary,
+      grossProfit: salary,
       region: 'rUK',
-      taxYear: TAX_YEAR,
-      otherIncome: 0,
-      hasEmploymentAllowance: false,
-      hasOtherPAYE: false,
-    });
-    const withOtherPAYE = calculateSalaryScenario({
-      targetSalary: 20000,
-      grossProfit: 80000,
-      region: 'rUK',
-      taxYear: TAX_YEAR,
-      otherIncome: 0,
-      hasEmploymentAllowance: false,
+      taxYear: TAX_YEAR_2026,
+      otherIncome: 30000,
+      hasEmploymentAllowance: true,
+      pension: 1000,
       hasOtherPAYE: true,
     });
 
-    expect(withOtherPAYE.employeeNI).toBeGreaterThan(withoutOtherPAYE.employeeNI);
+    expect(strategies.yourSetup).toMatchObject({ salary, employeeNI: ni });
+    expect({
+      allSalary: strategies.allSalary.employeeNI,
+      baselineMix: strategies.optimalMix.employeeNI,
+      slider: slider.employeeNI,
+      allDividends: strategies.allDividends.employeeNI,
+    }).toEqual({
+      allSalary: ni,
+      baselineMix: ni,
+      slider: ni,
+      allDividends: 0,
+    });
+    expect(strategies.allSalary.salary).toBe(salary);
+    expect(strategies.optimalMix.salary).toBe(salary);
+    expect(slider.salary).toBe(salary);
+    expect(strategies.yourSetup?.deltaVsOptimal).toBeCloseTo(0, 2);
+  });
+
+  it('keeps strategy rankings and Your Setup delta when the same other income is flagged as PAYE', () => {
+    const input = {
+      ...baseInput,
+      otherIncome: 30000,
+      yourSetupSalary: 12570,
+      yourSetupDividends: 20000,
+    };
+
+    expect(
+      calculateStrategyComparison({ ...input, hasOtherPAYEEmployment: true }, TAX_YEAR_2026),
+    ).toEqual(
+      calculateStrategyComparison({ ...input, hasOtherPAYEEmployment: false }, TAX_YEAR_2026),
+    );
   });
 
   it('treats company car BIK as taxable income that reduces take-home', () => {

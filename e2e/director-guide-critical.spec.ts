@@ -492,6 +492,98 @@ test.describe('Director result currentness @critical', () => {
 });
 
 test.describe('Director Intelligence critical @critical', () => {
+  test('JGF-42: another PAYE job preserves the annual director NI threshold', async ({
+    page,
+  }, testInfo) => {
+    const diagnostics: string[] = [];
+    page.on('pageerror', (error) => diagnostics.push(error.message));
+    page.on('console', (message) => {
+      const text = message.text();
+      if (text === 'Viewport argument key "interactive-widget" not recognized and ignored.') return;
+      if (['warning', 'error'].includes(message.type())) diagnostics.push(text);
+    });
+    await page.route('**/_vercel/{insights,speed-insights}/script.js', (route) =>
+      route.fulfill({ contentType: 'application/javascript', body: '' }),
+    );
+    await openDirectorGuide(page);
+    await page.waitForLoadState('load');
+    await selectEngland(page);
+    // £12,570 salary + (£12,570 − £5,000) × 15% employer NI uses the entire budget.
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 13705.5);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 0);
+    await page
+      .getByRole('button', { name: 'Full Inputs', exact: true })
+      .filter({ visible: true })
+      .click();
+    await fillCurrencyInput(
+      page
+        .getByRole('textbox', { name: 'Other Personal Income', exact: true })
+        .filter({ visible: true }),
+      30000,
+    );
+    await page.getByRole('button', { name: 'Advanced Options' }).filter({ visible: true }).click();
+    await fillCurrencyInput(
+      page.getByRole('textbox', { name: 'Minimum Salary', exact: true }).filter({ visible: true }),
+      12570,
+    );
+    await fillCurrencyInput(
+      page
+        .getByRole('textbox', { name: 'Your Current Salary', exact: true })
+        .filter({ visible: true }),
+      12570,
+    );
+    await page
+      .getByRole('button', { name: 'Apply', exact: true })
+      .filter({ visible: true })
+      .click();
+    await closeInputsPanelIfOpen(page);
+
+    const employeeNI = detailRowValue(page, 'Salary Breakdown', 'Employee NI');
+    await expect(detailRowValue(page, 'Salary Breakdown', 'Gross Salary')).toHaveText('£12,570');
+    await expect(employeeNI).toHaveText('£0');
+    const notes = page.getByRole('region', { name: 'About this estimate' });
+    await expect(notes).toHaveCount(0);
+    await testInfo.attach('other-paye-off', {
+      body: await page.screenshot(),
+      contentType: 'image/png',
+    });
+
+    await ensureInputsPanelIsVisible(page);
+    const otherPAYE = page
+      .getByRole('switch', { name: 'Other PAYE employment?' })
+      .filter({ visible: true });
+    await otherPAYE.click();
+    await expect(otherPAYE).toBeChecked();
+    await closeInputsPanelIfOpen(page);
+    await expect(employeeNI).toHaveText('£0');
+    const strategies = page.getByRole('region', { name: 'Strategy comparison' });
+    // The £30,000 external pay leaves this salary in the 20% Income Tax band.
+    // £12,570 − £2,514 Income Tax − £0 employee NI = £10,056 take-home.
+    for (const name of ['All Salary', 'Baseline Mix']) {
+      const card = strategies.getByRole('article').filter({
+        has: page.getByRole('heading', { name, exact: true }),
+      });
+      await expect(card).toContainText('£10,056');
+    }
+    const yourSetup = strategies.getByRole('heading', { name: 'Your Setup' }).locator('../../..');
+    await expect(yourSetup).toContainText('£10,056');
+    await expect(yourSetup).toContainText('Within £10 of max take-home reference');
+    await expect(notes).toContainText(
+      'your other job has a separate National Insurance calculation',
+    );
+    await expect(notes).toContainText('if your earnings must be combined');
+    await testInfo.attach('other-paye-on', {
+      body: await notes.screenshot(),
+      contentType: 'image/png',
+    });
+    const showLearn = await firstVisible(page.getByRole('button', { name: /show learn panel/i }));
+    if (showLearn) await showLearn.click();
+    await expect(
+      page.getByText(/Jobs with unrelated employers normally have separate/),
+    ).toBeVisible();
+    expect(diagnostics).toEqual([]);
+  });
+
   test('JGF-45: honours the salary minimum and reports when it becomes unaffordable', async ({
     page,
   }, testInfo) => {

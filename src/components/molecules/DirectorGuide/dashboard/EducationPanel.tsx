@@ -526,7 +526,7 @@ function buildWarnings(ctx: WarningContext): Warning[] {
       id: 'other-paye',
       title: 'Other PAYE Employment',
       description:
-        'With another PAYE employment, NI thresholds are typically used in that role first. This model applies NI from the first pound on director salary; confirm with payroll records.',
+        'Jobs with unrelated employers normally have separate National Insurance thresholds. If earnings must be combined or HMRC has approved deferment, check with your payroll provider. HMRC may refund contributions paid above the annual maximum across jobs.',
       show: formData.hasOtherPAYEEmployment,
     },
     {
