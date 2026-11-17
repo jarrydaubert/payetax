@@ -280,13 +280,17 @@ describe('Strategy Comparison helpers', () => {
       pension: 2500,
       companyCarBIK: 4000,
       employerNI: 600,
+      class1ANI: 600,
       employeeNI: 0,
       incomeTax: 286,
       corporationTax: 21725,
+      taxableProfit: 86900,
       dividendTax: 14572.82,
       studentLoan: 5229.9,
       totalPersonalTax: 20088.72,
       companyCost: 27325,
+      retainedProfit: 0,
+      companyShortfall: 0,
       takeHome: 55086.28,
       effectiveRate: 43.5,
     });
@@ -429,7 +433,14 @@ describe('Strategy Comparison helpers', () => {
       TAX_YEAR_2026,
     );
 
-    expect(result.strategies.allSalary.takeHome).toBe(81261.98);
+    // Annual rUK, 2026/27. £131,086.96 salary + £18,913.04 secondary NI uses £150,000.
+    // With no PA, Income Tax is £45,192.13 and employee NI is £4,632.34.
+    // gov.uk/income-tax-rates and gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027
+    expect(result.strategies.allSalary).toMatchObject({
+      salary: 131086.96,
+      employerNI: 18913.04,
+      takeHome: 81262.49,
+    });
     expect(result.strategies.allDividends.takeHome).toBe(84715.02);
 
     const fixedLowSalary = calculateSalaryScenario({
@@ -442,6 +453,6 @@ describe('Strategy Comparison helpers', () => {
     });
 
     expect(fixedLowSalary.takeHome).toBe(85109.9);
-    expect(fixedLowSalary.takeHome - result.strategies.allSalary.takeHome).toBeCloseTo(3847.92, 2);
+    expect(fixedLowSalary.takeHome - result.strategies.allSalary.takeHome).toBeCloseTo(3847.41, 2);
   });
 });

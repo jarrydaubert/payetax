@@ -492,6 +492,38 @@ test.describe('Director result currentness @critical', () => {
 });
 
 test.describe('Director Intelligence critical @critical', () => {
+  test('JGF-43: reserves Class 1A before dividends and shows a company shortfall', async ({
+    page,
+  }) => {
+    await openDirectorGuide(page);
+    await selectEngland(page);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 80000);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 0);
+    await page
+      .getByRole('button', { name: 'Full Inputs', exact: true })
+      .filter({ visible: true })
+      .click();
+    await page.getByRole('button', { name: 'Advanced Options' }).filter({ visible: true }).click();
+    await fillCurrencyInput(
+      page.getByRole('textbox', { name: 'Company Car BIK' }).filter({ visible: true }),
+      10000,
+    );
+    await closeInputsPanelIfOpen(page);
+
+    const allDividends = page.getByRole('article').filter({
+      has: page.getByRole('heading', { name: 'All Dividends', exact: true }),
+    });
+    // £61,447.50 rounds to £61,448 on the strategy card.
+    await expect(allDividends).toContainText('£61,448');
+    await expect(allDividends).toContainText('£1,500');
+
+    await ensureInputsPanelIsVisible(page);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 1000);
+    await closeInputsPanelIfOpen(page);
+    await expect(page.getByRole('alert').filter({ hasText: 'Class 1A' })).toContainText('£500.00');
+    await expect(detailRowValue(page, 'Dividend Breakdown', 'Gross Dividends')).toHaveText('£0');
+  });
+
   test('DI-27: the already-paid disclosure follows the displayed recommendation', async ({
     page,
   }) => {

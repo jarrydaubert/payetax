@@ -39,11 +39,6 @@ export function DetailCards({ className }: DetailCardsProps) {
   ) {
     return null;
   }
-  const taxableProfit =
-    (comparison.grossProfitAfterPension ?? comparison.grossProfit) -
-    activeScenario.salary -
-    activeScenario.employerNI;
-
   return (
     <div className={cn('grid grid-cols-2 gap-4 max-lg:grid-cols-1', className)}>
       {/* Salary Breakdown */}
@@ -147,7 +142,7 @@ export function DetailCards({ className }: DetailCardsProps) {
             value: `-${formatCurrency(activeScenario.salary + activeScenario.employerNI, 0)}`,
             negative: true,
           },
-          { label: 'Taxable Profit', value: formatCurrency(taxableProfit, 0) },
+          { label: 'Taxable Profit', value: formatCurrency(activeScenario.taxableProfit, 0) },
         ]}
         total={{
           label: 'Corp Tax Due',

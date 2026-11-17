@@ -484,7 +484,8 @@ function YourSetupCard({
         <div className='mt-3 flex items-start gap-2 rounded-sm border border-destructive/40 bg-destructive/10 p-3'>
           <AlertTriangle className='mt-0.5 size-4 shrink-0 text-destructive' />
           <p className='text-xs text-destructive/90'>
-            Your salary + dividends exceeds available profit. This may create or increase a
+            Your salary, dividends and company taxes exceed available profit by{' '}
+            {formatCurrency(yourSetup.companyShortfall)}. This may create or increase a
             Director&apos;s Loan Account balance. Speak to your accountant.
           </p>
         </div>
