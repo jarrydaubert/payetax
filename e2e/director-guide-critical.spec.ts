@@ -511,10 +511,10 @@ test.describe('Director Intelligence critical @critical', () => {
     // £12,570 salary + (£12,570 − £5,000) × 15% employer NI uses the entire budget.
     await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 13705.5);
     await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 0);
-    await page
+    const fullInputs = page
       .getByRole('button', { name: 'Full Inputs', exact: true })
-      .filter({ visible: true })
-      .click();
+      .filter({ visible: true });
+    await fullInputs.click();
     await fillCurrencyInput(
       page
         .getByRole('textbox', { name: 'Other Personal Income', exact: true })
@@ -552,6 +552,7 @@ test.describe('Director Intelligence critical @critical', () => {
     const otherPAYE = page
       .getByRole('switch', { name: 'Other PAYE employment?' })
       .filter({ visible: true });
+    if (!(await otherPAYE.isVisible())) await fullInputs.click();
     await otherPAYE.click();
     await expect(otherPAYE).toBeChecked();
     await closeInputsPanelIfOpen(page);
@@ -579,7 +580,9 @@ test.describe('Director Intelligence critical @critical', () => {
     const showLearn = await firstVisible(page.getByRole('button', { name: /show learn panel/i }));
     if (showLearn) await showLearn.click();
     await expect(
-      page.getByText(/Jobs with unrelated employers normally have separate/),
+      page
+        .getByText(/Jobs with unrelated employers normally have separate/)
+        .filter({ visible: true }),
     ).toBeVisible();
     expect(diagnostics).toEqual([]);
   });
@@ -1538,12 +1541,11 @@ test.describe('Director input help @critical', () => {
     await closeInputsPanelIfOpen(page);
     const notes = page.getByTestId('director-estimate-notes');
     await expect(notes).toContainText('VAT has not been removed');
-    await expect(notes).toContainText('employee National Insurance from the first pound');
     await expect(notes).toContainText(
-      'Jobs with separate employers usually have separate thresholds',
+      'your other job has a separate National Insurance calculation',
     );
-    await expect(notes).toContainText('may overstate your NI');
-    await expect(notes).toContainText('Check with your payroll provider');
+    await expect(notes).toContainText('if your earnings must be combined');
+    await expect(notes).toContainText('annual maximum across jobs');
     await expect(notes).toContainText('annual allowance across all your pensions');
     await expect(notes).toContainText('may mean a personal tax charge, which is not included');
     await expect(notes).toContainText(
