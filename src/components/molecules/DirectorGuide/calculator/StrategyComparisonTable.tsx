@@ -25,10 +25,13 @@ type StrategyKey = 'allSalary' | 'optimalMix' | 'allDividends';
 
 export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boolean }) {
   const { comparison, activeScenario, selectedStrategy } = useActiveDirectorScenario(readOnly);
-  const { ytdSalary, ytdDividends } = useDirectorFormSlice(({ ytdSalary, ytdDividends }) => ({
-    ytdSalary,
-    ytdDividends,
-  }));
+  const { ytdSalary, ytdDividends, minimumSalaryRequirement } = useDirectorFormSlice(
+    ({ ytdSalary, ytdDividends, minimumSalaryRequirement }) => ({
+      ytdSalary,
+      ytdDividends,
+      minimumSalaryRequirement,
+    }),
+  );
   const { setSelectedStrategy, setSliderSalary, setObjective } = useDirectorGuideActions();
   const storedObjective = useDirectorGuideStore((state) => state.objective);
   const objective = readOnly ? 'maximizeTakeHome' : storedObjective;
@@ -36,6 +39,7 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
 
   if (!comparison || comparison.grossProfit <= 0) return null;
 
+  const hasMinimumSalary = readOnly && (minimumSalaryRequirement ?? 0) > 0;
   const paidSalary = roundToPence(ytdSalary);
   const paidDividends = roundToPence(ytdDividends);
   const scenarioSalary = activeScenario && roundToPence(activeScenario.salary);
@@ -58,14 +62,14 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
       key: 'allDividends' as StrategyKey,
       data: comparison.strategies.allDividends,
       icon: PiggyBank,
-      description: 'Minimum salary, max dividends',
+      description: 'No salary, max dividends',
     },
   ];
 
   const comparisonStrategies = comparison.strategies;
   let objectiveReferenceKey: StrategyKey = readOnly ? comparison.recommended : 'allSalary';
 
-  for (const key of ['optimalMix', 'allDividends'] as const) {
+  for (const key of readOnly ? [] : (['optimalMix', 'allDividends'] as const)) {
     if (objective === 'maximizeTakeHome') {
       if (
         comparisonStrategies[key].takeHome > comparisonStrategies[objectiveReferenceKey].takeHome
@@ -120,8 +124,10 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
         </h3>
         {readOnly ? (
           <p className='mt-2 text-sm text-muted-foreground'>
-            The breakdown shows the highest take-home strategy. Other strategies are shown for
-            comparison.
+            {hasMinimumSalary
+              ? 'Your minimum salary guides the displayed result.'
+              : 'The breakdown shows the highest take-home strategy.'}{' '}
+            Other strategies are shown for comparison.
           </p>
         ) : (
           <>
@@ -238,7 +244,11 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
               {/* Objective badge */}
               {isRecommended && (
                 <span className='absolute -top-2 right-3 rounded-sm bg-success px-2 py-0.5 text-xs font-medium text-success-foreground'>
-                  {objective === 'maximizeTakeHome' ? 'Highest Take-Home' : 'Lowest NI'}
+                  {hasMinimumSalary
+                    ? 'Displayed Result'
+                    : objective === 'maximizeTakeHome'
+                      ? 'Highest Take-Home'
+                      : 'Lowest NI'}
                 </span>
               )}
 
@@ -290,7 +300,11 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
                 </div>
                 <div className='flex justify-between'>
                   <span className='text-muted-foreground'>
-                    {objective === 'maximizeTakeHome' ? 'Vs Max Take-Home' : 'Vs Lowest NI'}
+                    {hasMinimumSalary
+                      ? 'Vs Displayed Result'
+                      : objective === 'maximizeTakeHome'
+                        ? 'Vs Max Take-Home'
+                        : 'Vs Lowest NI'}
                   </span>
                   <span
                     className={cn(

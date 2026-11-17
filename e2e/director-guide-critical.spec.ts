@@ -492,6 +492,76 @@ test.describe('Director result currentness @critical', () => {
 });
 
 test.describe('Director Intelligence critical @critical', () => {
+  test('JGF-45: honours the salary minimum and reports when it becomes unaffordable', async ({
+    page,
+  }, testInfo) => {
+    const errors: string[] = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+    page.on('console', (message) => {
+      const text = message.text();
+      // WebKit ignores the site's existing virtual-keyboard viewport hint.
+      if (text === 'Viewport argument key "interactive-widget" not recognized and ignored.') return;
+      if (['warning', 'error'].includes(message.type())) errors.push(text);
+    });
+    await page.route('**/_vercel/{insights,speed-insights}/script.js', (route) =>
+      route.fulfill({ contentType: 'application/javascript', body: '' }),
+    );
+    await openDirectorGuide(page);
+    await selectEngland(page);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 200000);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 0);
+    await page
+      .getByRole('button', { name: 'Full Inputs', exact: true })
+      .filter({ visible: true })
+      .click();
+    await page.getByRole('button', { name: 'Advanced Options' }).filter({ visible: true }).click();
+    await fillCurrencyInput(
+      page.getByRole('textbox', { name: 'Minimum Salary', exact: true }).filter({ visible: true }),
+      60000,
+    );
+    await closeInputsPanelIfOpen(page);
+
+    const salary = detailRowValue(page, 'Salary Breakdown', 'Gross Salary');
+    const warning = page.getByRole('status').filter({ hasText: 'short of your minimum' });
+    const strategies = page.getByRole('region', { name: 'Strategy comparison' });
+    const displayed = strategies.getByRole('article').filter({
+      has: page.getByText('Displayed Result', { exact: true }),
+    });
+    const mix = strategies.getByRole('article').filter({
+      has: page.getByRole('heading', { name: 'Baseline Mix', exact: true }),
+    });
+    // The mix meets the floor with £131,750 taxable profit less £31,163.75 CT.
+    await expect(mix).toContainText('£60,000');
+    await expect(mix).toContainText('£100,586');
+    // All Salary also meets the floor and has the higher take-home of the feasible strategies.
+    await expect(displayed).toContainText('All Salary');
+    await expect(salary).toHaveText('£174,565');
+    await expect(page.getByRole('button', { name: 'Email My Results' })).toBeDisabled();
+    await expect(warning).toHaveCount(0);
+    await testInfo.attach('feasible-minimum', {
+      body: await page.screenshot(),
+      contentType: 'image/png',
+    });
+
+    // No EA or BIK. At £57,000 profit, (57,000 + 750) / 1.15 gives £50,217.39.
+    await ensureInputsPanelIsVisible(page);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 57000);
+    await closeInputsPanelIfOpen(page);
+    await expect(warning).toHaveText(
+      'The highest affordable salary is £50,217.39, which falls £9,782.61 short of your minimum.',
+    );
+    await expect(displayed).toContainText('Baseline Mix');
+    await expect(salary).toHaveText('£50,217');
+    await expect(strategies.getByRole('button')).toHaveCount(0);
+    await expect(page.getByRole('slider')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Email My Results' })).toBeEnabled();
+    await testInfo.attach('unaffordable-minimum', {
+      body: await page.screenshot(),
+      contentType: 'image/png',
+    });
+    expect(errors).toEqual([]);
+  });
+
   test('JGF-43: reserves Class 1A before dividends and shows a company shortfall', async ({
     page,
   }) => {

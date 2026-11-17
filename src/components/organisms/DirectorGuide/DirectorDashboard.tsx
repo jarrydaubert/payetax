@@ -231,6 +231,7 @@ export function DirectorDashboard() {
   const hasComparison = Boolean(comparison);
   const isSurvivalMode = Boolean(comparison && comparison.grossProfit <= 0);
   const companyShortfall = comparison?.strategies.allDividends.companyShortfall ?? 0;
+  const mix = comparison?.strategies.optimalMix;
 
   // Keep an open email form disabled during the debounce; close it if results cannot recover.
   useEffect(() => {
@@ -342,6 +343,15 @@ export function DirectorDashboard() {
                     Available company profit falls short of the Class 1A National Insurance bill by{' '}
                     {formatCurrency(companyShortfall)}. The full-year strategies have £0 available
                     for salary or dividends.
+                  </p>
+                )}
+                {mix && (mix.minimumSalaryShortfall ?? 0) > 0 && (
+                  <p
+                    role='status'
+                    className='rounded-sm border border-warning/40 bg-card p-4 text-sm'
+                  >
+                    The highest affordable salary is {formatCurrency(mix.salary)}, which falls{' '}
+                    {formatCurrency(mix.minimumSalaryShortfall ?? 0)} short of your minimum.
                   </p>
                 )}
                 {isSurvivalMode ? (
