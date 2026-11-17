@@ -66,7 +66,6 @@ interface StrategyCalcOptions {
   associatedCompaniesCount: number;
   hasOtherPAYE: boolean;
   lossesBroughtForward: number;
-  minimumSalary?: number;
 }
 
 export interface StrategyResult extends SalaryScenarioResult {
@@ -122,6 +121,7 @@ interface CompanyBudget {
 
 export interface SalaryScenarioResult extends CompanyBudget {
   salary: number;
+  minimumSalaryShortfall?: number; // Gap between the required and affordable gross salary
   employeeNI: number;
   incomeTax: number;
   dividendTax: number;
@@ -137,37 +137,40 @@ export interface SalaryScenarioResult extends CompanyBudget {
 // CONSTANTS
 // ============================================================================
 
-// Helper to get tax year specific values
-function getEmploymentAllowance(taxYear: TaxYear): number {
-  return TAX_RATES[taxYear].nationalInsurance.employmentAllowance;
-}
-
-function getEmployerNIParams(taxYear: TaxYear): { threshold: number; rate: number } {
-  const niRates = TAX_RATES[taxYear].nationalInsurance.employer.A.secondary;
-  return { threshold: niRates.threshold, rate: niRates.rate / 100 };
-}
-
 function getClass1ANI(companyCarBIK: number, taxYear: TaxYear): number {
   const rate = TAX_RATES[taxYear].nationalInsurance.class1A.rate / 100;
   return roundToPence(Math.max(0, companyCarBIK) * rate);
 }
 
-function getSecondaryNI(salary: number, taxYear: TaxYear, allowance: number): number {
+function getSecondaryNI(
+  salary: number,
+  { taxYear, hasEmploymentAllowance }: StrategyCalcOptions,
+): number {
+  const allowance = hasEmploymentAllowance
+    ? TAX_RATES[taxYear].nationalInsurance.employmentAllowance
+    : 0;
   return Math.max(0, getEmployerNI(salary, taxYear) - allowance);
 }
 
-function getAffordableSalary(salaryBudget: number, taxYear: TaxYear, allowance = 0): number {
-  const { threshold, rate } = getEmployerNIParams(taxYear);
-  const estimate = Math.min(
-    salaryBudget,
-    (salaryBudget + rate * threshold + allowance) / (1 + rate),
+function getAffordableSalary(opts: StrategyCalcOptions): number {
+  const salaryBudgetPence = Math.max(
+    0,
+    Math.round((opts.grossProfit - getClass1ANI(opts.companyCarBIK, opts.taxYear)) * 100),
   );
-  const salary = roundToPence(estimate);
 
-  // The rounded salary and rounded secondary Class 1 can cost a penny more than the estimate.
-  return roundToPence(salary + getSecondaryNI(salary, taxYear, allowance)) > salaryBudget
-    ? roundToPence(salary - 0.01)
-    : salary;
+  // Search whole pennies using the same rounded Class 1 cost as the company budget.
+  let low = 0;
+  let high = salaryBudgetPence;
+  while (low < high) {
+    const salaryPence = Math.ceil((low + high) / 2);
+    const niPence = Math.round(getSecondaryNI(salaryPence / 100, opts) * 100);
+    if (salaryPence + niPence <= salaryBudgetPence) {
+      low = salaryPence;
+    } else {
+      high = salaryPence - 1;
+    }
+  }
+  return low / 100;
 }
 
 /** Apply deductible company liabilities before allocating any remaining profit. */
@@ -176,11 +179,9 @@ function calculateCompanyBudget(
   salary: number,
   requestedDividends?: number,
 ): CompanyBudget {
-  const { grossProfit, taxYear, companyCarBIK, hasEmploymentAllowance, lossesBroughtForward } =
-    opts;
-  const allowance = hasEmploymentAllowance ? getEmploymentAllowance(taxYear) : 0;
+  const { grossProfit, taxYear, companyCarBIK, lossesBroughtForward } = opts;
   const class1ANI = getClass1ANI(companyCarBIK, taxYear);
-  const employerNI = roundToPence(getSecondaryNI(salary, taxYear, allowance) + class1ANI);
+  const employerNI = roundToPence(getSecondaryNI(salary, opts) + class1ANI);
   const profitAfterPayroll = roundToPence(grossProfit - salary - employerNI);
   const taxableProfit = roundToPence(Math.max(0, profitAfterPayroll - lossesBroughtForward));
   const corporationTax = getCorporationTax(taxableProfit, taxYear, opts.associatedCompaniesCount);
@@ -253,12 +254,13 @@ export function calculateStrategyComparison(
     associatedCompaniesCount: normalizeAssociatedCompaniesCount(input.associatedCompaniesCount),
     hasOtherPAYE: input.hasOtherPAYEEmployment ?? false,
     lossesBroughtForward: input.lossesBroughtForward ?? 0,
-    minimumSalary: input.minimumSalaryRequirement ?? 0,
   };
 
   // Calculate each strategy
-  const allSalary = calculateAllSalaryStrategy(opts);
-  const optimalMix = calculateOptimalMixStrategy(opts);
+  const minimumSalary = roundToPence(Math.max(0, input.minimumSalaryRequirement ?? 0));
+  const affordableSalary = getAffordableSalary(opts);
+  const allSalary = calculateAllSalaryStrategy(opts, affordableSalary);
+  const optimalMix = calculateOptimalMixStrategy(opts, affordableSalary, minimumSalary);
   const allDividends = calculateAllDividendsStrategy(opts);
 
   // Find best strategy
@@ -266,11 +268,11 @@ export function calculateStrategyComparison(
   let recommended: 'allSalary' | 'optimalMix' | 'allDividends' = 'optimalMix';
   let maxTakeHome = optimalMix.takeHome;
 
-  if (allSalary.takeHome > maxTakeHome) {
+  if (allSalary.salary >= minimumSalary && allSalary.takeHome > maxTakeHome) {
     recommended = 'allSalary';
     maxTakeHome = allSalary.takeHome;
   }
-  if (allDividends.takeHome > maxTakeHome) {
+  if (allDividends.salary >= minimumSalary && allDividends.takeHome > maxTakeHome) {
     recommended = 'allDividends';
     maxTakeHome = allDividends.takeHome;
   }
@@ -304,13 +306,12 @@ export function calculateStrategyComparison(
 // STRATEGY CALCULATORS
 // ============================================================================
 
-function calculateAllSalaryStrategy(opts: StrategyCalcOptions): StrategyResult {
+function calculateAllSalaryStrategy(opts: StrategyCalcOptions, salary: number): StrategyResult {
   const {
     grossProfit,
     region,
     taxYear,
     otherIncome,
-    hasEmploymentAllowance,
     studentLoanPlans,
     pension,
     companyCarBIK,
@@ -321,12 +322,6 @@ function calculateAllSalaryStrategy(opts: StrategyCalcOptions): StrategyResult {
     return createEmptyResult('All Salary', opts);
   }
 
-  const salaryBudget = Math.max(
-    0,
-    roundToPence(grossProfit - getClass1ANI(companyCarBIK, taxYear)),
-  );
-  const allowance = hasEmploymentAllowance ? getEmploymentAllowance(taxYear) : 0;
-  const salary = getAffordableSalary(salaryBudget, taxYear, allowance);
   const budget = calculateCompanyBudget(opts, salary, 0);
 
   // If other PAYE employment, NI threshold already used - pay NI from first pound
@@ -384,7 +379,7 @@ export function calculateSalaryScenario({
   minimumSalary = 0,
   ...options
 }: SalaryScenarioInput): SalaryScenarioResult {
-  const scenario = calculateSalaryScenarioInternal(Math.max(targetSalary, minimumSalary, 0), {
+  const opts: StrategyCalcOptions = {
     ...options,
     grossProfit: roundToPence(grossProfit),
     studentLoanPlans,
@@ -393,12 +388,23 @@ export function calculateSalaryScenario({
     associatedCompaniesCount: normalizeAssociatedCompaniesCount(associatedCompaniesCount),
     hasOtherPAYE,
     lossesBroughtForward,
-  });
-  return { ...scenario, takeHome: roundToPence(scenario.takeHome) };
+  };
+  const salaryFloor = roundToPence(Math.max(0, minimumSalary));
+  const salary = Math.min(
+    roundToPence(Math.max(targetSalary, salaryFloor)),
+    getAffordableSalary(opts),
+  );
+  const scenario = calculateSalaryScenarioInternal(salary, opts);
+  const minimumSalaryShortfall = roundToPence(salaryFloor - salary);
+  return {
+    ...scenario,
+    ...(minimumSalaryShortfall > 0 && { minimumSalaryShortfall }),
+    takeHome: roundToPence(scenario.takeHome),
+  };
 }
 
 function calculateSalaryScenarioInternal(
-  targetSalary: number,
+  salary: number,
   opts: StrategyCalcOptions,
 ): SalaryScenarioResult {
   const {
@@ -412,11 +418,6 @@ function calculateSalaryScenarioInternal(
     hasOtherPAYE,
   } = opts;
 
-  const salaryBudget = Math.max(
-    0,
-    roundToPence(grossProfit - getClass1ANI(companyCarBIK, taxYear)),
-  );
-  const salary = Math.min(roundToPence(targetSalary), getAffordableSalary(salaryBudget, taxYear));
   const budget = calculateCompanyBudget(opts, salary);
   const { dividends } = budget;
 
@@ -464,49 +465,51 @@ function calculateSalaryScenarioInternal(
   };
 }
 
-function calculateOptimalMixStrategy(opts: StrategyCalcOptions): StrategyResult {
-  const { grossProfit, taxYear, minimumSalary = 0 } = opts;
+function calculateOptimalMixStrategy(
+  opts: StrategyCalcOptions,
+  affordableSalary: number,
+  minimumSalary: number,
+): StrategyResult {
+  const { grossProfit, taxYear } = opts;
+  const minimumSalaryShortfall = roundToPence(minimumSalary - affordableSalary);
+  const shortfall = minimumSalaryShortfall > 0 ? { minimumSalaryShortfall } : {};
 
   if (grossProfit <= 0) {
-    return createEmptyResult('Baseline Mix', opts);
+    return { ...createEmptyResult('Baseline Mix', opts), ...shortfall };
   }
 
   // Spec: test salary/dividend combinations across the valid range.
   // In this model, dividends are determined by the remaining post-salary profit,
   // so we can sweep salary across a range and compute the resulting dividends/taxes.
   //
-  // Performance: Cap search at the NI Upper Earnings Limit (UEL) or gross profit.
+  // Bound the search at the UEL unless the required salary is higher.
   // Use a two-stage search: coarse sweep + local refinement around the best point.
   const uel = TAX_RATES[taxYear].nationalInsurance.employee.A.upper.threshold;
-  const maxSalary = Math.min(uel, grossProfit);
-  const minSalary = Math.max(0, minimumSalary);
-
-  // Guard: if the minimum salary is above what can be afforded, clamp to max.
-  if (minSalary >= maxSalary) {
-    const scenario = calculateSalaryScenarioInternal(maxSalary, opts);
-    return { ...scenario, name: 'Baseline Mix', takeHome: roundToPence(scenario.takeHome) };
-  }
+  const maxSalary = Math.min(affordableSalary, Math.max(uel, minimumSalary));
+  const minSalary = Math.min(minimumSalary, maxSalary);
 
   const coarseStep = 100; // £100 granularity is cheap and good enough for threshold-driven tax.
-  let bestSalary = minSalary;
-  let bestScenario = calculateSalaryScenarioInternal(bestSalary, opts);
+  let bestScenario = calculateSalaryScenarioInternal(minSalary, opts);
 
-  for (let s = minSalary; s <= maxSalary; s += coarseStep) {
-    const scenario = calculateSalaryScenarioInternal(s, opts);
+  for (let s = minSalary + coarseStep; s <= maxSalary; s += coarseStep) {
+    const scenario = calculateSalaryScenarioInternal(roundToPence(s), opts);
     if (scenario.takeHome > bestScenario.takeHome) {
       bestScenario = scenario;
-      bestSalary = s;
     }
+  }
+  if (maxSalary > minSalary) {
+    const upperScenario = calculateSalaryScenarioInternal(maxSalary, opts);
+    if (upperScenario.takeHome > bestScenario.takeHome) bestScenario = upperScenario;
   }
 
   // Refinement: search +/- £2,000 around the coarse winner in £10 steps.
   const refineWindow = 2000;
   const refineStep = 10;
-  const start = Math.max(minSalary, bestSalary - refineWindow);
-  const end = Math.min(maxSalary, bestSalary + refineWindow);
+  const start = Math.max(minSalary, bestScenario.salary - refineWindow);
+  const end = Math.min(maxSalary, bestScenario.salary + refineWindow);
 
   for (let s = start; s <= end; s += refineStep) {
-    const scenario = calculateSalaryScenarioInternal(s, opts);
+    const scenario = calculateSalaryScenarioInternal(roundToPence(s), opts);
     if (scenario.takeHome > bestScenario.takeHome) {
       bestScenario = scenario;
     }
@@ -517,13 +520,18 @@ function calculateOptimalMixStrategy(opts: StrategyCalcOptions): StrategyResult 
   const fineStart = Math.max(minSalary, bestScenario.salary - fineWindow);
   const fineEnd = Math.min(maxSalary, bestScenario.salary + fineWindow);
   for (let s = fineStart; s <= fineEnd; s += 1) {
-    const scenario = calculateSalaryScenarioInternal(s, opts);
+    const scenario = calculateSalaryScenarioInternal(roundToPence(s), opts);
     if (scenario.takeHome > bestScenario.takeHome) {
       bestScenario = scenario;
     }
   }
 
-  return { ...bestScenario, name: 'Baseline Mix', takeHome: roundToPence(bestScenario.takeHome) };
+  return {
+    ...bestScenario,
+    name: 'Baseline Mix',
+    ...shortfall,
+    takeHome: roundToPence(bestScenario.takeHome),
+  };
 }
 
 function calculateAllDividendsStrategy(opts: StrategyCalcOptions): StrategyResult {

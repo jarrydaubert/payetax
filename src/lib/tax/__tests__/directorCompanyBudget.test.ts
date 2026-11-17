@@ -10,6 +10,123 @@ const sliderInputs = {
   hasEmploymentAllowance: false,
 } as const;
 
+// Full-year category A director, rUK, 2026/27. Secondary Class 1 is 15% above
+// £5,000 even beyond the £50,270 UEL. Declared £10,500 EA offsets Class 1 only.
+// gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027
+// gov.uk/government/publications/employment-allowance-more-detailed-guidance/claiming-employment-allowance-further-employer-guidance
+describe('Director salary affordability (JGF-45)', () => {
+  it.each([
+    [0, 79347.83, 652.17, 79347.84, 0.02],
+    [10000, 78043.48, 1956.52, 78043.49, 0.01],
+  ])(
+    'shares the penny-level maximum with £%i BIK and declared allowance',
+    (companyCarBIK, salary, employerNI, nextPennySalary, nextPennyShortfall) => {
+      const { strategies } = calculateStrategyComparison(
+        {
+          ...inputs,
+          revenue: 100000,
+          expenses: 20000,
+          companyCarBIK,
+          employmentAllowance: true,
+          yourSetupSalary: nextPennySalary,
+        },
+        taxYear,
+      );
+      // For budget £80,000 less 15% of BIK, solve salary + 15% × (salary − £5,000)
+      // − £10,500 = budget. At £79,347.84 net Class 1 also rises by a penny.
+      const expected = {
+        salary,
+        employerNI,
+        dividends: 0,
+        companyCost: 80000,
+        companyShortfall: 0,
+      };
+      expect(strategies.allSalary).toMatchObject(expected);
+      expect(
+        calculateSalaryScenario({
+          ...sliderInputs,
+          hasEmploymentAllowance: true,
+          grossProfit: 80000,
+          targetSalary: salary,
+          companyCarBIK,
+        }),
+      ).toMatchObject(expected);
+      expect(strategies.yourSetup).toMatchObject({
+        salary: nextPennySalary,
+        companyShortfall: nextPennyShortfall,
+        exceedsProfit: true,
+      });
+    },
+  );
+
+  it.each([
+    [4999, false, 4999],
+    [5000, false, 5000],
+    [5001.15, false, 5001],
+    [74999, true, 74999],
+    [75000, true, 75000],
+    [75001.15, true, 75001],
+  ])(
+    'can spend £%p at the Secondary Threshold or allowance exhaustion',
+    (profit, allowance, salary) => {
+      // £75,000 is the point where 15% × (£75,000 − £5,000) spends the £10,500 EA.
+      expect(
+        calculateSalaryScenario({
+          ...sliderInputs,
+          grossProfit: profit,
+          hasEmploymentAllowance: allowance,
+          targetSalary: 100000,
+        }),
+      ).toMatchObject({ salary, dividends: 0, companyCost: profit });
+    },
+  );
+
+  it.each([
+    [50269, 6790.35],
+    [50270, 6790.5],
+    [50271, 6790.65],
+    [60000, 8250],
+  ])('respects a feasible £%i floor on either side of the UEL', (salary, employerNI) => {
+    // Baseline Mix keeps its bounded search. Above the UEL it evaluates the floor itself.
+    const { strategies, recommended } = calculateStrategyComparison(
+      {
+        ...inputs,
+        revenue: 200000,
+        minimumSalaryRequirement: salary,
+      },
+      taxYear,
+    );
+    expect(strategies.optimalMix).toMatchObject({ salary, employerNI });
+    expect(strategies[recommended].salary).toBeGreaterThanOrEqual(salary);
+    expect(strategies.allDividends.salary).toBe(0);
+  });
+
+  it('reports a minimum one penny above the maximum, even when the fallback balances', () => {
+    const { strategies } = calculateStrategyComparison(
+      {
+        ...inputs,
+        revenue: 80000,
+        companyCarBIK: 10000,
+        employmentAllowance: true,
+        minimumSalaryRequirement: 78043.49,
+      },
+      taxYear,
+    );
+    const expected = { salary: 78043.48, minimumSalaryShortfall: 0.01, companyShortfall: 0 };
+    expect(strategies.optimalMix).toMatchObject(expected);
+    expect(
+      calculateSalaryScenario({
+        ...sliderInputs,
+        grossProfit: 80000,
+        targetSalary: 0,
+        companyCarBIK: 10000,
+        hasEmploymentAllowance: true,
+        minimumSalary: 78043.49,
+      }),
+    ).toMatchObject(expected);
+  });
+});
+
 // Annual figures for one company, with no exempt distributions and provision costs already deducted.
 // Class 1A and secondary Class 1: gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027
 // Deductible NI: gov.uk/hmrc-internal-manuals/business-income-manual/bim42523

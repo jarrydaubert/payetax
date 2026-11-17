@@ -143,6 +143,9 @@ export function useActiveDirectorScenario(
       companyCost: strategy.companyCost,
       retainedProfit: strategy.retainedProfit,
       companyShortfall: strategy.companyShortfall,
+      ...(strategy.minimumSalaryShortfall && {
+        minimumSalaryShortfall: strategy.minimumSalaryShortfall,
+      }),
       effectiveRate: strategy.effectiveRate,
       takeHome: strategy.takeHome,
     };

@@ -49,6 +49,36 @@ describe('Director results route → real orchestration/templates', () => {
     );
   });
 
+  it('includes the salary minimum shortfall with the affordable estimate', async () => {
+    const response = await POST(
+      new NextRequest('https://payetax.co.uk/api/send-director-results', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', origin: 'https://payetax.co.uk' },
+        body: JSON.stringify({
+          email: 'audit@example.com',
+          taxYear: '2026-2027',
+          input: {
+            region: 'rUK',
+            revenue: 57000,
+            expenses: 0,
+            includesVat: false,
+            minimumSalaryRequirement: 60000,
+          },
+        }),
+      }),
+    );
+    expect(response.status).toBe(200);
+    const shortfall =
+      'The highest affordable salary is £50,217.39, which falls £9,782.61 short of your minimum.';
+    expect(sendOutboundEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        html: expect.stringContaining(shortfall),
+        text: expect.stringContaining(shortfall),
+      }),
+      'send-director-results',
+    );
+  });
+
   it.each(
     [
       { taxYear: '2025-2026', januaryReminder: '31 January 2027' },
