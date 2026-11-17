@@ -650,7 +650,7 @@ function createEmptyResult(name: string, opts: StrategyCalcOptions): StrategyRes
     ...calculateCompanyBudget(opts, 0, 0),
     name,
     salary: 0,
-    pension: 0,
+    pension: roundToPence(opts.pension),
     companyCarBIK: roundToPence(opts.companyCarBIK),
     employeeNI: 0,
     incomeTax: 0,

@@ -230,7 +230,7 @@ export function DirectorDashboard() {
   // Show results when calculation is complete (even for 0 or negative profit)
   const hasComparison = Boolean(comparison);
   const isSurvivalMode = Boolean(comparison && comparison.grossProfit <= 0);
-  const companyShortfall = comparison?.strategies[comparison.recommended].companyShortfall ?? 0;
+  const companyShortfall = comparison?.strategies.allDividends.companyShortfall ?? 0;
 
   // Keep an open email form disabled during the debounce; close it if results cannot recover.
   useEffect(() => {
@@ -336,11 +336,12 @@ export function DirectorDashboard() {
                 )}
                 {companyShortfall > 0 && (
                   <p
-                    role='alert'
+                    role='status'
                     className='rounded-sm border border-warning/40 bg-card p-4 text-sm'
                   >
-                    Company profit falls short of the Class 1A National Insurance bill by{' '}
-                    {formatCurrency(companyShortfall)}. The estimate shows no salary or dividends.
+                    Available company profit falls short of the Class 1A National Insurance bill by{' '}
+                    {formatCurrency(companyShortfall)}. The full-year strategies have £0 available
+                    for salary or dividends.
                   </p>
                 )}
                 {isSurvivalMode ? (

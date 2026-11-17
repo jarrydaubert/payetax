@@ -42,10 +42,18 @@ function formatTaxYearLabel(taxYear?: string): string {
   return `${start}-${end?.slice(-2) ?? ''}`;
 }
 
+type DirectorEmailStrategy = DirectorStrategy & { companyShortfall?: number };
+
 interface AllStrategies {
-  allSalary: DirectorStrategy;
-  optimalMix: DirectorStrategy;
-  allDividends: DirectorStrategy;
+  allSalary: DirectorEmailStrategy;
+  optimalMix: DirectorEmailStrategy;
+  allDividends: DirectorEmailStrategy;
+}
+
+function describeCompanyShortfall(amount = 0): string {
+  return amount > 0
+    ? `Available company profit falls short of the Class 1A National Insurance bill by ${formatCurrency(amount)}. The strategy has £0 available for salary or dividends.`
+    : '';
 }
 
 export function generateDirectorEmailText(args: {
@@ -58,6 +66,7 @@ export function generateDirectorEmailText(args: {
   const { grossProfit, strategies, recommended, savingsVsAllSalary, taxYear } = args;
   const strategy = strategies[recommended];
   const year = formatTaxYearLabel(taxYear);
+  const companyShortfall = describeCompanyShortfall(strategy.companyShortfall);
 
   return `
 DIRECTOR TAX STRATEGY REPORT - PayeTax
@@ -70,6 +79,7 @@ Scenario Summary: ${strategy.name}
 Monthly Take-Home: ${formatCurrency(strategy.takeHome / 12)}
 Annual Take-Home: ${formatCurrency(strategy.takeHome)}
 Total Company Cost: ${formatCurrency(strategy.companyCost)}
+${companyShortfall ? `\n${companyShortfall}\n` : ''}
 
 SAVINGS vs All Salary: ${formatCurrency(savingsVsAllSalary)}
 
@@ -124,6 +134,7 @@ export function generateDirectorEmailHtml(args: {
   const { grossProfit, strategies, recommended, savingsVsAllSalary, taxYear, generatedDate } = args;
 
   const strategy = strategies[recommended];
+  const companyShortfall = describeCompanyShortfall(strategy.companyShortfall);
   const safeStrategyName = escapeHtml(strategy.name);
   const safeTaxYear = escapeHtml(formatTaxYearLabel(taxYear));
   const safeGeneratedDate =
@@ -186,6 +197,7 @@ export function generateDirectorEmailHtml(args: {
 
               <h2 class="email-title" style="margin: 0 0 10px; color: #07111f; font-family: Georgia, 'Times New Roman', serif; font-size: 42px; font-weight: 700; line-height: 1.02;">${safeStrategyName}</h2>
               <p style="margin: 0 0 24px; color: #465468; font-size: 16px; line-height: 1.55;">Estimated salary and dividend extraction based on the company profit details supplied in Director Intelligence.</p>
+              ${companyShortfall ? `<p style="margin: 0 0 24px; color: #a6453c; font-size: 16px; line-height: 1.55;">${escapeHtml(companyShortfall)}</p>` : ''}
 
               <div style="border: 1px solid #123a66; border-left: 4px solid #123a66; background-color: #f2eee4; padding: 20px 22px; margin-bottom: 24px;">
                 <p style="margin: 0 0 8px; color: #123a66; font-family: Menlo, Consolas, monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700;">Annual take-home</p>

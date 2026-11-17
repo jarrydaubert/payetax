@@ -196,4 +196,34 @@ describe('Director company budget (JGF-43)', () => {
       exceedsProfit: true,
     });
   });
+
+  it('uses brought-forward losses for CT without treating them as company cash', () => {
+    const {
+      strategies: { allDividends },
+    } = calculateStrategyComparison(
+      { ...inputs, revenue: 80000, companyCarBIK: 10000, lossesBroughtForward: 10000 },
+      taxYear,
+    );
+    // £78,500 of cash profit after Class 1A. CT on £68,500 is £17,125 − £2,722.50.
+    expect(allDividends).toMatchObject({
+      taxableProfit: 68500,
+      corporationTax: 14402.5,
+      dividends: 64097.5,
+    });
+  });
+
+  it('preserves the pension and Class 1A when the pension uses all available profit', () => {
+    const { strategies } = calculateStrategyComparison(
+      { ...inputs, revenue: 1500, pensionContribution: 1500, companyCarBIK: 10000 },
+      taxYear,
+    );
+    for (const scenario of Object.values(strategies)) {
+      expect(scenario).toMatchObject({
+        pension: 1500,
+        employerNI: 1500,
+        dividends: 0,
+        companyShortfall: 1500,
+      });
+    }
+  });
 });

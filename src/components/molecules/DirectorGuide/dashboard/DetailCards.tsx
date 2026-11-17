@@ -22,12 +22,15 @@ interface DetailCardsProps {
 export function DetailCards({ className }: DetailCardsProps) {
   const { activeScenario, comparison, isProfitWhatIfActive, scenarioGrossProfitBeforePension } =
     useActiveDirectorScenario(true);
-  const { mode, revenue, expenses, pension } = useDirectorFormSlice((state) => ({
-    mode: state.mode,
-    revenue: state.revenue,
-    expenses: state.expenses,
-    pension: state.isPensionAlreadyDeducted ? 0 : state.pensionContribution,
-  }));
+  const { mode, revenue, expenses, pension, lossesBroughtForward } = useDirectorFormSlice(
+    (state) => ({
+      mode: state.mode,
+      revenue: state.revenue,
+      expenses: state.expenses,
+      pension: state.isPensionAlreadyDeducted ? 0 : state.pensionContribution,
+      lossesBroughtForward: state.lossesBroughtForward,
+    }),
+  );
   const monthlyOutput = useMonthlyModeOutput();
   const resolvedRevenue = mode === 'monthly' ? monthlyOutput?.projectedRevenue : (revenue ?? 0);
   const resolvedExpenses = mode === 'monthly' ? monthlyOutput?.projectedExpenses : (expenses ?? 0);
@@ -138,10 +141,22 @@ export function DetailCards({ className }: DetailCardsProps) {
               ]
             : []),
           {
-            label: 'Salary + Employer NI',
+            label:
+              activeScenario.class1ANI > 0
+                ? 'Salary + Employer NI (incl. Class 1A)'
+                : 'Salary + Employer NI',
             value: `-${formatCurrency(activeScenario.salary + activeScenario.employerNI, 0)}`,
             negative: true,
           },
+          ...(lossesBroughtForward > 0
+            ? [
+                {
+                  label: 'Losses Brought Forward',
+                  value: `-${formatCurrency(lossesBroughtForward, 0)}`,
+                  negative: true,
+                },
+              ]
+            : []),
           { label: 'Taxable Profit', value: formatCurrency(activeScenario.taxableProfit, 0) },
         ]}
         total={{
