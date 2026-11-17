@@ -318,10 +318,11 @@ export function DirectorDashboard() {
                     )}
                     {formData.hasOtherPAYEEmployment && (
                       <p>
-                        In the suggested pay options, selecting other PAYE employment means we
-                        estimate employee National Insurance from the first pound of director
-                        salary. Jobs with separate employers usually have separate thresholds, so
-                        this may overstate your NI. Check with your payroll provider.
+                        This estimate applies the annual director National Insurance thresholds to
+                        pay from this company. It assumes your other job has a separate National
+                        Insurance calculation. Ask your payroll provider if your earnings must be
+                        combined, for example if the employers carry on business in association.
+                        HMRC may refund contributions paid above the annual maximum across jobs.
                       </p>
                     )}
                     {formData.pensionContribution > 0 && (

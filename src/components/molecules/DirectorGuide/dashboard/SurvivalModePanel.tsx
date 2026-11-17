@@ -36,7 +36,7 @@ export function SurvivalModePanel({ className }: { className?: string }) {
   const companyLossIfPaySalary = Math.max(0, -(profitBeforeSalary - niCreditsSalary - employerNI));
 
   const noteIfOtherPAYE = formData.hasOtherPAYEEmployment
-    ? 'If you have another PAYE job, NI may apply differently than shown here.'
+    ? 'Your other PAYE job may already count towards a qualifying year. Check your National Insurance record.'
     : null;
 
   return (
