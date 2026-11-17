@@ -44,7 +44,7 @@ import {
 } from '@/lib/directorGuideAnalytics';
 import { safeGetItem, safeSetItem } from '@/lib/safeStorage';
 import { calculateSafeMonthlyDraw, resolveAnnualFinancials } from '@/lib/tax';
-import { cn } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 import type { DirectorEmailInput } from '@/lib/validation/emailValidation';
 import {
   useDirectorCalculationFailed,
@@ -230,6 +230,7 @@ export function DirectorDashboard() {
   // Show results when calculation is complete (even for 0 or negative profit)
   const hasComparison = Boolean(comparison);
   const isSurvivalMode = Boolean(comparison && comparison.grossProfit <= 0);
+  const companyShortfall = comparison?.strategies.allDividends.companyShortfall ?? 0;
 
   // Keep an open email form disabled during the debounce; close it if results cannot recover.
   useEffect(() => {
@@ -332,6 +333,16 @@ export function DirectorDashboard() {
                       </p>
                     )}
                   </section>
+                )}
+                {companyShortfall > 0 && (
+                  <p
+                    role='status'
+                    className='rounded-sm border border-warning/40 bg-card p-4 text-sm'
+                  >
+                    Available company profit falls short of the Class 1A National Insurance bill by{' '}
+                    {formatCurrency(companyShortfall)}. The full-year strategies have £0 available
+                    for salary or dividends.
+                  </p>
                 )}
                 {isSurvivalMode ? (
                   <>

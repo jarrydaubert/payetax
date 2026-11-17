@@ -25,20 +25,11 @@ export function MoneyFlowChart() {
   // Company-side taxes: Corporation Tax + Employer NI
   const companyTaxes = activeScenario.corporationTax + activeScenario.employerNI;
 
-  // What remains in the company after all extractions and taxes
-  // Retained = Profit - Salary - ErNI - Dividends - CT - Pension
-  const retained = Math.max(
-    0,
-    grossProfit -
-      activeScenario.salary -
-      activeScenario.employerNI -
-      activeScenario.dividends -
-      activeScenario.corporationTax -
-      activeScenario.pension,
-  );
+  const retained = activeScenario.retainedProfit;
 
   // Helper to clamp percentages for display
-  const clampPercent = (val: number, max: number) => Math.max(0, Math.min(100, (val / max) * 100));
+  const clampPercent = (val: number, max: number) =>
+    max > 0 ? Math.max(0, Math.min(100, (val / max) * 100)) : 0;
 
   const bars = [
     {

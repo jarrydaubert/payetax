@@ -19,6 +19,36 @@ describe('Director results route → real orchestration/templates', () => {
     jest.clearAllMocks();
   });
 
+  it('reports a Class 1A shortfall in the HTML and text emails from validated inputs', async () => {
+    const response = await POST(
+      new NextRequest('https://payetax.co.uk/api/send-director-results', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', origin: 'https://payetax.co.uk' },
+        body: JSON.stringify({
+          email: 'audit@example.com',
+          taxYear: '2026-2027',
+          input: {
+            region: 'rUK',
+            revenue: 1000,
+            expenses: 0,
+            includesVat: false,
+            companyCarBIK: 10000,
+          },
+        }),
+      }),
+    );
+    expect(response.status).toBe(200);
+    const shortfall =
+      'Available company profit falls short of the Class 1A National Insurance bill by £500.00.';
+    expect(sendOutboundEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        html: expect.stringContaining(shortfall),
+        text: expect.stringContaining(shortfall),
+      }),
+      'send-director-results',
+    );
+  });
+
   it.each(
     [
       { taxYear: '2025-2026', januaryReminder: '31 January 2027' },

@@ -69,27 +69,13 @@ interface StrategyCalcOptions {
   minimumSalary?: number;
 }
 
-export interface StrategyResult {
+export interface StrategyResult extends SalaryScenarioResult {
   name: string;
-  salary: number;
-  dividends: number;
-  pension: number;
-  companyCarBIK: number;
-  employerNI: number;
-  employeeNI: number;
-  incomeTax: number;
-  corporationTax: number;
-  dividendTax: number;
-  studentLoan: number;
-  totalPersonalTax: number;
-  companyCost: number;
-  takeHome: number;
-  effectiveRate: number;
 }
 
 export interface YourSetupResult extends StrategyResult {
   deltaVsOptimal: number; // Positive = paying more tax than optimal
-  exceedsProfit: boolean; // True if salary + dividends > gross profit (DLA warning)
+  exceedsProfit: boolean; // True if the entered setup exceeds the company budget
 }
 
 export interface StrategyComparison {
@@ -123,19 +109,26 @@ export interface SalaryScenarioInput {
   minimumSalary?: number;
 }
 
-export interface SalaryScenarioResult {
-  salary: number;
-  employerNI: number;
-  employeeNI: number;
-  incomeTax: number;
+interface CompanyBudget {
+  employerNI: number; // Secondary Class 1 after any allowance, plus Class 1A
+  class1ANI: number;
+  taxableProfit: number;
   corporationTax: number;
   dividends: number;
+  companyCost: number; // Salary and company tax liabilities, excluding dividends
+  retainedProfit: number;
+  companyShortfall: number;
+}
+
+export interface SalaryScenarioResult extends CompanyBudget {
+  salary: number;
+  employeeNI: number;
+  incomeTax: number;
   dividendTax: number;
   studentLoan: number;
   pension: number;
   companyCarBIK: number;
   totalPersonalTax: number;
-  companyCost: number;
   effectiveRate: number;
   takeHome: number;
 }
@@ -154,13 +147,57 @@ function getEmployerNIParams(taxYear: TaxYear): { threshold: number; rate: numbe
   return { threshold: niRates.threshold, rate: niRates.rate / 100 };
 }
 
-function getClass1ANIRate(taxYear: TaxYear): number {
-  return TAX_RATES[taxYear].nationalInsurance.class1A.rate / 100;
+function getClass1ANI(companyCarBIK: number, taxYear: TaxYear): number {
+  const rate = TAX_RATES[taxYear].nationalInsurance.class1A.rate / 100;
+  return roundToPence(Math.max(0, companyCarBIK) * rate);
 }
 
-function getClass1ANI(companyCarBIK: number, taxYear: TaxYear): number {
-  if (companyCarBIK <= 0) return 0;
-  return companyCarBIK * getClass1ANIRate(taxYear);
+function getSecondaryNI(salary: number, taxYear: TaxYear, allowance: number): number {
+  return Math.max(0, getEmployerNI(salary, taxYear) - allowance);
+}
+
+function getAffordableSalary(salaryBudget: number, taxYear: TaxYear, allowance = 0): number {
+  const { threshold, rate } = getEmployerNIParams(taxYear);
+  const estimate = Math.min(
+    salaryBudget,
+    (salaryBudget + rate * threshold + allowance) / (1 + rate),
+  );
+  const salary = roundToPence(estimate);
+
+  // The rounded salary and rounded secondary Class 1 can cost a penny more than the estimate.
+  return roundToPence(salary + getSecondaryNI(salary, taxYear, allowance)) > salaryBudget
+    ? roundToPence(salary - 0.01)
+    : salary;
+}
+
+/** Apply deductible company liabilities before allocating any remaining profit. */
+function calculateCompanyBudget(
+  opts: StrategyCalcOptions,
+  salary: number,
+  requestedDividends?: number,
+): CompanyBudget {
+  const { grossProfit, taxYear, companyCarBIK, hasEmploymentAllowance, lossesBroughtForward } =
+    opts;
+  const allowance = hasEmploymentAllowance ? getEmploymentAllowance(taxYear) : 0;
+  const class1ANI = getClass1ANI(companyCarBIK, taxYear);
+  const employerNI = roundToPence(getSecondaryNI(salary, taxYear, allowance) + class1ANI);
+  const profitAfterPayroll = roundToPence(grossProfit - salary - employerNI);
+  const taxableProfit = roundToPence(Math.max(0, profitAfterPayroll - lossesBroughtForward));
+  const corporationTax = getCorporationTax(taxableProfit, taxYear, opts.associatedCompaniesCount);
+  const distributableProfit = roundToPence(profitAfterPayroll - corporationTax);
+  const dividends = requestedDividends ?? Math.max(0, distributableProfit);
+  const balance = roundToPence(distributableProfit - dividends);
+
+  return {
+    employerNI,
+    class1ANI,
+    taxableProfit,
+    corporationTax,
+    dividends,
+    companyCost: roundToPence(salary + employerNI + corporationTax),
+    retainedProfit: Math.max(0, balance),
+    companyShortfall: Math.max(0, -balance),
+  };
 }
 
 function normalizeAssociatedCompaniesCount(value: number | undefined): number {
@@ -198,7 +235,7 @@ export function calculateStrategyComparison(
   const pensionContribution = input.pensionContribution ?? 0;
   // Spec: VAT status is warnings/education only (do NOT adjust revenue in calculations).
   const grossProfitBeforePension = input.revenue - input.expenses;
-  const grossProfit = Math.max(0, grossProfitBeforePension - pensionContribution);
+  const grossProfit = roundToPence(Math.max(0, grossProfitBeforePension - pensionContribution));
 
   // Available for extraction (profit minus what's already been taken)
   const availableForExtraction = Math.max(0, grossProfit - alreadyTaken);
@@ -281,62 +318,16 @@ function calculateAllSalaryStrategy(opts: StrategyCalcOptions): StrategyResult {
   } = opts;
 
   if (grossProfit <= 0) {
-    return createEmptyResult('All Salary');
+    return createEmptyResult('All Salary', opts);
   }
 
-  const class1ANI = getClass1ANI(companyCarBIK, taxYear);
-  const salaryBudget = Math.max(0, grossProfit - class1ANI);
-
-  // For all salary, we need to find the salary that uses up all profit
-  // With Employment Allowance, employer NI is reduced
-  // This changes the optimal salary calculation
-
-  const { threshold: niThreshold, rate: niRate } = getEmployerNIParams(taxYear);
-  const employmentAllowance = getEmploymentAllowance(taxYear);
-  let salary: number;
-  let employerNI: number;
-
-  if (hasEmploymentAllowance) {
-    // With EA, we can take more salary since employer NI is offset
-    // Max salary where EA fully covers employer NI:
-    // EA = employmentAllowance, NI = niRate * (salary - niThreshold)
-    // employmentAllowance = niRate * (salary - niThreshold)
-    // salary = employmentAllowance/niRate + niThreshold
-    const maxSalaryWithFullEA = employmentAllowance / niRate + niThreshold;
-
-    if (salaryBudget <= maxSalaryWithFullEA) {
-      // EA covers all employer NI, so salary = profit
-      salary = salaryBudget;
-      employerNI = Math.max(0, getEmployerNI(salary, taxYear) - employmentAllowance);
-    } else {
-      // Profit exceeds what EA can cover
-      // Profit = Salary + (EmployerNI - EA)
-      // Salary = (Profit + niThreshold * niRate + EA) / (1 + niRate)
-      salary = (salaryBudget + niThreshold * niRate + employmentAllowance) / (1 + niRate);
-      salary = Math.floor(salary);
-      employerNI = Math.max(0, getEmployerNI(salary, taxYear) - employmentAllowance);
-    }
-  } else {
-    // No EA - original calculation
-    if (salaryBudget <= niThreshold) {
-      salary = salaryBudget;
-    } else {
-      salary = (salaryBudget + niThreshold * niRate) / (1 + niRate);
-    }
-    salary = Math.floor(salary);
-    employerNI = getEmployerNI(salary, taxYear);
-  }
-
-  employerNI += class1ANI;
-
-  // Verify we're within budget
-  while (salary > 0 && salary + employerNI > grossProfit) {
-    salary -= 1;
-    const salaryEmployerNI = hasEmploymentAllowance
-      ? Math.max(0, getEmployerNI(salary, taxYear) - employmentAllowance)
-      : getEmployerNI(salary, taxYear);
-    employerNI = salaryEmployerNI + class1ANI;
-  }
+  const salaryBudget = Math.max(
+    0,
+    roundToPence(grossProfit - getClass1ANI(companyCarBIK, taxYear)),
+  );
+  const allowance = hasEmploymentAllowance ? getEmploymentAllowance(taxYear) : 0;
+  const salary = getAffordableSalary(salaryBudget, taxYear, allowance);
+  const budget = calculateCompanyBudget(opts, salary, 0);
 
   // If other PAYE employment, NI threshold already used - pay NI from first pound
   const employeeNI = hasOtherPAYE
@@ -353,8 +344,6 @@ function calculateAllSalaryStrategy(opts: StrategyCalcOptions): StrategyResult {
   const baseIncomeTax =
     otherIncome > 0 ? getIncomeTax(otherIncome, region, taxYear, adjustedNetIncome) : 0;
   const incomeTax = totalIncomeTax - baseIncomeTax; // Marginal tax from salary + BIK
-  const corporationTax = 0; // All profit used for salary
-  const dividends = 0;
   const dividendTax = 0;
 
   // Student loan on total income (salary + BIK for this strategy)
@@ -363,79 +352,73 @@ function calculateAllSalaryStrategy(opts: StrategyCalcOptions): StrategyResult {
   const studentLoan = studentLoanResult.total;
 
   const totalPersonalTax = incomeTax + employeeNI + dividendTax + studentLoan;
-  const companyCost = salary + employerNI;
   const takeHome = salary - incomeTax - employeeNI - studentLoan;
   const effectiveRate = grossProfit > 0 ? ((grossProfit - takeHome) / grossProfit) * 100 : 0;
 
   return {
+    ...budget,
     name: 'All Salary',
-    salary: roundToPence(salary),
-    dividends,
+    salary,
     pension: roundToPence(pension),
     companyCarBIK: roundToPence(companyCarBIK),
-    employerNI: roundToPence(employerNI),
     employeeNI: roundToPence(employeeNI),
     incomeTax: roundToPence(incomeTax),
-    corporationTax,
     dividendTax,
     studentLoan: roundToPence(studentLoan),
     totalPersonalTax: roundToPence(totalPersonalTax),
-    companyCost: roundToPence(companyCost),
     takeHome: roundToPence(takeHome),
     effectiveRate: roundToPence(effectiveRate),
   };
 }
 
-// Helper to calculate take-home for a given salary level
-// Exported for use by the salary slider
-export function calculateSalaryScenario(input: SalaryScenarioInput): SalaryScenarioResult {
+// The slider shares the same salary scenario as each Baseline Mix candidate.
+export function calculateSalaryScenario({
+  targetSalary,
+  grossProfit,
+  studentLoanPlans = [],
+  pension = 0,
+  companyCarBIK = 0,
+  associatedCompaniesCount = 1,
+  hasOtherPAYE = false,
+  lossesBroughtForward = 0,
+  minimumSalary = 0,
+  ...options
+}: SalaryScenarioInput): SalaryScenarioResult {
+  const scenario = calculateSalaryScenarioInternal(Math.max(targetSalary, minimumSalary, 0), {
+    ...options,
+    grossProfit: roundToPence(grossProfit),
+    studentLoanPlans,
+    pension,
+    companyCarBIK,
+    associatedCompaniesCount: normalizeAssociatedCompaniesCount(associatedCompaniesCount),
+    hasOtherPAYE,
+    lossesBroughtForward,
+  });
+  return { ...scenario, takeHome: roundToPence(scenario.takeHome) };
+}
+
+function calculateSalaryScenarioInternal(
+  targetSalary: number,
+  opts: StrategyCalcOptions,
+): SalaryScenarioResult {
   const {
-    targetSalary,
     grossProfit,
     region,
     taxYear,
     otherIncome,
-    hasEmploymentAllowance,
-    studentLoanPlans = [],
-    pension = 0,
-    companyCarBIK = 0,
-    associatedCompaniesCount = 1,
-    hasOtherPAYE = false,
-    lossesBroughtForward = 0,
-    minimumSalary = 0,
-  } = input;
+    studentLoanPlans,
+    pension,
+    companyCarBIK,
+    hasOtherPAYE,
+  } = opts;
 
-  const { threshold: niThreshold, rate: niRate } = getEmployerNIParams(taxYear);
-  const class1ANI = getClass1ANI(companyCarBIK, taxYear);
-  const salaryBudget = Math.max(0, grossProfit - class1ANI);
-
-  // Calculate max affordable salary (salary + employer NI ≤ grossProfit)
-  let maxAffordableSalary: number;
-  if (salaryBudget <= niThreshold) {
-    maxAffordableSalary = salaryBudget;
-  } else {
-    maxAffordableSalary = (salaryBudget + niThreshold * niRate) / (1 + niRate);
-  }
-
-  const minSalary = Math.max(0, minimumSalary);
-  const clampedTarget = Math.max(targetSalary, minSalary);
-  const salary = Math.min(clampedTarget, maxAffordableSalary, salaryBudget);
-  let employerNI = getEmployerNI(salary, taxYear);
-
-  if (hasEmploymentAllowance) {
-    const employmentAllowance = getEmploymentAllowance(taxYear);
-    employerNI = Math.max(0, employerNI - employmentAllowance);
-  }
-  employerNI += class1ANI;
-
-  const profitAfterSalaryCost = Math.max(0, grossProfit - salary - employerNI);
-  const taxableProfit = Math.max(0, profitAfterSalaryCost - lossesBroughtForward);
-  const corporationTax = getCorporationTax(
-    taxableProfit,
-    taxYear,
-    normalizeAssociatedCompaniesCount(associatedCompaniesCount),
+  const salaryBudget = Math.max(
+    0,
+    roundToPence(grossProfit - getClass1ANI(companyCarBIK, taxYear)),
   );
-  const dividends = profitAfterSalaryCost - corporationTax;
+  const salary = Math.min(roundToPence(targetSalary), getAffordableSalary(salaryBudget, taxYear));
+  const budget = calculateCompanyBudget(opts, salary);
+  const { dividends } = budget;
 
   const employeeNI = hasOtherPAYE
     ? getEmployeeNIWithNoThreshold(salary, taxYear)
@@ -463,142 +446,29 @@ export function calculateSalaryScenario(input: SalaryScenarioInput): SalaryScena
   const studentLoan = studentLoanResult.total;
 
   const totalPersonalTax = incomeTax + employeeNI + dividendTax + studentLoan;
-  const companyCost = salary + employerNI + corporationTax;
   const takeHome = salary + dividends - incomeTax - employeeNI - dividendTax - studentLoan;
   const effectiveRate = grossProfit > 0 ? ((grossProfit - takeHome) / grossProfit) * 100 : 0;
 
   return {
-    salary: roundToPence(salary),
-    employerNI: roundToPence(employerNI),
+    ...budget,
+    salary,
     employeeNI: roundToPence(employeeNI),
     incomeTax: roundToPence(incomeTax),
-    corporationTax: roundToPence(corporationTax),
-    dividends: roundToPence(dividends),
     dividendTax: roundToPence(dividendTax),
     studentLoan: roundToPence(studentLoan),
     pension: roundToPence(pension),
     companyCarBIK: roundToPence(companyCarBIK),
     totalPersonalTax: roundToPence(totalPersonalTax),
-    companyCost: roundToPence(companyCost),
     effectiveRate: roundToPence(effectiveRate),
-    takeHome: roundToPence(takeHome),
-  };
-}
-
-/**
- * Internal version of calculateSalaryScenario that supports all options
- * Used by the optimal strategy calculator
- */
-function calculateSalaryScenarioInternal(
-  targetSalary: number,
-  opts: StrategyCalcOptions,
-): {
-  salary: number;
-  employerNI: number;
-  employeeNI: number;
-  incomeTax: number;
-  corporationTax: number;
-  dividends: number;
-  dividendTax: number;
-  studentLoan: number;
-  pension: number;
-  companyCarBIK: number;
-  takeHome: number;
-} {
-  const {
-    grossProfit,
-    region,
-    taxYear,
-    otherIncome,
-    hasEmploymentAllowance,
-    studentLoanPlans,
-    pension,
-    companyCarBIK,
-    associatedCompaniesCount,
-    hasOtherPAYE,
-    lossesBroughtForward,
-  } = opts;
-
-  const { threshold: niThreshold, rate: niRate } = getEmployerNIParams(taxYear);
-  const class1ANI = getClass1ANI(companyCarBIK, taxYear);
-  const salaryBudget = Math.max(0, grossProfit - class1ANI);
-
-  // Calculate max affordable salary (salary + employer NI <= grossProfit)
-  let maxAffordableSalary: number;
-  if (salaryBudget <= niThreshold) {
-    maxAffordableSalary = salaryBudget;
-  } else {
-    maxAffordableSalary = (salaryBudget + niThreshold * niRate) / (1 + niRate);
-  }
-
-  const salary = Math.min(targetSalary, maxAffordableSalary, salaryBudget);
-  let employerNI = getEmployerNI(salary, taxYear);
-
-  if (hasEmploymentAllowance) {
-    const employmentAllowance = getEmploymentAllowance(taxYear);
-    employerNI = Math.max(0, employerNI - employmentAllowance);
-  }
-  employerNI += class1ANI;
-
-  const profitAfterSalaryCost = Math.max(0, grossProfit - salary - employerNI);
-  // Losses reduce the taxable profit for CT (cannot go below 0)
-  const taxableProfit = Math.max(0, profitAfterSalaryCost - lossesBroughtForward);
-  const corporationTax = getCorporationTax(
-    taxableProfit,
-    taxYear,
-    normalizeAssociatedCompaniesCount(associatedCompaniesCount),
-  );
-  // Dividends come from post-CT profit (losses reduce CT, increasing available dividends)
-  const dividends = profitAfterSalaryCost - corporationTax;
-
-  // If other PAYE employment, NI threshold already used - pay NI from first pound
-  const employeeNI = hasOtherPAYE
-    ? getEmployeeNIWithNoThreshold(salary, taxYear)
-    : getEmployeeNI(salary, taxYear);
-
-  const adjustedNetIncome = salary + dividends + otherIncome + companyCarBIK;
-
-  // Income tax includes BIK as taxable benefit
-  const totalIncomeTax = getIncomeTax(
-    salary + otherIncome + companyCarBIK,
-    region,
-    taxYear,
-    adjustedNetIncome,
-  );
-  const baseIncomeTax =
-    otherIncome > 0 ? getIncomeTax(otherIncome, region, taxYear, adjustedNetIncome) : 0;
-  const incomeTax = totalIncomeTax - baseIncomeTax;
-
-  // Dividend tax - BIK uses up some of the tax bands
-  const dividendTax = getDividendTax(dividends, salary + otherIncome + companyCarBIK, taxYear);
-
-  // Student loan is calculated on TOTAL income (salary + dividends + BIK) for Self Assessment filers
-  const totalIncome = salary + dividends + otherIncome + companyCarBIK;
-  const studentLoanResult = getStudentLoanRepayment(totalIncome, studentLoanPlans, taxYear);
-  const studentLoan = studentLoanResult.total;
-
-  const takeHome = salary + dividends - incomeTax - employeeNI - dividendTax - studentLoan;
-
-  return {
-    salary,
-    employerNI,
-    employeeNI,
-    incomeTax,
-    corporationTax,
-    dividends,
-    dividendTax,
-    studentLoan,
-    pension,
-    companyCarBIK,
     takeHome,
   };
 }
 
 function calculateOptimalMixStrategy(opts: StrategyCalcOptions): StrategyResult {
-  const { grossProfit, taxYear, pension, companyCarBIK, minimumSalary = 0 } = opts;
+  const { grossProfit, taxYear, minimumSalary = 0 } = opts;
 
   if (grossProfit <= 0) {
-    return createEmptyResult('Baseline Mix');
+    return createEmptyResult('Baseline Mix', opts);
   }
 
   // Spec: test salary/dividend combinations across the valid range.
@@ -613,12 +483,8 @@ function calculateOptimalMixStrategy(opts: StrategyCalcOptions): StrategyResult 
 
   // Guard: if the minimum salary is above what can be afforded, clamp to max.
   if (minSalary >= maxSalary) {
-    return scenarioToStrategyResult(
-      calculateSalaryScenarioInternal(maxSalary, opts),
-      pension,
-      companyCarBIK,
-      grossProfit,
-    );
+    const scenario = calculateSalaryScenarioInternal(maxSalary, opts);
+    return { ...scenario, name: 'Baseline Mix', takeHome: roundToPence(scenario.takeHome) };
   }
 
   const coarseStep = 100; // £100 granularity is cheap and good enough for threshold-driven tax.
@@ -657,106 +523,19 @@ function calculateOptimalMixStrategy(opts: StrategyCalcOptions): StrategyResult 
     }
   }
 
-  const {
-    salary,
-    employerNI,
-    employeeNI,
-    incomeTax,
-    corporationTax,
-    dividends,
-    dividendTax,
-    studentLoan,
-    takeHome,
-  } = bestScenario;
-
-  const totalPersonalTax = incomeTax + employeeNI + dividendTax + studentLoan;
-  const companyCost = salary + employerNI + corporationTax;
-  const effectiveRate = grossProfit > 0 ? ((grossProfit - takeHome) / grossProfit) * 100 : 0;
-
-  const name = 'Baseline Mix'; // Avoid advisory language like "Recommended"
-
-  return {
-    name,
-    salary: roundToPence(salary),
-    dividends: roundToPence(dividends),
-    pension: roundToPence(pension),
-    companyCarBIK: roundToPence(companyCarBIK),
-    employerNI: roundToPence(employerNI),
-    employeeNI: roundToPence(employeeNI),
-    incomeTax: roundToPence(incomeTax),
-    corporationTax: roundToPence(corporationTax),
-    dividendTax: roundToPence(dividendTax),
-    studentLoan: roundToPence(studentLoan),
-    totalPersonalTax: roundToPence(totalPersonalTax),
-    companyCost: roundToPence(companyCost),
-    takeHome: roundToPence(takeHome),
-    effectiveRate: roundToPence(effectiveRate),
-  };
-}
-
-function scenarioToStrategyResult(
-  scenario: ReturnType<typeof calculateSalaryScenarioInternal>,
-  pension: number,
-  companyCarBIK: number,
-  grossProfit: number,
-): StrategyResult {
-  const totalPersonalTax =
-    scenario.incomeTax + scenario.employeeNI + scenario.dividendTax + scenario.studentLoan;
-  const companyCost = scenario.salary + scenario.employerNI + scenario.corporationTax;
-  const effectiveRate =
-    grossProfit > 0 ? ((grossProfit - scenario.takeHome) / grossProfit) * 100 : 0;
-
-  return {
-    name: 'Baseline Mix',
-    salary: roundToPence(scenario.salary),
-    dividends: roundToPence(scenario.dividends),
-    pension: roundToPence(pension),
-    companyCarBIK: roundToPence(companyCarBIK),
-    employerNI: roundToPence(scenario.employerNI),
-    employeeNI: roundToPence(scenario.employeeNI),
-    incomeTax: roundToPence(scenario.incomeTax),
-    corporationTax: roundToPence(scenario.corporationTax),
-    dividendTax: roundToPence(scenario.dividendTax),
-    studentLoan: roundToPence(scenario.studentLoan),
-    totalPersonalTax: roundToPence(totalPersonalTax),
-    companyCost: roundToPence(companyCost),
-    takeHome: roundToPence(scenario.takeHome),
-    effectiveRate: roundToPence(effectiveRate),
-  };
+  return { ...bestScenario, name: 'Baseline Mix', takeHome: roundToPence(bestScenario.takeHome) };
 }
 
 function calculateAllDividendsStrategy(opts: StrategyCalcOptions): StrategyResult {
-  const {
-    grossProfit,
-    region,
-    taxYear,
-    otherIncome,
-    studentLoanPlans,
-    pension,
-    companyCarBIK,
-    associatedCompaniesCount,
-    lossesBroughtForward,
-  } = opts;
+  const { grossProfit, region, taxYear, otherIncome, studentLoanPlans, pension, companyCarBIK } =
+    opts;
 
   if (grossProfit <= 0) {
-    return createEmptyResult('All Dividends');
+    return createEmptyResult('All Dividends', opts);
   }
 
-  const salary = 0;
-  const employerNI = getClass1ANI(companyCarBIK, taxYear); // Class 1A still applies on BIK
-  const employeeNI = 0;
-
-  // BIK is still taxable even with £0 salary
-  // Losses reduce the taxable profit for CT (cannot go below 0)
-  const taxableProfit = Math.max(0, grossProfit - lossesBroughtForward);
-  const corporationTax = getCorporationTax(
-    taxableProfit,
-    taxYear,
-    normalizeAssociatedCompaniesCount(associatedCompaniesCount),
-  );
-  // Dividends come from post-CT profit, but losses don't create extra cash
-  // So dividends = grossProfit - CT (where CT is calculated on reduced taxable profit)
-  const dividends = grossProfit - corporationTax;
+  const budget = calculateCompanyBudget(opts, 0);
+  const { dividends } = budget;
 
   const adjustedNetIncome = dividends + otherIncome + companyCarBIK;
 
@@ -777,24 +556,20 @@ function calculateAllDividendsStrategy(opts: StrategyCalcOptions): StrategyResul
   const studentLoan = studentLoanResult.total;
 
   const totalPersonalTax = incomeTax + dividendTax + studentLoan;
-  const companyCost = employerNI + corporationTax;
   const takeHome = dividends - incomeTax - dividendTax - studentLoan;
   const effectiveRate = grossProfit > 0 ? ((grossProfit - takeHome) / grossProfit) * 100 : 0;
 
   return {
+    ...budget,
     name: 'All Dividends',
-    salary,
-    dividends: roundToPence(dividends),
+    salary: 0,
+    employeeNI: 0,
     pension: roundToPence(pension),
     companyCarBIK: roundToPence(companyCarBIK),
-    employerNI,
-    employeeNI,
     incomeTax: roundToPence(incomeTax),
-    corporationTax: roundToPence(corporationTax),
     dividendTax: roundToPence(dividendTax),
     studentLoan: roundToPence(studentLoan),
     totalPersonalTax: roundToPence(totalPersonalTax),
-    companyCost: roundToPence(companyCost),
     takeHome: roundToPence(takeHome),
     effectiveRate: roundToPence(effectiveRate),
   };
@@ -810,44 +585,12 @@ function calculateYourSetupStrategy(
   userDividends: number,
   optimalTakeHome: number,
 ): YourSetupResult {
-  const {
-    grossProfit,
-    region,
-    taxYear,
-    otherIncome,
-    hasEmploymentAllowance,
-    studentLoanPlans,
-    pension,
-    companyCarBIK,
-    associatedCompaniesCount,
-    lossesBroughtForward,
-  } = opts;
+  const { grossProfit, region, taxYear, otherIncome, studentLoanPlans, pension, companyCarBIK } =
+    opts;
 
-  const salary = userSalary;
-  const dividends = userDividends;
-
-  // Check if user's setup exceeds available profit (DLA warning)
-  let employerNI = getEmployerNI(salary, taxYear);
-  if (hasEmploymentAllowance) {
-    const employmentAllowance = getEmploymentAllowance(taxYear);
-    employerNI = Math.max(0, employerNI - employmentAllowance);
-  }
-  employerNI += getClass1ANI(companyCarBIK, taxYear);
-
-  // Company cost for salary = salary + employer NI
-  // Profit available for dividends = grossProfit - salary - employerNI - CT on remaining
-  const costOfSalary = salary + employerNI;
-  const profitAfterSalary = Math.max(0, grossProfit - costOfSalary);
-  const taxableProfitAfterSalary = Math.max(0, profitAfterSalary - lossesBroughtForward);
-  const ctOnRemaining = getCorporationTax(
-    taxableProfitAfterSalary,
-    taxYear,
-    normalizeAssociatedCompaniesCount(associatedCompaniesCount),
-  );
-  const maxDividends = profitAfterSalary - ctOnRemaining;
-
-  // Flag if user setup exceeds what's available
-  const exceedsProfit = salary + dividends > salary + maxDividends || costOfSalary > grossProfit;
+  const salary = roundToPence(userSalary);
+  const budget = calculateCompanyBudget(opts, salary, roundToPence(userDividends));
+  const { dividends } = budget;
 
   // Calculate taxes on user's setup
   const employeeNI = getEmployeeNI(salary, taxYear);
@@ -865,14 +608,6 @@ function calculateYourSetupStrategy(
     otherIncome > 0 ? getIncomeTax(otherIncome, region, taxYear, adjustedNetIncome) : 0;
   const incomeTax = totalIncomeTax - baseIncomeTax;
 
-  // Corporation tax: based on profit minus salary cost and losses brought forward
-  const taxableProfit = Math.max(0, grossProfit - costOfSalary - lossesBroughtForward);
-  const corporationTax = getCorporationTax(
-    taxableProfit,
-    taxYear,
-    normalizeAssociatedCompaniesCount(associatedCompaniesCount),
-  );
-
   // Dividend tax
   const dividendTax = getDividendTax(dividends, salary + otherIncome + companyCarBIK, taxYear);
 
@@ -882,7 +617,6 @@ function calculateYourSetupStrategy(
   const studentLoan = studentLoanResult.total;
 
   const totalPersonalTax = incomeTax + employeeNI + dividendTax + studentLoan;
-  const companyCost = costOfSalary + corporationTax;
   const takeHome = salary + dividends - incomeTax - employeeNI - dividendTax - studentLoan;
   const effectiveRate = grossProfit > 0 ? ((grossProfit - takeHome) / grossProfit) * 100 : 0;
 
@@ -890,23 +624,20 @@ function calculateYourSetupStrategy(
   const deltaVsOptimal = optimalTakeHome - takeHome;
 
   return {
+    ...budget,
     name: 'Your Setup',
-    salary: roundToPence(salary),
-    dividends: roundToPence(dividends),
+    salary,
     pension: roundToPence(pension),
     companyCarBIK: roundToPence(companyCarBIK),
-    employerNI: roundToPence(employerNI),
     employeeNI: roundToPence(employeeNI),
     incomeTax: roundToPence(incomeTax),
-    corporationTax: roundToPence(corporationTax),
     dividendTax: roundToPence(dividendTax),
     studentLoan: roundToPence(studentLoan),
     totalPersonalTax: roundToPence(totalPersonalTax),
-    companyCost: roundToPence(companyCost),
     takeHome: roundToPence(takeHome),
     effectiveRate: roundToPence(effectiveRate),
     deltaVsOptimal: roundToPence(deltaVsOptimal),
-    exceedsProfit,
+    exceedsProfit: budget.companyShortfall > 0,
   };
 }
 
@@ -914,21 +645,18 @@ function calculateYourSetupStrategy(
 // HELPERS
 // ============================================================================
 
-function createEmptyResult(name: string): StrategyResult {
+function createEmptyResult(name: string, opts: StrategyCalcOptions): StrategyResult {
   return {
+    ...calculateCompanyBudget(opts, 0, 0),
     name,
     salary: 0,
-    dividends: 0,
-    pension: 0,
-    companyCarBIK: 0,
-    employerNI: 0,
+    pension: roundToPence(opts.pension),
+    companyCarBIK: roundToPence(opts.companyCarBIK),
     employeeNI: 0,
     incomeTax: 0,
-    corporationTax: 0,
     dividendTax: 0,
     studentLoan: 0,
     totalPersonalTax: 0,
-    companyCost: 0,
     takeHome: 0,
     effectiveRate: 0,
   };
