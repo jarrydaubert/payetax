@@ -167,7 +167,7 @@ function printAllowlistFreshnessWarnings(
         `   - ${entry.packageName} (${entry.id}) last checked ${entry.days}d ago (cadence ${entry.cadence}d)`,
       );
     }
-    console.warn('   Update lastChecked after monthly upstream review.');
+    console.warn('   Update lastChecked after rechecking the upstream advisory.');
   }
 
   if (reviewSchedule.length > 0) {
