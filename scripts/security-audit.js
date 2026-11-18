@@ -7,7 +7,6 @@
 const { exec } = require('node:child_process');
 const fs = require('node:fs');
 const path = require('node:path');
-const { pathToFileURL } = require('node:url');
 
 const AUDIT_DIR = path.join(__dirname, '..', 'audit-outputs');
 const SECURITY_LOG = path.join(AUDIT_DIR, 'security-audit-history.json');
@@ -24,8 +23,6 @@ const SECURITY_THRESHOLDS = {
   moderate: 2, // Max 2 moderate vulnerabilities
   low: 10, // Max 10 low vulnerabilities
 };
-
-let dependencyAllowlist = [];
 
 function emptyAuditMetadata() {
   return {
@@ -179,30 +176,6 @@ function extractAdvisoryId(url) {
   return null;
 }
 
-function isAllowlistedVulnerability(vulnerability) {
-  if (!(vulnerability?.id && vulnerability?.name)) return false;
-  return dependencyAllowlist.some(
-    (entry) =>
-      String(entry.id).toUpperCase() === String(vulnerability.id).toUpperCase() &&
-      String(entry.package).toLowerCase() === String(vulnerability.name).toLowerCase(),
-  );
-}
-
-async function loadDependencyAllowlist() {
-  const allowlistPath = path.join(__dirname, 'dependency-advisory-allowlist.ts');
-  const allowlistUrl = pathToFileURL(allowlistPath).href;
-
-  try {
-    const imported = await import(allowlistUrl);
-    dependencyAllowlist = imported.DEPENDENCY_ADVISORY_ALLOWLIST || [];
-  } catch (error) {
-    dependencyAllowlist = [];
-    console.warn(
-      `⚠️  Could not load dependency advisory allowlist (${allowlistPath}): ${error.message}`,
-    );
-  }
-}
-
 function isAuditConnectivityFailure(output) {
   const normalized = String(output || '').toLowerCase();
   return (
@@ -353,7 +326,12 @@ async function runSecurityAudit() {
 
 async function main() {
   try {
-    await loadDependencyAllowlist();
+    const { DEPENDENCY_ADVISORY_ALLOWLIST: allowlist } = await import(
+      './dependency-advisory-allowlist.ts'
+    );
+    const { dependencyAdvisoryMatchesEntry, findDependencyAdvisoryAllowlistIssues } = await import(
+      './dependency-advisory-policy.ts'
+    );
 
     // Load existing history
     const history = loadSecurityHistory();
@@ -375,17 +353,28 @@ async function main() {
     // Generate report
     generateSecurityReport(audit, history);
 
-    const actionableVulnerabilities = (audit.vulnerabilities || []).filter(
-      (vuln) => !isAllowlistedVulnerability(vuln),
-    );
+    const vulnerabilities = (audit.vulnerabilities || []).map((vuln) => ({
+      ...vuln,
+      packageName: vuln.name,
+    }));
+    const issues = findDependencyAdvisoryAllowlistIssues(vulnerabilities, allowlist);
+    if (issues.length > 0) {
+      throw new Error(
+        issues
+          .map(
+            ({ kind, entry }) => `${entry.package} (${entry.id}): ${kind} [${entry.removeAfter}]`,
+          )
+          .join(', '),
+      );
+    }
+    const isAllowlisted = (vuln) =>
+      allowlist.some((entry) => dependencyAdvisoryMatchesEntry(vuln, entry));
+    const actionableVulnerabilities = vulnerabilities.filter((vuln) => !isAllowlisted(vuln));
 
-    if (actionableVulnerabilities.length !== (audit.vulnerabilities || []).length) {
-      const allowlistedCount =
-        (audit.vulnerabilities || []).length - actionableVulnerabilities.length;
+    if (actionableVulnerabilities.length !== vulnerabilities.length) {
+      const allowlistedCount = vulnerabilities.length - actionableVulnerabilities.length;
       console.log(`\nℹ️  Allowlisted advisories ignored for gate: ${allowlistedCount}`);
-      for (const vuln of (audit.vulnerabilities || []).filter((v) =>
-        isAllowlistedVulnerability(v),
-      )) {
+      for (const vuln of vulnerabilities.filter(isAllowlisted)) {
         console.log(`   - ${vuln.name} (${vuln.id || 'no-id'})`);
       }
     }
