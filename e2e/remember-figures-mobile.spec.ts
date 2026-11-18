@@ -161,7 +161,8 @@ for (const [calculator, route, restoredValue] of [
           ({ failure, preferenceKey }) => {
             const error = new DOMException('Blocked for test', 'SecurityError');
             if (failure === 'Web Lock rejection') {
-              Object.defineProperty(navigator.locks, 'request', {
+              // WebKit can collect the navigator.locks wrapper between evaluation and tap.
+              Object.defineProperty(Object.getPrototypeOf(navigator.locks), 'request', {
                 value: () => Promise.reject(error),
               });
               return;
