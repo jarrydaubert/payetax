@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import {
   clearFigures,
   rememberFigures,
@@ -11,9 +11,33 @@ import {
 export function FigureStorageControls() {
   const detailsId = useId();
   const { enabled, legacy, unavailable, erasureFailed } = useFigureStorage();
+  const requestPending = useRef(false);
+  const [feedback, setFeedback] = useState<'pending' | 'superseded' | null>(null);
+  const pending = feedback === 'pending';
   useEffect(() => {
     syncFigureStorage();
   }, []);
+  useEffect(() => {
+    if (enabled) setFeedback((current) => (current === 'superseded' ? null : current));
+  }, [enabled]);
+
+  async function enableRemembering(restoreLegacy = false) {
+    if (requestPending.current) return;
+    requestPending.current = true;
+    setFeedback('pending');
+    let superseded = false;
+    try {
+      superseded = (await rememberFigures(restoreLegacy)) === 'superseded';
+    } finally {
+      requestPending.current = false;
+      setFeedback(superseded && !useFigureStorage.getState().enabled ? 'superseded' : null);
+    }
+  }
+
+  function clearRemembering() {
+    setFeedback((current) => (current === 'pending' ? current : null));
+    clearFigures();
+  }
 
   return (
     <section
@@ -27,10 +51,23 @@ export function FigureStorageControls() {
           checked={enabled}
           aria-describedby={detailsId}
           disabled={legacy}
-          onChange={(event) => (event.target.checked ? rememberFigures() : clearFigures())}
+          aria-disabled={pending || undefined}
+          onChange={(event) => {
+            if (requestPending.current) return;
+            if (event.target.checked) enableRemembering();
+            else clearRemembering();
+          }}
         />
         Remember figures on this device (PAYE and Director)
       </label>
+      <p aria-live='polite' aria-atomic='true' className='text-xs'>
+        {pending && 'Waiting to save preference…'}
+        {feedback === 'superseded' &&
+          !enabled &&
+          !unavailable &&
+          !erasureFailed &&
+          'Remembering is still off because saved figures changed. You can try again.'}
+      </p>
       <p id={detailsId} className='text-xs text-muted-foreground'>
         Off by default. Saved inputs expire after 30 days for PAYE or 7 days for Director, and at
         tax-year rollover. Turning this off clears figures and results in open tabs. Analytics
@@ -46,7 +83,8 @@ export function FigureStorageControls() {
           <button
             type='button'
             className='min-h-11 underline underline-offset-2'
-            onClick={() => rememberFigures(true)}
+            aria-disabled={pending || undefined}
+            onClick={() => enableRemembering(true)}
           >
             Restore saved figures and remember
           </button>
@@ -55,7 +93,7 @@ export function FigureStorageControls() {
       <button
         type='button'
         className='mt-1 min-h-11 underline underline-offset-2'
-        onClick={clearFigures}
+        onClick={clearRemembering}
       >
         Clear figures and saved data
       </button>

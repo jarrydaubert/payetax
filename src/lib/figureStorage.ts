@@ -126,7 +126,7 @@ function storageFailed(erasureFailed = useFigureStorage.getState().erasureFailed
 
 // All read-modify-write operations share one origin-wide lock. Storage events alone
 // cannot serialize an erasure with a save or a legacy restore in another tab.
-function withFigureLock(action: () => void, onFailure = () => storageFailed()) {
+function withFigureLock<T>(action: () => T, onFailure = () => storageFailed()) {
   try {
     const locks = navigator.locks;
     if (locks) return locks.request(FIGURE_PREFERENCE_KEY, action).catch(onFailure);
@@ -301,12 +301,9 @@ export function rememberFigures(restoreLegacy = false) {
   startListening();
   const observedId = preference?.id;
   return withFigureLock(() => {
-    if (
-      !refreshStorage() ||
-      preference?.id !== observedId ||
-      useFigureStorage.getState().legacy !== restoreLegacy
-    )
-      return;
+    if (!refreshStorage()) return;
+    if (preference?.id !== observedId || useFigureStorage.getState().legacy !== restoreLegacy)
+      return 'superseded' as const;
 
     // Retry under the existing consent so other tabs keep their live figures.
     const retry = preference?.enabled && !restoreLegacy ? preference : null;

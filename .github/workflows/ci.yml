@@ -76,6 +76,25 @@ jobs:
       - name: Build
         run: bun run build:ci
 
+      - name: Install Playwright browsers for mobile figure storage
+        if: github.event_name == 'pull_request'
+        run: bunx playwright install chromium webkit --with-deps
+
+      - name: Test mobile figure storage
+        id: mobile-figure-storage
+        if: github.event_name == 'pull_request'
+        env:
+          PLAYWRIGHT_USE_PREBUILT: '1'
+        run: bun run test:e2e:remember-figures:mobile
+
+      - name: Upload mobile figure storage report on failure
+        if: failure() && steps.mobile-figure-storage.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-figure-storage-report
+          path: audit-outputs/blob-report
+          retention-days: 7
+
   # Non-blocking while flake behaviour on CI runners is measured.
   # Promote to a required check once it has run clean for a week.
   e2e-critical:
