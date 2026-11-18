@@ -214,8 +214,12 @@ minimal set with the first Director engine slice and reconcile this guide with t
 Tax-domain (`check:tax-imports` and `check:tax-facts`) baselines, test-skip baselines and advisory
 allowlists are shrink-only. Reduce them in the same PR that removes debt; do not add broad
 exceptions merely to pass. Do not hide failures with skips, blanket retries, arbitrary sleeps
-or relaxed expectations. Approved narrowly scoped
-temporary advisory renewals require explicit maintainer approval and fresh evidence.
+or relaxed expectations. Narrowly scoped temporary advisory renewals require explicit maintainer
+approval and fresh evidence.
+
+The [picomatch exception proposal](../reports/picomatch-exception-2026-11-18.md) adds one named
+entry as a proposed one-time deviation from the shrink-only rule. It requires explicit maintainer
+approval recorded in its PR before merge. The shrink-only rule governs all other additions.
 
 ## Test Layers And Oracles
 
