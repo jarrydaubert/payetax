@@ -58,6 +58,7 @@ export default defineConfig({
     // Desktop Chrome - Primary browser
     {
       name: 'chromium',
+      testIgnore: '**/remember-figures-mobile.spec.ts',
       use: {
         ...devices['Desktop Chrome'],
         launchOptions: {
@@ -77,7 +78,11 @@ export default defineConfig({
     {
       name: 'webkit',
       // PWA lifecycle inspection uses Playwright's Chromium-only ServiceWorker API.
-      testIgnore: ['**/monetary-input-pan.spec.ts', '**/pwa-upgrade.spec.ts'],
+      testIgnore: [
+        '**/monetary-input-pan.spec.ts',
+        '**/pwa-upgrade.spec.ts',
+        '**/remember-figures-mobile.spec.ts',
+      ],
       use: {
         ...devices['Desktop Safari'],
       },
@@ -94,6 +99,7 @@ export default defineConfig({
         '**/summary-cards.spec.ts',
         '**/smoke.spec.ts',
         '**/calculator-critical.spec.ts',
+        '**/remember-figures-mobile.spec.ts',
         '**/monetary-input-interaction.spec.ts',
         '**/monetary-input-pan.spec.ts',
         '**/director-guide-critical.spec.ts',
@@ -113,6 +119,7 @@ export default defineConfig({
         '**/summary-cards.spec.ts',
         '**/smoke.spec.ts',
         '**/calculator-critical.spec.ts',
+        '**/remember-figures-mobile.spec.ts',
         '**/monetary-input-interaction.spec.ts',
         '**/director-guide-critical.spec.ts',
         '**/payslip-regression.spec.ts',
@@ -126,7 +133,10 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'bun run build:ci && bun run start',
+    command:
+      process.env.PLAYWRIGHT_USE_PREBUILT === '1'
+        ? 'bun run start'
+        : 'bun run build:ci && bun run start',
     url: process.env.PLAYWRIGHT_BASE_URL ?? DEFAULT_PLAYWRIGHT_BASE_URL,
     reuseExistingServer: false,
     // Budget covers a cold production build on CI runners, not just server start.
