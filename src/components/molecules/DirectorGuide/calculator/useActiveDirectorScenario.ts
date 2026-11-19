@@ -133,6 +133,9 @@ export function useActiveDirectorScenario(
       class1ANI: strategy.class1ANI,
       employeeNI: strategy.employeeNI,
       incomeTax: strategy.incomeTax,
+      ...(strategy.taperTaxOnOtherIncome && {
+        taperTaxOnOtherIncome: strategy.taperTaxOnOtherIncome,
+      }),
       taxableProfit: strategy.taxableProfit,
       corporationTax: strategy.corporationTax,
       dividendTax: strategy.dividendTax,

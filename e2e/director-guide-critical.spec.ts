@@ -492,6 +492,62 @@ test.describe('Director result currentness @critical', () => {
 });
 
 test.describe('Director Intelligence critical @critical', () => {
+  test('JGF-44: extra Income Tax from taper is included in take-home and shown separately', async ({
+    page,
+  }) => {
+    const diagnostics: string[] = [];
+    page.on('pageerror', (error) => diagnostics.push(error.message));
+    page.on('console', (message) => {
+      const text = message.text();
+      if (text === 'Viewport argument key "interactive-widget" not recognized and ignored.') return;
+      if (['warning', 'error'].includes(message.type())) diagnostics.push(text);
+    });
+    await page.route('**/_vercel/{insights,speed-insights}/script.js', (route) =>
+      route.fulfill({ contentType: 'application/javascript', body: '' }),
+    );
+
+    await openDirectorGuide(page);
+    await selectEngland(page);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 40000);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 0);
+    await page
+      .getByRole('button', { name: 'Full Inputs', exact: true })
+      .filter({ visible: true })
+      .click();
+    await fillCurrencyInput(
+      page
+        .getByRole('textbox', { name: 'Other Personal Income', exact: true })
+        .filter({ visible: true }),
+      100000,
+    );
+    await page.getByRole('button', { name: 'Advanced Options' }).filter({ visible: true }).click();
+    await fillCurrencyInput(
+      page
+        .getByRole('textbox', { name: 'Your Current Dividends', exact: true })
+        .filter({ visible: true }),
+      32400,
+    );
+    await page
+      .getByRole('button', { name: 'Apply', exact: true })
+      .filter({ visible: true })
+      .click();
+    await closeInputsPanelIfOpen(page);
+
+    const strategies = page.getByRole('region', { name: 'Strategy comparison' });
+    const allDividends = strategies.getByRole('article').filter({
+      has: page.getByRole('heading', { name: 'All Dividends', exact: true }),
+    });
+    const yourSetup = strategies.getByRole('heading', { name: 'Your Setup' }).locator('../../..');
+    // £32,400 less £11,665.61 dividend tax and £5,028 tax from the lost allowance.
+    await expect(allDividends).toContainText('£15,706');
+    await expect(yourSetup).toContainText('£15,706');
+    await expect(
+      detailRowValue(page, 'Tax Summary', 'Extra Income Tax on other income'),
+    ).toHaveText('£5,028');
+    await expect(detailRowValue(page, 'Salary Breakdown', 'Income Tax')).toHaveText('£2,000');
+    expect(diagnostics).toEqual([]);
+  });
+
   test('JGF-42: another PAYE job preserves the annual director NI threshold', async ({
     page,
   }, testInfo) => {
