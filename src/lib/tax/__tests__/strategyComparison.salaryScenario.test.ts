@@ -320,6 +320,9 @@ describe('Strategy Comparison helpers', () => {
     );
     const optimal = whatIf.strategies.optimalMix;
 
+    // Plan 1 (2025/26): (£5,000 salary + £70,175 dividends + £5,000 other income
+    // - £26,065 threshold) × 9% = £4,869.90. The other income alone is below
+    // the threshold and the Class 1A company car benefit is excluded.
     expect(optimal).toEqual({
       name: 'Baseline Mix',
       salary: 5000,
@@ -333,13 +336,13 @@ describe('Strategy Comparison helpers', () => {
       corporationTax: 21725,
       taxableProfit: 86900,
       dividendTax: 14572.82,
-      studentLoan: 5229.9,
-      totalPersonalTax: 20088.72,
+      studentLoan: 4869.9,
+      totalPersonalTax: 19728.72,
       companyCost: 27325,
       retainedProfit: 0,
       companyShortfall: 0,
-      takeHome: 55086.28,
-      effectiveRate: 43.5,
+      takeHome: 55446.28,
+      effectiveRate: 43.13,
     });
 
     const scenario = calculateSalaryScenario({

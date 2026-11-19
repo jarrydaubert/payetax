@@ -125,7 +125,7 @@ export interface SalaryScenarioResult extends CompanyBudget {
   incomeTax: number;
   taperTaxOnOtherIncome?: number; // Extra tax on other income, included in incomeTax
   dividendTax: number;
-  studentLoan: number;
+  studentLoan: number; // Additional annual repayment attributable to this extraction
   pension: number;
   companyCarBIK: number;
   totalPersonalTax: number;
@@ -295,7 +295,7 @@ export function calculateStrategyComparison(
 // ============================================================================
 
 function calculateAllSalaryStrategy(opts: StrategyCalcOptions, salary: number): StrategyResult {
-  const { grossProfit, taxYear, otherIncome, studentLoanPlans, pension, companyCarBIK } = opts;
+  const { grossProfit, taxYear, pension, companyCarBIK } = opts;
 
   if (grossProfit <= 0) {
     return createEmptyResult('All Salary', opts);
@@ -308,10 +308,7 @@ function calculateAllSalaryStrategy(opts: StrategyCalcOptions, salary: number): 
   const { incomeTax } = attributedTax;
   const dividendTax = 0;
 
-  // Student loan on total income (salary + BIK for this strategy)
-  const totalIncome = salary + otherIncome + companyCarBIK;
-  const studentLoanResult = getStudentLoanRepayment(totalIncome, studentLoanPlans, taxYear);
-  const studentLoan = studentLoanResult.total;
+  const studentLoan = calculateAttributedStudentLoan(opts, salary, 0);
 
   const totalPersonalTax = incomeTax + employeeNI + dividendTax + studentLoan;
   const takeHome = salary - incomeTax - employeeNI - studentLoan;
@@ -327,7 +324,7 @@ function calculateAllSalaryStrategy(opts: StrategyCalcOptions, salary: number): 
     ...attributedTax,
     incomeTax: roundToPence(incomeTax),
     dividendTax,
-    studentLoan: roundToPence(studentLoan),
+    studentLoan,
     totalPersonalTax: roundToPence(totalPersonalTax),
     takeHome: roundToPence(takeHome),
     effectiveRate: roundToPence(effectiveRate),
@@ -379,7 +376,7 @@ function calculateSalaryScenarioInternal(
   salary: number,
   opts: StrategyCalcOptions,
 ): SalaryScenarioResult {
-  const { grossProfit, taxYear, otherIncome, studentLoanPlans, pension, companyCarBIK } = opts;
+  const { grossProfit, taxYear, otherIncome, pension, companyCarBIK } = opts;
 
   const budget = calculateCompanyBudget(opts, salary);
   const { dividends } = budget;
@@ -391,10 +388,7 @@ function calculateSalaryScenarioInternal(
   // Dividend tax - BIK uses up some of the tax bands
   const dividendTax = getDividendTax(dividends, salary + otherIncome + companyCarBIK, taxYear);
 
-  // Student loan is calculated on TOTAL income (salary + dividends + BIK) for Self Assessment filers
-  const totalIncome = salary + dividends + otherIncome + companyCarBIK;
-  const studentLoanResult = getStudentLoanRepayment(totalIncome, studentLoanPlans, taxYear);
-  const studentLoan = studentLoanResult.total;
+  const studentLoan = calculateAttributedStudentLoan(opts, salary, dividends);
 
   const totalPersonalTax = incomeTax + employeeNI + dividendTax + studentLoan;
   const takeHome = salary + dividends - incomeTax - employeeNI - dividendTax - studentLoan;
@@ -407,7 +401,7 @@ function calculateSalaryScenarioInternal(
     ...attributedTax,
     incomeTax: roundToPence(incomeTax),
     dividendTax: roundToPence(dividendTax),
-    studentLoan: roundToPence(studentLoan),
+    studentLoan,
     pension: roundToPence(pension),
     companyCarBIK: roundToPence(companyCarBIK),
     totalPersonalTax: roundToPence(totalPersonalTax),
@@ -486,7 +480,7 @@ function calculateOptimalMixStrategy(
 }
 
 function calculateAllDividendsStrategy(opts: StrategyCalcOptions): StrategyResult {
-  const { grossProfit, taxYear, otherIncome, studentLoanPlans, pension, companyCarBIK } = opts;
+  const { grossProfit, taxYear, otherIncome, pension, companyCarBIK } = opts;
 
   if (grossProfit <= 0) {
     return createEmptyResult('All Dividends', opts);
@@ -501,10 +495,7 @@ function calculateAllDividendsStrategy(opts: StrategyCalcOptions): StrategyResul
   // Dividend tax - BIK uses up some of the tax bands
   const dividendTax = getDividendTax(dividends, otherIncome + companyCarBIK, taxYear);
 
-  // Student loan on total income (dividends + BIK + other income for this strategy)
-  const totalIncome = dividends + otherIncome + companyCarBIK;
-  const studentLoanResult = getStudentLoanRepayment(totalIncome, studentLoanPlans, taxYear);
-  const studentLoan = studentLoanResult.total;
+  const studentLoan = calculateAttributedStudentLoan(opts, 0, dividends);
 
   const totalPersonalTax = incomeTax + dividendTax + studentLoan;
   const takeHome = dividends - incomeTax - dividendTax - studentLoan;
@@ -520,7 +511,7 @@ function calculateAllDividendsStrategy(opts: StrategyCalcOptions): StrategyResul
     ...attributedTax,
     incomeTax: roundToPence(incomeTax),
     dividendTax: roundToPence(dividendTax),
-    studentLoan: roundToPence(studentLoan),
+    studentLoan,
     totalPersonalTax: roundToPence(totalPersonalTax),
     takeHome: roundToPence(takeHome),
     effectiveRate: roundToPence(effectiveRate),
@@ -537,7 +528,7 @@ function calculateYourSetupStrategy(
   userDividends: number,
   optimalTakeHome: number,
 ): YourSetupResult {
-  const { grossProfit, taxYear, otherIncome, studentLoanPlans, pension, companyCarBIK } = opts;
+  const { grossProfit, taxYear, otherIncome, pension, companyCarBIK } = opts;
 
   const salary = roundToPence(userSalary);
   const budget = calculateCompanyBudget(opts, salary, roundToPence(userDividends));
@@ -552,10 +543,7 @@ function calculateYourSetupStrategy(
   // Dividend tax
   const dividendTax = getDividendTax(dividends, salary + otherIncome + companyCarBIK, taxYear);
 
-  // Student loan on total income
-  const totalIncome = salary + dividends + otherIncome + companyCarBIK;
-  const studentLoanResult = getStudentLoanRepayment(totalIncome, studentLoanPlans, taxYear);
-  const studentLoan = studentLoanResult.total;
+  const studentLoan = calculateAttributedStudentLoan(opts, salary, dividends);
 
   const totalPersonalTax = incomeTax + employeeNI + dividendTax + studentLoan;
   const takeHome = salary + dividends - incomeTax - employeeNI - dividendTax - studentLoan;
@@ -574,7 +562,7 @@ function calculateYourSetupStrategy(
     ...attributedTax,
     incomeTax: roundToPence(incomeTax),
     dividendTax: roundToPence(dividendTax),
-    studentLoan: roundToPence(studentLoan),
+    studentLoan,
     totalPersonalTax: roundToPence(totalPersonalTax),
     takeHome: roundToPence(takeHome),
     effectiveRate: roundToPence(effectiveRate),
@@ -609,6 +597,22 @@ function calculateAttributedIncomeTax(
     incomeTax: scenarioTax - baselineTax,
     ...(taperTaxOnOtherIncome > 0 && { taperTaxOnOtherIncome }),
   };
+}
+
+function calculateAttributedStudentLoan(
+  { otherIncome, studentLoanPlans, taxYear }: StrategyCalcOptions,
+  salary: number,
+  dividends: number,
+): number {
+  if (studentLoanPlans.length === 0) return 0;
+
+  // Other income is assumed to qualify in full. The model's only unearned income
+  // is company dividends, which count in full above £2,000. Class 1A BIK is excluded.
+  const eligibleDividends = dividends > 2000 ? dividends : 0;
+  const scenarioIncome = otherIncome + salary + eligibleDividends;
+  const scenario = getStudentLoanRepayment(scenarioIncome, studentLoanPlans, taxYear);
+  const baseline = getStudentLoanRepayment(otherIncome, studentLoanPlans, taxYear);
+  return roundToPence(scenario.total - baseline.total);
 }
 
 function createEmptyResult(name: string, opts: StrategyCalcOptions): StrategyResult {
