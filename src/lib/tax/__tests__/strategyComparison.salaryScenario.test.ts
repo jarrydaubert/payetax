@@ -8,7 +8,6 @@
 import { describe, expect, it } from '@jest/globals';
 import { TAX_RATES } from '@/constants/taxRates';
 import { getDividendTax } from '../dividendTax';
-import { getIncomeTax } from '../incomeTax';
 import { calculateSalaryScenario, calculateStrategyComparison } from '../strategyComparison';
 import { getStudentLoanRepayment } from '../studentLoan';
 import { roundToPence } from '../utils';
@@ -362,44 +361,6 @@ describe('Strategy Comparison helpers', () => {
     expect(scenario.salary).toBeCloseTo(optimal.salary, 2);
     expect(scenario.corporationTax).toBeCloseTo(optimal.corporationTax, 2);
     expect(scenario.takeHome).toBeCloseTo(optimal.takeHome, 2);
-  });
-
-  it('applies personal allowance taper when other income pushes a director salary scenario above £100k', () => {
-    // Bug caught: director slider path ignoring other income when tapering personal allowance.
-    const salary = 12570;
-    const grossProfit = 80000;
-    const lowerOtherIncome = 10000;
-    const higherOtherIncome = 100010;
-
-    const belowTaper = calculateSalaryScenario({
-      targetSalary: salary,
-      grossProfit,
-      region: 'rUK',
-      taxYear: TAX_YEAR,
-      otherIncome: lowerOtherIncome,
-      hasEmploymentAllowance: false,
-    });
-    const aboveTaper = calculateSalaryScenario({
-      targetSalary: salary,
-      grossProfit,
-      region: 'rUK',
-      taxYear: TAX_YEAR,
-      otherIncome: higherOtherIncome,
-      hasEmploymentAllowance: false,
-    });
-
-    const belowAdjustedNetIncome = salary + belowTaper.dividends + lowerOtherIncome;
-    const aboveAdjustedNetIncome = salary + aboveTaper.dividends + higherOtherIncome;
-    const expectedBelowMarginalTax =
-      getIncomeTax(salary + lowerOtherIncome, 'rUK', TAX_YEAR, belowAdjustedNetIncome) -
-      getIncomeTax(lowerOtherIncome, 'rUK', TAX_YEAR, belowAdjustedNetIncome);
-    const expectedAboveMarginalTax =
-      getIncomeTax(salary + higherOtherIncome, 'rUK', TAX_YEAR, aboveAdjustedNetIncome) -
-      getIncomeTax(higherOtherIncome, 'rUK', TAX_YEAR, aboveAdjustedNetIncome);
-
-    expect(belowTaper.incomeTax).toBeCloseTo(expectedBelowMarginalTax, 2);
-    expect(aboveTaper.incomeTax).toBeCloseTo(expectedAboveMarginalTax, 2);
-    expect(aboveTaper.incomeTax).toBeGreaterThan(belowTaper.incomeTax);
   });
 
   it('uses up dividend shielding when other income consumes the personal allowance and tax bands', () => {

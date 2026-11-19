@@ -123,6 +123,7 @@ export interface SalaryScenarioResult extends CompanyBudget {
   minimumSalaryShortfall?: number; // Gap between the required and affordable gross salary
   employeeNI: number;
   incomeTax: number;
+  taperTaxOnOtherIncome?: number; // Extra tax on other income, included in incomeTax
   dividendTax: number;
   studentLoan: number;
   pension: number;
@@ -294,8 +295,7 @@ export function calculateStrategyComparison(
 // ============================================================================
 
 function calculateAllSalaryStrategy(opts: StrategyCalcOptions, salary: number): StrategyResult {
-  const { grossProfit, region, taxYear, otherIncome, studentLoanPlans, pension, companyCarBIK } =
-    opts;
+  const { grossProfit, taxYear, otherIncome, studentLoanPlans, pension, companyCarBIK } = opts;
 
   if (grossProfit <= 0) {
     return createEmptyResult('All Salary', opts);
@@ -304,17 +304,8 @@ function calculateAllSalaryStrategy(opts: StrategyCalcOptions, salary: number): 
   const budget = calculateCompanyBudget(opts, salary, 0);
 
   const employeeNI = getEmployeeNI(salary, taxYear);
-  // Income tax is on salary + other income + BIK, but we only show the tax portion attributable to salary + BIK
-  const adjustedNetIncome = salary + otherIncome + companyCarBIK;
-  const totalIncomeTax = getIncomeTax(
-    salary + otherIncome + companyCarBIK,
-    region,
-    taxYear,
-    adjustedNetIncome,
-  );
-  const baseIncomeTax =
-    otherIncome > 0 ? getIncomeTax(otherIncome, region, taxYear, adjustedNetIncome) : 0;
-  const incomeTax = totalIncomeTax - baseIncomeTax; // Marginal tax from salary + BIK
+  const attributedTax = calculateAttributedIncomeTax(opts, salary, 0);
+  const { incomeTax } = attributedTax;
   const dividendTax = 0;
 
   // Student loan on total income (salary + BIK for this strategy)
@@ -333,6 +324,7 @@ function calculateAllSalaryStrategy(opts: StrategyCalcOptions, salary: number): 
     pension: roundToPence(pension),
     companyCarBIK: roundToPence(companyCarBIK),
     employeeNI: roundToPence(employeeNI),
+    ...attributedTax,
     incomeTax: roundToPence(incomeTax),
     dividendTax,
     studentLoan: roundToPence(studentLoan),
@@ -387,26 +379,14 @@ function calculateSalaryScenarioInternal(
   salary: number,
   opts: StrategyCalcOptions,
 ): SalaryScenarioResult {
-  const { grossProfit, region, taxYear, otherIncome, studentLoanPlans, pension, companyCarBIK } =
-    opts;
+  const { grossProfit, taxYear, otherIncome, studentLoanPlans, pension, companyCarBIK } = opts;
 
   const budget = calculateCompanyBudget(opts, salary);
   const { dividends } = budget;
 
   const employeeNI = getEmployeeNI(salary, taxYear);
-
-  const adjustedNetIncome = salary + dividends + otherIncome + companyCarBIK;
-
-  // Income tax includes BIK as taxable benefit
-  const totalIncomeTax = getIncomeTax(
-    salary + otherIncome + companyCarBIK,
-    region,
-    taxYear,
-    adjustedNetIncome,
-  );
-  const baseIncomeTax =
-    otherIncome > 0 ? getIncomeTax(otherIncome, region, taxYear, adjustedNetIncome) : 0;
-  const incomeTax = totalIncomeTax - baseIncomeTax;
+  const attributedTax = calculateAttributedIncomeTax(opts, salary, dividends);
+  const { incomeTax } = attributedTax;
 
   // Dividend tax - BIK uses up some of the tax bands
   const dividendTax = getDividendTax(dividends, salary + otherIncome + companyCarBIK, taxYear);
@@ -424,6 +404,7 @@ function calculateSalaryScenarioInternal(
     ...budget,
     salary,
     employeeNI: roundToPence(employeeNI),
+    ...attributedTax,
     incomeTax: roundToPence(incomeTax),
     dividendTax: roundToPence(dividendTax),
     studentLoan: roundToPence(studentLoan),
@@ -505,8 +486,7 @@ function calculateOptimalMixStrategy(
 }
 
 function calculateAllDividendsStrategy(opts: StrategyCalcOptions): StrategyResult {
-  const { grossProfit, region, taxYear, otherIncome, studentLoanPlans, pension, companyCarBIK } =
-    opts;
+  const { grossProfit, taxYear, otherIncome, studentLoanPlans, pension, companyCarBIK } = opts;
 
   if (grossProfit <= 0) {
     return createEmptyResult('All Dividends', opts);
@@ -515,15 +495,8 @@ function calculateAllDividendsStrategy(opts: StrategyCalcOptions): StrategyResul
   const budget = calculateCompanyBudget(opts, 0);
   const { dividends } = budget;
 
-  const adjustedNetIncome = dividends + otherIncome + companyCarBIK;
-
-  // BIK is still taxable even with £0 salary
-  const bikIncomeTax =
-    companyCarBIK > 0
-      ? getIncomeTax(otherIncome + companyCarBIK, region, taxYear, adjustedNetIncome) -
-        getIncomeTax(otherIncome, region, taxYear, adjustedNetIncome)
-      : 0;
-  const incomeTax = bikIncomeTax;
+  const attributedTax = calculateAttributedIncomeTax(opts, 0, dividends);
+  const { incomeTax } = attributedTax;
 
   // Dividend tax - BIK uses up some of the tax bands
   const dividendTax = getDividendTax(dividends, otherIncome + companyCarBIK, taxYear);
@@ -544,6 +517,7 @@ function calculateAllDividendsStrategy(opts: StrategyCalcOptions): StrategyResul
     employeeNI: 0,
     pension: roundToPence(pension),
     companyCarBIK: roundToPence(companyCarBIK),
+    ...attributedTax,
     incomeTax: roundToPence(incomeTax),
     dividendTax: roundToPence(dividendTax),
     studentLoan: roundToPence(studentLoan),
@@ -563,8 +537,7 @@ function calculateYourSetupStrategy(
   userDividends: number,
   optimalTakeHome: number,
 ): YourSetupResult {
-  const { grossProfit, region, taxYear, otherIncome, studentLoanPlans, pension, companyCarBIK } =
-    opts;
+  const { grossProfit, taxYear, otherIncome, studentLoanPlans, pension, companyCarBIK } = opts;
 
   const salary = roundToPence(userSalary);
   const budget = calculateCompanyBudget(opts, salary, roundToPence(userDividends));
@@ -573,18 +546,8 @@ function calculateYourSetupStrategy(
   // Calculate taxes on user's setup
   const employeeNI = getEmployeeNI(salary, taxYear);
 
-  const adjustedNetIncome = salary + dividends + otherIncome + companyCarBIK;
-
-  // Income tax on salary + other income + BIK
-  const totalIncomeTax = getIncomeTax(
-    salary + otherIncome + companyCarBIK,
-    region,
-    taxYear,
-    adjustedNetIncome,
-  );
-  const baseIncomeTax =
-    otherIncome > 0 ? getIncomeTax(otherIncome, region, taxYear, adjustedNetIncome) : 0;
-  const incomeTax = totalIncomeTax - baseIncomeTax;
+  const attributedTax = calculateAttributedIncomeTax(opts, salary, dividends);
+  const { incomeTax } = attributedTax;
 
   // Dividend tax
   const dividendTax = getDividendTax(dividends, salary + otherIncome + companyCarBIK, taxYear);
@@ -608,6 +571,7 @@ function calculateYourSetupStrategy(
     pension: roundToPence(pension),
     companyCarBIK: roundToPence(companyCarBIK),
     employeeNI: roundToPence(employeeNI),
+    ...attributedTax,
     incomeTax: roundToPence(incomeTax),
     dividendTax: roundToPence(dividendTax),
     studentLoan: roundToPence(studentLoan),
@@ -622,6 +586,30 @@ function calculateYourSetupStrategy(
 // ============================================================================
 // HELPERS
 // ============================================================================
+
+function calculateAttributedIncomeTax(
+  { otherIncome, companyCarBIK, region, taxYear }: StrategyCalcOptions,
+  salary: number,
+  dividends: number,
+): Pick<SalaryScenarioResult, 'incomeTax' | 'taperTaxOnOtherIncome'> {
+  const nonDividendIncome = salary + otherIncome + companyCarBIK;
+  const adjustedNetIncome = salary + dividends + otherIncome + companyCarBIK;
+  const scenarioTax = getIncomeTax(nonDividendIncome, region, taxYear, adjustedNetIncome);
+  // The counterfactual keeps the allowance due on other income alone.
+  const baselineTax = getIncomeTax(otherIncome, region, taxYear);
+  const otherIncomeTaxAtScenarioAllowance = getIncomeTax(
+    otherIncome,
+    region,
+    taxYear,
+    adjustedNetIncome,
+  );
+  const taperTaxOnOtherIncome = roundToPence(otherIncomeTaxAtScenarioAllowance - baselineTax);
+
+  return {
+    incomeTax: scenarioTax - baselineTax,
+    ...(taperTaxOnOtherIncome > 0 && { taperTaxOnOtherIncome }),
+  };
+}
 
 function createEmptyResult(name: string, opts: StrategyCalcOptions): StrategyResult {
   return {

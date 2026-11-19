@@ -42,6 +42,9 @@ export function DetailCards({ className }: DetailCardsProps) {
   ) {
     return null;
   }
+  const { taperTaxOnOtherIncome = 0 } = activeScenario;
+  const incomeTaxOnSalaryAndBenefits = activeScenario.incomeTax - taperTaxOnOtherIncome;
+
   return (
     <div className={cn('grid grid-cols-2 gap-4 max-lg:grid-cols-1', className)}>
       {/* Salary Breakdown */}
@@ -52,8 +55,8 @@ export function DetailCards({ className }: DetailCardsProps) {
           { label: 'Gross Salary', value: formatCurrency(activeScenario.salary, 0) },
           {
             label: 'Income Tax',
-            value: formatCurrency(activeScenario.incomeTax, 0),
-            positive: activeScenario.incomeTax === 0,
+            value: formatCurrency(incomeTaxOnSalaryAndBenefits, 0),
+            positive: incomeTaxOnSalaryAndBenefits === 0,
           },
           {
             label: 'Employee NI',
@@ -75,7 +78,7 @@ export function DetailCards({ className }: DetailCardsProps) {
         total={{
           label: 'Net Salary',
           value: formatCurrency(
-            activeScenario.salary - activeScenario.incomeTax - activeScenario.employeeNI,
+            activeScenario.salary - incomeTaxOnSalaryAndBenefits - activeScenario.employeeNI,
             0,
           ),
         }}
@@ -183,8 +186,16 @@ export function DetailCards({ className }: DetailCardsProps) {
           { label: 'Dividend Tax (you)', value: formatCurrency(activeScenario.dividendTax, 0) },
           {
             label: 'Personal Tax (salary)',
-            value: formatCurrency(activeScenario.incomeTax + activeScenario.employeeNI, 0),
+            value: formatCurrency(incomeTaxOnSalaryAndBenefits + activeScenario.employeeNI, 0),
           },
+          ...(taperTaxOnOtherIncome > 0
+            ? [
+                {
+                  label: 'Extra Income Tax on other income',
+                  value: formatCurrency(taperTaxOnOtherIncome, 0),
+                },
+              ]
+            : []),
         ]}
         total={{
           label: 'All Taxes & NI',
