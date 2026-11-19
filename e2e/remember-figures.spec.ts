@@ -118,7 +118,8 @@ test('legacy figures remain quarantined across reload and edits until restore-or
   await salary(page).blur();
   await page.reload({ waitUntil: 'networkidle' });
   await expect(salary(page)).toHaveValue('0.00');
-  await restore.click();
+  await restore.press('Enter');
+  await expect(checkbox(page)).toBeFocused();
   await expect(salary(page)).toHaveValue('54,321.98');
   await expect(page.getByTestId('pension-input')).toHaveAttribute('aria-invalid', 'true');
   await expect(page.getByTestId('tax-results')).toHaveCount(0);
@@ -338,7 +339,7 @@ test('a restore queued behind cross-tab erasure cannot recreate legacy figures @
     preference,
   );
   try {
-    await clear(page).click();
+    await page.getByRole('button', { name: 'Clear figures and start fresh' }).press('Enter');
     await restore.click();
   } finally {
     await lock.evaluate((gate) => gate.release());
@@ -346,6 +347,7 @@ test('a restore queued behind cross-tab erasure cannot recreate legacy figures @
   }
 
   await expect(restore).toHaveCount(0);
+  await expect(checkbox(page)).toBeFocused();
   await expect(checkbox(other)).not.toBeChecked();
   await expect(salary(other)).toHaveValue('0.00');
   expect(await other.evaluate((key) => localStorage.getItem(key), payeKey)).toBeNull();

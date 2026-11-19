@@ -1,4 +1,9 @@
 import { expect, type Page, test } from '@playwright/test';
+import {
+  legacyFigureSnapshots,
+  legacyRevenue,
+  legacySalary,
+} from './fixtures/legacy-figure-snapshots';
 
 const preferenceKey = 'payetax-remember-figures';
 const controls = (page: Page) => page.getByRole('region', { name: 'Remember figures' });
@@ -67,6 +72,112 @@ for (const [calculator, route, restoredValue] of [
   ['Director', '/tools/director-guide', '£42,001.23'],
 ] as const) {
   test.describe(calculator, () => {
+    for (const action of ['restore', 'clear'] as const) {
+      test(`legacy figures require an explicit choice before ${action}`, async ({
+        page,
+      }, testInfo) => {
+        await open(page, route);
+        const snapshots = legacyFigureSnapshots(await page.evaluate(() => Date.now()));
+        await page.evaluate((entries) => {
+          for (const [key, snapshot] of Object.entries(entries)) {
+            localStorage.setItem(key, JSON.stringify(snapshot));
+          }
+        }, snapshots);
+        await page.reload({ waitUntil: 'networkidle' });
+
+        const remember = checkbox(page);
+        const restore = controls(page).getByRole('button', {
+          name: 'Restore saved figures and remember',
+        });
+        const clear = controls(page).getByRole('button', { name: 'Clear figures and start fresh' });
+        await expect(remember).toBeDisabled();
+        await expect(remember).not.toBeChecked();
+        await expect(remember).toHaveAccessibleDescription(
+          /previously saved figures haven’t been loaded. Choose Restore or Clear to enable this checkbox/,
+        );
+        await expect(remember).not.toHaveCSS('opacity', '1');
+        await expect(clear).toHaveAccessibleDescription(
+          /discards current figures and results in all open tabs and deletes saved figures/,
+        );
+        const panelBackground = await controls(page).evaluate(
+          (element) => getComputedStyle(element).backgroundColor,
+        );
+        await expect(restore).not.toHaveCSS('background-color', panelBackground);
+        await expect(clear).toHaveCSS('background-color', panelBackground);
+        await expect(clear).toHaveCSS('border-top-style', 'solid');
+        for (const button of [restore, clear]) {
+          await expect(button).toBeVisible();
+          await expect(button).toHaveCSS('text-decoration-line', 'none');
+          expect((await button.boundingBox())?.height).toBeGreaterThanOrEqual(44);
+        }
+        await controls(page).locator('label').tap({ force: true });
+        await page.evaluate((key) => navigator.locks.request(key, () => undefined), preferenceKey);
+        await expect(remember).toBeDisabled();
+        await expect(remember).not.toBeChecked();
+        expect(await preference(page)).toBeNull();
+
+        const emptyValue = calculator === 'PAYE' ? '0.00' : '';
+        const legacyValue = calculator === 'PAYE' ? '54,321.98' : '£87,654.32';
+        const input = await figureInput(page, calculator);
+        await expect(input).toHaveValue(emptyValue);
+        await input.fill('12345');
+        await input.blur();
+        if (calculator === 'Director') {
+          await page.getByRole('button', { name: 'Close your numbers panel' }).tap();
+        }
+        await controls(page).screenshot({ path: testInfo.outputPath('legacy-choice.png') });
+        const consent = await page.evaluate(() => localStorage.getItem('cookie-consent'));
+        expect(consent).not.toBeNull();
+        await (action === 'restore' ? restore : clear).tap();
+
+        await expect(remember).toBeEnabled();
+        await expect(remember).toBeChecked({ checked: action === 'restore' });
+        await expect(restore).toHaveCount(0);
+        await expect(clear).toHaveCount(0);
+        await controls(page).screenshot({ path: testInfo.outputPath(`legacy-${action}.png`) });
+
+        const keys = Object.keys(snapshots);
+        const readStorage = () =>
+          page.evaluate(
+            ({ keys, preferenceKey }) => ({
+              snapshots: keys.map(
+                (key) => JSON.parse(localStorage.getItem(key) ?? 'null')?.state ?? null,
+              ),
+              preference: JSON.parse(localStorage.getItem(preferenceKey) ?? 'null'),
+              analytics: localStorage.getItem('cookie-consent'),
+            }),
+            { keys, preferenceKey },
+          );
+        const storage = await readStorage();
+        expect(storage.analytics).toBe(consent);
+        expect(storage.preference.enabled).toBe(action === 'restore');
+        if (action === 'restore') {
+          const rememberId = storage.preference.id;
+          expect(storage.snapshots).toEqual([
+            expect.objectContaining({
+              _rememberId: rememberId,
+              input: expect.objectContaining({ salary: legacySalary }),
+            }),
+            expect.objectContaining({
+              _rememberId: rememberId,
+              formData: expect.objectContaining({ revenue: legacyRevenue }),
+            }),
+          ]);
+        } else {
+          expect(storage.snapshots).toEqual([null, null]);
+        }
+
+        const expectedValue = action === 'restore' ? legacyValue : emptyValue;
+        await expect(await figureInput(page, calculator)).toHaveValue(expectedValue);
+        await page.reload({ waitUntil: 'networkidle' });
+        await expect(remember).toBeEnabled();
+        await expect(remember).toBeChecked({ checked: action === 'restore' });
+        await expect(restore).toHaveCount(0);
+        await expect(await figureInput(page, calculator)).toHaveValue(expectedValue);
+        expect(await readStorage()).toEqual(storage);
+      });
+    }
+
     test('box tap shows pending feedback, then saves consent and figures across reload', async ({
       page,
       context,

@@ -24,15 +24,6 @@ const MATCHING_AUDIT = {
   ],
 };
 
-const PICOMATCH_AUDIT = {
-  picomatch: [
-    {
-      url: 'https://github.com/advisories/GHSA-fc5q-39xc-vjpf',
-      severity: 'high',
-    },
-  ],
-};
-
 function auditCommand(payload: object, status: number) {
   return () => ({
     status,
@@ -149,7 +140,7 @@ describe('dependency audit allowlist enforcement', () => {
     };
 
     const exitCode = runDependencyAudit(
-      auditCommand({ ...PICOMATCH_AUDIT, ...advisories }, 1),
+      auditCommand(advisories, 1),
       undefined,
       new Date('2026-11-14T23:59:59Z'),
     );
@@ -159,54 +150,38 @@ describe('dependency audit allowlist enforcement', () => {
     expect(reportedErrors(consoleError)).toContain('minimatch (GHSA-G3HV-75WG-M249)');
   });
 
-  it('accepts a clean audit when no exceptions are configured', () => {
-    expect(runDependencyAudit(auditCommand({}, 0), [], new Date('2026-11-15'))).toBe(0);
+  it('accepts a clean audit with the empty repository allowlist', () => {
+    expect(DEPENDENCY_ADVISORY_ALLOWLIST).toEqual([]);
+    expect(runDependencyAudit(auditCommand({}, 0))).toBe(0);
   });
 
-  it('allowlists only the reviewed picomatch advisory on a seven-day review cadence', () => {
-    expect(DEPENDENCY_ADVISORY_ALLOWLIST).toEqual([
-      expect.objectContaining({
-        id: 'GHSA-FC5Q-39XC-VJPF',
-        package: 'picomatch',
-        reviewCadenceDays: 7,
-        removeAfter: '2026-12-02',
-      }),
-    ]);
-    expect(
-      runDependencyAudit(
-        auditCommand(PICOMATCH_AUDIT, 1),
-        undefined,
-        new Date('2026-12-02T23:59:59Z'),
-      ),
-    ).toBe(0);
-  });
+  it.each(['GHSA-FC5Q-39XC-VJPF', 'GHSA-4444-5555-6666'])(
+    'rejects picomatch advisory %s with the repository allowlist',
+    (id) => {
+      const advisories = {
+        picomatch: [{ url: `https://github.com/advisories/${id}`, severity: 'high' }],
+      };
+      expect(runDependencyAudit(auditCommand(advisories, 1))).toBe(1);
+      expect(reportedErrors(consoleError)).toContain('Non-allowlisted dependency advisories found');
+      expect(reportedErrors(consoleError)).toContain(`picomatch (${id})`);
+    },
+  );
 
-  it('rejects the reviewed picomatch advisory once its exception expires', () => {
-    expect(
-      runDependencyAudit(
-        auditCommand(PICOMATCH_AUDIT, 1),
-        undefined,
-        new Date('2026-12-03T00:00:00Z'),
-      ),
-    ).toBe(1);
-    expect(reportedErrors(consoleError)).toContain('expired after 2026-12-02');
-  });
-
-  it('rejects a different advisory for picomatch while the reviewed exception is current', () => {
+  it('rejects a different advisory for the same package while an exception is current', () => {
     const mixedAudit = {
-      picomatch: [
-        ...PICOMATCH_AUDIT.picomatch,
+      [ENTRY.package]: [
+        ...MATCHING_AUDIT[ENTRY.package],
         { url: 'https://github.com/advisories/GHSA-4444-5555-6666', severity: 'high' },
       ],
     };
-    expect(runDependencyAudit(auditCommand(mixedAudit, 1), undefined, new Date('2026-11-18'))).toBe(
-      1,
+    const exitCode = runDependencyAudit(
+      auditCommand(mixedAudit, 1),
+      [ENTRY],
+      new Date('2026-07-22'),
     );
-    expect(reportedErrors(consoleError)).toContain('picomatch (GHSA-4444-5555-6666)');
-  });
 
-  it('requires removal when the reviewed picomatch advisory stops appearing', () => {
-    expect(runDependencyAudit(auditCommand({}, 0), undefined, new Date('2026-11-18'))).toBe(1);
-    expect(reportedErrors(consoleError)).toContain('does not match a current audit advisory');
+    expect(exitCode).toBe(1);
+    expect(reportedErrors(consoleError)).toContain(`${ENTRY.package} (GHSA-4444-5555-6666)`);
+    expect(reportedErrors(consoleError)).not.toContain(`${ENTRY.package} (${ENTRY.id})`);
   });
 });
