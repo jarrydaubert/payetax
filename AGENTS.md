@@ -20,6 +20,8 @@ Use proportionate engineering: prefer the simplest complete, maintainable soluti
 
 Before editing, inspect Git state, project guidance and affected code. Work on an appropriate branch without disturbing unrelated changes.
 
+For bug fixes, reproduce the reported symptom before selecting a fix. If you cannot reproduce it, say so and label the change a suspected correction. Describe a fix as confirmed only after verifying it against the reproduced symptom.
+
 Implement the change, verify the relevant behaviour with tests and direct inspection where appropriate, and update documentation only when necessary. Commit and push only when requested (including when needed to open a requested PR).
 
 When GitHub CLI (`gh`) is available and authenticated, use it for GitHub operations where appropriate; never print authentication tokens. Report relevant PR and check links, and leave ongoing CI monitoring to the maintainer unless requested.
