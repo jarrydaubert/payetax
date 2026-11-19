@@ -192,7 +192,7 @@ export const INPUT_TOOLTIPS = {
   directorStudentLoans: {
     title: 'Student Loans',
     description:
-      'Select the repayment plans shown in your student loan account. We include an estimate of repayments through Self Assessment.',
+      'Select your repayment plans. We estimate the extra annual liability from this company under Self Assessment rules. We treat Other Personal Income as earnings. If it includes rent, interest or other dividends, your repayment may differ.',
     note: 'Plan 5 is not supported in Director Intelligence.',
   },
   directorPension: {

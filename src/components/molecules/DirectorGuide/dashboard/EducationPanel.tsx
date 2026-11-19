@@ -510,9 +510,9 @@ function buildWarnings(ctx: WarningContext): Warning[] {
     },
     {
       id: 'student-loan',
-      title: 'Student Loan via Self Assessment',
+      title: 'Student Loan Estimate',
       description:
-        'Student loan repayments may be calculated on total income (including dividends) via Self Assessment. Rules depend on your circumstances.',
+        'We estimate how much this company’s salary and dividends add to your annual student loan liability. We treat Other Personal Income as earnings. If it includes rent, interest or other dividends, your repayment may differ. Under Self Assessment, all unearned income counts once its annual total exceeds £2,000. Class 1A company car benefits are excluded. HMRC rounds repayments down to whole pounds and credits repayments already taken through payroll.',
       show: formData.studentLoanPlans.length > 0,
     },
     {

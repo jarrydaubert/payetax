@@ -548,6 +548,83 @@ test.describe('Director Intelligence critical @critical', () => {
     expect(diagnostics).toEqual([]);
   });
 
+  test('JGF-47: other employment loan liability is excluded from director take-home', async ({
+    page,
+  }) => {
+    const diagnostics: string[] = [];
+    page.on('pageerror', (error) => diagnostics.push(error.message));
+    page.on('console', (message) => {
+      const text = message.text();
+      if (text === 'Viewport argument key "interactive-widget" not recognized and ignored.') return;
+      if (['warning', 'error'].includes(message.type())) diagnostics.push(text);
+    });
+    await page.route('**/_vercel/{insights,speed-insights}/script.js', (route) =>
+      route.fulfill({ contentType: 'application/javascript', body: '' }),
+    );
+
+    await openDirectorGuide(page);
+    await page.waitForLoadState('load');
+    await selectEngland(page);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 40000);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 0);
+    await page
+      .getByRole('button', { name: 'Full Inputs', exact: true })
+      .filter({ visible: true })
+      .click();
+    await fillCurrencyInput(
+      page
+        .getByRole('textbox', { name: 'Other Personal Income', exact: true })
+        .filter({ visible: true }),
+      40000,
+    );
+    await page
+      .getByRole('switch', { name: 'Other PAYE employment?' })
+      .filter({ visible: true })
+      .click();
+    await page.getByRole('button', { name: 'Advanced Options' }).filter({ visible: true }).click();
+    await page
+      .getByRole('checkbox', { name: 'Plan 2', exact: true })
+      .filter({ visible: true })
+      .check();
+    const loanHelp = page.getByRole('button', { name: 'Help for Student Loans' }).filter({
+      visible: true,
+    });
+    await loanHelp.click();
+    await expect(page.getByTestId('tooltip-content-directorStudentLoans')).toContainText(
+      'We treat Other Personal Income as earnings.',
+    );
+    await page.keyboard.press('Escape');
+    await fillCurrencyInput(
+      page
+        .getByRole('textbox', { name: 'Your Current Dividends', exact: true })
+        .filter({ visible: true }),
+      32400,
+    );
+    await page
+      .getByRole('button', { name: 'Apply', exact: true })
+      .filter({ visible: true })
+      .click();
+    await closeInputsPanelIfOpen(page);
+
+    const strategies = page.getByRole('region', { name: 'Strategy comparison' });
+    const allDividends = strategies.getByRole('article').filter({
+      has: page.getByRole('heading', { name: 'All Dividends', exact: true }),
+    });
+    const yourSetup = strategies.getByRole('heading', { name: 'Your Setup' }).locator('../../..');
+    // £32,400 dividends less £8,961.75 dividend tax and 9% of the dividends (£2,916).
+    // The £40,000 of other employment income already covers the Plan 2 threshold.
+    for (const card of [allDividends, yourSetup]) {
+      await expect(
+        card.getByText('Take-Home', { exact: true }).locator('xpath=following-sibling::span'),
+      ).toHaveText('£20,522');
+    }
+    await page.getByRole('button', { name: 'Show learn panel' }).filter({ visible: true }).click();
+    await expect(
+      page.getByText(/all unearned income counts/).filter({ visible: true }),
+    ).toBeVisible();
+    expect(diagnostics).toEqual([]);
+  });
+
   test('JGF-42: another PAYE job preserves the annual director NI threshold', async ({
     page,
   }, testInfo) => {
