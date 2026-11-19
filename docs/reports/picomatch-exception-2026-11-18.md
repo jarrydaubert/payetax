@@ -1,5 +1,14 @@
 # Proposed temporary picomatch advisory exception
 
+> **Retired by PR #207.** GitHub recorded the withdrawal of `GHSA-fc5q-39xc-vjpf` at
+> 15:38:56 UTC on 18 November. The Picomatch maintainer explained that globs are regular
+> expressions and advised against letting untrusted users define them. The upstream patch
+> proposal closed without merging. Bun's live audit stopped reporting the advisory, which
+> required removal under the existing unmatched-entry rule. PayeTax retains its
+> `picomatch@4.0.7` override and lockfile.
+> [GitHub advisory record](https://api.github.com/advisories/GHSA-fc5q-39xc-vjpf) ·
+> [Maintainer comment](https://github.com/micromatch/picomatch/pull/235#issuecomment-6315749381)
+
 The introducing PR is the decision record. The PayeTax maintainer owns the review and must explicitly approve this
 one-time deviation from the [shrink-only policy](../guides/TESTING.md#calculation-verification-model)
 in its PR before merge. The exception covers the npm package `picomatch` and
