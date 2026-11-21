@@ -15,6 +15,8 @@ Never report a UI change as complete based on a successful edit alone. A passing
 
 3. **Interact with the change directly.** For a new or edited control (button, input, toggle, dialog): use it, confirm the expected state change, and capture before/after screenshots. For calculator changes, enter at least one known salary and confirm the output matches expected values — do not invent tax figures; compare against the hand-derived PAYE verification fixtures in `src/test/payeVerificationFixtures/` (expected values sourced from official HMRC / Scottish Government references), never against the engine's own output or generated golden-master fixtures.
 
+   For changes involving saved data, test a clean state and any applicable legacy states using existing fixtures. Inspect the rendered UI and perform the affected user actions in each state.
+
 4. **Check the browser console.** Zero new errors or warnings on load and during interaction.
 
 5. **Run the matching test slice.**
@@ -27,3 +29,5 @@ Never report a UI change as complete based on a successful edit alone. A passing
 6. **Before commit:** `bun run check:repo` and `bun run build:ci`.
 
 If a check fails, fix in-scope issues and rerun the affected checks. If verification is blocked or exposes an unrelated defect, report the exact failure, evidence and remaining checks; do not expand scope indefinitely or claim the UI work is complete. List commands and pass/fail status per `AGENTS.md`, and preserve PR evidence there as required.
+
+When reporting device checks, identify which used emulation and which ran on physical devices.
