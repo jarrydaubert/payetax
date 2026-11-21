@@ -6,7 +6,6 @@ describe('MC-03 explicit calculation', () => {
     store.reset();
     store.setSalary(30000);
     store.calculate();
-    store.calculatePreviousYear();
     store.calculateWhatIf();
     expect(useCalculatorStore.getState().results).not.toBeNull();
     expect(useCalculatorStore.getState().previousYearResults).not.toBeNull();
@@ -40,9 +39,6 @@ describe('MC-03 explicit calculation', () => {
       store.addIncomeSource();
       const id = useCalculatorStore.getState().input.incomeSources[0]?.id;
       if (!id) throw new Error('Missing source');
-      store.calculate();
-      store.calculatePreviousYear();
-      store.calculateWhatIf();
       store.updateIncomeSource(id, { amount: 1000 });
     },
     removeSource: () => {
@@ -50,12 +46,8 @@ describe('MC-03 explicit calculation', () => {
       store.addIncomeSource();
       const id = useCalculatorStore.getState().input.incomeSources[0]?.id;
       if (!id) throw new Error('Missing source');
-      store.calculate();
-      store.calculatePreviousYear();
-      store.calculateWhatIf();
       store.removeIncomeSource(id);
     },
-    validDraft: () => useCalculatorStore.getState().invalidateResults(),
     invalidDraft: () =>
       useCalculatorStore.getState().setInputError('salary', {
         text: 'abc',
@@ -63,25 +55,43 @@ describe('MC-03 explicit calculation', () => {
       }),
   };
 
-  it.each(Object.entries(edits))('%s invalidates every variant until Calculate', (_name, edit) => {
-    edit();
+  it.each(Object.entries(edits))(
+    '%s preserves all submitted results until Calculate',
+    (_name, edit) => {
+      const submitted = useCalculatorStore.getState();
+      edit();
+      const draft = useCalculatorStore.getState();
+      expect(draft.results).toBe(submitted.results);
+      expect(draft.calculatedInput).toBe(submitted.calculatedInput);
+      expect(draft.previousYearResults).toBe(submitted.previousYearResults);
+      expect(draft.whatIfResults).toBe(submitted.whatIfResults);
+      draft.setInputError('salary', null);
+      draft.calculate();
+      expect(useCalculatorStore.getState().calculatedInput).toBe(draft.input);
+      expect(useCalculatorStore.getState().results).not.toBe(submitted.results);
+    },
+  );
+
+  it('publishes the primary, comparison and scenario in one store update', () => {
     const store = useCalculatorStore.getState();
-    expect(store.results).toBeNull();
-    expect(store.previousYearResults).toBeNull();
-    expect(store.whatIfResults).toBeNull();
-    // Neither a comparison toggle nor a stale comparison callback can bypass Calculate.
-    store.toggleWhatIf();
-    store.calculateWhatIf();
-    store.calculatePreviousYear();
-    expect(useCalculatorStore.getState().results).toBeNull();
-    expect(useCalculatorStore.getState().previousYearResults).toBeNull();
-    expect(useCalculatorStore.getState().whatIfResults).toBeNull();
-    store.setInputError('salary', null);
-    store.calculate();
-    expect(useCalculatorStore.getState().results).not.toBeNull();
+    store.setInput({ salary: 40000, taxYear: '2025-2026' });
+    const updates: number[] = [];
+    const unsubscribe = useCalculatorStore.subscribe((state) => {
+      expect(state.calculatedInput?.salary).toBe(40000);
+      expect(state.results?.grossSalary.annually).toBe(40000);
+      expect(state.previousYearResults?.grossSalary.annually).toBe(40000);
+      expect(state.whatIfResults).toBeNull();
+      updates.push(state.results?.grossSalary.annually ?? 0);
+    });
+    try {
+      store.calculate();
+      expect(updates).toEqual([40000]);
+    } finally {
+      unsubscribe();
+    }
   });
 
-  it('rejects an unaffordable net-pay contribution and clears every result', () => {
+  it('rejects an unaffordable net-pay contribution and retains the submitted results', () => {
     const store = useCalculatorStore.getState();
     store.setInput({
       salary: 2000,
@@ -92,9 +102,9 @@ describe('MC-03 explicit calculation', () => {
     expect(store.calculate()).toMatch(/Reduce the net-pay pension contribution/);
     const state = useCalculatorStore.getState();
     expect(state.input.pensionContribution).toBe(100);
-    expect(state.results).toBeNull();
-    expect(state.previousYearResults).toBeNull();
-    expect(state.whatIfResults).toBeNull();
+    expect(state.results).toBe(store.results);
+    expect(state.previousYearResults).toBe(store.previousYearResults);
+    expect(state.whatIfResults).toBe(store.whatIfResults);
 
     store.setPensionContribution(5);
     expect(store.calculate()).toBeUndefined();
@@ -104,10 +114,10 @@ describe('MC-03 explicit calculation', () => {
   it('comparison controls reuse the current primary calculation', () => {
     const result = useCalculatorStore.getState().results;
     const store = useCalculatorStore.getState();
+    store.setSalary(70000);
     store.setWhatIfType('amount');
     store.setWhatIfValue(5000);
     store.calculateWhatIf();
-    store.calculatePreviousYear();
     expect(useCalculatorStore.getState().results).toBe(result);
     expect(useCalculatorStore.getState().whatIfResults?.grossSalary.annually).toBe(35000);
   });

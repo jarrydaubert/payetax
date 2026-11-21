@@ -79,7 +79,6 @@ describe('Pension restoration integrity', () => {
       expect(state.inputErrors.pensionContribution?.error).toContain(error);
       expect(() => {
         state.calculate();
-        state.calculatePreviousYear();
         state.toggleWhatIf();
         state.calculateWhatIf();
       }).not.toThrow();

@@ -74,7 +74,7 @@ describe('Tax-trap pension suggestion (mounted real inputs, store and engine)', 
     ['weekly', 52, 384.62],
   ];
 
-  it('rejects a stale suggestion callback before React has removed its button', async () => {
+  it('rejects a stale suggestion callback after a draft edit', async () => {
     const user = userEvent.setup();
     useCalculatorStore.getState().setInput({ salary: 110000, taxCode: '' });
     render(<CalculatorContainer />);
@@ -86,9 +86,9 @@ describe('Tax-trap pension suggestion (mounted real inputs, store and engine)', 
     });
     expect(useCalculatorStore.getState().input.pensionContribution).toBe(5);
     expect(useCalculatorStore.getState().input.pensionContributionType).toBe('percentage');
-    expect(useCalculatorStore.getState().results).toBeNull();
-    expect(screen.getByRole('status')).toHaveTextContent('Results were cleared');
-    expect(screen.getByRole('status')).not.toHaveTextContent('added to your annual pension');
+    expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(110000);
+    expect(screen.getByRole('alert')).toHaveTextContent('before applying a pension suggestion');
+    expect(apply).toBeInTheDocument();
   });
 
   it('rejects an old suggestion when another Calculate has replaced its result', async () => {
@@ -115,15 +115,21 @@ describe('Tax-trap pension suggestion (mounted real inputs, store and engine)', 
     render(<CalculatorContainer />);
     await user.click(screen.getByTestId('calculate-button'));
     await user.click(await screen.findByRole('button', { name: 'Add £10,000 to Pension' }));
-    expect(screen.getByRole('status')).toHaveTextContent('Calculate again');
+    expect(screen.getByText(/added to your annual pension contribution/)).toHaveTextContent(
+      'Calculate again',
+    );
 
     await user.click(screen.getByRole('button', { name: /Reset/i }));
-    await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(
+        screen.queryByText(/added to your annual pension contribution/),
+      ).not.toBeInTheDocument(),
+    );
     expect(screen.getByRole('heading', { name: 'Ready to Calculate' })).toBeVisible();
     await user.click(screen.getByTestId('pension-input'));
     await user.keyboard('5');
     await user.tab();
-    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    expect(screen.queryByText(/added to your annual pension contribution/)).not.toBeInTheDocument();
   });
 
   describe.each(periods)('%s pay', (payPeriod, periodsPerYear, storedAmount) => {
@@ -150,10 +156,7 @@ describe('Tax-trap pension suggestion (mounted real inputs, store and engine)', 
           name: `Add £${addition.toLocaleString('en-GB')} to Pension`,
         });
 
-        // Seed all result variants: applying must invalidate each, including email and suggestions.
-        act(() => {
-          useCalculatorStore.setState({ whatIfResults: useCalculatorStore.getState().results });
-        });
+        const submitted = useCalculatorStore.getState();
         await user.click(apply);
 
         const state = useCalculatorStore.getState();
@@ -169,19 +172,17 @@ describe('Tax-trap pension suggestion (mounted real inputs, store and engine)', 
             maximumFractionDigits: 2,
           }),
         );
-        expect(state.results).toBeNull();
-        expect(state.previousYearResults).toBeNull();
-        expect(state.whatIfResults).toBeNull();
+        expect(state.results).toBe(submitted.results);
+        expect(state.previousYearResults).toBe(submitted.previousYearResults);
         expect(
-          screen.queryByRole('button', { name: 'Email tax calculation results' }),
-        ).not.toBeInTheDocument();
-        await waitFor(() => expect(apply).not.toBeInTheDocument());
-        expect(screen.getByRole('status')).toHaveTextContent(
+          screen.getByRole('button', { name: 'Email tax calculation results' }),
+        ).toBeInTheDocument();
+        expect(apply).toBeInTheDocument();
+        expect(screen.getByText(/added to your annual pension contribution/)).toHaveTextContent(
           'Calculate again to update your results',
         );
-        expect(screen.getByRole('heading', { name: /^Calculate again$/ })).toBeVisible();
         if (pensionContributionType === 'percentage') {
-          expect(screen.getByRole('status')).toHaveTextContent(
+          expect(screen.getByText(/added to your annual pension contribution/)).toHaveTextContent(
             'Your existing 5% pension was converted to a £ amount',
           );
         }
@@ -190,9 +191,13 @@ describe('Tax-trap pension suggestion (mounted real inputs, store and engine)', 
         expect(annualPension).toBeGreaterThanOrEqual(20000);
         expect(annualPension - 20000).toBeLessThan(0.01 * periodsPerYear);
         if (payPeriod === 'annually') {
-          expect(screen.getByRole('status')).not.toHaveTextContent('Rounded up');
+          expect(
+            screen.getByText(/added to your annual pension contribution/),
+          ).not.toHaveTextContent('Rounded up');
         } else {
-          expect(screen.getByRole('status')).toHaveTextContent('Rounded up to the next penny');
+          expect(screen.getByText(/added to your annual pension contribution/)).toHaveTextContent(
+            'Rounded up to the next penny',
+          );
         }
         await expectPersistenceRoundTrip(storedAmount);
 
@@ -233,13 +238,17 @@ describe('Tax-trap pension suggestion (mounted real inputs, store and engine)', 
         }),
       );
       expect(useCalculatorStore.getState().input.pensionContribution).toBe(storedAmount);
-      expect(useCalculatorStore.getState().results).toBeNull();
-      expect(useCalculatorStore.getState().previousYearResults).toBeNull();
+      expect(useCalculatorStore.getState().results?.pensionContribution.annually).toBe(0);
+      expect(useCalculatorStore.getState().previousYearResults).not.toBeNull();
       expect(useCalculatorStore.getState().whatIfResults).toBeNull();
-      expect(screen.getByRole('status')).toHaveTextContent('Calculate again');
-      expect(screen.getByRole('status').textContent?.includes('Rounded up')).toBe(
-        payPeriod === 'hourly',
+      expect(screen.getByText(/added to your annual pension contribution/)).toHaveTextContent(
+        'Calculate again',
       );
+      expect(
+        screen
+          .getByText(/added to your annual pension contribution/)
+          .textContent?.includes('Rounded up'),
+      ).toBe(payPeriod === 'hourly');
       const annualPension = storedAmount * periodsPerYear;
       expect(annualPension).toBeGreaterThanOrEqual(target);
       expect(annualPension - target).toBeLessThan(0.01 * periodsPerYear);

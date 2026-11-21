@@ -9,34 +9,21 @@ import { Button } from '@/components/ui/button';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { convertPeriodToAnnual } from '@/lib/periodCalculator';
 import { cn } from '@/lib/utils';
-import { type CalculatorAmountField, getBlockingInputErrors } from '@/store/calculatorInputErrors';
+import { getRejectedAmountsMessage, MISSING_SALARY_MESSAGE } from '@/store/calculatorInputErrors';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
 import { BasicInputs } from './BasicInputs';
 import { commitFocusedField } from './commitFocusedField';
 
-const AMOUNT_FIELD_LABELS: Record<
-  Exclude<CalculatorAmountField, `incomeSource:${string}`>,
-  string
-> = {
-  salary: 'Salary',
-  partnerGrossWage: "Partner's Gross Wage",
-  allowancesDeductions: 'Non-taxable allowance(s)',
-  pensionContribution: 'Pension',
-};
-
-const amountFieldLabel = (field: CalculatorAmountField): string =>
-  field.startsWith('incomeSource:')
-    ? 'Additional Income Sources'
-    : AMOUNT_FIELD_LABELS[field as keyof typeof AMOUNT_FIELD_LABELS];
-
 interface CalculatorInputsSectionProps {
   onCalculate: () => string | undefined;
+  onCalculateAttempt?: () => void;
   onReset?: () => void;
   resultAction?: React.ReactNode;
 }
 
 export function CalculatorInputsSection({
   onCalculate,
+  onCalculateAttempt,
   onReset,
   resultAction,
 }: CalculatorInputsSectionProps) {
@@ -52,13 +39,7 @@ export function CalculatorInputsSection({
   } | null>(null);
 
   // A rejected amount in a field the calculation uses blocks calculating from its old amount.
-  const rejectedAmountsMessage = useCalculatorStore((state) => {
-    const blocking = getBlockingInputErrors(state);
-    const labels = [...new Set(blocking.map(([field]) => amountFieldLabel(field)))].join(', ');
-    return blocking.length > 0
-      ? `Correct the invalid ${blocking.length === 1 ? 'amount' : 'amounts'} in ${labels} before calculating.`
-      : '';
-  });
+  const rejectedAmountsMessage = useCalculatorStore(getRejectedAmountsMessage);
   const hasBlockingAmounts = rejectedAmountsMessage !== '';
   const hasSalary = useCalculatorStore((state) => state.input.salary > 0);
 
@@ -72,19 +53,15 @@ export function CalculatorInputsSection({
   }, [hasBlockingAmounts, hasSalary]);
 
   const handleCalculate = () => {
+    onCalculateAttempt?.();
     // Calculate must never use a previous amount while a field shows different text.
     commitFocusedField(inputsRef.current);
 
     // Read the store after that commit, not the values captured at the last render.
     const state = useCalculatorStore.getState();
-    const blocking = getBlockingInputErrors(state);
-    if (blocking.length > 0) {
-      const labels = [...new Set(blocking.map(([field]) => amountFieldLabel(field)))].join(', ');
-      setFormMessage({
-        tone: 'error',
-        text: `Correct the invalid ${blocking.length === 1 ? 'amount' : 'amounts'} in ${labels} before calculating.`,
-        rejectedAmounts: true,
-      });
+    const rejected = getRejectedAmountsMessage(state);
+    if (rejected) {
+      setFormMessage({ tone: 'error', text: rejected, rejectedAmounts: true });
       return;
     }
 
@@ -94,7 +71,7 @@ export function CalculatorInputsSection({
     if (salary <= 0) {
       setFormMessage({
         tone: 'error',
-        text: 'Enter your gross salary to calculate your tax breakdown.',
+        text: MISSING_SALARY_MESSAGE,
         missingSalary: true,
       });
       return;

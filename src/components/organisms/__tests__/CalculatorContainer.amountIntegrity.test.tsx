@@ -3,13 +3,18 @@
  * input fields and the real tax engine.
  *
  * Covers the defect where additional income `1234.56` became £123,456, negative amounts became
- * positive and malformed text became 0, and checks that rejected text never leaves results for
- * the previous amount on screen or lets Calculate use it.
+ * positive and malformed text became 0, and checks that rejected text cannot replace
+ * a submitted result or be sent by Email Results.
  */
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CURRENCY_INPUT_ERRORS } from '@/lib/currencyInput';
+import { generatePayeEmailHtml, generatePayeEmailText } from '@/lib/email/payeResultsEmail';
 import { rememberFigures } from '@/lib/figureStorage';
+import { calculateTax } from '@/lib/tax';
+import type { TaxCalculationInput } from '@/lib/types/calculator';
+import { formatCurrency } from '@/lib/utils';
+import { SendResultsRequestSchema } from '@/lib/validation/emailValidation';
 import { useCalculatorStore } from '@/store/calculatorStore';
 import { CalculatorContainer } from '../CalculatorContainer';
 
@@ -46,7 +51,9 @@ describe('Main calculator amount integrity (mounted)', () => {
       expect(screen.getByText(/Enter your salary, then select Calculate/)).toBeVisible(),
     );
     expect(resultsShown()).toBe(false);
-    expect(screen.queryByRole('button', { name: 'Email tax calculation results' })).toBeNull();
+    expect(
+      screen.getByRole('button', { name: 'Email tax calculation results' }),
+    ).toBeInTheDocument();
     await calculate(user);
     expect(screen.getByRole('alert')).toHaveTextContent('Enter your gross salary');
 
@@ -62,38 +69,53 @@ describe('Main calculator amount integrity (mounted)', () => {
     expect(screen.getByText(/Enter your salary, then select Calculate/)).toBeVisible();
     expect(screen.queryByRole('status')).toBeNull();
     expect(resultsShown()).toBe(false);
-    expect(screen.queryByRole('button', { name: 'Email tax calculation results' })).toBeNull();
+    expect(
+      screen.getByRole('button', { name: 'Email tax calculation results' }),
+    ).toBeInTheDocument();
   });
 
-  it('announces edited results through invalid submission, correction and remount until Calculate', async () => {
+  it('keeps cards and table on the submitted salary until Calculate', async () => {
+    const user = userEvent.setup();
+    render(<CalculatorContainer />);
+    const salary = screen.getByTestId('salary-input');
+    await typeInto(user, salary, '30000.50');
+    await calculate(user);
+    const summary = screen.getByRole('region', { name: 'Tax calculation results summary' });
+    const table = screen.getByTestId('tax-results');
+    const submitted = [summary.textContent, table.textContent];
+
+    await typeInto(user, salary, '40000.50');
+    expect([summary.textContent, table.textContent]).toEqual(submitted);
+    expect(resultsShown()).toBe(true);
+    expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(30000.5);
+
+    await calculate(user);
+    expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(40000.5);
+    expect(summary.textContent).not.toBe(submitted[0]);
+    expect(table.textContent).not.toBe(submitted[1]);
+  });
+
+  it('keeps the submitted results through invalid submission, correction and remount', async () => {
     const user = userEvent.setup();
     const mounted = render(<CalculatorContainer />);
     await typeInto(user, screen.getByTestId('salary-input'), '30000');
     await calculate(user);
+    const submitted = useCalculatorStore.getState().results;
     await typeInto(user, screen.getByTestId('pension-input'), '-5');
     await calculate(user);
     expect(screen.getByRole('alert')).toHaveTextContent('Pension');
-    expect(screen.getByRole('status')).toHaveTextContent(
-      'Results were cleared. Calculate again to update them.',
-    );
-    expect(screen.getByRole('status')).toHaveAttribute('aria-live', 'polite');
-    expect(screen.getByRole('status')).toHaveAttribute('aria-atomic', 'true');
     expect(screen.getByTestId('salary-input')).toHaveValue('30,000.00');
     expect(screen.getByTestId('pension-input')).toHaveValue('-5');
+    expect(useCalculatorStore.getState().results).toBe(submitted);
 
     await typeInto(user, screen.getByTestId('pension-input'), '5');
     expect(screen.queryByRole('alert')).toBeNull();
-    expect(screen.getByRole('status')).toHaveTextContent('Calculate again');
     mounted.unmount();
     render(<CalculatorContainer />);
-    expect(screen.getByRole('status')).toHaveTextContent('Calculate again');
-    await waitFor(() =>
-      expect(screen.getByRole('heading', { name: 'Calculate again' })).toBeVisible(),
-    );
-    expect(resultsShown()).toBe(false);
-    await calculate(user);
     expect(resultsShown()).toBe(true);
-    expect(screen.queryByText(/Results were cleared/)).toBeNull();
+    expect(useCalculatorStore.getState().results).toBe(submitted);
+    await calculate(user);
+    expect(useCalculatorStore.getState().results?.pensionContribution.annually).toBe(1500);
   });
 
   it('updates the invalid submission summary as individual fields are corrected', async () => {
@@ -112,53 +134,39 @@ describe('Main calculator amount integrity (mounted)', () => {
     expect(resultsShown()).toBe(false);
   });
 
-  it('requires Calculate after a valid salary draft and closes an already-open email dialog', async () => {
+  it('uses Email Results as the first calculation and reuses it for an unchanged resend', async () => {
     const user = userEvent.setup();
     const originalFetch = global.fetch;
-    global.fetch = jest.fn().mockResolvedValue({ ok: true });
+    const send = jest.fn().mockResolvedValue({ ok: true });
+    global.fetch = send;
     try {
       render(<CalculatorContainer />);
-      const salary = screen.getByTestId('salary-input');
-      await typeInto(user, salary, '30000');
-      await calculate(user);
-      await user.click(screen.getByRole('button', { name: 'Email tax calculation results' }));
-      await user.type(screen.getByLabelText('Email address for results'), 'test@example.com');
-      // An edit from another mounted consumer must invalidate an already-open dialog, too.
-      act(() => useCalculatorStore.getState().setSalary(40000));
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-      expect(global.fetch).not.toHaveBeenCalled();
+      await typeInto(user, screen.getByTestId('salary-input'), '30000.50');
       expect(resultsShown()).toBe(false);
-      await calculate(user);
-      await user.click(salary);
-      await user.keyboard('{Control>}a{/Control}30000');
-      expect(resultsShown()).toBe(false);
-      await user.tab();
-      expect(useCalculatorStore.getState().results).toBeNull();
-      await typeInto(user, salary, '40000');
-      expect(useCalculatorStore.getState().results).toBeNull();
-      await calculate(user);
-      expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(40000);
       await user.click(screen.getByRole('button', { name: 'Email tax calculation results' }));
       await user.type(screen.getByLabelText('Email address for results'), 'test@example.com');
       await user.click(screen.getByRole('button', { name: /^Email Results$/ }));
-      expect(global.fetch).toHaveBeenCalledWith(
-        '/api/send-results',
-        expect.objectContaining({
-          body: expect.any(String),
-        }),
+      expect(await screen.findByText(/Results sent/)).toBeVisible();
+      const submitted = useCalculatorStore.getState().results;
+      expect(submitted?.grossSalary.annually).toBe(30000.5);
+      await user.click(screen.getByRole('button', { name: 'Send to different email' }));
+      await user.type(screen.getByLabelText('Email address for results'), 'test2@example.com');
+      await user.click(screen.getByRole('button', { name: /^Email Results$/ }));
+      expect(useCalculatorStore.getState().results).toBe(submitted);
+      expect(send).toHaveBeenCalledTimes(2);
+      expect(JSON.parse(send.mock.calls[0][1].body).input).toEqual(
+        JSON.parse(send.mock.calls[1][1].body).input,
       );
-      const payload = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
-      expect(payload.input.salary).toBe(40000);
-      expect(payload.input.payPeriod).toBe(useCalculatorStore.getState().input.payPeriod);
     } finally {
       global.fetch = originalFetch;
     }
   });
 
-  it('refuses an old email callback when a newer calculation exists before React renders', async () => {
+  it('uses the latest inputs even when a valid edit and submit occur in the same task', async () => {
     const user = userEvent.setup();
     const originalFetch = global.fetch;
-    global.fetch = jest.fn().mockResolvedValue({ ok: true });
+    const send = jest.fn().mockResolvedValue({ ok: true });
+    global.fetch = send;
     try {
       render(<CalculatorContainer />);
       await typeInto(user, screen.getByTestId('salary-input'), '30000');
@@ -169,15 +177,92 @@ describe('Main calculator amount integrity (mounted)', () => {
       if (!form) throw new Error('Missing email form');
       act(() => {
         const store = useCalculatorStore.getState();
-        store.setSalary(40000);
-        store.calculate();
+        store.setRegion('Scotland');
+        store.setInput({ salary: 40000, taxYear: '2025-2026', payNoNI: true });
+        fireEvent.submit(form);
         fireEvent.submit(form);
       });
-      expect(global.fetch).not.toHaveBeenCalled();
-      expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(40000);
+      expect(await screen.findByText(/Results sent/)).toBeVisible();
+      expect(send).toHaveBeenCalledTimes(1);
+      const displayed = useCalculatorStore.getState().results;
+      expect(displayed).toMatchObject({
+        grossSalary: { annually: 40000 },
+        nationalInsurance: { annually: 0 },
+        calculationBasis: { taxYear: '2025-2026', incomeTaxRegime: 'Scotland' },
+      });
+      const { input } = SendResultsRequestSchema.parse(JSON.parse(send.mock.calls[0][1].body));
+      expect(input).toMatchObject({
+        salary: 40000,
+        taxYear: '2025-2026',
+        isScottish: true,
+        payNoNI: true,
+      });
+      const emailResults = calculateTax(input as TaxCalculationInput);
+      expect(emailResults).toEqual(displayed);
+      expect(generatePayeEmailText(emailResults)).toContain(
+        formatCurrency(emailResults.netPay.annually),
+      );
+      expect(generatePayeEmailHtml(emailResults)).toContain(
+        formatCurrency(emailResults.netPay.annually),
+      );
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+  it('blocks email when the latest net-pay pension is unaffordable', async () => {
+    const originalFetch = global.fetch;
+    const send = jest.fn();
+    global.fetch = send;
+    try {
+      const store = useCalculatorStore.getState();
+      store.setSalary(40000);
+      store.calculate();
+      const submitted = useCalculatorStore.getState().results;
+      store.setInput({
+        salary: 2000,
+        payPeriod: 'monthly',
+        pensionMethod: 'net-pay',
+        pensionContribution: 100,
+      });
+      const user = userEvent.setup();
+      render(<CalculatorContainer />);
+      await user.click(screen.getByRole('button', { name: 'Email tax calculation results' }));
+      await user.type(screen.getByLabelText('Email address for results'), 'test@example.com');
       await user.click(screen.getByRole('button', { name: /^Email Results$/ }));
-      const payload = JSON.parse((global.fetch as jest.Mock).mock.calls[0][1].body);
-      expect(payload.input.salary).toBe(40000);
+
+      expect(screen.getByRole('alert')).toHaveTextContent(
+        'Reduce the net-pay pension contribution',
+      );
+      expect(send).not.toHaveBeenCalled();
+      expect(useCalculatorStore.getState().results).toBe(submitted);
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+
+  it('discards an email response that arrives after Reset', async () => {
+    const originalFetch = global.fetch;
+    let resolve: (response: Pick<Response, 'ok'>) => void = () => {};
+    const response = new Promise<Pick<Response, 'ok'>>((complete) => {
+      resolve = complete;
+    });
+    const send = jest.fn().mockReturnValue(response);
+    global.fetch = send;
+    try {
+      useCalculatorStore.getState().setSalary(40000);
+      const user = userEvent.setup();
+      render(<CalculatorContainer />);
+      await user.click(screen.getByRole('button', { name: 'Email tax calculation results' }));
+      await user.type(screen.getByLabelText('Email address for results'), 'test@example.com');
+      await user.click(screen.getByRole('button', { name: /^Email Results$/ }));
+      expect(send).toHaveBeenCalledTimes(1);
+
+      act(() => useCalculatorStore.getState().reset());
+      await act(async () => resolve({ ok: true }));
+      expect(send.mock.calls[0][1].signal.aborted).toBe(true);
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(screen.queryByText(/Results sent/)).not.toBeInTheDocument();
+      expect(resultsShown()).toBe(false);
     } finally {
       global.fetch = originalFetch;
     }
@@ -225,7 +310,7 @@ describe('Main calculator amount integrity (mounted)', () => {
     },
   );
 
-  it('preserves a calculated salary on focus and leave, invalidates on a valid draft and recovers', async () => {
+  it('preserves a calculated salary on focus and leave, and keeps it through a valid draft', async () => {
     const user = userEvent.setup();
     render(<CalculatorContainer />);
     const salary = screen.getByTestId('salary-input');
@@ -238,10 +323,10 @@ describe('Main calculator amount integrity (mounted)', () => {
     expect(resultsShown()).toBe(true);
     await user.click(salary);
     fireEvent.change(salary, { target: { value: '40000' } });
-    await waitFor(() => expect(resultsShown()).toBe(false));
+    expect(resultsShown()).toBe(true);
     expect(
-      screen.queryByRole('button', { name: 'Email tax calculation results' }),
-    ).not.toBeInTheDocument();
+      screen.getByRole('button', { name: 'Email tax calculation results' }),
+    ).toBeInTheDocument();
     await user.tab();
     await calculate(user);
     await waitFor(() => expect(resultsShown()).toBe(true));
@@ -251,7 +336,7 @@ describe('Main calculator amount integrity (mounted)', () => {
     expect(salary).toHaveValue('');
     expect(salary).toHaveAttribute('aria-invalid', 'true');
     await calculate(user);
-    expect(resultsShown()).toBe(false);
+    expect(resultsShown()).toBe(true);
   });
 
   it.each([['1234.56'], ['£1,234.56']])(
@@ -276,7 +361,7 @@ describe('Main calculator amount integrity (mounted)', () => {
     },
   );
 
-  it('rejects a negative salary visibly, removes the old results and refuses to calculate', async () => {
+  it('rejects a negative salary visibly and protects the submitted results', async () => {
     const user = userEvent.setup();
     render(<CalculatorContainer />);
     const salary = screen.getByTestId('salary-input');
@@ -289,15 +374,15 @@ describe('Main calculator amount integrity (mounted)', () => {
 
     expect(salary).toHaveValue('-500');
     expect(salary).toHaveAccessibleDescription(CURRENCY_INPUT_ERRORS.negative);
-    await waitFor(() => expect(resultsShown()).toBe(false));
+    expect(resultsShown()).toBe(true);
     expect(useCalculatorStore.getState().input.salary).toBe(30000);
 
     await calculate(user);
     expect(screen.getByRole('alert')).toHaveTextContent(
       'Correct the invalid amount in Salary before calculating.',
     );
-    expect(resultsShown()).toBe(false);
-    expect(useCalculatorStore.getState().results).toBeNull();
+    expect(resultsShown()).toBe(true);
+    expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(30000);
 
     // Recovery: a corrected amount clears the error and calculates normally.
     await typeInto(user, salary, '40000');
@@ -329,7 +414,7 @@ describe('Main calculator amount integrity (mounted)', () => {
 
     expect(field).toHaveValue(text);
     expect(field).toHaveAccessibleDescription(expect.stringContaining(error));
-    await waitFor(() => expect(resultsShown()).toBe(false));
+    expect(resultsShown()).toBe(true);
     expect(useCalculatorStore.getState().input.allowancesDeductions).toBe(
       before.allowancesDeductions,
     );
@@ -339,7 +424,7 @@ describe('Main calculator amount integrity (mounted)', () => {
 
     await calculate(user);
     expect(screen.getByRole('alert')).toHaveTextContent('before calculating');
-    expect(resultsShown()).toBe(false);
+    expect(resultsShown()).toBe(true);
   });
 
   it('keeps a rejected income amount visible, and stops blocking once that source is removed', async () => {
@@ -443,15 +528,15 @@ describe('Main calculator amount integrity (mounted)', () => {
     const emailAction = () =>
       screen.queryByRole('button', { name: 'Email tax calculation results' });
 
-    it.each(['-500', 'abc'])('removes results and email as soon as %j is typed', async (keys) => {
+    it.each(['-500', 'abc'])('keeps the submitted results while %j is typed', async (keys) => {
       const user = userEvent.setup();
       const salary = await calculateThenEditSalary(user, keys);
 
       expect(salary).toHaveFocus();
       expect(useCalculatorStore.getState().inputErrors.salary?.text).toBe(keys);
-      expect(useCalculatorStore.getState().results).toBeNull();
-      await waitFor(() => expect(resultsShown()).toBe(false));
-      expect(emailAction()).not.toBeInTheDocument();
+      expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(30000);
+      expect(resultsShown()).toBe(true);
+      expect(emailAction()).toBeInTheDocument();
       // The committed amount is unchanged; it is just not usable.
       expect(useCalculatorStore.getState().input.salary).toBe(30000);
     });
@@ -468,24 +553,24 @@ describe('Main calculator amount integrity (mounted)', () => {
       expect(screen.getByRole('alert')).toHaveTextContent(
         'Correct the invalid amount in Salary before calculating.',
       );
-      expect(useCalculatorStore.getState().results).toBeNull();
-      expect(resultsShown()).toBe(false);
-      expect(emailAction()).not.toBeInTheDocument();
+      expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(30000);
+      expect(resultsShown()).toBe(true);
+      expect(emailAction()).toBeInTheDocument();
       expect(salary).toHaveValue(keys);
       expect(salary).toHaveAccessibleDescription(error);
     });
 
-    it('does not revive the old result when the text is corrected before leaving the field', async () => {
+    it('commits corrected text before calculating while the field is focused', async () => {
       const user = userEvent.setup();
       const salary = await calculateThenEditSalary(user, '-500');
 
       await user.clear(salary);
       await user.keyboard('40000');
       expect(salary).toHaveFocus();
-      // Valid but uncommitted text: still blocked, results still gone.
+      // Valid but uncommitted text must still be committed before calculation.
       expect(useCalculatorStore.getState().inputErrors.salary).toBeDefined();
-      expect(useCalculatorStore.getState().results).toBeNull();
-      expect(resultsShown()).toBe(false);
+      expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(30000);
+      expect(resultsShown()).toBe(true);
 
       clickCalculateWithoutBlur();
 
@@ -497,25 +582,24 @@ describe('Main calculator amount integrity (mounted)', () => {
       expect(salary).toHaveValue('40,000.00');
     });
 
-    it('clears results while an amount is half-typed, and Calculate restores them', async () => {
-      // Intermediate text such as `30,0` (on the way to `30,000`) is not a valid amount, so the
-      // results go: the safe direction. They are not restored without Calculate.
+    it('keeps the snapshot while an amount is half-typed and corrected', async () => {
+      // Intermediate text such as `30,0` (on the way to `30,000`) is not a valid amount until completed.
       const user = userEvent.setup();
       const salary = await calculateThenEditSalary(user, '30,0');
-      await waitFor(() => expect(resultsShown()).toBe(false));
+      expect(resultsShown()).toBe(true);
 
       await user.keyboard('00');
       await user.tab();
       expect(salary).not.toHaveAttribute('aria-invalid');
       expect(useCalculatorStore.getState().inputErrors).toEqual({});
-      expect(resultsShown()).toBe(false);
+      expect(resultsShown()).toBe(true);
 
       await calculate(user);
       await waitFor(() => expect(resultsShown()).toBe(true));
       expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(30000);
     });
 
-    it('removes a pension suggestion on a valid draft and refuses a stale action', async () => {
+    it('refuses to apply a pension suggestion after a valid edit', async () => {
       const user = userEvent.setup();
       render(<CalculatorContainer />);
       await typeInto(user, screen.getByTestId('salary-input'), '110000');
@@ -524,13 +608,13 @@ describe('Main calculator amount integrity (mounted)', () => {
       const pension = screen.getByTestId('pension-input');
       await user.clear(pension);
       await user.keyboard('3');
-      expect(apply).not.toBeInTheDocument();
+      expect(apply).toBeInTheDocument();
       fireEvent.click(apply);
       expect(useCalculatorStore.getState().input.pensionContributionType).toBe('percentage');
-      expect(useCalculatorStore.getState().results).toBeNull();
+      expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(110000);
     });
 
-    it('removes the suggested-pension action as soon as rejected text is typed', async () => {
+    it('refuses to apply a pension suggestion with rejected text', async () => {
       const user = userEvent.setup();
       render(<CalculatorContainer />);
       const salary = screen.getByTestId('salary-input');
@@ -538,11 +622,12 @@ describe('Main calculator amount integrity (mounted)', () => {
       await calculate(user);
       const apply = await screen.findByRole('button', { name: /to Pension$/ });
 
-      // The apply button is part of the results, which go as soon as rejected text is typed.
       await user.click(salary);
       await user.clear(salary);
       await user.keyboard('abc');
-      expect(apply).not.toBeInTheDocument();
+      expect(apply).toBeInTheDocument();
+      fireEvent.click(apply);
+      expect(screen.getByRole('alert')).toHaveTextContent('before applying a pension suggestion');
       expect(useCalculatorStore.getState().input.pensionContribution).toBe(0);
     });
 

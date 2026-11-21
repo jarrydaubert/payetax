@@ -56,13 +56,8 @@ function isValidPeriod(value: string): value is IncomeSource['period'] {
 
 export function IncomeSourceList() {
   const incomeSources = useCalculatorStore((state) => state.input.incomeSources || []);
-  const {
-    addIncomeSource,
-    updateIncomeSource,
-    removeIncomeSource,
-    setInputError,
-    invalidateResults,
-  } = useCalculatorActions();
+  const { addIncomeSource, updateIncomeSource, removeIncomeSource, setInputError } =
+    useCalculatorActions();
   const inputErrors = useCalculatorStore((state) => state.inputErrors);
   const inputRevision = useCalculatorStore((state) => state.inputRevision);
   const [isOpen, setIsOpen] = React.useState(false);
@@ -170,7 +165,6 @@ export function IncomeSourceList() {
               {/* Amount and Period Row */}
               <div className={cn('flex items-start', 'gap-2')}>
                 <NumberInput
-                  onDraftChange={invalidateResults}
                   value={source.amount}
                   onChange={(amount) => updateIncomeSource(source.id, { amount })}
                   onValidityChange={(invalid) =>

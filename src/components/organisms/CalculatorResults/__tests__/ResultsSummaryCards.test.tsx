@@ -1,9 +1,11 @@
 // src/components/organisms/CalculatorResults/__tests__/ResultsSummaryCards.test.tsx
 import { render, screen, within } from '@testing-library/react';
 import type { TaxCalculationResults } from '@/lib/taxCalculator';
+import { useCalculatorStore } from '@/store/calculatorStore';
 import { ResultsSummaryCards } from '../ResultsSummaryCards';
 
 describe('ResultsSummaryCards Component', () => {
+  const input = useCalculatorStore.getInitialState().input;
   const mockResults: TaxCalculationResults = {
     grossSalary: {
       annually: 30000,
@@ -68,7 +70,7 @@ describe('ResultsSummaryCards Component', () => {
 
   describe('Rendering', () => {
     it('should render all five summary cards', () => {
-      render(<ResultsSummaryCards results={mockResults} />);
+      render(<ResultsSummaryCards input={input} marginalTaxRate={28} results={mockResults} />);
 
       expect(screen.getByText('Annual Take-Home')).toBeInTheDocument();
       expect(screen.getByText('Monthly Take-Home', { selector: 'section p' })).toBeInTheDocument();
@@ -78,13 +80,13 @@ describe('ResultsSummaryCards Component', () => {
     });
 
     it('should display correct annual take-home value', () => {
-      render(<ResultsSummaryCards results={mockResults} />);
+      render(<ResultsSummaryCards input={input} marginalTaxRate={28} results={mockResults} />);
 
       expect(screen.getByText('£24,486.00')).toBeInTheDocument();
     });
 
     it('should display correct monthly take-home value', () => {
-      render(<ResultsSummaryCards results={mockResults} />);
+      render(<ResultsSummaryCards input={input} marginalTaxRate={28} results={mockResults} />);
 
       expect(
         within(screen.getByRole('region', { name: 'Tax calculation summary results' })).getByText(
@@ -94,14 +96,14 @@ describe('ResultsSummaryCards Component', () => {
     });
 
     it('should display correct total tax and NI', () => {
-      render(<ResultsSummaryCards results={mockResults} />);
+      render(<ResultsSummaryCards input={input} marginalTaxRate={28} results={mockResults} />);
 
       // Total tax: 3486 + 2028 = 5514
       expect(screen.getByText('£5,514.00')).toBeInTheDocument();
     });
 
     it('should display correct effective tax rate', () => {
-      render(<ResultsSummaryCards results={mockResults} />);
+      render(<ResultsSummaryCards input={input} marginalTaxRate={28} results={mockResults} />);
 
       // (5514 / 30000) * 100 = 18.38%
       expect(screen.getByText('18.4%')).toBeInTheDocument();
@@ -115,7 +117,7 @@ describe('ResultsSummaryCards Component', () => {
         pensionContribution: { ...mockResults.pensionContribution, annually: 1500 },
       };
 
-      render(<ResultsSummaryCards results={withPension} />);
+      render(<ResultsSummaryCards input={input} marginalTaxRate={28} results={withPension} />);
 
       const note = screen.getByTestId('pension-method-result-note');
       expect(note).toHaveTextContent(/Salary sacrifice/);
@@ -129,6 +131,8 @@ describe('ResultsSummaryCards Component', () => {
     it('identifies net pay and explains the gross earnings bases', () => {
       render(
         <ResultsSummaryCards
+          input={input}
+          marginalTaxRate={28}
           results={{
             ...mockResults,
             pensionMethod: 'net-pay',
@@ -143,14 +147,14 @@ describe('ResultsSummaryCards Component', () => {
     });
 
     it('does not show a pension note when no pension is entered', () => {
-      render(<ResultsSummaryCards results={mockResults} />);
+      render(<ResultsSummaryCards input={input} marginalTaxRate={28} results={mockResults} />);
       expect(screen.queryByTestId('pension-method-result-note')).not.toBeInTheDocument();
     });
   });
 
   describe('Accessibility', () => {
     it('keeps limitations and the marginal estimate explanation visible without card controls', () => {
-      render(<ResultsSummaryCards results={mockResults} />);
+      render(<ResultsSummaryCards input={input} marginalTaxRate={28} results={mockResults} />);
       const summary = screen.getByRole('region', { name: 'Tax calculation summary results' });
       expect(within(summary).queryByRole('button')).not.toBeInTheDocument();
       expect(within(summary).getByText('Marginal Rate Estimate')).toBeInTheDocument();
@@ -163,7 +167,9 @@ describe('ResultsSummaryCards Component', () => {
     });
 
     it('should have proper ARIA labels', () => {
-      const { container } = render(<ResultsSummaryCards results={mockResults} />);
+      const { container } = render(
+        <ResultsSummaryCards input={input} marginalTaxRate={28} results={mockResults} />,
+      );
 
       const section = container.querySelector('section');
       expect(section).toHaveAttribute('aria-live', 'polite');
@@ -172,7 +178,9 @@ describe('ResultsSummaryCards Component', () => {
     });
 
     it('should render as a semantic section', () => {
-      const { container } = render(<ResultsSummaryCards results={mockResults} />);
+      const { container } = render(
+        <ResultsSummaryCards input={input} marginalTaxRate={28} results={mockResults} />,
+      );
 
       const section = container.querySelector('section');
       expect(section).toBeInTheDocument();
@@ -189,7 +197,7 @@ describe('ResultsSummaryCards Component', () => {
         nationalInsurance: { ...mockResults.nationalInsurance, annually: 0 },
       };
 
-      render(<ResultsSummaryCards results={zeroResults} />);
+      render(<ResultsSummaryCards input={input} marginalTaxRate={0} results={zeroResults} />);
 
       // Multiple £0.00 values expected (annual, monthly, total tax)
       const zeroValues = screen.getAllByText('£0.00');
@@ -208,7 +216,9 @@ describe('ResultsSummaryCards Component', () => {
         nationalInsurance: { ...mockResults.nationalInsurance, annually: 6500 },
       };
 
-      render(<ResultsSummaryCards results={highSalaryResults} />);
+      render(
+        <ResultsSummaryCards input={input} marginalTaxRate={28} results={highSalaryResults} />,
+      );
 
       expect(screen.getByText('£85,000.00')).toBeInTheDocument();
       expect(
@@ -228,7 +238,7 @@ describe('ResultsSummaryCards Component', () => {
         nationalInsurance: { ...mockResults.nationalInsurance, annually: 6000 },
       };
 
-      render(<ResultsSummaryCards results={highTaxResults} />);
+      render(<ResultsSummaryCards input={input} marginalTaxRate={28} results={highTaxResults} />);
 
       // (28000 + 6000) / 100000 * 100 = 34%
       expect(screen.getByText('34.0%')).toBeInTheDocument();
@@ -237,7 +247,9 @@ describe('ResultsSummaryCards Component', () => {
 
   describe('Layout', () => {
     it('should have grid layout classes', () => {
-      const { container } = render(<ResultsSummaryCards results={mockResults} />);
+      const { container } = render(
+        <ResultsSummaryCards input={input} marginalTaxRate={28} results={mockResults} />,
+      );
 
       const section = container.querySelector('section');
       expect(section).toHaveClass('grid');
@@ -249,7 +261,7 @@ describe('ResultsSummaryCards Component', () => {
 
   describe('Integration with ResultCard', () => {
     it('should pass correct variant to each card', () => {
-      render(<ResultsSummaryCards results={mockResults} />);
+      render(<ResultsSummaryCards input={input} marginalTaxRate={28} results={mockResults} />);
 
       // Cards are rendered by ResultCard component
       // We just verify they're present with correct text
@@ -261,7 +273,9 @@ describe('ResultsSummaryCards Component', () => {
     });
 
     it('should render all cards with icons', () => {
-      const { container } = render(<ResultsSummaryCards results={mockResults} />);
+      const { container } = render(
+        <ResultsSummaryCards input={input} marginalTaxRate={28} results={mockResults} />,
+      );
 
       // ResultCard components render svg icons
       const svgs = container.querySelectorAll('svg');
@@ -277,7 +291,7 @@ describe('ResultsSummaryCards Component', () => {
         nationalInsurance: { ...mockResults.nationalInsurance, annually: 5000 },
       };
 
-      render(<ResultsSummaryCards results={customResults} />);
+      render(<ResultsSummaryCards input={input} marginalTaxRate={28} results={customResults} />);
 
       // 10000 + 5000 = 15000
       expect(screen.getByText('£15,000.00')).toBeInTheDocument();
@@ -291,7 +305,7 @@ describe('ResultsSummaryCards Component', () => {
         nationalInsurance: { ...mockResults.nationalInsurance, annually: 3210.45 },
       };
 
-      render(<ResultsSummaryCards results={customResults} />);
+      render(<ResultsSummaryCards input={input} marginalTaxRate={28} results={customResults} />);
 
       // (6543.21 + 3210.45) / 45678 * 100 = 21.36%
       expect(screen.getByText('21.4%')).toBeInTheDocument();

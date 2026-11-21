@@ -7,7 +7,7 @@
  * - Regression where marginal rate stops reflecting selected options (e.g. student loan)
  * - Regression where additional income sources stop showing/being included in totals
  * - Regression where amount fields scale pence, drop minus signs or turn malformed text into £0,
- *   or leave results for a rejected amount on screen
+ *   or replace a submitted result with rejected drafts
  */
 
 import { expect, type Locator, type Page, test } from '@playwright/test';
@@ -101,8 +101,9 @@ test('PAYE calculation failure stays inline and a retry restores results @critic
     'Unable to calculate your tax. Please try again.',
   );
   await expect(calculator.getByText('Tax calculation complete. Results updated.')).toHaveCount(0);
-  await expect(results).toHaveCount(0);
-  await expect(email).toHaveCount(0);
+  await expect(results).toBeVisible();
+  await expect(netPay.getByRole('cell', { name: expectedNetPay, exact: true })).toBeVisible();
+  await expect(email).toBeVisible();
   await expect(salary).toHaveValue('40,000.00');
   expect(diagnostics).toEqual([expect.stringContaining('Tax calculation error:')]);
 
@@ -340,8 +341,7 @@ test.describe('MC-04 submitted pay period @critical', () => {
     await page.getByRole('combobox', { name: 'Pay period', exact: true }).click();
     await page.getByRole('option', { name: 'Fortnightly', exact: true }).click();
     await expect(page.getByRole('combobox', { name: 'Pay period', exact: true })).toBeFocused();
-    await expect(display).toHaveCount(0);
-    await expect(page.getByRole('status')).toContainText('Calculate again');
+    await expect(display).toHaveText('Monthly');
     await enterSalary(page, '1500');
     await page.getByTestId('calculate-button').press('Enter');
     await expect(display).toHaveText('Fortnightly');
@@ -362,14 +362,15 @@ test.describe('MC-03 input integrity @critical', () => {
     await field.focus();
     await expect(field).toBeFocused();
     await field.press('ControlOrMeta+A');
-    await field.pressSequentially(text);
+    if (text) await field.pressSequentially(text);
+    else await field.press('Backspace');
     await expect(field).toHaveValue(text);
   }
 
   const emailAction = (page: Page) =>
     page.getByRole('button', { name: 'Email tax calculation results' });
 
-  test('first use and keyboard Reset offer Calculate without results or result actions', async ({
+  test('first use and keyboard Reset offer both calculation actions without results', async ({
     page,
   }) => {
     await expect(page.getByRole('heading', { name: 'Ready to Calculate' })).toBeVisible();
@@ -377,7 +378,7 @@ test.describe('MC-03 input integrity @critical', () => {
       page.getByText('Enter your salary, then select Calculate to see your take-home pay.'),
     ).toBeVisible();
     await expect(page.getByTestId('tax-results')).toHaveCount(0);
-    await expect(emailAction(page)).toHaveCount(0);
+    await expect(emailAction(page)).toBeVisible();
     await page.getByTestId('calculate-button').press('Enter');
     await expect(page.getByTestId('calculator-section').getByRole('alert')).toContainText(
       'Enter your gross salary',
@@ -400,53 +401,112 @@ test.describe('MC-03 input integrity @critical', () => {
     await expect(page.getByRole('region', { name: 'Tax calculation results summary' })).toHaveCount(
       0,
     );
-    await expect(emailAction(page)).toHaveCount(0);
+    await expect(emailAction(page)).toBeVisible();
     await expect(page.getByText(/Results were cleared/)).toHaveCount(0);
   });
 
-  test('valid salary edit and blur require Calculate, then email matches the displayed inputs', async ({
+  test('retains one submitted PAYE scenario until Calculate, then Reset clears it', async ({
+    page,
+  }, testInfo) => {
+    const salary = page.getByTestId('salary-input');
+    const calculate = page.getByTestId('calculate-button');
+    const summary = page.getByRole('region', { name: 'Tax calculation results summary' });
+    const table = page.getByTestId('tax-results');
+    await page.getByTestId('tax-code-input').fill('1257L');
+    await typeAmount(salary, '30000.50');
+    await calculate.press('Enter');
+    expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(30000.5);
+    await expect(summary).toBeVisible();
+    const summaryBefore = (await summary.textContent()) ?? '';
+    const tableBefore = (await table.textContent()) ?? '';
+    await page.screenshot({ path: testInfo.outputPath('submitted.png'), fullPage: true });
+
+    await typeAmount(salary, '40000.50');
+    await expect(table).toBeVisible();
+    await salary.press('Tab');
+    await expect(salary).toHaveValue('40,000.50');
+    await selectOption(page, page.getByTestId('tax-year-select'), /2025.*2026/);
+    await selectOption(page, page.getByTestId('region-select'), 'Scotland');
+    await selectOption(page, page.getByTestId('student-loan-select'), /Plan 2/);
+    await page.getByRole('checkbox', { name: 'I pay no NI' }).press('Space');
+    await expect(summary).toHaveText(summaryBefore);
+    await expect(table).toHaveText(tableBefore);
+    await page.screenshot({ path: testInfo.outputPath('draft.png'), fullPage: true });
+
+    await calculate.press('Enter');
+    expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(40000.5);
+    // 2025/26 Scottish Month 1: floor(3333.375 - 1048.26) = 2285; 21% less
+    // (14,921 + 2,827) x 1% / 12 = £465.06. No NI; Plan 2 floors to £86/month.
+    // https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2025-to-2026
+    expect(await getYearlyTableValue(page, 'Total Tax Due')).toBe(5580.72);
+    expect(await getYearlyTableValue(page, 'Student Loan')).toBe(1032);
+    expect(await getYearlyTableValue(page, 'National Insurance')).toBe(0);
+    expect(await getYearlyTableValue(page, 'Net Pay')).toBe(33387.78);
+    await expect(table).toContainText('Net Change from 2024');
+    await expect(summary).toContainText('£33,387.78');
+    await expect(table).not.toHaveText(tableBefore);
+    await page.screenshot({ path: testInfo.outputPath('recalculated.png'), fullPage: true });
+
+    await page.getByRole('button', { name: 'Reset', exact: true }).press('Enter');
+    await expect(salary).toHaveValue('0.00');
+    await expect(summary).toHaveCount(0);
+    await expect(table).toHaveCount(0);
+  });
+
+  test('Email Results calculates edited inputs, handles provider failure and resends the same scenario', async ({
     page,
   }) => {
     const sent: unknown[] = [];
     await page.route('**/api/send-results', async (route) => {
       sent.push(route.request().postDataJSON());
-      await route.fulfill({ json: { success: true } });
+      await route.fulfill(
+        sent.length === 1
+          ? { status: 503, json: { error: 'Email service temporarily unavailable.' } }
+          : { json: { success: true } },
+      );
     });
     const salary = page.getByTestId('salary-input');
-    await typeAmount(salary, '30000');
+    await page.getByTestId('tax-code-input').fill('1257L');
+    await typeAmount(salary, '30000.50');
     await page.getByTestId('calculate-button').press('Enter');
-    expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(30000);
+    expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(30000.5);
+
     await typeAmount(salary, '40000');
-    await expect(salary).toBeFocused();
-    await expect(page.getByRole('status')).toContainText('Results were cleared');
-    await expect(page.getByRole('status')).toHaveAttribute('aria-live', 'polite');
-    await expect(page.getByRole('heading', { name: 'Calculate again' })).toBeVisible();
-    await expect(page.getByRole('region', { name: 'Tax calculation results summary' })).toHaveCount(
-      0,
-    );
-    await expect(page.getByTestId('tax-results')).toHaveCount(0);
-    await expect(emailAction(page)).toHaveCount(0);
-    await salary.press('Tab');
-    await expect(salary).toHaveValue('40,000.00');
-    await expect(page.getByTestId('tax-results')).toHaveCount(0);
-    await expect(page.getByRole('button', { name: /to Pension$/ })).toHaveCount(0);
-    expect(sent).toEqual([]);
-    await page.getByTestId('calculate-button').press('Enter');
-    expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(40000);
-    await expect(page.getByText(/Results were cleared/)).toHaveCount(0);
     await emailAction(page).press('Enter');
-    await page.getByLabel('Email address for results').fill('mc03@example.com');
-    await page.getByRole('button', { name: /^Email Results$/ }).press('Enter');
-    await expect(page.getByRole('status').filter({ hasText: 'Results sent' })).toBeVisible();
-    expect(sent).toEqual([
-      expect.objectContaining({
-        input: expect.objectContaining({
-          salary: 40000,
-          payPeriod: 'annually',
-          pensionContribution: 0,
-        }),
-      }),
-    ]);
+    const dialog = page.getByRole('dialog');
+    const address = dialog.getByLabel('Email address for results');
+    const submit = dialog.getByRole('button', { name: /^Email Results$/ });
+    await address.fill('paye-test@example.com');
+    await submit.press('Enter');
+    await expect(dialog.getByRole('alert')).toHaveText('Email service temporarily unavailable.');
+    await expect(dialog.getByText('Results sent', { exact: false })).toHaveCount(0);
+    expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(40000);
+    const fixture = payrollFixtures.scenarios.find(({ id }) => id === 'salary-guide-40k-base');
+    if (!fixture) throw new Error('Missing the independent £40,000 PAYE fixture');
+    expect(await getYearlyTableValue(page, 'Net Pay')).toBe(fixture.expected.netPayAnnual);
+
+    await submit.press('Enter');
+    await expect(dialog.getByText('Results sent', { exact: false })).toBeVisible();
+    await dialog.getByRole('button', { name: 'Send to different email' }).press('Enter');
+    await address.fill('paye-resend@example.com');
+    await submit.press('Enter');
+    await expect(dialog.getByText('Results sent', { exact: false })).toBeVisible();
+    expect(sent).toHaveLength(3);
+    const submitted = {
+      salary: 40000,
+      payPeriod: 'annually',
+      taxYear: '2026-2027',
+      taxCode: '1257L',
+      isScottish: false,
+      isMarried: false,
+      pensionContribution: 0,
+    };
+    for (const body of sent) {
+      expect(body).toMatchObject({ input: submitted });
+    }
+    await page.keyboard.press('Escape');
+    await expect(dialog).toHaveCount(0);
+    expect(await getYearlyTableValue(page, 'Net Pay')).toBe(fixture.expected.netPayAnnual);
   });
 
   test('pension method changes require recalculation and carry through to email', async ({
@@ -482,8 +542,9 @@ test.describe('MC-03 input integrity @critical', () => {
 
     await selectOption(page, method, 'Net pay');
     await expect(pension).toHaveValue('10.00');
-    await expect(page.getByTestId('tax-results')).toHaveCount(0);
-    await expect(emailAction(page)).toHaveCount(0);
+    await expect(note).toContainText('Salary sacrifice');
+    expect(await getYearlyTableValue(page, 'Net Pay')).toBe(sacrifice.expected.netPayAnnual);
+    await expect(emailAction(page)).toBeVisible();
     await calculate.press('Enter');
     await expect(note).toContainText('Net pay');
     await expect(note).toContainText('Relief at source requires a separate calculation.');
@@ -524,7 +585,7 @@ test.describe('MC-03 input integrity @critical', () => {
     await page.getByTestId('calculate-button').press('Enter');
     await expect(page.getByText(/Reduce the net-pay pension contribution/)).toBeVisible();
     await expect(page.getByTestId('tax-results')).toHaveCount(0);
-    await expect(emailAction(page)).toHaveCount(0);
+    await expect(emailAction(page)).toBeVisible();
   });
 
   test('invalid drafts stay blocked through recovery until explicit Calculate', async ({
@@ -544,21 +605,19 @@ test.describe('MC-03 input integrity @critical', () => {
     await expect(salary).toHaveAttribute('aria-invalid', 'true');
     await expect(salary).toHaveAccessibleDescription(/negative/i);
     await expect(salary).toHaveValue('-500');
-    await expect(page.getByRole('status')).toContainText('Results were cleared');
-    await expect(page.getByTestId('tax-results')).toHaveCount(0);
-    await expect(emailAction(page)).toHaveCount(0);
+    await expect(page.getByTestId('tax-results')).toBeVisible();
+    await expect(emailAction(page)).toBeVisible();
     await typeAmount(salary, '40000');
     await salary.press('Enter');
     await expect(salary).not.toHaveAttribute('aria-invalid');
     await expect(page.getByTestId('calculator-section').getByRole('alert')).toHaveCount(0);
-    await expect(page.getByRole('status')).toContainText('Calculate again');
     await expect(salary).toHaveValue('40,000.00');
-    await expect(page.getByTestId('tax-results')).toHaveCount(0);
+    await expect(page.getByTestId('tax-results')).toBeVisible();
     await page.getByTestId('calculate-button').press('Enter');
     expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(40000);
   });
 
-  test('pension edit removes stale suggestions; applying a fresh suggestion only edits input', async ({
+  test('a pension draft retains the submitted figures and prevents applying an old suggestion', async ({
     page,
   }) => {
     await typeAmount(page.getByTestId('salary-input'), '120000');
@@ -566,18 +625,22 @@ test.describe('MC-03 input integrity @critical', () => {
     await expect(page.getByRole('button', { name: 'Add £20,000 to Pension' })).toBeVisible();
     const pension = page.getByTestId('pension-input');
     await typeAmount(pension, '5');
-    await expect(page.getByRole('button', { name: /to Pension$/ })).toHaveCount(0);
+    const oldSuggestion = page.getByRole('button', { name: 'Add £20,000 to Pension' });
+    await expect(oldSuggestion).toBeVisible();
     await pension.press('Tab');
-    await expect(page.getByTestId('tax-results')).toHaveCount(0);
+    await oldSuggestion.press('Enter');
+    await expect(page.getByText(/before applying a pension suggestion/)).toBeVisible();
+    await expect(pension).toHaveValue('5.00');
+    await expect(page.getByTestId('tax-results')).toBeVisible();
     await page.getByTestId('calculate-button').press('Enter');
     await page.getByRole('button', { name: 'Add £14,000 to Pension' }).press('Enter');
     await expect(pension).toHaveValue('20,000.00');
-    await expect(page.getByTestId('tax-results')).toHaveCount(0);
-    await expect(emailAction(page)).toHaveCount(0);
-    await expect(page.getByRole('status').filter({ hasText: 'Calculate again' })).toBeVisible();
+    await expect(page.getByTestId('tax-results')).toBeVisible();
+    await expect(emailAction(page)).toBeVisible();
+    await expect(page.getByText(/added to your annual pension contribution/)).toBeVisible();
     await pension.focus();
     await pension.press('Tab');
-    await expect(page.getByTestId('tax-results')).toHaveCount(0);
+    await expect(page.getByTestId('tax-results')).toBeVisible();
     await page.getByTestId('calculate-button').press('Enter');
     expect(await getYearlyTableValue(page, 'Pension')).toBe(20000);
     await expect(page.getByRole('button', { name: /to Pension$/ })).toHaveCount(0);
@@ -599,7 +662,7 @@ test.describe('MC-03 input integrity @critical', () => {
     await expect(pension).toHaveAttribute('aria-invalid', 'true');
     await expect(pension).toHaveAccessibleDescription(/no more than 100%/);
     await expect(page.getByTestId('salary-input')).toHaveValue('40,000.00');
-    await expect(page.getByTestId('tax-results')).toHaveCount(0);
+    await expect(page.getByTestId('tax-results')).toBeVisible();
     await typeAmount(pension, '5');
     await pension.press('Tab');
     const additionalIncome = page.getByRole('button', { name: /Additional Income Sources/ });
@@ -610,36 +673,44 @@ test.describe('MC-03 input integrity @critical', () => {
     await expect(additionalIncome).toBeFocused();
     await additionalIncome.press('Tab');
     await expect(page.getByTestId('calculator-section').getByRole('alert')).toHaveCount(0);
-    await expect(page.getByRole('status')).toContainText('Calculate again');
     await calculate.press('Enter');
     expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(40000);
     expect(await getYearlyTableValue(page, 'Pension')).toBe(2000);
     await expect(page.getByText(/Results were cleared/)).toHaveCount(0);
   });
 
-  test('an already-open email form cannot send after a concurrent input edit', async ({ page }) => {
+  test('Email Results blocks negative, incomplete and invalid tax-code drafts without sending', async ({
+    page,
+  }) => {
     const sent: unknown[] = [];
     await page.route('**/api/send-results', async (route) => {
       sent.push(route.request().postDataJSON());
       await route.fulfill({ json: { success: true } });
     });
-    await typeAmount(page.getByTestId('salary-input'), '30000');
+    const salary = page.getByTestId('salary-input');
+    await typeAmount(salary, '30000');
     await page.getByTestId('calculate-button').press('Enter');
+    for (const draft of ['-500', '30,0', '']) {
+      await typeAmount(salary, draft);
+      await emailAction(page).press('Enter');
+      const dialog = page.getByRole('dialog');
+      await dialog.getByLabel('Email address for results').fill('paye-test@example.com');
+      await dialog.getByRole('button', { name: /^Email Results$/ }).press('Enter');
+      await expect(dialog.getByRole('alert')).toContainText('Correct the invalid amount in Salary');
+      await page.keyboard.press('Escape');
+      await expect(dialog).toHaveCount(0);
+      expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(30000);
+    }
+    await typeAmount(salary, '40000');
+    await page.getByTestId('tax-code-input').fill('S');
     await emailAction(page).press('Enter');
-    await page.getByLabel('Email address for results').fill('mc03@example.com');
-    // Model another mounted consumer editing while this dialog is open. Dispatch the stale
-    // form in the same task, before React has necessarily removed its DOM.
-    await page.evaluate(() => {
-      const salary = document.querySelector<HTMLInputElement>('[data-testid="salary-input"]');
-      const form = document.querySelector<HTMLFormElement>('[role="dialog"] form');
-      const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
-      if (!(salary && form && setter)) throw new Error('Missing mounted salary/email form');
-      setter.call(salary, '40000');
-      salary.dispatchEvent(new Event('input', { bubbles: true }));
-      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-    });
-    await expect(page.getByRole('dialog')).toHaveCount(0);
-    await expect(page.getByTestId('tax-results')).toHaveCount(0);
+    const dialog = page.getByRole('dialog');
+    await dialog.getByLabel('Email address for results').fill('paye-test@example.com');
+    await dialog.getByRole('button', { name: /^Email Results$/ }).press('Enter');
+    await expect(dialog.getByRole('alert')).toContainText(
+      'Enter a complete supported HMRC tax code',
+    );
+    expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(30000);
     expect(sent).toEqual([]);
   });
 });
@@ -750,9 +821,9 @@ test.describe('MC-02 pension units and restoration @critical', () => {
         page.getByRole('alert').filter({ hasText: 'Correct the invalid amount in Pension' }),
       ).toBeVisible();
       await expect(results).toHaveCount(0);
-      await expect(page.getByRole('button', { name: 'Email tax calculation results' })).toHaveCount(
-        0,
-      );
+      await expect(
+        page.getByRole('button', { name: 'Email tax calculation results' }),
+      ).toBeVisible();
       const saved = await page.evaluate(() =>
         JSON.parse(localStorage.getItem('tax-calculator-storage') ?? '{}'),
       );
@@ -799,6 +870,7 @@ test.describe('MC-02 pension units and restoration @critical', () => {
       const calculate = page.getByTestId('calculate-button');
       await calculate.press('Enter');
       await expect(page.getByTestId('tax-results')).toBeVisible();
+      const submittedPension = await getYearlyTableValue(page, 'Pension');
       await switchPensionUnit(page, from === 'amount' ? 'percentage' : 'amount');
       await expect(pension).toHaveValue('0.00');
       const pensionHelp = page.getByRole('button', { name: 'Help for Pension', exact: true });
@@ -807,15 +879,15 @@ test.describe('MC-02 pension units and restoration @critical', () => {
         page.getByRole('region', { name: 'Help for Pension', exact: true }),
       ).toHaveAccessibleDescription(/Changing between % and £ resets it to 0/);
       await page.keyboard.press('Escape');
-      await expect(page.getByTestId('tax-results')).toHaveCount(0);
+      expect(await getYearlyTableValue(page, 'Pension')).toBe(submittedPension);
       await typePension(pension, from === 'amount' ? '100.01' : '10000000.01');
       await expect(pension).toHaveAttribute('aria-invalid', 'true');
       await expect(pension).toHaveAccessibleDescription(/no more than/);
       await calculate.press('Enter');
-      await expect(page.getByTestId('tax-results')).toHaveCount(0);
+      expect(await getYearlyTableValue(page, 'Pension')).toBe(submittedPension);
       await typePension(pension, from === 'amount' ? '5.25' : '5000.25');
       await expect(pension).not.toHaveAttribute('aria-invalid');
-      await expect(page.getByTestId('tax-results')).toHaveCount(0);
+      expect(await getYearlyTableValue(page, 'Pension')).toBe(submittedPension);
       await calculate.press('Enter');
       expect(await getYearlyTableValue(page, 'Pension')).toBe(from === 'amount' ? 3150 : 5000.25);
     });
@@ -1002,22 +1074,26 @@ test.describe('MC-09 pension suggestion @critical', () => {
       await apply.click();
 
       await expect(page.getByTestId('pension-input')).toHaveValue(scenario.total);
-      await expect(page.getByTestId('tax-results')).toHaveCount(0);
-      await expect(page.getByRole('button', { name: 'Email tax calculation results' })).toHaveCount(
-        0,
-      );
-      await expect(page.getByRole('button', { name: /to Pension$/ })).toHaveCount(0);
-      await expect(page.getByRole('status')).toContainText(
+      await expect(page.getByTestId('tax-results')).toBeVisible();
+      await expect(
+        page.getByRole('button', { name: 'Email tax calculation results' }),
+      ).toBeVisible();
+      await expect(apply).toBeVisible();
+      await expect(page.getByText(/added to your annual pension contribution/)).toContainText(
         'Calculate again to update your results',
       );
-      await expect(page.getByRole('status')).toBeVisible();
+      await expect(page.getByText(/added to your annual pension contribution/)).toBeVisible();
       if (scenario.annualPension > scenario.target) {
-        await expect(page.getByRole('status')).toContainText('Rounded up to the next penny');
+        await expect(page.getByText(/added to your annual pension contribution/)).toContainText(
+          'Rounded up to the next penny',
+        );
       } else {
-        await expect(page.getByRole('status')).not.toContainText('Rounded up');
+        await expect(page.getByText(/added to your annual pension contribution/)).not.toContainText(
+          'Rounded up',
+        );
       }
       if (!scenario.amount) {
-        await expect(page.getByRole('status')).toContainText(
+        await expect(page.getByText(/added to your annual pension contribution/)).toContainText(
           'Your existing 5% pension was converted to a £ amount',
         );
       }
@@ -1246,7 +1322,7 @@ test.describe('Calculator critical @critical', () => {
     }
   });
 
-  test('Rejected amounts show an error, remove old results and are never calculated @critical', async ({
+  test('Rejected amounts show an error, preserve the submitted figures and are never calculated @critical', async ({
     page,
   }) => {
     await setLandscapeViewportIfPortrait(page);
@@ -1260,17 +1336,16 @@ test.describe('Calculator critical @critical', () => {
     await calculate.click();
     await expect(results).toBeVisible();
 
-    // A negative salary is not turned into a positive one. Results and email go as soon as it is
-    // typed, before the field is left, and Calculate activated without moving focus refuses.
+    // Calculate activated without moving focus must reject a negative draft.
     await salary.fill('-500');
     await expect(salary).toBeFocused();
-    await expect(results).toBeHidden();
-    await expect(page.getByRole('button', { name: 'Email tax calculation results' })).toBeHidden();
+    expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(30000);
+    await expect(page.getByRole('button', { name: 'Email tax calculation results' })).toBeVisible();
     await calculate.dispatchEvent('click');
     await expect(
       page.getByRole('alert').filter({ hasText: 'Correct the invalid amount in Salary' }),
     ).toBeVisible();
-    await expect(results).toBeHidden();
+    expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(30000);
     await salary.focus();
     await salary.press('Tab');
     await expect(salary).toHaveValue('-500');
@@ -1278,12 +1353,12 @@ test.describe('Calculator critical @critical', () => {
     await expect(
       page.getByText('Enter an amount of £0 or more. Negative amounts are not supported.'),
     ).toBeVisible();
-    await expect(results).toBeHidden();
+    expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(30000);
     await calculate.click();
     await expect(
       page.getByRole('alert').filter({ hasText: 'Correct the invalid amount in Salary' }),
     ).toBeVisible();
-    await expect(results).toBeHidden();
+    expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(30000);
 
     // Correcting it recovers normally.
     await salary.fill('30000');
@@ -1301,11 +1376,11 @@ test.describe('Calculator critical @critical', () => {
     await expect(
       page.getByText('Enter an amount in pounds and pence, like 1,234.56.'),
     ).toBeVisible();
-    await expect(results).toBeHidden();
+    expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(30000);
     await page.getByText('Additional Income Sources').click();
     await expect(amount).toBeVisible();
     await calculate.click();
-    await expect(results).toBeHidden();
+    expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(30000);
 
     await page.getByRole('button', { name: 'Remove income source 1' }).click();
     await calculate.click();
@@ -1364,8 +1439,8 @@ test('focus, drafts, empty fields and pension unit changes preserve result integ
   await expect(salary).toHaveValue('60,000.00');
   await expect(page.getByTestId('tax-results')).toBeVisible();
   await salary.fill('70000');
-  await expect(page.getByTestId('tax-results')).toHaveCount(0);
-  await expect(page.getByRole('button', { name: 'Email tax calculation results' })).toHaveCount(0);
+  await expect(page.getByTestId('tax-results')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Email tax calculation results' })).toBeVisible();
   await page.getByTestId('calculate-button').click();
   await expect(page.getByTestId('tax-results')).toBeVisible();
   await salary.fill('');
@@ -1373,7 +1448,7 @@ test('focus, drafts, empty fields and pension unit changes preserve result integ
   await expect(salary).toHaveValue('');
   await expect(salary).toHaveAttribute('aria-invalid', 'true');
   await page.getByTestId('calculate-button').click();
-  await expect(page.getByTestId('tax-results')).toHaveCount(0);
+  await expect(page.getByTestId('tax-results')).toBeVisible();
   await salary.fill('60000');
   const pensionType = page.getByTestId('pension-type-select');
   await pensionType.click();
@@ -1383,7 +1458,7 @@ test('focus, drafts, empty fields and pension unit changes preserve result integ
   await pensionType.click();
   await page.getByRole('option').first().click();
   await expect(page.getByTestId('pension-input')).toHaveValue('0.00');
-  await expect(page.getByTestId('tax-results')).toHaveCount(0);
+  await expect(page.getByTestId('tax-results')).toBeVisible();
   await page.getByTestId('calculate-button').click();
   await expect(page.getByTestId('tax-results')).toBeVisible();
 });

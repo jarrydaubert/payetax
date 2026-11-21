@@ -100,11 +100,10 @@ describe('CalculatorStore Integration', () => {
     });
 
     it('should calculate previous year comparison', () => {
-      const { setSalary, calculate, calculatePreviousYear } = useCalculatorStore.getState();
+      const { setSalary, calculate } = useCalculatorStore.getState();
 
       setSalary(50000);
       calculate();
-      calculatePreviousYear();
 
       const state = useCalculatorStore.getState();
 
