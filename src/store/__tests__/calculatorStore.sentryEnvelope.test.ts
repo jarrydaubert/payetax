@@ -171,12 +171,13 @@ describe('calculator grouping through real browser SDK envelopes', () => {
       netPay: { annually: -1 },
       incomeTax: { annually: Number.NaN },
       employerNI: -1,
+      nationalInsurance: { annually: 0 },
+      studentLoan: { annually: 0 },
     } as ReturnType<typeof calculateTax>;
     mockCalculateTax.mockReturnValue(result);
     store.getState().setSalary(73123.47);
     store.getState().setTaxYear('2026-2027');
     store.getState().calculate();
-    store.getState().calculatePreviousYear();
     store.getState().calculateWhatIf();
     await Sentry.flush(1000);
 

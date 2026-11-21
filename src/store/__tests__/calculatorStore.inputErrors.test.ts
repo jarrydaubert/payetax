@@ -15,68 +15,45 @@ describe('calculatorStore rejected amount text', () => {
   const calculateFor = (salary: number) => {
     useCalculatorStore.getState().setSalary(salary);
     useCalculatorStore.getState().calculate();
-    useCalculatorStore.getState().calculatePreviousYear();
   };
 
-  it('keeps calculation history through draft/committed invalidation and recovery, but Reset clears it', () => {
-    expect(useCalculatorStore.getState().hasCalculated).toBe(false);
-    calculateFor(30000);
-    expect(useCalculatorStore.getState().hasCalculated).toBe(true);
-    useCalculatorStore.getState().invalidateResults();
-    expect(useCalculatorStore.getState().hasCalculated).toBe(true);
-    useCalculatorStore.getState().setSalary(40000);
+  it('does not persist or reconstruct a submitted result from saved figures', async () => {
     useCalculatorStore.getState().setInputError('salary', rejected);
     useCalculatorStore.getState().calculate();
-    expect(useCalculatorStore.getState().hasCalculated).toBe(true);
-    expect(useCalculatorStore.getState().results).toBeNull();
-    useCalculatorStore.getState().setInputError('salary', null);
-    useCalculatorStore.getState().calculate();
-    expect(useCalculatorStore.getState().results?.grossSalary.annually).toBe(40000);
-    useCalculatorStore.getState().reset();
-    expect(useCalculatorStore.getState().hasCalculated).toBe(false);
-    expect(useCalculatorStore.getState().results).toBeNull();
-  });
-
-  it('does not mistake a first rejected submission or restored inputs for a past calculation', async () => {
-    useCalculatorStore.getState().setInputError('salary', rejected);
-    useCalculatorStore.getState().calculate();
-    expect(useCalculatorStore.getState().hasCalculated).toBe(false);
+    expect(useCalculatorStore.getState().calculatedInput).toBeNull();
     useCalculatorStore.getState().setInputError('salary', null);
     calculateFor(30000);
     const saved = JSON.parse(localStorage.getItem('tax-calculator-storage') ?? '{}');
-    expect(saved.state).not.toHaveProperty('hasCalculated');
+    expect(saved.state).not.toHaveProperty('calculatedInput');
+    expect(saved.state).not.toHaveProperty('results');
     useCalculatorStore.getState().reset();
     localStorage.setItem('tax-calculator-storage', JSON.stringify(saved));
     await useCalculatorStore.persist.rehydrate();
     expect(useCalculatorStore.getState().input.salary).toBe(30000);
-    expect(useCalculatorStore.getState().hasCalculated).toBe(false);
+    expect(useCalculatorStore.getState().calculatedInput).toBeNull();
     expect(useCalculatorStore.getState().results).toBeNull();
   });
 
-  it('clears every result when a field holds rejected text', () => {
+  it('refuses to use a draft with rejected text and retains the submitted calculation until recovery', () => {
     calculateFor(30000);
-    expect(useCalculatorStore.getState().results).not.toBeNull();
-
-    useCalculatorStore.getState().setInputError('salary', rejected);
+    const submitted = useCalculatorStore.getState();
+    submitted.setSalary(40000);
+    submitted.setInputError('pensionContribution', rejected);
+    expect(submitted.calculate()).toBe(rejected.error);
 
     const state = useCalculatorStore.getState();
-    expect(state.inputErrors.salary).toEqual(rejected);
-    expect(state.results).toBeNull();
-    expect(state.previousYearResults).toBeNull();
-    expect(state.whatIfResults).toBeNull();
-    // The previously committed amount is kept, not replaced by another amount.
-    expect(state.input.salary).toBe(30000);
-  });
+    expect(state.inputErrors.pensionContribution).toEqual(rejected);
+    expect(state.results).toBe(submitted.results);
+    expect(state.previousYearResults).toBe(submitted.previousYearResults);
+    expect(state.calculatedInput?.salary).toBe(30000);
+    expect(state.input.salary).toBe(40000);
 
-  it('refuses to calculate from the previous amount while rejected text is held', () => {
-    calculateFor(30000);
-    useCalculatorStore.getState().setInputError('pensionContribution', rejected);
-
-    useCalculatorStore.getState().calculate();
-    useCalculatorStore.getState().calculatePreviousYear();
-
+    state.setInputError('pensionContribution', null);
+    state.calculate();
+    expect(useCalculatorStore.getState().calculatedInput?.salary).toBe(40000);
+    state.reset();
+    expect(useCalculatorStore.getState().calculatedInput).toBeNull();
     expect(useCalculatorStore.getState().results).toBeNull();
-    expect(useCalculatorStore.getState().previousYearResults).toBeNull();
   });
 
   it('calculates again once the rejected text is cleared', () => {
@@ -176,21 +153,23 @@ describe('Pension units and result currency', () => {
     store.setPensionContributionType(from);
     store.setPensionContribution(value);
     store.calculate();
-    store.calculatePreviousYear();
+    const submitted = useCalculatorStore.getState();
     store.setPensionContributionType(to);
     expect(useCalculatorStore.getState().input.pensionContribution).toBe(0);
     expect(useCalculatorStore.getState().input.pensionContributionType).toBe(to);
-    expect(useCalculatorStore.getState().results).toBeNull();
-    expect(useCalculatorStore.getState().previousYearResults).toBeNull();
+    expect(useCalculatorStore.getState().results).toBe(submitted.results);
+    expect(useCalculatorStore.getState().previousYearResults).toBe(submitted.previousYearResults);
   });
 
-  it('invalidates results for programmatic edits and retains them for a no-op', () => {
+  it('retains and reuses results for unchanged values, even if the draft object was replaced', () => {
     const store = useCalculatorStore.getState();
-    store.setSalary(30000);
+    store.setInput({ salary: 30000, studentLoanPlans: ['plan2'] });
     store.calculate();
-    store.setSalary(30000);
-    expect(useCalculatorStore.getState().results).not.toBeNull();
+    const submitted = useCalculatorStore.getState();
     store.setInput({ salary: 40000 });
-    expect(useCalculatorStore.getState().results).toBeNull();
+    store.setInput({ salary: 30000, studentLoanPlans: ['plan2'] });
+    expect(useCalculatorStore.getState().input).not.toBe(submitted.calculatedInput);
+    store.calculate({ reuseCurrent: true });
+    expect(useCalculatorStore.getState().results).toBe(submitted.results);
   });
 });

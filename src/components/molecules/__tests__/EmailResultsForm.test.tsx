@@ -32,7 +32,7 @@ describe('EmailResultsForm', () => {
   it('submits and shows sent confirmation', async () => {
     global.fetch = jest.fn().mockResolvedValue({ ok: true });
 
-    render(<EmailResultsForm input={makeInput()} />);
+    render(<EmailResultsForm prepare={() => ({ input: makeInput(), isCurrent: () => true })} />);
 
     expect(screen.getByRole('link', { name: 'Privacy Policy' })).toHaveAttribute(
       'href',
@@ -55,16 +55,44 @@ describe('EmailResultsForm', () => {
     });
   });
 
-  it('checks calculation validity at submission even if the open form has old props', () => {
+  it('shows scenario validation feedback without requesting delivery', () => {
     global.fetch = jest.fn();
-    let current = true;
-    render(<EmailResultsForm input={makeInput()} canSend={() => current} />);
+    render(
+      <EmailResultsForm
+        prepare={() => {
+          throw new Error('Correct the invalid amount in Salary');
+        }}
+      />,
+    );
     fireEvent.change(screen.getByLabelText('Email address for results'), {
       target: { value: 'test@example.com' },
     });
-    current = false;
     fireEvent.click(screen.getByRole('button', { name: /Email Results/i }));
     expect(global.fetch).not.toHaveBeenCalled();
-    expect(screen.getByRole('alert')).toHaveTextContent('Calculate again before emailing');
+    expect(screen.getByRole('alert')).toHaveTextContent('Correct the invalid amount in Salary');
+  });
+
+  it('ignores duplicate submissions and attributes a late delivery to the earlier calculation', async () => {
+    let resolveRequest: (response: Response) => void = () => {};
+    const response = new Promise<Response>((resolve) => {
+      resolveRequest = resolve;
+    });
+    global.fetch = jest.fn().mockReturnValue(response);
+    let current = true;
+    const { container } = render(
+      <EmailResultsForm prepare={() => ({ input: makeInput(), isCurrent: () => current })} />,
+    );
+    fireEvent.change(screen.getByLabelText('Email address for results'), {
+      target: { value: 'test@example.com' },
+    });
+    const form = container.querySelector('form');
+    if (!form) throw new Error('Missing email form');
+    fireEvent.submit(form);
+    fireEvent.submit(form);
+    expect(global.fetch).toHaveBeenCalledTimes(1);
+
+    current = false;
+    resolveRequest({ ok: true } as Response);
+    expect(await screen.findByRole('status')).toHaveTextContent('Earlier results sent to');
   });
 });

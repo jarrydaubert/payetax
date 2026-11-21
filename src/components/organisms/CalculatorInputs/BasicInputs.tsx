@@ -64,7 +64,6 @@ export function BasicInputs() {
     setInput,
     setAllowancesDeductions,
     setInputError,
-    invalidateResults,
   } = useCalculatorActions();
   const validityFor = (field: CalculatorAmountField) => (invalid: CalculatorInvalidAmount | null) =>
     setInputError(field, invalid);
@@ -238,7 +237,6 @@ export function BasicInputs() {
           )}
         >
           <NumberInput
-            onDraftChange={invalidateResults}
             id={salaryId}
             value={input.salary}
             onChange={(value) => {
@@ -401,7 +399,6 @@ export function BasicInputs() {
             </Label>
           </div>
           <NumberInput
-            onDraftChange={invalidateResults}
             id={partnerWageId}
             value={input.partnerGrossWage}
             onChange={setPartnerGrossWage}
@@ -516,7 +513,6 @@ export function BasicInputs() {
           </Label>
         </div>
         <NumberInput
-          onDraftChange={invalidateResults}
           id={allowancesId}
           value={input.allowancesDeductions}
           onChange={setAllowancesDeductions}
@@ -616,7 +612,6 @@ export function BasicInputs() {
 
           {/* Input field */}
           <NumberInput
-            onDraftChange={invalidateResults}
             id={pensionId}
             value={input.pensionContribution}
             onChange={setPensionContribution}

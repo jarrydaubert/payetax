@@ -32,10 +32,11 @@ import {
   TAX_CODE_NON_CUMULATIVE_MARKERS,
 } from '@/lib/tax';
 import { cn } from '@/lib/utils';
-import type { PayeEmailInput } from '@/lib/validation/emailValidation';
+import { PayeEmailInputSchema } from '@/lib/validation/emailValidation';
 import { useShallow } from '@/lib/zustandShallow';
-import { getBlockingInputErrors } from '@/store/calculatorInputErrors';
+import { getRejectedAmountsMessage, MISSING_SALARY_MESSAGE } from '@/store/calculatorInputErrors';
 import {
+  isSubmittedCalculatorInput,
   useCalculatorActions,
   useCalculatorResults,
   useCalculatorStore,
@@ -48,50 +49,57 @@ import { TaxCodeBasisNotice } from './CalculatorResults/TaxCodeBasisNotice';
 
 const DEFAULT_PERIODS = ['Yearly', 'Monthly', 'Weekly', 'Daily', 'Hourly'];
 
+function getTaxCodeNotice({ taxCode, region }: { taxCode: string; region: string }) {
+  const trimmedCode = taxCode.trim();
+  const parsedTaxCode = parseTaxCode(trimmedCode, 0);
+  if (trimmedCode && !parsedTaxCode.isValid) {
+    return {
+      tone: 'error',
+      text: 'Tax code format not recognized. This estimate used a policy-derived tax-free amount based on the selected year, adjusted net income and allowance answers. Check the complete code against your payslip or HMRC notice.',
+    };
+  }
+
+  const notices: string[] = [];
+  if (hasNonCumulativeTaxCodeMarker(trimmedCode)) {
+    notices.push(
+      `Emergency tax code detected. ${TAX_CODE_NON_CUMULATIVE_MARKERS.join(', ')} codes use only the current pay period. This calculator shows a steady-pay annual projection, not an exact deduction from a particular emergency-code payslip.`,
+    );
+  }
+  const codeRegion = getTaxCodeRegionOverride(parsedTaxCode);
+  if (codeRegion && codeRegion !== region) {
+    notices.push(
+      `The ${parsedTaxCode.prefix} prefix assigns ${codeRegion} tax rates, so it takes precedence over the selected ${region} region for this estimate.`,
+    );
+  }
+  return notices.length ? { tone: 'info', text: notices.join(' ') } : null;
+}
+
 export function CalculatorContainer() {
   const hasLegacyFigures = useFigureStorage((state) => state.legacy);
-  // Use optimized selectors to prevent unnecessary re-renders
   const results = useCalculatorResults();
-  const hasCalculated = useCalculatorStore((state) => state.hasCalculated);
-  const previousYearResults = useCalculatorStore((state) => state.previousYearResults);
-  const input = useCalculatorStore(
-    useShallow((state) => ({
-      salary: state.input.salary,
-      payPeriod: state.input.payPeriod,
-      taxYear: state.input.taxYear,
-      taxCode: state.input.taxCode,
-      isScottish: state.input.isScottish,
-      isMarried: state.input.isMarried,
-      partnerGrossWage: state.input.partnerGrossWage,
-      isBlind: state.input.isBlind,
-      age: state.input.age,
-      payNoNI: state.input.payNoNI,
-      pensionContribution: state.input.pensionContribution,
-      pensionContributionType: state.input.pensionContributionType,
-      pensionMethod: state.input.pensionMethod,
-      studentLoanPlans: state.input.studentLoanPlans,
-      niCategory: state.input.niCategory,
-      hoursPerWeek: state.input.hoursPerWeek,
-      allowancesDeductions: state.input.allowancesDeductions,
-      incomeSources: state.input.incomeSources,
-      region: state.input.region,
-    })),
+  const { calculatedInput, marginalTaxRate, previousYearResults, inputRevision } =
+    useCalculatorStore(
+      useShallow(({ calculatedInput, marginalTaxRate, previousYearResults, inputRevision }) => ({
+        calculatedInput,
+        marginalTaxRate,
+        previousYearResults,
+        inputRevision,
+      })),
+    );
+  const hasSalary = useCalculatorStore((state) => state.input.salary > 0);
+  const { calculate, setInput } = useCalculatorActions();
+  const taxCodeNotice = React.useMemo(
+    () => (calculatedInput ? getTaxCodeNotice(calculatedInput) : null),
+    [calculatedInput],
   );
-  const { calculate, calculatePreviousYear, setInput, invalidateResults } = useCalculatorActions();
-  const parsedInputTaxCode = React.useMemo(() => parseTaxCode(input.taxCode, 0), [input.taxCode]);
-  const codeRegionOverride = getTaxCodeRegionOverride(parsedInputTaxCode);
-  const effectiveIsScottish =
-    codeRegionOverride === 'Scotland' ||
-    (codeRegionOverride === null && input.region === 'Scotland');
   const isDesktop = useMediaQuery('(min-width: 1280px)');
   const [inputsBeforeSummary, setInputsBeforeSummary] = React.useState(false);
   const [visiblePeriods, setSelectedPeriods] = React.useState<string[]>(DEFAULT_PERIODS);
   const [actionMessage, setActionMessage] = React.useState<{
     tone: 'info' | 'error';
     text: string;
-    taxCodeLink?: boolean;
-    requiresCalculate?: boolean;
   } | null>(null);
+  const focusOnResultsRef = React.useRef(true);
   const resultsRef = React.useRef<HTMLDivElement>(null);
   const sectionRef = React.useRef<HTMLDivElement>(null);
   const hasTrackedCalculatorStartRef = React.useRef(false);
@@ -101,32 +109,6 @@ export function CalculatorContainer() {
 
   // SR-only live region message (event-driven, not region-driven)
   const [liveMessage, setLiveMessage] = React.useState('');
-
-  // Derive showResults from results state
-  const showResults = !!results;
-  const needsCalculate = !results && hasCalculated;
-  const emailInput: PayeEmailInput = {
-    salary: input.salary,
-    payPeriod: input.payPeriod,
-    taxYear: input.taxYear,
-    taxCode: input.taxCode,
-    isScottish: input.isScottish,
-    isMarried: input.isMarried,
-    partnerGrossWage: input.partnerGrossWage,
-    isBlind: input.isBlind,
-    age: input.age,
-    payNoNI: input.payNoNI,
-    pensionContribution: input.pensionContribution,
-    pensionContributionType: input.pensionContributionType,
-    pensionMethod: input.pensionMethod,
-    studentLoanPlans: input.studentLoanPlans,
-    niCategory: input.niCategory,
-    hoursPerWeek: input.hoursPerWeek,
-    allowancesDeductions: input.allowancesDeductions,
-    incomeSources: input.incomeSources?.length
-      ? input.incomeSources.map(({ type, amount, period }) => ({ type, amount, period }))
-      : undefined,
-  };
 
   // Cleanup timeouts on unmount to prevent memory leaks
   React.useEffect(() => {
@@ -150,7 +132,7 @@ export function CalculatorContainer() {
   }, []);
 
   React.useLayoutEffect(() => {
-    if (results && window.innerWidth >= BREAKPOINTS.XL) {
+    if (results && focusOnResultsRef.current && window.innerWidth >= BREAKPOINTS.XL) {
       resultsRef.current?.focus({ preventScroll: true });
       resultsRef.current?.scrollIntoView({ behavior: 'instant', block: 'start' });
     }
@@ -178,9 +160,18 @@ export function CalculatorContainer() {
     });
   };
 
-  const handleCalculate = () => {
+  const clearActionFeedback = () => {
     setActionMessage(null);
-    if (calcScrollTimeoutRef.current) clearTimeout(calcScrollTimeoutRef.current);
+    setLiveMessage('');
+    if (calcScrollTimeoutRef.current !== null) {
+      clearTimeout(calcScrollTimeoutRef.current);
+      calcScrollTimeoutRef.current = null;
+    }
+  };
+
+  const handleCalculate = (isEmail = false) => {
+    const before = useCalculatorStore.getState().results;
+    focusOnResultsRef.current = !isEmail;
 
     if (!hasTrackedCalculatorStartRef.current) {
       trackEvent({
@@ -191,48 +182,17 @@ export function CalculatorContainer() {
       hasTrackedCalculatorStartRef.current = true;
     }
 
-    // Run the synchronous store actions where the input form can catch failures.
     try {
-      const pensionIssue = calculate();
-      if (pensionIssue) {
-        setLiveMessage('');
-        return pensionIssue;
-      }
-      calculatePreviousYear();
+      const inputIssue = calculate({ reuseCurrent: isEmail });
+      if (inputIssue) return inputIssue;
     } catch {
-      invalidateResults();
-      setLiveMessage('');
       throw new Error('Unable to calculate your tax. Please try again.');
     }
 
-    const taxCodeInput = typeof input.taxCode === 'string' ? input.taxCode.trim() : '';
-    const parsedTaxCode = parsedInputTaxCode;
-    if (taxCodeInput && !parsedTaxCode.isValid) {
-      setActionMessage({
-        tone: 'error',
-        text: 'Tax code format not recognized. This estimate used a policy-derived tax-free amount based on the selected year, adjusted net income and allowance answers. Check the complete code against your payslip or HMRC notice.',
-        taxCodeLink: true,
-      });
-    } else {
-      const taxCodeNotices: string[] = [];
-      if (hasNonCumulativeTaxCodeMarker(taxCodeInput)) {
-        taxCodeNotices.push(
-          `Emergency tax code detected. ${TAX_CODE_NON_CUMULATIVE_MARKERS.join(', ')} codes use only the current pay period. This calculator shows a steady-pay annual projection, not an exact deduction from a particular emergency-code payslip.`,
-        );
-      }
-      const parsedCodeRegion = getTaxCodeRegionOverride(parsedTaxCode);
-      if (parsedCodeRegion && parsedCodeRegion !== input.region) {
-        taxCodeNotices.push(
-          `The ${parsedTaxCode.prefix} prefix assigns ${parsedCodeRegion} tax rates, so it takes precedence over the selected ${input.region} region for this estimate.`,
-        );
-      }
-      if (taxCodeNotices.length > 0) {
-        setActionMessage({ tone: 'info', text: taxCodeNotices.join(' '), taxCodeLink: true });
-      }
+    if (useCalculatorStore.getState().results !== before) {
+      setLiveMessage('Tax calculation complete. Results updated.');
     }
-
-    // Announce for screen readers (event-driven)
-    setLiveMessage('Tax calculation complete. Results updated.');
+    if (isEmail) return;
 
     // Only scroll to results on mobile (desktop scrolls when its results commit).
     calcScrollTimeoutRef.current = window.setTimeout(() => {
@@ -245,18 +205,67 @@ export function CalculatorContainer() {
     }, TIMERS.CALC_SCROLL);
   };
 
+  const prepareEmail = () => {
+    commitFocusedField(sectionRef.current);
+    clearActionFeedback();
+    const state = useCalculatorStore.getState();
+    if (state.inputRevision !== inputRevision) throw new Error('Reopen Email Results to continue.');
+    const rejected = getRejectedAmountsMessage(state);
+    if (rejected) throw new Error(rejected);
+    if (state.input.salary <= 0) throw new Error(MISSING_SALARY_MESSAGE);
+
+    const input = PayeEmailInputSchema.safeParse({
+      ...state.input,
+      incomeSources: state.input.incomeSources.map(({ type, amount, period }) => ({
+        type,
+        amount,
+        period,
+      })),
+    });
+    if (!input.success) {
+      throw new Error(input.error.issues[0]?.message ?? 'Check your inputs before emailing.');
+    }
+
+    const inputIssue = handleCalculate(true);
+    if (inputIssue) throw new Error(inputIssue);
+    const submitted = useCalculatorStore.getState();
+    if (
+      !(submitted.results && isSubmittedCalculatorInput(state.input, submitted.calculatedInput))
+    ) {
+      throw new Error('Unable to calculate your tax. Please try again.');
+    }
+
+    return {
+      input: input.data,
+      isCurrent: () => {
+        const current = useCalculatorStore.getState();
+        return (
+          current.inputRevision === submitted.inputRevision && current.results === submitted.results
+        );
+      },
+    };
+  };
+
   const handleVisiblePeriodsChange = (periods: string[]) => {
     setSelectedPeriods(periods);
   };
 
   const handleApplyPensionOptimization = (pensionAmount: number) => {
     setActionMessage(null);
-    // Commit the focused field so a later blur cannot overwrite the applied pension.
-    // Rejected text clears the results this action belongs to; then there is nothing to apply to.
     commitFocusedField(sectionRef.current);
     const current = useCalculatorStore.getState();
-    if (!results || current.results !== results || getBlockingInputErrors(current).length > 0)
+    if (
+      !results ||
+      current.results !== results ||
+      getRejectedAmountsMessage(current) ||
+      !isSubmittedCalculatorInput(current.input, current.calculatedInput)
+    ) {
+      setActionMessage({
+        tone: 'error',
+        text: 'Calculate with your current inputs before applying a pension suggestion.',
+      });
       return;
+    }
     try {
       // Validate pension amount
       if (
@@ -283,7 +292,6 @@ export function CalculatorContainer() {
         pensionContribution,
         pensionContributionType: 'amount',
       });
-      invalidateResults();
 
       // Show success message
       const formattedAmount = new Intl.NumberFormat('en-GB', {
@@ -301,8 +309,7 @@ export function CalculatorContainer() {
           ? ' Rounded up to the next penny for your pay period so your annual contribution meets the target.'
           : '';
       const message = `${formattedAmount} added to your annual pension contribution.${conversionNotice}${roundingNotice} Calculate again to update your results.`;
-      setActionMessage({ tone: 'info', text: message, requiresCalculate: true });
-      setLiveMessage(message);
+      setActionMessage({ tone: 'info', text: message });
     } catch (error) {
       console.error('[CalculatorContainer] Error applying pension:', error);
       setActionMessage({
@@ -313,13 +320,14 @@ export function CalculatorContainer() {
   };
 
   const emailResultsAction = (
-    <Dialog>
+    <Dialog key={inputRevision}>
       <DialogTrigger asChild>
         <button
           type='button'
           className='inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition-colors hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
           aria-label='Email tax calculation results'
           title='Email Results'
+          onClick={() => commitFocusedField(sectionRef.current)}
         >
           <Mail className='h-4 w-4' />
           <span className='sr-only'>Email Results</span>
@@ -328,27 +336,18 @@ export function CalculatorContainer() {
       <DialogContent className='border-border/60 bg-card text-card-foreground sm:max-w-md'>
         <DialogHeader>
           <DialogTitle>Email Results</DialogTitle>
-          <DialogDescription>Send a copy of this calculation to your inbox.</DialogDescription>
+          <DialogDescription>
+            Calculate with your current inputs and send the results to your inbox.
+          </DialogDescription>
         </DialogHeader>
-        <EmailResultsForm
-          input={emailInput}
-          canSend={() => {
-            const current = useCalculatorStore.getState();
-            return (
-              !!results &&
-              current.results === results &&
-              getBlockingInputErrors(current).length === 0
-            );
-          }}
-          className='w-full'
-        />
+        <EmailResultsForm prepare={prepareEmail} className='w-full' />
       </DialogContent>
     </Dialog>
   );
 
   const summarySection = (
     <React.Fragment key='summary'>
-      {showResults && (
+      {results && calculatedInput && marginalTaxRate !== null && (
         <motion.div
           ref={resultsRef}
           variants={shouldReduceMotion ? {} : ANIMATION_VARIANTS.fadeInDown}
@@ -361,7 +360,7 @@ export function CalculatorContainer() {
           aria-label='Tax calculation results summary'
           tabIndex={-1}
         >
-          {actionMessage && (
+          {taxCodeNotice && (
             <motion.div
               initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -369,29 +368,27 @@ export function CalculatorContainer() {
               transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.2 }}
               className={cn(
                 'mb-3 rounded-md border px-3 py-2 text-sm',
-                actionMessage.tone === 'error'
+                taxCodeNotice.tone === 'error'
                   ? 'border-destructive/30 bg-destructive/10 text-destructive'
                   : 'border-primary/30 bg-primary/10 text-primary',
               )}
-              role={actionMessage.tone === 'error' ? 'alert' : 'status'}
+              role={taxCodeNotice.tone === 'error' ? 'alert' : 'status'}
             >
-              <span>{actionMessage.text}</span>
-              {actionMessage.taxCodeLink && (
-                <Link
-                  href='/tools/tax-code-decoder'
-                  className='ml-1 inline-flex min-h-11 items-center font-medium underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none'
-                >
-                  Check the code
-                </Link>
-              )}
+              <span>{taxCodeNotice.text}</span>
+              <Link
+                href='/tools/tax-code-decoder'
+                className='ml-1 inline-flex min-h-11 items-center font-medium underline underline-offset-4 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none'
+              >
+                Check the code
+              </Link>
             </motion.div>
           )}
-          {results && (
-            <>
-              <TaxCodeBasisNotice basis={results.taxCodeBasis} />
-              <ResultsSummaryCards results={results} input={input} />
-            </>
-          )}
+          <TaxCodeBasisNotice basis={results.taxCodeBasis} />
+          <ResultsSummaryCards
+            results={results}
+            input={calculatedInput}
+            marginalTaxRate={marginalTaxRate}
+          />
         </motion.div>
       )}
     </React.Fragment>
@@ -407,29 +404,26 @@ export function CalculatorContainer() {
       )}
     >
       <CalculatorInputsSection
-        onCalculate={handleCalculate}
+        onCalculate={() => handleCalculate()}
+        onCalculateAttempt={clearActionFeedback}
         onReset={() => {
-          setActionMessage(null);
-          setLiveMessage('');
+          clearActionFeedback();
+          setSelectedPeriods(DEFAULT_PERIODS);
         }}
-        resultAction={showResults ? emailResultsAction : undefined}
+        resultAction={emailResultsAction}
       />
       <p
+        className={cn(
+          actionMessage ? 'mt-3 rounded-md border px-3 py-2 text-sm' : 'sr-only',
+          actionMessage?.tone === 'error'
+            ? 'border-destructive/30 bg-destructive/10 text-destructive'
+            : 'border-primary/30 bg-primary/10 text-primary',
+        )}
+        role={actionMessage?.tone === 'error' ? 'alert' : undefined}
         aria-live='polite'
         aria-atomic='true'
-        role={needsCalculate ? 'status' : undefined}
-        className={
-          needsCalculate
-            ? 'mt-3 rounded-md border border-primary/30 bg-primary/10 px-3 py-2 text-sm'
-            : 'sr-only'
-        }
       >
-        {needsCalculate && (
-          <>
-            Results were cleared. Calculate again to update them.
-            {actionMessage?.requiresCalculate && ` ${actionMessage.text}`}
-          </>
-        )}
+        {actionMessage?.text}
       </p>
     </Card>
   );
@@ -499,7 +493,7 @@ export function CalculatorContainer() {
 
       {/* Results column - order-6 on mobile, right column on desktop */}
       <React.Fragment key='results'>
-        {showResults && results ? (
+        {results && calculatedInput ? (
           <motion.div
             variants={shouldReduceMotion ? {} : ANIMATION_VARIANTS.scaleIn}
             initial={shouldReduceMotion ? {} : 'initial'}
@@ -520,10 +514,10 @@ export function CalculatorContainer() {
               onVisiblePeriodsChange={handleVisiblePeriodsChange}
               onApplyPensionOptimization={handleApplyPensionOptimization}
               marriageAllowance={{
-                isMarried: input.isMarried,
-                partnerGrossWage: input.partnerGrossWage,
-                taxCode: input.taxCode,
-                isScottish: effectiveIsScottish,
+                isMarried: calculatedInput.isMarried,
+                partnerGrossWage: calculatedInput.partnerGrossWage,
+                taxCode: calculatedInput.taxCode,
+                isScottish: results.calculationBasis?.incomeTaxRegime === 'Scotland',
               }}
             />
           </motion.div>
@@ -540,15 +534,11 @@ export function CalculatorContainer() {
           >
             <div>
               <Sparkles className={cn('mx-auto text-muted-foreground', 'mb-4', 'size-12')} />
-              <h3 className={cn('font-semibold', 'mb-2', 'text-lg')}>
-                {needsCalculate ? 'Calculate again' : 'Ready to Calculate'}
-              </h3>
+              <h3 className={cn('font-semibold', 'mb-2', 'text-lg')}>Ready to Calculate</h3>
               <p className={cn('text-muted-foreground', 'text-sm')}>
-                {needsCalculate
-                  ? 'Calculate to see your updated take-home pay.'
-                  : input.salary > 0
-                    ? 'Check your inputs, then select Calculate to see your take-home pay.'
-                    : 'Enter your salary, then select Calculate to see your take-home pay.'}
+                {hasSalary
+                  ? 'Check your inputs, then select Calculate to see your take-home pay.'
+                  : 'Enter your salary, then select Calculate to see your take-home pay.'}
               </p>
             </div>
           </motion.div>

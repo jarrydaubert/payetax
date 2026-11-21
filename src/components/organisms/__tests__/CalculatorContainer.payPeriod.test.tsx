@@ -88,8 +88,8 @@ describe('Submitted pay period presentation (mounted)', () => {
     expect(useCalculatorStore.getState().results).not.toBe(snapshot.results);
 
     act(() => useCalculatorStore.getState().setPayPeriod('fortnightly'));
-    expect(screen.queryByTestId('mobile-take-home')).toBeNull();
-    expect(screen.getByRole('status')).toHaveTextContent('Calculate again');
+    expect(screen.getByTestId('mobile-take-home')).toBeInTheDocument();
+    expect(selector()).toHaveTextContent('Monthly');
     await user.click(screen.getByTestId('calculate-button'));
     expect(selector()).toHaveTextContent('Fortnightly');
     await user.click(screen.getByRole('button', { name: /Reset/ }));

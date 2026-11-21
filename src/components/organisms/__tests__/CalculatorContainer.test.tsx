@@ -10,6 +10,7 @@ import {
 import { CalculatorContainer } from '../CalculatorContainer';
 
 jest.mock('@/store/calculatorStore', () => ({
+  ...jest.requireActual('@/store/calculatorStore'),
   useCalculatorResults: jest.fn(),
   useCalculatorActions: jest.fn(),
   useCalculatorStore: jest.fn(),
@@ -119,23 +120,23 @@ describe('CalculatorContainer Component', () => {
   };
 
   const mockCalculate = jest.fn();
-  const mockCalculatePreviousYear = jest.fn();
   const mockSetInput = jest.fn();
-  const mockInvalidateResults = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
     (useCalculatorActions as jest.Mock).mockReturnValue({
       calculate: mockCalculate,
-      calculatePreviousYear: mockCalculatePreviousYear,
       setInput: mockSetInput,
-      invalidateResults: mockInvalidateResults,
     });
     (useCalculatorResults as jest.Mock).mockReturnValue(null);
     const storeState = {
       previousYearResults: null,
+      marginalTaxRate: 28,
+      inputRevision: 0,
       inputErrors: {},
       input: {
+        taxCode: '',
+        region: 'England',
         studentLoanPlans: 'none',
         allowancesDeductions: 0,
         isMarried: false,
@@ -143,7 +144,10 @@ describe('CalculatorContainer Component', () => {
       },
     };
     (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
-      selector(storeState),
+      selector({
+        ...storeState,
+        calculatedInput: useCalculatorResults() ? storeState.input : null,
+      }),
     );
     Object.assign(useCalculatorStore, {
       getState: () => ({ ...storeState, results: useCalculatorResults() }),
@@ -220,7 +224,10 @@ describe('CalculatorContainer Component', () => {
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
         selector({
           previousYearResults: null,
-          input: {
+          marginalTaxRate: 28,
+          inputRevision: 0,
+          input: { salary: 30000 },
+          calculatedInput: {
             studentLoanPlans: 'none',
             allowancesDeductions: 0,
             taxCode: 'K100ABC',
@@ -240,7 +247,10 @@ describe('CalculatorContainer Component', () => {
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
         selector({
           previousYearResults: null,
-          input: {
+          marginalTaxRate: 28,
+          inputRevision: 0,
+          input: { salary: 30000 },
+          calculatedInput: {
             studentLoanPlans: 'none',
             allowancesDeductions: 0,
             taxCode: '1257LNONCUM',
@@ -261,7 +271,10 @@ describe('CalculatorContainer Component', () => {
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
         selector({
           previousYearResults: null,
-          input: {
+          marginalTaxRate: 28,
+          inputRevision: 0,
+          input: { salary: 30000 },
+          calculatedInput: {
             studentLoanPlans: 'none',
             allowancesDeductions: 0,
             taxCode: '999999T',
@@ -285,7 +298,10 @@ describe('CalculatorContainer Component', () => {
         (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
           selector({
             previousYearResults: null,
-            input: {
+            marginalTaxRate: 28,
+            inputRevision: 0,
+            input: { salary: 30000 },
+            calculatedInput: {
               studentLoanPlans: 'none',
               allowancesDeductions: 0,
               taxCode,
@@ -318,7 +334,10 @@ describe('CalculatorContainer Component', () => {
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
         selector({
           previousYearResults: null,
-          input: {
+          marginalTaxRate: 28,
+          inputRevision: 0,
+          input: { salary: 30000 },
+          calculatedInput: {
             studentLoanPlans: 'none',
             allowancesDeductions: 0,
             taxCode: '1383M',
@@ -339,7 +358,10 @@ describe('CalculatorContainer Component', () => {
       (useCalculatorStore as unknown as jest.Mock).mockImplementation((selector) =>
         selector({
           previousYearResults: null,
-          input: {
+          marginalTaxRate: 28,
+          inputRevision: 0,
+          input: { salary: 30000 },
+          calculatedInput: {
             studentLoanPlans: 'none',
             allowancesDeductions: 0,
             taxCode: 'NONCUM',
@@ -451,13 +473,13 @@ describe('CalculatorContainer Component', () => {
       expect(screen.getByLabelText(/Email address for results/i)).toBeInTheDocument();
     });
 
-    it('should not show result actions when no results exist', () => {
+    it('offers Email Results as a first calculation action', () => {
       (useCalculatorResults as jest.Mock).mockReturnValue(null);
       render(<CalculatorContainer />);
 
       expect(
         screen.queryByRole('button', { name: /Email tax calculation results/i }),
-      ).not.toBeInTheDocument();
+      ).toBeInTheDocument();
       expect(
         screen.queryByRole('button', { name: /Print tax calculation results/i }),
       ).not.toBeInTheDocument();
@@ -467,17 +489,16 @@ describe('CalculatorContainer Component', () => {
     });
 
     it('should apply pension optimization and require Calculate again', () => {
+      const input = {
+        salary: 110000,
+        payPeriod: 'annually',
+        pensionContribution: 0,
+        pensionContributionType: 'amount',
+        incomeSources: [],
+      };
+      (useCalculatorResults as jest.Mock).mockReturnValue(mockResults);
       Object.assign(useCalculatorStore, {
-        getState: () => ({
-          results: mockResults,
-          inputErrors: {},
-          input: {
-            salary: 110000,
-            payPeriod: 'annually',
-            pensionContribution: 0,
-            pensionContributionType: 'amount',
-          },
-        }),
+        getState: () => ({ results: mockResults, inputErrors: {}, input, calculatedInput: input }),
       });
       render(<CalculatorContainer />);
 
@@ -488,8 +509,6 @@ describe('CalculatorContainer Component', () => {
         pensionContributionType: 'amount',
       });
       expect(mockCalculate).not.toHaveBeenCalled();
-      expect(mockCalculatePreviousYear).not.toHaveBeenCalled();
-      expect(mockInvalidateResults).toHaveBeenCalledTimes(1);
     });
   });
 

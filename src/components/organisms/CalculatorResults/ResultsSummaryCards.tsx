@@ -3,14 +3,12 @@
 
 import { motion } from 'framer-motion';
 import { AlertTriangle, Calendar, Percent, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { ResultCard } from '@/components/molecules/ResultCard';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { ANIMATION_CONTAINER_VARIANTS, ANIMATION_VARIANTS } from '@/constants/animationTokens';
-import { TAX_YEARS, type TaxYear } from '@/constants/taxRates';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
-import { calculateMarginalTaxRate } from '@/lib/calculatorMarginalTax';
 import {
   PENSION_METHOD_LABELS,
   type TaxCalculationInput,
@@ -21,20 +19,11 @@ import { MobileTakeHomeCard } from './MobileTakeHomeCard';
 
 interface ResultsSummaryCardsProps {
   results: TaxCalculationResults;
-  /** Tax year to use for rates and thresholds (defaults to latest available tax year) */
-  taxYear?: TaxYear;
-  /**
-   * Original calculator input (used to compute a dynamic marginal tax rate).
-   * When omitted, we fall back to a simple band-based approximation.
-   */
-  input?: TaxCalculationInput;
+  input: TaxCalculationInput;
+  marginalTaxRate: number;
 }
 
-export function ResultsSummaryCards({
-  results,
-  taxYear = TAX_YEARS[0] as TaxYear,
-  input,
-}: ResultsSummaryCardsProps) {
+export function ResultsSummaryCards({ results, input, marginalTaxRate }: ResultsSummaryCardsProps) {
   const shouldReduceMotion = useMotionPreference();
   const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
   const tooltipState = (card: string) => ({
@@ -47,11 +36,6 @@ export function ResultsSummaryCards({
   const totalTax = results.incomeTax.annually + results.nationalInsurance.annually;
   const effectiveRate =
     results.grossSalary.annually > 0 ? (totalTax / results.grossSalary.annually) * 100 : 0;
-
-  const marginalTaxRate = useMemo(
-    () => calculateMarginalTaxRate({ results, taxYear, input }),
-    [input, results, taxYear],
-  );
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -67,7 +51,7 @@ export function ResultsSummaryCards({
           Relief at source requires a separate calculation.
         </p>
       )}
-      {Boolean(input?.incomeSources?.length) && (
+      {Boolean(input.incomeSources?.length) && (
         <Alert variant='warning' className='mb-3' data-testid='additional-income-result-note'>
           <AlertTriangle className='size-4' aria-hidden='true' />
           <AlertTitle>Additional income accuracy</AlertTitle>
@@ -77,7 +61,7 @@ export function ResultsSummaryCards({
           </AlertDescription>
         </Alert>
       )}
-      <MobileTakeHomeCard results={results} submittedPeriod={input?.payPeriod ?? 'annually'} />
+      <MobileTakeHomeCard results={results} submittedPeriod={input.payPeriod} />
       <motion.section
         className={cn('grid border-b border-border py-4 md:grid-cols-2 lg:grid-cols-5', 'gap-4')}
         variants={shouldReduceMotion ? undefined : ANIMATION_CONTAINER_VARIANTS.staggerFast}

@@ -24,20 +24,18 @@ const maskEmail = (email: string): string => {
 };
 
 interface EmailResultsFormProps {
-  input: PayeEmailInput;
+  prepare: () => { input: PayeEmailInput; isCurrent: () => boolean };
   className?: string;
-  canSend?: () => boolean;
 }
 
-export function EmailResultsForm({ input, className, canSend }: EmailResultsFormProps) {
+export function EmailResultsForm({ prepare, className }: EmailResultsFormProps) {
   const formId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isSent, setIsSent] = useState(false);
-  const [sentEmail, setSentEmail] = useState('');
+  const [sent, setSent] = useState<{ email: string; earlierCalculation: boolean } | null>(null);
   const [submitError, setSubmitError] = useState('');
 
   // Cleanup abort controller on unmount
@@ -50,10 +48,7 @@ export function EmailResultsForm({ input, className, canSend }: EmailResultsForm
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (canSend && !canSend()) {
-      setSubmitError('Inputs changed. Calculate again before emailing results.');
-      return;
-    }
+    if (abortControllerRef.current || sent) return;
 
     // Use native validation
     if (!inputRef.current?.validity.valid) {
@@ -63,69 +58,56 @@ export function EmailResultsForm({ input, className, canSend }: EmailResultsForm
 
     const normalizedEmail = email.trim().toLowerCase();
 
-    // Abort any in-flight request
-    abortControllerRef.current?.abort();
-    abortControllerRef.current = new AbortController();
-
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
     setSubmitError('');
-    setIsLoading(true);
 
     try {
-      const sanitizedInput: PayeEmailInput = {
-        ...input,
-        incomeSources: input.incomeSources?.map(({ type, amount, period }) => ({
-          type,
-          amount,
-          period,
-        })),
-      };
-
+      const { input, isCurrent } = prepare();
+      setIsLoading(true);
       const response = await fetch('/api/send-results', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: normalizedEmail,
-          input: sanitizedInput,
+          input,
         }),
-        signal: abortControllerRef.current.signal,
+        signal: controller.signal,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-
-        if (response.status === 429) {
-          setSubmitError('Too many requests. Please wait a minute before trying again.');
-          return;
-        }
-
-        throw new Error(errorData?.error || 'Failed to send email');
+      const errorData = response.ok ? null : await response.json().catch(() => null);
+      if (controller.signal.aborted) return;
+      if (response.status === 429) {
+        setSubmitError('Too many requests. Please wait a minute before trying again.');
+        return;
       }
+      if (!response.ok) throw new Error(errorData?.error || 'Failed to send email');
 
-      setSentEmail(normalizedEmail);
-      setIsSent(true);
+      setSent({ email: normalizedEmail, earlierCalculation: !isCurrent() });
       trackEvent({
         action: 'result_shared',
         category: 'engagement',
         label: 'email',
       });
     } catch (error) {
-      // Ignore abort errors
-      if (error instanceof Error && error.name === 'AbortError') return;
+      if (controller.signal.aborted) return;
 
       setSubmitError(error instanceof Error ? error.message : 'Please try again later');
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        abortControllerRef.current = null;
+        setIsLoading(false);
+      }
     }
   };
 
   const handleReset = () => {
-    setIsSent(false);
-    setSentEmail('');
+    setSent(null);
     setEmail('');
     setSubmitError('');
   };
 
-  if (isSent) {
+  if (sent) {
     return (
       <output
         className={cn(
@@ -137,7 +119,10 @@ export function EmailResultsForm({ input, className, canSend }: EmailResultsForm
       >
         <div className='flex items-center gap-2'>
           <Mail className={'size-4'} aria-hidden='true' />
-          <span>Results sent to {maskEmail(sentEmail)}</span>
+          <span>
+            {sent.earlierCalculation ? 'Earlier results sent to' : 'Results sent to'}{' '}
+            {maskEmail(sent.email)}
+          </span>
         </div>
         <Button
           type='button'
@@ -180,7 +165,6 @@ export function EmailResultsForm({ input, className, canSend }: EmailResultsForm
             className='pl-10'
             disabled={isLoading}
             aria-label='Email address for results'
-            aria-invalid={!!submitError}
             aria-describedby={submitError ? `${formId}-email-error` : undefined}
           />
         </div>

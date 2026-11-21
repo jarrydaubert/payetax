@@ -133,9 +133,12 @@ These are regression obligations, not a second backlog:
 
 - Amount entry preserves pounds/pence; rejected text stays visible with an associated error.
   Pension-unit changes cannot silently reinterpret amounts or bypass invalid restored values.
-- Input changes invalidate results and require explicit Calculate. Display-only period changes
-  reuse the calculation. Email, open dialogs and other actions cannot use stale/invalid results.
-  First use/Reset have no result actions; invalid submissions retain values and allow recovery.
+- Main PAYE input edits leave the last submitted figures and their labels in place. Calculate and
+  Email Results validate the latest inputs and publish a successful calculation together with its
+  comparison and labels. Email Results reuses an unchanged calculation and sends the submitted
+  inputs for server-side calculation. Invalid input or a calculation failure preserves the
+  previous results and blocks email. Display-only period changes reuse the calculation. Reset
+  returns the inputs to their defaults and clears the results.
 - Pension suggestions add to the existing annual contribution, convert back to the selected pay
   period and round up to a penny without adding a penny to exact values. Applying changes input
   only and requires Calculate. Preserve parser/storage and exact-penny regressions.

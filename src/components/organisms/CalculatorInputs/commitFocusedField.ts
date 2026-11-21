@@ -11,7 +11,7 @@
  */
 export function commitFocusedField(container: HTMLElement | null): void {
   const active = document.activeElement;
-  if (active instanceof HTMLElement && container?.contains(active)) {
+  if (active instanceof HTMLInputElement && container?.contains(active)) {
     active.blur();
   }
 }

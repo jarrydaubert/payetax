@@ -173,12 +173,11 @@ describe('CalculatorStore', () => {
     });
 
     it('should clear all calculated results on reset', () => {
-      const { setSalary, calculate, calculatePreviousYear, reset } = useCalculatorStore.getState();
+      const { setSalary, calculate, reset } = useCalculatorStore.getState();
 
       // Set up calculation
       setSalary(50000);
       calculate();
-      calculatePreviousYear();
 
       // Verify results exist
       let state = useCalculatorStore.getState();
