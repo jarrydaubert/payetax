@@ -4,6 +4,7 @@
 import { Calculator, RotateCcw } from 'lucide-react';
 import * as React from 'react';
 import { Spinner } from '@/components/atoms/Spinner';
+import { FigureStorageControls } from '@/components/molecules/FigureStorageControls';
 import { Button } from '@/components/ui/button';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { convertPeriodToAnnual } from '@/lib/periodCalculator';
@@ -184,6 +185,7 @@ export function CalculatorInputsSection({
             {formMessage.rejectedAmounts ? rejectedAmountsMessage : formMessage.text}
           </p>
         )}
+        <FigureStorageControls />
       </div>
     </TooltipProvider>
   );

@@ -1,5 +1,6 @@
 'use client';
 
+import { ChevronDown } from 'lucide-react';
 import { type MouseEvent, useEffect, useId, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,16 +11,34 @@ import {
 } from '@/lib/figureStorage';
 import { cn } from '@/lib/utils';
 
+export const LEGACY_RESTORE_SELECTOR = '[data-legacy-restore]';
+
+export function FigureStorageAlert({ className }: { className?: string }) {
+  const unavailable = useFigureStorage((state) => state.unavailable);
+  const erasureFailed = useFigureStorage((state) => state.erasureFailed);
+  if (!(unavailable || erasureFailed)) return null;
+
+  return (
+    <p role='alert' className={cn('text-sm', className)}>
+      {erasureFailed
+        ? 'Current figures were cleared, but saved data could not be fully removed. Allow site storage and clear again, or remove this site’s data in your browser settings.'
+        : 'Remembering is off because this browser cannot save figures reliably. You can still calculate. Previously saved data may remain; use your browser settings to remove it.'}
+    </p>
+  );
+}
+
 export function FigureStorageControls() {
   const detailsId = useId();
   const legacyReasonId = `${detailsId}-legacy`;
   const restoreDetailsId = `${detailsId}-restore`;
   const clearDetailsId = `${detailsId}-clear`;
+  const optionsId = `${detailsId}-options`;
   const { enabled, legacy, unavailable, erasureFailed } = useFigureStorage();
   const checkbox = useRef<HTMLInputElement>(null);
   const returnFocus = useRef(false);
   const requestPending = useRef(false);
   const [feedback, setFeedback] = useState<'pending' | 'superseded' | null>(null);
+  const [optionsOpen, setOptionsOpen] = useState(false);
   const pending = feedback === 'pending';
   useEffect(() => {
     syncFigureStorage();
@@ -60,34 +79,58 @@ export function FigureStorageControls() {
   }
 
   return (
-    <section
-      aria-label='Remember figures'
-      className='my-3 rounded-sm border border-border bg-background p-3 text-sm'
-    >
-      <label
-        className={cn(
-          'flex min-h-11 items-center gap-3 font-medium',
-          legacy ? 'cursor-not-allowed text-muted-foreground' : 'cursor-pointer',
+    <section aria-label='Remember figures' className='border-t border-border pt-2 text-sm'>
+      <div className='flex flex-wrap items-start gap-x-3'>
+        <div className='min-w-0 grow basis-52'>
+          <label
+            className={cn(
+              'flex min-h-11 items-center gap-2 font-medium',
+              legacy ? 'cursor-not-allowed text-muted-foreground' : 'cursor-pointer',
+            )}
+          >
+            <input
+              ref={checkbox}
+              type='checkbox'
+              className='size-5 shrink-0 accent-primary disabled:cursor-not-allowed disabled:opacity-50'
+              checked={enabled}
+              aria-label='Remember figures on this device (PAYE and Director)'
+              aria-describedby={legacy ? `${legacyReasonId} ${detailsId}` : detailsId}
+              disabled={legacy}
+              aria-disabled={pending || undefined}
+              onChange={(event) => {
+                if (requestPending.current) return;
+                if (event.target.checked) enableRemembering();
+                else clearRemembering();
+              }}
+            />
+            Remember figures on this device
+          </label>
+          <p id={detailsId} className='text-xs text-muted-foreground'>
+            Saves only your PAYE and Director inputs.
+            {enabled &&
+              ' Turning this off clears figures and results for both calculators in open tabs.'}
+          </p>
+        </div>
+        {!legacy && (
+          <Button
+            type='button'
+            variant='ghost'
+            size='touch'
+            className='px-2 text-muted-foreground hover:text-foreground'
+            aria-expanded={optionsOpen}
+            aria-controls={optionsId}
+            onClick={() => setOptionsOpen((open) => !open)}
+          >
+            Saved data options
+            <ChevronDown
+              aria-hidden='true'
+              className={cn('transition-transform', optionsOpen && 'rotate-180')}
+            />
+          </Button>
         )}
-      >
-        <input
-          ref={checkbox}
-          type='checkbox'
-          className='size-5 shrink-0 accent-primary disabled:cursor-not-allowed disabled:opacity-50'
-          checked={enabled}
-          aria-describedby={legacy ? `${legacyReasonId} ${detailsId}` : detailsId}
-          disabled={legacy}
-          aria-disabled={pending || undefined}
-          onChange={(event) => {
-            if (requestPending.current) return;
-            if (event.target.checked) enableRemembering();
-            else clearRemembering();
-          }}
-        />
-        Remember figures on this device (PAYE and Director)
-      </label>
+      </div>
       {legacy && (
-        <p id={legacyReasonId}>
+        <p id={legacyReasonId} className='mt-3 font-medium'>
           Your previously saved figures haven’t been loaded. Choose Restore or Clear to enable this
           checkbox.
         </p>
@@ -109,14 +152,15 @@ export function FigureStorageControls() {
             </span>{' '}
             <span id={clearDetailsId}>
               Clearing discards current figures and results in all open tabs and deletes saved
-              figures for both calculators.
+              figures for both calculators. Analytics preferences are separate.
             </span>
           </p>
-          <div className='flex flex-col gap-2 sm:flex-row sm:flex-wrap'>
+          <div className='flex flex-wrap gap-2'>
             <Button
               type='button'
               size='touch'
               className='h-auto min-h-11 whitespace-normal'
+              data-legacy-restore
               aria-describedby={restoreDetailsId}
               aria-disabled={pending || undefined}
               onClick={(event) => chooseLegacyAction(event, true)}
@@ -136,27 +180,29 @@ export function FigureStorageControls() {
           </div>
         </div>
       )}
-      <p id={detailsId} className='text-xs text-muted-foreground'>
-        Off by default. Saved inputs expire after 30 days for PAYE or 7 days for Director, and at
-        tax-year rollover. Turning this off clears figures and results in open tabs. Analytics
-        preferences are separate.
-      </p>
       {!legacy && (
-        <button
-          type='button'
-          className='mt-1 min-h-11 underline underline-offset-2'
-          onClick={clearRemembering}
-        >
-          Clear figures and saved data
-        </button>
+        <div id={optionsId} hidden={!optionsOpen} className='mt-2 space-y-2'>
+          <p className='text-xs text-muted-foreground'>
+            Off by default. Saved inputs expire after 30 days for PAYE or 7 days for Director, and
+            at tax-year rollover.
+          </p>
+          <p id={clearDetailsId} className='text-xs text-muted-foreground'>
+            Clearing removes current figures, results and saved inputs for both PAYE and Director
+            across open tabs. Analytics preferences are separate.
+          </p>
+          <Button
+            type='button'
+            variant='outline'
+            size='touch'
+            className='h-auto min-h-11 border-destructive whitespace-normal text-destructive hover:bg-destructive/10 hover:text-destructive'
+            aria-describedby={clearDetailsId}
+            onClick={clearRemembering}
+          >
+            Clear figures and saved data
+          </Button>
+        </div>
       )}
-      {(unavailable || erasureFailed) && (
-        <p role='alert' className='mt-2 text-sm'>
-          {erasureFailed
-            ? 'Current figures were cleared, but saved data could not be fully removed. Allow site storage and clear again, or remove this site’s data in your browser settings.'
-            : 'Remembering is off because this browser cannot save figures reliably. You can still calculate. Previously saved data may remain; use your browser settings to remove it.'}
-        </p>
-      )}
+      <FigureStorageAlert className='mt-2' />
     </section>
   );
 }

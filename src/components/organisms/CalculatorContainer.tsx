@@ -6,7 +6,8 @@ import { Mail, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 import { EmailResultsForm } from '@/components/molecules/EmailResultsForm';
-import { FigureStorageControls } from '@/components/molecules/FigureStorageControls';
+import { LEGACY_RESTORE_SELECTOR } from '@/components/molecules/FigureStorageControls';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
   Dialog,
@@ -21,6 +22,7 @@ import { BREAKPOINTS, TIMERS } from '@/constants/ui';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { trackEvent } from '@/lib/analytics';
+import { useFigureStorage } from '@/lib/figureStorage';
 import { roundPensionUpToPence } from '@/lib/pensionOptimizer';
 import { convertAnnualToPeriod } from '@/lib/periodCalculator';
 import {
@@ -47,6 +49,7 @@ import { TaxCodeBasisNotice } from './CalculatorResults/TaxCodeBasisNotice';
 const DEFAULT_PERIODS = ['Yearly', 'Monthly', 'Weekly', 'Daily', 'Hourly'];
 
 export function CalculatorContainer() {
+  const hasLegacyFigures = useFigureStorage((state) => state.legacy);
   // Use optimized selectors to prevent unnecessary re-renders
   const results = useCalculatorResults();
   const hasCalculated = useCalculatorStore((state) => state.hasCalculated);
@@ -471,9 +474,21 @@ export function CalculatorContainer() {
         </p>
       </div>
 
-      <div className='order-1 xl:col-span-2'>
-        <FigureStorageControls />
-      </div>
+      {hasLegacyFigures && (
+        <div className='order-1 flex flex-wrap items-center gap-x-4 text-sm xl:col-span-2'>
+          <p className='font-medium'>Previously saved figures are waiting.</p>
+          <Button
+            type='button'
+            variant='outline'
+            size='touch'
+            onClick={() =>
+              sectionRef.current?.querySelector<HTMLButtonElement>(LEGACY_RESTORE_SELECTOR)?.focus()
+            }
+          >
+            Review saved figures
+          </Button>
+        </div>
+      )}
 
       {/* Match the desktop DOM sequence to the input-band and sidebar layouts. */}
       {inputsBeforeSummary ? [inputsSection, summarySection] : [summarySection, inputsSection]}

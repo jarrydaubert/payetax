@@ -296,6 +296,7 @@ test.describe('Director result currentness @critical', () => {
     };
 
     await expectRecommendation('£52,476');
+    await ensureInputsPanelIsVisible(page);
     await page
       .getByRole('checkbox', { name: 'Remember figures on this device (PAYE and Director)' })
       .press('Space');
@@ -303,6 +304,7 @@ test.describe('Director result currentness @critical', () => {
       name: 'Remember figures on this device (PAYE and Director)',
     });
     await expect(remembered).toBeChecked();
+    await closeInputsPanelIfOpen(page);
     // Reproduce a saved All Salary selection from the formerly interactive strategy cards.
     await page.evaluate(() => {
       const key = 'director-guide-storage';
