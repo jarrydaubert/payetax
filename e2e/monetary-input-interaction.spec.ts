@@ -59,8 +59,12 @@ test('MC-01 focus, keyboard, clearing, Enter, Reset and focus return', async ({
   const results = page.getByTestId('results-table');
   await expect(results).toBeVisible();
   // Independent hand-derived fixture: salary-guide-60k-base (2026/27, 1257L).
-  const net = results.getByRole('row').filter({ hasText: 'Net Pay' });
-  await expect(net.getByRole('cell').nth(1)).toHaveText('£45,365.28');
+  const annualNetPay = results
+    .getByRole('row')
+    .filter({ hasText: 'Net Pay' })
+    .getByRole('cell')
+    .nth(1);
+  await expect(annualNetPay).toHaveText('£45,365.28');
   await enterAt(salary, 'right', isMobile);
   await salary.press('Tab');
   await expect(salary).toHaveValue('60,000.00');
@@ -72,22 +76,27 @@ test('MC-01 focus, keyboard, clearing, Enter, Reset and focus return', async ({
   await salary.pressSequentially('30000');
   await salary.press('Tab');
   await expect(salary).toHaveValue('30,000.00');
-  await expect(results).toBeHidden();
+  await expect(annualNetPay).toHaveText('£45,365.28');
   await enterAt(salary, 'left', isMobile);
   await salary.press('Backspace');
   await salary.press('Tab');
   await expect(salary).toHaveValue('');
   await expect(salary).toHaveAttribute('aria-invalid', 'true');
   await activate(page.getByTestId('calculate-button'), isMobile);
-  await expect(results).toBeHidden();
+  await expect(
+    page.getByText('Correct the invalid amount in Salary before calculating.'),
+  ).toBeVisible();
+  await expect(annualNetPay).toHaveText('£45,365.28');
   await activate(page.getByRole('button', { name: /Reset/ }), isMobile);
   await expect(salary).toHaveValue('0.00');
+  await expect(results).toHaveCount(0);
   await enterAt(salary, 'right', isMobile);
   await salary.pressSequentially('30000');
   await salary.press('Enter');
   await expect(salary).toHaveValue('30,000.00');
   await page.getByTestId('calculate-button').press('Enter');
-  await expect(results).toBeVisible();
+  const gross = results.getByRole('row').filter({ hasText: 'Gross Pay' });
+  await expect(gross.getByRole('cell').nth(1)).toHaveText('£30,000.00');
 });
 
 test('MC-01 mounted amounts keep pence and rejected text recoverable', async ({
