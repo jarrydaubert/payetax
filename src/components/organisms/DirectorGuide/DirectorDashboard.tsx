@@ -33,7 +33,11 @@ import {
 } from '@/components/molecules/DirectorGuide/dashboard';
 import { EmailResultsDialog } from '@/components/molecules/DirectorGuide/EmailResultsDialog';
 import { useDirectorEmailUnavailableReason } from '@/components/molecules/DirectorGuide/useDirectorEmailUnavailableReason';
-import { FigureStorageControls } from '@/components/molecules/FigureStorageControls';
+import {
+  FigureStorageAlert,
+  FigureStorageControls,
+  LEGACY_RESTORE_SELECTOR,
+} from '@/components/molecules/FigureStorageControls';
 import { Button } from '@/components/ui/button';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { formatCurrencyInputValue } from '@/lib/currencyInput';
@@ -42,6 +46,7 @@ import {
   trackGuideStarted,
   trackResultsShown,
 } from '@/lib/directorGuideAnalytics';
+import { useFigureStorage } from '@/lib/figureStorage';
 import { safeGetItem, safeSetItem } from '@/lib/safeStorage';
 import { calculateSafeMonthlyDraw, resolveAnnualFinancials } from '@/lib/tax';
 import { cn, formatCurrency } from '@/lib/utils';
@@ -67,9 +72,11 @@ export function DirectorDashboard() {
   const [educationCollapsed, setEducationCollapsed] = useState(true); // Start collapsed to prioritize calculator workspace
   const [hasLoadedEducationPreference, setHasLoadedEducationPreference] = useState(false);
   const [mobileInputsOpen, setMobileInputsOpen] = useState(false);
+  const [reviewLegacyIn, setReviewLegacyIn] = useState<'desktop' | 'mobile' | null>(null);
   const [mobileEducationOpen, setMobileEducationOpen] = useState(false);
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
 
+  const hasLegacyFigures = useFigureStorage((state) => state.legacy);
   const formData = useDirectorFormSlice((data) => data);
   const comparison = useStrategyComparison();
   const monthlyModeOutput = useMonthlyModeOutput();
@@ -254,7 +261,12 @@ export function DirectorDashboard() {
             dashboardVariant={hasComparison ? (isSurvivalMode ? 'survival' : 'normal') : undefined}
           />
         }
-        inputs={<InputsPanel onReset={handleReset} />}
+        inputs={<InputsPanel onReset={handleReset} className='h-auto flex-1 pb-3' />}
+        inputActions={
+          <div className='px-5 pb-6'>
+            <FigureStorageControls />
+          </div>
+        }
         main={
           <main className='p-6' data-testid='director-dashboard-main'>
             {/* Header */}
@@ -279,7 +291,43 @@ export function DirectorDashboard() {
                 </Link>
               </nav>
             </div>
-            <FigureStorageControls />
+            {hasLegacyFigures && (
+              <div className='mb-4 space-y-2'>
+                <p className='text-sm font-medium'>
+                  Previously saved figures are waiting. Choose Restore or Clear below Reset in Your
+                  Numbers.
+                </p>
+                <Button
+                  type='button'
+                  variant='outline'
+                  size='touch'
+                  className='lg:hidden'
+                  onClick={() => {
+                    setReviewLegacyIn('mobile');
+                    setMobileInputsOpen(true);
+                  }}
+                >
+                  Review saved figures
+                </Button>
+                {inputsCollapsed && (
+                  <Button
+                    type='button'
+                    variant='outline'
+                    size='touch'
+                    className='hidden lg:inline-flex'
+                    onClick={() => {
+                      setReviewLegacyIn('desktop');
+                      setInputsCollapsed(false);
+                    }}
+                  >
+                    Review saved figures
+                  </Button>
+                )}
+              </div>
+            )}
+            {!mobileInputsOpen && (
+              <FigureStorageAlert className={cn('mb-4', !inputsCollapsed && 'lg:hidden')} />
+            )}
 
             {/* Results */}
             <p
@@ -584,11 +632,23 @@ export function DirectorDashboard() {
         education={<EducationPanel monthlyDraw={monthlyDraw} />}
         inputsCollapsed={inputsCollapsed}
         educationCollapsed={educationCollapsed}
-        onToggleInputs={() => setInputsCollapsed((prev) => !prev)}
+        onToggleInputs={() => {
+          setReviewLegacyIn(null);
+          setInputsCollapsed((prev) => !prev);
+        }}
+        desktopInputsInitialFocusSelector={
+          reviewLegacyIn === 'desktop' ? LEGACY_RESTORE_SELECTOR : undefined
+        }
         onToggleEducation={() => setEducationCollapsed((prev) => !prev)}
         mobileInputsOpen={mobileInputsOpen}
-        onToggleMobileInputs={() => setMobileInputsOpen((prev) => !prev)}
+        onToggleMobileInputs={() => {
+          setReviewLegacyIn(null);
+          setMobileInputsOpen((prev) => !prev);
+        }}
         mobileInputsReady={hasComparison}
+        mobileInputsInitialFocusSelector={
+          reviewLegacyIn === 'mobile' ? LEGACY_RESTORE_SELECTOR : undefined
+        }
         mobileEducationOpen={mobileEducationOpen}
         onToggleMobileEducation={() => setMobileEducationOpen((prev) => !prev)}
       />

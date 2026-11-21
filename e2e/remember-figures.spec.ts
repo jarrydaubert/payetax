@@ -1,12 +1,15 @@
 import { expect, type Page, test } from '@playwright/test';
 import fixtures from '../src/test/payeVerificationFixtures/uk-baseline-2026-27.json';
+import { legacyFigureSnapshots } from './fixtures/legacy-figure-snapshots';
 
 const preference = 'payetax-remember-figures';
 const payeKey = 'tax-calculator-storage';
 const directorKey = 'director-guide-storage';
+const figureControls = (page: Page) => page.getByRole('region', { name: 'Remember figures' });
 const checkbox = (page: Page) =>
-  page.getByRole('checkbox', { name: 'Remember figures on this device (PAYE and Director)' });
+  page.getByRole('checkbox', { name: 'Remember figures on this device' });
 const clear = (page: Page) => page.getByRole('button', { name: 'Clear figures and saved data' });
+const savedDataOptions = (page: Page) => page.getByRole('button', { name: 'Saved data options' });
 const salary = (page: Page) => page.getByTestId('salary-input');
 const revenue = (page: Page) =>
   page.locator('[data-testid="director-revenue-input"]:visible').first();
@@ -35,6 +38,55 @@ test.beforeEach(async ({ context }) => {
     localStorage.setItem('directorGuideWelcome:dismissed:v1', 'true'),
   );
 });
+
+for (const [calculator, route] of [
+  ['PAYE', '/'],
+  ['Director', '/tools/director-guide'],
+] as const) {
+  test(`${calculator} keeps saved data options below Reset and separate from it @critical`, async ({
+    page,
+  }) => {
+    await open(page, route);
+    const reset = page.getByRole('button', { name: 'Reset', exact: true });
+    const options = savedDataOptions(page);
+    await expect(reset).toBeVisible();
+    const region = await figureControls(page).elementHandle();
+    expect(
+      await reset.evaluate(
+        (button, controls) =>
+          Boolean(button.compareDocumentPosition(controls) & Node.DOCUMENT_POSITION_FOLLOWING),
+        region,
+      ),
+    ).toBe(true);
+    await expect(checkbox(page)).not.toBeChecked();
+    await expect(clear(page)).toBeHidden();
+    await options.press('Enter');
+    await expect(options).toHaveAttribute('aria-expanded', 'true');
+    await expect(clear(page)).toBeVisible();
+    await expect(clear(page)).toHaveCSS('border-top-style', 'solid');
+    await expect(clear(page)).toHaveAccessibleDescription(/both PAYE and Director/);
+    await expect(clear(page)).toHaveAccessibleDescription(/Analytics preferences are separate/);
+    await options.press('Enter');
+    await expect(options).toHaveAttribute('aria-expanded', 'false');
+    await expect(options).toBeFocused();
+    await expect(clear(page)).toBeHidden();
+
+    await checkbox(page).press('Space');
+    await expect(checkbox(page)).toBeChecked();
+    await expect(checkbox(page)).toHaveAccessibleDescription(/Turning this off clears figures/);
+    await expect(figureControls(page).getByText(/Turning this off clears figures/)).toBeVisible();
+    await reset.click();
+    await expect(checkbox(page)).toBeChecked();
+    await page.reload();
+    await expect(checkbox(page)).toBeChecked();
+    await expect(clear(page)).toBeHidden();
+    await options.click();
+    await clear(page).click();
+    await expect(checkbox(page)).not.toBeChecked();
+    await page.reload();
+    await expect(checkbox(page)).not.toBeChecked();
+  });
+}
 
 test('off by default; opt-in survives reload; clear-data preserves analytics and the independent PAYE result @critical', async ({
   page,
@@ -69,6 +121,7 @@ test('off by default; opt-in survives reload; clear-data preserves analytics and
     localStorage.getItem('cookie-consent'),
     localStorage.getItem('cookie-consent-timestamp'),
   ]);
+  await savedDataOptions(page).click();
   await clear(page).click();
   await expect(checkbox(page)).not.toBeChecked();
   await expect(salary(page)).toHaveValue('0.00');
@@ -118,11 +171,14 @@ test('legacy figures remain quarantined across reload and edits until restore-or
   await salary(page).blur();
   await page.reload({ waitUntil: 'networkidle' });
   await expect(salary(page)).toHaveValue('0.00');
-  await restore.press('Enter');
+  await page.getByRole('button', { name: 'Review saved figures' }).press('Enter');
+  await expect(restore).toBeFocused();
+  await page.keyboard.press('Enter');
   await expect(checkbox(page)).toBeFocused();
   await expect(salary(page)).toHaveValue('54,321.98');
   await expect(page.getByTestId('pension-input')).toHaveAttribute('aria-invalid', 'true');
   await expect(page.getByTestId('tax-results')).toHaveCount(0);
+  await savedDataOptions(page).click();
   await clear(page).click();
   await expect
     .poll(() =>
@@ -137,6 +193,40 @@ test('legacy figures remain quarantined across reload and edits until restore-or
     .toEqual([null, null]);
   await page.reload({ waitUntil: 'networkidle' });
   await expect(restore).toHaveCount(0);
+});
+
+test('Director legacy Restore is keyboard reachable and remembers the input across reload @critical', async ({
+  page,
+}) => {
+  await open(page, '/tools/director-guide');
+  await page.evaluate((snapshots) => {
+    for (const [key, snapshot] of Object.entries(snapshots)) {
+      localStorage.setItem(key, JSON.stringify(snapshot));
+    }
+  }, legacyFigureSnapshots(Date.now()));
+  await page.reload({ waitUntil: 'networkidle' });
+  const restore = page.getByRole('button', { name: 'Restore saved figures and remember' });
+  const legacyClear = page.getByRole('button', { name: 'Clear figures and start fresh' });
+  await expect(checkbox(page)).toBeDisabled();
+  await expect(
+    figureControls(page).getByText(/Choose Restore or Clear to enable this checkbox/),
+  ).toBeVisible();
+  await expect(revenue(page)).toHaveValue('');
+  await page.getByRole('button', { name: 'Hide inputs panel' }).click();
+  await expect(restore).toHaveCount(0);
+  await page.getByRole('button', { name: 'Review saved figures' }).press('Enter');
+  await expect(restore).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(legacyClear).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(restore).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(checkbox(page)).toBeFocused();
+  await expect(checkbox(page)).toBeChecked();
+  await expect(revenue(page)).toHaveValue('£87,654.32');
+  await page.reload({ waitUntil: 'networkidle' });
+  await expect(checkbox(page)).toBeChecked();
+  await expect(revenue(page)).toHaveValue('£87,654.32');
 });
 
 test('Director and PAYE tabs clear live figures and cannot recreate erased snapshots @critical', async ({
@@ -159,6 +249,7 @@ test('Director and PAYE tabs clear live figures and cannot recreate erased snaps
   // Erasure must also discard a focused draft in another tab.
   await revenue(other).focus();
   await revenue(other).fill('99999.99');
+  await savedDataOptions(page).click();
   await clear(page).click();
   await expect(checkbox(other)).not.toBeChecked();
   await revenue(other).blur();
@@ -234,6 +325,7 @@ test('blocked storage keeps calculations usable and reports erasure limits @crit
   await expect(checkbox(page)).not.toBeChecked();
   await page.getByTestId('calculate-button').click();
   await expect(page.getByTestId('tax-results')).toBeVisible();
+  await savedDataOptions(page).click();
   await clear(page).click();
   await expect(salary(page)).toHaveValue('0.00');
   await expect(
@@ -292,7 +384,8 @@ test('remembering controls remain usable on a narrow Director screen and privacy
   page,
 }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await open(page, '/tools/director-guide');
+  await page.goto('/tools/director-guide', { waitUntil: 'networkidle' });
+  await page.getByRole('button', { name: 'Open calculator inputs' }).click();
   await checkbox(page).press('Space');
   await expect(checkbox(page)).toBeChecked();
   await checkbox(page).press('Space');

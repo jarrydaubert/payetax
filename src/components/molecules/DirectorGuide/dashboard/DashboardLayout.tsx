@@ -25,15 +25,18 @@ import { cn } from '@/lib/utils';
 interface DashboardLayoutProps {
   sidebar: ReactNode;
   inputs: ReactNode;
+  inputActions?: ReactNode;
   main: ReactNode;
   education?: ReactNode;
   inputsCollapsed?: boolean;
   educationCollapsed?: boolean;
   onToggleInputs?: () => void;
+  desktopInputsInitialFocusSelector?: string;
   onToggleEducation?: () => void;
   mobileInputsOpen?: boolean;
   onToggleMobileInputs?: () => void;
   mobileInputsReady?: boolean;
+  mobileInputsInitialFocusSelector?: string;
   mobileEducationOpen?: boolean;
   onToggleMobileEducation?: () => void;
   className?: string;
@@ -49,6 +52,8 @@ function MobileDrawer({
   children,
   variant = 'default',
   inputsReady = false,
+  initialFocusSelector,
+  inputActions,
 }: {
   isOpen: boolean;
   onClose?: () => void;
@@ -56,8 +61,11 @@ function MobileDrawer({
   children: ReactNode;
   variant?: 'default' | 'education';
   inputsReady?: boolean;
+  initialFocusSelector?: string;
+  inputActions?: ReactNode;
 }) {
   const drawerRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const onCloseRef = useRef(onClose);
 
@@ -73,8 +81,11 @@ function MobileDrawer({
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
-    // Focus the close button on open
-    closeButtonRef.current?.focus();
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+    const initialFocus = initialFocusSelector
+      ? drawerRef.current?.querySelector<HTMLElement>(initialFocusSelector)
+      : null;
+    (initialFocus ?? closeButtonRef.current)?.focus();
 
     // Handle Escape key
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -89,9 +100,9 @@ function MobileDrawer({
       document.body.style.overflow = originalOverflow;
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isOpen]);
+  }, [isOpen, initialFocusSelector]);
 
-  if (!isOpen) return null;
+  if (!(isOpen || inputActions)) return null;
 
   const bgColor = variant === 'education' ? 'bg-card' : 'bg-background';
   const showResultsHint = variant === 'default' && Boolean(onClose);
@@ -99,10 +110,10 @@ function MobileDrawer({
   return (
     <div
       ref={drawerRef}
-      role='dialog'
-      aria-modal='true'
-      aria-labelledby={`drawer-title-${variant}`}
-      className={cn('fixed inset-0 z-50 flex flex-col lg:hidden', bgColor)}
+      role={isOpen ? 'dialog' : undefined}
+      aria-modal={isOpen || undefined}
+      aria-labelledby={isOpen ? `drawer-title-${variant}` : undefined}
+      className={cn('fixed inset-0 z-50 flex-col lg:hidden', isOpen ? 'flex' : 'hidden', bgColor)}
     >
       <div className='relative border-b border-border/40 px-4 pt-[calc(env(safe-area-inset-top,0px)+0.75rem)] pb-3'>
         <h2
@@ -123,8 +134,18 @@ function MobileDrawer({
           </button>
         )}
       </div>
-      <div className='flex-1 overflow-y-auto pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)]'>
-        {children}
+      <div
+        ref={scrollRef}
+        className='flex-1 overflow-y-auto pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)]'
+      >
+        {inputActions ? (
+          <div className='flex min-h-full flex-col'>
+            {isOpen && children}
+            {inputActions}
+          </div>
+        ) : (
+          children
+        )}
       </div>
       {showResultsHint && (
         <div className='border-t border-border/40 bg-background px-4 pt-3 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)]'>
@@ -148,19 +169,38 @@ function MobileDrawer({
 export function DashboardLayout({
   sidebar,
   inputs,
+  inputActions,
   main,
   education,
   inputsCollapsed = false,
   educationCollapsed = false,
   onToggleInputs,
+  desktopInputsInitialFocusSelector,
   onToggleEducation,
   mobileInputsOpen = false,
   onToggleMobileInputs,
   mobileInputsReady = false,
+  mobileInputsInitialFocusSelector,
   mobileEducationOpen = false,
   onToggleMobileEducation,
   className,
 }: DashboardLayoutProps) {
+  const desktopInputsRef = useRef<HTMLDivElement>(null);
+  const mobileInputsButton = useRef<HTMLButtonElement>(null);
+  const wasMobileInputsOpen = useRef(mobileInputsOpen);
+
+  useEffect(() => {
+    if (inputsCollapsed || !desktopInputsInitialFocusSelector) return;
+    desktopInputsRef.current
+      ?.querySelector<HTMLElement>(desktopInputsInitialFocusSelector)
+      ?.focus();
+  }, [desktopInputsInitialFocusSelector, inputsCollapsed]);
+
+  useEffect(() => {
+    if (wasMobileInputsOpen.current && !mobileInputsOpen) mobileInputsButton.current?.focus();
+    wasMobileInputsOpen.current = mobileInputsOpen;
+  }, [mobileInputsOpen]);
+
   // Memoize toggle handlers for stable references
   const handleToggleMobileInputs = useCallback(() => {
     onToggleMobileInputs?.();
@@ -195,7 +235,12 @@ export function DashboardLayout({
               Your Numbers
             </h2>
           </div>
-          <div className='h-full w-72 overflow-y-auto bg-background pt-12'>{inputs}</div>
+          <div ref={desktopInputsRef} className='h-full w-72 overflow-y-auto bg-background pt-12'>
+            <div className='flex min-h-full flex-col'>
+              {inputs}
+              {inputActions}
+            </div>
+          </div>
           {onToggleInputs && !inputsCollapsed && (
             <button
               type='button'
@@ -227,6 +272,7 @@ export function DashboardLayout({
               </span>
               {onToggleMobileInputs && (
                 <button
+                  ref={mobileInputsButton}
                   type='button'
                   onClick={handleToggleMobileInputs}
                   className='inline-flex min-h-10 items-center gap-2 rounded-sm border border-primary/35 bg-background px-3 text-sm font-medium text-primary transition-colors hover:border-primary/60 hover:bg-primary/5 focus:ring-2 focus:ring-primary/60 focus:outline-none lg:hidden'
@@ -339,6 +385,8 @@ export function DashboardLayout({
         title='Your Numbers'
         variant='default'
         inputsReady={mobileInputsReady}
+        initialFocusSelector={mobileInputsInitialFocusSelector}
+        inputActions={inputActions}
       >
         {inputs}
       </MobileDrawer>
