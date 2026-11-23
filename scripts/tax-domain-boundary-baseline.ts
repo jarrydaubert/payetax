@@ -202,11 +202,6 @@ const BASELINE_ENTRIES = [
   ],
   ['src/lib/salaryComparison.ts', './taxCalculator', ['calculateTax']],
   [
-    'src/lib/taxRateDescriptions.ts',
-    '@/constants/taxRates',
-    ['CURRENT_TAX_YEAR', 'TAX_RATES', 'type:TaxYear'],
-  ],
-  [
     'src/lib/types/calculator.ts',
     '@/constants/taxRates',
     ['PERIODS', 'type:NICategory', 'type:PayPeriod', 'type:StudentLoanSelection', 'type:TaxYear'],
