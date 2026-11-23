@@ -27,7 +27,6 @@ import {
   resolveAnnualFinancials,
   resolveTaxYear,
 } from '@/lib/tax';
-import { calculateDirectorScenario } from '@/lib/tax/directorCalculator';
 import { calculateStrategyComparison, type StrategyComparison } from '@/lib/tax/strategyComparison';
 import {
   isDirectorStudentLoanPlanAvailable,
@@ -35,8 +34,6 @@ import {
 } from '@/lib/tax/studentLoanPlans';
 import {
   CurrencyAmountSchema,
-  type DirectorCalculationResult,
-  type DirectorInput,
   type Region,
   RegionSchema,
 } from '@/lib/validation/directorValidation';
@@ -138,7 +135,6 @@ function hasBlockingInputErrors(state: Pick<DirectorGuideState, 'formData' | 'in
 
 /** Clears every derived result so nothing calculated from earlier inputs stays on screen. */
 const CLEARED_RESULTS = {
-  results: null,
   strategyComparison: null,
   monthlyModeOutput: null,
   sliderSalary: null,
@@ -162,7 +158,6 @@ interface DirectorGuideState {
   formData: DirectorFormData;
 
   // Calculation results
-  results: DirectorCalculationResult | null;
   strategyComparison: StrategyComparison | null;
   /** In-memory inputs that produced the results; shared by display and email eligibility. */
   calculatedFormData: DirectorFormData | null;
@@ -285,7 +280,6 @@ const defaultFormData: DirectorFormData = {
 
 const defaultState: DirectorGuideState = {
   formData: { ...defaultFormData },
-  results: null,
   strategyComparison: null,
   calculatedFormData: null,
   failedFormData: null,
@@ -712,13 +706,8 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         // ====================================================================
 
         invalidateResults: () => {
-          const { results, strategyComparison, monthlyModeOutput, error } = get();
-          if (
-            results === null &&
-            strategyComparison === null &&
-            monthlyModeOutput === null &&
-            error === null
-          ) {
+          const { strategyComparison, monthlyModeOutput, error } = get();
+          if (strategyComparison === null && monthlyModeOutput === null && error === null) {
             return;
           }
           set({ ...CLEARED_RESULTS, error: null });
@@ -763,29 +752,6 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
           set({ isCalculating: true, error: null, failedFormData: null });
 
           try {
-            // Compute total already taken from YTD fields
-            const alreadyTaken = formData.ytdSalary + formData.ytdDividends + formData.ytdDrawings;
-
-            // Determine if taken via payroll:
-            // - true if salary was taken (via PAYE)
-            // - false if only drawings (not via payroll)
-            // - null if only dividends or nothing taken
-            const alreadyTakenViaPayroll =
-              formData.ytdSalary > 0 ? true : formData.ytdDrawings > 0 ? false : null;
-
-            // Main calculation (for survival mode detection)
-            const input: DirectorInput = {
-              region: formData.region,
-              revenue: effectiveRevenue,
-              includesVat: formData.includesVat,
-              expenses: effectiveExpenses,
-              alreadyTaken,
-              alreadyTakenViaPayroll,
-              confirmedSoleIncome: formData.otherIncome === 0,
-            };
-
-            const results = calculateDirectorScenario(input, CURRENT_TAX_YEAR);
-
             const commonStrategyInput = {
               region: formData.region,
               revenue: effectiveRevenue,
@@ -825,7 +791,6 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
             }
 
             set({
-              results,
               strategyComparison,
               calculatedFormData: formData,
               monthlyModeOutput: monthlyProjection,
@@ -949,15 +914,6 @@ export function useDirectorFormValue<T>(selector: (formData: DirectorFormData) =
  */
 export function useDirectorFormSlice<T>(selector: (formData: DirectorFormData) => T) {
   return useDirectorGuideStore(useShallow((state) => selector(state.formData)));
-}
-
-/**
- * Hook for accessing results
- */
-export function useDirectorResults() {
-  return useDirectorGuideStore((state) =>
-    hasCurrentDirectorResults(state) ? state.results : null,
-  );
 }
 
 /**

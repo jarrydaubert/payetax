@@ -212,17 +212,6 @@ const BASELINE_ENTRIES = [
     ['PERIODS', 'type:NICategory', 'type:PayPeriod', 'type:StudentLoanSelection', 'type:TaxYear'],
   ],
   ['src/lib/validation/atomsValidation.ts', '@/constants/taxRates', ['TAX_YEARS']],
-  [
-    'src/lib/validation/directorValidation.ts',
-    '@/constants/taxRates',
-    ['TAX_YEARS', 'type:StudentLoanPlan', 'type:TaxYear'],
-  ],
-  [
-    'src/lib/validation/directorValidation.ts',
-    '@/lib/tax/studentLoanPlans',
-    ['DIRECTOR_SUPPORTED_STUDENT_LOAN_PLANS', 'getAvailableDirectorStudentLoanPlans'],
-  ],
-  ['src/lib/validation/directorValidation.ts', '@/lib/tax/warnings', ['DIRECTOR_WARNING_TYPES']],
   ['src/lib/validation/emailValidation.ts', '@/constants/taxRates', ['PERIODS', 'TAX_YEARS']],
   [
     'src/store/calculatorStore.ts',
@@ -237,11 +226,6 @@ const BASELINE_ENTRIES = [
     ],
   ],
   ['src/store/directorGuideStore.ts', '@/constants/taxRates', ['type:StudentLoanPlan']],
-  [
-    'src/store/directorGuideStore.ts',
-    '@/lib/tax/directorCalculator',
-    ['calculateDirectorScenario'],
-  ],
   [
     'src/store/directorGuideStore.ts',
     '@/lib/tax/strategyComparison',

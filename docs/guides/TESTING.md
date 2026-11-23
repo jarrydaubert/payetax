@@ -234,7 +234,7 @@ Examples:
 - `src/lib/tax/__tests__/incomeTax.test.ts`
 - `src/lib/tax/__tests__/employeeNI.test.ts`
 - `src/lib/__tests__/nationalInsuranceVertical.test.ts`
-- `src/lib/tax/__tests__/directorCalculator.*.test.ts`
+- `src/lib/tax/__tests__/strategyComparison.salaryScenario.test.ts`
 
 These tests should use hand-anchored expected values, HMRC examples, payslip-derived expectations, or explicit legal/rate-table assumptions. They should not derive the expected answer from the same production constants or implementation path they are trying to test.
 

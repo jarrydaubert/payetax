@@ -460,12 +460,12 @@ test.describe('Director result currentness @critical', () => {
     await page.route('**/_next/static/chunks/app/tools/director-guide/*.js', async (route) => {
       const response = await route.fetch();
       const source = await response.text();
-      // The store's catch sits immediately after the try containing its engine calls.
-      // Inject before the first calculation in that try, without adding a production test switch.
-      const calculation = /try\{(let \w+=\w+\.ytdSalary\+\w+\.ytdDividends\+\w+\.ytdDrawings)/g;
-      const body = source.replace(calculation, (_, firstStatement) => {
+      // Match the live strategy engine's first three input reads in the minified chunk.
+      const calculation =
+        /\{(?=(?:let|const|var) \w+=\((\w+)\.ytdSalary\?\?0\)\+\(\1\.ytdDividends\?\?0\)\+\(\1\.ytdDrawings\?\?0\))/g;
+      const body = source.replace(calculation, (start) => {
         injections += 1;
-        return `try{if(document.documentElement.hasAttribute("${faultAttribute}")){document.documentElement.removeAttribute("${faultAttribute}");throw Error("Controlled Director failure")} ${firstStatement}`;
+        return `${start}if(document.documentElement.hasAttribute("${faultAttribute}")){document.documentElement.removeAttribute("${faultAttribute}");throw Error("Controlled Director failure")}`;
       });
       await route.fulfill(body === source ? { response } : { response, body });
     });
@@ -494,6 +494,28 @@ test.describe('Director result currentness @critical', () => {
 });
 
 test.describe('Director Intelligence critical @critical', () => {
+  for (const { revenue, salary, employerNI } of [
+    { revenue: 10000, salary: '£9,348', employerNI: '£652' },
+    { revenue: 13000, salary: '£11,957', employerNI: '£1,043' },
+  ]) {
+    test(`JGF-56: renders affordable pay and zero dividends at £${revenue} revenue`, async ({
+      page,
+    }) => {
+      await openDirectorGuide(page);
+      await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), revenue);
+      await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 0);
+      await selectEngland(page);
+      await closeInputsPanelIfOpen(page);
+
+      await expect(page.getByTestId('director-survival-mode')).toHaveCount(0);
+      await expect(detailRowValue(page, 'Salary Breakdown', 'Gross Salary')).toHaveText(salary);
+      await expect(detailRowValue(page, 'Tax Summary', 'Employer NI (company)')).toHaveText(
+        employerNI,
+      );
+      await expect(detailRowValue(page, 'Dividend Breakdown', 'Gross Dividends')).toHaveText('£0');
+    });
+  }
+
   test('JGF-44: extra Income Tax from taper is included in take-home and shown separately', async ({
     page,
   }) => {

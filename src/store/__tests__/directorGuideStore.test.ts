@@ -6,30 +6,9 @@ import { rememberFigures } from '@/lib/figureStorage';
  * Post-merge: Removed step wizard tests, added strategy comparison tests.
  */
 
-import { calculateDirectorScenario } from '@/lib/tax/directorCalculator';
 import { calculateStrategyComparison } from '@/lib/tax/strategyComparison';
 import { DIRECTOR_TAX_YEARS } from '@/lib/validation/directorValidation';
 import { useDirectorGuideStore } from '../directorGuideStore';
-
-// Mock the director calculator
-jest.mock('@/lib/tax/directorCalculator', () => ({
-  calculateDirectorScenario: jest.fn().mockReturnValue({
-    mode: 'normal',
-    grossRevenue: 100000,
-    netRevenue: 100000,
-    grossProfit: 80000,
-    salary: 12570,
-    employerNI: 1135.5,
-    corporationTax: 15000,
-    dividendsAvailable: 51294.5,
-    dividendTax: 5000,
-    averageMonthlyPay: 4905.38,
-    companyTaxPot: 16135.5,
-    warnings: [],
-    taxYear: '2025-2026',
-    region: 'rUK',
-  }),
-}));
 
 // Mock strategy comparison
 jest.mock('@/lib/tax/strategyComparison', () => ({
@@ -64,7 +43,6 @@ jest.mock('@/lib/tax/strategyComparison', () => ({
   }),
 }));
 
-const mockCalculateDirectorScenario = calculateDirectorScenario as jest.Mock;
 const mockCalculateStrategyComparison = calculateStrategyComparison as jest.Mock;
 const DIRECTOR_STORAGE_KEY = 'director-guide-storage';
 
@@ -73,7 +51,6 @@ describe('DirectorGuideStore', () => {
     localStorage.clear();
     useDirectorGuideStore.getState().reset();
     rememberFigures();
-    mockCalculateDirectorScenario.mockClear();
     mockCalculateStrategyComparison.mockClear();
   });
 
@@ -97,7 +74,6 @@ describe('DirectorGuideStore', () => {
       expect(state.formData.monthlyExpenses).toBeUndefined();
       expect(state.formData.contractStartMonth).toBe(4);
       expect(state.formData.runwayMonths).toBe(3);
-      expect(state.results).toBeNull();
       expect(state.strategyComparison).toBeNull();
       expect(state.monthlyModeOutput).toBeNull();
     });
@@ -281,7 +257,8 @@ describe('DirectorGuideStore', () => {
   describe('Calculation', () => {
     it('should not calculate without required fields', () => {
       useDirectorGuideStore.getState().calculate();
-      expect(useDirectorGuideStore.getState().results).toBeNull();
+      expect(mockCalculateStrategyComparison).not.toHaveBeenCalled();
+      expect(useDirectorGuideStore.getState().strategyComparison).toBeNull();
     });
 
     it('should calculate with all required fields', () => {
@@ -293,12 +270,10 @@ describe('DirectorGuideStore', () => {
       useDirectorGuideStore.getState().calculate();
 
       const state = useDirectorGuideStore.getState();
-      expect(state.results).not.toBeNull();
       expect(state.strategyComparison).not.toBeNull();
     });
 
-    it('should pass already taken total and payroll flag to calculator', () => {
-      // Bug caught: misclassified payroll flag or incorrect totals used for warnings.
+    it('passes each YTD amount to the strategy comparison', () => {
       const store = useDirectorGuideStore.getState();
       store.setRegion('rUK');
       store.setRevenue(100000);
@@ -309,39 +284,12 @@ describe('DirectorGuideStore', () => {
 
       store.calculate();
 
-      const input = mockCalculateDirectorScenario.mock.calls[0][0];
-      expect(input.alreadyTaken).toBe(8000);
-      expect(input.alreadyTakenViaPayroll).toBe(true);
-    });
-
-    it('should pass drawings-only as non-payroll already taken', () => {
-      // Bug caught: drawings treated as PAYE salary.
-      const store = useDirectorGuideStore.getState();
-      store.setRegion('rUK');
-      store.setRevenue(100000);
-      store.setExpenses(20000);
-      store.setYtdDrawings(1500);
-
-      store.calculate();
-
-      const input = mockCalculateDirectorScenario.mock.calls[0][0];
-      expect(input.alreadyTaken).toBe(1500);
-      expect(input.alreadyTakenViaPayroll).toBe(false);
-    });
-
-    it('should treat dividends-only as unknown payroll status', () => {
-      // Bug caught: dividends incorrectly flagging payroll usage.
-      const store = useDirectorGuideStore.getState();
-      store.setRegion('rUK');
-      store.setRevenue(100000);
-      store.setExpenses(20000);
-      store.setYtdDividends(2500);
-
-      store.calculate();
-
-      const input = mockCalculateDirectorScenario.mock.calls[0][0];
-      expect(input.alreadyTaken).toBe(2500);
-      expect(input.alreadyTakenViaPayroll).toBeNull();
+      expect(mockCalculateStrategyComparison).toHaveBeenCalledTimes(1);
+      expect(mockCalculateStrategyComparison.mock.calls[0][0]).toMatchObject({
+        ytdSalary: 5000,
+        ytdDividends: 2000,
+        ytdDrawings: 1000,
+      });
     });
 
     it('should drop pension contribution when already deducted from profit', () => {
@@ -514,7 +462,6 @@ describe('DirectorGuideStore', () => {
 
       const state = useDirectorGuideStore.getState();
       expect(state.strategyComparison).toBeNull();
-      expect(state.results).toBeNull();
       expect(state.error).toBe('Please fill in revenue, expenses, and region');
     });
 
@@ -568,7 +515,6 @@ describe('DirectorGuideStore', () => {
       useDirectorGuideStore.getState().invalidateResults();
 
       const state = useDirectorGuideStore.getState();
-      expect(state.results).toBeNull();
       expect(state.strategyComparison).toBeNull();
       expect(state.monthlyModeOutput).toBeNull();
       expect(state.sliderSalary).toBeNull();
@@ -586,7 +532,7 @@ describe('DirectorGuideStore', () => {
       expect(useDirectorGuideStore.getState().monthlyModeOutput?.projectedRevenue).toBe(60000);
 
       actions.setMonthlyIncome(6000);
-      mockCalculateDirectorScenario.mockImplementationOnce(() => {
+      mockCalculateStrategyComparison.mockImplementationOnce(() => {
         throw new Error('Synthetic Director failure');
       });
       const diagnostic = jest.spyOn(console, 'error').mockImplementation(() => undefined);
@@ -597,7 +543,6 @@ describe('DirectorGuideStore', () => {
         diagnostic.mockRestore();
       }
       expect(useDirectorGuideStore.getState()).toMatchObject({
-        results: null,
         strategyComparison: null,
         monthlyModeOutput: null,
         calculatedFormData: null,

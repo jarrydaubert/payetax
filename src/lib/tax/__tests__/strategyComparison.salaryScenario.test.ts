@@ -23,6 +23,35 @@ const baseInput = {
 };
 
 describe('Strategy Comparison helpers', () => {
+  // HMRC CA44 (2026–27), annual category A, sections 13–15 and 40.
+  // https://www.gov.uk/government/publications/ca44-national-insurance-for-company-directors
+  // With no Employment Allowance, the company pays 15% above £5,000, rounded to pence.
+  // The highest affordable salary plus employer NI uses the entire budget in each case.
+  // Both salaries are below the £12,570 primary threshold and personal allowance.
+  it.each([
+    { revenue: 10_000, salary: 9_347.83, employerNI: 652.17 },
+    { revenue: 13_000, salary: 11_956.52, employerNI: 1_043.48 },
+  ])(
+    'recommends affordable pay at £$revenue with no dividends',
+    ({ revenue, salary, employerNI }) => {
+      const { strategies, recommended } = calculateStrategyComparison(
+        { ...baseInput, revenue },
+        TAX_YEAR_2026,
+      );
+
+      expect(strategies[recommended]).toMatchObject({
+        salary,
+        employerNI,
+        employeeNI: 0,
+        incomeTax: 0,
+        corporationTax: 0,
+        dividends: 0,
+        takeHome: salary,
+        companyCost: revenue,
+      });
+    },
+  );
+
   it('caps salary to the affordable maximum when target exceeds profit', () => {
     // Bug caught: salary slider allowing take-home beyond profit budget.
     const grossProfit = 20000;

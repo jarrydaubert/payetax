@@ -118,8 +118,8 @@ Warnings:
 
 ## Regression Anchors
 
-- Golden director-calculation example is covered in `src/lib/tax/__tests__/directorCalculator.test.ts`.
-- Recruiter “feast or famine” case-study behavior is covered in `src/lib/tax/__tests__/directorCalculator.caseStudy.test.ts`.
+- The recommended Director strategy is checked against independently derived low-profit fixtures in `src/lib/tax/__tests__/strategyComparison.salaryScenario.test.ts` and through the rendered route in `e2e/director-guide-critical.spec.ts`.
+- The recruiter “feast or famine” case is exercised through the rendered route in `e2e/director-guide-recruiter-regression.spec.ts`.
 - Monthly mode behavior is anchored in `src/lib/tax/variableIncome.ts` tests plus store/component coverage.
 
 ## References
