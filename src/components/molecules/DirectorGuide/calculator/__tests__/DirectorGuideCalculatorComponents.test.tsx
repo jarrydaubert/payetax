@@ -196,7 +196,7 @@ describe('Director Intelligence calculator components', () => {
   });
 
   describe('SalarySlider', () => {
-    it('initializes salary slider to baseline salary and updates on change', () => {
+    it('shows the baseline without writing it and stages only the control that changes', () => {
       setStoreState({ strategyComparison: createComparison() as never });
 
       render(<SalarySlider />);
@@ -205,12 +205,17 @@ describe('Director Intelligence calculator components', () => {
 
       expect(salarySlider.getAttribute('data-value')).toBe('7000');
       expect(profitSlider.getAttribute('data-value')).toBe('0');
+      expect(useDirectorGuideStore.getState().sliderSalary).toBeNull();
 
       fireEvent.click(salarySlider);
       expect(useDirectorGuideStore.getState().sliderSalary).toBe(20000);
 
       fireEvent.click(profitSlider);
       expect(useDirectorGuideStore.getState().profitWhatIfPercent).toBe(10);
+      expect(useDirectorGuideStore.getState().sliderSalary).toBe(20000);
+      fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
+      expect(useDirectorGuideStore.getState().profitWhatIfPercent).toBe(0);
+      expect(useDirectorGuideStore.getState().sliderSalary).toBe(20000);
     });
   });
 
@@ -331,14 +336,16 @@ describe('Director Intelligence calculator components', () => {
       expect(screen.getByText(/against your selected objective/i)).toBeInTheDocument();
     });
 
-    it('switches objective mode to Minimize NI and updates objective labels', () => {
+    it('stages Minimize NI without changing the submitted comparison labels', () => {
       setStoreState({ strategyComparison: createComparison() as never });
 
       render(<StrategyComparisonTable />);
-      fireEvent.click(screen.getByRole('button', { name: 'Minimize NI' }));
+      const objective = screen.getByRole('button', { name: 'Minimize NI' });
+      fireEvent.click(objective);
 
-      expect(screen.getByText('Lowest NI')).toBeInTheDocument();
-      expect(screen.getAllByText(/Vs Lowest NI/i).length).toBeGreaterThan(0);
+      expect(objective).toHaveAttribute('aria-pressed', 'true');
+      expect(screen.getByText('Highest Take-Home')).toBeInTheDocument();
+      expect(screen.queryByText('Lowest NI')).not.toBeInTheDocument();
     });
 
     it('tracks pro strategy selection when a card is clicked', () => {

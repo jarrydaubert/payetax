@@ -20,8 +20,7 @@ interface DetailCardsProps {
 }
 
 export function DetailCards({ className }: DetailCardsProps) {
-  const { activeScenario, comparison, isProfitWhatIfActive, scenarioGrossProfitBeforePension } =
-    useActiveDirectorScenario(true);
+  const { activeScenario, comparison, isProfitWhatIfActive } = useActiveDirectorScenario();
   const { mode, revenue, expenses, pension, lossesBroughtForward } = useDirectorFormSlice(
     (state) => ({
       mode: state.mode,
@@ -123,7 +122,7 @@ export function DetailCards({ className }: DetailCardsProps) {
             ? [
                 {
                   label: 'Scenario Gross Profit',
-                  value: formatCurrency(scenarioGrossProfitBeforePension, 0),
+                  value: formatCurrency(comparison.grossProfit, 0),
                 },
               ]
             : [

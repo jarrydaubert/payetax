@@ -39,29 +39,9 @@ const BASELINE_ENTRIES = [
   ],
   ['src/components/atoms/TaxYearSelect.tsx', '@/constants/taxRates', ['TAX_YEARS', 'type:TaxYear']],
   [
-    'src/components/molecules/DirectorGuide/calculator/SalarySlider.tsx',
-    '@/constants/taxRates',
-    ['CURRENT_TAX_YEAR', 'TAX_RATES'],
-  ],
-  [
     'src/components/molecules/DirectorGuide/calculator/StrategyComparisonTable.tsx',
     '@/lib/tax/strategyComparison',
     ['type:YourSetupResult'],
-  ],
-  [
-    'src/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario.ts',
-    '@/constants/taxRates',
-    ['CURRENT_TAX_YEAR'],
-  ],
-  [
-    'src/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario.ts',
-    '@/lib/tax/strategyComparison',
-    [
-      'calculateSalaryScenario',
-      'calculateStrategyComparison',
-      'type:SalaryScenarioResult',
-      'type:StrategyComparison',
-    ],
   ],
   [
     'src/components/molecules/DirectorGuide/dashboard/DetailCards.tsx',
@@ -221,11 +201,6 @@ const BASELINE_ENTRIES = [
     ],
   ],
   ['src/store/directorGuideStore.ts', '@/constants/taxRates', ['type:StudentLoanPlan']],
-  [
-    'src/store/directorGuideStore.ts',
-    '@/lib/tax/strategyComparison',
-    ['calculateStrategyComparison', 'type:StrategyComparison'],
-  ],
   [
     'src/store/directorGuideStore.ts',
     '@/lib/tax/studentLoanPlans',

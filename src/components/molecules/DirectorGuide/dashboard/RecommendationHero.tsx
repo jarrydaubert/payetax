@@ -14,16 +14,21 @@ interface RecommendationHeroProps {
 }
 
 export function RecommendationHero({ className }: RecommendationHeroProps) {
-  const { comparison, selectedStrategy, activeScenario } = useActiveDirectorScenario(true);
+  const { comparison, selectedStrategy, activeScenario, exploration } = useActiveDirectorScenario();
 
   if (!(comparison && selectedStrategy && activeScenario)) return null;
 
-  const isRecommended = selectedStrategy === comparison.recommended;
+  const isRecommended = !exploration && selectedStrategy === comparison.recommended;
   const label = isRecommended ? 'Recommended strategy' : 'Displayed strategy';
-  const heading =
-    selectedStrategy === 'optimalMix' && !isRecommended
-      ? 'Baseline Mix'
-      : STRATEGY_LABEL[selectedStrategy];
+  const namedStrategy = comparison.strategies[selectedStrategy].name;
+  let heading = isRecommended ? STRATEGY_LABEL[selectedStrategy] : namedStrategy;
+  if (exploration?.customSalaryScenario) {
+    heading = exploration.profitWhatIfPercent ? 'Custom salary and profit' : 'Custom salary';
+  } else if (exploration?.profitWhatIfPercent) {
+    heading = `Custom profit (based on ${namedStrategy})`;
+  } else if (!exploration && selectedStrategy !== 'optimalMix') {
+    heading = STRATEGY_LABEL[selectedStrategy];
+  }
   const totalTax =
     activeScenario.corporationTax + activeScenario.employerNI + activeScenario.totalPersonalTax;
   const savingsVsAllSalary = activeScenario.takeHome - comparison.strategies.allSalary.takeHome;

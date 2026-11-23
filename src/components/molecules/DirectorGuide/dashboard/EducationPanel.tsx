@@ -92,7 +92,7 @@ export function EducationPanel({ className, monthlyDraw }: EducationPanelProps) 
     associatedCompaniesCount: formData.associatedCompaniesCount,
     hasOtherPAYEEmployment: formData.hasOtherPAYEEmployment,
   }));
-  const { comparison, activeScenario } = useActiveDirectorScenario(true);
+  const { comparison, activeScenario } = useActiveDirectorScenario();
   const grossProfit = comparison?.grossProfit ?? 0;
   const monthlyModeOutput = useMonthlyModeOutput();
   const isMonthlyMode = formData.mode === 'monthly';

@@ -2,6 +2,7 @@ import { act, render, renderHook, screen } from '@testing-library/react';
 import { StrategyComparisonTable } from '@/components/molecules/DirectorGuide/calculator/StrategyComparisonTable';
 import { TaxPots } from '@/components/molecules/DirectorGuide/calculator/TaxPots';
 import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario';
+import { DetailCards } from '@/components/molecules/DirectorGuide/dashboard/DetailCards';
 import { EducationPanel } from '@/components/molecules/DirectorGuide/dashboard/EducationPanel';
 import { RecommendationHero } from '@/components/molecules/DirectorGuide/dashboard/RecommendationHero';
 import { SummaryCards } from '@/components/molecules/DirectorGuide/dashboard/SummaryCards';
@@ -28,7 +29,7 @@ describe('submitted Director strategies (JGF-148)', () => {
     store.setSliderSalary(50270);
     store.calculate('allSalary');
 
-    const { result } = renderHook(() => useActiveDirectorScenario(true));
+    const { result } = renderHook(() => useActiveDirectorScenario());
     expect(result.current.activeScenario).toMatchObject({
       salary: 70217.39,
       dividends: 0,
@@ -55,7 +56,7 @@ describe('submitted Director strategies (JGF-148)', () => {
 
     act(() => useDirectorGuideStore.getState().setSliderSalary(50270));
     act(() => useDirectorGuideStore.getState().setSelectedStrategy('allDividends'));
-    expect(useDirectorGuideStore.getState().sliderSalary).toBe(50270);
+    expect(useDirectorGuideStore.getState().sliderSalary).toBeNull();
     expect(result.current.selectedStrategy).toBe('allSalary');
     expect(screen.getByText('£70,217 salary + £0 dividends')).toBeInTheDocument();
   });
@@ -76,7 +77,7 @@ describe('submitted Director strategies (JGF-148)', () => {
       store.setHasEmploymentAllowance(allowance);
       store.calculate('allSalary');
 
-      const { result } = renderHook(() => useActiveDirectorScenario(true));
+      const { result } = renderHook(() => useActiveDirectorScenario());
       expect(result.current.selectedStrategy).toBe('allSalary');
       expect(result.current.activeScenario).toMatchObject({
         salary,
@@ -100,7 +101,7 @@ describe('submitted Director strategies (JGF-148)', () => {
     store.setYourSetupDividends(20000);
     store.calculate('optimalMix');
 
-    const { result } = renderHook(() => useActiveDirectorScenario(true));
+    const { result } = renderHook(() => useActiveDirectorScenario());
     expect(result.current.comparison?.recommended).toBe('allSalary');
     expect(result.current.selectedStrategy).toBe('optimalMix');
     expect(result.current.activeScenario).toMatchObject({
@@ -131,7 +132,7 @@ describe('submitted Director strategies (JGF-148)', () => {
       projectedRevenue: 90000,
       projectedExpenses: 12000,
     });
-    const { result } = renderHook(() => useActiveDirectorScenario(true));
+    const { result } = renderHook(() => useActiveDirectorScenario());
     expect(result.current.selectedStrategy).toBe('allDividends');
     // £78,000 profit gives CT of 25% × £78,000 − 3/200 × £172,000 = £16,920.
     expect(result.current.activeScenario).toMatchObject({
@@ -149,7 +150,7 @@ describe('submitted Director strategies (JGF-148)', () => {
     store.calculate();
 
     const { result } = renderHook(() => ({
-      ...useActiveDirectorScenario(true),
+      ...useActiveDirectorScenario(),
       emailReason: useDirectorEmailUnavailableReason(undefined, true),
     }));
     const baseline = result.current.activeScenario;
@@ -202,7 +203,7 @@ describe('submitted Director strategies (JGF-148)', () => {
   it('withholds stale identity and clears it on invalidation, reset and stale-state recovery', () => {
     const store = useDirectorGuideStore.getState();
     store.calculate('allSalary');
-    const { result } = renderHook(() => useActiveDirectorScenario(true));
+    const { result } = renderHook(() => useActiveDirectorScenario());
     expect(result.current.selectedStrategy).toBe('allSalary');
 
     act(() => store.setRevenue(150000));
@@ -236,5 +237,232 @@ describe('submitted Director strategies (JGF-148)', () => {
     store.setMinimumSalaryRequirement(0.004);
     store.calculate('allDividends');
     expect(useDirectorGuideStore.getState().calculatedStrategy).toBe('allDividends');
+  });
+});
+
+describe('submitted Director exploration (JGF-149)', () => {
+  beforeEach(() => {
+    const store = useDirectorGuideStore.getState();
+    store.reset();
+    store.setRegion('rUK');
+    store.setRevenue(100000);
+    store.setExpenses(20000);
+  });
+
+  it('applies a staged profit adjustment only when explicitly submitted', () => {
+    const store = useDirectorGuideStore.getState();
+    store.setSelectedStrategy('allSalary');
+    store.setProfitWhatIfPercent(-45);
+    store.calculate();
+    expect(useDirectorGuideStore.getState().strategyComparison?.grossProfit).toBe(80000);
+
+    store.calculate('draft');
+    expect(useDirectorGuideStore.getState().strategyComparison?.grossProfit).toBe(44000);
+  });
+
+  it('preserves the audit salary through the profit conflict, reset and date-only recalculation', () => {
+    const store = useDirectorGuideStore.getState();
+    store.setSliderSalary(48300);
+    store.calculate('draft');
+    const { result } = renderHook(useActiveDirectorScenario);
+    expect(result.current.activeScenario?.salary).toBe(48300);
+
+    act(() => store.setProfitWhatIfPercent(-45));
+    expect(result.current.activeScenario?.salary).toBe(48300);
+    expect(result.current.comparison?.grossProfit).toBe(80000);
+    act(() => store.calculate('draft'));
+    expect(result.current.activeScenario).toBeNull();
+    expect(useDirectorGuideStore.getState()).toMatchObject({
+      sliderSalary: 48300,
+      profitWhatIfPercent: -45,
+      error: expect.stringContaining('company budget or minimum salary'),
+    });
+
+    act(() => store.setProfitWhatIfPercent(0));
+    expect(result.current.activeScenario).toBeNull();
+    act(() => store.calculate('draft'));
+    expect(result.current.activeScenario?.salary).toBe(48300);
+
+    act(() => store.setAccountingPeriodEnd('2027-03-31'));
+    expect(result.current.activeScenario).toBeNull();
+    act(() => store.calculate());
+    expect(result.current.isCustomSalary).toBe(false);
+    expect(useDirectorGuideStore.getState().sliderSalary).toBe(48300);
+    act(() => store.calculate('draft'));
+    expect(result.current.activeScenario?.salary).toBe(48300);
+    expect(useDirectorGuideStore.getState().calculatedFormData?.accountingPeriodEnd).toBe(
+      '2027-03-31',
+    );
+  });
+
+  it('retains adjusted profit on a named choice and restores exact named identity after profit reset', () => {
+    const store = useDirectorGuideStore.getState();
+    store.setSliderSalary(48300);
+    store.calculate('draft');
+    render(<RecommendationHero />);
+    expect(screen.getByRole('heading', { name: 'Custom salary' })).toBeVisible();
+
+    act(() => {
+      store.setProfitWhatIfPercent(-45);
+      store.setSelectedStrategy('allSalary');
+    });
+    expect(screen.getByRole('heading', { name: 'Custom salary' })).toBeVisible();
+    expect(useDirectorGuideStore.getState()).toMatchObject({
+      selectedStrategy: 'allSalary',
+      sliderSalary: null,
+      profitWhatIfPercent: -45,
+    });
+    act(() => store.calculate('draft'));
+    expect(
+      screen.getByRole('heading', { name: 'Custom profit (based on All Salary)' }),
+    ).toBeVisible();
+    // The audit budget is £44,000, so salary + 15% of (salary − £5,000) spends it.
+    expect(screen.getByText('£38,913 salary + £0 dividends')).toBeVisible();
+
+    act(() => store.setProfitWhatIfPercent(0));
+    expect(
+      screen.getByRole('heading', { name: 'Custom profit (based on All Salary)' }),
+    ).toBeVisible();
+    act(() => store.calculate('draft'));
+    expect(screen.getByRole('heading', { name: 'All Salary' })).toBeVisible();
+    expect(screen.getByText('£70,217 salary + £0 dividends')).toBeVisible();
+  });
+
+  it('presents the same custom result in the hero, breakdown, reserves and warnings', () => {
+    const store = useDirectorGuideStore.getState();
+    store.setProfitWhatIfPercent(-25);
+    store.setSliderSalary(12570);
+    store.setOtherIncome(40000);
+    store.setHasOtherPAYEEmployment(true);
+    store.setIncludesVat(true);
+    store.setStudentLoanPlans(['plan2']);
+    store.setYtdSalary(13000);
+    store.calculate('draft');
+
+    const { result } = renderHook(useActiveDirectorScenario);
+    // JGF-47's £60,000 profit fixture (PR #209), with separate PAYE and warning-only VAT.
+    expect(result.current.activeScenario).toMatchObject({
+      salary: 12570,
+      dividends: 37498.54,
+      corporationTax: 8795.96,
+      studentLoan: 4506.17,
+      takeHome: 29361.39,
+    });
+    render(
+      <>
+        <RecommendationHero />
+        <SummaryCards />
+        <DetailCards />
+        <TaxPots />
+        <StrategyComparisonTable readOnly />
+      </>,
+    );
+    expect(screen.getByRole('heading', { name: 'Custom salary and profit' })).toBeVisible();
+    expect(screen.getByText('£12,570 salary + £37,499 dividends')).toBeVisible();
+    expect(screen.getByText('Scenario Gross Profit').parentElement).toHaveTextContent('£60,000');
+    expect(screen.getByText('Student Loan').parentElement).toHaveTextContent('£4,506');
+    expect(screen.getByText(/Salary already paid/)).toHaveTextContent('£12,570.00');
+  });
+
+  it('changes only the reference on objective submission and excludes comparisons below the minimum', () => {
+    const store = useDirectorGuideStore.getState();
+    store.setSliderSalary(20000);
+    store.calculate('draft');
+    const { result } = renderHook(useActiveDirectorScenario);
+    const active = result.current.activeScenario;
+    expect(result.current.exploration?.objectiveReference).toBe('optimalMix');
+    render(<StrategyComparisonTable readOnly />);
+
+    act(() => store.setObjective('minimizeNI'));
+    expect(screen.queryByText('Lowest NI')).not.toBeInTheDocument();
+    act(() => store.calculate('draft'));
+    expect(result.current.activeScenario).toEqual(active);
+    expect(result.current.exploration?.objectiveReference).toBe('allDividends');
+    expect(screen.getByText('All Dividends').closest('article')).toHaveTextContent('Lowest NI');
+
+    act(() => {
+      store.setMinimumSalaryRequirement(20000);
+      store.calculate('draft');
+    });
+    expect(result.current.activeScenario?.salary).toBe(20000);
+    expect(result.current.exploration?.objectiveReference).toBe('optimalMix');
+    expect(screen.getByText('Baseline Mix').closest('article')).toHaveTextContent('Lowest NI');
+    expect(screen.getByText('All Dividends').closest('article')).toHaveTextContent(
+      'Comparison only',
+    );
+
+    act(() => {
+      store.setMinimumSalaryRequirement(80000);
+      store.setSelectedStrategy('optimalMix');
+      store.calculate('draft');
+    });
+    expect(result.current.activeScenario?.minimumSalaryShortfall).toBe(9782.61);
+    expect(result.current.exploration?.objectiveReference).toBeNull();
+    expect(screen.getByText(/No strategy meets your minimum salary/)).toBeVisible();
+  });
+
+  it('keeps the recommendation as active on an objective-only submission without a named draft', () => {
+    const store = useDirectorGuideStore.getState();
+    store.setHasEmploymentAllowance(true);
+    store.calculate();
+    const { result } = renderHook(useActiveDirectorScenario);
+    const active = result.current.activeScenario;
+    expect(result.current.selectedStrategy).toBe('allSalary');
+    act(() => {
+      store.setObjective('minimizeNI');
+      store.calculate('draft');
+    });
+    expect(result.current.selectedStrategy).toBe('allSalary');
+    expect(result.current.activeScenario).toEqual(active);
+    expect(result.current.exploration?.objectiveReference).not.toBe('allSalary');
+  });
+
+  it('adjusts projected profit before deducting employer pension in monthly mode', () => {
+    const store = useDirectorGuideStore.getState();
+    store.setMode('monthly');
+    store.setContractStartMonth(10);
+    store.setMonthlyIncome(15000);
+    store.setMonthlyExpenses(2000);
+    store.setPensionContribution(6000);
+    store.setProfitWhatIfPercent(-25);
+    store.setSelectedStrategy('allDividends');
+    store.calculate('draft');
+    expect(useDirectorGuideStore.getState().monthlyModeOutput?.monthsRemaining).toBe(6);
+    const { result } = renderHook(useActiveDirectorScenario);
+    expect(result.current.comparison).toMatchObject({
+      grossProfit: 58500,
+      grossProfitAfterPension: 52500,
+    });
+    expect(result.current.activeScenario).toMatchObject({ salary: 0, pension: 6000 });
+  });
+
+  it('enforces both the shared allowance-aware company budget and the salary minimum at the penny', () => {
+    const store = useDirectorGuideStore.getState();
+    store.setHasEmploymentAllowance(true);
+    store.setCompanyCarBIK(10000);
+    // Reuse the independently checked £80,000 budget in JGF-45 (PR #203).
+    store.setSliderSalary(78043.48);
+    store.calculate('draft');
+    const { result } = renderHook(useActiveDirectorScenario);
+    expect(result.current.activeScenario).toMatchObject({
+      salary: 78043.48,
+      employerNI: 1956.52,
+      class1ANI: 1500,
+      companyCost: 80000,
+    });
+    act(() => {
+      store.setSliderSalary(78043.49);
+      store.calculate('draft');
+    });
+    expect(result.current.activeScenario).toBeNull();
+    expect(useDirectorGuideStore.getState().sliderSalary).toBe(78043.49);
+
+    act(() => {
+      store.setSliderSalary(78043.48);
+      store.setMinimumSalaryRequirement(78043.49);
+      store.calculate('draft');
+    });
+    expect(result.current.activeScenario).toBeNull();
+    expect(useDirectorGuideStore.getState().sliderSalary).toBe(78043.48);
   });
 });
