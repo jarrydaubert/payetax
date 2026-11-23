@@ -104,6 +104,7 @@ function setStoreState(partial: Partial<ReturnType<typeof useDirectorGuideStore.
   useDirectorGuideStore.setState((state) => ({
     ...partial,
     calculatedFormData: partial.formData ?? state.formData,
+    calculatedStrategy: partial.strategyComparison?.recommended ?? null,
   }));
 }
 
@@ -354,6 +355,7 @@ describe('Director Intelligence calculator components', () => {
     it('downloads and tracks the current iCal file, then blocks a same-task click after a date edit', () => {
       const current = useDirectorGuideStore.getState();
       setStoreState({
+        strategyComparison: createComparison() as never,
         formData: {
           ...current.formData,
           accountingPeriodEnd: '2026-12-31',

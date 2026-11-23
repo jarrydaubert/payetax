@@ -518,6 +518,7 @@ describe('DirectorGuideStore', () => {
       expect(state.strategyComparison).toBeNull();
       expect(state.monthlyModeOutput).toBeNull();
       expect(state.sliderSalary).toBeNull();
+      expect(state.calculatedStrategy).toBeNull();
       // Inputs are untouched; only derived results are removed.
       expect(state.formData.revenue).toBe(100000);
     });
@@ -546,6 +547,7 @@ describe('DirectorGuideStore', () => {
         strategyComparison: null,
         monthlyModeOutput: null,
         calculatedFormData: null,
+        calculatedStrategy: null,
         failedFormData: { monthlyIncome: 6000 },
         isCalculating: false,
       });
@@ -556,6 +558,7 @@ describe('DirectorGuideStore', () => {
       expect(useDirectorGuideStore.getState()).toMatchObject({
         monthlyModeOutput: { projectedRevenue: 72000 },
         calculatedFormData: { monthlyIncome: 6000 },
+        calculatedStrategy: 'optimalMix',
         failedFormData: null,
         error: null,
       });

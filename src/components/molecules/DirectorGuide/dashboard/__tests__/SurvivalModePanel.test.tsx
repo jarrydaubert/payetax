@@ -17,6 +17,7 @@ describe('DirectorGuide SurvivalModePanel', () => {
       strategyComparison: null,
       formData,
       calculatedFormData: formData,
+      calculatedStrategy: 'optimalMix',
     } as never);
   });
 

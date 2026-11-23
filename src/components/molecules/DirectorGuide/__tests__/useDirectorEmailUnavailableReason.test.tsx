@@ -60,6 +60,7 @@ describe('Director email interim guard', () => {
       const state = useDirectorGuideStore.getState();
       state.setProfitWhatIfPercent(0);
       state.setObjective('maximizeTakeHome');
+      state.setSliderSalary(null);
       state.setSelectedStrategy(state.strategyComparison?.recommended ?? 'optimalMix');
     });
     expect(result.current).toBeNull();
@@ -194,9 +195,11 @@ describe('Director email interim guard', () => {
     useDirectorGuideStore.getState().setObjective('minimizeNI');
     const saved = JSON.parse(localStorage.getItem('director-guide-storage') ?? '{}').state;
     expect(saved).not.toHaveProperty('calculatedFormData');
+    expect(saved).not.toHaveProperty('calculatedStrategy');
     expect(saved).not.toHaveProperty('objective');
     useDirectorGuideStore.getState().clearStaleState();
     expect(useDirectorGuideStore.getState().calculatedFormData).toBeNull();
+    expect(useDirectorGuideStore.getState().calculatedStrategy).toBeNull();
     expect(useDirectorGuideStore.getState().objective).toBe('maximizeTakeHome');
   });
 });

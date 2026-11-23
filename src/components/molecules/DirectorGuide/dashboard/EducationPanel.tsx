@@ -5,6 +5,7 @@
 
 import { AlertTriangle } from 'lucide-react';
 import { type ReactNode, useMemo } from 'react';
+import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario';
 import { CURRENT_TAX_YEAR, CURRENT_TAX_YEAR_DISPLAY, TAX_RATES } from '@/constants/taxRates';
 import { getSection455Rate, type SafeDrawResult } from '@/lib/tax';
 import { DIRECTOR_GUIDE_BUSINESS_THRESHOLDS } from '@/lib/tax/businessThresholds';
@@ -13,7 +14,6 @@ import {
   type DirectorFormData,
   useDirectorFormSlice,
   useMonthlyModeOutput,
-  useStrategyComparison,
 } from '@/store/directorGuideStore';
 
 // Tax year configuration - single source
@@ -92,35 +92,30 @@ export function EducationPanel({ className, monthlyDraw }: EducationPanelProps) 
     associatedCompaniesCount: formData.associatedCompaniesCount,
     hasOtherPAYEEmployment: formData.hasOtherPAYEEmployment,
   }));
-  const comparison = useStrategyComparison();
+  const { comparison, activeScenario } = useActiveDirectorScenario(true);
+  const grossProfit = comparison?.grossProfit ?? 0;
   const monthlyModeOutput = useMonthlyModeOutput();
   const isMonthlyMode = formData.mode === 'monthly';
 
-  const hasResults = comparison !== null && comparison.grossProfit > 0;
+  const hasResults = activeScenario !== null;
   const revenue = isMonthlyMode
     ? (monthlyModeOutput?.projectedRevenue ?? 0)
     : (formData.revenue ?? 0);
-  const recommended = comparison?.strategies[comparison.recommended];
-  const optimalSalary = recommended?.salary ?? 0;
+  const salary = activeScenario?.salary ?? 0;
+  const dividends = activeScenario?.dividends ?? 0;
 
   // Calculate total income for PA taper / HICBC warnings
-  const totalIncome =
-    hasResults && recommended
-      ? formData.otherIncome + recommended.salary + recommended.dividends
-      : 0;
+  const totalIncome = hasResults ? formData.otherIncome + salary + dividends : 0;
 
   // Compute total already taken from YTD fields
   const alreadyTaken = formData.ytdSalary + formData.ytdDividends + formData.ytdDrawings;
 
-  // Gross extraction available (salary + dividends from optimal strategy)
-  const grossExtraction =
-    hasResults && recommended ? recommended.salary + recommended.dividends : 0;
+  const grossExtraction = salary + dividends;
 
   // Personal tax liability
-  const personalTax =
-    hasResults && recommended
-      ? recommended.incomeTax + recommended.dividendTax + recommended.studentLoan
-      : 0;
+  const personalTax = activeScenario
+    ? activeScenario.incomeTax + activeScenario.dividendTax + activeScenario.studentLoan
+    : 0;
 
   const visibleLearnCards = useMemo(
     () =>
@@ -135,7 +130,7 @@ export function EducationPanel({ className, monthlyDraw }: EducationPanelProps) 
           title: 'What Are Dividends?',
           description:
             'Payments from company profits to shareholders, taxed at lower rates than salary. Must be paid from retained profits after Corporation Tax.',
-          show: hasResults && (recommended?.dividends ?? 0) > 0,
+          show: dividends > 0,
         },
         {
           title: 'Corporation Tax',
@@ -150,20 +145,21 @@ export function EducationPanel({ className, monthlyDraw }: EducationPanelProps) 
           show: true,
         },
       ].filter((card) => card.show),
-    [recommended, hasResults],
+    [dividends],
   );
 
   const sortedWarnings = useMemo(() => {
     const visibleWarnings = buildWarnings({
       hasResults,
       revenue,
-      optimalSalary,
+      salary,
+      dividends,
       totalIncome,
       alreadyTaken,
       grossExtraction,
       personalTax,
       formData,
-      comparison,
+      grossProfit,
       monthlyDraw: monthlyModeOutput ? monthlyDraw : null,
       isMonthlyMode,
     }).filter((warning) => warning.show);
@@ -176,16 +172,17 @@ export function EducationPanel({ className, monthlyDraw }: EducationPanelProps) 
     });
   }, [
     alreadyTaken,
-    comparison,
+    dividends,
     formData,
     grossExtraction,
+    grossProfit,
     hasResults,
     isMonthlyMode,
     monthlyDraw,
     monthlyModeOutput,
-    optimalSalary,
     personalTax,
     revenue,
+    salary,
     totalIncome,
   ]);
 
@@ -318,13 +315,14 @@ export function EducationPanel({ className, monthlyDraw }: EducationPanelProps) 
 interface WarningContext {
   hasResults: boolean;
   revenue: number;
-  optimalSalary: number;
+  salary: number;
+  dividends: number;
   totalIncome: number;
   alreadyTaken: number;
   grossExtraction: number;
   personalTax: number;
   formData: EducationPanelFormData;
-  comparison: ReturnType<typeof useStrategyComparison>;
+  grossProfit: number;
   monthlyDraw?: SafeDrawResult | null;
   isMonthlyMode: boolean;
 }
@@ -341,13 +339,14 @@ function buildWarnings(ctx: WarningContext): Warning[] {
   const {
     hasResults,
     revenue,
-    optimalSalary,
+    salary,
+    dividends,
     totalIncome,
     alreadyTaken,
     grossExtraction,
     personalTax,
     formData,
-    comparison,
+    grossProfit,
     monthlyDraw,
     isMonthlyMode,
   } = ctx;
@@ -355,8 +354,7 @@ function buildWarnings(ctx: WarningContext): Warning[] {
   // Pre-compute conditions
   const isOverdrawn = hasResults && alreadyTaken > grossExtraction;
   const hasDrawings = formData.ytdDrawings > 0;
-  const recommended = comparison?.strategies[comparison.recommended];
-  const hasDividends = hasResults && (recommended?.dividends ?? 0) > 0;
+  const hasDividends = dividends > 0;
   const vatNote = formData.includesVat
     ? ' (If your turnover figure includes VAT, HMRC thresholds use VAT-exclusive taxable turnover — treat this as an estimate.)'
     : '';
@@ -386,7 +384,7 @@ function buildWarnings(ctx: WarningContext): Warning[] {
       id: 'pension-gap',
       title: 'Inefficient Salary Zone',
       description: `Your salary is between £${SECONDARY_THRESHOLD.toLocaleString()} and £${LEL.toLocaleString()}. Employer NI applies here, but NI credits are not earned. NI credits typically require earnings around £${LEL.toLocaleString()} (illustrative).`,
-      show: hasResults && optimalSalary > SECONDARY_THRESHOLD && optimalSalary < LEL,
+      show: hasResults && salary > SECONDARY_THRESHOLD && salary < LEL,
       isCritical: true,
     },
     {
@@ -438,7 +436,7 @@ function buildWarnings(ctx: WarningContext): Warning[] {
       title: 'High Profit Complexity',
       description:
         'At this profit level, an accountant could save you serious money with advanced strategies.',
-      show: hasResults && (comparison?.grossProfit ?? 0) > HIGH_PROFIT_COMPLEXITY_THRESHOLD,
+      show: hasResults && grossProfit > HIGH_PROFIT_COMPLEXITY_THRESHOLD,
     },
     {
       id: 'hicbc',
@@ -485,7 +483,7 @@ function buildWarnings(ctx: WarningContext): Warning[] {
       title: 'Payroll Administration Required',
       description:
         'Taking a salary means running payroll and submitting RTI to HMRC each payday. Payroll software or an accountant can handle this.',
-      show: hasResults && (recommended?.salary ?? 0) > 0,
+      show: hasResults && salary > 0,
     },
     {
       id: 'payments-on-account',

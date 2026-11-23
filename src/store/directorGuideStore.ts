@@ -26,6 +26,7 @@ import {
   parseAccountingPeriodEnd,
   resolveAnnualFinancials,
   resolveTaxYear,
+  roundToPence,
 } from '@/lib/tax';
 import { calculateStrategyComparison, type StrategyComparison } from '@/lib/tax/strategyComparison';
 import {
@@ -60,6 +61,7 @@ export type TakenViaPayroll = 'yes' | 'no' | 'unsure';
 /** Director Intelligence input mode */
 export type DirectorGuideMode = 'annual' | 'monthly';
 export type StrategyObjective = 'maximizeTakeHome' | 'minimizeNI';
+export type DirectorStrategyKey = StrategyComparison['recommended'];
 
 /**
  * Form data for the calculator
@@ -139,12 +141,15 @@ const CLEARED_RESULTS = {
   monthlyModeOutput: null,
   sliderSalary: null,
   calculatedFormData: null,
+  calculatedStrategy: null,
   failedFormData: null,
 } as const;
 
 export function hasCurrentDirectorResults(state: DirectorGuideState) {
   return (
     !(state.isCalculating || state.error) &&
+    state.strategyComparison !== null &&
+    state.calculatedStrategy !== null &&
     shallow(state.calculatedFormData, state.formData) &&
     !hasBlockingInputErrors(state)
   );
@@ -161,6 +166,7 @@ interface DirectorGuideState {
   strategyComparison: StrategyComparison | null;
   /** In-memory inputs that produced the results; shared by display and email eligibility. */
   calculatedFormData: DirectorFormData | null;
+  calculatedStrategy: DirectorStrategyKey | null;
   failedFormData: DirectorFormData | null;
   monthlyModeOutput: MonthlyProjectionResult | null;
   error: string | null;
@@ -173,7 +179,7 @@ interface DirectorGuideState {
 
   // UI state
   isCalculating: boolean;
-  selectedStrategy: 'allSalary' | 'optimalMix' | 'allDividends';
+  selectedStrategy: DirectorStrategyKey;
   sliderSalary: number | null;
   profitWhatIfPercent: number;
   objective: StrategyObjective;
@@ -224,7 +230,7 @@ interface DirectorGuideActions {
   setRunwayMonths: (months: number) => void;
 
   // UI actions
-  setSelectedStrategy: (strategy: 'allSalary' | 'optimalMix' | 'allDividends') => void;
+  setSelectedStrategy: (strategy: DirectorStrategyKey) => void;
   setSliderSalary: (salary: number | null) => void;
   setProfitWhatIfPercent: (percent: number) => void;
   setObjective: (objective: StrategyObjective) => void;
@@ -233,7 +239,7 @@ interface DirectorGuideActions {
   setInputError: (field: DirectorInputField, invalid: DirectorInvalidInput | null) => void;
 
   // Calculation
-  calculate: () => void;
+  calculate: (strategy?: DirectorStrategyKey) => void;
   /** Removes results that no longer match valid, complete inputs. */
   invalidateResults: () => void;
 
@@ -282,6 +288,7 @@ const defaultState: DirectorGuideState = {
   formData: { ...defaultFormData },
   strategyComparison: null,
   calculatedFormData: null,
+  calculatedStrategy: null,
   failedFormData: null,
   monthlyModeOutput: null,
   error: null,
@@ -666,7 +673,7 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         // ====================================================================
 
         setSelectedStrategy: (strategy) => {
-          set({ selectedStrategy: strategy, sliderSalary: null });
+          set({ selectedStrategy: strategy });
         },
 
         setSliderSalary: (salary) => {
@@ -706,17 +713,23 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
         // ====================================================================
 
         invalidateResults: () => {
-          const { strategyComparison, monthlyModeOutput, error } = get();
-          if (strategyComparison === null && monthlyModeOutput === null && error === null) {
+          const { strategyComparison, calculatedStrategy, monthlyModeOutput, error } = get();
+          if (
+            strategyComparison === null &&
+            calculatedStrategy === null &&
+            monthlyModeOutput === null &&
+            error === null
+          ) {
             return;
           }
           set({ ...CLEARED_RESULTS, error: null });
         },
 
-        calculate: () => {
-          const { formData } = get();
+        calculate: (strategy) => {
+          const state = get();
+          const { formData } = state;
 
-          if (hasBlockingInputErrors(get())) {
+          if (hasBlockingInputErrors(state)) {
             set({ ...CLEARED_RESULTS, error: 'Please correct the highlighted amounts' });
             return;
           }
@@ -746,6 +759,19 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
 
           if (effectiveRevenue === undefined || effectiveExpenses === undefined) {
             set({ ...CLEARED_RESULTS, error: 'Please fill in revenue, expenses, and region' });
+            return;
+          }
+
+          if (
+            strategy === 'allDividends' &&
+            roundToPence(formData.minimumSalaryRequirement ?? 0) > 0
+          ) {
+            set({
+              ...CLEARED_RESULTS,
+              sliderSalary: state.sliderSalary,
+              error:
+                'All Dividends cannot meet your minimum salary. Choose All Salary or Baseline Mix, or clear the minimum salary.',
+            });
             return;
           }
 
@@ -793,6 +819,8 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
             set({
               strategyComparison,
               calculatedFormData: formData,
+              // The existing automatic calculation omits a choice and publishes the recommendation.
+              calculatedStrategy: strategy ?? strategyComparison.recommended,
               monthlyModeOutput: monthlyProjection,
               isCalculating: false,
               sliderSalary: null, // Reset slider on new calculation

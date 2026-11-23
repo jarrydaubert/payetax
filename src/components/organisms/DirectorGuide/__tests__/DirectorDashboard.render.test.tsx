@@ -133,7 +133,10 @@ function setCurrentResult(
     },
     strategyComparison: createComparison(grossProfit) as never,
   } as never);
-  useDirectorGuideStore.setState({ calculatedFormData: useDirectorGuideStore.getState().formData });
+  useDirectorGuideStore.setState({
+    calculatedFormData: useDirectorGuideStore.getState().formData,
+    calculatedStrategy: 'optimalMix',
+  });
 }
 
 describe('DirectorDashboard (normal mode)', () => {
@@ -220,7 +223,7 @@ describe('DirectorDashboard (normal mode)', () => {
     expect(screen.queryByRole('region', { name: 'About this estimate' })).not.toBeInTheDocument();
   });
 
-  it('keeps the monthly draw and buffer on the recommendation', () => {
+  it('keeps the monthly draw and buffer on the submitted strategy', () => {
     setCurrentResult(80000, {
       mode: 'monthly',
       monthlyIncome: 3000,
@@ -258,6 +261,11 @@ describe('DirectorDashboard (normal mode)', () => {
       state.setObjective('minimizeNI');
     });
     expect(screen.getByText('£2,300/mo')).toBeInTheDocument();
+
+    // All Dividends holds £2,000 more in company tax reserves than the recommendation.
+    act(() => useDirectorGuideStore.setState({ calculatedStrategy: 'allDividends' }));
+    expect(screen.getByText('£300/mo')).toBeInTheDocument();
+    expect(screen.getByText('£600/mo below your spending target')).toBeInTheDocument();
 
     act(() => useDirectorGuideStore.getState().setCashInBank(12000));
     expect(

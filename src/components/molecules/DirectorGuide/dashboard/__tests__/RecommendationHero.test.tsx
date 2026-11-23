@@ -43,8 +43,11 @@ function comparison(recommended: 'allSalary' | 'optimalMix' | 'allDividends', sa
 
 describe('RecommendationHero', () => {
   it('renders the recommended strategy with take-home and savings', () => {
+    const result = comparison('optimalMix', 4000);
     mockUseActiveDirectorScenario.mockReturnValue({
-      comparison: comparison('optimalMix', 4000),
+      comparison: result,
+      selectedStrategy: 'optimalMix',
+      activeScenario: result.strategies.optimalMix,
     });
 
     render(<RecommendationHero />);
@@ -56,8 +59,11 @@ describe('RecommendationHero', () => {
   });
 
   it('hides the savings figure when all-salary is recommended', () => {
+    const result = comparison('allSalary', 0);
     mockUseActiveDirectorScenario.mockReturnValue({
-      comparison: comparison('allSalary', 0),
+      comparison: result,
+      selectedStrategy: 'allSalary',
+      activeScenario: result.strategies.allSalary,
     });
 
     render(<RecommendationHero />);

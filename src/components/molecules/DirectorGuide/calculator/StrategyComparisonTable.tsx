@@ -32,14 +32,16 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
       minimumSalaryRequirement,
     }),
   );
-  const { setSelectedStrategy, setSliderSalary, setObjective } = useDirectorGuideActions();
+  const { setSelectedStrategy, setObjective } = useDirectorGuideActions();
   const storedObjective = useDirectorGuideStore((state) => state.objective);
   const objective = readOnly ? 'maximizeTakeHome' : storedObjective;
-  const StrategyCard = readOnly ? 'article' : 'button';
+  const objectiveBadge = objective === 'maximizeTakeHome' ? 'Highest Take-Home' : 'Lowest NI';
 
   if (!comparison || comparison.grossProfit <= 0) return null;
 
-  const hasMinimumSalary = readOnly && (minimumSalaryRequirement ?? 0) > 0;
+  const hasMinimumSalary = roundToPence(minimumSalaryRequirement ?? 0) > 0;
+  const compareWithDisplayed = readOnly && hasMinimumSalary && selectedStrategy !== null;
+  const displaysRecommendation = selectedStrategy === comparison.recommended;
   const paidSalary = roundToPence(ytdSalary);
   const paidDividends = roundToPence(ytdDividends);
   const scenarioSalary = activeScenario && roundToPence(activeScenario.salary);
@@ -68,6 +70,7 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
 
   const comparisonStrategies = comparison.strategies;
   let objectiveReferenceKey: StrategyKey = readOnly ? comparison.recommended : 'allSalary';
+  if (compareWithDisplayed) objectiveReferenceKey = selectedStrategy;
 
   for (const key of readOnly ? [] : (['optimalMix', 'allDividends'] as const)) {
     if (objective === 'maximizeTakeHome') {
@@ -111,8 +114,6 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
   const handleSelectStrategy = (key: StrategyKey) => {
     trackStrategySelected();
     setSelectedStrategy(key);
-    const salary = comparison.strategies[key].salary;
-    setSliderSalary(salary);
   };
 
   return (
@@ -124,9 +125,9 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
         </h3>
         {readOnly ? (
           <p className='mt-2 text-sm text-muted-foreground'>
-            {hasMinimumSalary
-              ? 'Your minimum salary guides the displayed result.'
-              : 'The breakdown shows the highest take-home strategy.'}{' '}
+            {displaysRecommendation && !hasMinimumSalary
+              ? 'The breakdown shows the highest take-home strategy. '
+              : 'The breakdown follows the displayed strategy. '}
             Other strategies are shown for comparison.
           </p>
         ) : (
@@ -218,37 +219,48 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
       <div className='grid grid-cols-1 gap-3 md:grid-cols-3'>
         {strategies.map(({ key, data, icon: Icon, description }) => {
           const isSelected = selectedStrategy === key;
-          const isRecommended = objectiveReferenceKey === key;
+          const isObjectiveReference = objectiveReferenceKey === key;
+          const comparisonOnly = key === 'allDividends' && hasMinimumSalary;
+          const canSelect = !(readOnly || comparisonOnly);
+          const StrategyCard = canSelect ? 'button' : 'article';
+          const showsDisplayedBadge =
+            readOnly && isSelected && (compareWithDisplayed || !displaysRecommendation);
+          const showsRecommendationBadge = compareWithDisplayed && key === comparison.recommended;
+          const badge = showsDisplayedBadge
+            ? 'Displayed Result'
+            : showsRecommendationBadge
+              ? 'Recommendation'
+              : isObjectiveReference
+                ? objectiveBadge
+                : null;
           const totalTax = data.totalPersonalTax + data.corporationTax + data.employerNI;
           const totalNI = data.employeeNI + data.employerNI;
           const takeHomeDelta = data.takeHome - objectiveReferenceTakeHome;
           const niDelta = totalNI - objectiveReferenceTotalNI;
           const isReference =
-            objective === 'maximizeTakeHome'
-              ? Math.abs(takeHomeDelta) < 0.01
-              : Math.abs(niDelta) < 0.01;
+            readOnly || comparisonOnly
+              ? isObjectiveReference && !comparisonOnly
+              : objective === 'maximizeTakeHome'
+                ? Math.abs(takeHomeDelta) < 0.01
+                : Math.abs(niDelta) < 0.01;
 
           return (
             <StrategyCard
               key={key}
-              {...(!readOnly && {
+              {...(canSelect && {
                 type: 'button' as const,
                 onClick: () => handleSelectStrategy(key),
               })}
               className={cn(
                 'relative rounded-sm border p-5 text-left transition-colors',
                 isSelected ? 'border-primary bg-primary/5' : 'border-border/40 bg-card',
-                !readOnly && 'hover:border-border/70 hover:bg-accent/20',
+                canSelect && 'hover:border-border/70 hover:bg-accent/20',
               )}
             >
               {/* Objective badge */}
-              {isRecommended && (
+              {!comparisonOnly && badge && (
                 <span className='absolute -top-2 right-3 rounded-sm bg-success px-2 py-0.5 text-xs font-medium text-success-foreground'>
-                  {hasMinimumSalary
-                    ? 'Displayed Result'
-                    : objective === 'maximizeTakeHome'
-                      ? 'Highest Take-Home'
-                      : 'Lowest NI'}
+                  {badge}
                 </span>
               )}
 
@@ -266,7 +278,11 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
                 </div>
                 <div>
                   <h4 className='font-medium text-foreground'>{data.name}</h4>
-                  <p className='text-xs text-muted-foreground'>{description}</p>
+                  <p className='text-xs text-muted-foreground'>
+                    {comparisonOnly
+                      ? 'Comparison only. Zero salary does not meet your minimum.'
+                      : description}
+                  </p>
                 </div>
               </div>
 
@@ -300,7 +316,7 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
                 </div>
                 <div className='flex justify-between'>
                   <span className='text-muted-foreground'>
-                    {hasMinimumSalary
+                    {compareWithDisplayed
                       ? 'Vs Displayed Result'
                       : objective === 'maximizeTakeHome'
                         ? 'Vs Max Take-Home'
@@ -356,6 +372,7 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
         objective={objective}
         objectiveReferenceTakeHome={objectiveReferenceTakeHome}
         objectiveReferenceTotalNI={objectiveReferenceTotalNI}
+        compareWithDisplayed={compareWithDisplayed}
         readOnly={readOnly}
       />
     </div>
@@ -367,6 +384,7 @@ interface YourSetupCardProps {
   objective: StrategyObjective;
   objectiveReferenceTakeHome: number;
   objectiveReferenceTotalNI: number;
+  compareWithDisplayed: boolean;
   readOnly: boolean;
 }
 
@@ -375,6 +393,7 @@ function YourSetupCard({
   objective,
   objectiveReferenceTakeHome,
   objectiveReferenceTotalNI,
+  compareWithDisplayed,
   readOnly,
 }: YourSetupCardProps) {
   if (!yourSetup) {
@@ -402,6 +421,7 @@ function YourSetupCard({
   const totalNI = yourSetup.employeeNI + yourSetup.employerNI;
   const takeHomeDelta = yourSetup.takeHome - objectiveReferenceTakeHome;
   const niDelta = totalNI - objectiveReferenceTotalNI;
+  const takeHomeReference = compareWithDisplayed ? 'the displayed result' : 'max take-home';
   const isNearObjective =
     objective === 'maximizeTakeHome' ? Math.abs(takeHomeDelta) < 10 : Math.abs(niDelta) < 10;
 
@@ -466,16 +486,20 @@ function YourSetupCard({
       {/* Delta vs Optimal */}
       <div className='mt-3 rounded-sm bg-muted/20 p-2 text-center text-sm'>
         {objective === 'maximizeTakeHome' && isNearObjective && (
-          <span className='text-success'>Within £10 of max take-home reference</span>
+          <span className='text-success'>
+            Within £10 of{' '}
+            {compareWithDisplayed ? 'the displayed result' : 'max take-home reference'}
+          </span>
         )}
         {objective === 'maximizeTakeHome' && takeHomeDelta < -10 && (
           <span className='text-destructive'>
-            Takes home {formatCurrency(Math.abs(takeHomeDelta), 0)} less per year vs max take-home
+            Takes home {formatCurrency(Math.abs(takeHomeDelta), 0)} less per year vs{' '}
+            {takeHomeReference}
           </span>
         )}
         {objective === 'maximizeTakeHome' && takeHomeDelta > 10 && (
           <span className='text-success'>
-            Takes home {formatCurrency(takeHomeDelta, 0)} more per year vs max take-home
+            Takes home {formatCurrency(takeHomeDelta, 0)} more per year vs {takeHomeReference}
           </span>
         )}
         {objective === 'minimizeNI' && isNearObjective && (
