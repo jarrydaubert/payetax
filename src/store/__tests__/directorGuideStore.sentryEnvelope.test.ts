@@ -4,7 +4,7 @@
  */
 import type { Envelope } from '@sentry/core';
 import type * as SentryNextjs from '@sentry/nextjs';
-import { calculateDirectorScenario } from '@/lib/tax/directorCalculator';
+import { calculateStrategyComparison } from '@/lib/tax/strategyComparison';
 import { setNodeEnv } from '@/test/env';
 
 const mockEnvelopes: Envelope[] = [];
@@ -36,25 +36,11 @@ jest.mock('@sentry/nextjs', () => {
   };
 });
 
-jest.mock('@/lib/tax/directorCalculator', () => ({
-  calculateDirectorScenario: jest.fn(),
-}));
-
 jest.mock('@/lib/tax/strategyComparison', () => ({
-  calculateStrategyComparison: jest.fn().mockReturnValue({
-    grossProfit: 80000,
-    grossProfitAfterPension: 80000,
-    strategies: {
-      allSalary: { name: 'All Salary', salary: 80000, dividends: 0, takeHome: 55000 },
-      optimalMix: { name: 'Baseline Mix', salary: 12570, dividends: 50000, takeHome: 60000 },
-      allDividends: { name: 'All Dividends', salary: 0, dividends: 60000, takeHome: 58000 },
-    },
-    recommended: 'optimalMix',
-    savingsVsAllSalary: 5000,
-  }),
+  calculateStrategyComparison: jest.fn(),
 }));
 
-const mockCalculateDirectorScenario = calculateDirectorScenario as jest.Mock;
+const mockCalculateStrategyComparison = calculateStrategyComparison as jest.Mock;
 
 const EMAIL_CANARY = 'director.canary@example.com';
 const TAX_CODE_CANARY = 'K4321';
@@ -134,18 +120,18 @@ describe('Director calculation failure Sentry envelopes', () => {
   beforeEach(() => {
     mockEnvelopes.length = 0;
     useDirectorGuideStore.getState().reset();
-    mockCalculateDirectorScenario.mockReset();
+    mockCalculateStrategyComparison.mockReset();
   });
 
   it('sends one fixed, canary-free event for a thrown Error and keeps the store behaviour', async () => {
-    mockCalculateDirectorScenario.mockImplementation(throwSyntheticEngineFailure);
+    mockCalculateStrategyComparison.mockImplementation(throwSyntheticEngineFailure);
 
     await calculateWithValidInput();
 
     const state = useDirectorGuideStore.getState();
     expect(state.error).toBe('Calculation failed');
     expect(state.isCalculating).toBe(false);
-    expect(state.results).toBeNull();
+    expect(state.strategyComparison).toBeNull();
 
     expect(mockEnvelopes.flatMap(([, items]) => items.map(([header]) => header.type))).toEqual([
       'event',
@@ -176,7 +162,7 @@ describe('Director calculation failure Sentry envelopes', () => {
   });
 
   it('sends one fixed, canary-free event for a non-Error throw', async () => {
-    mockCalculateDirectorScenario.mockImplementation(throwSyntheticNonError);
+    mockCalculateStrategyComparison.mockImplementation(throwSyntheticNonError);
 
     await calculateWithValidInput();
 
@@ -194,7 +180,7 @@ describe('Director calculation failure Sentry envelopes', () => {
   });
 
   it('reports custom Error subclasses with a bounded built-in type', async () => {
-    mockCalculateDirectorScenario.mockImplementation(throwSyntheticCustomError);
+    mockCalculateStrategyComparison.mockImplementation(throwSyntheticCustomError);
 
     await calculateWithValidInput();
 
@@ -215,7 +201,7 @@ describe('Director calculation failure Sentry envelopes', () => {
     ].join('\n');
     const rewrittenError = new Error('short');
     rewrittenError.stack = `Error: ${CANARY_MESSAGE}\n    at leakedFrame (https://payetax.test/73123.47.js:1:1)`;
-    mockCalculateDirectorScenario
+    mockCalculateStrategyComparison
       .mockImplementationOnce(() => {
         throw geckoError;
       })
@@ -243,7 +229,7 @@ describe('Director calculation failure Sentry envelopes', () => {
   });
 
   it('keeps repeated identical failures as separate events without disabling global dedupe', async () => {
-    mockCalculateDirectorScenario.mockImplementation(throwSyntheticEngineFailure);
+    mockCalculateStrategyComparison.mockImplementation(throwSyntheticEngineFailure);
 
     const store = useDirectorGuideStore.getState();
     store.setRegion('rUK');
@@ -255,7 +241,7 @@ describe('Director calculation failure Sentry envelopes', () => {
     }
     await Sentry.flush(1000);
 
-    expect(mockCalculateDirectorScenario).toHaveBeenCalledTimes(2);
+    expect(mockCalculateStrategyComparison).toHaveBeenCalledTimes(2);
     expect(eventItems()).toHaveLength(2);
 
     mockEnvelopes.length = 0;
@@ -267,17 +253,17 @@ describe('Director calculation failure Sentry envelopes', () => {
   });
 
   it('emits no event for successful calculations or incomplete input', async () => {
-    mockCalculateDirectorScenario.mockReturnValue({ mode: 'normal', warnings: [] });
+    mockCalculateStrategyComparison.mockReturnValue({ grossProfit: 80000 });
 
     await calculateWithValidInput();
-    expect(useDirectorGuideStore.getState().results).not.toBeNull();
+    expect(useDirectorGuideStore.getState().strategyComparison).not.toBeNull();
 
     useDirectorGuideStore.getState().reset();
     useDirectorGuideStore.getState().calculate();
     await Sentry.flush(1000);
 
     expect(useDirectorGuideStore.getState().error).toBe('Please select your region');
-    expect(mockCalculateDirectorScenario).toHaveBeenCalledTimes(1);
+    expect(mockCalculateStrategyComparison).toHaveBeenCalledTimes(1);
     expect(eventItems()).toHaveLength(0);
   });
 });

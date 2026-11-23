@@ -70,7 +70,6 @@ describe('tax-domain public interface', () => {
     expect(taxDomain).not.toHaveProperty('calculateStudentLoanRepayments');
     expect(taxDomain).not.toHaveProperty('calculatePayrollPeriodDeductions');
     expect(taxDomain).not.toHaveProperty('convertToPeriods');
-    expect(taxDomain).not.toHaveProperty('calculateDirectorScenario');
     expect(taxDomain).not.toHaveProperty('getAdjustedPersonalAllowance');
   });
 });
