@@ -75,6 +75,7 @@ describe('DirectorDashboard (Survival Mode)', () => {
     useDirectorGuideStore.setState({
       formData,
       calculatedFormData: formData,
+      calculatedStrategy: 'optimalMix',
       strategyComparison: createEmptyComparison(0) as never,
     } as never);
 

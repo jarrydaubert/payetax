@@ -64,6 +64,7 @@ function setStoreState(partial: Partial<ReturnType<typeof useDirectorGuideStore.
   useDirectorGuideStore.setState((state) => ({
     ...partial,
     calculatedFormData: partial.formData ?? state.formData,
+    calculatedStrategy: partial.strategyComparison?.recommended ?? null,
   }));
 }
 

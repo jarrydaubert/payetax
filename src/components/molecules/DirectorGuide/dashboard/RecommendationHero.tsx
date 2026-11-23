@@ -1,11 +1,3 @@
-/**
- * Recommendation Hero - answer-first summary of the director pay result.
- *
- * Leads the results with the single recommended strategy (most take-home):
- * the salary/dividend split, annual + monthly take-home, total tax to set
- * aside, and the gain versus taking everything as salary. Everything below
- * it (slider, comparison table, breakdowns) is for exploring around this.
- */
 'use client';
 
 import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario';
@@ -22,32 +14,37 @@ interface RecommendationHeroProps {
 }
 
 export function RecommendationHero({ className }: RecommendationHeroProps) {
-  const { comparison } = useActiveDirectorScenario(true);
+  const { comparison, selectedStrategy, activeScenario } = useActiveDirectorScenario(true);
 
-  if (!comparison || comparison.grossProfit <= 0) return null;
+  if (!(comparison && selectedStrategy && activeScenario)) return null;
 
-  const recommended = comparison.strategies[comparison.recommended];
+  const isRecommended = selectedStrategy === comparison.recommended;
+  const label = isRecommended ? 'Recommended strategy' : 'Displayed strategy';
+  const heading =
+    selectedStrategy === 'optimalMix' && !isRecommended
+      ? 'Baseline Mix'
+      : STRATEGY_LABEL[selectedStrategy];
   const totalTax =
-    recommended.corporationTax + recommended.employerNI + recommended.totalPersonalTax;
-  const showSavings = comparison.recommended !== 'allSalary' && comparison.savingsVsAllSalary > 0;
+    activeScenario.corporationTax + activeScenario.employerNI + activeScenario.totalPersonalTax;
+  const savingsVsAllSalary = activeScenario.takeHome - comparison.strategies.allSalary.takeHome;
 
   return (
     <section
-      aria-label='Recommended pay strategy'
+      aria-label={isRecommended ? 'Recommended pay strategy' : 'Displayed pay strategy'}
       className={cn('rounded-sm border border-primary/35 bg-card p-6', className)}
     >
       <div className='mb-3 text-xs font-semibold tracking-[0.22em] text-primary uppercase'>
-        Recommended strategy
+        {label}
       </div>
 
       <div className='grid gap-6 lg:grid-cols-[1.3fr_1fr] lg:items-end'>
         <div>
           <h2 className='font-display text-2xl leading-tight font-semibold text-foreground'>
-            {STRATEGY_LABEL[comparison.recommended]}
+            {heading}
           </h2>
           <p className='mt-1 text-sm text-muted-foreground'>
-            {formatCurrency(recommended.salary, 0)} salary +{' '}
-            {formatCurrency(recommended.dividends, 0)} dividends
+            {formatCurrency(activeScenario.salary, 0)} salary +{' '}
+            {formatCurrency(activeScenario.dividends, 0)} dividends
           </p>
 
           <div className='mt-4'>
@@ -55,11 +52,11 @@ export function RecommendationHero({ className }: RecommendationHeroProps) {
               Annual take-home
             </div>
             <div className='font-mono text-4xl font-semibold tracking-tight text-primary'>
-              {formatCurrency(recommended.takeHome, 0)}
+              {formatCurrency(activeScenario.takeHome, 0)}
             </div>
             <div className='mt-1 text-sm text-muted-foreground'>
-              ≈ {formatCurrency(recommended.takeHome / 12, 0)}/mo ·{' '}
-              {recommended.effectiveRate.toFixed(1)}% effective tax rate
+              ≈ {formatCurrency(activeScenario.takeHome / 12, 0)}/mo ·{' '}
+              {activeScenario.effectiveRate.toFixed(1)}% effective tax rate
             </div>
           </div>
         </div>
@@ -73,13 +70,13 @@ export function RecommendationHero({ className }: RecommendationHeroProps) {
               {formatCurrency(totalTax, 0)}
             </dd>
           </div>
-          {showSavings && (
+          {savingsVsAllSalary > 0 && (
             <div>
               <dt className='text-xs tracking-wider text-muted-foreground uppercase'>
                 vs all salary
               </dt>
               <dd className='mt-1 font-mono text-xl font-semibold text-success'>
-                +{formatCurrency(comparison.savingsVsAllSalary, 0)}
+                +{formatCurrency(savingsVsAllSalary, 0)}
               </dd>
             </div>
           )}

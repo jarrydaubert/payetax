@@ -237,7 +237,8 @@ export function DirectorDashboard() {
   // Show results when calculation is complete (even for 0 or negative profit)
   const hasComparison = Boolean(comparison);
   const isSurvivalMode = Boolean(comparison && comparison.grossProfit <= 0);
-  const companyShortfall = comparison?.strategies.allDividends.companyShortfall ?? 0;
+  const companyShortfall =
+    activeScenario?.companyShortfall ?? comparison?.strategies.allDividends.companyShortfall ?? 0;
   const mix = comparison?.strategies.optimalMix;
 
   // Keep an open email form disabled during the debounce; close it if results cannot recover.
@@ -462,12 +463,9 @@ export function DirectorDashboard() {
                       </section>
                     )}
 
-                    <section
-                      data-director-section='director-recommendation'
-                      aria-label='Recommended strategy'
-                    >
+                    <div data-director-section='director-recommendation'>
                       <RecommendationHero />
-                    </section>
+                    </div>
 
                     <section data-director-section='director-summary' aria-label='Summary cards'>
                       <SummaryCards

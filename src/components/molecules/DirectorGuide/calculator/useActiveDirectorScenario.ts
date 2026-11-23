@@ -10,7 +10,9 @@ import {
   type StrategyComparison,
 } from '@/lib/tax/strategyComparison';
 import {
+  type DirectorStrategyKey,
   useDirectorFormSlice,
+  useDirectorGuideStore,
   useProfitWhatIfPercent,
   useSelectedStrategy,
   useSliderSalary,
@@ -19,12 +21,10 @@ import {
 
 const TAX_YEAR = CURRENT_TAX_YEAR;
 
-type SelectedStrategyKey = 'allSalary' | 'optimalMix' | 'allDividends';
-
 export type ActiveDirectorScenario = SalaryScenarioResult;
 
 interface UseActiveDirectorScenarioResult {
-  selectedStrategy: SelectedStrategyKey;
+  selectedStrategy: DirectorStrategyKey | null;
   sliderSalary: number | null;
   profitWhatIfPercent: number;
   isProfitWhatIfActive: boolean;
@@ -35,19 +35,20 @@ interface UseActiveDirectorScenarioResult {
   activeScenario: ActiveDirectorScenario | null;
 }
 
-export function useActiveDirectorScenario(
-  recommendationOnly = false,
-): UseActiveDirectorScenarioResult {
+export function useActiveDirectorScenario(submittedOnly = false): UseActiveDirectorScenarioResult {
   const baseComparison = useStrategyComparison();
+  const calculatedStrategy = useDirectorGuideStore((state) => state.calculatedStrategy);
   const storedStrategy = useSelectedStrategy();
   const storedSalary = useSliderSalary();
   const storedProfitPercent = useProfitWhatIfPercent();
   // The dashboard contains what-if output until strategy controls have an explicit submission.
-  const selectedStrategy = recommendationOnly
-    ? (baseComparison?.recommended ?? 'optimalMix')
+  const selectedStrategy = submittedOnly
+    ? baseComparison
+      ? calculatedStrategy
+      : null
     : storedStrategy;
-  const sliderSalary = recommendationOnly ? null : storedSalary;
-  const profitWhatIfPercent = recommendationOnly ? 0 : storedProfitPercent;
+  const sliderSalary = submittedOnly ? null : storedSalary;
+  const profitWhatIfPercent = submittedOnly ? 0 : storedProfitPercent;
   const formData = useDirectorFormSlice((state) => ({
     region: state.region,
     otherIncome: state.otherIncome,
@@ -105,7 +106,7 @@ export function useActiveDirectorScenario(
   }, [baseComparison, formData, profitWhatIfPercent]);
 
   const activeScenario = useMemo(() => {
-    if (!comparison || comparison.grossProfit <= 0) return null;
+    if (!comparison || comparison.grossProfit <= 0 || selectedStrategy === null) return null;
 
     if (sliderSalary !== null) {
       return calculateSalaryScenario({
@@ -125,33 +126,8 @@ export function useActiveDirectorScenario(
       });
     }
 
-    const strategy = comparison.strategies[selectedStrategy];
-    return {
-      salary: strategy.salary,
-      dividends: strategy.dividends,
-      employerNI: strategy.employerNI,
-      class1ANI: strategy.class1ANI,
-      employeeNI: strategy.employeeNI,
-      incomeTax: strategy.incomeTax,
-      ...(strategy.taperTaxOnOtherIncome && {
-        taperTaxOnOtherIncome: strategy.taperTaxOnOtherIncome,
-      }),
-      taxableProfit: strategy.taxableProfit,
-      corporationTax: strategy.corporationTax,
-      dividendTax: strategy.dividendTax,
-      studentLoan: strategy.studentLoan,
-      pension: strategy.pension,
-      companyCarBIK: strategy.companyCarBIK,
-      totalPersonalTax: strategy.totalPersonalTax,
-      companyCost: strategy.companyCost,
-      retainedProfit: strategy.retainedProfit,
-      companyShortfall: strategy.companyShortfall,
-      ...(strategy.minimumSalaryShortfall && {
-        minimumSalaryShortfall: strategy.minimumSalaryShortfall,
-      }),
-      effectiveRate: strategy.effectiveRate,
-      takeHome: strategy.takeHome,
-    };
+    const { name: _name, ...scenario } = comparison.strategies[selectedStrategy];
+    return scenario;
   }, [comparison, formData, selectedStrategy, sliderSalary]);
 
   return {

@@ -9,6 +9,7 @@ function setDirectorGuideState(
   useDirectorGuideStore.setState((state) => ({
     ...partial,
     calculatedFormData: partial.strategyComparison ? (partial.formData ?? state.formData) : null,
+    calculatedStrategy: partial.strategyComparison?.recommended ?? null,
   }));
 }
 

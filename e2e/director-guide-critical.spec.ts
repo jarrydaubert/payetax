@@ -278,11 +278,15 @@ test.describe('Director result currentness @critical', () => {
     page,
   }, testInfo) => {
     await showScenarioA(page);
-    const expectRecommendation = async (dividends: string) => {
+    const expectRecommendation = async (dividends: string, allSalaryAmount: string) => {
       const strategies = page.getByRole('region', { name: 'Strategy comparison' });
-      const hero = page.getByRole('region', { name: 'Recommended strategy', exact: true });
+      const hero = page.getByRole('region', { name: 'Recommended pay strategy', exact: true });
       await expect(hero).toContainText(`£12,570 salary + ${dividends} dividends`);
-      await expect(strategies.getByRole('heading', { name: 'All Salary' })).toBeVisible();
+      const allSalary = strategies.getByRole('article').filter({
+        has: page.getByRole('heading', { name: 'All Salary', exact: true }),
+      });
+      await expect(allSalary).toContainText(allSalaryAmount);
+      await expect(allSalary).not.toContainText('Highest Take-Home');
       await expect(strategies.getByRole('button')).toHaveCount(0);
       await expect(page.getByRole('slider')).toHaveCount(0);
       await expect(detailRowValue(page, 'Salary Breakdown', 'Gross Salary')).toHaveText('£12,570');
@@ -295,7 +299,7 @@ test.describe('Director result currentness @critical', () => {
       ).toContainText(dividends);
     };
 
-    await expectRecommendation('£52,476');
+    await expectRecommendation('£52,476', '£70,217');
     await ensureInputsPanelIsVisible(page);
     await page
       .getByRole('checkbox', { name: 'Remember figures on this device (PAYE and Director)' })
@@ -315,7 +319,7 @@ test.describe('Director result currentness @critical', () => {
       localStorage.setItem(key, JSON.stringify(snapshot));
     });
     await page.reload();
-    await expectRecommendation('£52,476');
+    await expectRecommendation('£52,476', '£70,217');
     await expect(page.getByRole('button', { name: 'Email My Results' })).toBeEnabled();
     const sidebarEmail = page.getByRole('button', { name: 'Email Results', exact: true });
     if (await sidebarEmail.isVisible()) await expect(sidebarEmail).toBeEnabled();
@@ -328,7 +332,7 @@ test.describe('Director result currentness @critical', () => {
     await ensureInputsPanelIsVisible(page);
     await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 120000);
     await closeInputsPanelIfOpen(page);
-    await expectRecommendation('£67,176');
+    await expectRecommendation('£67,176', '£87,609');
     await expect(profit(page, '£100,000')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Email My Results' })).toBeEnabled();
     await expect(page.getByRole('button', { name: 'Download .ics' })).toBeVisible();
@@ -725,7 +729,7 @@ test.describe('Director Intelligence critical @critical', () => {
     }
     const yourSetup = strategies.getByRole('heading', { name: 'Your Setup' }).locator('../../..');
     await expect(yourSetup).toContainText('£10,056');
-    await expect(yourSetup).toContainText('Within £10 of max take-home reference');
+    await expect(yourSetup).toContainText('Within £10 of the displayed result');
     await expect(notes).toContainText(
       'your other job has a separate National Insurance calculation',
     );
@@ -782,6 +786,12 @@ test.describe('Director Intelligence critical @critical', () => {
     const mix = strategies.getByRole('article').filter({
       has: page.getByRole('heading', { name: 'Baseline Mix', exact: true }),
     });
+    const allDividends = strategies.getByRole('article').filter({
+      has: page.getByRole('heading', { name: 'All Dividends', exact: true }),
+    });
+    await expect(allDividends).toContainText(
+      'Comparison only. Zero salary does not meet your minimum.',
+    );
     // The mix meets the floor with £131,750 taxable profit less £31,163.75 CT.
     await expect(mix).toContainText('£60,000');
     await expect(mix).toContainText('£100,586');
