@@ -461,7 +461,7 @@ test.describe('Director result currentness @critical', () => {
       )
         diagnostics.push(text);
     });
-    await page.route('**/_next/static/chunks/app/tools/director-guide/*.js', async (route) => {
+    await page.route('**/_next/static/chunks/**/*.js', async (route) => {
       const response = await route.fetch();
       const source = await response.text();
       // Match the live strategy engine's first three input reads in the minified chunk.

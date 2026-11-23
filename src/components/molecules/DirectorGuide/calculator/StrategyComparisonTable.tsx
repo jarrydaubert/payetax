@@ -3,8 +3,7 @@
  * Strategy Comparison Cards - 3 selectable strategy cards
  *
  * All Salary | Baseline Mix (Comparison) | All Dividends
- * Selected card uses a bordered Ledger treatment. Clicking a card updates the slider.
- * Dynamic message shows savings (green) or cost (red) vs optimal mix.
+ * Cards compare submitted results and can stage a named choice when enabled.
  */
 'use client';
 
@@ -18,13 +17,22 @@ import {
   useDirectorFormSlice,
   useDirectorGuideActions,
   useDirectorGuideStore,
+  useSelectedStrategy,
+  useSliderSalary,
 } from '@/store/directorGuideStore';
 import { useActiveDirectorScenario } from './useActiveDirectorScenario';
 
 type StrategyKey = 'allSalary' | 'optimalMix' | 'allDividends';
 
 export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boolean }) {
-  const { comparison, activeScenario, selectedStrategy } = useActiveDirectorScenario(readOnly);
+  const {
+    comparison,
+    activeScenario,
+    selectedStrategy,
+    exploration,
+    isCustomSalary,
+    isProfitWhatIfActive,
+  } = useActiveDirectorScenario();
   const { ytdSalary, ytdDividends, minimumSalaryRequirement } = useDirectorFormSlice(
     ({ ytdSalary, ytdDividends, minimumSalaryRequirement }) => ({
       ytdSalary,
@@ -33,15 +41,19 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
     }),
   );
   const { setSelectedStrategy, setObjective } = useDirectorGuideActions();
-  const storedObjective = useDirectorGuideStore((state) => state.objective);
-  const objective = readOnly ? 'maximizeTakeHome' : storedObjective;
+  const draftObjective = useDirectorGuideStore((state) => state.objective);
+  const draftStrategy = useSelectedStrategy();
+  const draftSalary = useSliderSalary();
+  const objective = exploration?.objective ?? 'maximizeTakeHome';
   const objectiveBadge = objective === 'maximizeTakeHome' ? 'Highest Take-Home' : 'Lowest NI';
 
   if (!comparison || comparison.grossProfit <= 0) return null;
 
   const hasMinimumSalary = roundToPence(minimumSalaryRequirement ?? 0) > 0;
-  const compareWithDisplayed = readOnly && hasMinimumSalary && selectedStrategy !== null;
-  const displaysRecommendation = selectedStrategy === comparison.recommended;
+  const isCustom = isCustomSalary || isProfitWhatIfActive;
+  const compareWithDisplayed =
+    !exploration && readOnly && hasMinimumSalary && selectedStrategy !== null;
+  const displaysRecommendation = !isCustom && selectedStrategy === comparison.recommended;
   const paidSalary = roundToPence(ytdSalary);
   const paidDividends = roundToPence(ytdDividends);
   const scenarioSalary = activeScenario && roundToPence(activeScenario.salary);
@@ -68,36 +80,23 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
     },
   ];
 
-  const comparisonStrategies = comparison.strategies;
-  let objectiveReferenceKey: StrategyKey = readOnly ? comparison.recommended : 'allSalary';
-  if (compareWithDisplayed) objectiveReferenceKey = selectedStrategy;
-
-  for (const key of readOnly ? [] : (['optimalMix', 'allDividends'] as const)) {
-    if (objective === 'maximizeTakeHome') {
-      if (
-        comparisonStrategies[key].takeHome > comparisonStrategies[objectiveReferenceKey].takeHome
-      ) {
-        objectiveReferenceKey = key;
-      }
-      continue;
-    }
-
-    const candidateNI = comparisonStrategies[key].employeeNI + comparisonStrategies[key].employerNI;
-    const bestNI =
-      comparisonStrategies[objectiveReferenceKey].employeeNI +
-      comparisonStrategies[objectiveReferenceKey].employerNI;
-    if (candidateNI < bestNI) {
-      objectiveReferenceKey = key;
-    }
-  }
-
-  const objectiveReference = comparisonStrategies[objectiveReferenceKey];
-  const objectiveReferenceTakeHome = objectiveReference.takeHome;
-  const objectiveReferenceTotalTax =
-    objectiveReference.totalPersonalTax +
-    objectiveReference.corporationTax +
-    objectiveReference.employerNI;
-  const objectiveReferenceTotalNI = objectiveReference.employeeNI + objectiveReference.employerNI;
+  const objectiveReferenceKey = exploration
+    ? exploration.objectiveReference
+    : compareWithDisplayed
+      ? selectedStrategy
+      : comparison.recommended;
+  const objectiveReference = objectiveReferenceKey
+    ? comparison.strategies[objectiveReferenceKey]
+    : null;
+  const objectiveReferenceTakeHome = objectiveReference?.takeHome ?? 0;
+  const objectiveReferenceTotalTax = objectiveReference
+    ? objectiveReference.totalPersonalTax +
+      objectiveReference.corporationTax +
+      objectiveReference.employerNI
+    : 0;
+  const objectiveReferenceTotalNI = objectiveReference
+    ? objectiveReference.employeeNI + objectiveReference.employerNI
+    : 0;
 
   const currentTakeHome = activeScenario?.takeHome ?? objectiveReferenceTakeHome;
   const currentTotalNI =
@@ -138,11 +137,11 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
                 onClick={() => setObjective('maximizeTakeHome')}
                 className={cn(
                   'rounded-sm px-3 py-2 text-sm transition-colors',
-                  objective === 'maximizeTakeHome'
+                  draftObjective === 'maximizeTakeHome'
                     ? 'bg-primary/20 font-medium text-primary'
                     : 'text-muted-foreground hover:text-foreground',
                 )}
-                aria-pressed={objective === 'maximizeTakeHome'}
+                aria-pressed={draftObjective === 'maximizeTakeHome'}
               >
                 Maximize take-home
               </button>
@@ -151,20 +150,24 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
                 onClick={() => setObjective('minimizeNI')}
                 className={cn(
                   'rounded-sm px-3 py-2 text-sm transition-colors',
-                  objective === 'minimizeNI'
+                  draftObjective === 'minimizeNI'
                     ? 'bg-primary/20 font-medium text-primary'
                     : 'text-muted-foreground hover:text-foreground',
                 )}
-                aria-pressed={objective === 'minimizeNI'}
+                aria-pressed={draftObjective === 'minimizeNI'}
               >
                 Minimize NI
               </button>
             </div>
             <p className='mt-2 text-sm text-muted-foreground'>
-              Compare salary/dividend tradeoffs using your selected objective. Switch objective to
-              see how the recommended strategy changes.
+              Compare salary/dividend tradeoffs using your selected objective after Calculate.
             </p>
           </>
+        )}
+        {exploration && !objectiveReference && (
+          <p className='mt-2 text-sm text-muted-foreground'>
+            No strategy meets your minimum salary for this objective comparison.
+          </p>
         )}
         <p className='mt-2 text-sm text-muted-foreground'>
           Salary and dividends are full-year estimates calculated without adjusting for amounts
@@ -184,7 +187,7 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
             </p>
           )}
         </div>
-        {!readOnly && isNearObjective && (
+        {!readOnly && objectiveReference && isNearObjective && (
           <p className='text-sm'>
             <span className='font-medium text-success'>
               {objective === 'maximizeTakeHome'
@@ -197,7 +200,7 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
             </span>
           </p>
         )}
-        {objective === 'maximizeTakeHome' && takeHomeDifference < -10 && (
+        {objectiveReference && objective === 'maximizeTakeHome' && takeHomeDifference < -10 && (
           <p className='text-sm'>
             <span className='font-medium text-destructive'>
               {formatCurrency(Math.abs(takeHomeDifference), 0)} lower take-home
@@ -205,7 +208,7 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
             <span className='text-muted-foreground'>{' than max take-home strategy'}</span>
           </p>
         )}
-        {objective === 'minimizeNI' && niDifference > 10 && (
+        {objectiveReference && objective === 'minimizeNI' && niDifference > 10 && (
           <p className='text-sm'>
             <span className='font-medium text-destructive'>
               {formatCurrency(niDifference, 0)} more NI
@@ -218,13 +221,15 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
       {/* 3 Strategy Cards */}
       <div className='grid grid-cols-1 gap-3 md:grid-cols-3'>
         {strategies.map(({ key, data, icon: Icon, description }) => {
-          const isSelected = selectedStrategy === key;
+          const isDisplayed = !isCustom && selectedStrategy === key;
+          const isSelected = readOnly ? isDisplayed : draftSalary === null && draftStrategy === key;
           const isObjectiveReference = objectiveReferenceKey === key;
           const comparisonOnly = key === 'allDividends' && hasMinimumSalary;
           const canSelect = !(readOnly || comparisonOnly);
           const StrategyCard = canSelect ? 'button' : 'article';
           const showsDisplayedBadge =
-            readOnly && isSelected && (compareWithDisplayed || !displaysRecommendation);
+            isDisplayed &&
+            (exploration || (readOnly && (compareWithDisplayed || !displaysRecommendation)));
           const showsRecommendationBadge = compareWithDisplayed && key === comparison.recommended;
           const badge = showsDisplayedBadge
             ? 'Displayed Result'
@@ -237,12 +242,7 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
           const totalNI = data.employeeNI + data.employerNI;
           const takeHomeDelta = data.takeHome - objectiveReferenceTakeHome;
           const niDelta = totalNI - objectiveReferenceTotalNI;
-          const isReference =
-            readOnly || comparisonOnly
-              ? isObjectiveReference && !comparisonOnly
-              : objective === 'maximizeTakeHome'
-                ? Math.abs(takeHomeDelta) < 0.01
-                : Math.abs(niDelta) < 0.01;
+          const isReference = isObjectiveReference && !comparisonOnly;
 
           return (
             <StrategyCard
@@ -314,47 +314,51 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
                     {formatCurrency(data.takeHome, 0)}
                   </span>
                 </div>
-                <div className='flex justify-between'>
-                  <span className='text-muted-foreground'>
-                    {compareWithDisplayed
-                      ? 'Vs Displayed Result'
-                      : objective === 'maximizeTakeHome'
-                        ? 'Vs Max Take-Home'
-                        : 'Vs Lowest NI'}
-                  </span>
-                  <span
-                    className={cn(
-                      'font-mono',
-                      isReference
-                        ? 'text-success'
-                        : objective === 'maximizeTakeHome' && takeHomeDelta < 0
-                          ? 'text-destructive'
-                          : objective === 'minimizeNI' && niDelta > 0
-                            ? 'text-destructive'
-                            : 'text-success',
-                    )}
-                  >
-                    {isReference
-                      ? 'Reference'
-                      : objective === 'maximizeTakeHome'
-                        ? `${takeHomeDelta < 0 ? '-' : '+'}${formatCurrency(Math.abs(takeHomeDelta), 0)}`
-                        : `${niDelta > 0 ? '+' : '-'}${formatCurrency(Math.abs(niDelta), 0)}`}
-                  </span>
-                </div>
-                <div className='text-right text-xs text-muted-foreground'>
-                  {objective === 'maximizeTakeHome' ? 'Tax delta' : 'NI delta'}:{' '}
-                  {objective === 'maximizeTakeHome'
-                    ? totalTax > objectiveReferenceTotalTax
-                      ? `+${formatCurrency(totalTax - objectiveReferenceTotalTax, 0)}`
-                      : totalTax < objectiveReferenceTotalTax
-                        ? `-${formatCurrency(Math.abs(totalTax - objectiveReferenceTotalTax), 0)}`
-                        : '£0'
-                    : niDelta > 0
-                      ? `+${formatCurrency(niDelta, 0)}`
-                      : niDelta < 0
-                        ? `-${formatCurrency(Math.abs(niDelta), 0)}`
-                        : '£0'}
-                </div>
+                {objectiveReference && (
+                  <>
+                    <div className='flex justify-between'>
+                      <span className='text-muted-foreground'>
+                        {compareWithDisplayed
+                          ? 'Vs Displayed Result'
+                          : objective === 'maximizeTakeHome'
+                            ? 'Vs Max Take-Home'
+                            : 'Vs Lowest NI'}
+                      </span>
+                      <span
+                        className={cn(
+                          'font-mono',
+                          isReference
+                            ? 'text-success'
+                            : objective === 'maximizeTakeHome' && takeHomeDelta < 0
+                              ? 'text-destructive'
+                              : objective === 'minimizeNI' && niDelta > 0
+                                ? 'text-destructive'
+                                : 'text-success',
+                        )}
+                      >
+                        {isReference
+                          ? 'Reference'
+                          : objective === 'maximizeTakeHome'
+                            ? `${takeHomeDelta < 0 ? '-' : '+'}${formatCurrency(Math.abs(takeHomeDelta), 0)}`
+                            : `${niDelta > 0 ? '+' : '-'}${formatCurrency(Math.abs(niDelta), 0)}`}
+                      </span>
+                    </div>
+                    <div className='text-right text-xs text-muted-foreground'>
+                      {objective === 'maximizeTakeHome' ? 'Tax delta' : 'NI delta'}:{' '}
+                      {objective === 'maximizeTakeHome'
+                        ? totalTax > objectiveReferenceTotalTax
+                          ? `+${formatCurrency(totalTax - objectiveReferenceTotalTax, 0)}`
+                          : totalTax < objectiveReferenceTotalTax
+                            ? `-${formatCurrency(Math.abs(totalTax - objectiveReferenceTotalTax), 0)}`
+                            : '£0'
+                        : niDelta > 0
+                          ? `+${formatCurrency(niDelta, 0)}`
+                          : niDelta < 0
+                            ? `-${formatCurrency(Math.abs(niDelta), 0)}`
+                            : '£0'}
+                    </div>
+                  </>
+                )}
               </div>
 
               {/* Effective Rate */}
@@ -373,6 +377,7 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
         objectiveReferenceTakeHome={objectiveReferenceTakeHome}
         objectiveReferenceTotalNI={objectiveReferenceTotalNI}
         compareWithDisplayed={compareWithDisplayed}
+        hasObjectiveReference={objectiveReference !== null}
         readOnly={readOnly}
       />
     </div>
@@ -385,6 +390,7 @@ interface YourSetupCardProps {
   objectiveReferenceTakeHome: number;
   objectiveReferenceTotalNI: number;
   compareWithDisplayed: boolean;
+  hasObjectiveReference: boolean;
   readOnly: boolean;
 }
 
@@ -394,6 +400,7 @@ function YourSetupCard({
   objectiveReferenceTakeHome,
   objectiveReferenceTotalNI,
   compareWithDisplayed,
+  hasObjectiveReference,
   readOnly,
 }: YourSetupCardProps) {
   if (!yourSetup) {
@@ -484,38 +491,40 @@ function YourSetupCard({
       </div>
 
       {/* Delta vs Optimal */}
-      <div className='mt-3 rounded-sm bg-muted/20 p-2 text-center text-sm'>
-        {objective === 'maximizeTakeHome' && isNearObjective && (
-          <span className='text-success'>
-            Within £10 of{' '}
-            {compareWithDisplayed ? 'the displayed result' : 'max take-home reference'}
-          </span>
-        )}
-        {objective === 'maximizeTakeHome' && takeHomeDelta < -10 && (
-          <span className='text-destructive'>
-            Takes home {formatCurrency(Math.abs(takeHomeDelta), 0)} less per year vs{' '}
-            {takeHomeReference}
-          </span>
-        )}
-        {objective === 'maximizeTakeHome' && takeHomeDelta > 10 && (
-          <span className='text-success'>
-            Takes home {formatCurrency(takeHomeDelta, 0)} more per year vs {takeHomeReference}
-          </span>
-        )}
-        {objective === 'minimizeNI' && isNearObjective && (
-          <span className='text-success'>Within £10 of minimum NI reference</span>
-        )}
-        {objective === 'minimizeNI' && niDelta > 10 && (
-          <span className='text-destructive'>
-            Pays {formatCurrency(niDelta, 0)} more NI per year vs lowest-NI strategy
-          </span>
-        )}
-        {objective === 'minimizeNI' && niDelta < -10 && (
-          <span className='text-success'>
-            Pays {formatCurrency(Math.abs(niDelta), 0)} less NI per year vs lowest-NI strategy
-          </span>
-        )}
-      </div>
+      {hasObjectiveReference && (
+        <div className='mt-3 rounded-sm bg-muted/20 p-2 text-center text-sm'>
+          {objective === 'maximizeTakeHome' && isNearObjective && (
+            <span className='text-success'>
+              Within £10 of{' '}
+              {compareWithDisplayed ? 'the displayed result' : 'max take-home reference'}
+            </span>
+          )}
+          {objective === 'maximizeTakeHome' && takeHomeDelta < -10 && (
+            <span className='text-destructive'>
+              Takes home {formatCurrency(Math.abs(takeHomeDelta), 0)} less per year vs{' '}
+              {takeHomeReference}
+            </span>
+          )}
+          {objective === 'maximizeTakeHome' && takeHomeDelta > 10 && (
+            <span className='text-success'>
+              Takes home {formatCurrency(takeHomeDelta, 0)} more per year vs {takeHomeReference}
+            </span>
+          )}
+          {objective === 'minimizeNI' && isNearObjective && (
+            <span className='text-success'>Within £10 of minimum NI reference</span>
+          )}
+          {objective === 'minimizeNI' && niDelta > 10 && (
+            <span className='text-destructive'>
+              Pays {formatCurrency(niDelta, 0)} more NI per year vs lowest-NI strategy
+            </span>
+          )}
+          {objective === 'minimizeNI' && niDelta < -10 && (
+            <span className='text-success'>
+              Pays {formatCurrency(Math.abs(niDelta), 0)} less NI per year vs lowest-NI strategy
+            </span>
+          )}
+        </div>
+      )}
 
       {/* DLA Warning */}
       {yourSetup.exceedsProfit && (

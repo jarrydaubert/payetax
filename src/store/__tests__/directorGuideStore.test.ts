@@ -517,7 +517,7 @@ describe('DirectorGuideStore', () => {
       const state = useDirectorGuideStore.getState();
       expect(state.strategyComparison).toBeNull();
       expect(state.monthlyModeOutput).toBeNull();
-      expect(state.sliderSalary).toBeNull();
+      expect(state.sliderSalary).toBe(20000);
       expect(state.calculatedStrategy).toBeNull();
       // Inputs are untouched; only derived results are removed.
       expect(state.formData.revenue).toBe(100000);
@@ -622,6 +622,30 @@ describe('DirectorGuideStore', () => {
   });
 
   describe('Persisted State Hydration Guards', () => {
+    it('restores a saved named draft on a fresh visit without replacing live exploration', async () => {
+      const store = useDirectorGuideStore.getState();
+      store.setSelectedStrategy('allSalary');
+      const saved = localStorage.getItem(DIRECTOR_STORAGE_KEY) ?? '';
+      store.reset();
+      localStorage.setItem(DIRECTOR_STORAGE_KEY, saved);
+      await useDirectorGuideStore.persist.rehydrate();
+      expect(useDirectorGuideStore.getState().selectedStrategy).toBe('allSalary');
+
+      store.setSelectedStrategy('optimalMix');
+      store.setSliderSalary(24000);
+      store.setProfitWhatIfPercent(-45);
+      store.setObjective('minimizeNI');
+      localStorage.setItem(DIRECTOR_STORAGE_KEY, saved);
+      await useDirectorGuideStore.persist.rehydrate();
+      expect(useDirectorGuideStore.getState()).toMatchObject({
+        selectedStrategy: 'optimalMix',
+        sliderSalary: 24000,
+        profitWhatIfPercent: -45,
+        objective: 'minimizeNI',
+        calculatedExploration: null,
+      });
+    });
+
     it('restores legacy figures without guessing a year for a saved month and day', async () => {
       localStorage.setItem(
         DIRECTOR_STORAGE_KEY,
@@ -667,7 +691,7 @@ describe('DirectorGuideStore', () => {
 
       const state = useDirectorGuideStore.getState();
       expect(state.formData.monthlyIncome).toBe(2500);
-      expect(state.selectedStrategy).toBe('optimalMix');
+      expect(state.selectedStrategy).toBeNull();
     });
 
     it('should sanitize disallowed student loan plans from persisted state', async () => {

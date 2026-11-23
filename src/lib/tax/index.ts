@@ -63,6 +63,8 @@ export type {
   ScottishTaxBandSlice,
 } from './scottishIncomeTax';
 export { sliceScottishTaxableIncome } from './scottishIncomeTax';
+export type { SalaryScenarioResult, StrategyComparison, StrategyInput } from './strategyComparison';
+export { calculateSalaryScenario, calculateStrategyComparison } from './strategyComparison';
 export type {
   TaxCodeBandOverride,
   TaxCodeClassification,

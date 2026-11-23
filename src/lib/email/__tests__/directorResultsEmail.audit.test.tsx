@@ -82,15 +82,21 @@ describe('Director display → email payload → server → HTML/text audit', ()
       state.calculate();
       const comparison = useDirectorGuideStore.getState().strategyComparison;
       if (!comparison) throw new Error('Expected audit comparison');
-      state.setSelectedStrategy(sample.selectedStrategy ?? 'optimalMix');
-      if (comparison.grossProfit > 0) {
-        state.setSliderSalary(sample.salary ?? comparison.strategies.optimalMix.salary);
+      if (
+        sample.selectedStrategy ||
+        sample.salary !== undefined ||
+        sample.profitPercent ||
+        sample.objective
+      ) {
+        state.setSelectedStrategy(sample.selectedStrategy ?? comparison.recommended);
+        if (!sample.selectedStrategy) state.setSliderSalary(sample.salary ?? null);
+        state.setProfitWhatIfPercent(sample.profitPercent ?? 0);
+        state.setObjective(sample.objective ?? 'maximizeTakeHome');
+        state.calculate('draft');
       }
-      state.setProfitWhatIfPercent(sample.profitPercent ?? 0);
-      state.setObjective(sample.objective ?? 'maximizeTakeHome');
       const { result } = renderHook(() => ({
         display: useActiveDirectorScenario(),
-        reason: useDirectorEmailUnavailableReason(),
+        reason: useDirectorEmailUnavailableReason(undefined, true),
       }));
       render(<DirectorDashboard />);
       if (!mockEmailInput) throw new Error('Expected dashboard email payload');

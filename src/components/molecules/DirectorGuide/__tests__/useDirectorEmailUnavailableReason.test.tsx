@@ -22,15 +22,11 @@ describe('Director email interim guard', () => {
     state.setExpenses(20000);
   });
 
-  it('allows the recommended scenario, including the automatically initialized salary', () => {
-    const comparison = calculateCurrent();
+  it('keeps the contained recommendation when a custom salary is staged', () => {
+    calculateCurrent();
     const { result } = renderHook(useDirectorEmailUnavailableReason);
     expect(result.current).toBeNull();
-    act(() =>
-      useDirectorGuideStore
-        .getState()
-        .setSliderSalary(comparison.strategies[comparison.recommended].salary),
-    );
+    act(() => useDirectorGuideStore.getState().setSliderSalary(20000));
     expect(result.current).toBeNull();
   });
 
@@ -51,10 +47,12 @@ describe('Director email interim guard', () => {
       () => useDirectorGuideStore.getState().setObjective('minimizeNI'),
       /selected objective/,
     ],
-  ] as const)('blocks a divergent %s and recovers after reset', (_name, change, reason) => {
+  ] as const)('blocks a submitted %s and recovers after resubmission', (_name, change, reason) => {
     calculateCurrent();
     const { result } = renderHook(useDirectorEmailUnavailableReason);
     act(change);
+    expect(result.current).toBeNull();
+    act(() => useDirectorGuideStore.getState().calculate('draft'));
     expect(result.current).toMatch(reason);
     act(() => {
       const state = useDirectorGuideStore.getState();
@@ -62,6 +60,7 @@ describe('Director email interim guard', () => {
       state.setObjective('maximizeTakeHome');
       state.setSliderSalary(null);
       state.setSelectedStrategy(state.strategyComparison?.recommended ?? 'optimalMix');
+      state.calculate('draft');
     });
     expect(result.current).toBeNull();
   });
@@ -123,8 +122,7 @@ describe('Director email interim guard', () => {
     (fields) => {
       const state = useDirectorGuideStore.getState();
       useDirectorGuideStore.setState({ formData: { ...state.formData, ...fields } });
-      const comparison = calculateCurrent();
-      state.setSliderSalary(comparison.strategies[comparison.recommended].salary);
+      calculateCurrent();
       const { result } = renderHook(useDirectorEmailUnavailableReason);
       expect(result.current).toBeNull();
     },
@@ -142,7 +140,10 @@ describe('Director email interim guard', () => {
       expect(comparison.recommended).toBe('allSalary');
       const { result } = renderHook(useDirectorEmailUnavailableReason);
       expect(result.current).toBeNull();
-      act(() => state.setSelectedStrategy('optimalMix'));
+      act(() => {
+        state.setSelectedStrategy('optimalMix');
+        state.calculate('draft');
+      });
       expect(result.current).toMatch(/unavailable for this setup/);
       act(() => {
         state.setSelectedStrategy('allSalary');
@@ -152,9 +153,13 @@ describe('Director email interim guard', () => {
             comparison.strategies.allSalary.salary,
           ),
         );
+        state.calculate('draft');
       });
-      expect(result.current).toMatch(/unavailable for this setup/);
-      act(() => state.setSliderSalary(null));
+      expect(result.current).toMatch(/what-if salary/);
+      act(() => {
+        state.setSliderSalary(null);
+        state.calculate('draft');
+      });
       expect(result.current).toBeNull();
     },
   );
@@ -192,10 +197,13 @@ describe('Director email interim guard', () => {
   it('does not persist the calculation reference or objective', () => {
     rememberFigures();
     calculateCurrent();
-    useDirectorGuideStore.getState().setObjective('minimizeNI');
+    const state = useDirectorGuideStore.getState();
+    state.setObjective('minimizeNI');
+    state.calculate('draft');
     const saved = JSON.parse(localStorage.getItem('director-guide-storage') ?? '{}').state;
     expect(saved).not.toHaveProperty('calculatedFormData');
     expect(saved).not.toHaveProperty('calculatedStrategy');
+    expect(saved).not.toHaveProperty('calculatedExploration');
     expect(saved).not.toHaveProperty('objective');
     useDirectorGuideStore.getState().clearStaleState();
     expect(useDirectorGuideStore.getState().calculatedFormData).toBeNull();

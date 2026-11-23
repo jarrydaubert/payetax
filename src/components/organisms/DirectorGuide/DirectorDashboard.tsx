@@ -80,7 +80,7 @@ export function DirectorDashboard() {
   const formData = useDirectorFormSlice((data) => data);
   const comparison = useStrategyComparison();
   const monthlyModeOutput = useMonthlyModeOutput();
-  const { activeScenario } = useActiveDirectorScenario(true);
+  const { activeScenario } = useActiveDirectorScenario();
   const hasInputErrors = useHasDirectorInputErrors();
   const calculationFailed = useDirectorCalculationFailed();
   const { calculate, invalidateResults, reset } = useDirectorGuideActions();
