@@ -94,7 +94,8 @@ export interface Class1PeriodThresholds {
 }
 
 export interface EmployeeNIExemptionInput {
-  age?: number;
+  /** Explicit declaration that the employee has reached State Pension age. */
+  reachedStatePensionAge?: boolean;
   niCategory?: NICategory;
   payNoNI?: boolean;
 }
@@ -102,16 +103,6 @@ export interface EmployeeNIExemptionInput {
 // ============================================================================
 // CONSTANTS
 // ============================================================================
-
-/**
- * Age at which employee Class 1 contributions stop.
- *
- * Employer contributions continue to be due for employees over State Pension
- * age — only the employee side is exempt.
- *
- * @see https://www.gov.uk/state-pension-age
- */
-export const STATE_PENSION_AGE_NI_EXEMPTION = 66;
 
 /** Tax months and tax years both begin on the 6th. */
 const TAX_YEAR_START_DAY = 6;
@@ -205,16 +196,21 @@ export function sliceClass1EmployerEarnings(
 /**
  * Whether employee Class 1 contributions are exempt.
  *
- * Employer contributions are unaffected — callers must still charge them.
+ * State Pension age varies by date of birth, so it is an explicit declaration
+ * rather than an age threshold. Employee contributions stop once it is
+ * reached; employer contributions are unaffected — callers must still charge
+ * them.
+ *
+ * @see https://www.gov.uk/employee-reaches-state-pension-age
  */
 export function isEmployeeNIExempt({
-  age,
+  reachedStatePensionAge,
   niCategory,
   payNoNI,
 }: EmployeeNIExemptionInput): boolean {
   if (payNoNI) return true;
   if (niCategory === 'C') return true;
-  return age !== undefined && age >= STATE_PENSION_AGE_NI_EXEMPTION;
+  return reachedStatePensionAge === true;
 }
 
 /**

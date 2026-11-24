@@ -6,7 +6,6 @@ describe('tax-domain public interface', () => {
     expect(Object.keys(taxDomain).sort()).toEqual([
       'CURRENT_TAX_YEAR',
       'SCOTTISH_TAX_RATES',
-      'STATE_PENSION_AGE_NI_EXEMPTION',
       'TAX_CODE_MAX_LENGTH',
       'TAX_CODE_NON_CUMULATIVE_MARKERS',
       'TAX_RATES',

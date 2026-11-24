@@ -22,7 +22,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
     isMarried: false,
     partnerGrossWage: 0,
     isBlind: false,
-    age: undefined,
+    reachedStatePensionAge: false,
     payNoNI: false,
     pensionContribution: 0,
     pensionContributionType: 'percentage',
@@ -192,13 +192,11 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
       });
     });
 
-    it('category C with age 67 - no NI', () => {
+    it('category C alone - no employee NI', () => {
       const result = calculateTax(
         createInput({
           salary: 50000,
           niCategory: 'C',
-          age: 67,
-          payNoNI: true,
         }),
       );
       expect(result.nationalInsurance.annually).toBe(0);
@@ -372,24 +370,12 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
       expect(malformed.nationalInsurance.annually).toBe(current.nationalInsurance.annually);
     });
 
-    it('handles invalid age values', () => {
-      const testCases = [
-        { age: -1, expectedPA: 12570 }, // Negative age
-        { age: 0, expectedPA: 12570 }, // Zero age
-        { age: 150, expectedPA: 12570 }, // Very old — age never changes the allowance
-        { age: undefined, expectedPA: 12570 }, // No age
-      ];
-
-      // biome-ignore lint/complexity/noForEach: Dynamic test generation pattern
-      testCases.forEach(({ age, expectedPA }) => {
-        const result = calculateTax(
-          createInput({
-            salary: 25000,
-            age,
-          }),
-        );
-        expect(result.taxFreeAmount).toBe(expectedPA);
-      });
+    it('never changes the allowance for the State Pension age declaration', () => {
+      // Age-related allowances were abolished from 2016-17; the declaration only affects NI.
+      for (const reachedStatePensionAge of [true, false, undefined]) {
+        const result = calculateTax(createInput({ salary: 25000, reachedStatePensionAge }));
+        expect(result.taxFreeAmount).toBe(12570);
+      }
     });
 
     it('handles pension contribution edge cases', () => {
@@ -429,18 +415,18 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
   });
 
   describe('Complex Combination Scenarios', () => {
-    it('maximum allowances: age 75+, blind, married, all eligible', () => {
+    it('maximum allowances: over State Pension age, blind, married, all eligible', () => {
       const result = calculateTax(
         createInput({
           salary: 30000,
-          age: 75,
+          reachedStatePensionAge: true,
           isBlind: true,
           isMarried: true,
           partnerGrossWage: 8000,
         }),
       );
       // £12,570 + £3,130 (blind) + £1,260 (marriage) = £16,960.
-      // Age adds nothing — age-related allowances were abolished from 2016-17.
+      // State Pension age adds nothing — age-related allowances were abolished from 2016-17.
       expect(result.taxFreeAmount).toBe(16960);
     });
 
@@ -448,7 +434,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
       const result = calculateTax(
         createInput({
           salary: 150000,
-          age: 67,
+          reachedStatePensionAge: true,
           isBlind: true,
           isMarried: true,
           partnerGrossWage: 10000,
@@ -474,7 +460,7 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
           isScottish: true,
           isMarried: true,
           partnerGrossWage: 10000,
-          age: 70,
+          reachedStatePensionAge: true,
           isBlind: true,
           studentLoanPlans: ['plan4'], // Scottish plan
           niCategory: 'A',
@@ -494,7 +480,6 @@ describe('Comprehensive Tax Calculator Tests - All User Inputs', () => {
       const result = calculateTax(
         createInput({
           salary: 22000,
-          age: 19,
           niCategory: 'M', // Under 21
           studentLoanPlans: ['plan1'],
         }),

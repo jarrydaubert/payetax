@@ -62,7 +62,7 @@ const validPayload = {
     isMarried: false,
     partnerGrossWage: 0,
     isBlind: false,
-    age: 30,
+    reachedStatePensionAge: false,
     payNoNI: false,
     pensionContribution: 0,
     pensionContributionType: 'percentage',

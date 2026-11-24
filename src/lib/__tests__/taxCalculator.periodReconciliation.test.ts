@@ -20,7 +20,7 @@ const input: TaxCalculationInput = {
   isMarried: false,
   partnerGrossWage: 0,
   isBlind: false,
-  age: undefined,
+  reachedStatePensionAge: false,
   payNoNI: false,
   pensionContribution: 4,
   pensionContributionType: 'percentage',

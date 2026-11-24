@@ -109,7 +109,7 @@ async function expectInputGeometry(page: Page, width: number) {
     const fieldWidth = (name: string) =>
       geometry.fields.find((field) => field.label === name)?.width ?? 0;
     expect(fieldWidth('Tax Code')).toBeLessThan(fieldWidth('Salary'));
-    expect(fieldWidth('Non-taxable allowance(s)')).toBeLessThan(fieldWidth('Age'));
+    expect(fieldWidth('Non-taxable allowance(s)')).toBeLessThan(fieldWidth('Student Loan'));
   }
   return geometry;
 }
@@ -129,12 +129,7 @@ for (const theme of ['light', 'dark'] as const) {
       document.documentElement.style.colorScheme = value;
     }, theme);
 
-    const laterControls = [
-      'age-select',
-      'student-loan-select',
-      'non-taxable-allowances-input',
-      'pension-input',
-    ];
+    const laterControls = ['student-loan-select', 'non-taxable-allowances-input', 'pension-input'];
     const controlPositions = () =>
       Promise.all(
         laterControls.map((id) =>
@@ -169,8 +164,7 @@ for (const theme of ['light', 'dark'] as const) {
     await page.getByTestId('non-taxable-allowances-input').fill('1000000');
     await page.getByRole('combobox', { name: 'Pay period', exact: true }).click();
     await page.getByRole('option', { name: 'Fortnightly' }).click();
-    await page.getByTestId('age-select').click();
-    await page.getByRole('option', { name: 'State Pension Age or over' }).click();
+    await page.getByTestId('state-pension-age-checkbox').check();
     await page.getByTestId('student-loan-select').click();
     await page.getByRole('option', { name: /Plan 1/ }).click();
     await page.getByTestId('postgraduate-addon-checkbox').check();

@@ -138,6 +138,23 @@ describe('PayeEmailInputSchema', () => {
     });
     expect(result.success).toBe(false);
   });
+
+  it('passes an explicit State Pension age declaration through', () => {
+    const result = PayeEmailInputSchema.parse({ ...validPayeInput, reachedStatePensionAge: true });
+    expect(result.reachedStatePensionAge).toBe(true);
+    expect(result).not.toHaveProperty('age');
+  });
+
+  it.each([
+    [67, true],
+    [66, true],
+    [65, false],
+    [undefined, false],
+  ])('maps a legacy client age of %s to reachedStatePensionAge=%s', (age, expected) => {
+    const result = PayeEmailInputSchema.parse({ ...validPayeInput, age });
+    expect(result.reachedStatePensionAge).toBe(expected);
+    expect(result).not.toHaveProperty('age');
+  });
 });
 
 describe('SendResultsRequestSchema', () => {

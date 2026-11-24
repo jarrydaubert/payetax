@@ -93,15 +93,15 @@ export const INPUT_TOOLTIPS = {
     description:
       "Select if you qualify for Blind Person's Allowance, which increases the income you can receive before paying Income Tax.",
   },
-  age: {
-    title: 'Age',
+  statePensionAge: {
+    title: 'State Pension age',
     description:
-      'Choose whether you have reached your State Pension age. This affects employee National Insurance.',
+      'Tick if you have already reached your State Pension age. Results then show no employee National Insurance for the whole period; your employer still pays theirs.',
   },
   payNoNI: {
     title: 'No National Insurance',
     description:
-      'Select if you are exempt from employee National Insurance, for example because you have reached State Pension age.',
+      'Select if no employee National Insurance is deducted from your pay for another reason. If you have reached State Pension age, tick that option instead.',
   },
   allowancesDeductions: {
     title: 'Non-taxable Allowance(s)',

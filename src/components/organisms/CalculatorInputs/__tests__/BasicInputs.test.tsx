@@ -22,7 +22,7 @@ describe('BasicInputs Component', () => {
   const mockSetIsMarried = jest.fn();
   const mockSetPartnerGrossWage = jest.fn();
   const mockSetIsBlind = jest.fn();
-  const mockSetAge = jest.fn();
+  const mockSetReachedStatePensionAge = jest.fn();
   const mockSetPayNoNI = jest.fn();
   const mockSetStudentLoanPlan = jest.fn();
   const mockSetAllowancesDeductions = jest.fn();
@@ -38,7 +38,7 @@ describe('BasicInputs Component', () => {
     isMarried: false,
     partnerGrossWage: 0,
     isBlind: false,
-    age: undefined,
+    reachedStatePensionAge: false,
     payNoNI: false,
     studentLoanPlans: 'none' as const,
     allowancesDeductions: 0,
@@ -62,7 +62,7 @@ describe('BasicInputs Component', () => {
       setIsMarried: mockSetIsMarried,
       setPartnerGrossWage: mockSetPartnerGrossWage,
       setIsBlind: mockSetIsBlind,
-      setAge: mockSetAge,
+      setReachedStatePensionAge: mockSetReachedStatePensionAge,
       setPayNoNI: mockSetPayNoNI,
       setStudentLoanPlans: mockSetStudentLoanPlan,
       setAllowancesDeductions: mockSetAllowancesDeductions,
@@ -106,17 +106,25 @@ describe('BasicInputs Component', () => {
       expect(screen.getByText('Region')).toBeInTheDocument();
     });
 
-    it('should render 3 checkboxes in one row', () => {
+    it('should render the allowance and State Pension age checkboxes', () => {
       render(<BasicInputs />);
       expect(screen.getByText('Married')).toBeInTheDocument();
       expect(screen.getByText('Blind')).toBeInTheDocument();
+      expect(
+        screen.getByRole('checkbox', { name: 'Reached State Pension age' }),
+      ).toBeInTheDocument();
       expect(screen.getByRole('checkbox', { name: 'I pay no NI' })).toBeInTheDocument();
     });
 
-    it('should render age dropdown', () => {
+    it('declares State Pension age explicitly instead of storing an age', () => {
       render(<BasicInputs />);
-      expect(screen.getByText('Age')).toBeInTheDocument();
-      expect(screen.getByTestId('age-select')).toBeInTheDocument();
+      expect(screen.queryByTestId('age-select')).not.toBeInTheDocument();
+      const checkbox = screen.getByRole('checkbox', { name: 'Reached State Pension age' });
+      expect(checkbox).not.toBeChecked();
+
+      fireEvent.click(checkbox);
+
+      expect(mockSetReachedStatePensionAge).toHaveBeenCalledWith(true);
     });
 
     it('should render student loan select', () => {

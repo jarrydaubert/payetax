@@ -102,8 +102,11 @@ export interface TaxCalculationInput {
   partnerGrossWage: number;
   /** Whether blind person's allowance applies */
   isBlind: boolean;
-  /** Age of the taxpayer (for age-related allowances) */
-  age?: number;
+  /**
+   * The taxpayer has declared they have reached State Pension age, so employee
+   * Class 1 NI stops (employer NI continues). Omitted means not reached.
+   */
+  reachedStatePensionAge?: boolean;
   /** Whether paying no National Insurance */
   payNoNI: boolean;
   /** Pension contribution amount or percentage */

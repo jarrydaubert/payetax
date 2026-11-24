@@ -618,7 +618,7 @@ export function calculateTax(
   // Employee NI is exempt for payNoNI, category C, or State Pension age.
   // Employer NI below is charged regardless.
   const employeeNIExempt = isEmployeeNIExempt({
-    age: input.age,
+    reachedStatePensionAge: input.reachedStatePensionAge,
     niCategory: input.niCategory,
     payNoNI: input.payNoNI,
   });

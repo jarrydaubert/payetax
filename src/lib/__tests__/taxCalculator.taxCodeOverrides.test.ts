@@ -16,7 +16,7 @@ const baseInput: TaxCalculationInput = {
   isMarried: false,
   partnerGrossWage: 0,
   isBlind: false,
-  age: undefined,
+  reachedStatePensionAge: false,
   payNoNI: false,
   pensionContribution: 0,
   pensionContributionType: 'percentage',
