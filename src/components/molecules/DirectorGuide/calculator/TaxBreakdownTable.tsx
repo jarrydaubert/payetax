@@ -14,10 +14,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { formatCurrency } from '@/lib/utils';
-import { useDirectorFormValue, useStrategyComparison } from '@/store/directorGuideStore';
+import { useStrategyComparison, useSubmittedDirectorForm } from '@/store/directorGuideStore';
 
 export function TaxBreakdownTable() {
-  const hasStudentLoans = useDirectorFormValue((formData) => formData.studentLoanPlans.length > 0);
+  const hasStudentLoans = Boolean(useSubmittedDirectorForm()?.studentLoanPlans.length);
   const comparison = useStrategyComparison();
 
   if (!comparison || comparison.grossProfit <= 0) return null;

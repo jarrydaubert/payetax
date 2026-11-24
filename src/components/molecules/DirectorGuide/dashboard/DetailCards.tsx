@@ -10,7 +10,7 @@
 import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario';
 import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
 import { cn, formatCurrency } from '@/lib/utils';
-import { useDirectorFormSlice, useMonthlyModeOutput } from '@/store/directorGuideStore';
+import { useMonthlyModeOutput, useSubmittedDirectorForm } from '@/store/directorGuideStore';
 
 const TAX_YEAR = CURRENT_TAX_YEAR;
 const DIVIDEND_ALLOWANCE = TAX_RATES[TAX_YEAR].dividendAllowance;
@@ -21,26 +21,15 @@ interface DetailCardsProps {
 
 export function DetailCards({ className }: DetailCardsProps) {
   const { activeScenario, comparison, isProfitWhatIfActive } = useActiveDirectorScenario();
-  const { mode, revenue, expenses, pension, lossesBroughtForward } = useDirectorFormSlice(
-    (state) => ({
-      mode: state.mode,
-      revenue: state.revenue,
-      expenses: state.expenses,
-      pension: state.isPensionAlreadyDeducted ? 0 : state.pensionContribution,
-      lossesBroughtForward: state.lossesBroughtForward,
-    }),
-  );
+  const formData = useSubmittedDirectorForm();
   const monthlyOutput = useMonthlyModeOutput();
-  const resolvedRevenue = mode === 'monthly' ? monthlyOutput?.projectedRevenue : (revenue ?? 0);
-  const resolvedExpenses = mode === 'monthly' ? monthlyOutput?.projectedExpenses : (expenses ?? 0);
+  if (!(formData && activeScenario && comparison)) return null;
 
-  if (
-    !(activeScenario && comparison) ||
-    resolvedRevenue === undefined ||
-    resolvedExpenses === undefined
-  ) {
-    return null;
-  }
+  const { mode, revenue, expenses, lossesBroughtForward } = formData;
+  const pension = formData.isPensionAlreadyDeducted ? 0 : formData.pensionContribution;
+  const resolvedRevenue = mode === 'monthly' ? monthlyOutput?.projectedRevenue : revenue;
+  const resolvedExpenses = mode === 'monthly' ? monthlyOutput?.projectedExpenses : expenses;
+  if (resolvedRevenue === undefined || resolvedExpenses === undefined) return null;
   const { taperTaxOnOtherIncome = 0 } = activeScenario;
   const incomeTaxOnSalaryAndBenefits = activeScenario.incomeTax - taperTaxOnOtherIncome;
 

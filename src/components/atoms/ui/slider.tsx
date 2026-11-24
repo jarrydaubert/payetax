@@ -2,7 +2,9 @@ import * as SliderPrimitive from '@radix-ui/react-slider';
 import { type ComponentPropsWithoutRef, type ElementRef, forwardRef } from 'react';
 import { cn } from '@/lib/utils';
 
-export type SliderProps = ComponentPropsWithoutRef<typeof SliderPrimitive.Root>;
+export type SliderProps = ComponentPropsWithoutRef<typeof SliderPrimitive.Root> & {
+  thumbLabel?: string;
+};
 
 /**
  * Slider component for selecting numeric values
@@ -33,7 +35,7 @@ export type SliderProps = ComponentPropsWithoutRef<typeof SliderPrimitive.Root>;
  * ```
  */
 const Slider = forwardRef<ElementRef<typeof SliderPrimitive.Root>, SliderProps>(
-  ({ className, disabled, ...props }, ref) => (
+  ({ className, disabled, thumbLabel, ...props }, ref) => (
     <SliderPrimitive.Root
       ref={ref}
       disabled={disabled}
@@ -65,6 +67,7 @@ const Slider = forwardRef<ElementRef<typeof SliderPrimitive.Root>, SliderProps>(
         />
       </SliderPrimitive.Track>
       <SliderPrimitive.Thumb
+        aria-label={thumbLabel}
         className={cn(
           // Size - visible thumb
           'block size-5 rounded-full',

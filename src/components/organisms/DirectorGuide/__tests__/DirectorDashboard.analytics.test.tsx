@@ -1,12 +1,7 @@
-import { act, render } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { trackCalculationRun } from '@/lib/directorGuideAnalytics';
-import {
-  useDirectorFormSlice,
-  useDirectorGuideActions,
-  useMonthlyModeOutput,
-  useStrategyComparison,
-} from '@/store/directorGuideStore';
+import { useDirectorGuideStore } from '@/store/directorGuideStore';
 import { DirectorDashboard } from '../DirectorDashboard';
 
 jest.mock('@/lib/directorGuideAnalytics', () => ({
@@ -17,15 +12,6 @@ jest.mock('@/lib/directorGuideAnalytics', () => ({
   trackModeChanged: jest.fn(),
   trackSafeDrawCalculated: jest.fn(),
   trackBufferShortfallShown: jest.fn(),
-}));
-
-jest.mock('@/store/directorGuideStore', () => ({
-  useHasDirectorInputErrors: jest.fn(() => false),
-  useDirectorCalculationFailed: jest.fn(() => false),
-  useDirectorFormSlice: jest.fn(),
-  useStrategyComparison: jest.fn(),
-  useMonthlyModeOutput: jest.fn(),
-  useDirectorGuideActions: jest.fn(),
 }));
 
 jest.mock('@/components/molecules/DirectorGuide/useDirectorEmailUnavailableReason', () => ({
@@ -65,8 +51,13 @@ jest.mock('@/components/molecules/DirectorGuide/dashboard', () => ({
   ),
   DetailCards: () => null,
   EducationPanel: () => null,
-  InputsPanel: () => null,
+  InputsPanel: ({ onCalculate }: { onCalculate: () => void }) => (
+    <button type='button' onClick={onCalculate}>
+      Calculate
+    </button>
+  ),
   MoneyFlowChart: () => null,
+  RecommendationHero: () => null,
   SidebarNav: () => null,
   SummaryCards: () => null,
   SurvivalModePanel: () => null,
@@ -76,114 +67,38 @@ jest.mock('@/components/molecules/DirectorGuide/EmailResultsDialog', () => ({
   EmailResultsDialog: () => null,
 }));
 
-describe('DirectorDashboard analytics', () => {
-  const mockFormSlice = (overrides: Record<string, unknown>) => {
-    const defaults = {
-      mode: 'annual',
-      region: undefined,
-      revenue: undefined,
-      includesVat: false,
-      expenses: undefined,
-      lossesBroughtForward: undefined,
-      ytdSalary: undefined,
-      ytdDividends: undefined,
-      ytdDrawings: undefined,
-      otherIncome: undefined,
-      hasOtherPAYEEmployment: false,
-      studentLoanPlans: [],
-      pensionContribution: undefined,
-      isPensionAlreadyDeducted: false,
-      companyCarBIK: undefined,
-      hasEmploymentAllowance: false,
-      minimumSalaryRequirement: undefined,
-      yourSetupSalary: undefined,
-      yourSetupDividends: undefined,
-      monthlyIncome: undefined,
-      monthlyExpenses: undefined,
-      contractStartMonth: undefined,
-      cashInBank: undefined,
-      minimumMonthlyDraw: undefined,
-      runwayMonths: undefined,
-    };
-
-    (useDirectorFormSlice as unknown as jest.Mock).mockImplementation(
-      (selector: (state: Record<string, unknown>) => unknown) =>
-        selector({ ...defaults, ...overrides }),
-    );
-  };
-
+describe('DirectorDashboard calculation telemetry', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    useDirectorGuideStore.getState().clearStaleState();
     jest.clearAllMocks();
   });
 
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
-  test('tracks calculation_run once and schedules calculate when inputs become valid', () => {
-    const mockCalculate = jest.fn();
-
-    mockFormSlice({
-      region: 'rUK',
-      revenue: 100000,
-      expenses: 20000,
-      includesVat: false,
-    });
-
-    (useStrategyComparison as unknown as jest.Mock).mockReturnValue(null);
-    (useMonthlyModeOutput as unknown as jest.Mock).mockReturnValue(null);
-
-    (useDirectorGuideActions as unknown as jest.Mock).mockReturnValue({
-      calculate: mockCalculate,
-      invalidateResults: jest.fn(),
-      reset: jest.fn(),
-    });
-
+  test('counts only explicit, figure-free Calculate attempts, including invalid attempts and retries', () => {
+    const store = useDirectorGuideStore.getState();
     render(<DirectorDashboard />);
+    const calculate = screen.getByRole('button', { name: 'Calculate' });
 
-    expect(trackCalculationRun).toHaveBeenCalledTimes(1);
-    expect(trackCalculationRun).toHaveBeenCalledWith();
+    expect(trackCalculationRun).not.toHaveBeenCalled();
+    fireEvent.click(calculate);
+    expect(useDirectorGuideStore.getState().error).toBe('Please select your region');
 
     act(() => {
-      jest.advanceTimersByTime(250);
+      store.setMode('monthly');
+      store.setRegion('rUK');
+      store.setMonthlyIncome(3000);
+      store.setMonthlyExpenses(1000);
+      store.setContractStartMonth(10);
     });
-
-    expect(mockCalculate).toHaveBeenCalledTimes(1);
-  });
-
-  test('counts a monthly calculation without passing projected financials', () => {
-    const mockCalculate = jest.fn();
-
-    mockFormSlice({
-      mode: 'monthly',
-      region: 'rUK',
-      includesVat: false,
-      monthlyIncome: 3000,
-      monthlyExpenses: 1000,
-      contractStartMonth: 10, // 6 months remaining
-      revenue: undefined,
-      expenses: undefined,
-    });
-
-    (useStrategyComparison as unknown as jest.Mock).mockReturnValue(null);
-    (useMonthlyModeOutput as unknown as jest.Mock).mockReturnValue(null);
-
-    (useDirectorGuideActions as unknown as jest.Mock).mockReturnValue({
-      calculate: mockCalculate,
-      invalidateResults: jest.fn(),
-      reset: jest.fn(),
-    });
-
-    render(<DirectorDashboard />);
-
     expect(trackCalculationRun).toHaveBeenCalledTimes(1);
-    expect(trackCalculationRun).toHaveBeenCalledWith();
+    expect(useDirectorGuideStore.getState().strategyComparison).toBeNull();
 
-    act(() => {
-      jest.advanceTimersByTime(250);
-    });
+    fireEvent.click(calculate);
+    expect(useDirectorGuideStore.getState().monthlyModeOutput?.monthsRemaining).toBe(6);
+    expect(trackCalculationRun).toHaveBeenCalledTimes(2);
+    expect(trackCalculationRun).toHaveBeenNthCalledWith(1);
+    expect(trackCalculationRun).toHaveBeenNthCalledWith(2);
 
-    expect(mockCalculate).toHaveBeenCalledTimes(1);
+    act(() => store.reset());
+    expect(trackCalculationRun).toHaveBeenCalledTimes(2);
   });
 });

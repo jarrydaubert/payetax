@@ -33,6 +33,12 @@ describe('EducationPanel warning analytics', () => {
       formData: { ...useDirectorGuideStore.getState().formData, revenue: 91000 },
     });
 
+    const store = useDirectorGuideStore.getState();
+    store.setRegion('rUK');
+    store.setExpenses(91000);
+    store.calculate();
+    jest.clearAllMocks();
+
     render(<EducationPanel />);
 
     expect(screen.getByText('VAT Registration Required')).toBeVisible();

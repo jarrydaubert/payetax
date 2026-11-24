@@ -2,14 +2,14 @@
  * Summary Cards - Top row of key financial metrics
  *
  * Shows monthly take-home, annual salary, dividends, and corporation tax.
- * Values come from either the slider scenario or selected strategy.
+ * Values come from the submitted scenario.
  */
 'use client';
 
 import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario';
 import { formatCurrencyInputValue } from '@/lib/currencyInput';
 import { cn, formatCurrency } from '@/lib/utils';
-import { useDirectorFormValue } from '@/store/directorGuideStore';
+import { useSubmittedDirectorForm } from '@/store/directorGuideStore';
 
 interface SummaryCardsProps {
   className?: string;
@@ -18,7 +18,7 @@ interface SummaryCardsProps {
 
 export function SummaryCards({ className, monthlyDraw }: SummaryCardsProps) {
   const { activeScenario } = useActiveDirectorScenario();
-  const mode = useDirectorFormValue((state) => state.mode);
+  const mode = useSubmittedDirectorForm()?.mode;
   const isMonthlyMode = mode === 'monthly';
 
   const hasResults = activeScenario !== null;

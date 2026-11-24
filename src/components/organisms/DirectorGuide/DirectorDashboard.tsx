@@ -48,25 +48,24 @@ import {
 } from '@/lib/directorGuideAnalytics';
 import { useFigureStorage } from '@/lib/figureStorage';
 import { safeGetItem, safeSetItem } from '@/lib/safeStorage';
-import { calculateSafeMonthlyDraw, resolveAnnualFinancials } from '@/lib/tax';
+import { calculateSafeMonthlyDraw } from '@/lib/tax';
 import { cn, formatCurrency } from '@/lib/utils';
 import type { DirectorEmailInput } from '@/lib/validation/emailValidation';
 import {
-  useDirectorCalculationFailed,
-  useDirectorFormSlice,
+  hasCurrentDirectorResults,
+  useDirectorError,
   useDirectorGuideActions,
+  useDirectorGuideStore,
   useHasDirectorInputErrors,
   useMonthlyModeOutput,
   useStrategyComparison,
+  useSubmittedDirectorForm,
 } from '@/store/directorGuideStore';
 
-/** Debounce delay for auto-calculate (ms) */
-const CALCULATE_DEBOUNCE_MS = 200;
 export const DIRECTOR_EDUCATION_COLLAPSED_STORAGE_KEY = 'director-guide-education-collapsed:v1';
 
 export function DirectorDashboard() {
   const emailUnavailableId = useId();
-  const calculationErrorId = useId();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true); // Icon menu collapsed by default
   const [inputsCollapsed, setInputsCollapsed] = useState(false); // Inputs panel expanded
   const [educationCollapsed, setEducationCollapsed] = useState(true); // Start collapsed to prioritize calculator workspace
@@ -77,21 +76,19 @@ export function DirectorDashboard() {
   const [emailDialogOpen, setEmailDialogOpen] = useState(false);
 
   const hasLegacyFigures = useFigureStorage((state) => state.legacy);
-  const formData = useDirectorFormSlice((data) => data);
+  const formData = useSubmittedDirectorForm();
   const comparison = useStrategyComparison();
   const monthlyModeOutput = useMonthlyModeOutput();
-  const { activeScenario } = useActiveDirectorScenario();
+  const { activeScenario, isProfitWhatIfActive } = useActiveDirectorScenario();
   const hasInputErrors = useHasDirectorInputErrors();
-  const calculationFailed = useDirectorCalculationFailed();
-  const { calculate, invalidateResults, reset } = useDirectorGuideActions();
-  const isMonthlyMode = formData.mode === 'monthly';
+  const calculationError = useDirectorError();
+  const hasPreviousSubmission = useDirectorGuideStore((state) => state.strategyComparison !== null);
+  const { calculate, reset } = useDirectorGuideActions();
   const monthlyDraw =
-    isMonthlyMode && monthlyModeOutput
+    formData?.mode === 'monthly' && monthlyModeOutput && activeScenario
       ? calculateSafeMonthlyDraw({
-          annualTakeHome: activeScenario?.takeHome ?? 0,
-          companyTaxReserve: activeScenario
-            ? activeScenario.corporationTax + activeScenario.employerNI
-            : 0,
+          annualTakeHome: activeScenario.takeHome,
+          companyTaxReserve: activeScenario.corporationTax + activeScenario.employerNI,
           monthsRemaining: monthlyModeOutput.monthsRemaining,
           cashInBank: formData.cashInBank,
           minimumMonthlyDraw: formData.minimumMonthlyDraw,
@@ -100,57 +97,23 @@ export function DirectorDashboard() {
         })
       : null;
 
-  const annualizedFromInputs = resolveAnnualFinancials({
-    mode: formData.mode,
-    revenue: formData.revenue,
-    expenses: formData.expenses,
-    monthlyIncome: formData.monthlyIncome,
-    monthlyExpenses: formData.monthlyExpenses,
-    contractStartMonth: formData.contractStartMonth,
-  });
-  const { revenue, expenses, hasInvalidContractStartMonth } = annualizedFromInputs;
-  const hasInvalidInputs =
-    hasInputErrors || hasInvalidContractStartMonth || (revenue ?? 0) < 0 || (expenses ?? 0) < 0;
-  const readyToCalculate =
-    !hasInvalidInputs &&
-    formData.region !== undefined &&
-    revenue !== undefined &&
-    expenses !== undefined;
-  const showFailure = readyToCalculate && calculationFailed;
-  const isUpdating = readyToCalculate && !comparison && !showFailure;
-  const invalidInputsMessage = hasInvalidContractStartMonth
-    ? 'Select a valid contract start month in Your Numbers to see results.'
-    : 'Results are paused until every amount is valid. Check the amounts in Your Numbers.';
   const emailUnavailableReason = useDirectorEmailUnavailableReason(
-    showFailure
-      ? 'Retry the calculation to email results.'
-      : isUpdating
-        ? 'Email is paused while results update.'
-        : hasInvalidInputs
-          ? 'Correct your inputs to email results.'
-          : 'Enter your numbers to calculate results before emailing them.',
+    'Calculate a current scenario before emailing results.',
     true,
   );
   const canEmail = emailUnavailableReason === null;
-
-  const effectiveRevenue = isMonthlyMode
-    ? (monthlyModeOutput?.projectedRevenue ?? annualizedFromInputs.revenue)
-    : annualizedFromInputs.revenue;
-  const effectiveExpenses = isMonthlyMode
-    ? (monthlyModeOutput?.projectedExpenses ?? annualizedFromInputs.expenses)
-    : annualizedFromInputs.expenses;
-
+  const revenue =
+    formData?.mode === 'monthly' ? monthlyModeOutput?.projectedRevenue : formData?.revenue;
+  const expenses =
+    formData?.mode === 'monthly' ? monthlyModeOutput?.projectedExpenses : formData?.expenses;
   const emailInput: DirectorEmailInput | null =
-    comparison &&
-    formData.region !== undefined &&
-    effectiveRevenue !== undefined &&
-    effectiveExpenses !== undefined
+    formData && formData.region !== undefined && revenue !== undefined && expenses !== undefined
       ? {
           mode: formData.mode,
           region: formData.region,
-          revenue: effectiveRevenue,
+          revenue,
           includesVat: formData.includesVat,
-          expenses: effectiveExpenses,
+          expenses,
           lossesBroughtForward: formData.lossesBroughtForward,
           otherIncome: formData.otherIncome,
           employmentAllowance: formData.hasEmploymentAllowance,
@@ -176,7 +139,6 @@ export function DirectorDashboard() {
 
   const hasTrackedStart = useRef(false);
   const hasTrackedResults = useRef(false);
-  const lastTrackedCalcSignature = useRef<string | null>(null);
 
   // Track page load (once)
   useEffect(() => {
@@ -201,24 +163,10 @@ export function DirectorDashboard() {
     safeSetItem(DIRECTOR_EDUCATION_COLLAPSED_STORAGE_KEY, String(educationCollapsed));
   }, [educationCollapsed, hasLoadedEducationPreference]);
 
-  // Auto-calculate when inputs change (debounced to avoid keystroke thrash).
-  // Result readers already withhold mismatched snapshots while this timer is pending.
-  useEffect(() => {
-    if (!readyToCalculate) {
-      invalidateResults();
-      return;
-    }
-
-    // Track once per distinct input set (avoid spamming analytics while typing).
-    const signature = `${formData.mode}|${formData.region}|${revenue}|${expenses}|${String(formData.includesVat)}`;
-    if (lastTrackedCalcSignature.current !== signature) {
-      trackCalculationRun();
-      lastTrackedCalcSignature.current = signature;
-    }
-
-    const timer = window.setTimeout(() => calculate(), CALCULATE_DEBOUNCE_MS);
-    return () => window.clearTimeout(timer);
-  }, [formData, readyToCalculate, revenue, expenses, calculate, invalidateResults]);
+  const handleCalculate = useCallback(() => {
+    trackCalculationRun();
+    calculate();
+  }, [calculate]);
 
   // Track results shown (once per session, when comparison first becomes available)
   useEffect(() => {
@@ -235,19 +183,21 @@ export function DirectorDashboard() {
   }, [reset]);
 
   // Show results when calculation is complete (even for 0 or negative profit)
-  const hasComparison = Boolean(comparison);
+  const hasComparison = Boolean(comparison && formData);
   const isSurvivalMode = Boolean(comparison && comparison.grossProfit <= 0);
   const companyShortfall =
     activeScenario?.companyShortfall ?? comparison?.strategies.allDividends.companyShortfall ?? 0;
   const mix = comparison?.strategies.optimalMix;
 
-  // Keep an open email form disabled during the debounce; close it if results cannot recover.
   useEffect(() => {
-    if (!(hasComparison || isUpdating)) setEmailDialogOpen(false);
-  }, [hasComparison, isUpdating]);
-  const openEmailDialog = useCallback(() => {
-    if (canEmail) setEmailDialogOpen(true);
+    if (!canEmail) setEmailDialogOpen(false);
   }, [canEmail]);
+  const openEmailDialog = useCallback(() => {
+    const state = useDirectorGuideStore.getState();
+    if (canEmail && state.strategyComparison === comparison && hasCurrentDirectorResults(state)) {
+      setEmailDialogOpen(true);
+    }
+  }, [canEmail, comparison]);
 
   return (
     <TooltipProvider>
@@ -262,7 +212,13 @@ export function DirectorDashboard() {
             dashboardVariant={hasComparison ? (isSurvivalMode ? 'survival' : 'normal') : undefined}
           />
         }
-        inputs={<InputsPanel onReset={handleReset} className='h-auto flex-1 pb-3' />}
+        inputs={
+          <InputsPanel
+            onReset={handleReset}
+            onCalculate={handleCalculate}
+            className='h-auto flex-1 pb-3'
+          />
+        }
         inputActions={
           <div className='px-5 pb-6'>
             <FigureStorageControls />
@@ -333,23 +289,22 @@ export function DirectorDashboard() {
             {/* Results */}
             <p
               role='status'
-              data-testid={hasInvalidInputs ? 'director-results-paused' : undefined}
+              data-testid={hasInputErrors ? 'director-results-paused' : undefined}
               className={cn(
-                hasInvalidInputs &&
-                  'mb-4 rounded-sm border border-warning/40 bg-card p-4 text-sm text-foreground',
-                isUpdating && 'rounded-sm border border-border bg-card p-4 text-sm text-foreground',
-                hasComparison && 'mb-3 text-sm text-muted-foreground',
+                hasInputErrors
+                  ? 'mb-4 rounded-sm border border-warning/40 bg-card p-4 text-sm text-foreground'
+                  : 'mb-3 text-sm text-muted-foreground',
               )}
             >
-              {hasInvalidInputs
-                ? invalidInputsMessage
-                : isUpdating
-                  ? 'Updating results…'
-                  : hasComparison
-                    ? 'Results are up to date.'
+              {hasInputErrors
+                ? 'Results are paused until every amount is valid. Check the amounts in Your Numbers.'
+                : hasComparison
+                  ? 'Results are up to date.'
+                  : calculationError || hasPreviousSubmission
+                    ? 'Select Calculate in Your Numbers to see current results.'
                     : ''}
             </p>
-            {hasComparison ? (
+            {hasComparison && formData ? (
               <div className='space-y-6'>
                 {(formData.includesVat ||
                   formData.hasOtherPAYEEmployment ||
@@ -459,6 +414,8 @@ export function DirectorDashboard() {
                           Uses current cash after the buffer and company tax and employer NI
                           estimated for the full projection period. Projected monthly take-home caps
                           the draw.
+                          {isProfitWhatIfActive &&
+                            ' Take-home and tax reserves use the simulated profit. The buffer uses your submitted monthly running costs.'}
                         </p>
                       </section>
                     )}
@@ -477,7 +434,7 @@ export function DirectorDashboard() {
                       data-director-section='director-strategy'
                       aria-label='Strategy comparison'
                     >
-                      <StrategyComparisonTable readOnly />
+                      <StrategyComparisonTable />
                     </section>
 
                     <section
@@ -542,21 +499,7 @@ export function DirectorDashboard() {
                   )}
                 </div>
               </div>
-            ) : showFailure ? (
-              <div className='rounded-sm border border-destructive/40 bg-card p-4'>
-                <p id={calculationErrorId} role='alert' className='mb-3 text-sm text-foreground'>
-                  Unable to calculate director pay. Your numbers are still entered. Try again.
-                </p>
-                <Button
-                  type='button'
-                  variant='outline'
-                  aria-describedby={calculationErrorId}
-                  onClick={() => calculate()}
-                >
-                  Try again
-                </Button>
-              </div>
-            ) : isUpdating ? null : (
+            ) : hasPreviousSubmission || calculationError ? null : (
               /* Empty State */
               <div className='flex min-h-[calc(100dvh-11rem)] flex-col items-center justify-center rounded-sm border border-dashed border-border/70 bg-background px-5 py-8 sm:min-h-[calc(100dvh-9rem)] sm:px-8 lg:min-h-screen'>
                 <div className='mx-auto max-w-xl text-center'>
@@ -653,7 +596,7 @@ export function DirectorDashboard() {
 
       {/* Email Results Dialog */}
       <EmailResultsDialog
-        open={emailDialogOpen && (hasComparison || isUpdating)}
+        open={emailDialogOpen && canEmail}
         onOpenChange={setEmailDialogOpen}
         comparison={comparison}
         emailInput={emailInput}

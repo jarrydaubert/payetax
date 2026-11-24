@@ -10,7 +10,9 @@ import { ChevronDown, ChevronUp, RotateCcw } from 'lucide-react';
 import { useEffect, useId, useState } from 'react';
 import { CurrencyInput, type CurrencyInputInvalidDraft } from '@/components/atoms/CurrencyInput';
 import { LabelTooltip } from '@/components/atoms/LabelTooltip';
+import { SalarySlider } from '@/components/molecules/DirectorGuide/calculator/SalarySlider';
 import { AccountingPeriodEndInput } from '@/components/molecules/DirectorGuide/inputs/AccountingPeriodEndInput';
+import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,15 +26,23 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { CURRENT_TAX_YEAR, type StudentLoanPlan, TAX_RATES } from '@/constants/taxRates';
 import { formatCurrencyInputValue } from '@/lib/currencyInput';
+import { trackStrategySelected } from '@/lib/directorGuideAnalytics';
+import { roundToPence } from '@/lib/tax';
 import { getAvailableDirectorStudentLoanPlans } from '@/lib/tax/studentLoanPlans';
 import { cn } from '@/lib/utils';
 import type { Region } from '@/lib/validation/directorValidation';
 import {
   type DirectorInputField,
+  type DirectorStrategyKey,
+  hasUnappliedYourSetup,
+  useDirectorError,
   useDirectorFormSlice,
   useDirectorGuideActions,
+  useDirectorGuideStore,
   useDirectorInputErrors,
   useDirectorInputRevision,
+  useIsCalculating,
+  useSliderSalary,
 } from '@/store/directorGuideStore';
 
 const TAX_YEAR = CURRENT_TAX_YEAR;
@@ -65,6 +75,7 @@ const DETAIL_CURRENCY_FIELDS: readonly DirectorInputField[] = [
 
 interface InputsPanelProps {
   onReset?: () => void;
+  onCalculate?: () => void;
   className?: string;
 }
 
@@ -76,22 +87,17 @@ const STUDENT_LOAN_PLAN_SHORT_LABELS: Record<StudentLoanPlan, string> = {
   postgrad: 'Postgrad',
 };
 
-export function InputsPanel({ onReset, className }: InputsPanelProps) {
+export function InputsPanel({ onReset, onCalculate, className }: InputsPanelProps) {
   const baseId = useId();
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [quickStartMode, setQuickStartMode] = useState(true);
   const inputRevision = useDirectorInputRevision();
   const inputErrors = useDirectorInputErrors();
-  const [yourSetupDraftSalary, setYourSetupDraftSalary] = useState<number | undefined>(undefined);
-  const [yourSetupDraftDividends, setYourSetupDraftDividends] = useState<number | undefined>(
-    undefined,
-  );
-  const [yourSetupDraftErrors, setYourSetupDraftErrors] = useState<{
-    salary?: CurrencyInputInvalidDraft;
-    dividends?: CurrencyInputInvalidDraft;
-  }>({});
-  // Remounts the draft fields so Reset Draft/Clear also discard unparsed text.
-  const [yourSetupDraftRevision, setYourSetupDraftRevision] = useState(0);
+  const yourSetupDraft = useDirectorGuideStore((state) => state.yourSetupDraft);
+  const yourSetupRevision = useDirectorGuideStore((state) => state.yourSetupRevision);
+  const hasYourSetupDraftChanges = useDirectorGuideStore(hasUnappliedYourSetup);
+  const calculationError = useDirectorError();
+  const isCalculating = useIsCalculating();
 
   const formData = useDirectorFormSlice((formData) => ({
     mode: formData.mode,
@@ -128,51 +134,17 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
   const validityFor = (field: DirectorInputField) => (invalid: CurrencyInputInvalidDraft | null) =>
     actions.setInputError(field, invalid);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: a reset (inputRevision) must also discard drafts
-  useEffect(() => {
-    setYourSetupDraftSalary(formData.yourSetupSalary);
-    setYourSetupDraftDividends(formData.yourSetupDividends);
-    setYourSetupDraftErrors({});
-  }, [formData.yourSetupSalary, formData.yourSetupDividends, inputRevision]);
-
-  const hasYourSetupDraftErrors = Boolean(
-    yourSetupDraftErrors.salary || yourSetupDraftErrors.dividends,
-  );
-  const hasYourSetupDraftChanges =
-    hasYourSetupDraftErrors ||
-    yourSetupDraftSalary !== formData.yourSetupSalary ||
-    yourSetupDraftDividends !== formData.yourSetupDividends;
-  const canApplyYourSetup = hasYourSetupDraftChanges && !hasYourSetupDraftErrors;
+  const yourSetupInput = { ...formData, ...yourSetupDraft };
+  const canApplyYourSetup =
+    hasYourSetupDraftChanges && !(inputErrors.yourSetupSalary || inputErrors.yourSetupDividends);
   const canClearYourSetup =
-    hasYourSetupDraftErrors ||
-    yourSetupDraftSalary !== undefined ||
-    yourSetupDraftDividends !== undefined ||
+    hasYourSetupDraftChanges ||
     formData.yourSetupSalary !== undefined ||
     formData.yourSetupDividends !== undefined;
 
-  const discardYourSetupDraftText = () => {
-    setYourSetupDraftErrors({});
-    setYourSetupDraftRevision((revision) => revision + 1);
-  };
-
-  const handleApplyYourSetup = () => {
-    if (hasYourSetupDraftErrors) return;
-    actions.setYourSetupSalary(yourSetupDraftSalary);
-    actions.setYourSetupDividends(yourSetupDraftDividends);
-  };
-
-  const handleResetYourSetupDraft = () => {
-    setYourSetupDraftSalary(formData.yourSetupSalary);
-    setYourSetupDraftDividends(formData.yourSetupDividends);
-    discardYourSetupDraftText();
-  };
-
-  const handleClearYourSetup = () => {
-    setYourSetupDraftSalary(undefined);
-    setYourSetupDraftDividends(undefined);
-    discardYourSetupDraftText();
-    actions.setYourSetupSalary(undefined);
-    actions.setYourSetupDividends(undefined);
+  const handleCalculate = () => {
+    if (hasYourSetupDraftChanges) setQuickStartMode(false);
+    onCalculate?.();
   };
 
   // Detailed amounts hidden by Quick Start or a collapsed Advanced panel still feed the result, so
@@ -231,7 +203,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
     actions.setLossesBroughtForward(0);
     actions.setMinimumSalaryRequirement(undefined);
     for (const field of DETAIL_CURRENCY_FIELDS) actions.setInputError(field, null);
-    handleClearYourSetup();
+    actions.clearYourSetup();
   };
 
   const handleReset = () => {
@@ -529,6 +501,8 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
 
         <AccountingPeriodEndInput className={INPUT_CLASS} />
       </Section>
+
+      {onCalculate && <ScenarioDraftControls minimumSalary={formData.minimumSalaryRequirement} />}
 
       {quickStartMode ? (
         <div className='mb-5 rounded-sm border border-primary/20 bg-primary/5 p-4'>
@@ -850,14 +824,12 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               tooltipFieldName='directorYourSalary'
             >
               <CurrencyInput
-                key={`your-salary-${yourSetupDraftRevision}`}
+                key={yourSetupRevision}
                 id={ids.yourSalary}
-                value={yourSetupDraftSalary}
-                onValueChange={setYourSetupDraftSalary}
-                onValidityChange={(invalid) =>
-                  setYourSetupDraftErrors((prev) => ({ ...prev, salary: invalid ?? undefined }))
-                }
-                invalidDraft={yourSetupDraftErrors.salary}
+                value={yourSetupInput.yourSetupSalary}
+                onValueChange={(amount) => actions.setYourSetupDraft('yourSetupSalary', amount)}
+                onValidityChange={validityFor('yourSetupSalary')}
+                invalidDraft={inputErrors.yourSetupSalary}
                 placeholder='£0'
                 className={INPUT_CLASS}
               />
@@ -868,14 +840,12 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               tooltipFieldName='directorYourDividends'
             >
               <CurrencyInput
-                key={`your-dividends-${yourSetupDraftRevision}`}
+                key={yourSetupRevision}
                 id={ids.yourDividends}
-                value={yourSetupDraftDividends}
-                onValueChange={setYourSetupDraftDividends}
-                onValidityChange={(invalid) =>
-                  setYourSetupDraftErrors((prev) => ({ ...prev, dividends: invalid ?? undefined }))
-                }
-                invalidDraft={yourSetupDraftErrors.dividends}
+                value={yourSetupInput.yourSetupDividends}
+                onValueChange={(amount) => actions.setYourSetupDraft('yourSetupDividends', amount)}
+                onValidityChange={validityFor('yourSetupDividends')}
+                invalidDraft={inputErrors.yourSetupDividends}
                 placeholder='£0'
                 className={INPUT_CLASS}
               />
@@ -884,7 +854,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
               <div className='grid grid-cols-3 gap-2'>
                 <button
                   type='button'
-                  onClick={handleApplyYourSetup}
+                  onClick={actions.applyYourSetupDraft}
                   disabled={!canApplyYourSetup}
                   className={cn(
                     'rounded-md px-3 py-2 text-xs transition-colors',
@@ -897,7 +867,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 </button>
                 <button
                   type='button'
-                  onClick={handleResetYourSetupDraft}
+                  onClick={actions.discardYourSetupDraft}
                   disabled={!hasYourSetupDraftChanges}
                   className={cn(
                     'rounded-md border border-border/40 px-3 py-2 text-xs transition-colors',
@@ -910,7 +880,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 </button>
                 <button
                   type='button'
-                  onClick={handleClearYourSetup}
+                  onClick={actions.clearYourSetup}
                   disabled={!canClearYourSetup}
                   className={cn(
                     'rounded-md border border-border/40 px-3 py-2 text-xs transition-colors',
@@ -923,7 +893,7 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
                 </button>
               </div>
               <p className='text-xs text-muted-foreground/80'>
-                Applied setup:{' '}
+                Applied to draft:{' '}
                 <span className='text-muted-foreground'>
                   Salary {formatCurrencyInputValue(formData.yourSetupSalary) || 'Not set'} /
                   Dividends {formatCurrencyInputValue(formData.yourSetupDividends) || 'Not set'}
@@ -935,6 +905,27 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
       ) : null}
       {/* Spacer */}
       <div className='flex-1' />
+
+      {onCalculate && (
+        <div className='sticky bottom-0 z-10 space-y-2 border-t border-border bg-background py-3'>
+          {calculationError && (
+            <p id={`${baseId}-calculation-error`} role='alert' className='text-sm text-destructive'>
+              {calculationError === 'Calculation failed'
+                ? 'Unable to calculate director pay. Your numbers are still entered. Select Calculate to try again.'
+                : calculationError}
+            </p>
+          )}
+          <Button
+            type='button'
+            onClick={handleCalculate}
+            disabled={isCalculating}
+            aria-describedby={calculationError ? `${baseId}-calculation-error` : undefined}
+            className='w-full'
+          >
+            Calculate
+          </Button>
+        </div>
+      )}
 
       {/* Reset Button */}
       <div className='mt-6'>
@@ -948,6 +939,69 @@ export function InputsPanel({ onReset, className }: InputsPanelProps) {
         </button>
       </div>
     </aside>
+  );
+}
+
+function ScenarioDraftControls({ minimumSalary }: { minimumSalary?: number }) {
+  const strategyId = useId();
+  const objectiveId = useId();
+  const { setSelectedStrategy, setObjective } = useDirectorGuideActions();
+  const selected = useDirectorGuideStore((state) => state.selectedStrategy);
+  const objective = useDirectorGuideStore((state) => state.objective);
+  const customSalary = useSliderSalary() !== null;
+  const hasMinimumSalary = roundToPence(minimumSalary ?? 0) > 0;
+
+  return (
+    <Section title='Scenario draft'>
+      <Field label='Strategy' id={strategyId}>
+        <Select
+          value={customSalary ? 'custom' : (selected ?? 'recommended')}
+          onValueChange={(value) => {
+            trackStrategySelected();
+            setSelectedStrategy(value === 'recommended' ? null : (value as DirectorStrategyKey));
+          }}
+        >
+          <SelectTrigger id={strategyId}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='recommended'>Recommended strategy</SelectItem>
+            <SelectItem value='allSalary'>All Salary</SelectItem>
+            <SelectItem value='optimalMix'>Baseline Mix</SelectItem>
+            <SelectItem value='allDividends' disabled={hasMinimumSalary}>
+              All Dividends
+            </SelectItem>
+            {customSalary && (
+              <SelectItem value='custom' disabled>
+                Custom salary
+              </SelectItem>
+            )}
+          </SelectContent>
+        </Select>
+        {hasMinimumSalary && (
+          <p className='text-xs text-muted-foreground'>
+            All Dividends is comparison only with a minimum salary.
+          </p>
+        )}
+      </Field>
+      <Field label='Comparison objective' id={objectiveId}>
+        <Select
+          value={objective}
+          onValueChange={(value) =>
+            setObjective(value === 'minimizeNI' ? 'minimizeNI' : 'maximizeTakeHome')
+          }
+        >
+          <SelectTrigger id={objectiveId}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='maximizeTakeHome'>Maximize take-home</SelectItem>
+            <SelectItem value='minimizeNI'>Minimize NI</SelectItem>
+          </SelectContent>
+        </Select>
+      </Field>
+      <SalarySlider />
+    </Section>
   );
 }
 

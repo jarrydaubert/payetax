@@ -1,6 +1,6 @@
 'use client';
 
-import { useDirectorGuideStore } from '@/store/directorGuideStore';
+import { useSubmittedDirectorForm } from '@/store/directorGuideStore';
 import {
   type ActiveDirectorScenario,
   useActiveDirectorScenario,
@@ -8,12 +8,12 @@ import {
 
 /** Interim guard for the existing email, which always reports the original recommendation. */
 export function useDirectorEmailUnavailableReason(
-  noCurrentResultsReason = 'Email is paused until results have updated from complete, valid inputs.',
+  noCurrentResultsReason = 'Calculate a current scenario before emailing results.',
   recommendationOnly = false,
 ): string | null {
   const { comparison, activeScenario, selectedStrategy, exploration, isCustomSalary } =
     useActiveDirectorScenario();
-  const mode = useDirectorGuideStore((state) => state.formData.mode);
+  const mode = useSubmittedDirectorForm()?.mode;
 
   if (!comparison) return noCurrentResultsReason;
   if (mode === 'monthly') {

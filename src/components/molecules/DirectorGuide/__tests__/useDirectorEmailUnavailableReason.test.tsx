@@ -6,10 +6,10 @@ import { useDirectorEmailUnavailableReason } from '../useDirectorEmailUnavailabl
 
 function calculateCurrent() {
   const state = useDirectorGuideStore.getState();
+  state.setSelectedStrategy(null);
   state.calculate();
   const comparison = useDirectorGuideStore.getState().strategyComparison;
   if (!comparison) throw new Error('Expected a valid comparison');
-  state.setSelectedStrategy(comparison.recommended);
   return comparison;
 }
 
@@ -22,12 +22,12 @@ describe('Director email interim guard', () => {
     state.setExpenses(20000);
   });
 
-  it('keeps the contained recommendation when a custom salary is staged', () => {
+  it('withholds email when a custom salary is staged', () => {
     calculateCurrent();
     const { result } = renderHook(useDirectorEmailUnavailableReason);
     expect(result.current).toBeNull();
     act(() => useDirectorGuideStore.getState().setSliderSalary(20000));
-    expect(result.current).toBeNull();
+    expect(result.current).toMatch(/Calculate a current scenario/);
   });
 
   it.each([
@@ -51,8 +51,8 @@ describe('Director email interim guard', () => {
     calculateCurrent();
     const { result } = renderHook(useDirectorEmailUnavailableReason);
     act(change);
-    expect(result.current).toBeNull();
-    act(() => useDirectorGuideStore.getState().calculate('draft'));
+    expect(result.current).toMatch(/Calculate a current scenario/);
+    act(() => useDirectorGuideStore.getState().calculate());
     expect(result.current).toMatch(reason);
     act(() => {
       const state = useDirectorGuideStore.getState();
@@ -60,7 +60,7 @@ describe('Director email interim guard', () => {
       state.setObjective('maximizeTakeHome');
       state.setSliderSalary(null);
       state.setSelectedStrategy(state.strategyComparison?.recommended ?? 'optimalMix');
-      state.calculate('draft');
+      state.calculate();
     });
     expect(result.current).toBeNull();
   });
@@ -79,7 +79,7 @@ describe('Director email interim guard', () => {
     calculateCurrent();
     const { result } = renderHook(useDirectorEmailUnavailableReason);
     act(change);
-    expect(result.current).toMatch(/results have updated/);
+    expect(result.current).toMatch(/Calculate a current scenario/);
     act(() => {
       calculateCurrent();
     });
@@ -94,7 +94,7 @@ describe('Director email interim guard', () => {
         .getState()
         .setInputError('expenses', { text: 'bad', error: 'Invalid amount' }),
     );
-    expect(result.current).toMatch(/valid inputs/);
+    expect(result.current).toMatch(/Calculate a current scenario/);
   });
 
   it('keeps email available when an edit parses to the same numeric value', () => {
@@ -142,7 +142,7 @@ describe('Director email interim guard', () => {
       expect(result.current).toBeNull();
       act(() => {
         state.setSelectedStrategy('optimalMix');
-        state.calculate('draft');
+        state.calculate();
       });
       expect(result.current).toMatch(/unavailable for this setup/);
       act(() => {
@@ -153,12 +153,12 @@ describe('Director email interim guard', () => {
             comparison.strategies.allSalary.salary,
           ),
         );
-        state.calculate('draft');
+        state.calculate();
       });
       expect(result.current).toMatch(/what-if salary/);
       act(() => {
         state.setSliderSalary(null);
-        state.calculate('draft');
+        state.calculate();
       });
       expect(result.current).toBeNull();
     },
@@ -189,9 +189,9 @@ describe('Director email interim guard', () => {
       state.setObjective('minimizeNI');
       state.setProfitWhatIfPercent(10);
     });
-    expect(result.current).toMatch(/survival plan/);
+    expect(result.current).toMatch(/Calculate a current scenario/);
     act(() => useDirectorGuideStore.setState({ error: 'Calculation failed' }));
-    expect(result.current).toMatch(/results have updated/);
+    expect(result.current).toMatch(/Calculate a current scenario/);
   });
 
   it('does not persist the calculation reference or objective', () => {
@@ -199,7 +199,7 @@ describe('Director email interim guard', () => {
     calculateCurrent();
     const state = useDirectorGuideStore.getState();
     state.setObjective('minimizeNI');
-    state.calculate('draft');
+    state.calculate();
     const saved = JSON.parse(localStorage.getItem('director-guide-storage') ?? '{}').state;
     expect(saved).not.toHaveProperty('calculatedFormData');
     expect(saved).not.toHaveProperty('calculatedStrategy');

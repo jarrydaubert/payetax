@@ -253,7 +253,9 @@ describe('Director calculation failure Sentry envelopes', () => {
   });
 
   it('emits no event for successful calculations or incomplete input', async () => {
-    mockCalculateStrategyComparison.mockReturnValue({ grossProfit: 80000 });
+    mockCalculateStrategyComparison.mockImplementation(
+      jest.requireActual('@/lib/tax/strategyComparison').calculateStrategyComparison,
+    );
 
     await calculateWithValidInput();
     expect(useDirectorGuideStore.getState().strategyComparison).not.toBeNull();

@@ -64,6 +64,12 @@ function setStoreState(partial: Partial<ReturnType<typeof useDirectorGuideStore.
   useDirectorGuideStore.setState((state) => ({
     ...partial,
     calculatedFormData: partial.formData ?? state.formData,
+    calculatedDraftScenario: {
+      selectedStrategy: partial.selectedStrategy ?? state.selectedStrategy,
+      sliderSalary: partial.sliderSalary ?? state.sliderSalary,
+      profitWhatIfPercent: partial.profitWhatIfPercent ?? state.profitWhatIfPercent,
+      objective: partial.objective ?? state.objective,
+    },
     calculatedStrategy: partial.strategyComparison?.recommended ?? null,
   }));
 }

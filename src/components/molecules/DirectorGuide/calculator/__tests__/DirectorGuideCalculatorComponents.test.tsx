@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { trackCalendarDownloaded, trackStrategySelected } from '@/lib/directorGuideAnalytics';
+import { trackCalendarDownloaded } from '@/lib/directorGuideAnalytics';
 import { calculateSalaryScenario } from '@/lib/tax/strategyComparison';
 import { useDirectorGuideStore } from '@/store/directorGuideStore';
 import { KeyDates } from '../KeyDates';
@@ -51,9 +51,6 @@ jest.mock('@/lib/directorGuideAnalytics', () => ({
 }));
 
 const mockCalculateSalaryScenario = calculateSalaryScenario as jest.Mock;
-const mockTrackStrategySelected = trackStrategySelected as jest.MockedFunction<
-  typeof trackStrategySelected
->;
 const mockTrackCalendarDownloaded = trackCalendarDownloaded as jest.MockedFunction<
   typeof trackCalendarDownloaded
 >;
@@ -104,6 +101,12 @@ function setStoreState(partial: Partial<ReturnType<typeof useDirectorGuideStore.
   useDirectorGuideStore.setState((state) => ({
     ...partial,
     calculatedFormData: partial.formData ?? state.formData,
+    calculatedDraftScenario: {
+      selectedStrategy: partial.selectedStrategy ?? state.selectedStrategy,
+      sliderSalary: partial.sliderSalary ?? state.sliderSalary,
+      profitWhatIfPercent: partial.profitWhatIfPercent ?? state.profitWhatIfPercent,
+      objective: partial.objective ?? state.objective,
+    },
     calculatedStrategy: partial.strategyComparison?.recommended ?? null,
   }));
 }
@@ -131,7 +134,6 @@ describe('Director Intelligence calculator components', () => {
       objective: 'maximizeTakeHome',
     });
     mockCalculateSalaryScenario.mockReset();
-    mockTrackStrategySelected.mockClear();
     mockTrackCalendarDownloaded.mockClear();
     mockCalculateSalaryScenario.mockReturnValue({
       salary: 20000,
@@ -196,14 +198,22 @@ describe('Director Intelligence calculator components', () => {
   });
 
   describe('SalarySlider', () => {
-    it('shows the baseline without writing it and stages only the control that changes', () => {
-      setStoreState({ strategyComparison: createComparison() as never });
+    it('uses draft bounds without exposing a submitted strategy and preserves the staged salary', () => {
+      setStoreState({
+        strategyComparison: createComparison() as never,
+        formData: {
+          ...useDirectorGuideStore.getState().formData,
+          revenue: 100000,
+          expenses: 20000,
+        },
+      });
 
       render(<SalarySlider />);
       const salarySlider = screen.getByTestId('director-salary-slider');
       const profitSlider = screen.getByTestId('director-profit-slider');
 
-      expect(salarySlider.getAttribute('data-value')).toBe('7000');
+      expect(salarySlider).toHaveAttribute('data-value', '0');
+      expect(salarySlider).toHaveAttribute('data-max', '80000');
       expect(profitSlider.getAttribute('data-value')).toBe('0');
       expect(useDirectorGuideStore.getState().sliderSalary).toBeNull();
 
@@ -213,7 +223,7 @@ describe('Director Intelligence calculator components', () => {
       fireEvent.click(profitSlider);
       expect(useDirectorGuideStore.getState().profitWhatIfPercent).toBe(10);
       expect(useDirectorGuideStore.getState().sliderSalary).toBe(20000);
-      fireEvent.click(screen.getByRole('button', { name: 'Reset' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Reset profit adjustment' }));
       expect(useDirectorGuideStore.getState().profitWhatIfPercent).toBe(0);
       expect(useDirectorGuideStore.getState().sliderSalary).toBe(20000);
     });
@@ -224,10 +234,7 @@ describe('Director Intelligence calculator components', () => {
       setStoreState({ strategyComparison: createComparison() as never });
 
       render(<StrategyComparisonTable />);
-      expect(screen.getByText('Choose Your Strategy')).toBeInTheDocument();
-      expect(
-        screen.getByText(/Compare salary\/dividend tradeoffs using your selected objective/i),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Compare Strategies')).toBeInTheDocument();
       expect(screen.getByText(/Salary and dividends are full-year estimates/)).toBeVisible();
       expect(screen.getByText(/Closest to max take-home objective/i)).toBeInTheDocument();
       expect(screen.getByText('-£4,000')).toBeInTheDocument();
@@ -333,28 +340,13 @@ describe('Director Intelligence calculator components', () => {
       expect(
         screen.getByText(/Add your salary and dividends in Full Inputs to compare/i),
       ).toBeInTheDocument();
-      expect(screen.getByText(/against your selected objective/i)).toBeInTheDocument();
     });
 
-    it('stages Minimize NI without changing the submitted comparison labels', () => {
+    it('renders submitted strategy cards as comparisons without draft controls', () => {
       setStoreState({ strategyComparison: createComparison() as never });
-
       render(<StrategyComparisonTable />);
-      const objective = screen.getByRole('button', { name: 'Minimize NI' });
-      fireEvent.click(objective);
-
-      expect(objective).toHaveAttribute('aria-pressed', 'true');
-      expect(screen.getByText('Highest Take-Home')).toBeInTheDocument();
-      expect(screen.queryByText('Lowest NI')).not.toBeInTheDocument();
-    });
-
-    it('tracks pro strategy selection when a card is clicked', () => {
-      setStoreState({ strategyComparison: createComparison() as never });
-
-      render(<StrategyComparisonTable />);
-      fireEvent.click(screen.getByRole('button', { name: /All Salary/i }));
-
-      expect(mockTrackStrategySelected).toHaveBeenCalledWith();
+      expect(screen.getByText('All Salary').closest('article')).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /All Salary/i })).not.toBeInTheDocument();
     });
   });
 

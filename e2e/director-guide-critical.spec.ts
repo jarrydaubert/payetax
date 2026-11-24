@@ -168,6 +168,32 @@ async function closeInputsPanelIfOpen(page: Page): Promise<void> {
   await expect(drawer).toHaveCount(0);
 }
 
+function currentCalculateButton(page: Page) {
+  return page.getByRole('button', { name: 'Calculate', exact: true });
+}
+
+async function dragScenarioSlider(page: Page, testId: string, fraction: number) {
+  const track = page.getByTestId(testId).filter({ visible: true });
+  const thumb = track.getByRole('slider');
+  await thumb.scrollIntoViewIfNeeded();
+  const trackBox = await track.boundingBox();
+  const thumbBox = await thumb.boundingBox();
+  if (!(trackBox && thumbBox)) throw new Error('Expected a visible scenario slider');
+  const y = thumbBox.y + thumbBox.height / 2;
+  await page.mouse.move(thumbBox.x + thumbBox.width / 2, y);
+  await page.mouse.down();
+  await page.mouse.move(trackBox.x + trackBox.width * fraction, y, { steps: 8 });
+  await page.mouse.up();
+}
+
+async function calculateAndView(page: Page) {
+  if (!(await currentCalculateButton(page).isVisible())) {
+    await page.getByRole('button', { name: 'Open calculator inputs' }).click();
+  }
+  await currentCalculateButton(page).click();
+  await closeInputsPanelIfOpen(page);
+}
+
 async function ensureLearnPanelIsVisible(page: Page): Promise<void> {
   const vatWarnings = page.getByText('VAT Registration Required');
   if ((await firstVisible(vatWarnings)) !== null) {
@@ -185,6 +211,25 @@ async function ensureLearnPanelIsVisible(page: Page): Promise<void> {
     .toBe('visible');
 }
 
+test('JGF-150: a complete draft does not publish until Calculate @critical', async ({ page }) => {
+  await openDirectorGuide(page);
+  await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 100000);
+  await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 20000);
+  await page.clock.install();
+  await selectEngland(page);
+  await page.clock.runFor(400);
+  await closeInputsPanelIfOpen(page);
+
+  await expect(page.locator('[data-director-section="director-recommendation"]')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Email My Results' })).toHaveCount(0);
+  await ensureInputsPanelIsVisible(page);
+  await page.getByRole('button', { name: 'Calculate', exact: true }).click();
+  await closeInputsPanelIfOpen(page);
+
+  await expect(page.locator('[data-director-section="director-recommendation"]')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Email My Results' })).toBeEnabled();
+});
+
 test.describe('Director result currentness @critical', () => {
   async function showScenarioA(page: Page) {
     await openDirectorGuide(page);
@@ -196,7 +241,7 @@ test.describe('Director result currentness @critical', () => {
       .getByRole('textbox', { name: 'Company Accounting Period End' })
       .filter({ visible: true })
       .fill('2026-12-31');
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
     await expect(page.getByRole('button', { name: 'Email My Results' })).toBeEnabled();
     await expect(page.getByRole('button', { name: 'Download .ics' })).toBeVisible();
     await expect(profit(page, '£80,000')).toBeVisible();
@@ -274,77 +319,226 @@ test.describe('Director result currentness @critical', () => {
     );
   });
 
-  test('JGF-153: one recommendation owns the result after reload and input edits', async ({
+  test('JGF-150: restores named drafts and publishes the exact All Salary only on Calculate', async ({
     page,
   }, testInfo) => {
     await showScenarioA(page);
-    const expectRecommendation = async (dividends: string, allSalaryAmount: string) => {
-      const strategies = page.getByRole('region', { name: 'Strategy comparison' });
-      const hero = page.getByRole('region', { name: 'Recommended pay strategy', exact: true });
-      await expect(hero).toContainText(`£12,570 salary + ${dividends} dividends`);
-      const allSalary = strategies.getByRole('article').filter({
-        has: page.getByRole('heading', { name: 'All Salary', exact: true }),
-      });
-      await expect(allSalary).toContainText(allSalaryAmount);
-      await expect(allSalary).not.toContainText('Highest Take-Home');
-      await expect(strategies.getByRole('button')).toHaveCount(0);
-      await expect(page.getByRole('slider')).toHaveCount(0);
-      await expect(detailRowValue(page, 'Salary Breakdown', 'Gross Salary')).toHaveText('£12,570');
-      await expect(detailRowValue(page, 'Dividend Breakdown', 'Gross Dividends')).toHaveText(
-        dividends,
-      );
-      await expect(page.getByRole('region', { name: 'Summary cards' })).toContainText(dividends);
-      await expect(
-        strategies.getByRole('article').filter({ hasText: 'Highest Take-Home' }),
-      ).toContainText(dividends);
-    };
+    const hero = page.locator('[data-director-section="director-recommendation"]');
+    await expect(hero).toContainText('£12,570 salary + £52,476 dividends');
 
-    await expectRecommendation('£52,476', '£70,217');
     await ensureInputsPanelIsVisible(page);
-    await page
-      .getByRole('checkbox', { name: 'Remember figures on this device (PAYE and Director)' })
-      .press('Space');
-    const remembered = page.getByRole('checkbox', {
+    const strategy = page.getByRole('combobox', { name: 'Strategy', exact: true });
+    await selectDropdownOption(page, strategy, 'All Salary');
+    await expectResultsWithheld(page);
+    const salaryDraft = page.getByRole('slider', { name: 'Custom salary' });
+    await expect(salaryDraft).toHaveAttribute('aria-valuenow', '0');
+    await expect(salaryDraft).toHaveAttribute('aria-valuemax', '80000');
+    const remember = page.getByRole('checkbox', {
       name: 'Remember figures on this device (PAYE and Director)',
     });
-    await expect(remembered).toBeChecked();
-    await closeInputsPanelIfOpen(page);
-    // Reproduce a saved All Salary selection from the formerly interactive strategy cards.
-    await page.evaluate(() => {
-      const key = 'director-guide-storage';
-      const saved = localStorage.getItem(key);
-      if (!saved) throw new Error('Director figures were not saved');
-      const snapshot = JSON.parse(saved);
-      snapshot.state.selectedStrategy = 'allSalary';
-      localStorage.setItem(key, JSON.stringify(snapshot));
-    });
-    await page.reload();
-    await expectRecommendation('£52,476', '£70,217');
-    await expect(page.getByRole('button', { name: 'Email My Results' })).toBeEnabled();
-    const sidebarEmail = page.getByRole('button', { name: 'Email Results', exact: true });
-    if (await sidebarEmail.isVisible()) await expect(sidebarEmail).toBeEnabled();
-    await expect(page.getByRole('button', { name: 'Download .ics' })).toBeVisible();
-    await testInfo.attach('contained-recommendation', {
+    await remember.press('Space');
+    await expect(remember).toBeChecked();
+    await calculateAndView(page);
+
+    async function expectAllSalary() {
+      await expect(hero).toContainText('£70,217 salary + £0 dividends');
+      await expect(page.getByRole('region', { name: 'Summary cards' })).toContainText('£70,217');
+      await expect(detailRowValue(page, 'Salary Breakdown', 'Gross Salary')).toHaveText('£70,217');
+      await expect(detailRowValue(page, 'Dividend Breakdown', 'Gross Dividends')).toHaveText('£0');
+      const card = page
+        .getByRole('region', { name: 'Strategy comparison' })
+        .getByRole('article')
+        .filter({
+          has: page.getByRole('heading', { name: 'All Salary', exact: true }),
+        });
+      await expect(card).toContainText('Displayed Result');
+      await expect(page.getByRole('button', { name: 'Email My Results' })).toBeDisabled();
+      await expect(page.getByRole('button', { name: 'Download .ics' })).toBeVisible();
+    }
+
+    await expectAllSalary();
+    await testInfo.attach('submitted-all-salary', {
       body: await page.screenshot(),
       contentType: 'image/png',
     });
+    await page.reload();
+    await ensureInputsPanelIsVisible(page);
+    await expect(strategy).toHaveText('All Salary');
+    await expectNumericValue(visibleInputByTestId(page, 'director-revenue-input'), 100000);
+    await expectResultsWithheld(page);
+    await calculateAndView(page);
+    await expectAllSalary();
+  });
+
+  test('JGF-150: Custom salary, profit reset and objective stay drafts', async ({ page }) => {
+    await showScenarioA(page);
+    await ensureInputsPanelIsVisible(page);
+    const salary = page.getByRole('slider', { name: 'Custom salary' });
+    const profitAdjustment = page.getByRole('slider', { name: 'Company profit adjustment' });
+    await expect(salary).toHaveAttribute('aria-valuenow', '0');
+    await expect(salary).toHaveAttribute('aria-valuemax', '80000');
+    await dragScenarioSlider(page, 'director-salary-slider', 0.6);
+    const requestedSalary = await salary.getAttribute('aria-valuenow');
+    expect(Number(requestedSalary)).toBeGreaterThan(44000);
+    expect(Number(requestedSalary)).toBeLessThan(70217);
+    await expectResultsWithheld(page);
+    await dragScenarioSlider(page, 'director-profit-slider', 0.15);
+    await expect(profitAdjustment).not.toHaveAttribute('aria-valuenow', '0');
+    await profitAdjustment.press('Home');
+    await profitAdjustment.press('ArrowRight');
+    await expect(profitAdjustment).toHaveAttribute('aria-valuenow', '-45');
+    await expect(salary).toHaveAttribute('aria-valuenow', requestedSalary ?? '');
+    await expectResultsWithheld(page);
+    await currentCalculateButton(page).click();
+    await expect(
+      page.getByRole('alert').filter({ hasText: 'company budget or minimum salary' }),
+    ).toBeVisible();
+    await expect(salary).toHaveAttribute('aria-valuenow', requestedSalary ?? '');
+    await expect(profitAdjustment).toHaveAttribute('aria-valuenow', '-45');
+
+    await page.getByRole('button', { name: 'Reset profit adjustment' }).click();
+    await expect(profitAdjustment).toHaveAttribute('aria-valuenow', '0');
+    await expect(salary).toHaveAttribute('aria-valuenow', requestedSalary ?? '');
+    await expectResultsWithheld(page);
+    await calculateAndView(page);
+    await expect(page.getByRole('heading', { name: 'Custom salary', exact: true })).toBeVisible();
+    const hero = page.locator('[data-director-section="director-recommendation"]');
+    const amounts = await hero.textContent();
+    await ensureInputsPanelIsVisible(page);
+    await selectDropdownOption(
+      page,
+      page.getByRole('combobox', { name: 'Comparison objective' }),
+      'Minimize NI',
+    );
+    await page
+      .getByRole('textbox', { name: 'Company Accounting Period End' })
+      .filter({ visible: true })
+      .fill('2027-03-31');
+    await expectResultsWithheld(page);
+    await calculateAndView(page);
+    await expect(hero).toHaveText(amounts ?? '');
+    await expect(page.getByRole('region', { name: 'Strategy comparison' })).toContainText(
+      'Lowest NI',
+    );
+    await expect(page.getByRole('button', { name: 'Email My Results' })).toBeDisabled();
 
     await ensureInputsPanelIsVisible(page);
-    await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 120000);
-    await closeInputsPanelIfOpen(page);
-    await expectRecommendation('£67,176', '£87,609');
-    await expect(profit(page, '£100,000')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Email My Results' })).toBeEnabled();
-    await expect(page.getByRole('button', { name: 'Download .ics' })).toBeVisible();
+    await selectDropdownOption(
+      page,
+      page.getByRole('combobox', { name: 'Strategy', exact: true }),
+      'Recommended strategy',
+    );
+    await expect(salary).toHaveAttribute('aria-valuenow', '0');
+    await expectResultsWithheld(page);
+    await calculateAndView(page);
+    await expect(hero.getByRole('region', { name: 'Recommended pay strategy' })).toContainText(
+      '£12,570 salary + £52,476 dividends',
+    );
+  });
 
+  test('JGF-150: monthly simulations use the submitted period and running costs', async ({
+    page,
+    isMobile,
+  }) => {
+    await showScenarioA(page);
     await ensureInputsPanelIsVisible(page);
-    await replaceText(visibleInputByTestId(page, 'director-revenue-input'), '-1');
-    await closeInputsPanelIfOpen(page);
-    await expect(page.getByTestId('director-results-paused')).toBeVisible();
+    const button = (name: string) =>
+      page.getByRole('button', { name, exact: true }).filter({ visible: true });
+    const amount = (name: string) =>
+      page.getByRole('textbox', { name, exact: true }).filter({ visible: true });
+    await button('Monthly').click();
+    await fillCurrencyInput(amount('Monthly Contract Income'), 4000);
+    await fillCurrencyInput(amount('Monthly Business Expenses'), 1000);
+    await fillCurrencyInput(amount('Cash In Bank'), 0);
+    await fillCurrencyInput(amount('Minimum Monthly Draw'), 900);
+    await selectDropdownOption(
+      page,
+      page.getByRole('combobox', { name: 'Contract Start Month' }).filter({ visible: true }),
+      'October',
+    );
+    const profitAdjustment = page.getByRole('slider', { name: 'Company profit adjustment' });
+    await profitAdjustment.press('Home');
+    for (let step = 0; step < 5; step += 1) await profitAdjustment.press('ArrowRight');
+    await expect(profitAdjustment).toHaveAttribute('aria-valuenow', '-25');
+    await expectResultsWithheld(page);
+    await calculateAndView(page);
+
+    await expect(detailRowValue(page, 'Corporation Tax', 'Scenario Gross Profit')).toHaveText(
+      '£13,500',
+    );
+    await expect(detailRowValue(page, 'Corporation Tax', 'Revenue')).toHaveCount(0);
+    await expect(page.getByText('£5,700', { exact: true })).toBeVisible();
+    await expect(page.getByText('£900/mo below your spending target')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Email My Results' })).toBeDisabled();
+    const learn = page.getByRole('button', { name: /show learn panel/i }).filter({ visible: true });
+    await learn.click();
+    const visibleLearn = isMobile
+      ? page.getByRole('dialog', { name: 'Learn' })
+      : page
+          .getByRole('complementary')
+          .filter({ has: page.getByRole('heading', { name: 'Assumptions' }) });
+    await expect(visibleLearn.getByText('Monthly projection (6 months remaining)')).toBeVisible();
+    await expect(visibleLearn.getByText('Profit simulation', { exact: true })).toBeVisible();
+    await expect(visibleLearn.getByText('-25%', { exact: true })).toBeVisible();
+    if (isMobile) await visibleLearn.getByRole('button', { name: 'Close learn panel' }).click();
+
+    const openInputs = page.getByRole('button', { name: 'Open calculator inputs' });
+    if (await openInputs.isVisible()) await openInputs.click();
+    await button('Reset profit adjustment').click();
+    await button('Annual').click();
+    await expectNumericValue(visibleInputByTestId(page, 'director-revenue-input'), 100000);
+    await expectResultsWithheld(page);
+    await calculateAndView(page);
+    await expect(profit(page, '£80,000')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Monthly Draw Estimate' })).toHaveCount(0);
+  });
+
+  test('JGF-150: Compare My Setup requires Apply or discard, and Reset withholds results', async ({
+    page,
+  }) => {
+    await showScenarioA(page);
+    await ensureInputsPanelIsVisible(page);
+    const fullInputs = page
+      .getByRole('button', { name: 'Full Inputs', exact: true })
+      .filter({ visible: true });
+    await fullInputs.click();
+    const setup = page
+      .getByRole('textbox', { name: 'Your Current Salary' })
+      .filter({ visible: true });
+    await fillCurrencyInput(setup, 15000);
+    await expectResultsWithheld(page);
+    await currentCalculateButton(page).click();
+    await expect(
+      page.getByRole('alert').filter({ hasText: 'Apply or discard your changes' }),
+    ).toBeVisible();
+
+    const apply = page
+      .getByRole('button', { name: 'Apply', exact: true })
+      .filter({ visible: true });
+    await apply.click();
+    await expectResultsWithheld(page);
+    await calculateAndView(page);
+    const strategyResults = page.getByRole('region', { name: 'Strategy comparison' });
+    await expect(strategyResults).toContainText('£15,000');
+    await ensureInputsPanelIsVisible(page);
+    if (!(await setup.isVisible())) await fullInputs.click();
+    await replaceText(setup, '-500');
+    await setup.blur();
+    await expect(setup).toHaveAttribute('aria-invalid', 'true');
+    await currentCalculateButton(page).click();
+    await expectResultsWithheld(page);
+    await page.getByRole('button', { name: 'Reset Draft', exact: true }).click();
+    await expectNumericValue(setup, 15000);
+    await expect(setup).not.toHaveAttribute('aria-invalid', 'true');
+    await expectResultsWithheld(page);
+    await page.locator('aside:visible').getByRole('button', { name: 'Reset', exact: true }).click();
+    await expect(visibleInputByTestId(page, 'director-revenue-input')).toHaveValue('');
     await expectResultsWithheld(page);
   });
 
-  test('withholds the previous scenario during the debounce', async ({ page }, testInfo) => {
+  test('withholds previous results and blocks a same-task calendar click until Calculate', async ({
+    page,
+  }, testInfo) => {
     await showScenarioA(page);
     const now = new Date();
     await page.clock.install({ time: now });
@@ -352,11 +546,15 @@ test.describe('Director result currentness @critical', () => {
     const staleDownloads = await editScenarioB(page, true);
 
     await expectResultsWithheld(page);
-    await expect(page.getByRole('status').filter({ hasText: 'Updating results' })).toBeVisible();
+    await expect(
+      page.getByRole('status').filter({ hasText: 'Select Calculate in Your Numbers' }),
+    ).toBeVisible();
     expect(staleDownloads).toBe(0);
 
     await page.clock.runFor(250);
     await page.clock.resume();
+    await expectResultsWithheld(page);
+    await calculateAndView(page);
     await expect(profit(page, '£100,000')).toBeVisible();
     await testInfo.attach('updated-results', {
       body: await page.screenshot(),
@@ -424,7 +622,7 @@ test.describe('Director result currentness @critical', () => {
 
     await ensureInputsPanelIsVisible(page);
     await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 120000);
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
     await expect(profit(page, '£100,000')).toBeVisible();
     await page.getByRole('button', { name: 'Email My Results' }).click();
     await expect(dialog).toBeVisible();
@@ -479,17 +677,20 @@ test.describe('Director result currentness @critical', () => {
       .locator('html')
       .evaluate((html, attribute) => html.setAttribute(attribute, ''), faultAttribute);
     await editScenarioB(page);
+    await expect(page.locator('html')).toHaveAttribute(faultAttribute, '');
+    if (!(await currentCalculateButton(page).isVisible())) await ensureInputsPanelIsVisible(page);
+    await currentCalculateButton(page).click();
     await expect(page.locator('html')).not.toHaveAttribute(faultAttribute);
 
     await expectResultsWithheld(page);
-    const alert = page.getByTestId('director-dashboard-main').getByRole('alert');
+    const alert = page.getByRole('alert').filter({ hasText: 'Unable to calculate director pay' });
     await expect(alert).toContainText('Unable to calculate director pay');
     await expect(page.getByText('Controlled Director failure')).toHaveCount(0);
     await testInfo.attach('inline-calculation-failure', {
       body: await page.screenshot(),
       contentType: 'image/png',
     });
-    await page.getByRole('button', { name: 'Try again' }).click();
+    await calculateAndView(page);
     await expect(alert).toHaveCount(0);
     await expectScenarioB(page);
     expect(pageErrors).toEqual([]);
@@ -509,7 +710,7 @@ test.describe('Director Intelligence critical @critical', () => {
       await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), revenue);
       await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 0);
       await selectEngland(page);
-      await closeInputsPanelIfOpen(page);
+      await calculateAndView(page);
 
       await expect(page.getByTestId('director-survival-mode')).toHaveCount(0);
       await expect(detailRowValue(page, 'Salary Breakdown', 'Gross Salary')).toHaveText(salary);
@@ -559,7 +760,7 @@ test.describe('Director Intelligence critical @critical', () => {
       .getByRole('button', { name: 'Apply', exact: true })
       .filter({ visible: true })
       .click();
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
 
     const strategies = page.getByRole('region', { name: 'Strategy comparison' });
     const allDividends = strategies.getByRole('article').filter({
@@ -632,7 +833,7 @@ test.describe('Director Intelligence critical @critical', () => {
       .getByRole('button', { name: 'Apply', exact: true })
       .filter({ visible: true })
       .click();
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
 
     const strategies = page.getByRole('region', { name: 'Strategy comparison' });
     const allDividends = strategies.getByRole('article').filter({
@@ -697,7 +898,7 @@ test.describe('Director Intelligence critical @critical', () => {
       .getByRole('button', { name: 'Apply', exact: true })
       .filter({ visible: true })
       .click();
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
 
     const employeeNI = detailRowValue(page, 'Salary Breakdown', 'Employee NI');
     await expect(detailRowValue(page, 'Salary Breakdown', 'Gross Salary')).toHaveText('£12,570');
@@ -716,7 +917,7 @@ test.describe('Director Intelligence critical @critical', () => {
     if (!(await otherPAYE.isVisible())) await fullInputs.click();
     await otherPAYE.click();
     await expect(otherPAYE).toBeChecked();
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
     await expect(employeeNI).toHaveText('£0');
     const strategies = page.getByRole('region', { name: 'Strategy comparison' });
     // The £30,000 external pay leaves this salary in the 20% Income Tax band.
@@ -729,7 +930,7 @@ test.describe('Director Intelligence critical @critical', () => {
     }
     const yourSetup = strategies.getByRole('heading', { name: 'Your Setup' }).locator('../../..');
     await expect(yourSetup).toContainText('£10,056');
-    await expect(yourSetup).toContainText('Within £10 of the displayed result');
+    await expect(yourSetup).toContainText('Within £10 of max take-home reference');
     await expect(notes).toContainText(
       'your other job has a separate National Insurance calculation',
     );
@@ -775,7 +976,7 @@ test.describe('Director Intelligence critical @critical', () => {
       page.getByRole('textbox', { name: 'Minimum Salary', exact: true }).filter({ visible: true }),
       60000,
     );
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
 
     const salary = detailRowValue(page, 'Salary Breakdown', 'Gross Salary');
     const warning = page.getByRole('status').filter({ hasText: 'short of your minimum' });
@@ -808,14 +1009,14 @@ test.describe('Director Intelligence critical @critical', () => {
     // No EA or BIK. At £57,000 profit, (57,000 + 750) / 1.15 gives £50,217.39.
     await ensureInputsPanelIsVisible(page);
     await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 57000);
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
     await expect(warning).toHaveText(
       'The highest affordable salary is £50,217.39, which falls £9,782.61 short of your minimum.',
     );
     await expect(displayed).toContainText('Baseline Mix');
     await expect(salary).toHaveText('£50,217');
     await expect(strategies.getByRole('button')).toHaveCount(0);
-    await expect(page.getByRole('slider')).toHaveCount(0);
+    await expect(strategies.getByRole('slider')).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Email My Results' })).toBeEnabled();
     await testInfo.attach('unaffordable-minimum', {
       body: await page.screenshot(),
@@ -840,7 +1041,7 @@ test.describe('Director Intelligence critical @critical', () => {
       page.getByRole('textbox', { name: 'Company Car BIK' }).filter({ visible: true }),
       10000,
     );
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
 
     const allDividends = page.getByRole('article').filter({
       has: page.getByRole('heading', { name: 'All Dividends', exact: true }),
@@ -882,7 +1083,7 @@ test.describe('Director Intelligence critical @critical', () => {
       .getByRole('button', { name: 'Apply', exact: true })
       .filter({ visible: true })
       .click();
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
     const shortfall = page
       .getByRole('status')
       .filter({ hasText: 'Class 1A National Insurance bill' });
@@ -922,7 +1123,7 @@ test.describe('Director Intelligence critical @critical', () => {
       page.getByRole('textbox', { name: 'YTD Dividends' }).filter({ visible: true }),
       6000,
     );
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
 
     const strategies = page.getByRole('region', { name: 'Strategy comparison' });
     const conflict = strategies.getByRole('status');
@@ -949,7 +1150,7 @@ test.describe('Director Intelligence critical @critical', () => {
       page.getByRole('textbox', { name: 'YTD Dividends' }).filter({ visible: true }),
       5000,
     );
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
     await expect(conflict).toBeEmpty();
     await expect(
       strategies.getByText(/Salary and dividends are full-year estimates/),
@@ -972,7 +1173,7 @@ test.describe('Director Intelligence critical @critical', () => {
     await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 100000);
     await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 20000);
     await selectEngland(page);
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
 
     const email = page.getByRole('button', { name: 'Email My Results', exact: true });
     const sidebarEmail = page.getByRole('button', { name: 'Email Results', exact: true }).first();
@@ -1031,7 +1232,7 @@ test.describe('Director Intelligence critical @critical', () => {
     await ensureInputsPanelIsVisible(page);
     await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 500000);
     await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 0);
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
     await expect(page.getByRole('heading', { name: 'Take it all as salary' })).toBeVisible();
     await expectBlocked(/unavailable for this setup/, 1);
   });
@@ -1048,7 +1249,7 @@ test.describe('Director Intelligence critical @critical', () => {
     await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 100000);
     await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 20000);
     await selectEngland(page);
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
     await page.getByRole('button', { name: 'Email My Results' }).click();
     await page.getByLabel('Email address').fill('di05@example.com');
     await page.evaluate(() => {
@@ -1062,10 +1263,8 @@ test.describe('Director Intelligence critical @critical', () => {
       input.dispatchEvent(new Event('input', { bubbles: true }));
       form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     });
-    await expect(page.getByRole('alert')).toHaveText(
-      /Results changed|Email is paused while results update/,
-    );
-    await expect(page.getByRole('button', { name: 'Send Results' })).toBeEnabled();
+    await expect(page.getByRole('dialog', { name: 'Email Your Results' })).toBeHidden();
+    await expect(page.getByRole('button', { name: 'Email My Results' })).toHaveCount(0);
     expect(requests).toEqual([]);
   });
 
@@ -1082,7 +1281,7 @@ test.describe('Director Intelligence critical @critical', () => {
     if (await sidebar.isVisible()) {
       await sidebar.getByRole('button', { name: 'Expand sidebar' }).click();
       await expect(
-        sidebar.getByText('Enter your numbers to calculate results before emailing them.'),
+        sidebar.getByText('Calculate a current scenario before emailing results.'),
       ).toBeVisible();
       await sidebar.getByRole('button', { name: 'Collapse sidebar' }).click();
     }
@@ -1093,7 +1292,7 @@ test.describe('Director Intelligence critical @critical', () => {
       .getByRole('textbox', { name: 'Company Accounting Period End' })
       .filter({ visible: true })
       .fill('2026-12-31');
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
     const email = page.getByRole('button', { name: 'Email My Results' });
     await expect(email).toBeEnabled();
     await ensureInputsPanelIsVisible(page);
@@ -1109,7 +1308,7 @@ test.describe('Director Intelligence critical @critical', () => {
       page.getByRole('textbox', { name: 'Monthly Business Expenses' }).filter({ visible: true }),
       2000,
     );
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
     await expect(email).toBeDisabled();
     await expect(page.getByRole('heading', { name: 'Monthly Draw Estimate' })).toBeVisible();
     await expect(page.getByRole('status', { name: 'Email availability' })).toHaveText(
@@ -1123,7 +1322,7 @@ test.describe('Director Intelligence critical @critical', () => {
       .getByRole('button', { name: 'Annual', exact: true })
       .filter({ visible: true })
       .click();
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
     await expect(email).toBeEnabled();
     await expect(page.getByRole('heading', { name: 'Monthly Draw Estimate' })).toHaveCount(0);
   });
@@ -1151,7 +1350,7 @@ test.describe('Director Intelligence critical @critical', () => {
       'England',
     );
 
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
 
     // Mock email endpoint to avoid sending real emails.
     await page.route('/api/send-director-results', async (route) => {
@@ -1162,7 +1361,7 @@ test.describe('Director Intelligence critical @critical', () => {
       });
     });
 
-    // Auto-calculate kicks in; email CTA should be available from the results area.
+    // The email action is available for the submitted result.
     const emailResultsButton = page.getByRole('button', { name: 'Email My Results' });
     await emailResultsButton.scrollIntoViewIfNeeded();
     await expect(emailResultsButton).toBeVisible();
@@ -1201,7 +1400,7 @@ test.describe('Director Intelligence critical @critical', () => {
       'England',
     );
 
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
 
     await expect(page.getByTestId('director-survival-mode')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Compare Strategies' })).toBeHidden();
@@ -1303,7 +1502,7 @@ test.describe('Director resolved monthly financials @critical', () => {
     await mode('Monthly').click();
     await fillCurrencyInput(amount('Monthly Contract Income'), 4000);
     await fillCurrencyInput(amount('Monthly Business Expenses'), 1000);
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
 
     // April through March: £48,000 - £12,000 - £12,570 salary - £1,135.50 NI.
     await expect(company('Revenue')).toHaveText('£48,000');
@@ -1321,7 +1520,7 @@ test.describe('Director resolved monthly financials @critical', () => {
     );
     await openPensionInputs(page);
     await fillCurrencyInput(amount('Employer Pension'), 3000);
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
 
     // October through March: £24,000 - £6,000 - £3,000 pension - £13,705.50 payroll.
     await expect(company('Revenue')).toHaveText('£24,000');
@@ -1334,14 +1533,14 @@ test.describe('Director resolved monthly financials @critical', () => {
     await mode('Annual').click();
     await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 27000);
     await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 7000);
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
     await expect(company('Revenue')).toHaveText('£27,000');
     await expect(company('Business Expenses')).toHaveText('-£7,000');
     await expect(company('Taxable Profit')).toHaveText('£3,295');
 
     if (await openInputs.isVisible()) await openInputs.click();
     await mode('Monthly').click();
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
     await expect(company('Revenue')).toHaveText('£24,000');
     await expect(company('Business Expenses')).toHaveText('-£6,000');
     await expect(company('Taxable Profit')).toHaveText('£1,295');
@@ -1352,7 +1551,7 @@ test.describe('Director resolved monthly financials @critical', () => {
       .getByRole('checkbox', { name: 'Already included in business expenses' })
       .filter({ visible: true })
       .click();
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
     await expect(company('Taxable Profit')).toHaveText('£4,295');
     await expect(company('Corp Tax Due')).toHaveText('£816');
     await expect(company('Employer Pension')).toHaveCount(0);
@@ -1373,7 +1572,7 @@ test.describe('Director resolved monthly financials @critical', () => {
       .filter({ visible: true });
     await fillCurrencyInput(income, 2000);
     await fillCurrencyInput(expenses, 2000);
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
 
     const survival = page.getByTestId('director-survival-mode');
     const loss = survival
@@ -1385,7 +1584,7 @@ test.describe('Director resolved monthly financials @critical', () => {
     const openInputs = page.getByRole('button', { name: 'Open calculator inputs' });
     if (await openInputs.isVisible()) await openInputs.click();
     await fillCurrencyInput(expenses, 3000);
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
     // £1,000 monthly trading loss for 12 months plus the same illustrative payroll.
     await expect(loss).toHaveText('£18,964');
 
@@ -1395,7 +1594,7 @@ test.describe('Director resolved monthly financials @critical', () => {
       page.getByRole('textbox', { name: 'Employer Pension' }).filter({ visible: true }),
       3000,
     );
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
     await expect(loss).toHaveText('£21,964');
 
     if (await openInputs.isVisible()) await openInputs.click();
@@ -1404,7 +1603,7 @@ test.describe('Director resolved monthly financials @critical', () => {
       .getByRole('checkbox', { name: 'Already included in business expenses' })
       .filter({ visible: true })
       .click();
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
     await expect(loss).toHaveText('£18,964');
   });
 });
@@ -1425,7 +1624,7 @@ test('DI-03: projected income cannot fund a withdrawal from zero cash @critical'
   await fillCurrencyInput(amount('Monthly Business Expenses'), 1000);
   await fillCurrencyInput(amount('Cash In Bank'), 0);
   await fillCurrencyInput(amount('Minimum Monthly Draw'), 900);
-  await closeInputsPanelIfOpen(page);
+  await calculateAndView(page);
 
   const draw = page.getByText('Available this month', { exact: true }).locator('..');
   await expect(draw).toContainText('£0/mo');
@@ -1457,7 +1656,7 @@ test.describe('Director Intelligence currency inputs @critical', () => {
     await expect(revenueInput).toHaveValue('£30,000.80');
 
     await selectEngland(page);
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
 
     // £30,000.80 - £10,000.95 - £12,570 salary - £1,135.50 employer NI = £6,294.35.
     await expect(detailRowValue(page, 'Corporation Tax', 'Salary + Employer NI')).toHaveText(
@@ -1507,7 +1706,7 @@ test.describe('Director Intelligence currency inputs @critical', () => {
     await fillCurrencyInput(revenueInput, 100000);
     await fillCurrencyInput(expensesInput, 20000);
     await selectEngland(page);
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
     await expect(recommendation).toBeVisible();
     await expect(emailCta).toBeVisible();
     await expect(sidebarEmail).toBeEnabled();
@@ -1528,10 +1727,17 @@ test.describe('Director Intelligence currency inputs @critical', () => {
     await expect(emailCta).toHaveCount(0);
     await expect(sidebarEmail).toBeDisabled();
 
-    // Correcting the amount restores a current result and email.
+    await currentCalculateButton(page).click();
+    await expect(
+      page.getByRole('alert').filter({ hasText: 'Please correct the highlighted amounts' }),
+    ).toBeVisible();
+    await expect(revenueInput).toHaveValue('-500');
+
+    // Correcting the amount alone cannot restore currentness after a failed attempt.
     await replaceText(revenueInput, '100000');
     await revenueInput.blur();
-    await closeInputsPanelIfOpen(page);
+    await expect(recommendation).toHaveCount(0);
+    await calculateAndView(page);
     await expect(recommendation).toBeVisible();
     await expect(emailCta).toBeVisible();
     await expect(sidebarEmail).toBeEnabled();
@@ -1633,7 +1839,7 @@ test.describe('Director input help @critical', () => {
     await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 100000);
     await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 20000);
     await selectEngland(page);
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
 
     const keyDates = page.locator('[data-director-section="director-key-dates"]');
     const downloadButton = keyDates.getByRole('button', { name: 'Download .ics' });
@@ -1652,7 +1858,7 @@ test.describe('Director input help @critical', () => {
       .filter({ visible: true });
     await ensureInputsPanelIsVisible(page);
     await periodEnd.fill('2026-12-31');
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
     await expect(keyDates).toContainText('1 Oct 2027');
     await expect(keyDates).toContainText('31 Dec 2027');
     await expect(personalDate).toHaveText(expectedPersonalDate);
@@ -1674,11 +1880,13 @@ test.describe('Director input help @critical', () => {
     await ensureInputsPanelIsVisible(page);
     await periodEnd.fill('2026-02-29');
     await expect(periodEnd).toHaveAccessibleDescription(/Enter a valid date/);
+    await currentCalculateButton(page).click();
+    await expect(
+      page.getByRole('alert').filter({ hasText: 'Enter a valid company accounting period end' }),
+    ).toBeVisible();
     await closeInputsPanelIfOpen(page);
-    await expect(keyDates).toContainText('Correct the accounting period end');
-    await expect(keyDates).not.toContainText('1 Oct 2027');
+    await expect(keyDates).toHaveCount(0);
     await expect(downloadButton).toHaveCount(0);
-    await expect(personalDate).toHaveText(expectedPersonalDate);
   });
 
   test('material Director estimate warnings appear with results', async ({ page }) => {
@@ -1705,7 +1913,7 @@ test.describe('Director input help @critical', () => {
         .filter({ visible: true }),
       1000,
     );
-    await closeInputsPanelIfOpen(page);
+    await calculateAndView(page);
     const notes = page.getByTestId('director-estimate-notes');
     await expect(notes).toContainText('VAT has not been removed');
     await expect(notes).toContainText(
