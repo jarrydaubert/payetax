@@ -7,8 +7,15 @@ import { Label } from '@/components/ui/label';
 import { parseAccountingPeriodEnd } from '@/lib/tax';
 import { useDirectorFormSlice, useDirectorGuideActions } from '@/store/directorGuideStore';
 
-export function AccountingPeriodEndInput({ className }: { className?: string }) {
-  const id = useId();
+export function AccountingPeriodEndInput({
+  id: inputId,
+  className,
+}: {
+  id?: string;
+  className?: string;
+}) {
+  const generatedId = useId();
+  const id = inputId ?? generatedId;
   const value = useDirectorFormSlice((formData) => formData.accountingPeriodEnd);
   const { setAccountingPeriodEnd } = useDirectorGuideActions();
   const invalid = value !== '' && !parseAccountingPeriodEnd(value);

@@ -9,6 +9,7 @@
  * @see docs/business/DIRECTOR_INTELLIGENCE.md
  */
 
+import { useEffect } from 'react';
 import { z } from 'zod';
 import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
@@ -66,7 +67,7 @@ export type TakenViaPayroll = 'yes' | 'no' | 'unsure';
 export type DirectorGuideMode = 'annual' | 'monthly';
 export type StrategyObjective = 'maximizeTakeHome' | 'minimizeNI';
 export type DirectorStrategyKey = StrategyComparison['recommended'];
-const UNAPPLIED_SETUP_ERROR =
+export const UNAPPLIED_SETUP_ERROR =
   'Apply or discard your changes in Compare My Setup before calculating.';
 
 interface DirectorDraftScenario {
@@ -152,7 +153,35 @@ export interface DirectorFormData {
 }
 
 /** Form fields that can hold unparsed, invalid text. */
-export type DirectorInputField = keyof DirectorFormData;
+export type DirectorInputField =
+  | 'revenue'
+  | 'expenses'
+  | 'monthlyIncome'
+  | 'monthlyExpenses'
+  | 'cashInBank'
+  | 'minimumMonthlyDraw'
+  | 'ytdSalary'
+  | 'ytdDividends'
+  | 'ytdDrawings'
+  | 'otherIncome'
+  | 'pensionContribution'
+  | 'companyCarBIK'
+  | 'lossesBroughtForward'
+  | 'minimumSalaryRequirement'
+  | 'yourSetupSalary'
+  | 'yourSetupDividends';
+
+export type DirectorValidationField =
+  | DirectorInputField
+  | 'region'
+  | 'accountingPeriodEnd'
+  | 'contractStartMonth';
+
+interface DirectorFieldValidationSummary {
+  mode: DirectorGuideMode;
+  fields: DirectorValidationField[];
+  requiresSetupDecision: boolean;
+}
 
 type YourSetupField = 'yourSetupSalary' | 'yourSetupDividends';
 
@@ -181,10 +210,66 @@ const FIELDS_UNUSED_BY_MODE: Record<DirectorGuideMode, ReadonlySet<DirectorInput
   monthly: new Set<DirectorInputField>(['revenue', 'expenses']),
 };
 
-/** Whether any field the current mode calculates from holds invalid text. */
-function hasBlockingInputErrors(state: Pick<DirectorGuideState, 'formData' | 'inputErrors'>) {
+function getBlockingInputFields(state: Pick<DirectorGuideState, 'formData' | 'inputErrors'>) {
   const unused = FIELDS_UNUSED_BY_MODE[state.formData.mode];
-  return Object.keys(state.inputErrors).some((field) => !unused.has(field as DirectorInputField));
+  return (Object.keys(state.inputErrors) as DirectorInputField[]).filter(
+    (field) => !unused.has(field),
+  );
+}
+
+function hasBlockingInputErrors(state: Pick<DirectorGuideState, 'formData' | 'inputErrors'>) {
+  return getBlockingInputFields(state).length > 0;
+}
+
+function validateDirectorFields(state: DirectorGuideState) {
+  const { formData } = state;
+  const { accountingPeriodEnd, mode, region } = formData;
+  const fields = new Set<DirectorValidationField>(getBlockingInputFields(state));
+  let error = hasUnappliedYourSetup(state) ? UNAPPLIED_SETUP_ERROR : null;
+  if (fields.size > 0) error ??= 'Please correct the highlighted amounts';
+
+  if (accountingPeriodEnd && !parseAccountingPeriodEnd(accountingPeriodEnd)) {
+    fields.add('accountingPeriodEnd');
+    error ??= 'Enter a valid company accounting period end or leave it blank.';
+  }
+  if (!region) {
+    fields.add('region');
+    error ??= 'Please select your region';
+  }
+
+  const { revenue, expenses, monthlyProjection, hasInvalidContractStartMonth } =
+    resolveAnnualFinancials(formData);
+  if (hasInvalidContractStartMonth) {
+    fields.add('contractStartMonth');
+    error ??= 'Please select a valid contract start month';
+  }
+  if (revenue === undefined || expenses === undefined) {
+    const requiredFields =
+      mode === 'monthly'
+        ? (['monthlyIncome', 'monthlyExpenses'] as const)
+        : (['revenue', 'expenses'] as const);
+    for (const field of requiredFields) {
+      if (formData[field] === undefined) fields.add(field);
+    }
+    return {
+      valid: false as const,
+      fields: [...fields],
+      error:
+        error ??
+        (mode === 'monthly'
+          ? 'Enter your monthly contract income and business expenses.'
+          : 'Enter your annual revenue and business expenses.'),
+    };
+  }
+  if (error || !region) {
+    return {
+      valid: false as const,
+      fields: [...fields],
+      error: error ?? 'Please select your region',
+    };
+  }
+
+  return { valid: true as const, region, revenue, expenses, monthlyProjection };
 }
 
 export function hasCurrentDirectorResults(state: DirectorGuideState) {
@@ -227,6 +312,7 @@ interface DirectorGuideState extends DirectorDraftScenario {
   // Input validity (not persisted): field key → unparsed text that is not a valid amount, kept
   // while the field is hidden or unmounted so it is never silently replaced by an older amount.
   inputErrors: Partial<Record<DirectorInputField, DirectorInvalidInput>>;
+  fieldValidationSummary: DirectorFieldValidationSummary | null;
   /** Incremented on reset so input fields discard any unparsed text. */
   inputRevision: number;
 
@@ -346,6 +432,7 @@ const defaultState: DirectorGuideState = {
   monthlyModeOutput: null,
   error: null,
   inputErrors: {},
+  fieldValidationSummary: null,
   inputRevision: 0,
   isCalculating: false,
   selectedStrategy: null,
@@ -813,60 +900,32 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
           const draftScenario = getDraftScenario(state);
           const { selectedStrategy, sliderSalary, profitWhatIfPercent, objective } = draftScenario;
 
-          if (hasUnappliedYourSetup(state)) {
-            set({ error: UNAPPLIED_SETUP_ERROR });
-            return;
-          }
-
-          if (hasBlockingInputErrors(state)) {
-            set({ error: 'Please correct the highlighted amounts' });
-            return;
-          }
-
-          if (
-            formData.accountingPeriodEnd &&
-            !parseAccountingPeriodEnd(formData.accountingPeriodEnd)
-          ) {
-            set({ error: 'Enter a valid company accounting period end or leave it blank.' });
-            return;
-          }
-
-          if (!formData.region) {
-            set({ error: 'Please select your region' });
-            return;
-          }
-
-          const annualizedFinancials = resolveAnnualFinancials({
-            mode: formData.mode,
-            revenue: formData.revenue,
-            expenses: formData.expenses,
-            monthlyIncome: formData.monthlyIncome,
-            monthlyExpenses: formData.monthlyExpenses,
-            contractStartMonth: formData.contractStartMonth,
-          });
-          const monthlyProjection = annualizedFinancials.monthlyProjection;
-
-          if (annualizedFinancials.hasInvalidContractStartMonth) {
-            set({ error: 'Please select a valid contract start month' });
-            return;
-          }
-
-          const effectiveRevenue = annualizedFinancials.revenue;
-          const effectiveExpenses = annualizedFinancials.expenses;
-
-          if (effectiveRevenue === undefined || effectiveExpenses === undefined) {
+          const validation = validateDirectorFields(state);
+          if (!validation.valid) {
             set({
-              error:
-                formData.mode === 'monthly'
-                  ? 'Enter your monthly contract income and business expenses.'
-                  : 'Enter your annual revenue and business expenses.',
+              error: validation.error,
+              fieldValidationSummary:
+                validation.fields.length > 1
+                  ? {
+                      mode: formData.mode,
+                      fields: validation.fields,
+                      requiresSetupDecision: hasUnappliedYourSetup(state),
+                    }
+                  : null,
             });
             return;
           }
+          const {
+            region,
+            revenue: effectiveRevenue,
+            expenses: effectiveExpenses,
+            monthlyProjection,
+          } = validation;
 
           const minimumSalary = roundToPence(formData.minimumSalaryRequirement ?? 0);
           if (sliderSalary === null && selectedStrategy === 'allDividends' && minimumSalary > 0) {
             set({
+              fieldValidationSummary: null,
               error:
                 'All Dividends cannot meet your minimum salary. Choose All Salary or Baseline Mix, or clear the minimum salary.',
             });
@@ -874,7 +933,7 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
           }
 
           if (sliderSalary !== null && !CurrencyAmountSchema.safeParse(sliderSalary).success) {
-            set({ error: 'Choose a valid custom salary.' });
+            set({ error: 'Choose a valid custom salary.', fieldValidationSummary: null });
             return;
           }
 
@@ -882,15 +941,16 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
           if (grossProfit <= 0 && (sliderSalary !== null || profitWhatIfPercent !== 0)) {
             set({
               error: 'A custom salary or profit requires positive company profit.',
+              fieldValidationSummary: null,
             });
             return;
           }
 
-          set({ isCalculating: true, error: null });
+          set({ isCalculating: true, error: null, fieldValidationSummary: null });
 
           try {
             const strategyInput: StrategyInput = {
-              region: formData.region,
+              region,
               revenue:
                 profitWhatIfPercent === 0
                   ? effectiveRevenue
@@ -1148,6 +1208,49 @@ export function useHasDirectorInputErrors() {
  */
 export function useDirectorInputErrors() {
   return useDirectorGuideStore((state) => state.inputErrors);
+}
+
+function getUnresolvedSummaryFields(state: DirectorGuideState) {
+  const summary = state.fieldValidationSummary;
+  if (!summary?.fields.length || summary.mode !== state.formData.mode) return [];
+  const validation = validateDirectorFields(state);
+  return validation.valid
+    ? []
+    : summary.fields.filter((field) => validation.fields.includes(field));
+}
+
+function hasUnresolvedSummarySetup(state: DirectorGuideState) {
+  return (
+    state.fieldValidationSummary?.requiresSetupDecision === true && hasUnappliedYourSetup(state)
+  );
+}
+
+export function useDirectorValidationSummary() {
+  const summary = useDirectorGuideStore((state) => state.fieldValidationSummary);
+  const fields = useDirectorGuideStore(useShallow(getUnresolvedSummaryFields));
+  const requiresSetupDecision = useDirectorGuideStore(hasUnresolvedSummarySetup);
+
+  // Prune after the draft edit commits. Currency inputs report validity and value separately.
+  useEffect(() => {
+    if (
+      !summary ||
+      (fields.length === summary.fields.length &&
+        requiresSetupDecision === summary.requiresSetupDecision)
+    ) {
+      return;
+    }
+    const current = useDirectorGuideStore.getState();
+    if (current.fieldValidationSummary !== summary) return;
+    useDirectorGuideStore.setState({
+      fieldValidationSummary: {
+        ...summary,
+        fields: getUnresolvedSummaryFields(current),
+        requiresSetupDecision: hasUnresolvedSummarySetup(current),
+      },
+    });
+  }, [summary, fields, requiresSetupDecision]);
+
+  return { hasSummaryAttempt: summary !== null, fields, requiresSetupDecision };
 }
 
 /**

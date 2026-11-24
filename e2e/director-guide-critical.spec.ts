@@ -1691,14 +1691,21 @@ test.describe('Director Intelligence currency inputs @critical', () => {
     await expect(revenueInput).not.toHaveAttribute('aria-invalid', 'true');
   });
 
-  test('invalid or empty required inputs remove the result and disable email @critical', async ({
+  test('summarizes multiple invalid inputs and publishes corrected figures only on Calculate @critical', async ({
     page,
   }) => {
     await openDirectorGuide(page);
     const revenueInput = visibleInputByTestId(page, 'director-revenue-input');
     const expensesInput = visibleInputByTestId(page, 'director-expenses-input');
+    const periodEnd = page
+      .getByRole('textbox', { name: 'Company Accounting Period End' })
+      .filter({ visible: true });
+    const pension = page
+      .getByRole('textbox', { name: 'Employer Pension' })
+      .filter({ visible: true });
     const emailCta = page.getByRole('button', { name: 'Email My Results' });
     const recommendation = page.locator('[data-director-section="director-recommendation"]');
+    const calendar = page.getByRole('button', { name: 'Download .ics' });
     const sidebarEmail = page
       .getByRole('button', { name: 'Email Results', exact: true, includeHidden: true })
       .first();
@@ -1706,50 +1713,127 @@ test.describe('Director Intelligence currency inputs @critical', () => {
     await fillCurrencyInput(revenueInput, 100000);
     await fillCurrencyInput(expensesInput, 20000);
     await selectEngland(page);
+    await periodEnd.fill('2026-12-31');
     await calculateAndView(page);
     await expect(recommendation).toBeVisible();
-    await expect(emailCta).toBeVisible();
+    await expect(
+      page.getByRole('listitem', { name: 'Gross Profit: £80,000, 100% of total' }),
+    ).toBeVisible();
+    await expect(emailCta).toBeEnabled();
     await expect(sidebarEmail).toBeEnabled();
+    await expect(calendar).toBeVisible();
 
-    // Unsupported negative amount: explained, never converted into another amount.
     await ensureInputsPanelIsVisible(page);
     await replaceText(revenueInput, '-500');
     await revenueInput.blur();
-    await expect(revenueInput).toHaveValue('-500');
-    await expect(revenueInput).toHaveAttribute('aria-invalid', 'true');
-    await expect(
-      page
-        .getByText('Enter an amount of £0 or more. Negative amounts are not supported.')
-        .filter({ visible: true }),
-    ).toBeVisible();
+    await periodEnd.fill('2026-02-29');
+    await replaceText(expensesInput, '');
+    await expensesInput.blur();
+    await page.getByRole('button', { name: 'Add More Detail', exact: true }).click();
+    await page.getByRole('button', { name: 'Advanced Options' }).click();
+    await replaceText(pension, '-300');
+    await pension.blur();
+    await page.getByRole('button', { name: 'Advanced Options' }).click();
+    await page.getByRole('button', { name: 'Quick Start', exact: true }).click();
+    await expect(pension).toBeHidden();
+    const summary = page.getByRole('alert').filter({ hasText: 'before calculating' });
+    await expect(summary).toHaveCount(0);
     await expect(page.getByTestId('director-results-paused')).toBeVisible();
     await expect(recommendation).toHaveCount(0);
     await expect(emailCta).toHaveCount(0);
     await expect(sidebarEmail).toBeDisabled();
+    await expect(calendar).toHaveCount(0);
 
     await currentCalculateButton(page).click();
+    await expect(summary).toHaveText('Check 4 fields before calculating.');
+    await expect(summary).toBeFocused();
+    const checkPension = page.getByRole('button', { name: 'Employer Pension', exact: true });
+    await expect(page.getByRole('button', { name: 'Annual Revenue', exact: true })).toBeVisible();
     await expect(
-      page.getByRole('alert').filter({ hasText: 'Please correct the highlighted amounts' }),
+      page.getByRole('button', { name: 'Business Expenses', exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: 'Company Accounting Period End', exact: true }),
     ).toBeVisible();
     await expect(revenueInput).toHaveValue('-500');
+    await expect(revenueInput).toHaveAttribute('aria-invalid', 'true');
+    await expect(revenueInput).toHaveAccessibleDescription(/Negative amounts are not supported/);
+    await expect(expensesInput).toHaveValue('');
+    await expect(periodEnd).toHaveValue('2026-02-29');
+    await expect(periodEnd).toHaveAccessibleDescription(/Enter a valid date/);
+    await checkPension.press('Enter');
+    await expect(pension).toBeFocused();
+    await expect(pension).toHaveValue('-300');
+    await expect(pension).toHaveAccessibleDescription(/Negative amounts are not supported/);
+    await expect
+      .poll(() =>
+        pension.evaluate((field) => {
+          const { x, y, width, height } = field.getBoundingClientRect();
+          return document.elementFromPoint(x + width / 2, y + height / 2) === field;
+        }),
+      )
+      .toBe(true);
 
-    // Correcting the amount alone cannot restore currentness after a failed attempt.
-    await replaceText(revenueInput, '100000');
-    await revenueInput.blur();
+    await fillCurrencyInput(pension, 0);
+    await expect(summary).toHaveText('Check 3 fields before calculating.');
+    await fillCurrencyInput(revenueInput, 100000);
+    await fillCurrencyInput(expensesInput, 20000);
+    await periodEnd.fill('2026-12-31');
+    await expect(summary).toHaveCount(0);
     await expect(recommendation).toHaveCount(0);
+    await expect(emailCta).toHaveCount(0);
+    await expect(calendar).toHaveCount(0);
+
+    await periodEnd.fill('2026-1');
+    await fillCurrencyInput(page.getByRole('textbox', { name: 'Your Current Salary' }), 500);
+    await expect(summary).toHaveCount(0);
+    await periodEnd.fill('2026-12-31');
+    await page.getByRole('button', { name: 'Reset Draft', exact: true }).click();
+    await expect(recommendation).toHaveCount(0);
+
+    await page.getByRole('button', { name: 'Monthly', exact: true }).click();
+    await expect(
+      page.getByRole('alert').filter({ hasText: 'Please correct the highlighted amounts' }),
+    ).toHaveCount(0);
+    await page.getByRole('button', { name: 'Annual', exact: true }).click();
+    await fillCurrencyInput(revenueInput, 120000);
+    await fillCurrencyInput(expensesInput, 25000);
     await calculateAndView(page);
     await expect(recommendation).toBeVisible();
-    await expect(emailCta).toBeVisible();
+    await expect(
+      page.getByRole('listitem', { name: 'Gross Profit: £95,000, 100% of total' }),
+    ).toBeVisible();
+    await expect(emailCta).toBeEnabled();
     await expect(sidebarEmail).toBeEnabled();
+    await expect(calendar).toBeVisible();
 
-    // Clearing a required input removes the result; empty is not treated as £0.
     await ensureInputsPanelIsVisible(page);
-    await replaceText(expensesInput, '');
-    await expensesInput.blur();
+    await page.getByRole('button', { name: 'Full Inputs', exact: true }).click();
+    await fillCurrencyInput(page.getByRole('textbox', { name: 'Your Current Salary' }), 500);
+    await replaceText(revenueInput, '-500');
+    await revenueInput.blur();
+    await periodEnd.fill('2026-02-29');
+    await currentCalculateButton(page).click();
+    await expect(summary).toContainText('Check 2 fields before calculating.');
+    await expect(summary).toContainText(
+      'Apply or discard your changes in Compare My Setup before calculating.',
+    );
+    await expect(currentCalculateButton(page)).toHaveAccessibleDescription(
+      /Check 2 fields before calculating\.\s*Apply or discard your changes in Compare My Setup/,
+    );
+    await page
+      .getByRole('button', { name: 'Reset', exact: true })
+      .filter({ visible: true })
+      .last()
+      .click();
+    await expect(revenueInput).toHaveValue('');
     await expect(expensesInput).toHaveValue('');
+    await expect(periodEnd).toHaveValue('');
+    await expect(summary).toHaveCount(0);
     await expect(recommendation).toHaveCount(0);
     await expect(emailCta).toHaveCount(0);
     await expect(sidebarEmail).toBeDisabled();
+    await expect(calendar).toHaveCount(0);
   });
 });
 
