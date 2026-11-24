@@ -8,6 +8,7 @@
 
 import { z } from 'zod';
 import { PERIODS, TAX_YEARS } from '@/constants/taxRates';
+import { reachedStatePensionAgeFromLegacyAge } from '@/lib/legacyStatePensionAge';
 import { isValidTaxCode, TAX_CODE_MAX_LENGTH } from '@/lib/tax';
 import { INCOME_SOURCE_TYPES, PensionMethodSchema } from '@/lib/types/calculator';
 import { CurrencyAmountSchema, DirectorTaxYearSchema, RegionSchema } from './directorValidation';
@@ -118,6 +119,8 @@ export const PayeEmailInputSchema = z
     isMarried: z.boolean(),
     partnerGrossWage: payeMoneyField,
     isBlind: z.boolean(),
+    reachedStatePensionAge: z.boolean().optional(),
+    // Sent by clients cached before JGF-21; mapped below and never used directly.
     age: z.number().int().min(0).max(120).optional(),
     payNoNI: z.boolean(),
     pensionContribution: payeMoneyField,
@@ -143,7 +146,12 @@ export const PayeEmailInputSchema = z
   .refine(
     (input) => input.pensionContributionType !== 'percentage' || input.pensionContribution <= 100,
     { path: ['pensionContribution'], message: 'Enter a percentage no more than 100%.' },
-  );
+  )
+  .transform(({ age, ...input }) => ({
+    ...input,
+    reachedStatePensionAge:
+      input.reachedStatePensionAge ?? reachedStatePensionAgeFromLegacyAge(age),
+  }));
 
 /**
  * Request body for /api/send-results

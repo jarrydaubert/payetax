@@ -21,7 +21,7 @@ describe('Marriage Allowance - Comprehensive Tests', () => {
     isMarried: true,
     partnerGrossWage: partnerWage,
     isBlind: false,
-    age: undefined,
+    reachedStatePensionAge: false,
     payNoNI: false,
     pensionContribution: 0,
     pensionContributionType: 'percentage',

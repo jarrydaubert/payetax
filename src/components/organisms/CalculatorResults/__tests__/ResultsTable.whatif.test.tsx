@@ -27,7 +27,7 @@ describe('ResultsTable - What If Scenarios with All Display Periods', () => {
     isMarried: false,
     partnerGrossWage: 0,
     isBlind: false,
-    age: undefined,
+    reachedStatePensionAge: false,
     payNoNI: false,
     studentLoanPlans: 'none' as const,
     pensionContribution: 0,

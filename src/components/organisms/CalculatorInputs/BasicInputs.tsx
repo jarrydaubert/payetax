@@ -30,9 +30,6 @@ import { cn } from '@/lib/utils';
 import type { CalculatorAmountField, CalculatorInvalidAmount } from '@/store/calculatorInputErrors';
 import { useCalculatorActions, useCalculatorStore } from '@/store/calculatorStore';
 
-/** State Pension Age threshold - employees over SPA don't pay NI */
-const STATE_PENSION_AGE = 66;
-
 /** Field limits, matching the calculator store's input schemas so no accepted amount is dropped. */
 const SALARY_MAX = 10_000_000;
 const PARTNER_WAGE_MAX = 10_000_000;
@@ -56,7 +53,7 @@ export function BasicInputs() {
     setIsMarried,
     setPartnerGrossWage,
     setIsBlind,
-    setAge,
+    setReachedStatePensionAge,
     setPayNoNI,
     setStudentLoanPlans,
     setPensionContribution,
@@ -79,8 +76,7 @@ export function BasicInputs() {
   const marriedId = useId();
   const partnerWageId = useId();
   const blindId = useId();
-  const ageId = useId();
-  const ageLabelId = `${ageId}-label`;
+  const statePensionAgeId = useId();
   const payNoNIId = useId();
   const studentLoanId = useId();
   const studentLoanLabelId = `${studentLoanId}-label`;
@@ -137,9 +133,6 @@ export function BasicInputs() {
     input.studentLoanPlans.includes('postgrad') &&
     input.studentLoanPlans.length === 2;
 
-  // Determine if user is over State Pension Age (for NI exemption)
-  const isOverStatePensionAge = input.age !== undefined && input.age >= STATE_PENSION_AGE;
-
   const trackCalculatorFieldFocus = (fieldName: string) => {
     if (trackedFieldFocusesRef.current.has(fieldName)) return;
 
@@ -190,7 +183,7 @@ export function BasicInputs() {
   );
   const fieldLabelClass = cn('flex min-w-0 items-center', 'gap-1.5');
   const fieldControlClass = 'min-w-0 w-full max-w-full justify-self-start';
-  // Sized for the longest values: £10,000,000.00, "State Pension Age or over", "Fortnightly".
+  // Sized for the longest values: £10,000,000.00 and "Fortnightly".
   const amountControlClass = cn(fieldControlClass, 'sm:w-36');
   const selectControlClass = cn(fieldControlClass, 'sm:w-54');
   const pairedControlClass = cn(fieldControlClass, 'sm:w-64');
@@ -417,40 +410,18 @@ export function BasicInputs() {
         </div>
       )}
 
-      {/* Age - Dropdown for State Pension Age (affects NI) */}
-      <div className={fieldRowClass}>
-        <div className={cn(fieldLabelClass, 'sm:whitespace-nowrap')}>
-          <LabelTooltip fieldName='age' />
-          <Label id={ageLabelId} htmlFor={ageId} className={cn('whitespace-nowrap', 'text-sm')}>
-            Age
-          </Label>
-        </div>
-        <Select
-          value={isOverStatePensionAge ? 'over-spa' : 'under-spa'}
-          onValueChange={(value) => {
-            // Store a representative age for calculation purposes
-            // Under SPA: undefined (standard NI applies)
-            // Over SPA: 67 (NI exempt - employees don't pay NI after State Pension Age)
-            if (value === 'under-spa') {
-              setAge(undefined);
-            } else {
-              setAge(67); // Representative age over State Pension Age
-            }
-          }}
-        >
-          <SelectTrigger
-            id={ageId}
-            className={selectControlClass}
-            data-testid='age-select'
-            aria-labelledby={ageLabelId}
-          >
-            <SelectValue placeholder='Select age range' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='under-spa'>Under State Pension Age</SelectItem>
-            <SelectItem value='over-spa'>State Pension Age or over</SelectItem>
-          </SelectContent>
-        </Select>
+      {/* Own row, where the former dropdown sat, so the allowances group still fits one line. */}
+      <div className={checkboxRowClass}>
+        <LabelTooltip fieldName='statePensionAge' />
+        <Label htmlFor={statePensionAgeId} className={checkboxLabelClass}>
+          Reached State Pension age
+        </Label>
+        <Checkbox
+          id={statePensionAgeId}
+          checked={input.reachedStatePensionAge === true}
+          onCheckedChange={(v) => setReachedStatePensionAge(v === true)}
+          data-testid='state-pension-age-checkbox'
+        />
       </div>
 
       {/* Student Loan - Select + Conditional */}

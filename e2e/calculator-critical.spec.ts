@@ -1153,21 +1153,7 @@ test.describe('MC-09 pension suggestion @critical', () => {
 });
 
 test.describe('Calculator critical @critical', () => {
-  test('Age select text is not visually truncated in the side panel @critical', async ({
-    page,
-  }) => {
-    await setLandscapeViewportIfPortrait(page);
-    await gotoCalculator(page);
-
-    const ageTrigger = page.getByTestId('age-select');
-    await expect(ageTrigger).toBeVisible();
-
-    // If the trigger is too narrow, the selected value will truncate with ellipsis (scrollWidth > clientWidth).
-    const hasOverflow = await ageTrigger.evaluate((el) => el.scrollWidth > el.clientWidth);
-    expect(hasOverflow).toBe(false);
-  });
-
-  test('State Pension Age selection removes employee NI and increases net pay @critical', async ({
+  test('State Pension age checkbox removes employee NI and increases net pay @critical', async ({
     page,
   }) => {
     await setLandscapeViewportIfPortrait(page);
@@ -1181,11 +1167,11 @@ test.describe('Calculator critical @critical', () => {
     const baseNet = await getYearlyTableValue(page, 'Net Pay');
     expect(baseNI).toBeGreaterThan(0);
 
-    await selectOption(
-      page,
-      page.getByTestId('age-select'),
-      /State Pension Age or over|Over State Pension Age/i,
-    );
+    const statePensionAge = page.getByRole('checkbox', { name: 'Reached State Pension age' });
+    await statePensionAge.check();
+    await expect(statePensionAge).toBeChecked();
+    // Editing a draft never recalculates: the submitted result stays until Calculate.
+    expect(await getYearlyTableValue(page, 'National Insurance')).toBe(baseNI);
     await page.getByTestId('calculate-button').click();
 
     const niAtPensionAge = await getYearlyTableValue(page, 'National Insurance');

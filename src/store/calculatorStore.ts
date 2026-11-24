@@ -47,6 +47,7 @@ import {
 } from '@/lib/calculatorValidation';
 import { parseCurrencyInput } from '@/lib/currencyInput';
 import { figureStorage, registerFigureStore } from '@/lib/figureStorage';
+import { reachedStatePensionAgeFromLegacyAge } from '@/lib/legacyStatePensionAge';
 import {
   addBreadcrumb,
   type CalculationAnomalyCode,
@@ -141,11 +142,8 @@ const PARTNER_GROSS_WAGE_INPUT_SCHEMA = z
   .max(10_000_000, 'Partner wage exceeds maximum')
   .finite('Partner wage must be a valid number');
 
-const AGE_INPUT_SCHEMA = z
-  .number()
-  .int('Age must be a whole number')
-  .min(0, 'Age cannot be negative')
-  .max(120, 'Age must be between 0 and 120');
+/** Remembered figures saved before JGF-21 may still carry a representative age. */
+const LEGACY_PERSISTED_AGE_SCHEMA = z.number().int().min(0).max(120);
 
 const PENSION_PERCENT_INPUT_SCHEMA = z
   .number()
@@ -243,7 +241,7 @@ interface CalculatorState {
   setIsMarried: (isMarried: boolean) => void;
   setPartnerGrossWage: (wage: number) => void;
   setIsBlind: (isBlind: boolean) => void;
-  setAge: (age: number | undefined) => void;
+  setReachedStatePensionAge: (reached: boolean) => void;
   setPayNoNI: (payNoNI: boolean) => void;
   setStudentLoanPlans: (plans: StudentLoanSelection) => void;
   toggleStudentLoan: (plan: StudentLoanPlan) => void;
@@ -476,7 +474,7 @@ const defaultInput: CalculatorInput = {
   isMarried: false,
   partnerGrossWage: 0,
   isBlind: false,
-  age: undefined,
+  reachedStatePensionAge: false,
   payNoNI: false,
   studentLoanPlans: 'none',
   pensionContribution: 0,
@@ -509,7 +507,7 @@ const CalculatorInputPartialSchema = z
     isMarried: z.boolean().optional(),
     partnerGrossWage: PARTNER_GROSS_WAGE_INPUT_SCHEMA.optional(),
     isBlind: z.boolean().optional(),
-    age: AGE_INPUT_SCHEMA.optional(),
+    reachedStatePensionAge: z.boolean().optional(),
     payNoNI: z.boolean().optional(),
     studentLoanPlans: STUDENT_LOAN_SELECTION_SCHEMA.optional(),
     pensionContribution: PENSION_AMOUNT_INPUT_SCHEMA.optional(),
@@ -527,6 +525,7 @@ const PersistedCalculatorStoreSchema = z
     // Preserve invalid saved pension numbers for correction, rather than discarding the form.
     input: CalculatorInputPartialSchema.extend({
       pensionContribution: z.number().optional(),
+      age: LEGACY_PERSISTED_AGE_SCHEMA.optional(),
     }).optional(),
     _savedAt: z.number().int().positive().optional(),
     _taxYear: z.string().optional(),
@@ -739,21 +738,20 @@ export const useCalculatorStore = create<CalculatorState>()(
             input: { ...state.input, isBlind: validated.data },
           }));
         },
-        setAge: (age) => {
-          // Validate age if provided
-          if (age !== undefined) {
-            const validated = AGE_INPUT_SCHEMA.safeParse(age);
+        setReachedStatePensionAge: (reached) => {
+          const validated = BooleanSchema.safeParse(reached);
 
-            if (!validated.success) {
-              logCalculatorWarning(
-                '[Calculator] Invalid age:',
-                validated.error.issues[0]?.message ?? 'Validation failed',
-              );
-              return;
-            }
-            age = validated.data;
+          if (!validated.success) {
+            logCalculatorWarning(
+              '[Calculator] Invalid reachedStatePensionAge:',
+              validated.error.issues[0]?.message ?? 'Validation failed',
+            );
+            return;
           }
-          set((state) => ({ input: { ...state.input, age } }));
+
+          set((state) => ({
+            input: { ...state.input, reachedStatePensionAge: validated.data },
+          }));
         },
         setPayNoNI: (payNoNI) => {
           // Validate boolean using extracted schema
@@ -1309,11 +1307,14 @@ export const useCalculatorStore = create<CalculatorState>()(
             normalizedTaxYear = getCurrentTaxYear();
           }
 
+          const { age: legacyAge, ...savedInput } = persistedInput ?? {};
           const input = {
             ...defaultInput,
-            ...persistedInput,
+            ...savedInput,
             // Ensure new fields have defaults if missing in persisted state
-            incomeSources: persistedInput?.incomeSources ?? [],
+            incomeSources: savedInput.incomeSources ?? [],
+            reachedStatePensionAge:
+              savedInput.reachedStatePensionAge ?? reachedStatePensionAgeFromLegacyAge(legacyAge),
             taxYear: normalizedTaxYear,
           };
           const percentage = input.pensionContributionType === 'percentage';
@@ -1378,7 +1379,7 @@ export const useCalculatorActions = () =>
       setIsMarried: state.setIsMarried,
       setPartnerGrossWage: state.setPartnerGrossWage,
       setIsBlind: state.setIsBlind,
-      setAge: state.setAge,
+      setReachedStatePensionAge: state.setReachedStatePensionAge,
       setPayNoNI: state.setPayNoNI,
       setStudentLoanPlans: state.setStudentLoanPlans,
       toggleStudentLoan: state.toggleStudentLoan,

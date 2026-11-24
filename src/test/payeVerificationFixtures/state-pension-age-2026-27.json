@@ -16,7 +16,7 @@
   "scenarios": [
     {
       "id": "spa-20k-age67",
-      "description": "£20,000 at age 67 (the UI's over-SPA choice). Employee NI is exempt, but the Personal Allowance stays at the standard £12,570 — age-related allowances were abolished from 2016-17 (Finance Act 2015). Taxable pay is floor(1666.67-1048.26)=618 at 20% = £123.60/mo (£1,483.20/yr).",
+      "description": "£20,000 at age 67, declared as having reached State Pension age (the UI checkbox). Employee NI is exempt, but the Personal Allowance stays at the standard £12,570 — age-related allowances were abolished from 2016-17 (Finance Act 2015). Taxable pay is floor(1666.67-1048.26)=618 at 20% = £123.60/mo (£1,483.20/yr).",
       "input": {
         "salary": 20000,
         "payPeriod": "annually",
@@ -26,38 +26,7 @@
         "isMarried": false,
         "partnerGrossWage": 0,
         "isBlind": false,
-        "age": 67,
-        "payNoNI": false,
-        "pensionContribution": 0,
-        "pensionContributionType": "percentage",
-        "studentLoanPlans": "none",
-        "niCategory": "A",
-        "hoursPerWeek": 40
-      },
-      "expected": {
-        "taxFreeAmount": 12570,
-        "incomeTaxAnnual": 1483.2,
-        "nationalInsuranceAnnual": 0
-      },
-      "invariants": [
-        "employee-ni-is-zero",
-        "employer-ni-is-positive",
-        "tax-free-amount-is-standard-personal-allowance"
-      ]
-    },
-    {
-      "id": "spa-20k-age78",
-      "description": "£20,000 at age 78. Identical income tax to any other adult — no 75+ allowance exists in any supported tax year.",
-      "input": {
-        "salary": 20000,
-        "payPeriod": "annually",
-        "taxYear": "2026-2027",
-        "taxCode": "1257L",
-        "isScottish": false,
-        "isMarried": false,
-        "partnerGrossWage": 0,
-        "isBlind": false,
-        "age": 78,
+        "reachedStatePensionAge": true,
         "payNoNI": false,
         "pensionContribution": 0,
         "pensionContributionType": "percentage",
@@ -104,7 +73,7 @@
     },
     {
       "id": "spa-36k-age67",
-      "description": "£36,000 at age 67 — sits inside the abolished allowance's old £34,600 taper zone. Correct law: standard PA; HMRC Tables A gives £1,048.26 Month 1 free pay, so taxable floor(3000-1048.26)=1951 at 20% = £390.20/mo (£4,682.40/yr). Guards against any taper artifact reappearing.",
+      "description": "£36,000 at age 67, declared as having reached State Pension age — sits inside the abolished allowance's old £34,600 taper zone. Correct law: standard PA; HMRC Tables A gives £1,048.26 Month 1 free pay, so taxable floor(3000-1048.26)=1951 at 20% = £390.20/mo (£4,682.40/yr). Guards against any taper artifact reappearing.",
       "input": {
         "salary": 36000,
         "payPeriod": "annually",
@@ -114,7 +83,7 @@
         "isMarried": false,
         "partnerGrossWage": 0,
         "isBlind": false,
-        "age": 67,
+        "reachedStatePensionAge": true,
         "payNoNI": false,
         "pensionContribution": 0,
         "pensionContributionType": "percentage",
@@ -135,7 +104,7 @@
     },
     {
       "id": "age65-25k-under-spa",
-      "description": "£25,000 at age 65 — under SPA, so full NI applies (8% of 1035.33 = £82.83/mo, £993.96/yr) and there is no 65-74 allowance. Taxable pay is floor(2083.33-1048.26)=1035 at 20% = £207/mo (£2,484/yr).",
+      "description": "£25,000 at age 65, declared as not having reached State Pension age, so full NI applies (8% of 1035.33 = £82.83/mo, £993.96/yr) and there is no 65-74 allowance. Taxable pay is floor(2083.33-1048.26)=1035 at 20% = £207/mo (£2,484/yr).",
       "input": {
         "salary": 25000,
         "payPeriod": "annually",
@@ -145,7 +114,7 @@
         "isMarried": false,
         "partnerGrossWage": 0,
         "isBlind": false,
-        "age": 65,
+        "reachedStatePensionAge": false,
         "payNoNI": false,
         "pensionContribution": 0,
         "pensionContributionType": "percentage",

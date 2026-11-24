@@ -37,7 +37,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
     isMarried: false,
     partnerGrossWage: 0,
     isBlind: false,
-    age: undefined,
+    reachedStatePensionAge: false,
     payNoNI: false,
     pensionContribution: 0,
     pensionContributionType: 'percentage',
@@ -312,45 +312,45 @@ describe('HMRC Rate Verification & Edge Cases', () => {
     });
   });
 
-  describe('Age never changes the Personal Allowance (abolished 2016-17)', () => {
-    it('Age 67, £34,600 - standard Personal Allowance', () => {
+  describe('State Pension age never changes the Personal Allowance (abolished 2016-17)', () => {
+    it('Over State Pension age, £34,600 - standard Personal Allowance', () => {
       const result = calculateTax(
         createInput({
           salary: 34600,
-          age: 67,
+          reachedStatePensionAge: true,
         }),
       );
       expect(result.taxFreeAmount).toBe(12570);
     });
 
-    it('Age 67, £41,920 - standard Personal Allowance', () => {
+    it('Over State Pension age, £41,920 - standard Personal Allowance', () => {
       const result = calculateTax(
         createInput({
           salary: 41920,
-          age: 67,
+          reachedStatePensionAge: true,
         }),
       );
       expect(result.taxFreeAmount).toBe(12570);
     });
 
-    it('Age 75, £42,520 - standard Personal Allowance (no 75+ uplift)', () => {
+    it('Over State Pension age, £42,520 - standard Personal Allowance (no age-related uplift)', () => {
       const result = calculateTax(
         createInput({
           salary: 42520,
-          age: 75,
+          reachedStatePensionAge: true,
         }),
       );
       expect(result.taxFreeAmount).toBe(12570);
     });
 
-    it('Age 67, £110,000 - only the £100k taper applies', () => {
+    it('Over State Pension age, £110,000 - only the £100k taper applies', () => {
       const result = calculateTax(
         createInput({
           salary: 110000,
-          age: 67,
+          reachedStatePensionAge: true,
         }),
       );
-      // PA reduction: (£110,000 - £100,000) ÷ 2 = £5,000; age adds nothing
+      // PA reduction: (£110,000 - £100,000) ÷ 2 = £5,000; State Pension age adds nothing
       expect(result.taxFreeAmount).toBe(12570 - 5000);
     });
   });
@@ -369,11 +369,11 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       expect(result.taxFreeAmount).toBe(16960);
     });
 
-    it('Age 67 + Marriage + Blind allowances (age adds nothing)', () => {
+    it('Over State Pension age + Marriage + Blind allowances (adds nothing)', () => {
       const result = calculateTax(
         createInput({
           salary: 30000,
-          age: 67,
+          reachedStatePensionAge: true,
           isMarried: true,
           partnerGrossWage: 8000,
           isBlind: true,
@@ -384,11 +384,11 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       expect(result.taxFreeAmount).toBe(16960);
     });
 
-    it('Age 75 + all allowances + pension contribution (age adds nothing)', () => {
+    it('Over State Pension age + all allowances + pension contribution (adds nothing)', () => {
       const result = calculateTax(
         createInput({
           salary: 35000,
-          age: 75,
+          reachedStatePensionAge: true,
           isMarried: true,
           partnerGrossWage: 10000,
           isBlind: true,
@@ -470,25 +470,22 @@ describe('HMRC Rate Verification & Edge Cases', () => {
       expect(result.nationalInsurance.annually).toBeCloseTo(322.32, 2);
     });
 
-    it('Category C - over state pension age', () => {
+    it('Category C alone - no employee NI', () => {
       const result = calculateTax(
         createInput({
           salary: 30000,
           niCategory: 'C',
-          age: 67,
-          payNoNI: true,
         }),
       );
       // No NI for category C
       expect(result.nationalInsurance.annually).toBe(0);
     });
 
-    it('Age 66+ automatic NI exemption', () => {
+    it('State Pension age declaration alone exempts employee NI', () => {
       const result = calculateTax(
         createInput({
           salary: 50000,
-          age: 67,
-          payNoNI: true,
+          reachedStatePensionAge: true,
         }),
       );
       expect(result.nationalInsurance.annually).toBe(0);

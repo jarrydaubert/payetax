@@ -45,7 +45,6 @@ export {
   getEmployeeClass1RateForPayDate,
   getPayDateForTaxPeriod,
   isEmployeeNIExempt,
-  STATE_PENSION_AGE_NI_EXEMPTION,
   sliceClass1EmployeeEarnings,
   sliceClass1EmployerEarnings,
 } from './nationalInsurance';

@@ -16,7 +16,7 @@ describe('Salary Comparison', () => {
     isMarried: false,
     partnerGrossWage: 0,
     isBlind: false,
-    age: 30,
+    reachedStatePensionAge: false,
     payNoNI: false,
     studentLoanPlans: 'none',
     pensionContribution: 0,

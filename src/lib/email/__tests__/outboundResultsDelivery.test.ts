@@ -17,6 +17,7 @@ const PAYE_INPUT: PayeEmailInput = {
   isMarried: false,
   partnerGrossWage: 0,
   isBlind: false,
+  reachedStatePensionAge: false,
   payNoNI: false,
   pensionContribution: 0,
   pensionContributionType: 'percentage',

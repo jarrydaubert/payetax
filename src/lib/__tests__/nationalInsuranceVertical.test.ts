@@ -38,7 +38,6 @@ import {
   getPayDateForTaxPeriod,
   isEmployeeNIExempt,
   type NICategory,
-  STATE_PENSION_AGE_NI_EXEMPTION,
   sliceClass1EmployeeEarnings,
   sliceClass1EmployerEarnings,
   type TaxCalculationInput,
@@ -446,26 +445,27 @@ describe('National Insurance vertical', () => {
 
   describe('State Pension age exemption', () => {
     const exemptionFixtures = [
-      { label: 'below State Pension age', input: { age: 65 }, exempt: false },
-      { label: 'at State Pension age', input: { age: 66 }, exempt: true },
-      { label: 'above State Pension age', input: { age: 80 }, exempt: true },
+      {
+        label: 'State Pension age not reached',
+        input: { reachedStatePensionAge: false },
+        exempt: false,
+      },
+      { label: 'State Pension age reached', input: { reachedStatePensionAge: true }, exempt: true },
       { label: 'category C', input: { niCategory: 'C' as NICategory }, exempt: true },
       { label: 'payNoNI override', input: { payNoNI: true }, exempt: true },
-      { label: 'no age supplied', input: {}, exempt: false },
+      { label: 'no declaration supplied', input: {}, exempt: false },
     ] as const;
 
     it.each(exemptionFixtures)('treats $label correctly', ({ input, exempt }) => {
       expect(isEmployeeNIExempt(input)).toBe(exempt);
     });
 
-    it('exposes the State Pension age used for the exemption', () => {
-      expect(STATE_PENSION_AGE_NI_EXEMPTION).toBe(66);
-    });
-
     it.each(['2026-2027', '2025-2026', '2024-2025', '2023-2024'] as const)(
       'exempts the employee but still charges the employer in %s',
       (taxYear) => {
-        const result = calculateTax(createInput({ salary: 50000, taxYear, age: 67 }));
+        const result = calculateTax(
+          createInput({ salary: 50000, taxYear, reachedStatePensionAge: true }),
+        );
 
         expect(result.nationalInsurance.annually).toBe(0);
         expect(result.employerNI).toBeGreaterThan(0);
@@ -473,8 +473,8 @@ describe('National Insurance vertical', () => {
     );
 
     it('charges employer NI at the same amount whether or not the employee is exempt', () => {
-      const working = calculateTax(createInput({ salary: 50000, age: 40 }));
-      const pensioner = calculateTax(createInput({ salary: 50000, age: 67 }));
+      const working = calculateTax(createInput({ salary: 50000 }));
+      const pensioner = calculateTax(createInput({ salary: 50000, reachedStatePensionAge: true }));
 
       expect(pensioner.employerNI).toBeCloseTo(working.employerNI, 2);
       expect(pensioner.nationalInsurance.annually).toBe(0);

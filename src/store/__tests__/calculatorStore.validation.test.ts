@@ -330,50 +330,32 @@ describe('Calculator Store Validation', () => {
     });
   });
 
-  describe('setAge', () => {
-    it('should accept valid age', () => {
-      const { setAge } = useCalculatorStore.getState();
+  describe('setReachedStatePensionAge', () => {
+    it('stores an explicit declaration', () => {
+      const { setReachedStatePensionAge } = useCalculatorStore.getState();
 
-      setAge(67);
+      setReachedStatePensionAge(true);
+      expect(useCalculatorStore.getState().input.reachedStatePensionAge).toBe(true);
 
-      expect(useCalculatorStore.getState().input.age).toBe(67);
+      setReachedStatePensionAge(false);
+      expect(useCalculatorStore.getState().input.reachedStatePensionAge).toBe(false);
     });
 
-    it('should accept undefined age', () => {
-      const { setAge } = useCalculatorStore.getState();
+    it('defaults to not reached', () => {
+      useCalculatorStore.getState().reset();
 
-      setAge(undefined);
-
-      expect(useCalculatorStore.getState().input.age).toBeUndefined();
+      expect(useCalculatorStore.getState().input.reachedStatePensionAge).toBe(false);
     });
 
-    it('should reject negative age', () => {
-      const { setAge } = useCalculatorStore.getState();
+    it('rejects a non-boolean value', () => {
+      const { setReachedStatePensionAge } = useCalculatorStore.getState();
       const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+      setReachedStatePensionAge(false);
 
-      setAge(-1);
+      setReachedStatePensionAge(67 as unknown as boolean);
 
       expect(consoleSpy).toHaveBeenCalled();
-      consoleSpy.mockRestore();
-    });
-
-    it('should reject age over 120', () => {
-      const { setAge } = useCalculatorStore.getState();
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-
-      setAge(121);
-
-      expect(consoleSpy).toHaveBeenCalled();
-      consoleSpy.mockRestore();
-    });
-
-    it('should reject non-integer age', () => {
-      const { setAge } = useCalculatorStore.getState();
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
-
-      setAge(67.5);
-
-      expect(consoleSpy).toHaveBeenCalled();
+      expect(useCalculatorStore.getState().input.reachedStatePensionAge).toBe(false);
       consoleSpy.mockRestore();
     });
   });
@@ -645,6 +627,63 @@ describe('Calculator Store Validation', () => {
       expect(hydrated.salary).toBe(42000);
       expect(hydrated.taxCode).toBe('1257L');
     });
+
+    it.each([
+      [67, true],
+      [66, true],
+      [65, false],
+    ] as const)(
+      'restores a legacy remembered age of %i as reachedStatePensionAge=%s',
+      async (age, expected) => {
+        const baselineTaxYear = useCalculatorStore.getState().input.taxYear;
+        localStorage.setItem(
+          CALCULATOR_STORAGE_KEY,
+          JSON.stringify({
+            state: {
+              input: { salary: 30000, age },
+              _savedAt: Date.now(),
+              _taxYear: baselineTaxYear,
+            },
+            version: 0,
+          }),
+        );
+
+        rememberFigures(true);
+        await useCalculatorStore.persist.rehydrate();
+
+        const hydrated = useCalculatorStore.getState().input;
+        expect(hydrated.salary).toBe(30000);
+        expect(hydrated.reachedStatePensionAge).toBe(expected);
+        expect(hydrated).not.toHaveProperty('age');
+      },
+    );
+
+    it.each([
+      [{ reachedStatePensionAge: true }, true],
+      [{ reachedStatePensionAge: false, age: 67 }, false],
+      [{}, false],
+    ] as const)(
+      'restores remembered declaration %j as reachedStatePensionAge=%s',
+      async (declaration, expected) => {
+        const baselineTaxYear = useCalculatorStore.getState().input.taxYear;
+        localStorage.setItem(
+          CALCULATOR_STORAGE_KEY,
+          JSON.stringify({
+            state: {
+              input: { salary: 30000, ...declaration },
+              _savedAt: Date.now(),
+              _taxYear: baselineTaxYear,
+            },
+            version: 0,
+          }),
+        );
+
+        rememberFigures(true);
+        await useCalculatorStore.persist.rehydrate();
+
+        expect(useCalculatorStore.getState().input.reachedStatePensionAge).toBe(expected);
+      },
+    );
 
     it('should ignore expired persisted snapshots', async () => {
       const THIRTY_DAYS_AND_ONE_MS = 30 * 24 * 60 * 60 * 1000 + 1;
