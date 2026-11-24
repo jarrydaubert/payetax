@@ -126,6 +126,19 @@ describe('telemetry data minimisation', () => {
     window.history.replaceState({}, '', '/');
   });
 
+  it('keeps only the explicit Director Calculate label and drops financial data', () => {
+    expect(
+      sanitizeAnalyticsParameters('guide_calculation_run', {
+        category: 'director_guide',
+        label: 'explicit',
+        revenue: 120000,
+        value: 10000,
+        profit_bucket: '100k_250k',
+      }),
+    ).toEqual({ category: 'director_guide', label: 'explicit' });
+    expect(sanitizeAnalyticsParameters('guide_calculation_run', { label: 'auto' })).toEqual({});
+  });
+
   it('drops financial derivatives, arbitrary custom data and unsafe labels without losing completion counts', () => {
     expect(
       sanitizeAnalyticsParameters('calculator_completed', {

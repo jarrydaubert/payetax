@@ -67,12 +67,12 @@ export function trackCalendarDownloaded(): void {
   });
 }
 
-/** Count calculation runs without receiving the calculation inputs. */
+/** Count deliberate Calculate attempts without receiving the calculation inputs. */
 export function trackCalculationRun(): void {
   trackEvent({
     action: 'guide_calculation_run',
     category: 'director_guide',
-    label: 'auto',
+    label: 'explicit',
   });
 }
 

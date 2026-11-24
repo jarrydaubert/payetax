@@ -19,7 +19,7 @@ const LABELS: Record<string, readonly string[]> = {
   pro_calculator_completed: ['shown'],
   pro_strategy_selected: ['selected'],
   pro_calendar_downloaded: ['ics'],
-  guide_calculation_run: ['auto'],
+  guide_calculation_run: ['explicit'],
   guide_email_opened: ['dialog_open'],
   guide_email_sent: ['success'],
   guide_reset: ['start_over'],
