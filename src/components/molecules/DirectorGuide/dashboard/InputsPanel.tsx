@@ -34,13 +34,16 @@ import type { Region } from '@/lib/validation/directorValidation';
 import {
   type DirectorInputField,
   type DirectorStrategyKey,
+  type DirectorValidationField,
   hasUnappliedYourSetup,
+  UNAPPLIED_SETUP_ERROR,
   useDirectorError,
   useDirectorFormSlice,
   useDirectorGuideActions,
   useDirectorGuideStore,
   useDirectorInputErrors,
   useDirectorInputRevision,
+  useDirectorValidationSummary,
   useIsCalculating,
   useSliderSalary,
 } from '@/store/directorGuideStore';
@@ -91,13 +94,20 @@ export function InputsPanel({ onReset, onCalculate, className }: InputsPanelProp
   const baseId = useId();
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [quickStartMode, setQuickStartMode] = useState(true);
+  const [focusTarget, setFocusTarget] = useState<string | null>(null);
   const inputRevision = useDirectorInputRevision();
   const inputErrors = useDirectorInputErrors();
   const yourSetupDraft = useDirectorGuideStore((state) => state.yourSetupDraft);
   const yourSetupRevision = useDirectorGuideStore((state) => state.yourSetupRevision);
   const hasYourSetupDraftChanges = useDirectorGuideStore(hasUnappliedYourSetup);
   const calculationError = useDirectorError();
+  const {
+    hasSummaryAttempt,
+    fields: validationFields,
+    requiresSetupDecision,
+  } = useDirectorValidationSummary();
   const isCalculating = useIsCalculating();
+  const calculationErrorId = `${baseId}-calculation-error`;
 
   const formData = useDirectorFormSlice((formData) => ({
     mode: formData.mode,
@@ -145,7 +155,18 @@ export function InputsPanel({ onReset, onCalculate, className }: InputsPanelProp
   const handleCalculate = () => {
     if (hasYourSetupDraftChanges) setQuickStartMode(false);
     onCalculate?.();
+    if (useDirectorGuideStore.getState().fieldValidationSummary) {
+      setFocusTarget(calculationErrorId);
+    }
   };
+
+  useEffect(() => {
+    if (!focusTarget) return;
+    const target = document.getElementById(focusTarget);
+    target?.focus({ preventScroll: true });
+    target?.scrollIntoView?.({ block: focusTarget === calculationErrorId ? 'nearest' : 'center' });
+    setFocusTarget(null);
+  }, [focusTarget, calculationErrorId]);
 
   // Detailed amounts hidden by Quick Start or a collapsed Advanced panel still feed the result, so
   // invalid text in them must stay visible somewhere and keep results paused.
@@ -227,6 +248,7 @@ export function InputsPanel({ onReset, onCalculate, className }: InputsPanelProp
     includesVat: `${baseId}-includes-vat`,
     expenses: `${baseId}-expenses`,
     region: `${baseId}-region`,
+    accountingPeriodEnd: `${baseId}-accounting-period-end`,
     ytdSalary: `${baseId}-ytd-salary`,
     ytdDividends: `${baseId}-ytd-dividends`,
     ytdDrawings: `${baseId}-ytd-drawings`,
@@ -242,6 +264,51 @@ export function InputsPanel({ onReset, onCalculate, className }: InputsPanelProp
     minSalary: `${baseId}-min-salary`,
     yourSalary: `${baseId}-your-salary`,
     yourDividends: `${baseId}-your-dividends`,
+  };
+
+  const validationFieldControls: Record<DirectorValidationField, [string, string]> = {
+    revenue: [ids.revenue, 'Annual Revenue'],
+    expenses: [ids.expenses, 'Business Expenses'],
+    monthlyIncome: [ids.monthlyIncome, 'Monthly Contract Income'],
+    monthlyExpenses: [ids.monthlyExpenses, 'Monthly Business Expenses'],
+    contractStartMonth: [ids.contractStartMonth, 'Contract Start Month'],
+    cashInBank: [ids.cashInBank, 'Cash In Bank'],
+    minimumMonthlyDraw: [ids.minimumMonthlyDraw, 'Minimum Monthly Draw'],
+    region: [ids.region, 'Income Tax Region'],
+    accountingPeriodEnd: [ids.accountingPeriodEnd, 'Company Accounting Period End'],
+    ytdSalary: [ids.ytdSalary, 'YTD Salary'],
+    ytdDividends: [ids.ytdDividends, 'YTD Dividends'],
+    ytdDrawings: [ids.ytdDrawings, 'Other Drawings'],
+    otherIncome: [ids.otherIncome, 'Other Personal Income'],
+    pensionContribution: [ids.pension, 'Employer Pension'],
+    companyCarBIK: [ids.carBik, 'Company Car BIK'],
+    lossesBroughtForward: [ids.losses, 'Losses Brought Forward'],
+    minimumSalaryRequirement: [ids.minSalary, 'Minimum Salary'],
+    yourSetupSalary: [ids.yourSalary, 'Your Current Salary'],
+    yourSetupDividends: [ids.yourDividends, 'Your Current Dividends'],
+  };
+  const fieldsToReview = (Object.keys(validationFieldControls) as DirectorValidationField[]).filter(
+    (field) => validationFields.includes(field),
+  );
+  const fieldCount = fieldsToReview.length;
+  const calculationMessage = hasSummaryAttempt
+    ? requiresSetupDecision
+      ? UNAPPLIED_SETUP_ERROR
+      : null
+    : calculationError;
+
+  const focusValidationField = (field: DirectorValidationField, id: string) => {
+    if (
+      DETAIL_CURRENCY_FIELDS.some((detailField) => detailField === field) ||
+      field === 'yourSetupSalary' ||
+      field === 'yourSetupDividends'
+    ) {
+      setQuickStartMode(false);
+    }
+    if (ADVANCED_CURRENCY_FIELDS.some((advancedField) => advancedField === field)) {
+      setAdvancedOpen(true);
+    }
+    setFocusTarget(id);
   };
 
   return (
@@ -499,7 +566,7 @@ export function InputsPanel({ onReset, onCalculate, className }: InputsPanelProp
           </Select>
         </Field>
 
-        <AccountingPeriodEndInput className={INPUT_CLASS} />
+        <AccountingPeriodEndInput id={ids.accountingPeriodEnd} className={INPUT_CLASS} />
       </Section>
 
       {onCalculate && <ScenarioDraftControls minimumSalary={formData.minimumSalaryRequirement} />}
@@ -908,18 +975,50 @@ export function InputsPanel({ onReset, onCalculate, className }: InputsPanelProp
 
       {onCalculate && (
         <div className='sticky bottom-0 z-10 space-y-2 border-t border-border bg-background py-3'>
-          {calculationError && (
-            <p id={`${baseId}-calculation-error`} role='alert' className='text-sm text-destructive'>
-              {calculationError === 'Calculation failed'
-                ? 'Unable to calculate director pay. Your numbers are still entered. Select Calculate to try again.'
-                : calculationError}
-            </p>
+          {(fieldCount > 0 || calculationMessage) && (
+            <div
+              id={calculationErrorId}
+              role='alert'
+              tabIndex={fieldCount > 0 ? -1 : undefined}
+              className='space-y-1 text-sm text-destructive'
+            >
+              {fieldCount > 0 && (
+                <p>
+                  Check {fieldCount} {fieldCount === 1 ? 'field' : 'fields'} before calculating.
+                </p>
+              )}
+              {calculationMessage && (
+                <p>
+                  {calculationMessage === 'Calculation failed'
+                    ? 'Unable to calculate director pay. Your numbers are still entered. Select Calculate to try again.'
+                    : calculationMessage}
+                </p>
+              )}
+            </div>
+          )}
+          {fieldCount > 0 && (
+            <ul className='flex max-h-24 flex-wrap gap-x-3 gap-y-1 overflow-y-auto p-1 text-sm text-destructive'>
+              {fieldsToReview.map((field) => {
+                const [id, label] = validationFieldControls[field];
+                return (
+                  <li key={field}>
+                    <button
+                      type='button'
+                      className='rounded-sm text-left underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2'
+                      onClick={() => focusValidationField(field, id)}
+                    >
+                      {label}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
           )}
           <Button
             type='button'
             onClick={handleCalculate}
             disabled={isCalculating}
-            aria-describedby={calculationError ? `${baseId}-calculation-error` : undefined}
+            aria-describedby={fieldCount > 0 || calculationMessage ? calculationErrorId : undefined}
             className='w-full'
           >
             Calculate
