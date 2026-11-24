@@ -10,6 +10,9 @@ export function useActiveDirectorScenario() {
   const comparison = useStrategyComparison();
   const calculatedStrategy = useDirectorGuideStore((state) => state.calculatedStrategy);
   const calculatedExploration = useDirectorGuideStore((state) => state.calculatedExploration);
+  const draftStrategy = useDirectorGuideStore(
+    (state) => state.calculatedDraftScenario?.selectedStrategy,
+  );
   const selectedStrategy = comparison ? calculatedStrategy : null;
   const exploration = comparison ? calculatedExploration : null;
   const customSalaryScenario = exploration?.customSalaryScenario ?? null;
@@ -27,6 +30,12 @@ export function useActiveDirectorScenario() {
     selectedStrategy,
     exploration,
     isCustomSalary: customSalaryScenario !== null,
+    isRecommended:
+      comparison !== null &&
+      selectedStrategy === comparison.recommended &&
+      customSalaryScenario === null &&
+      profitWhatIfPercent === 0 &&
+      draftStrategy === null,
     profitWhatIfPercent,
     isProfitWhatIfActive: profitWhatIfPercent !== 0,
     comparison,

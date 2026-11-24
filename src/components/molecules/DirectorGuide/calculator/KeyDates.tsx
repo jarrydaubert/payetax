@@ -7,7 +7,12 @@
 import { Calendar, Download } from 'lucide-react';
 import { trackCalendarDownloaded } from '@/lib/directorGuideAnalytics';
 import { CURRENT_TAX_YEAR, formatTaxYearDisplay, getCompanyDeadlines } from '@/lib/tax';
-import { hasCurrentDirectorResults, useDirectorGuideStore } from '@/store/directorGuideStore';
+import {
+  hasCurrentDirectorResults,
+  useDirectorGuideStore,
+  useStrategyComparison,
+  useSubmittedDirectorForm,
+} from '@/store/directorGuideStore';
 
 const formatDate = (date: Date) =>
   date.toLocaleDateString('en-GB', {
@@ -23,7 +28,8 @@ const escapeICSText = (value: string) =>
   value.replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
 
 export function KeyDates() {
-  const calculatedFormData = useDirectorGuideStore((state) => state.calculatedFormData);
+  const calculatedFormData = useSubmittedDirectorForm();
+  const comparison = useStrategyComparison();
   const periodEnd = calculatedFormData?.accountingPeriodEnd ?? '';
   const companyDeadlines = getCompanyDeadlines(periodEnd);
   const companyDates = companyDeadlines
@@ -58,8 +64,7 @@ export function KeyDates() {
   const handleDownloadCalendar = () => {
     if (!companyDeadlines || typeof URL.createObjectURL !== 'function') return;
     const state = useDirectorGuideStore.getState();
-    if (state.calculatedFormData !== calculatedFormData || !hasCurrentDirectorResults(state))
-      return;
+    if (state.strategyComparison !== comparison || !hasCurrentDirectorResults(state)) return;
 
     const nowStamp = new Date()
       .toISOString()

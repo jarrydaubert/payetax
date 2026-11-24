@@ -687,6 +687,24 @@ describe('DirectorGuide InputsPanel', () => {
       expect(useDirectorGuideStore.getState().inputErrors).toEqual({});
     });
 
+    it.each(['Reset Draft', 'Clear'])(
+      'discards invalid setup text on %s even when the input retains focus',
+      (action) => {
+        render(<InputsPanel />);
+        fireEvent.click(screen.getByRole('button', { name: 'Full Inputs' }));
+        const salary = screen.getByLabelText('Your Current Salary');
+        fireEvent.focus(salary);
+        fireEvent.change(salary, { target: { value: '-12' } });
+        expect(useDirectorGuideStore.getState().inputErrors.yourSetupSalary?.text).toBe('-12');
+
+        // Some pointer interactions do not move focus away from the text field.
+        fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${action}$`) }));
+
+        expect(screen.getByLabelText('Your Current Salary')).toHaveValue('');
+        expect(useDirectorGuideStore.getState().inputErrors.yourSetupSalary).toBeUndefined();
+      },
+    );
+
     it('disables Apply in Compare My Setup while a draft amount is invalid', async () => {
       const user = userEvent.setup();
       render(<InputsPanel />);

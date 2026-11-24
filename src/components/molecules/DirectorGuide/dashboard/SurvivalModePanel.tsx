@@ -10,20 +10,16 @@
 import { AlertTriangle } from 'lucide-react';
 import { CURRENT_TAX_YEAR, getEmployerNI, TAX_RATES } from '@/lib/tax';
 import { cn, formatCurrency } from '@/lib/utils';
-import { useDirectorFormSlice, useStrategyComparison } from '@/store/directorGuideStore';
+import { useStrategyComparison, useSubmittedDirectorForm } from '@/store/directorGuideStore';
 
 const TAX_YEAR = CURRENT_TAX_YEAR;
 const rates = TAX_RATES[TAX_YEAR];
 
 export function SurvivalModePanel({ className }: { className?: string }) {
-  const formData = useDirectorFormSlice((state) => ({
-    isPensionAlreadyDeducted: state.isPensionAlreadyDeducted,
-    pensionContribution: state.pensionContribution,
-    hasOtherPAYEEmployment: state.hasOtherPAYEEmployment,
-  }));
+  const formData = useSubmittedDirectorForm();
   const comparison = useStrategyComparison();
 
-  if (!comparison || comparison.grossProfit > 0) return null;
+  if (!(formData && comparison) || comparison.grossProfit > 0) return null;
 
   const niCreditsSalary = rates.nationalInsurance.lowerEarningsLimit;
   const employerNI = getEmployerNI(niCreditsSalary, TAX_YEAR);

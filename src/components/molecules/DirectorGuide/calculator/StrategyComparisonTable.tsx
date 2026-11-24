@@ -1,30 +1,21 @@
 // src/components/molecules/DirectorGuide/calculator/StrategyComparisonTable.tsx
 /**
- * Strategy Comparison Cards - 3 selectable strategy cards
+ * Submitted strategy comparison cards
  *
  * All Salary | Baseline Mix (Comparison) | All Dividends
- * Cards compare submitted results and can stage a named choice when enabled.
  */
 'use client';
 
 import { AlertTriangle, Banknote, PiggyBank, Split, User } from 'lucide-react';
-import { trackStrategySelected } from '@/lib/directorGuideAnalytics';
 import { roundToPence } from '@/lib/tax';
 import type { YourSetupResult } from '@/lib/tax/strategyComparison';
 import { cn, formatCurrency } from '@/lib/utils';
-import {
-  type StrategyObjective,
-  useDirectorFormSlice,
-  useDirectorGuideActions,
-  useDirectorGuideStore,
-  useSelectedStrategy,
-  useSliderSalary,
-} from '@/store/directorGuideStore';
+import { type StrategyObjective, useSubmittedDirectorForm } from '@/store/directorGuideStore';
 import { useActiveDirectorScenario } from './useActiveDirectorScenario';
 
 type StrategyKey = 'allSalary' | 'optimalMix' | 'allDividends';
 
-export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boolean }) {
+export function StrategyComparisonTable() {
   const {
     comparison,
     activeScenario,
@@ -33,26 +24,17 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
     isCustomSalary,
     isProfitWhatIfActive,
   } = useActiveDirectorScenario();
-  const { ytdSalary, ytdDividends, minimumSalaryRequirement } = useDirectorFormSlice(
-    ({ ytdSalary, ytdDividends, minimumSalaryRequirement }) => ({
-      ytdSalary,
-      ytdDividends,
-      minimumSalaryRequirement,
-    }),
-  );
-  const { setSelectedStrategy, setObjective } = useDirectorGuideActions();
-  const draftObjective = useDirectorGuideStore((state) => state.objective);
-  const draftStrategy = useSelectedStrategy();
-  const draftSalary = useSliderSalary();
+  const formData = useSubmittedDirectorForm();
   const objective = exploration?.objective ?? 'maximizeTakeHome';
   const objectiveBadge = objective === 'maximizeTakeHome' ? 'Highest Take-Home' : 'Lowest NI';
 
-  if (!comparison || comparison.grossProfit <= 0) return null;
+  if (!(formData && comparison) || comparison.grossProfit <= 0) return null;
+
+  const { ytdSalary, ytdDividends, minimumSalaryRequirement } = formData;
 
   const hasMinimumSalary = roundToPence(minimumSalaryRequirement ?? 0) > 0;
   const isCustom = isCustomSalary || isProfitWhatIfActive;
-  const compareWithDisplayed =
-    !exploration && readOnly && hasMinimumSalary && selectedStrategy !== null;
+  const compareWithDisplayed = !exploration && hasMinimumSalary && selectedStrategy !== null;
   const displaysRecommendation = !isCustom && selectedStrategy === comparison.recommended;
   const paidSalary = roundToPence(ytdSalary);
   const paidDividends = roundToPence(ytdDividends);
@@ -110,60 +92,13 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
       ? Math.abs(takeHomeDifference) < 10
       : Math.abs(niDifference) < 10;
 
-  const handleSelectStrategy = (key: StrategyKey) => {
-    trackStrategySelected();
-    setSelectedStrategy(key);
-  };
-
   return (
     <div className='space-y-3'>
-      {/* Header with dynamic message */}
       <div>
-        <h3 className='font-semibold text-foreground'>
-          {readOnly ? 'Compare Strategies' : 'Choose Your Strategy'}
-        </h3>
-        {readOnly ? (
-          <p className='mt-2 text-sm text-muted-foreground'>
-            {displaysRecommendation && !hasMinimumSalary
-              ? 'The breakdown shows the highest take-home strategy. '
-              : 'The breakdown follows the displayed strategy. '}
-            Other strategies are shown for comparison.
-          </p>
-        ) : (
-          <>
-            <div className='mt-2 grid grid-cols-2 gap-2 rounded-sm border border-border/40 bg-background p-1'>
-              <button
-                type='button'
-                onClick={() => setObjective('maximizeTakeHome')}
-                className={cn(
-                  'rounded-sm px-3 py-2 text-sm transition-colors',
-                  draftObjective === 'maximizeTakeHome'
-                    ? 'bg-primary/20 font-medium text-primary'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
-                aria-pressed={draftObjective === 'maximizeTakeHome'}
-              >
-                Maximize take-home
-              </button>
-              <button
-                type='button'
-                onClick={() => setObjective('minimizeNI')}
-                className={cn(
-                  'rounded-sm px-3 py-2 text-sm transition-colors',
-                  draftObjective === 'minimizeNI'
-                    ? 'bg-primary/20 font-medium text-primary'
-                    : 'text-muted-foreground hover:text-foreground',
-                )}
-                aria-pressed={draftObjective === 'minimizeNI'}
-              >
-                Minimize NI
-              </button>
-            </div>
-            <p className='mt-2 text-sm text-muted-foreground'>
-              Compare salary/dividend tradeoffs using your selected objective after Calculate.
-            </p>
-          </>
-        )}
+        <h3 className='font-semibold text-foreground'>Compare Strategies</h3>
+        <p className='mt-2 text-sm text-muted-foreground'>
+          Other strategies are shown for comparison.
+        </p>
         {exploration && !objectiveReference && (
           <p className='mt-2 text-sm text-muted-foreground'>
             No strategy meets your minimum salary for this objective comparison.
@@ -187,7 +122,7 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
             </p>
           )}
         </div>
-        {!readOnly && objectiveReference && isNearObjective && (
+        {objectiveReference && isNearObjective && (
           <p className='text-sm'>
             <span className='font-medium text-success'>
               {objective === 'maximizeTakeHome'
@@ -222,14 +157,10 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
       <div className='grid grid-cols-1 gap-3 md:grid-cols-3'>
         {strategies.map(({ key, data, icon: Icon, description }) => {
           const isDisplayed = !isCustom && selectedStrategy === key;
-          const isSelected = readOnly ? isDisplayed : draftSalary === null && draftStrategy === key;
           const isObjectiveReference = objectiveReferenceKey === key;
           const comparisonOnly = key === 'allDividends' && hasMinimumSalary;
-          const canSelect = !(readOnly || comparisonOnly);
-          const StrategyCard = canSelect ? 'button' : 'article';
           const showsDisplayedBadge =
-            isDisplayed &&
-            (exploration || (readOnly && (compareWithDisplayed || !displaysRecommendation)));
+            isDisplayed && (exploration || compareWithDisplayed || !displaysRecommendation);
           const showsRecommendationBadge = compareWithDisplayed && key === comparison.recommended;
           const badge = showsDisplayedBadge
             ? 'Displayed Result'
@@ -245,16 +176,11 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
           const isReference = isObjectiveReference && !comparisonOnly;
 
           return (
-            <StrategyCard
+            <article
               key={key}
-              {...(canSelect && {
-                type: 'button' as const,
-                onClick: () => handleSelectStrategy(key),
-              })}
               className={cn(
                 'relative rounded-sm border p-5 text-left transition-colors',
-                isSelected ? 'border-primary bg-primary/5' : 'border-border/40 bg-card',
-                canSelect && 'hover:border-border/70 hover:bg-accent/20',
+                isDisplayed ? 'border-primary bg-primary/5' : 'border-border/40 bg-card',
               )}
             >
               {/* Objective badge */}
@@ -269,11 +195,11 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
                 <div
                   className={cn(
                     'flex size-8 items-center justify-center rounded-sm',
-                    isSelected ? 'bg-primary/20' : 'bg-muted/20',
+                    isDisplayed ? 'bg-primary/20' : 'bg-muted/20',
                   )}
                 >
                   <Icon
-                    className={cn('size-4', isSelected ? 'text-primary' : 'text-muted-foreground')}
+                    className={cn('size-4', isDisplayed ? 'text-primary' : 'text-muted-foreground')}
                   />
                 </div>
                 <div>
@@ -365,7 +291,7 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
               <div className='mt-2 text-right text-xs text-muted-foreground'>
                 {data.effectiveRate.toFixed(1)}% effective rate
               </div>
-            </StrategyCard>
+            </article>
           );
         })}
       </div>
@@ -378,7 +304,6 @@ export function StrategyComparisonTable({ readOnly = false }: { readOnly?: boole
         objectiveReferenceTotalNI={objectiveReferenceTotalNI}
         compareWithDisplayed={compareWithDisplayed}
         hasObjectiveReference={objectiveReference !== null}
-        readOnly={readOnly}
       />
     </div>
   );
@@ -391,7 +316,6 @@ interface YourSetupCardProps {
   objectiveReferenceTotalNI: number;
   compareWithDisplayed: boolean;
   hasObjectiveReference: boolean;
-  readOnly: boolean;
 }
 
 function YourSetupCard({
@@ -401,7 +325,6 @@ function YourSetupCard({
   objectiveReferenceTotalNI,
   compareWithDisplayed,
   hasObjectiveReference,
-  readOnly,
 }: YourSetupCardProps) {
   if (!yourSetup) {
     return (
@@ -417,8 +340,7 @@ function YourSetupCard({
         </div>
         <div className='rounded-sm bg-muted/20 p-3 text-sm text-foreground/80'>
           <span className='font-medium text-foreground'>Not set.</span> Add your salary and
-          dividends in Full Inputs to compare your current setup
-          {readOnly ? '.' : ' against your selected objective.'}
+          dividends in Full Inputs to compare your current setup.
         </div>
       </div>
     );

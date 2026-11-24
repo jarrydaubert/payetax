@@ -135,6 +135,12 @@ function setCurrentResult(
   } as never);
   useDirectorGuideStore.setState({
     calculatedFormData: useDirectorGuideStore.getState().formData,
+    calculatedDraftScenario: {
+      selectedStrategy: null,
+      sliderSalary: null,
+      profitWhatIfPercent: 0,
+      objective: 'maximizeTakeHome',
+    },
     calculatedStrategy: 'optimalMix',
   });
 }
@@ -251,7 +257,7 @@ describe('DirectorDashboard (normal mode)', () => {
     expect(screen.getByText('£5,700')).toBeInTheDocument();
 
     act(() => useDirectorGuideStore.getState().setSelectedStrategy('allDividends'));
-    expect(screen.getByText('£2,300/mo')).toBeInTheDocument();
+    expect(screen.queryByText('£2,300/mo')).not.toBeInTheDocument();
     expect(screen.queryByText('£600/mo below your spending target')).not.toBeInTheDocument();
 
     act(() => {
@@ -260,10 +266,20 @@ describe('DirectorDashboard (normal mode)', () => {
       state.setProfitWhatIfPercent(-45);
       state.setObjective('minimizeNI');
     });
-    expect(screen.getByText('£2,300/mo')).toBeInTheDocument();
+    expect(screen.queryByText('£2,300/mo')).not.toBeInTheDocument();
 
     // All Dividends holds £2,000 more in company tax reserves than the recommendation.
-    act(() => useDirectorGuideStore.setState({ calculatedStrategy: 'allDividends' }));
+    act(() =>
+      useDirectorGuideStore.setState({
+        calculatedStrategy: 'allDividends',
+        calculatedDraftScenario: {
+          selectedStrategy: 'allDividends',
+          sliderSalary: 50000,
+          profitWhatIfPercent: -45,
+          objective: 'minimizeNI',
+        },
+      }),
+    );
     expect(screen.getByText('£300/mo')).toBeInTheDocument();
     expect(screen.getByText('£600/mo below your spending target')).toBeInTheDocument();
 
@@ -292,7 +308,7 @@ describe('DirectorDashboard (normal mode)', () => {
       expect(screen.queryByText('Summary Cards')).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: 'Email My Results' })).not.toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Sidebar Email Results' })).toBeDisabled();
-      expect(useDirectorGuideStore.getState().strategyComparison).toBeNull();
+      expect(useDirectorGuideStore.getState().strategyComparison).not.toBeNull();
     };
 
     it.each([
@@ -306,7 +322,7 @@ describe('DirectorDashboard (normal mode)', () => {
       act(() => clear());
 
       expectResultAndEmailRemoved();
-      expect(screen.getByText(/Enter your numbers to compare director pay options/i)).toBeVisible();
+      expect(screen.getByText(/Select Calculate in Your Numbers/i)).toBeVisible();
     });
 
     it('removes the result when switching to an incomplete monthly form', () => {

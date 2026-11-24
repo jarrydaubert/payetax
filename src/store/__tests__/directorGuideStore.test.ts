@@ -8,7 +8,7 @@ import { rememberFigures } from '@/lib/figureStorage';
 
 import { calculateStrategyComparison } from '@/lib/tax/strategyComparison';
 import { DIRECTOR_TAX_YEARS } from '@/lib/validation/directorValidation';
-import { useDirectorGuideStore } from '../directorGuideStore';
+import { hasCurrentDirectorResults, useDirectorGuideStore } from '../directorGuideStore';
 
 // Mock strategy comparison
 jest.mock('@/lib/tax/strategyComparison', () => ({
@@ -454,83 +454,156 @@ describe('DirectorGuideStore', () => {
       });
     });
 
-    it('clears the previous result when a required input becomes empty', () => {
+    it('retains the previous submission when a required input becomes empty', () => {
       calculateCompleteResult();
 
-      useDirectorGuideStore.getState().setRevenue(undefined);
-      useDirectorGuideStore.getState().calculate();
+      const store = useDirectorGuideStore.getState();
+      store.setRevenue(undefined);
+      store.calculate();
 
       const state = useDirectorGuideStore.getState();
-      expect(state.strategyComparison).toBeNull();
-      expect(state.error).toBe('Please fill in revenue, expenses, and region');
+      expect(state.strategyComparison).toBe(store.strategyComparison);
+      expect(state.calculatedFormData).toBe(store.calculatedFormData);
+      expect(hasCurrentDirectorResults(state)).toBe(false);
+      expect(state.error).toBe('Enter your annual revenue and business expenses.');
     });
 
-    it('clears the previous result and refuses to calculate while any amount is invalid', () => {
+    it('retains invalid draft text and never calls the engine for an invalid attempt', () => {
       calculateCompleteResult();
       mockCalculateStrategyComparison.mockClear();
 
-      useDirectorGuideStore.getState().setInputError('ytdSalary', INVALID);
-      useDirectorGuideStore.getState().calculate();
+      const store = useDirectorGuideStore.getState();
+      store.setInputError('ytdSalary', INVALID);
+      store.calculate();
 
       const state = useDirectorGuideStore.getState();
       expect(mockCalculateStrategyComparison).not.toHaveBeenCalled();
-      expect(state.strategyComparison).toBeNull();
+      expect(state.calculatedFormData).toBe(store.calculatedFormData);
+      expect(hasCurrentDirectorResults(state)).toBe(false);
+      expect(state.inputErrors.ytdSalary).toEqual(INVALID);
       expect(state.error).toBe('Please correct the highlighted amounts');
     });
 
-    it('ignores invalid text in fields the current mode does not calculate from', () => {
+    it('validates the fields used by the selected mode and retains the other draft', () => {
       const store = useDirectorGuideStore.getState();
       store.setInputError('cashInBank', INVALID);
       calculateCompleteResult();
+      const annual = useDirectorGuideStore.getState().calculatedFormData;
 
-      useDirectorGuideStore.getState().setMode('monthly');
-      useDirectorGuideStore.getState().setMonthlyIncome(5000);
-      useDirectorGuideStore.getState().setMonthlyExpenses(1000);
-      useDirectorGuideStore.getState().setInputError('revenue', INVALID);
-      useDirectorGuideStore.getState().calculate();
-      // Monthly mode uses cash in bank, so its invalid text now blocks the result.
-      expect(useDirectorGuideStore.getState().strategyComparison).toBeNull();
+      store.setMode('monthly');
+      expect(hasCurrentDirectorResults(useDirectorGuideStore.getState())).toBe(false);
+      store.calculate();
+      expect(useDirectorGuideStore.getState().calculatedFormData).toBe(annual);
 
-      useDirectorGuideStore.getState().setInputError('cashInBank', null);
-      useDirectorGuideStore.getState().calculate();
-      // Annual revenue's invalid text is kept for the annual form but does not block monthly mode.
-      expect(useDirectorGuideStore.getState().strategyComparison).not.toBeNull();
-      expect(useDirectorGuideStore.getState().inputErrors.revenue).toEqual(INVALID);
+      store.setMonthlyIncome(5000);
+      store.setMonthlyExpenses(1000);
+      store.setInputError('revenue', INVALID);
+      store.calculate();
+      expect(useDirectorGuideStore.getState().calculatedFormData).toBe(annual);
+
+      store.setInputError('cashInBank', null);
+      store.calculate();
+      const monthly = useDirectorGuideStore.getState();
+      expect(hasCurrentDirectorResults(monthly)).toBe(true);
+      expect(monthly.calculatedFormData?.mode).toBe('monthly');
+      expect(monthly.inputErrors.revenue).toEqual(INVALID);
+      expect(monthly.monthlyModeOutput?.projectedRevenue).toBe(60000);
     });
 
-    it('clears the previous result when switching to an incomplete monthly form', () => {
+    it.each([
+      [
+        'strategy',
+        (state: ReturnType<typeof useDirectorGuideStore.getState>) =>
+          state.setSelectedStrategy('allSalary'),
+      ],
+      [
+        'salary',
+        (state: ReturnType<typeof useDirectorGuideStore.getState>) => state.setSliderSalary(20000),
+      ],
+      [
+        'profit',
+        (state: ReturnType<typeof useDirectorGuideStore.getState>) =>
+          state.setProfitWhatIfPercent(-45),
+      ],
+      [
+        'objective',
+        (state: ReturnType<typeof useDirectorGuideStore.getState>) =>
+          state.setObjective('minimizeNI'),
+      ],
+    ] as const)('withholds the result on a draft %s edit without recalculating', (_field, edit) => {
       calculateCompleteResult();
+      mockCalculateStrategyComparison.mockClear();
 
-      useDirectorGuideStore.getState().setMode('monthly');
-      useDirectorGuideStore.getState().calculate();
-
-      expect(useDirectorGuideStore.getState().strategyComparison).toBeNull();
-      expect(useDirectorGuideStore.getState().monthlyModeOutput).toBeNull();
-    });
-
-    it('invalidateResults removes every derived result', () => {
-      calculateCompleteResult();
-      useDirectorGuideStore.getState().setSliderSalary(20000);
-
-      useDirectorGuideStore.getState().invalidateResults();
+      const store = useDirectorGuideStore.getState();
+      edit(store);
 
       const state = useDirectorGuideStore.getState();
-      expect(state.strategyComparison).toBeNull();
-      expect(state.monthlyModeOutput).toBeNull();
-      expect(state.sliderSalary).toBe(20000);
-      expect(state.calculatedStrategy).toBeNull();
-      // Inputs are untouched; only derived results are removed.
-      expect(state.formData.revenue).toBe(100000);
+      expect(state.strategyComparison).toBe(store.strategyComparison);
+      expect(state.calculatedDraftScenario).toBe(store.calculatedDraftScenario);
+      expect(hasCurrentDirectorResults(state)).toBe(false);
+      expect(mockCalculateStrategyComparison).not.toHaveBeenCalled();
     });
 
-    it('clears the previous monthly outputs and calculation snapshot when recalculation throws', () => {
+    it('keeps a failed scenario withheld even after reverting its draft choices', () => {
+      const store = useDirectorGuideStore.getState();
+      store.setMinimumSalaryRequirement(10000);
+      calculateCompleteResult();
+      const previous = useDirectorGuideStore.getState().calculatedDraftScenario;
+      store.setSelectedStrategy('allDividends');
+      store.setObjective('minimizeNI');
+      store.calculate();
+      expect(useDirectorGuideStore.getState().error).toMatch(/All Dividends cannot meet/);
+
+      store.setSelectedStrategy(null);
+      store.setObjective('maximizeTakeHome');
+      expect(useDirectorGuideStore.getState().calculatedDraftScenario).toBe(previous);
+      expect(hasCurrentDirectorResults(useDirectorGuideStore.getState())).toBe(false);
+      store.calculate();
+      expect(hasCurrentDirectorResults(useDirectorGuideStore.getState())).toBe(true);
+    });
+
+    it('requires Apply or discard before Calculate and stages both setup fields together', () => {
+      calculateCompleteResult();
+      mockCalculateStrategyComparison.mockClear();
+      const store = useDirectorGuideStore.getState();
+      store.setYourSetupDraft('yourSetupSalary', 20000);
+      store.setYourSetupDraft('yourSetupDividends', 15000);
+      expect(hasCurrentDirectorResults(useDirectorGuideStore.getState())).toBe(false);
+
+      store.calculate();
+      expect(useDirectorGuideStore.getState().error).toMatch(/Apply or discard/);
+      expect(useDirectorGuideStore.getState().calculatedFormData).toBe(store.calculatedFormData);
+      expect(mockCalculateStrategyComparison).not.toHaveBeenCalled();
+
+      store.applyYourSetupDraft();
+      expect(useDirectorGuideStore.getState().formData).toMatchObject({
+        yourSetupSalary: 20000,
+        yourSetupDividends: 15000,
+      });
+      expect(useDirectorGuideStore.getState().calculatedFormData).toBe(store.calculatedFormData);
+      expect(mockCalculateStrategyComparison).not.toHaveBeenCalled();
+
+      store.calculate();
+      expect(hasCurrentDirectorResults(useDirectorGuideStore.getState())).toBe(true);
+
+      store.setInputError('yourSetupSalary', INVALID);
+      store.calculate();
+      expect(hasCurrentDirectorResults(useDirectorGuideStore.getState())).toBe(false);
+      store.discardYourSetupDraft();
+      expect(useDirectorGuideStore.getState().inputErrors.yourSetupSalary).toBeUndefined();
+      expect(hasCurrentDirectorResults(useDirectorGuideStore.getState())).toBe(false);
+      store.calculate();
+      expect(hasCurrentDirectorResults(useDirectorGuideStore.getState())).toBe(true);
+    });
+
+    it('retains the previous monthly submission after an exception and publishes the explicit retry', () => {
       const actions = useDirectorGuideStore.getState();
       actions.setRegion('rUK');
       actions.setMode('monthly');
       actions.setMonthlyIncome(5000);
       actions.setMonthlyExpenses(1000);
       actions.calculate();
-      expect(useDirectorGuideStore.getState().monthlyModeOutput?.projectedRevenue).toBe(60000);
+      const previous = useDirectorGuideStore.getState();
 
       actions.setMonthlyIncome(6000);
       mockCalculateStrategyComparison.mockImplementationOnce(() => {
@@ -543,25 +616,26 @@ describe('DirectorGuideStore', () => {
       } finally {
         diagnostic.mockRestore();
       }
-      expect(useDirectorGuideStore.getState()).toMatchObject({
-        strategyComparison: null,
-        monthlyModeOutput: null,
-        calculatedFormData: null,
-        calculatedStrategy: null,
-        failedFormData: { monthlyIncome: 6000 },
-        isCalculating: false,
-      });
+      const failed = useDirectorGuideStore.getState();
+      expect(failed.monthlyModeOutput).toBe(previous.monthlyModeOutput);
+      expect(failed.calculatedFormData).toBe(previous.calculatedFormData);
+      expect(failed.formData.monthlyIncome).toBe(6000);
+      expect(failed.error).toBe('Calculation failed');
+      expect(hasCurrentDirectorResults(failed)).toBe(false);
+
       const persisted = JSON.parse(localStorage.getItem(DIRECTOR_STORAGE_KEY) ?? '{}').state;
-      expect(persisted).not.toHaveProperty('failedFormData');
+      expect(persisted).not.toHaveProperty('calculatedFormData');
+      expect(persisted).not.toHaveProperty('calculatedDraftScenario');
+      expect(persisted).not.toHaveProperty('yourSetupDraft');
 
       actions.calculate();
       expect(useDirectorGuideStore.getState()).toMatchObject({
         monthlyModeOutput: { projectedRevenue: 72000 },
         calculatedFormData: { monthlyIncome: 6000 },
         calculatedStrategy: 'optimalMix',
-        failedFormData: null,
         error: null,
       });
+      expect(hasCurrentDirectorResults(useDirectorGuideStore.getState())).toBe(true);
     });
 
     it('reset clears input errors and advances the input revision', () => {

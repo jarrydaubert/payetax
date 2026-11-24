@@ -10,6 +10,12 @@ function setDirectorGuideState(
     ...partial,
     calculatedFormData: partial.strategyComparison ? (partial.formData ?? state.formData) : null,
     calculatedStrategy: partial.strategyComparison?.recommended ?? null,
+    calculatedDraftScenario: {
+      selectedStrategy: null,
+      sliderSalary: null,
+      profitWhatIfPercent: 0,
+      objective: 'maximizeTakeHome',
+    },
   }));
 }
 
@@ -102,7 +108,7 @@ describe('DirectorGuide EducationPanel', () => {
     expect(screen.queryByText('Section 455 Tax Warning')).not.toBeInTheDocument();
   });
 
-  test('shows VAT mandatory warning based on revenue even with no results', () => {
+  test('withholds VAT warnings and assumptions until a submission exists', () => {
     setDirectorGuideState({
       strategyComparison: null,
       formData: { ...useDirectorGuideStore.getState().formData, revenue: 91000 },
@@ -110,7 +116,8 @@ describe('DirectorGuide EducationPanel', () => {
 
     render(<EducationPanel />);
 
-    expect(screen.getByText('VAT Registration Required')).toBeInTheDocument();
+    expect(screen.queryByText('VAT Registration Required')).not.toBeInTheDocument();
+    expect(screen.queryByText('Assumptions')).not.toBeInTheDocument();
   });
 
   test('shows VAT approaching warning based on revenue even when profit is zero', () => {
@@ -126,7 +133,7 @@ describe('DirectorGuide EducationPanel', () => {
 
   test('adds a VAT note when revenue includes VAT (warning-only)', () => {
     setDirectorGuideState({
-      strategyComparison: null,
+      strategyComparison: createComparison(0),
       formData: { ...useDirectorGuideStore.getState().formData, revenue: 91000, includesVat: true },
     });
 
@@ -177,7 +184,7 @@ describe('DirectorGuide EducationPanel', () => {
     expect(screen.queryByText('Cash Buffer Shortfall')).not.toBeInTheDocument();
     expect(screen.queryByText('Contract-End Risk')).not.toBeInTheDocument();
     expect(screen.queryByText(/2 months remaining/i)).not.toBeInTheDocument();
-    expect(screen.getByText('Monthly projection', { exact: true })).toBeInTheDocument();
+    expect(screen.queryByText('Assumptions')).not.toBeInTheDocument();
     expect(screen.queryByText('Full Year')).not.toBeInTheDocument();
   });
 

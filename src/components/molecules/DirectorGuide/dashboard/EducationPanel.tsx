@@ -12,8 +12,8 @@ import { DIRECTOR_GUIDE_BUSINESS_THRESHOLDS } from '@/lib/tax/businessThresholds
 import { cn } from '@/lib/utils';
 import {
   type DirectorFormData,
-  useDirectorFormSlice,
   useMonthlyModeOutput,
+  useSubmittedDirectorForm,
 } from '@/store/directorGuideStore';
 
 // Tax year configuration - single source
@@ -76,39 +76,26 @@ type EducationPanelFormData = Pick<
 >;
 
 export function EducationPanel({ className, monthlyDraw }: EducationPanelProps) {
-  const formData = useDirectorFormSlice<EducationPanelFormData>((formData) => ({
-    mode: formData.mode,
-    region: formData.region,
-    revenue: formData.revenue,
-    otherIncome: formData.otherIncome,
-    ytdSalary: formData.ytdSalary,
-    ytdDividends: formData.ytdDividends,
-    ytdDrawings: formData.ytdDrawings,
-    hasEmploymentAllowance: formData.hasEmploymentAllowance,
-    studentLoanPlans: formData.studentLoanPlans,
-    includesVat: formData.includesVat,
-    pensionContribution: formData.pensionContribution,
-    companyCarBIK: formData.companyCarBIK,
-    associatedCompaniesCount: formData.associatedCompaniesCount,
-    hasOtherPAYEEmployment: formData.hasOtherPAYEEmployment,
-  }));
-  const { comparison, activeScenario } = useActiveDirectorScenario();
+  const formData = useSubmittedDirectorForm();
+  const { comparison, activeScenario, profitWhatIfPercent } = useActiveDirectorScenario();
   const grossProfit = comparison?.grossProfit ?? 0;
   const monthlyModeOutput = useMonthlyModeOutput();
-  const isMonthlyMode = formData.mode === 'monthly';
+  const isMonthlyMode = formData?.mode === 'monthly';
 
   const hasResults = activeScenario !== null;
   const revenue = isMonthlyMode
     ? (monthlyModeOutput?.projectedRevenue ?? 0)
-    : (formData.revenue ?? 0);
+    : (formData?.revenue ?? 0);
   const salary = activeScenario?.salary ?? 0;
   const dividends = activeScenario?.dividends ?? 0;
 
   // Calculate total income for PA taper / HICBC warnings
-  const totalIncome = hasResults ? formData.otherIncome + salary + dividends : 0;
+  const totalIncome = hasResults ? (formData?.otherIncome ?? 0) + salary + dividends : 0;
 
   // Compute total already taken from YTD fields
-  const alreadyTaken = formData.ytdSalary + formData.ytdDividends + formData.ytdDrawings;
+  const alreadyTaken = formData
+    ? formData.ytdSalary + formData.ytdDividends + formData.ytdDrawings
+    : 0;
 
   const grossExtraction = salary + dividends;
 
@@ -149,6 +136,7 @@ export function EducationPanel({ className, monthlyDraw }: EducationPanelProps) 
   );
 
   const sortedWarnings = useMemo(() => {
+    if (!formData) return [];
     const visibleWarnings = buildWarnings({
       hasResults,
       revenue,
@@ -211,47 +199,57 @@ export function EducationPanel({ className, monthlyDraw }: EducationPanelProps) 
         </PanelSection>
       )}
 
-      <PanelSection title='Assumptions'>
-        <div className='rounded-[10px] border border-border/50 bg-background p-4'>
-          <p className='mb-3 text-xs leading-relaxed text-muted-foreground'>
-            Results below use the current inputs and assumptions shown here.
-          </p>
-          <AssumptionRow label='Tax Year' value={CURRENT_TAX_YEAR_DISPLAY} />
-          <AssumptionRow
-            label='Region'
-            value={formData.region === 'scotland' ? 'Scotland' : 'England/Wales/NI'}
-          />
-          <AssumptionRow
-            label='Trading Period'
-            value={
-              isMonthlyMode
-                ? monthlyModeOutput
-                  ? `Monthly projection (${monthlyModeOutput.monthsRemaining} month${monthlyModeOutput.monthsRemaining === 1 ? '' : 's'} remaining)`
-                  : 'Monthly projection'
-                : 'Full Year'
-            }
-          />
-          <AssumptionRow
-            label='Other Income'
-            value={formData.otherIncome > 0 ? `£${formData.otherIncome.toLocaleString()}` : 'None'}
-          />
-          <AssumptionRow
-            label='Employment Allowance'
-            value={formData.hasEmploymentAllowance ? 'Claimed' : 'Not claimed'}
-          />
-          <AssumptionRow
-            label='Student Loans'
-            value={
-              formData.studentLoanPlans.length > 0 ? formData.studentLoanPlans.join(', ') : 'None'
-            }
-          />
-          <AssumptionRow
-            label='Associated Companies'
-            value={String(formData.associatedCompaniesCount)}
-            isLast
-          />
-        </div>
-      </PanelSection>
+      {formData && (
+        <PanelSection title='Assumptions'>
+          <div className='rounded-[10px] border border-border/50 bg-background p-4'>
+            <p className='mb-3 text-xs leading-relaxed text-muted-foreground'>
+              These assumptions apply to the submitted results.
+            </p>
+            <AssumptionRow label='Tax Year' value={CURRENT_TAX_YEAR_DISPLAY} />
+            <AssumptionRow
+              label='Region'
+              value={formData.region === 'scotland' ? 'Scotland' : 'England/Wales/NI'}
+            />
+            <AssumptionRow
+              label='Trading Period'
+              value={
+                isMonthlyMode
+                  ? monthlyModeOutput
+                    ? `Monthly projection (${monthlyModeOutput.monthsRemaining} month${monthlyModeOutput.monthsRemaining === 1 ? '' : 's'} remaining)`
+                    : 'Monthly projection'
+                  : 'Full Year'
+              }
+            />
+            {profitWhatIfPercent !== 0 && (
+              <AssumptionRow
+                label='Profit simulation'
+                value={`${profitWhatIfPercent > 0 ? '+' : ''}${profitWhatIfPercent}%`}
+              />
+            )}
+            <AssumptionRow
+              label='Other Income'
+              value={
+                formData.otherIncome > 0 ? `£${formData.otherIncome.toLocaleString()}` : 'None'
+              }
+            />
+            <AssumptionRow
+              label='Employment Allowance'
+              value={formData.hasEmploymentAllowance ? 'Claimed' : 'Not claimed'}
+            />
+            <AssumptionRow
+              label='Student Loans'
+              value={
+                formData.studentLoanPlans.length > 0 ? formData.studentLoanPlans.join(', ') : 'None'
+              }
+            />
+            <AssumptionRow
+              label='Associated Companies'
+              value={String(formData.associatedCompaniesCount)}
+              isLast
+            />
+          </div>
+        </PanelSection>
+      )}
 
       <PanelSection title='Accuracy & Scope' className='mb-0'>
         <div className='space-y-3'>

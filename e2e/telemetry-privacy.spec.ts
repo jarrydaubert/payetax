@@ -82,7 +82,7 @@ for (const [source, campaign] of [
   });
 }
 
-test('Director retains completion counts without profit bands, VAT warnings or result conditions', async ({
+test('Director counts deliberate Calculate and completion without sending financial data', async ({
   context,
   page,
 }) => {
@@ -92,21 +92,44 @@ test('Director retains completion counts without profit bands, VAT warnings or r
   await page.goto('/');
   await page.getByTestId('cookie-accept-all').click();
   await page.getByRole('link', { name: 'Director Intelligence', exact: true }).click();
+  await expect
+    .poll(async () => (await events(page)).map(([, name]) => name))
+    .toContain('pro_calculator_started');
+  await page.clock.install();
   await page.getByTestId('director-revenue-input').fill('120000');
   await page.getByTestId('director-expenses-input').fill('10000');
   await page.getByTestId('director-expenses-input').blur();
   await page.getByTestId('director-region-select').click();
   await page.getByRole('option', { name: /England/ }).click();
-  await expect
-    .poll(async () => (await events(page)).some((e) => e[1] === 'pro_calculator_completed'))
-    .toBe(true);
+  const submissionEvents = async () =>
+    (await events(page)).filter(([, name]) =>
+      ['guide_calculation_run', 'guide_results_shown', 'pro_calculator_completed'].includes(
+        String(name),
+      ),
+    );
+
+  // Advance beyond the former debounce to catch any automatic calculation or telemetry.
+  await page.clock.runFor(1000);
+  expect(await submissionEvents()).toEqual([]);
+
+  await page.getByRole('button', { name: 'Calculate', exact: true }).click();
+  await expect(page.locator('[data-director-section="director-recommendation"]')).toBeVisible();
+  const contextParams = {
+    category: 'director_guide',
+    page_path: '/tools/director-guide',
+    page_location: new URL('/tools/director-guide', page.url()).href,
+    page_referrer: '',
+  };
+  await expect.poll(submissionEvents).toEqual([
+    ['event', 'guide_calculation_run', { ...contextParams, label: 'explicit' }],
+    ['event', 'guide_results_shown', { ...contextParams, label: 'shown' }],
+    ['event', 'pro_calculator_completed', { ...contextParams, label: 'shown' }],
+  ]);
+
   const directorEvents = (await events(page)).filter((e) =>
     /^(guide_|pro_|director_)/.test(String(e[1])),
   );
   expect(JSON.stringify(directorEvents)).not.toMatch(
     /120000|10000|100k_250k|under_25k|_bucket|vat-mandatory|survival|recommended|includes_vat|region/,
   );
-  expect(directorEvents.find((e) => e[1] === 'pro_calculator_completed')?.[2]).toMatchObject({
-    label: 'shown',
-  });
 });

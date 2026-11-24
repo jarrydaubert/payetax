@@ -47,6 +47,7 @@ describe('RecommendationHero', () => {
     mockUseActiveDirectorScenario.mockReturnValue({
       comparison: result,
       selectedStrategy: 'optimalMix',
+      isRecommended: true,
       activeScenario: result.strategies.optimalMix,
     });
 
@@ -63,6 +64,7 @@ describe('RecommendationHero', () => {
     mockUseActiveDirectorScenario.mockReturnValue({
       comparison: result,
       selectedStrategy: 'allSalary',
+      isRecommended: true,
       activeScenario: result.strategies.allSalary,
     });
 

@@ -67,6 +67,7 @@ test.describe('Director Intelligence recruiter regression', () => {
     await expectNumericValue(expensesInput, 2499);
 
     await selectEnglandRegion(page);
+    await page.getByRole('button', { name: 'Calculate', exact: true }).click();
 
     await expect(page.getByRole('heading', { name: 'Compare Strategies' })).toBeVisible();
 
@@ -114,6 +115,7 @@ test.describe('Director Intelligence recruiter regression', () => {
     await expectNumericValue(runwayMonthsInput, 3);
 
     await selectEnglandRegion(page);
+    await page.getByRole('button', { name: 'Calculate', exact: true }).click();
 
     await expect(page.getByRole('heading', { name: 'Compare Strategies' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Monthly Draw Estimate' })).toBeVisible();

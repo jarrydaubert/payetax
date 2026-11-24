@@ -14,11 +14,11 @@ interface RecommendationHeroProps {
 }
 
 export function RecommendationHero({ className }: RecommendationHeroProps) {
-  const { comparison, selectedStrategy, activeScenario, exploration } = useActiveDirectorScenario();
+  const { comparison, selectedStrategy, activeScenario, exploration, isRecommended } =
+    useActiveDirectorScenario();
 
   if (!(comparison && selectedStrategy && activeScenario)) return null;
 
-  const isRecommended = !exploration && selectedStrategy === comparison.recommended;
   const label = isRecommended ? 'Recommended strategy' : 'Displayed strategy';
   const namedStrategy = comparison.strategies[selectedStrategy].name;
   let heading = isRecommended ? STRATEGY_LABEL[selectedStrategy] : namedStrategy;

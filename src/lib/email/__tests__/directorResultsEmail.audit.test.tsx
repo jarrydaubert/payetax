@@ -92,7 +92,7 @@ describe('Director display → email payload → server → HTML/text audit', ()
         if (!sample.selectedStrategy) state.setSliderSalary(sample.salary ?? null);
         state.setProfitWhatIfPercent(sample.profitPercent ?? 0);
         state.setObjective(sample.objective ?? 'maximizeTakeHome');
-        state.calculate('draft');
+        state.calculate();
       }
       const { result } = renderHook(() => ({
         display: useActiveDirectorScenario(),

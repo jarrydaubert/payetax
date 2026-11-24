@@ -17,6 +17,12 @@ describe('DirectorGuide SurvivalModePanel', () => {
       strategyComparison: null,
       formData,
       calculatedFormData: formData,
+      calculatedDraftScenario: {
+        selectedStrategy: null,
+        sliderSalary: null,
+        profitWhatIfPercent: 0,
+        objective: 'maximizeTakeHome',
+      },
       calculatedStrategy: 'optimalMix',
     } as never);
   });

@@ -75,6 +75,12 @@ describe('DirectorDashboard (Survival Mode)', () => {
     useDirectorGuideStore.setState({
       formData,
       calculatedFormData: formData,
+      calculatedDraftScenario: {
+        selectedStrategy: null,
+        sliderSalary: null,
+        profitWhatIfPercent: 0,
+        objective: 'maximizeTakeHome',
+      },
       calculatedStrategy: 'optimalMix',
       strategyComparison: createEmptyComparison(0) as never,
     } as never);
