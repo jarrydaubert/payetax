@@ -13,15 +13,18 @@ export function getTaxCodeBasisExplanation(basis: TaxCodeCalculationBasis): stri
     basis.periodAdjustment === 'additional-pay'
       ? 'The annual amount is the code-number basis; monthly additional pay uses HMRC Tables A, not annual ÷ 12.'
       : basis.periodAdjustment === 'free-pay'
-        ? 'The annual amount is the code-number basis; monthly free pay uses HMRC Tables A, not annual ÷ 12.'
+        ? 'Monthly free pay uses the tax-code number and HMRC Tables A.'
         : '';
 
-  if (basis.kind === 'policy-derived') {
-    return `Basis: policy-derived PAYE estimate. No code was supplied, so PayeTax estimated the tax-free amount from the selected year, adjusted net income and allowance answers. ${tablesACopy}`;
-  }
-
-  if (basis.kind === 'invalid-code-fallback') {
-    return `Basis: policy-derived fallback. The supplied code was not usable, so PayeTax estimated the tax-free amount from the selected year, adjusted net income and allowance answers. ${tablesACopy}`;
+  if (basis.kind !== 'supplied-code') {
+    const estimate =
+      basis.kind === 'policy-derived'
+        ? 'Basis: policy-derived PAYE estimate. No code was supplied, so PayeTax estimated the tax-free amount from the selected year, adjusted net income and allowance answers.'
+        : 'Basis: policy-derived fallback. The supplied code was not usable, so PayeTax estimated the tax-free amount from the selected year, adjusted net income and allowance answers.';
+    const marriageAllowance = basis.marriageAllowanceAdjustment
+      ? 'This PAYE estimate assumes an approved Marriage Allowance transfer. Payroll withholding can differ from the annual tax reduction, especially when estimated coding changes at a band boundary. Enter your HMRC tax code for an estimate based on that code.'
+      : '';
+    return [estimate, marriageAllowance, tablesACopy].filter(Boolean).join(' ');
   }
 
   const parts = [

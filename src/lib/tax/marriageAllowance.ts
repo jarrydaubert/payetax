@@ -1,30 +1,45 @@
-import { SCOTTISH_TAX_RATES, TAX_RATES, type TaxBand, type TaxYear } from '@/constants/taxRates';
+import type { TaxBand, TaxYear } from '@/constants/taxRates';
 import { sliceRukTaxableIncome } from './rukIncomeTax';
 import { sliceScottishTaxableIncome } from './scottishIncomeTax';
+import { selectTaxPolicy } from './taxPolicy';
+import { roundToPence } from './utils';
 
 export type MarriageAllowanceRegion = 'rUK' | 'scotland';
 
-interface TaxRateContext {
-  personalAllowance: number;
-  marriageAllowance: number;
-  bands: TaxBand[];
-  higherRateThreshold: number;
-}
+function getPolicy(taxYear: TaxYear, region: MarriageAllowanceRegion) {
+  const { ruk, scottish } = selectTaxPolicy(taxYear);
+  const { bands } = region === 'scotland' ? scottish : ruk;
+  const basicBand = bands.find((band) => band.name === 'Basic rate');
+  const lastEligibleBand =
+    region === 'scotland' ? bands.find((band) => band.name === 'Intermediate rate') : basicBand;
 
-function getRateContext(taxYear: TaxYear, region: MarriageAllowanceRegion): TaxRateContext | null {
-  const rates = region === 'scotland' ? SCOTTISH_TAX_RATES[taxYear] : TAX_RATES[taxYear];
-  if (!rates) return null;
-
-  const higherBandIndex = rates.bands.findIndex((band) => band.rate >= 40);
-  const preHigherBand = higherBandIndex > 0 ? rates.bands[higherBandIndex - 1] : rates.bands[0];
-  if (!preHigherBand) return null;
+  if (!(basicBand && lastEligibleBand)) {
+    throw new Error('Marriage Allowance policy requires the eligible income tax bands');
+  }
 
   return {
-    personalAllowance: rates.personalAllowance,
-    marriageAllowance: rates.marriageAllowance,
-    bands: rates.bands,
-    higherRateThreshold: rates.personalAllowance + preHigherBand.threshold,
+    bands,
+    basicRate: basicBand.rate,
+    eligibleTaxableLimit: lastEligibleBand.threshold,
+    personalAllowance: ruk.personalAllowance,
+    transferAmount: ruk.marriageAllowance,
+    maxRecipientRelief: roundToPence((ruk.marriageAllowance * basicBand.rate) / 100),
   };
+}
+
+export function getMarriageAllowanceAmounts(taxYear: TaxYear) {
+  const { personalAllowance, transferAmount, maxRecipientRelief } = getPolicy(taxYear, 'rUK');
+  return { personalAllowance, transferAmount, maxRecipientRelief };
+}
+
+function getEligibility(
+  recipientTaxable: number,
+  transferorTaxableAfter: number,
+  eligibleTaxableLimit: number,
+) {
+  if (recipientTaxable > eligibleTaxableLimit) return 'recipient-higher-rate';
+  if (transferorTaxableAfter > eligibleTaxableLimit) return 'transferor-higher-rate';
+  return 'eligible';
 }
 
 function calculateIncomeTax(
@@ -48,62 +63,75 @@ export interface MarriageAllowanceNetSavingInput {
   transferorIncome: number;
   taxYear: TaxYear;
   region?: MarriageAllowanceRegion;
+  recipientTaxFreeAmount?: number;
 }
 
 export interface MarriageAllowanceNetSavingResult {
+  eligibility: ReturnType<typeof getEligibility>;
   netSaving: number;
   recipientSaving: number;
   transferorAdditionalTax: number;
-  transferAmount: number;
-  personalAllowance: number;
-  higherRateThreshold: number;
 }
 
 export function calculateMarriageAllowanceNetSaving(
   input: MarriageAllowanceNetSavingInput,
-): MarriageAllowanceNetSavingResult | null {
-  const region: MarriageAllowanceRegion = input.region ?? 'rUK';
-  const context = getRateContext(input.taxYear, region);
-  if (!context) return null;
-
-  const recipientIncome = Math.max(0, input.recipientIncome);
-  const transferorIncome = Math.max(0, input.transferorIncome);
-
-  const transferAmount = context.marriageAllowance;
-  const personalAllowance = context.personalAllowance;
-
-  const recipientTaxBefore = calculateIncomeTax(
-    Math.max(0, recipientIncome - personalAllowance),
-    context.bands,
-    region,
+): MarriageAllowanceNetSavingResult {
+  const { region = 'rUK', recipientIncome, transferorIncome, taxYear } = input;
+  const policy = getPolicy(taxYear, region);
+  const { bands, personalAllowance, transferAmount, maxRecipientRelief, eligibleTaxableLimit } =
+    policy;
+  const recipientTaxable = Math.max(
+    0,
+    recipientIncome - (input.recipientTaxFreeAmount ?? personalAllowance),
   );
-  const recipientTaxAfter = calculateIncomeTax(
-    Math.max(0, recipientIncome - (personalAllowance + transferAmount)),
-    context.bands,
-    region,
+  const transferorTaxableBefore = Math.max(0, transferorIncome - personalAllowance);
+  const transferorTaxableAfter = Math.max(
+    0,
+    transferorIncome - (personalAllowance - transferAmount),
   );
-  const recipientSaving = Math.max(0, recipientTaxBefore - recipientTaxAfter);
+  const eligibility = getEligibility(
+    recipientTaxable,
+    transferorTaxableAfter,
+    eligibleTaxableLimit,
+  );
 
-  const transferorTaxBefore = calculateIncomeTax(
-    Math.max(0, transferorIncome - personalAllowance),
-    context.bands,
-    region,
-  );
-  const transferorTaxAfter = calculateIncomeTax(
-    Math.max(0, transferorIncome - Math.max(0, personalAllowance - transferAmount)),
-    context.bands,
-    region,
-  );
-  const transferorAdditionalTax = Math.max(0, transferorTaxAfter - transferorTaxBefore);
+  if (eligibility !== 'eligible') {
+    return { eligibility, netSaving: 0, recipientSaving: 0, transferorAdditionalTax: 0 };
+  }
 
-  const netSaving = Math.max(0, recipientSaving - transferorAdditionalTax);
+  // ITA 2007 ss29 and 55B: the basic-rate credit can reduce existing tax to zero.
+  const recipientTax = calculateIncomeTax(recipientTaxable, bands, region);
+  const recipientSaving = roundToPence(Math.min(recipientTax, maxRecipientRelief));
+  const transferorAdditionalTax = roundToPence(
+    calculateIncomeTax(transferorTaxableAfter, bands, region) -
+      calculateIncomeTax(transferorTaxableBefore, bands, region),
+  );
 
   return {
-    netSaving,
+    eligibility,
+    netSaving: roundToPence(recipientSaving - transferorAdditionalTax),
     recipientSaving,
     transferorAdditionalTax,
-    transferAmount,
-    personalAllowance,
-    higherRateThreshold: context.higherRateThreshold,
   };
+}
+
+/** Estimate the free-pay addition on the assumption that HMRC codes the transfer. */
+export function estimateMarriageAllowanceCodingAdjustment(
+  input: MarriageAllowanceNetSavingInput,
+): number {
+  const { region = 'rUK', recipientIncome, transferorIncome, taxYear } = input;
+  if (!(transferorIncome >= 0 && transferorIncome < recipientIncome)) return 0;
+
+  // Only assume a claim from the wage inputs when it benefits the household.
+  // Annual statutory savings determine whether to model a claim; PAYE sizing is separate.
+  if (calculateMarriageAllowanceNetSaving(input).netSaving <= 0) return 0;
+
+  const { personalAllowance, transferAmount, basicRate, bands } = getPolicy(taxYear, region);
+  const recipientTaxable = recipientIncome - (input.recipientTaxFreeAmount ?? personalAllowance);
+
+  // Model HMRC's highest-rate examples (PAYE100035) using the pre-transfer
+  // annual band and rounding the addition up to a pound. The payroll routine
+  // applies its own rounding and chooses the band after applying free pay.
+  const band = bands.find((band) => recipientTaxable <= band.threshold);
+  return band ? Math.ceil((transferAmount * basicRate) / band.rate) : 0;
 }

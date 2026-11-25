@@ -54,6 +54,7 @@ Personal Allowance taper for the blank-code cases.
 | Scenario ID | Sources and working |
 | --- | --- |
 | `uk-40k-1257L`, `uk-60k-1257L` | PAYE and NI shared derivations. Apply 20% up to the accrued rUK basic-rate limit and 40% above it. |
+| `scotland-40k-estimated-marriage-allowance` | [HMRC Scottish coding](https://www.gov.uk/hmrc-internal-manuals/paye-manual/paye100035) gives £252 / 21% = £1,200 added to standard free pay. Tables A for illustrative S1377M gives £1,148.26 free pay (£2,185 whole-pound taxable pay). Under PAYE formula 3, (3,967 × 19% + 12,989 × 20%) / 12 + (2,185 − 1,413) × 21% gives £441.41 after rounding down. NI stays £182.83 monthly on the £40,000 wage. |
 | `uk-12856-1257L-exact-460-penny` | PAYE §4.4, formula 1. £23 × 20% is exactly £4.60 before penny rounding. |
 | `uk-110k-757T-coded-amount` | HMRC code-number guidance and PAYE. Two distinct figures are the £7,570 coded amount and £631.59 Month 1 free pay (£416.67 + £214.92). NI gives £350.83 monthly. |
 | `uk-110k-blank-code-policy-taper` | Personal Allowance rules give £12,570 − (£110,000 − £100,000) / 2 = £7,570. PayeTax projects the corresponding numeric code basis, so the PAYE and NI working matches the 757T case. |

@@ -811,26 +811,6 @@ describe('Tax Calculator', () => {
     });
   });
 
-  describe('Scottish Tax + Marriage Allowance', () => {
-    it('applies marriage allowance correctly with Scottish tax rates', () => {
-      const inputWithMarriage = createBasicInput(30000, {
-        isScottish: true,
-        isMarried: true,
-        partnerGrossWage: 10000, // Partner must earn LESS than PA
-      });
-
-      const inputWithoutMarriage = createBasicInput(30000, {
-        isScottish: true,
-      });
-
-      const resultWith = calculateTax(inputWithMarriage);
-      const resultWithout = calculateTax(inputWithoutMarriage);
-
-      // Marriage allowance should add £1,260
-      expect(resultWith.taxFreeAmount).toBe(resultWithout.taxFreeAmount + 1260);
-    });
-  });
-
   describe('Scottish Advanced Rate (45%)', () => {
     it('calculates tax correctly for income in the Advanced rate band', () => {
       // £80,000 salary hits the Advanced rate (45%) band (£75,001-£125,140)

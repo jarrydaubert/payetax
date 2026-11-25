@@ -235,7 +235,7 @@ describe('HMRC Rate Verification & Edge Cases', () => {
   });
 
   describe('Marriage Allowance Complex Scenarios', () => {
-    it('Both partners £30k - no allowance (both above PA)', () => {
+    it('Both partners £30k - no inferred transfer direction', () => {
       const result = calculateTax(
         createInput({
           salary: 30000,
@@ -295,8 +295,9 @@ describe('HMRC Rate Verification & Edge Cases', () => {
           partnerGrossWage: 10000,
         }),
       );
-      // Scottish higher rate starts at £43,663
-      expect(result.taxFreeAmount).toBe(13830);
+      // At the top of intermediate rate, HMRC PAYE100035 gives £252 / 21%
+      // = £1,200 of coded free pay on top of the standard allowance.
+      expect(result.taxFreeAmount).toBe(13770);
     });
 
     it('Scottish taxpayer £43,663, partner £10k - no allowance', () => {

@@ -25,7 +25,6 @@ import { ResultTableRow } from '@/components/molecules/ResultTableRow';
 import { TaxTrapInlineAlert } from '@/components/molecules/TaxTrapInlineAlert';
 import { Card } from '@/components/ui/card';
 import { TableBody } from '@/components/ui/table';
-import { CURRENT_TAX_YEAR, TAX_RATES, type TaxYear } from '@/constants/taxRates';
 import { useHorizontalScrollIndicator } from '@/hooks/useHorizontalScrollIndicator';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { useMouseDragScroll } from '@/hooks/useMouseDragScroll';
@@ -36,7 +35,7 @@ import {
   type ResultsTableRowViewModel,
 } from '@/lib/calculatorResultsPresenter';
 import { calculateOptimalPension } from '@/lib/pensionOptimizer';
-import { parseTaxCode } from '@/lib/tax';
+import { CURRENT_TAX_YEAR, parseTaxCode, type TaxYear } from '@/lib/tax';
 import type { TaxCalculationResults } from '@/lib/types/calculator';
 import { cn } from '@/lib/utils';
 
@@ -143,35 +142,13 @@ export function ResultsTable({
     );
   }, [results.grossSalary.annually, results.pensionContribution.annually]);
 
-  // Marriage allowance eligibility check
-  const marriageAllowanceEligible = React.useMemo(() => {
-    // Must be married - partnerGrossWage can be 0 (that's a valid eligible case!)
-    if (!isMarried) return false;
-    if (partnerGrossWage == null) return false;
-
-    // M and N both mean the code already reflects a Marriage Allowance transfer.
-    // M1 is an unrelated non-cumulative marker and must not suppress this UI.
-    const parsedTaxCode = parseTaxCode(taxCode, 0);
-    const hasMarriageCode = parsedTaxCode.letter === 'M' || parsedTaxCode.letter === 'N';
-    if (hasMarriageCode) return false;
-
-    // Get tax constants for the current year
-    const taxConstants = TAX_RATES[currentTaxYear as TaxYear];
-    const basicBand = taxConstants?.bands[0];
-    if (!(taxConstants && basicBand)) return false;
-    const personalAllowance = taxConstants.personalAllowance;
-    const basicRateUpper = personalAllowance + basicBand.threshold;
-
-    // Partner must earn less than Personal Allowance
-    if (partnerGrossWage >= personalAllowance) return false;
-
-    // User must be a basic rate taxpayer
-    const userSalary = results.grossSalary.annually;
-    if (userSalary <= personalAllowance || userSalary > basicRateUpper) return false;
-
-    // User is eligible!
-    return true;
-  }, [isMarried, partnerGrossWage, taxCode, results.grossSalary.annually, currentTaxYear]);
+  const codeLetter = isMarried ? parseTaxCode(taxCode, 0).letter : null;
+  const codeBasis = results.taxCodeBasis;
+  const recipientTaxFreeAmount = codeBasis
+    ? codeBasis.policyDerivedTaxFreeAmount - (codeBasis.marriageAllowanceAdjustment ?? 0)
+    : undefined;
+  const recipientIncome =
+    results.calculationBasis?.pay.payeAdjustedPayment.annual ?? results.grossSalary.annually;
 
   // Extract current year from taxYear to show "Net Change from 2024" instead of "Previous Year"
   const currentYearStart = Number.parseInt(currentTaxYear.split('-')[0] || '', 10); // 2025
@@ -358,17 +335,18 @@ export function ResultsTable({
         </div>
       )}
 
-      {/* Marriage Allowance Alert */}
-      {marriageAllowanceEligible && (
-        <div className={'mt-4'}>
-          <MarriageAllowanceAlert
-            userSalary={results.grossSalary.annually}
-            partnerSalary={partnerGrossWage}
-            hasMarriageCode={false}
-            taxYear={currentTaxYear as TaxYear}
-            isScottish={isScottish}
-          />
-        </div>
+      {isMarried && (
+        <MarriageAllowanceAlert
+          userSalary={recipientIncome}
+          recipientTaxFreeAmount={recipientTaxFreeAmount}
+          includedInPayeEstimate={Boolean(
+            codeBasis?.kind !== 'supplied-code' && codeBasis?.marriageAllowanceAdjustment,
+          )}
+          partnerSalary={partnerGrossWage}
+          hasMarriageCode={codeLetter === 'M' || codeLetter === 'N'}
+          taxYear={currentTaxYear as TaxYear}
+          isScottish={isScottish}
+        />
       )}
     </motion.div>
   );

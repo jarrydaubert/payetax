@@ -211,6 +211,8 @@ describe('calculator and decoder consistency', () => {
   it.each([
     ['1383M', 13_830],
     ['1131N', 11_310],
+    ['S1377M', 13_770],
+    ['S1131N', 11_310],
   ] as const)('does not apply a second Marriage Allowance adjustment to %s', (code, amount) => {
     const calculated = calculateTax({
       ...baseInput,

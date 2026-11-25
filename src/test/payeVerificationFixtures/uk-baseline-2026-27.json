@@ -8,6 +8,7 @@
       "https://www.gov.uk/government/publications/tables-a-pay-adjustment-tables",
       "https://www.gov.uk/income-tax-rates",
       "https://www.gov.uk/tax-codes/what-your-tax-code-means",
+      "https://www.gov.uk/hmrc-internal-manuals/paye-manual/paye100035",
       "https://www.gov.scot/publications/scottish-income-tax-rates-and-bands/pages/2026-to-2027/"
     ],
     "taxYear": "2026-2027",
@@ -40,6 +41,34 @@
         "nationalInsuranceAnnual": 2193.96,
         "netPayAnnual": 32322.04,
         "taxBandRates": [20]
+      }
+    },
+    {
+      "id": "scotland-40k-estimated-marriage-allowance",
+      "description": "£40,000 Scottish wage with an £8,000 transferor. PAYE100035 intermediate-rate adjustment is £252 / 21% = £1,200, giving illustrative S1377M. Tables A gives £1,148.26 free pay, leaving whole-pound Month 1 taxable pay of £2,185. Using exact Scottish band widths gives £441.41 monthly PAYE after rounding down.",
+      "input": {
+        "salary": 40000,
+        "payPeriod": "annually",
+        "taxYear": "2026-2027",
+        "taxCode": "",
+        "isScottish": true,
+        "isMarried": true,
+        "partnerGrossWage": 8000,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "percentage",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40
+      },
+      "expected": {
+        "taxFreeAmount": 13770,
+        "incomeTaxAnnual": 5296.92,
+        "incomeTaxMonthly": 441.41,
+        "nationalInsuranceAnnual": 2193.96,
+        "netPayAnnual": 32509.12,
+        "taxBandRates": [19, 20, 21]
       }
     },
     {

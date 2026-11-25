@@ -1,83 +1,28 @@
 // src/app/tools/marriage-allowance-calculator/MarriageAllowanceClient.tsx
 'use client';
 
-import { ArrowRight, CheckCircle, Heart, Info, XCircle } from 'lucide-react';
+import { ArrowRight, Heart, Info } from 'lucide-react';
 import Link from 'next/link';
 import { useId, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { CURRENT_TAX_YEAR_DISPLAY_SHORT } from '@/constants/freshness';
-import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
 import { parseCurrencyInput } from '@/lib/currencyInput';
-import { calculateMarriageAllowanceNetSaving } from '@/lib/tax/marriageAllowance';
+import {
+  CURRENT_TAX_YEAR,
+  calculateMarriageAllowanceNetSaving,
+  getMarriageAllowanceAmounts,
+} from '@/lib/tax';
 import { cn, formatCurrency } from '@/lib/utils';
 
 const TAX_YEAR = CURRENT_TAX_YEAR;
-const rates = TAX_RATES[TAX_YEAR];
-const MARRIAGE_ALLOWANCE = rates.marriageAllowance;
-const PERSONAL_ALLOWANCE = rates.personalAllowance; // £12,570
-const BASIC_RATE_LIMIT = PERSONAL_ALLOWANCE + (rates.bands[0]?.threshold ?? 0);
-const TAX_SAVING = Math.round(MARRIAGE_ALLOWANCE * 0.2); // £252
-
-type EligibilityStatus = 'eligible' | 'not_eligible';
-
-interface EligibilityResult {
-  status: EligibilityStatus;
-  reason: string;
-  annualSaving: number;
-  transferorIncome: number;
-  recipientIncome: number;
-}
-
-function checkEligibility(transferorIncome: number, recipientIncome: number): EligibilityResult {
-  const baseResult = {
-    transferorIncome,
-    recipientIncome,
-    annualSaving: 0,
-  };
-
-  // Transferor must earn less than personal allowance
-  if (transferorIncome > PERSONAL_ALLOWANCE) {
-    return {
-      ...baseResult,
-      status: 'not_eligible',
-      reason: `The lower earner must earn less than ${formatCurrency(PERSONAL_ALLOWANCE, 0)} (the Personal Allowance) to transfer their unused allowance.`,
-    };
-  }
-
-  // Recipient must be a basic rate taxpayer
-  if (recipientIncome <= PERSONAL_ALLOWANCE) {
-    return {
-      ...baseResult,
-      status: 'not_eligible',
-      reason: `The higher earner must earn more than ${formatCurrency(PERSONAL_ALLOWANCE, 0)} to benefit from the transferred allowance.`,
-    };
-  }
-
-  if (recipientIncome > BASIC_RATE_LIMIT) {
-    return {
-      ...baseResult,
-      status: 'not_eligible',
-      reason: `The higher earner must be a basic rate taxpayer (earning up to ${formatCurrency(BASIC_RATE_LIMIT, 0)}). Higher rate taxpayers cannot receive Marriage Allowance.`,
-    };
-  }
-
-  const savingResult = calculateMarriageAllowanceNetSaving({
-    recipientIncome,
-    transferorIncome,
-    taxYear: TAX_YEAR,
-    region: 'rUK',
-  });
-  const saving = Math.round(savingResult?.netSaving ?? TAX_SAVING);
-
-  return {
-    ...baseResult,
-    status: 'eligible',
-    reason: `You qualify for Marriage Allowance. The lower earner can transfer ${formatCurrency(MARRIAGE_ALLOWANCE, 0)} of their Personal Allowance to their partner.`,
-    annualSaving: saving,
-  };
-}
+const { transferAmount, personalAllowance, maxRecipientRelief } =
+  getMarriageAllowanceAmounts(TAX_YEAR);
+const REGIONS = [
+  { region: 'rUK', label: 'England, Wales and Northern Ireland' },
+  { region: 'scotland', label: 'Scotland' },
+] as const;
 
 export function MarriageAllowanceClient() {
   const id = useId();
@@ -87,19 +32,28 @@ export function MarriageAllowanceClient() {
   const [recipientIncome, setRecipientIncome] = useState<string>('');
   const [transferorError, setTransferorError] = useState<string | null>(null);
   const [recipientError, setRecipientError] = useState<string | null>(null);
-  const [result, setResult] = useState<EligibilityResult | null>(null);
+  const [incomes, setIncomes] = useState<{
+    transferorIncome: number;
+    recipientIncome: number;
+  } | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const transferor = parseCurrencyInput(transferorIncome);
     const recipient = parseCurrencyInput(recipientIncome);
+    const incomesReversed =
+      transferor.status === 'valid' &&
+      recipient.status === 'valid' &&
+      transferor.value > recipient.value;
 
     setTransferorError(
       transferor.status === 'empty'
         ? 'Enter the lower earner’s annual income, or enter 0 if none.'
         : transferor.status === 'invalid'
           ? transferor.error
-          : null,
+          : incomesReversed
+            ? 'Enter the lower annual income here.'
+            : null,
     );
     setRecipientError(
       recipient.status === 'empty'
@@ -108,9 +62,9 @@ export function MarriageAllowanceClient() {
           ? recipient.error
           : null,
     );
-    setResult(
-      transferor.status === 'valid' && recipient.status === 'valid'
-        ? checkEligibility(transferor.value, recipient.value)
+    setIncomes(
+      !incomesReversed && transferor.status === 'valid' && recipient.status === 'valid'
+        ? { transferorIncome: transferor.value, recipientIncome: recipient.value }
         : null,
     );
   };
@@ -133,8 +87,10 @@ export function MarriageAllowanceClient() {
         </h1>
         <p className={cn('mx-auto max-w-2xl text-muted-foreground', 'text-lg')}>
           Married? In a civil partnership? You could save up to{' '}
-          <span className='font-semibold text-foreground'>{formatCurrency(TAX_SAVING, 0)}</span> per
-          year by transferring unused Personal Allowance to your partner.
+          <span className='font-semibold text-foreground'>
+            {formatCurrency(maxRecipientRelief, 0)}
+          </span>{' '}
+          per year as a couple through Marriage Allowance.
         </p>
       </div>
 
@@ -144,11 +100,15 @@ export function MarriageAllowanceClient() {
           <div className='grid gap-6 text-center md:grid-cols-3'>
             <div>
               <p className='mb-1 text-sm font-medium text-muted-foreground'>Amount Transferred</p>
-              <p className='text-2xl font-bold'>{formatCurrency(MARRIAGE_ALLOWANCE, 0)}</p>
+              <p className='text-2xl font-bold'>{formatCurrency(transferAmount, 0)}</p>
             </div>
             <div>
-              <p className='mb-1 text-sm font-medium text-muted-foreground'>Annual Tax Saving</p>
-              <p className='text-2xl font-bold text-success'>{formatCurrency(TAX_SAVING, 0)}</p>
+              <p className='mb-1 text-sm font-medium text-muted-foreground'>
+                Maximum Recipient Tax Relief
+              </p>
+              <p className='text-2xl font-bold text-success'>
+                {formatCurrency(maxRecipientRelief, 0)}
+              </p>
             </div>
             <div>
               <p className='mb-1 text-sm font-medium text-muted-foreground'>Can Backdate</p>
@@ -162,9 +122,7 @@ export function MarriageAllowanceClient() {
       <Card className='mb-8'>
         <CardHeader>
           <CardTitle>Check Your Eligibility</CardTitle>
-          <CardDescription>
-            Enter both partners&apos; annual income to see if you qualify.
-          </CardDescription>
+          <CardDescription>Enter both partners&apos; annual pay before Income Tax.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className='space-y-4'>
@@ -186,7 +144,7 @@ export function MarriageAllowanceClient() {
                     onChange={(e) => {
                       setTransferorIncome(e.target.value);
                       setTransferorError(null);
-                      setResult(null);
+                      setIncomes(null);
                     }}
                     aria-invalid={transferorError ? true : undefined}
                     aria-describedby={
@@ -229,7 +187,7 @@ export function MarriageAllowanceClient() {
                     onChange={(e) => {
                       setRecipientIncome(e.target.value);
                       setRecipientError(null);
-                      setResult(null);
+                      setIncomes(null);
                     }}
                     aria-invalid={recipientError ? true : undefined}
                     aria-describedby={
@@ -263,50 +221,72 @@ export function MarriageAllowanceClient() {
         </CardContent>
       </Card>
 
-      {/* Result */}
-      {result && (
-        <Card
-          className={cn(
-            'mb-8',
-            result.status === 'eligible' ? 'border-success/30' : 'border-destructive/30',
-          )}
-        >
-          <CardContent className='pt-6'>
-            <div className='flex items-start gap-4'>
-              {result.status === 'eligible' ? (
-                <CheckCircle className={cn('size-8', 'flex-shrink-0 text-success')} />
-              ) : (
-                <XCircle className={cn('size-8', 'flex-shrink-0 text-destructive')} />
-              )}
-              <div>
-                <h3
-                  className={cn(
-                    'mb-2 text-lg font-semibold',
-                    result.status === 'eligible' ? 'text-success' : '',
-                  )}
-                >
-                  {result.status === 'eligible'
-                    ? 'You Qualify for Marriage Allowance!'
-                    : "You Don't Qualify"}
-                </h3>
-                <p className='text-muted-foreground'>{result.reason}</p>
-                {result.status === 'eligible' && (
-                  <div className='mt-4 rounded-lg bg-success/10 p-4'>
-                    <p className='font-medium text-success'>
-                      Your annual saving:{' '}
-                      <span className='text-xl'>{formatCurrency(result.annualSaving, 0)}</span>
+      <div aria-live='polite'>
+        {incomes && (
+          <Card className='mb-8'>
+            <CardHeader>
+              <CardTitle>Estimated annual household impact</CardTitle>
+              <CardDescription>
+                These estimates assume wages only, standard Personal Allowances and both partners
+                using the same tax regime. If your tax regimes differ or you have other income or
+                reliefs, check with HMRC.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className='grid gap-4 sm:grid-cols-2'>
+              {REGIONS.map(({ region, label }) => {
+                const { eligibility, recipientSaving, transferorAdditionalTax, netSaving } =
+                  calculateMarriageAllowanceNetSaving({ ...incomes, taxYear: TAX_YEAR, region });
+                const headingId = `${id}-${region}`;
+
+                return (
+                  <section
+                    key={region}
+                    aria-labelledby={headingId}
+                    className='rounded-lg border p-4'
+                  >
+                    <h4 id={headingId} className='font-semibold'>
+                      {label}
+                    </h4>
+                    <p className='mt-1 text-sm text-muted-foreground'>
+                      {eligibility === 'eligible'
+                        ? 'Eligible on these incomes'
+                        : 'Ineligible on these incomes'}
                     </p>
-                    <p className='mt-1 text-sm text-success'>
-                      Plus, you can backdate up to 4 years for a total of up to{' '}
-                      {formatCurrency(result.annualSaving * 4, 0)}!
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+                    {eligibility === 'eligible' ? (
+                      <dl className='mt-3 space-y-2 text-sm'>
+                        <div className='flex justify-between gap-2'>
+                          <dt>Recipient tax relief</dt>
+                          <dd>{formatCurrency(recipientSaving)}</dd>
+                        </div>
+                        <div className='flex justify-between gap-2'>
+                          <dt>Transferor additional tax</dt>
+                          <dd>{formatCurrency(transferorAdditionalTax)}</dd>
+                        </div>
+                        <div className='flex justify-between gap-2 border-t pt-2 font-semibold'>
+                          <dt>
+                            {netSaving === 0
+                              ? 'No net household change'
+                              : netSaving < 0
+                                ? 'Net household cost'
+                                : 'Net household saving'}
+                          </dt>
+                          <dd>{formatCurrency(Math.abs(netSaving))}</dd>
+                        </div>
+                      </dl>
+                    ) : (
+                      <p className='mt-3 text-sm'>
+                        {eligibility === 'recipient-higher-rate'
+                          ? 'The recipient pays Income Tax above the eligible rates.'
+                          : 'The transferor would pay Income Tax above the eligible rates after the transfer.'}
+                      </p>
+                    )}
+                  </section>
+                );
+              })}
+            </CardContent>
+          </Card>
+        )}
+      </div>
 
       {/* How It Works */}
       <Card className='mb-8'>
@@ -317,29 +297,20 @@ export function MarriageAllowanceClient() {
           <div className='grid gap-4 md:grid-cols-2'>
             <div className='rounded-lg border p-4'>
               <h3 className='mb-2 font-semibold'>The Transferor (Lower Earner)</h3>
-              <ul className='space-y-2 text-sm text-muted-foreground'>
-                <li>• Must earn less than {formatCurrency(PERSONAL_ALLOWANCE, 0)}</li>
-                <li>
-                  • Transfers {formatCurrency(MARRIAGE_ALLOWANCE, 0)} of their Personal Allowance
-                </li>
-                <li>
-                  • Their Personal Allowance reduces to{' '}
-                  {formatCurrency(PERSONAL_ALLOWANCE - MARRIAGE_ALLOWANCE, 0)}
-                </li>
-                <li>• Usually pays no tax anyway, so no impact</li>
-              </ul>
+              <p className='text-sm text-muted-foreground'>
+                Gives up {formatCurrency(transferAmount, 0)} of Personal Allowance, leaving{' '}
+                {formatCurrency(personalAllowance - transferAmount, 0)} with a standard allowance.
+                The transferor usually earns below their Personal Allowance and can pay more Income
+                Tax after the transfer.
+              </p>
             </div>
             <div className='rounded-lg border p-4'>
               <h3 className='mb-2 font-semibold'>The Recipient (Higher Earner)</h3>
-              <ul className='space-y-2 text-sm text-muted-foreground'>
-                <li>• Must be a basic rate taxpayer (20%)</li>
-                <li>• Cannot earn more than {formatCurrency(BASIC_RATE_LIMIT, 0)}</li>
-                <li>• Receives {formatCurrency(MARRIAGE_ALLOWANCE, 0)} extra allowance</li>
-                <li>
-                  • Saves {formatCurrency(TAX_SAVING, 0)} in tax (20% of{' '}
-                  {formatCurrency(MARRIAGE_ALLOWANCE, 0)})
-                </li>
-              </ul>
+              <p className='text-sm text-muted-foreground'>
+                Gets an annual tax reduction of up to {formatCurrency(maxRecipientRelief, 0)},
+                limited to their Income Tax. The Scottish starter, basic and intermediate rates
+                qualify, as does the basic rate elsewhere in the UK.
+              </p>
             </div>
           </div>
 
@@ -350,9 +321,7 @@ export function MarriageAllowanceClient() {
                 <p className='font-medium'>Important Notes:</p>
                 <ul className='mt-1 space-y-1'>
                   <li>• You must be married or in a civil partnership</li>
-                  <li>• The saving is a tax reduction, not a refund</li>
                   <li>• Apply on GOV.UK - it&apos;s free and takes 5 minutes</li>
-                  <li>• You can usually backdate claims for up to 4 tax years</li>
                 </ul>
               </div>
             </div>
@@ -385,16 +354,22 @@ export function MarriageAllowanceClient() {
           <div>
             <h3 className='mb-2 font-semibold'>Can I backdate my claim?</h3>
             <p className='text-muted-foreground'>
-              Yes! You can backdate your claim for up to 4 tax years. If you qualified for all 4
-              years, you could receive up to {formatCurrency(TAX_SAVING * 4, 0)} as a lump sum.
+              You can usually backdate a claim for up to four previous tax years if you were
+              eligible in each year you claim. Check the{' '}
+              <a
+                href='https://www.gov.uk/marriage-allowance/how-it-works#backdating-your-claim'
+                className='text-primary underline'
+              >
+                GOV.UK backdating guidance
+              </a>{' '}
+              for the earliest year you can claim.
             </p>
           </div>
           <div>
             <h3 className='mb-2 font-semibold'>What if my partner is Scottish?</h3>
             <p className='text-muted-foreground'>
-              Scottish taxpayers can still qualify for Marriage Allowance. The higher earner must
-              not be a higher-rate taxpayer. Scottish tax bands differ from rUK, so check the
-              current Scottish thresholds on GOV.UK if your partner pays Scottish income tax.
+              HMRC can adjust a Scottish recipient&apos;s PAYE code according to their tax band. Use
+              the code HMRC gives you to estimate deductions from your pay.
             </p>
           </div>
           <div>
@@ -409,14 +384,14 @@ export function MarriageAllowanceClient() {
       {/* CTA */}
       <div className='mt-12 text-center'>
         <p className={cn('mb-4 text-muted-foreground', 'text-lg')}>
-          See your full household tax breakdown with Marriage Allowance applied.
+          Estimate deductions and take-home pay with your HMRC tax code.
         </p>
-        <Link href='/?marriageAllowance=receiving'>
-          <Button size='lg' variant='outline'>
-            Calculate with Marriage Allowance
-            <ArrowRight className={cn('ml-2', 'size-4')} />
-          </Button>
-        </Link>
+        <Button asChild size='lg' variant='outline'>
+          <Link href='/#tax-calculator'>
+            Open PAYE Calculator
+            <ArrowRight className='ml-2 size-4' aria-hidden='true' />
+          </Link>
+        </Button>
       </div>
     </div>
   );
