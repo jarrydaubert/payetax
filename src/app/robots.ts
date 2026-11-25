@@ -30,7 +30,6 @@ const DISALLOW_PATHS = [
   '/_next/data/',
   '/_vercel/',
   '/private/',
-  '/offline',
   '/monitoring',
 ];
 

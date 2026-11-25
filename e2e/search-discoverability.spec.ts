@@ -73,6 +73,7 @@ test('published sitemap has no redirects, no noindex pages, and no /tools/ link 
   await sitemapResponse.dispose();
 
   expect(publicUrls.length).toBeGreaterThan(0);
+  expect(publicUrls.map((url) => new URL(url).pathname)).not.toContain('/offline');
 
   const results = [];
   for (let index = 0; index < publicUrls.length; index += 8) {
@@ -94,4 +95,22 @@ test('published sitemap has no redirects, no noindex pages, and no /tools/ link 
   expect(unexpectedStatuses, 'sitemap URLs without HTTP 200').toEqual([]);
   expect(noindexPages, 'sitemap URLs marked noindex').toEqual([]);
   expect(toolsRedirectLinks, 'internal links that point to /tools/').toEqual([]);
+});
+
+test('offline fallback explains updates and exposes its noindex directive', async ({
+  page,
+  request,
+}) => {
+  const response = await page.goto('/offline');
+  expect(response?.status()).toBe(200);
+  await expect(
+    page.getByText('Reload PayeTax when you’re back online to check for updates'),
+  ).toBeVisible();
+  await expect(page).toHaveTitle('Offline | PayeTax');
+  await expect(page.locator('link[rel="canonical"]')).toHaveCount(0);
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex, nofollow');
+
+  const robots = await request.get('/robots.txt');
+  expect(robots.status()).toBe(200);
+  expect(await robots.text()).not.toMatch(/^Disallow: \/offline\s*$/m);
 });
