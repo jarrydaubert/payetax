@@ -86,7 +86,7 @@ export const INPUT_TOOLTIPS = {
   partnerGrossWage: {
     title: "Partner's Gross Wage",
     description:
-      "Enter your partner's yearly pay before tax. With equal pay, either partner could be the transferor. Enter your HMRC tax code to include an approved transfer in your PAYE estimate.",
+      "Enter your partner's yearly pay before tax. With equal pay, either partner could transfer the allowance. A blank tax code gives a PAYE estimate without the transfer. Enter your HMRC tax code to include an approved transfer.",
   },
   blindAllowance: {
     title: "Blind Person's Allowance",

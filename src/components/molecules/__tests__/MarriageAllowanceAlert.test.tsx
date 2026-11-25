@@ -136,17 +136,26 @@ describe('MarriageAllowanceAlert', () => {
       expect(screen.getByText(/£252\.00 per year/)).toBeInTheDocument();
     });
 
-    it('withholds the claim prompt when the household would pay more tax', () => {
-      render(
-        <MarriageAllowanceAlert
-          userSalary={13_000}
-          partnerSalary={12_500}
-          hasMarriageCode={false}
-        />,
-      );
+    it.each([
+      [13_000, 12_500, false, 'when the household would pay more tax'],
+      [14_000, 14_000, true, 'when equal Scottish pay leaves the transfer direction undecided'],
+    ])(
+      'withholds the claim prompt at £%i and £%i (Scottish: %s) %s',
+      (userSalary, partnerSalary, isScottish) => {
+        render(
+          <MarriageAllowanceAlert
+            userSalary={userSalary}
+            partnerSalary={partnerSalary}
+            hasMarriageCode={false}
+            isScottish={isScottish}
+          />,
+        );
 
-      expect(screen.queryByText('You May Qualify for Marriage Allowance')).not.toBeInTheDocument();
-    });
+        expect(
+          screen.queryByText('You May Qualify for Marriage Allowance'),
+        ).not.toBeInTheDocument();
+      },
+    );
 
     it('should reduce net saving when partner income is near Personal Allowance', () => {
       render(
