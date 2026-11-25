@@ -27,16 +27,6 @@ const BASELINE_ENTRIES = [
     '@/constants/taxRates',
     ['CURRENT_TAX_YEAR', 'formatTaxYearDisplay'],
   ],
-  [
-    'src/app/tools/marriage-allowance-calculator/MarriageAllowanceClient.tsx',
-    '@/constants/taxRates',
-    ['CURRENT_TAX_YEAR', 'TAX_RATES'],
-  ],
-  [
-    'src/app/tools/marriage-allowance-calculator/MarriageAllowanceClient.tsx',
-    '@/lib/tax/marriageAllowance',
-    ['calculateMarriageAllowanceNetSaving'],
-  ],
   ['src/components/atoms/TaxYearSelect.tsx', '@/constants/taxRates', ['TAX_YEARS', 'type:TaxYear']],
   [
     'src/components/molecules/DirectorGuide/calculator/StrategyComparisonTable.tsx',
@@ -88,16 +78,6 @@ const BASELINE_ENTRIES = [
     '@/lib/tax/studentLoanPlans',
     ['getAvailableDirectorStudentLoanPlans'],
   ],
-  [
-    'src/components/molecules/MarriageAllowanceAlert.tsx',
-    '@/constants/taxRates',
-    ['CURRENT_TAX_YEAR', 'type:TaxYear'],
-  ],
-  [
-    'src/components/molecules/MarriageAllowanceAlert.tsx',
-    '@/lib/tax/marriageAllowance',
-    ['calculateMarriageAllowanceNetSaving'],
-  ],
   ['src/components/molecules/ResultTableRow.tsx', '@/constants/taxRates', ['type:PayPeriod']],
   [
     'src/components/molecules/SalaryComparisonTable.tsx',
@@ -136,11 +116,6 @@ const BASELINE_ENTRIES = [
     'src/components/organisms/CalculatorInputs/BasicInputs.tsx',
     '@/constants/taxRates',
     ['PERIODS', 'type:StudentLoanPlan'],
-  ],
-  [
-    'src/components/organisms/CalculatorResults/ResultsTable.tsx',
-    '@/constants/taxRates',
-    ['CURRENT_TAX_YEAR', 'TAX_RATES', 'type:TaxYear'],
   ],
   ['src/components/organisms/IncomeSourceList.tsx', '@/constants/taxRates', ['PERIODS']],
   [

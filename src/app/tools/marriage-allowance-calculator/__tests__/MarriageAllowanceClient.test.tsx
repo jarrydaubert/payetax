@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { acceptedToolSalaries, rejectedToolSalaries } from '@/test/toolSalaryCases';
 import { MarriageAllowanceClient } from '../MarriageAllowanceClient';
@@ -15,8 +15,8 @@ describe('MarriageAllowanceClient', () => {
       await user.type(screen.getByLabelText(/Higher Earner's Income/i), text);
       await user.click(screen.getByRole('button', { name: /Check Eligibility/i }));
 
-      expect(await screen.findByText('You Qualify for Marriage Allowance!')).toBeInTheDocument();
-      expect(screen.getByText(/Your annual saving/i)).toBeInTheDocument();
+      const ruk = screen.getByRole('region', { name: 'England, Wales and Northern Ireland' });
+      expect(within(ruk).getByText('Eligible on these incomes')).toBeVisible();
     },
   );
 
@@ -28,7 +28,7 @@ describe('MarriageAllowanceClient', () => {
       const lower = screen.getByRole('textbox', { name: /Lower Earner/ });
       const higher = screen.getByRole('textbox', { name: /Higher Earner/ });
       const submit = screen.getByRole('button', { name: 'Check Eligibility' });
-      const resultHeading = /You Qualify for Marriage Allowance|You Don't Qualify/;
+      const resultHeading = 'Estimated annual household impact';
 
       await user.type(lower, '10000');
       await user.type(higher, '30000');
@@ -58,44 +58,42 @@ describe('MarriageAllowanceClient', () => {
     },
   );
 
-  it('preserves the lower earner’s pence on either side of the Personal Allowance', async () => {
+  it('shows the transferor tax and household saving at the Scottish allowance boundary', async () => {
     const user = userEvent.setup();
     render(<MarriageAllowanceClient />);
     const lower = screen.getByRole('textbox', { name: /Lower Earner/ });
-    const submit = screen.getByRole('button', { name: 'Check Eligibility' });
 
-    await user.type(screen.getByRole('textbox', { name: /Higher Earner/ }), '30,000.50');
-    await user.type(lower, '12,569.99');
-    await user.click(submit);
-    expect(
-      screen.getByRole('heading', { name: 'You Qualify for Marriage Allowance!' }),
-    ).toBeVisible();
-
-    await user.clear(lower);
+    await user.type(screen.getByRole('textbox', { name: /Higher Earner/ }), '40,000');
     await user.type(lower, '12,570.01');
-    await user.click(submit);
-    expect(screen.getByRole('heading', { name: "You Don't Qualify" })).toBeVisible();
-    expect(screen.getByText(/The lower earner must earn less than/)).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Check Eligibility' }));
+
+    const scotland = within(screen.getByRole('region', { name: 'Scotland' }));
+    expect(scotland.getByText('Eligible on these incomes')).toBeVisible();
+    expect(scotland.getByText('Recipient tax relief').parentElement).toHaveTextContent('£252.00');
+    expect(scotland.getByText('Transferor additional tax').parentElement).toHaveTextContent(
+      '£239.40',
+    );
+    expect(scotland.getByText('Net household saving').parentElement).toHaveTextContent('£12.60');
   });
 
-  it('clears eligibility after a valid edit and uses pence at the existing recipient limit', async () => {
+  it('clears results on edit and checks the rUK recipient limit to the penny', async () => {
     const user = userEvent.setup();
     render(<MarriageAllowanceClient />);
     const higher = screen.getByRole('textbox', { name: /Higher Earner/ });
     const submit = screen.getByRole('button', { name: 'Check Eligibility' });
+    const ruk = () =>
+      within(screen.getByRole('region', { name: 'England, Wales and Northern Ireland' }));
 
     await user.type(screen.getByRole('textbox', { name: /Lower Earner/ }), '0');
     await user.type(higher, '50270');
     await user.click(submit);
-    expect(
-      screen.getByRole('heading', { name: 'You Qualify for Marriage Allowance!' }),
-    ).toBeVisible();
+    expect(ruk().getByText('Eligible on these incomes')).toBeVisible();
 
     await user.type(higher, '.01');
     expect(
-      screen.queryByRole('heading', { name: 'You Qualify for Marriage Allowance!' }),
+      screen.queryByRole('region', { name: 'England, Wales and Northern Ireland' }),
     ).toBeNull();
     await user.click(submit);
-    expect(screen.getByRole('heading', { name: "You Don't Qualify" })).toBeVisible();
+    expect(ruk().getByText('Ineligible on these incomes')).toBeVisible();
   });
 });

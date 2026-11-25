@@ -148,6 +148,8 @@ export interface TaxCodeCalculationBasis {
   appliedCode: string | null;
   /** Tax-free amount estimated from tax-year policy and the entered circumstances. */
   policyDerivedTaxFreeAmount: number;
+  /** Marriage Allowance portion of the policy estimate, before conversion to a tax code. */
+  marriageAllowanceAdjustment?: number;
   /** Source-specific tax-free amount encoded by an accepted L/M/N/T or 0T code. */
   suppliedTaxFreeAmount?: number;
   /** Which HMRC Tables A adjustment, if any, the accepted/derived basis applies. */

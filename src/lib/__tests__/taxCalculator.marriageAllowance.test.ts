@@ -1,14 +1,3 @@
-/**
- * Marriage Allowance Comprehensive Test Suite
- *
- * This test suite verifies the CORRECTED marriage allowance logic:
- * - Lower earner (< £12,570) transfers £1,260 to their partner
- * - Receiving partner must be a basic rate taxpayer
- * - Saves £252/year (£1,260 × 20%)
- *
- * CRITICAL FIX: Logic was previously backwards (checking partner > PA instead of < PA)
- */
-
 import { calculateTax, type TaxCalculationInput } from '../taxCalculator';
 
 describe('Marriage Allowance - Comprehensive Tests', () => {
@@ -85,12 +74,6 @@ describe('Marriage Allowance - Comprehensive Tests', () => {
       expect(result.taxFreeAmount).toBe(12570); // No marriage allowance
     });
 
-    it('❌ User earns £30k, partner earns £12,571 - NO allowance (partner just over threshold)', () => {
-      // Partner earns £1 over PA - cannot transfer
-      const result = calculateTax(createTestInput(30000, 12571));
-      expect(result.taxFreeAmount).toBe(12570); // No marriage allowance
-    });
-
     it('❌ User earns £50,271, partner earns £8k - NO allowance (user just into higher rate)', () => {
       // User £1 into higher rate band - cannot receive
       const result = calculateTax(createTestInput(50271, 8000));
@@ -106,9 +89,49 @@ describe('Marriage Allowance - Comprehensive Tests', () => {
   });
 
   describe('Edge Cases and Boundary Conditions', () => {
-    it('Partner earns exactly £12,570 - NO allowance (at PA threshold)', () => {
-      const result = calculateTax(createTestInput(30000, 12570));
-      expect(result.taxFreeAmount).toBe(12570);
+    it.each([12_570, 12_571])(
+      'estimates Scottish coding with a £%i transferor and £12.60 household benefit',
+      (partnerWage) => {
+        const result = calculateTax({
+          ...createTestInput(40_000, partnerWage),
+          taxYear: '2026-2027',
+          isScottish: true,
+        });
+        expect(result.incomeTax.monthly).toBeCloseTo(441.41, 2);
+      },
+    );
+
+    it.each([
+      // Two ordinary earners: both incur the same transfer amount at basic rate in rUK,
+      // and the Scottish transferor pays £264.60 at intermediate for £252 of relief.
+      [false, 40_000, 30_000, 457],
+      [true, 40_000, 30_000, 462.41],
+      [false, 35_000, 12_570, 373.6],
+      [false, 35_000, 12_571, 373.6],
+      [false, 13_000, 12_500, 7],
+    ])(
+      'keeps blank-code PAYE at baseline with no household benefit (Scottish: %s, pay £%i/£%i)',
+      (isScottish, salary, partnerWage, monthlyTax) => {
+        const result = calculateTax({
+          ...createTestInput(salary, partnerWage),
+          taxYear: '2026-2027',
+          isScottish,
+        });
+        expect(result.taxFreeAmount).toBe(12_570);
+        expect(result.incomeTax.monthly).toBeCloseTo(monthlyTax, 2);
+      },
+    );
+
+    it('uses pay after a net-pay pension contribution at the rUK higher-rate boundary', () => {
+      const result = calculateTax({
+        ...createTestInput(51_000, 8_000),
+        taxYear: '2026-2027',
+        pensionContribution: 1_000,
+        pensionContributionType: 'amount',
+        pensionMethod: 'net-pay',
+      });
+      // (£50,000 / 12 − £1,153.26) floors to £3,013 at 20%.
+      expect(result.incomeTax.monthly).toBeCloseTo(602.6, 2);
     });
 
     it('Partner earns £12,569 - SHOULD get allowance (£1 under PA)', () => {
@@ -127,25 +150,42 @@ describe('Marriage Allowance - Comprehensive Tests', () => {
     });
   });
 
-  describe('Scottish Tax Rates', () => {
-    it('Scottish user with eligible partner - SHOULD get allowance', () => {
-      const input = createTestInput(35000, 8000);
-      input.isScottish = true;
-      const result = calculateTax(input);
-
-      // Scottish taxpayers still get marriage allowance
-      expect(result.taxFreeAmount).toBe(12570 + 1260);
+  describe('Scottish PAYE coding', () => {
+    // Following the PAYE100035 examples, estimate the coding using the pre-transfer
+    // annual rate. £252 divided by 19%, 20% or 21% implies S1389M, S1383M or S1377M.
+    // Tables A Month 1 free pay is £1,158.26, £1,153.26 or £1,148.26.
+    // The coding band follows annual taxable pay before applying the transfer.
+    it.each([
+      [16_537, 41.61], // £219 × 19%
+      [16_538, 42.56], // £224 × 19%
+      [29_526, 258.09], // first £3,967 / 12 at 19%, remainder of £1,307 at 20%
+      [29_527, 259.09], // first £3,967 / 12 at 19%, remainder of £1,312 at 20%
+    ])('uses the pre-adjustment Scottish band at £%i annual pay', (salary, monthlyTax) => {
+      const result = calculateTax({
+        ...createTestInput(salary, 8_000),
+        taxYear: '2026-2027',
+        isScottish: true,
+      });
+      expect(result.incomeTax.monthly).toBeCloseTo(monthlyTax, 2);
     });
-
-    it('Scottish higher rate starts at £43,662 - correct threshold applied', () => {
-      // Scottish higher rate threshold is lower
-      const input = createTestInput(43663, 8000);
-      input.isScottish = true;
-      const result = calculateTax(input);
-
-      // User just into Scottish higher rate - NO allowance
-      expect(result.taxFreeAmount).toBe(12570);
-    });
+    it.each([
+      [17_000, 70.29, 49.97], // £368 straddles starter/basic. £263 is all starter.
+      [30_000, 287.27, 266.89], // £1,451 straddles basic/intermediate. £1,351 is below intermediate.
+    ])(
+      'recalculates the Month 1 band after the coding adjustment at £%i',
+      (salary, before, after) => {
+        const input: TaxCalculationInput = {
+          ...createTestInput(salary, 8_000),
+          taxYear: '2026-2027',
+          isScottish: true,
+        };
+        expect(calculateTax({ ...input, isMarried: false }).incomeTax.monthly).toBeCloseTo(
+          before,
+          2,
+        );
+        expect(calculateTax(input).incomeTax.monthly).toBeCloseTo(after, 2);
+      },
+    );
   });
 
   describe('Financial Impact Verification', () => {

@@ -49,16 +49,18 @@ describe('MarriageAllowanceAlert', () => {
       expect(container.firstChild).toBeNull();
     });
 
-    it('should NOT show alert when partner earns at or above Personal Allowance', () => {
-      const { container } = render(
+    it('shows a Scottish household saving with a transferor at the Personal Allowance', () => {
+      render(
         <MarriageAllowanceAlert
-          userSalary={35000}
-          partnerSalary={12570} // At PA threshold
+          userSalary={40_000}
+          partnerSalary={12_570}
           hasMarriageCode={false}
+          isScottish
         />,
       );
 
-      expect(container.firstChild).toBeNull();
+      expect(screen.getByText('You May Qualify for Marriage Allowance')).toBeInTheDocument();
+      expect(screen.getByText('Net household saving £12.60 per year')).toBeInTheDocument();
     });
 
     it('should show alert when user earns exactly at Personal Allowance + £1', () => {
@@ -131,16 +133,29 @@ describe('MarriageAllowanceAlert', () => {
       );
 
       // Marriage allowance = £1,260, basic rate = 20%, so net saving = £252/year
-      expect(screen.getByText(/£252 per year/)).toBeInTheDocument();
+      expect(screen.getByText(/£252\.00 per year/)).toBeInTheDocument();
     });
 
-    it('should display correct monthly savings (£252 ÷ 12 = £21)', () => {
-      render(
-        <MarriageAllowanceAlert userSalary={35000} partnerSalary={8000} hasMarriageCode={false} />,
-      );
+    it.each([
+      [13_000, 12_500, false, 'when the household would pay more tax'],
+      [14_000, 14_000, true, 'when equal Scottish pay leaves the transfer direction undecided'],
+    ])(
+      'withholds the claim prompt at £%i and £%i (Scottish: %s) %s',
+      (userSalary, partnerSalary, isScottish) => {
+        render(
+          <MarriageAllowanceAlert
+            userSalary={userSalary}
+            partnerSalary={partnerSalary}
+            hasMarriageCode={false}
+            isScottish={isScottish}
+          />,
+        );
 
-      expect(screen.getByText(/£21\/month/)).toBeInTheDocument();
-    });
+        expect(
+          screen.queryByText('You May Qualify for Marriage Allowance'),
+        ).not.toBeInTheDocument();
+      },
+    );
 
     it('should reduce net saving when partner income is near Personal Allowance', () => {
       render(
@@ -148,7 +163,7 @@ describe('MarriageAllowanceAlert', () => {
       );
 
       // Partner income near PA reduces net saving below £252
-      expect(screen.getByText(/£114 per year/)).toBeInTheDocument();
+      expect(screen.getByText(/£114\.00 per year/)).toBeInTheDocument();
     });
 
     it('should format partner income correctly', () => {
@@ -161,15 +176,13 @@ describe('MarriageAllowanceAlert', () => {
   });
 
   describe('Content and Links', () => {
-    it('should explain the 10% Personal Allowance transfer', () => {
+    it('explains the annual estimate and how to use an updated tax code', () => {
       render(
         <MarriageAllowanceAlert userSalary={35000} partnerSalary={8000} hasMarriageCode={false} />,
       );
 
-      expect(
-        screen.getByText(/Your partner can transfer 10% of their Personal Allowance/),
-      ).toBeInTheDocument();
-      expect(screen.getByText(/update your tax code to include an 'M' suffix/)).toBeInTheDocument();
+      expect(screen.getByText(/your partner has wage income only/)).toBeInTheDocument();
+      expect(screen.getByText(/enter the new code to estimate your PAYE/)).toBeInTheDocument();
     });
 
     it('should link to the Marriage Allowance calculator', () => {
@@ -214,13 +227,13 @@ describe('MarriageAllowanceAlert', () => {
   });
 
   describe('Tax Year Support', () => {
-    it('should use default tax year (2025-2026) when not specified', () => {
+    it('should use default tax year when not specified', () => {
       render(
         <MarriageAllowanceAlert userSalary={35000} partnerSalary={8000} hasMarriageCode={false} />,
       );
 
-      // Should use 2025-2026 rates (PA: £12,570, MA: £1,260)
-      expect(screen.getByText(/£252 per year/)).toBeInTheDocument();
+      // The current statutory reduction is £252.
+      expect(screen.getByText(/£252\.00 per year/)).toBeInTheDocument();
     });
 
     it('should support custom tax year', () => {

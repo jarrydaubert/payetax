@@ -155,16 +155,31 @@ describe('payeResultsEmail', () => {
     }
   });
 
-  test('emails disclose a blank-code policy estimate', () => {
-    const results = calculateTax(calculationInput);
+  test.each([
+    ['', 8_000, 'assumes an approved Marriage Allowance transfer', '£441.41', '£5,296.92'],
+    ['S1377M', 8_000, 'supplied HMRC code S1377M', '£441.41', '£5,296.92'],
+    ['', 30_000, 'No code was supplied', '£462.41', '£5,548.92'],
+  ])(
+    'both emails show Scottish PAYE with code "%s" and partner pay of £%i',
+    (taxCode, partnerGrossWage, basis, monthlyTax, annualTax) => {
+      const results = calculateTax({
+        ...calculationInput,
+        salary: 40_000,
+        taxYear: '2026-2027',
+        taxCode,
+        isScottish: true,
+        isMarried: true,
+        partnerGrossWage,
+        pensionContribution: 0,
+      });
 
-    expect(generatePayeEmailText(results, '2026-27')).toContain(
-      'No code was supplied, so PayeTax estimated the tax-free amount',
-    );
-    expect(generatePayeEmailHtml(results, '2026-27')).toContain(
-      'No code was supplied, so PayeTax estimated the tax-free amount',
-    );
-  });
+      for (const output of [generatePayeEmailText(results), generatePayeEmailHtml(results)]) {
+        expect(output).toContain(basis);
+        expect(output).toContain(monthlyTax);
+        expect(output).toContain(annualTax);
+      }
+    },
+  );
 
   test('emails disclose an invalid-code policy fallback', () => {
     const results = calculateTax({ ...calculationInput, taxCode: 'INVALID' });

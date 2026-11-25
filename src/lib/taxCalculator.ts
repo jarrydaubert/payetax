@@ -49,6 +49,7 @@ import {
 } from '@/constants/taxRates';
 import type { TaxCalculationInput, TaxCalculationResults } from '@/lib/types/calculator';
 import { convertAnnualToPeriod, convertMonthlyToPeriod } from './periodCalculator';
+import { estimateMarriageAllowanceCodingAdjustment } from './tax/marriageAllowance';
 import {
   calculateMonth1ProgressiveIncomeTax,
   getExactMonth1Threshold,
@@ -441,35 +442,16 @@ export function calculateTax(
   // regardless of date of birth. Age only affects employee NI (see State Pension age
   // exemption in the NI section below).
 
-  // Marriage Allowance (transferable allowance for married couples/civil partners)
-  // CRITICAL FIX: Logic was backwards!
-  // CORRECT RULES: The LOWER earner (earning < PA) transfers £1,260 to their partner
-  // - The transferring partner must earn LESS than the Personal Allowance
-  // - The receiving partner (user) must be a basic rate taxpayer
-  // This saves up to £252/year (£1,260 at 20% basic rate)
-  let policyIncludesMarriageAllowance = false;
-  if (input.isMarried && input.partnerGrossWage >= 0) {
-    // Find the threshold where "Higher rate" (40% or 42%) starts
-    const higherRateBandIndex = taxRates.bands.findIndex((band) => band.rate >= 40);
-    const prevBand = higherRateBandIndex > 0 ? taxRates.bands[higherRateBandIndex - 1] : null;
-    const firstBand = taxRates.bands[0];
-    const basicRateThreshold = prevBand?.threshold ?? firstBand?.threshold ?? 0;
-    const higherRateThreshold = taxRates.personalAllowance + basicRateThreshold;
-
-    // Check if USER can RECEIVE marriage allowance from their partner:
-    // 1. Partner must earn LESS than personal allowance (they transfer it)
-    // 2. User must earn MORE than personal allowance (they pay tax)
-    // 3. User must be a basic rate taxpayer (not higher rate) - based on TOTAL income
-    if (
-      input.partnerGrossWage < taxRates.personalAllowance && // Partner earns LESS than PA
-      payBasis.totalGrossIncome.annual > taxRates.personalAllowance && // User pays tax (total income)
-      payBasis.totalGrossIncome.annual <= higherRateThreshold // User is basic rate taxpayer (total income)
-    ) {
-      // User RECEIVES the marriage allowance from their lower-earning partner
-      policyDerivedTaxFreeAmount += taxRates.marriageAllowance;
-      policyIncludesMarriageAllowance = true;
-    }
-  }
+  const marriageAllowanceAdjustment = input.isMarried
+    ? estimateMarriageAllowanceCodingAdjustment({
+        recipientIncome: payBasis.payeAdjustedPayment.annual,
+        transferorIncome: input.partnerGrossWage,
+        recipientTaxFreeAmount: policyDerivedTaxFreeAmount,
+        region: usesScottishIncomeTax ? 'scotland' : 'rUK',
+        taxYear,
+      })
+    : 0;
+  policyDerivedTaxFreeAmount += marriageAllowanceAdjustment;
 
   // Use the shared interpretation for supported explicit tax-code forms,
   // including K codes and flat-rate overrides. With no usable explicit code,
@@ -852,6 +834,7 @@ export function calculateTax(
           : 'policy-derived',
       appliedCode: hasExplicitValidTaxCode ? taxCodeResult.normalizedCode : null,
       policyDerivedTaxFreeAmount,
+      ...(marriageAllowanceAdjustment > 0 ? { marriageAllowanceAdjustment } : {}),
       suppliedTaxFreeAmount:
         hasExplicitValidTaxCode &&
         (taxCodeResult.classification === 'standard' ||
@@ -870,7 +853,7 @@ export function calculateTax(
       ignoredAdjustments: hasExplicitValidTaxCode
         ? [
             ...(input.isBlind ? (['blind-persons-allowance'] as const) : []),
-            ...(policyIncludesMarriageAllowance ? (['marriage-allowance'] as const) : []),
+            ...(marriageAllowanceAdjustment > 0 ? (['marriage-allowance'] as const) : []),
           ]
         : [],
     },

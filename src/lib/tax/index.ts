@@ -29,6 +29,10 @@ export {
 } from './employerNI';
 export type { IncomeTaxResult } from './incomeTax';
 export { calculateIncomeTax } from './incomeTax';
+export {
+  calculateMarriageAllowanceNetSaving,
+  getMarriageAllowanceAmounts,
+} from './marriageAllowance';
 export type {
   Class1EmployeeBands,
   Class1EmployeeCalculation,

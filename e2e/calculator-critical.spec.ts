@@ -1180,25 +1180,49 @@ test.describe('Calculator critical @critical', () => {
     expect(netAtPensionAge).toBeGreaterThan(baseNet);
   });
 
-  test('Marriage allowance prompt toggles with married + partner wage thresholds @critical', async ({
+  test('Scottish Marriage Allowance shows payroll withholding and annual relief separately @critical', async ({
     page,
   }) => {
     await setLandscapeViewportIfPortrait(page);
     await gotoCalculator(page);
+    await selectOption(page, page.getByTestId('tax-year-select'), /2026.*2027/);
+    await selectOption(page, page.getByTestId('region-select'), 'Scotland');
 
-    await page.getByTestId('salary-input').fill('35000');
+    await page.getByTestId('salary-input').fill('40000');
     await page.getByTestId('married-checkbox').click();
-    await expect(page.getByTestId('partner-salary-input')).toBeVisible();
-    await page.getByTestId('partner-salary-input').fill('10000');
+    await page.getByTestId('partner-salary-input').fill('8000');
 
-    await page.getByTestId('calculate-button').click();
-    await expect(page.getByTestId('results-table')).toBeVisible();
-    await expect(page.getByText(/You May Qualify for Marriage Allowance/i)).toBeVisible();
+    const calculate = page.getByTestId('calculate-button');
+    const table = page.getByTestId('results-table');
+    const tax = table.getByRole('row', { name: /^Total Tax Due/ });
+    const basis = page.getByTestId('tax-code-basis-notice');
+    const alert = page.getByText('You May Qualify for Marriage Allowance');
 
-    // Push partner salary above PA threshold; prompt should disappear.
-    await page.getByTestId('partner-salary-input').fill('13000');
-    await page.getByTestId('calculate-button').click();
-    await expect(page.getByText(/You May Qualify for Marriage Allowance/i)).toBeHidden();
+    await calculate.click();
+    // Hand-worked HMRC Tables A and Scottish band calculation, fixture
+    // scotland-40k-estimated-marriage-allowance.
+    await expect(tax.getByRole('cell', { name: '£441.41', exact: true })).toBeVisible();
+    await expect(basis).toContainText('assumes an approved Marriage Allowance transfer');
+    await expect(alert).toBeVisible();
+    await expect(page.getByText('Net household saving £252.00 per year')).toBeVisible();
+    await expect(page.getByText(/already includes the assumed transfer/)).toBeVisible();
+
+    await page.getByTestId('partner-salary-input').fill('30000');
+    await calculate.click();
+    await expect(tax.getByRole('cell', { name: '£462.41', exact: true })).toBeVisible();
+    await expect(alert).toBeHidden();
+
+    await page.getByTestId('partner-salary-input').fill('12571');
+    await calculate.click();
+    await expect(page.getByText('Net household saving £12.60 per year')).toBeVisible();
+
+    await page.getByTestId('tax-code-input').fill('S1383M');
+    await calculate.click();
+    // Entering S1383M overrides the inferred S1377M amount. It leaves
+    // £2,180 whole-pound taxable pay, £5 less at the intermediate rate.
+    await expect(tax.getByRole('cell', { name: '£440.36', exact: true })).toBeVisible();
+    await expect(basis).toContainText('supplied HMRC code S1383M');
+    await expect(alert).toBeHidden();
   });
 
   test('Breakdown table renders and marginal responds to student loan @critical', async ({
