@@ -170,11 +170,13 @@ export function EmailResultsDialog({
             Email Your Results
           </DialogTitle>
           <DialogDescription className='text-muted-foreground'>
-            We&apos;ll send your director pay breakdown to your inbox. Results are sent directly via
-            email and not stored on our servers.{' '}
+            When you select Send Results, we send your email address and calculator inputs to our
+            server to recalculate your results. Brevo receives your email address and the resulting
+            breakdown to deliver the email. See our{' '}
             <Link href='/privacy' className='text-primary underline hover:text-primary/80'>
-              Privacy policy
+              privacy policy
             </Link>
+            .
           </DialogDescription>
         </DialogHeader>
 

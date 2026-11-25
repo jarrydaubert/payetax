@@ -1200,9 +1200,17 @@ test.describe('Director Intelligence critical @critical', () => {
     await closeInputsPanelIfOpen(page);
     await expect(email).toBeEnabled();
     await email.click();
-    await expect(page.getByText(/Company key dates are not included/)).toBeVisible();
-    await page.getByLabel('Email address').fill('di05@example.com');
-    await page.getByRole('button', { name: 'Send Results', exact: true }).click();
+    const dialog = page.getByRole('dialog', { name: 'Email Your Results' });
+    await expect(dialog).toHaveAccessibleDescription(
+      /send your email address and calculator inputs to our server to recalculate your results\. Brevo receives your email address and the resulting breakdown/,
+    );
+    const privacyPolicy = dialog.getByRole('link', { name: 'privacy policy', exact: true });
+    await expect(privacyPolicy).toBeVisible();
+    await expect(privacyPolicy).toHaveAttribute('href', '/privacy');
+    await expect(dialog.getByText(/Company key dates are not included/)).toBeVisible();
+    await dialog.getByLabel('Email address').fill('di05@example.com');
+    expect(requests).toHaveLength(0);
+    await dialog.getByRole('button', { name: 'Send Results', exact: true }).click();
     await expect(page.getByText(/Results sent to di05@example.com/)).toBeVisible();
     expect(requests).toHaveLength(1);
     const request = requests[0];
