@@ -4,24 +4,21 @@
  * Shows when the user is offline and the requested page isn't cached.
  */
 
-import { CheckCircle, WifiOff } from 'lucide-react';
+import { WifiOff } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { StatusPage } from '@/components/molecules/StatusPage';
 import { Button } from '@/components/ui/button';
 import { BackButton } from './BackButton';
 
-// Prevent indexing of utility/fallback pages
 export const metadata: Metadata = {
+  title: { absolute: 'Offline | PayeTax' },
+  description: 'How to use the PayeTax calculator offline and check for updates.',
+  alternates: { canonical: null },
   robots: { index: false, follow: false },
+  openGraph: null,
+  twitter: null,
 };
-
-const OFFLINE_FEATURES = [
-  'Tax calculations',
-  'Cached tax rates',
-  'Previous results',
-  'Saved calculations',
-];
 
 export default function OfflinePage() {
   return (
@@ -29,7 +26,19 @@ export default function OfflinePage() {
       icon={WifiOff}
       tone='warning'
       title="You're offline"
-      description="You're not connected to the internet right now. PayeTax still works offline, and your previous calculations remain available."
+      description={
+        <>
+          <p>
+            If the calculator is cached, you can use it offline with the tax rates included in that
+            version of PayeTax.
+          </p>
+          <p className='mt-3'>
+            If you turned on <strong>Remember figures on this device</strong>, your browser can
+            refill your inputs. After a reload, select <strong>Calculate</strong> to generate your
+            results again.
+          </p>
+        </>
+      }
       actions={
         <>
           <BackButton />
@@ -38,26 +47,7 @@ export default function OfflinePage() {
           </Button>
         </>
       }
-      footer={
-        <>
-          <strong className='text-foreground'>Tip:</strong> when you're back online, PayeTax
-          automatically syncs and shows the latest tax rates.
-        </>
-      }
-    >
-      <div className='rounded-sm border border-border bg-background p-6'>
-        <h2 className='font-display mb-4 text-lg font-semibold text-foreground'>
-          Available offline
-        </h2>
-        <ul className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
-          {OFFLINE_FEATURES.map((feature) => (
-            <li key={feature} className='flex items-center gap-3'>
-              <CheckCircle className='size-5 flex-shrink-0 text-success' aria-hidden='true' />
-              <span className='text-foreground/80'>{feature}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </StatusPage>
+      footer='Reload PayeTax when you’re back online to check for updates. If an update is waiting, close all open PayeTax tabs and windows, then reopen PayeTax online.'
+    />
   );
 }
