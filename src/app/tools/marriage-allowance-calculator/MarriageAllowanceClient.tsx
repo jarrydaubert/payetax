@@ -122,7 +122,10 @@ export function MarriageAllowanceClient() {
       <Card className='mb-8'>
         <CardHeader>
           <CardTitle>Check Your Eligibility</CardTitle>
-          <CardDescription>Enter both partners&apos; annual pay before Income Tax.</CardDescription>
+          <CardDescription>
+            Enter both partners&apos; annual pay before Income Tax. If you earn the same amount,
+            enter it in both fields.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className='space-y-4'>
@@ -375,8 +378,17 @@ export function MarriageAllowanceClient() {
           <div>
             <h3 className='mb-2 font-semibold'>What happens if I get divorced?</h3>
             <p className='text-muted-foreground'>
-              You should cancel your Marriage Allowance as soon as you separate. You&apos;ll get the
-              benefit for the full tax year in which you cancel.
+              If you divorce, dissolve your civil partnership or legally separate, you must cancel
+              Marriage Allowance. Either partner can cancel. HMRC may make the change effective from
+              6 April at the start of the tax year, so you or your partner may owe tax for that
+              year. Read{' '}
+              <a
+                href='https://www.gov.uk/marriage-allowance/if-your-circumstances-change'
+                className='text-primary underline'
+              >
+                HMRC&apos;s cancellation guidance
+              </a>
+              .
             </p>
           </div>
         </CardContent>

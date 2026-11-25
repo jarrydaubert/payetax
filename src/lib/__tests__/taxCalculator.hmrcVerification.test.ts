@@ -235,15 +235,21 @@ describe('HMRC Rate Verification & Edge Cases', () => {
   });
 
   describe('Marriage Allowance Complex Scenarios', () => {
-    it('Both partners £30k - no inferred transfer direction', () => {
-      const result = calculateTax(
-        createInput({
-          salary: 30000,
-          isMarried: true,
-          partnerGrossWage: 30000,
-        }),
-      );
-      expect(result.taxFreeAmount).toBe(12570);
+    it('uses the supplied code to establish the transfer direction with equal Scottish pay', () => {
+      const input = createInput({
+        salary: 14_000,
+        taxYear: '2026-2027',
+        isScottish: true,
+        isMarried: true,
+        partnerGrossWage: 14_000,
+      });
+
+      // Both partners could transfer under the wage-only model. Tables A leaves
+      // £118 taxable in Month 1 with standard free pay, £8 with S1389M (recipient),
+      // or £223 with S1131N (transferor). The 2026–27 starter rate is 19%.
+      expect(calculateTax(input).incomeTax.monthly).toBeCloseTo(22.42, 2);
+      expect(calculateTax({ ...input, taxCode: 'S1389M' }).incomeTax.monthly).toBeCloseTo(1.52, 2);
+      expect(calculateTax({ ...input, taxCode: 'S1131N' }).incomeTax.monthly).toBeCloseTo(42.37, 2);
     });
 
     it('User £50,270, partner £12,569 - allowance applies', () => {

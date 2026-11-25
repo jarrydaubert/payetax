@@ -65,6 +65,13 @@ test('Marriage Allowance shows regional eligibility and annual household cost', 
   await expect(ruk.getByText('Net household cost').locator('..')).toContainText('£152.00');
   await expect(page.getByText(/wages only, standard Personal Allowances/)).toBeVisible();
   await expect(page.getByRole('link', { name: 'GOV.UK backdating guidance' })).toBeVisible();
+  const cancellation = page
+    .getByRole('heading', { name: 'What happens if I get divorced?' })
+    .locator('..');
+  await expect(cancellation).toContainText('effective from 6 April');
+  await expect(
+    cancellation.getByRole('link', { name: "HMRC's cancellation guidance" }),
+  ).toHaveAttribute('href', 'https://www.gov.uk/marriage-allowance/if-your-circumstances-change');
   await expect(page.getByText(/for a total of up to/)).toHaveCount(0);
 
   await lower.fill('30,000');
@@ -72,6 +79,19 @@ test('Marriage Allowance shows regional eligibility and annual household cost', 
   await submit.click();
   await expect(ruk.getByText('No net household change').locator('..')).toContainText('£0.00');
   await expect(scotland.getByText('Net household cost').locator('..')).toContainText('£12.60');
+
+  // Both Scottish wages are in the starter band after either person transfers.
+  // The recipient saves up to £252 and the transferor pays £1,260 × 19% more.
+  await expect(page.getByText(/If you earn the same amount/)).toBeVisible();
+  await lower.fill('14,000');
+  await higher.fill('14,000');
+  await submit.click();
+  await expect(scotland.getByText('Recipient tax relief').locator('..')).toContainText('£252.00');
+  await expect(scotland.getByText('Transferor additional tax').locator('..')).toContainText(
+    '£239.40',
+  );
+  await expect(scotland.getByText('Net household saving').locator('..')).toContainText('£12.60');
+  await expect(ruk.getByText('No net household change').locator('..')).toContainText('£0.00');
 
   await lower.fill('45,000');
   await submit.click();
