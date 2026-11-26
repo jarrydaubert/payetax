@@ -117,8 +117,8 @@ function assertSuiteShape(fileName: string, raw: unknown): VerificationSuite {
   };
 
   if (typeof suite?.suite !== 'string' || suite.suite.length === 0) fail('missing "suite" name');
-  if (typeof suite.tolerancePence !== 'number' || suite.tolerancePence < 0) {
-    fail('"tolerancePence" must be a non-negative number');
+  if (!Number.isFinite(suite.tolerancePence) || suite.tolerancePence < 0) {
+    fail('"tolerancePence" must be a finite non-negative number');
   }
   const { authority, urls, taxYear, verifiedOn } = suite.source ?? {};
   if (typeof authority !== 'string' || authority.length === 0) fail('source.authority missing');
@@ -143,13 +143,30 @@ function assertSuiteShape(fileName: string, raw: unknown): VerificationSuite {
     if (!(scenario.expected || scenario.invariants?.length || scenario.decoder)) {
       fail(`scenario "${scenario.id}" asserts nothing`);
     }
+    for (const [field, value] of Object.entries(scenario.expected ?? {})) {
+      if (field === 'pensionMethod' || field === 'pensionShortfall') continue;
+      const valid =
+        field === 'taxBandRates'
+          ? Array.isArray(value) && value.every(Number.isFinite)
+          : Number.isFinite(value);
+      if (!valid) {
+        const format = field === 'taxBandRates' ? 'an array of finite numbers' : 'a finite number';
+        fail(`scenario "${scenario.id}" expected.${field} must be ${format}`);
+      }
+    }
     if (
       scenario.decoder &&
       (typeof scenario.decoder.isValid !== 'boolean' ||
-        !(typeof scenario.decoder.amount === 'number' || scenario.decoder.amount === null) ||
         typeof scenario.decoder.meaningIncludes !== 'string')
     ) {
       fail(`scenario "${scenario.id}" has an incomplete decoder expectation`);
+    }
+    if (
+      scenario.decoder &&
+      scenario.decoder.amount !== null &&
+      !Number.isFinite(scenario.decoder.amount)
+    ) {
+      fail(`scenario "${scenario.id}" decoder.amount must be null or a finite number`);
     }
     for (const invariant of scenario.invariants ?? []) {
       if (!KNOWN_INVARIANTS.includes(invariant)) {
