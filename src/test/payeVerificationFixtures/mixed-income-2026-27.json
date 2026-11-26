@@ -1,0 +1,195 @@
+{
+  "suite": "Mixed-income PAYE and combined-income projections",
+  "source": {
+    "authority": "HMRC and UK legislation",
+    "urls": [
+      "https://www.legislation.gov.uk/uksi/2003/2682/made/data.xht",
+      "https://www.legislation.gov.uk/uksi/2014/2689/pdfs/uksi_20142689_en.pdf",
+      "https://www.gov.uk/hmrc-internal-manuals/paye-manual/paye11025",
+      "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027",
+      "https://www.gov.uk/government/publications/payroll-technical-specifications-income-tax",
+      "https://www.gov.uk/government/publications/tables-a-pay-adjustment-tables"
+    ],
+    "taxYear": "2026-2027",
+    "verifiedOn": "2026-11-26"
+  },
+  "tolerancePence": 0,
+  "scenarios": [
+    {
+      "id": "mixed-br-m1-primary-paye",
+      "description": "BR M1 taxes the £1,000 primary payment at 20%. The £500 cap does not bind. £2,000 rent remains in combined cash before separate tax.",
+      "input": {
+        "salary": 1000,
+        "payPeriod": "monthly",
+        "taxYear": "2026-2027",
+        "taxCode": "BR M1",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "amount",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40,
+        "incomeSources": [
+          {
+            "id": "rent",
+            "type": "rental",
+            "amount": 2000,
+            "period": "monthly"
+          }
+        ]
+      },
+      "expected": {
+        "incomeTaxMonthly": 200,
+        "taxableIncomeAnnual": 12000,
+        "netPayMonthly": 2800,
+        "nationalInsuranceMonthly": 0,
+        "taxBandRates": [20]
+      }
+    },
+    {
+      "id": "mixed-br-m1-net-pay-pension",
+      "description": "A £100 net-pay pension leaves a £900 relevant payment. BR deducts 20% (£180), below the £450 cap. Combined cash is £900 + £200 rent − £180.",
+      "input": {
+        "salary": 1000,
+        "payPeriod": "monthly",
+        "taxYear": "2026-2027",
+        "taxCode": "BR M1",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 100,
+        "pensionContributionType": "amount",
+        "pensionMethod": "net-pay",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40,
+        "incomeSources": [
+          {
+            "id": "rent",
+            "type": "rental",
+            "amount": 200,
+            "period": "monthly"
+          }
+        ]
+      },
+      "expected": {
+        "incomeTaxMonthly": 180,
+        "taxableIncomeAnnual": 10800,
+        "netPayMonthly": 920,
+        "nationalInsuranceMonthly": 0,
+        "taxBandRates": [20]
+      }
+    },
+    {
+      "id": "mixed-s0t-m1-primary-paye",
+      "description": "S0T gives zero free pay. Tax the first £3,967 / 12 at 19% and the remainder of the £1,000 primary payment at 20%. Round down to £196.69.",
+      "input": {
+        "salary": 1000,
+        "payPeriod": "monthly",
+        "taxYear": "2026-2027",
+        "taxCode": "S0T M1",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "amount",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40,
+        "incomeSources": [
+          {
+            "id": "rent",
+            "type": "rental",
+            "amount": 2000,
+            "period": "monthly"
+          }
+        ]
+      },
+      "expected": {
+        "incomeTaxMonthly": 196.69,
+        "taxableIncomeAnnual": 12000,
+        "netPayMonthly": 2803.31,
+        "nationalInsuranceMonthly": 0,
+        "taxBandRates": [19, 20]
+      }
+    },
+    {
+      "id": "mixed-c1257l-m1-primary-paye",
+      "description": "Month 1 Tables A free pay of £1,048.26 exceeds the £1,000 primary payment. No Welsh PAYE is deducted. £2,000 rent stays in combined cash.",
+      "input": {
+        "salary": 1000,
+        "payPeriod": "monthly",
+        "taxYear": "2026-2027",
+        "taxCode": "C1257L M1",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "amount",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40,
+        "incomeSources": [
+          {
+            "id": "rent",
+            "type": "rental",
+            "amount": 2000,
+            "period": "monthly"
+          }
+        ]
+      },
+      "expected": {
+        "incomeTaxMonthly": 0,
+        "taxableIncomeAnnual": 0,
+        "netPayMonthly": 3000,
+        "nationalInsuranceMonthly": 0,
+        "taxBandRates": []
+      }
+    },
+    {
+      "id": "mixed-blank-code-combined-projection",
+      "description": "The blank-code policy estimate uses £3,000 monthly combined income. After £1,048.26 Tables A free pay, whole-pound taxable pay is £1,951. Tax at 20% is £390.20.",
+      "input": {
+        "salary": 1000,
+        "payPeriod": "monthly",
+        "taxYear": "2026-2027",
+        "taxCode": "",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 0,
+        "pensionContributionType": "amount",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 40,
+        "incomeSources": [
+          {
+            "id": "rent",
+            "type": "rental",
+            "amount": 2000,
+            "period": "monthly"
+          }
+        ]
+      },
+      "expected": {
+        "incomeTaxMonthly": 390.2,
+        "taxableIncomeAnnual": 23412,
+        "netPayMonthly": 2609.8,
+        "nationalInsuranceMonthly": 0,
+        "taxBandRates": [20]
+      }
+    }
+  ]
+}

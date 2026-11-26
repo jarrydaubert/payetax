@@ -35,9 +35,10 @@ export function ResultsSummaryCards({ results, input, marginalTaxRate }: Results
 
   const totalTax = results.incomeTax.annually + results.nationalInsurance.annually;
   const primaryJobPaye = results.taxCodeBasis?.payeScope === 'primary-employment';
-  const grossIncome = primaryJobPaye
-    ? (results.incomeBreakdown?.total ?? results.grossSalary.annually)
-    : results.grossSalary.annually;
+  const grossIncome =
+    results.calculationBasis?.pay.totalGrossIncome.annual ??
+    results.incomeBreakdown?.total ??
+    results.grossSalary.annually;
   const effectiveRate = grossIncome > 0 ? (totalTax / grossIncome) * 100 : 0;
 
   return (
@@ -121,7 +122,7 @@ export function ResultsSummaryCards({ results, input, marginalTaxRate }: Results
             tooltip={
               primaryJobPaye
                 ? 'The share of combined gross income taken by the PAYE and employee National Insurance shown here.'
-                : 'The share of your gross pay that goes towards Income Tax and employee National Insurance.'
+                : 'The share of your total gross income that goes towards estimated Income Tax and employee National Insurance.'
             }
           />
         </motion.div>

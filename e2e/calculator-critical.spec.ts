@@ -1328,6 +1328,62 @@ test.describe('Calculator critical @critical', () => {
     expect(await getYearlyTableValue(page, 'Net Pay')).toBe(fixture.expected.netPayMonthly * 12);
   });
 
+  for (const scenario of [
+    {
+      code: 'BR M1',
+      basis: 'We assume this code belongs to your primary job.',
+      taxableLabel: 'Primary Job Taxable Pay',
+      taxLabel: 'Primary Job PAYE',
+      shareLabel: 'Tax & NI Share of Gross',
+      share: '6.7%',
+      taxable: 12000,
+      tax: 2400,
+      cash: 33600,
+    },
+    {
+      code: '',
+      basis: 'using the income you entered',
+      taxableLabel: 'Total Taxable',
+      taxLabel: 'Total Tax Due',
+      shareLabel: 'Effective Tax Rate',
+      share: '13.0%',
+      taxable: 23412,
+      tax: 4682.4,
+      cash: 31317.6,
+    },
+  ]) {
+    test(`Rental income uses combined gross and the right tax basis for ${scenario.code || 'a blank code'} @critical`, async ({
+      page,
+    }) => {
+      // Independent working: mixed-br-m1-primary-paye and
+      // mixed-blank-code-combined-projection in the mixed-income fixtures.
+      await setLandscapeViewportIfPortrait(page);
+      await gotoCalculator(page);
+      await selectOption(page, page.getByTestId('tax-year-select'), /2026.*2027/);
+      await page.getByTestId('salary-input').fill('12000');
+      await page.getByTestId('tax-code-input').fill(scenario.code);
+      await page.getByText('Additional Income Sources').click();
+      await page.getByTestId('add-income-source').click();
+      await selectOption(page, page.getByTestId('income-source-0-type'), 'Rental Income');
+      await page.getByTestId('income-source-0-amount').fill('24000');
+      await page.getByTestId('calculate-button').click();
+
+      const summary = page.getByRole('region', { name: 'Tax calculation summary results' });
+      await expect(summary.getByText(scenario.share, { exact: true })).toBeVisible();
+      await expect(summary.getByText(scenario.shareLabel, { exact: true })).toBeVisible();
+      const basis = page.getByTestId('tax-code-basis-notice');
+      await expect(basis).toContainText(scenario.basis);
+      if (scenario.code) {
+        await expect(basis).toContainText('including tax another payer may withhold.');
+      }
+      expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(36000);
+      expect(await getYearlyTableValue(page, scenario.taxableLabel)).toBe(scenario.taxable);
+      expect(await getYearlyTableValue(page, '20% Rate')).toBe(scenario.taxable);
+      expect(await getYearlyTableValue(page, scenario.taxLabel)).toBe(scenario.tax);
+      expect(await getYearlyTableValue(page, 'Net Pay')).toBe(scenario.cash);
+    });
+  }
+
   test('Additional income keeps its pence instead of being scaled up @critical', async ({
     page,
   }) => {
