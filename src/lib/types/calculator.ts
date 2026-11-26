@@ -146,6 +146,8 @@ export interface TaxCodeCalculationBasis {
   kind: 'supplied-code' | 'policy-derived' | 'invalid-code-fallback';
   /** Canonical supplied code when one was accepted. */
   appliedCode: string | null;
+  /** Withholding scope when additional income is included in the cash totals. */
+  payeScope?: 'primary-employment';
   /** Tax-free amount estimated from tax-year policy and the entered circumstances. */
   policyDerivedTaxFreeAmount: number;
   /** Marriage Allowance portion of the policy estimate, before conversion to a tax code. */

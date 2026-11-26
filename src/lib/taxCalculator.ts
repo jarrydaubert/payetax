@@ -467,15 +467,15 @@ export function calculateTax(
   // 3. Calculate adjusted salary and taxable income (annual and monthly)
   // ---------------
 
-  // Adjusted salary (after pre-tax deductions - pension only)
-  const monthlyTaxableAdjustedSalary = payBasis.payeAdjustedPayment.monthly;
+  // A supplied K-family code is modeled on the primary employment's payment.
+  const usesPrimaryEmploymentPaye = hasExplicitValidTaxCode && taxCodeResult.isKCode;
+  const monthlyPayePayment = usesPrimaryEmploymentPaye
+    ? payBasis.primaryEmploymentPayePayment.monthly
+    : payBasis.payeAdjustedPayment.monthly;
 
   // HMRC first retains taxable pay U (including pence) to select a formula via
   // Cvalue/SCvalue, then rounds U down to whole-pound T inside that formula.
-  const unroundedMonthlyTaxableIncome = Math.max(
-    0,
-    monthlyTaxableAdjustedSalary - monthlyTaxFreeAmount,
-  );
+  const unroundedMonthlyTaxableIncome = Math.max(0, monthlyPayePayment - monthlyTaxFreeAmount);
   const monthlyTaxableIncome = getWholePoundMonth1TaxablePay(unroundedMonthlyTaxableIncome);
   const annualTaxableIncome = monthlyTaxableIncome * 12;
 
@@ -574,10 +574,9 @@ export function calculateTax(
   // Overriding limit: PAYE Regulations 2003 (SI 2003/2682) reg 2 caps the tax
   // deducted from a relevant payment at 50% of that payment. Originally a K-code
   // rule, it was extended to all tax codes from 6 April 2015 (SI 2014/2689).
-  // The engine's payment base for the month is gross pay less pre-tax pension.
-  // Floored to the penny: the deduction must never exceed the limit.
-  const monthlyOverridingLimit =
-    Math.floor(Math.max(0, monthlyTaxableAdjustedSalary) * 0.5 * 100) / 100;
+  // Use the same payer's payment for coded PAYE and its cap. Other code families
+  // retain the existing combined-income projection. Floor the cap to the penny.
+  const monthlyOverridingLimit = Math.floor(Math.max(0, monthlyPayePayment) * 0.5 * 100) / 100;
   if (monthlyTax > monthlyOverridingLimit) {
     monthlyTax = monthlyOverridingLimit;
   }
@@ -722,7 +721,7 @@ export function calculateTax(
 
   // Monthly net pay
   const monthlyNetPay =
-    monthlyTaxableAdjustedSalary -
+    payBasis.payeAdjustedPayment.monthly -
     monthlyTax -
     monthlyNationalInsurance -
     monthlyStudentLoan +
@@ -834,6 +833,9 @@ export function calculateTax(
           : 'policy-derived',
       appliedCode: hasExplicitValidTaxCode ? taxCodeResult.normalizedCode : null,
       policyDerivedTaxFreeAmount,
+      ...(usesPrimaryEmploymentPaye && input.incomeSources?.some((source) => source.amount > 0)
+        ? { payeScope: 'primary-employment' }
+        : {}),
       ...(marriageAllowanceAdjustment > 0 ? { marriageAllowanceAdjustment } : {}),
       suppliedTaxFreeAmount:
         hasExplicitValidTaxCode &&

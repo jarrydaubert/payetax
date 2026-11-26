@@ -34,8 +34,11 @@ export function ResultsSummaryCards({ results, input, marginalTaxRate }: Results
   });
 
   const totalTax = results.incomeTax.annually + results.nationalInsurance.annually;
-  const effectiveRate =
-    results.grossSalary.annually > 0 ? (totalTax / results.grossSalary.annually) * 100 : 0;
+  const primaryJobPaye = results.taxCodeBasis?.payeScope === 'primary-employment';
+  const grossIncome = primaryJobPaye
+    ? (results.incomeBreakdown?.total ?? results.grossSalary.annually)
+    : results.grossSalary.annually;
+  const effectiveRate = grossIncome > 0 ? (totalTax / grossIncome) * 100 : 0;
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -51,7 +54,7 @@ export function ResultsSummaryCards({ results, input, marginalTaxRate }: Results
           Relief at source requires a separate calculation.
         </p>
       )}
-      {Boolean(input.incomeSources?.length) && (
+      {!primaryJobPaye && Boolean(input.incomeSources?.length) && (
         <Alert variant='warning' className='mb-3' data-testid='additional-income-result-note'>
           <AlertTriangle className='size-4' aria-hidden='true' />
           <AlertTitle>Additional income accuracy</AlertTitle>
@@ -98,7 +101,7 @@ export function ResultsSummaryCards({ results, input, marginalTaxRate }: Results
         </motion.div>
         <motion.div variants={shouldReduceMotion ? undefined : ANIMATION_VARIANTS.fadeInUp}>
           <ResultCard
-            label='Total Tax & NI'
+            label={primaryJobPaye ? 'Estimated Tax & NI' : 'Total Tax & NI'}
             {...tooltipState('total')}
             value={formatCurrency(totalTax)}
             icon={TrendingDown}
@@ -109,13 +112,17 @@ export function ResultsSummaryCards({ results, input, marginalTaxRate }: Results
         </motion.div>
         <motion.div variants={shouldReduceMotion ? undefined : ANIMATION_VARIANTS.fadeInUp}>
           <ResultCard
-            label='Effective Tax Rate'
+            label={primaryJobPaye ? 'Tax & NI Share of Gross' : 'Effective Tax Rate'}
             {...tooltipState('effective')}
             value={`${effectiveRate.toFixed(1)}%`}
             icon={Percent}
             variant='default'
             delay={0.15}
-            tooltip='The share of your gross pay that goes towards Income Tax and employee National Insurance.'
+            tooltip={
+              primaryJobPaye
+                ? 'The share of combined gross income taken by the PAYE and employee National Insurance shown here.'
+                : 'The share of your gross pay that goes towards Income Tax and employee National Insurance.'
+            }
           />
         </motion.div>
         <motion.div variants={shouldReduceMotion ? undefined : ANIMATION_VARIANTS.fadeInUp}>
@@ -135,11 +142,13 @@ export function ResultsSummaryCards({ results, input, marginalTaxRate }: Results
         className='mt-3 text-sm leading-relaxed text-muted-foreground'
         data-testid='summary-result-note'
       >
-        Monthly take-home is your yearly estimate divided by 12; actual payslips may vary. Total Tax
-        &amp; NI and the effective rate include Income Tax and employee National Insurance only,
-        excluding pension contributions and student loan repayments. The marginal rate estimates the
-        share of an extra £100 a year taken in Income Tax, employee National Insurance and any
-        student loan repayments, using rounded payroll figures; it excludes pension contributions.
+        Monthly take-home is your yearly estimate divided by 12; actual payslips may vary.{' '}
+        {primaryJobPaye
+          ? 'The tax and NI share divides the PAYE and employee National Insurance shown by combined gross income.'
+          : 'Total Tax & NI and the effective rate include Income Tax and employee National Insurance only, excluding pension contributions and student loan repayments.'}{' '}
+        The marginal rate estimates the share of an extra £100 a year taken in Income Tax, employee
+        National Insurance and any student loan repayments, using rounded payroll figures; it
+        excludes pension contributions.
       </p>
     </TooltipProvider>
   );

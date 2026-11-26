@@ -50,5 +50,10 @@ export function getTaxCodeBasisExplanation(basis: TaxCodeCalculationBasis): stri
   }
 
   if (tablesACopy) parts.push(tablesACopy);
+  if (basis.payeScope === 'primary-employment') {
+    parts.push(
+      'We assume this code belongs to your primary job. Taxable pay, tax bands and PAYE cover that job, and the cap uses its relevant payment after salary sacrifice or allowable net-pay pension contributions. Take-home includes your other income before any separate income tax on it, including tax another payer may withhold. Other income can also affect student loan repayments.',
+    );
+  }
   return parts.join(' ');
 }

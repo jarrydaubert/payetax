@@ -4,6 +4,10 @@
     "authority": "UK legislation / HMRC",
     "urls": [
       "https://www.legislation.gov.uk/uksi/2003/2682/regulation/2",
+      "https://www.legislation.gov.uk/uksi/2003/2682/regulation/3",
+      "https://www.legislation.gov.uk/uksi/2003/2682/regulation/4",
+      "https://www.legislation.gov.uk/uksi/2014/2689/pdfs/uksi_20142689_en.pdf",
+      "https://www.gov.uk/government/publications/payroll-technical-specifications-income-tax",
       "https://www.gov.uk/hmrc-internal-manuals/paye-manual/paye11095",
       "https://www.gov.uk/hmrc-internal-manuals/paye-manual/paye70025",
       "https://www.gov.uk/government/publications/tables-a-pay-adjustment-tables",
@@ -11,7 +15,7 @@
       "https://www.gov.uk/guidance/rates-and-thresholds-for-employers-2026-to-2027"
     ],
     "taxYear": "2026-2027",
-    "verifiedOn": "2026-07-18"
+    "verifiedOn": "2026-11-26"
   },
   "tolerancePence": 2,
   "scenarios": [
@@ -163,6 +167,78 @@
         "isValid": true,
         "amount": 25000,
         "meaningIncludes": "add"
+      }
+    },
+    {
+      "id": "k2500-mixed-rental-cap-binds",
+      "description": "The primary employer pays £900 after the £100 net-pay pension. Tables A adds £2,084.10, giving £2,984 whole-pound taxable pay and £596.80 uncapped tax. The £450 cap is half of £900. Combined cash after modeled deductions is £900 + £200 rent - £450 = £650.",
+      "input": {
+        "salary": 1000,
+        "payPeriod": "monthly",
+        "taxYear": "2026-2027",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 100,
+        "pensionContributionType": "amount",
+        "pensionMethod": "net-pay",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 15,
+        "incomeSources": [
+          {
+            "id": "rent",
+            "type": "rental",
+            "amount": 200,
+            "period": "monthly"
+          }
+        ],
+        "taxCode": "K2500 M1"
+      },
+      "expected": {
+        "incomeTaxMonthly": 450,
+        "taxableIncomeAnnual": 35808,
+        "netPayMonthly": 650,
+        "nationalInsuranceMonthly": 0,
+        "taxBandRates": [20]
+      }
+    },
+    {
+      "id": "k1000-mixed-rental-cap-does-not-bind",
+      "description": "Tables A adds £834.09 to the £900 primary payment, giving £1,734 whole-pound taxable pay at 20%. The £346.80 deduction is below £450. Combined cash after modeled deductions is £900 + £200 rent - £346.80 = £753.20.",
+      "input": {
+        "salary": 1000,
+        "payPeriod": "monthly",
+        "taxYear": "2026-2027",
+        "isScottish": false,
+        "isMarried": false,
+        "partnerGrossWage": 0,
+        "isBlind": false,
+        "payNoNI": false,
+        "pensionContribution": 100,
+        "pensionContributionType": "amount",
+        "pensionMethod": "net-pay",
+        "studentLoanPlans": "none",
+        "niCategory": "A",
+        "hoursPerWeek": 15,
+        "incomeSources": [
+          {
+            "id": "rent",
+            "type": "rental",
+            "amount": 200,
+            "period": "monthly"
+          }
+        ],
+        "taxCode": "K1000 M1"
+      },
+      "expected": {
+        "incomeTaxMonthly": 346.8,
+        "taxableIncomeAnnual": 20808,
+        "netPayMonthly": 753.2,
+        "nationalInsuranceMonthly": 0,
+        "taxBandRates": [20]
       }
     }
   ]
