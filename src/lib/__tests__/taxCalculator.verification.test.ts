@@ -185,6 +185,9 @@ describe('PAYE verification fixtures', () => {
                 `${scenario.id} netPay.monthly`,
               );
             }
+            if (expected.taxableIncomeAnnual !== undefined) {
+              expect(result.taxableIncome).toBe(expected.taxableIncomeAnnual);
+            }
             if (expected.taxBandRates !== undefined) {
               expect(result.taxBands.map((band) => band.rate)).toEqual(expected.taxBandRates);
             }

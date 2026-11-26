@@ -34,6 +34,7 @@ export interface FixtureSource {
 /** Exact-value assertions in pounds for the named output period. */
 export interface FixtureExpected {
   taxFreeAmount?: number;
+  taxableIncomeAnnual?: number;
   incomeTaxAnnual?: number;
   incomeTaxMonthly?: number;
   nationalInsuranceAnnual?: number;

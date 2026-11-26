@@ -12,6 +12,7 @@
 
 import { expect, type Locator, type Page, test } from '@playwright/test';
 import { parseCurrencyInput } from '../src/lib/currencyInput';
+import kCodeFixtures from '../src/test/payeVerificationFixtures/k-code-overriding-limit-2026-27.json';
 import pensionFixtures from '../src/test/payeVerificationFixtures/pension-methods-2026-27.json';
 import payrollFixtures from '../src/test/payeVerificationFixtures/salary-guides-payroll-2026-27.json';
 import {
@@ -1277,33 +1278,54 @@ test.describe('Calculator critical @critical', () => {
     expect(newNet - baseNet).toBeCloseTo(projectedAllowance, 2);
   });
 
-  test('Additional rental income shows as "Other Income (No NI)" and is included in gross @critical', async ({
+  test('Rental income increases combined cash without changing primary job K-code PAYE @critical', async ({
     page,
   }) => {
     await setLandscapeViewportIfPortrait(page);
     await gotoCalculator(page);
 
-    await page.getByTestId('salary-input').fill('30000');
+    const fixture = kCodeFixtures.scenarios.find(({ id }) => id === 'k2500-mixed-rental-cap-binds');
+    if (!(fixture?.expected.incomeTaxMonthly && fixture.expected.netPayMonthly)) {
+      throw new Error('Missing the independent mixed-income K-code fixture');
+    }
+
+    await selectOption(page, page.getByTestId('tax-year-select'), /2026.*2027/);
+    await page.getByTestId('salary-input').fill('12000');
+    await page.getByTestId('tax-code-input').fill(fixture.input.taxCode);
+    await page.getByTestId('pension-input').fill('10');
+    await selectOption(
+      page,
+      page.getByRole('combobox', { name: 'Pension method', exact: true }),
+      'Net pay',
+    );
     await page.getByTestId('calculate-button').click();
-    await expect(page.getByTestId('results-table')).toBeVisible();
-
     const baseGross = await getYearlyTableValue(page, 'Gross Pay');
+    expect(baseGross).toBe(12000);
+    const basis = page.getByTestId('tax-code-basis-notice');
+    await expect(basis).not.toContainText('We assume this code belongs to your primary job.');
+    expect(await getYearlyTableValue(page, 'Total Tax Due')).toBe(
+      fixture.expected.incomeTaxMonthly * 12,
+    );
 
-    // Add a rental income source: £1,000 annually.
     await page.getByText('Additional Income Sources').click();
     await page.getByTestId('add-income-source').click();
-
     await selectOption(page, page.getByTestId('income-source-0-type'), 'Rental Income');
-
-    await page.getByTestId('income-source-0-amount').fill('1000');
-
+    await page.getByTestId('income-source-0-amount').fill('2400');
     await page.getByTestId('calculate-button').click();
-    await expect(page.getByTestId('results-table')).toBeVisible();
 
-    await expect(page.getByText('Other Income (No NI)')).toBeVisible();
-
-    const newGross = await getYearlyTableValue(page, 'Gross Pay');
-    expect(newGross).toBeCloseTo(baseGross + 1000, 1);
+    await expect(basis).toContainText('We assume this code belongs to your primary job.');
+    await expect(basis).toContainText('including tax another payer may withhold.');
+    await expect(page.getByText('Tax & NI Share of Gross', { exact: true })).toBeVisible();
+    expect(await getYearlyTableValue(page, 'Other Income (No NI)')).toBe(2400);
+    expect(await getYearlyTableValue(page, 'Gross Pay')).toBe(baseGross + 2400);
+    expect(await getYearlyTableValue(page, 'Primary Job PAYE')).toBe(
+      fixture.expected.incomeTaxMonthly * 12,
+    );
+    expect(await getYearlyTableValue(page, 'Primary Job Taxable Pay')).toBe(
+      fixture.expected.taxableIncomeAnnual,
+    );
+    expect(await getYearlyTableValue(page, '20% Rate')).toBe(fixture.expected.taxableIncomeAnnual);
+    expect(await getYearlyTableValue(page, 'Net Pay')).toBe(fixture.expected.netPayMonthly * 12);
   });
 
   test('Additional income keeps its pence instead of being scaled up @critical', async ({

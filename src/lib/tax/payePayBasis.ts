@@ -32,6 +32,7 @@ export interface PayePayBasis {
   readonly pensionMethod: PensionMethod;
   readonly pensionDeduction: AnnualMonthlyPayBasis;
   readonly adjustedNetIncome: AnnualMonthlyPayBasis;
+  readonly primaryEmploymentPayePayment: AnnualMonthlyPayBasis;
   readonly payeAdjustedPayment: AnnualMonthlyPayBasis;
   readonly niableEmploymentEarnings: AnnualMonthlyPayBasis;
   readonly studentLoanEmploymentEarnings: AnnualMonthlyPayBasis;
@@ -99,6 +100,10 @@ export function derivePayePayBasis(input: PayBasisInput): PayePayBasis {
     Math.max(0, totalGrossIncome.annual - pensionDeduction.annual),
     hoursPerWeek,
   );
+  const primaryEmploymentPayePayment = Object.freeze({
+    annual: primaryEmploymentGross.annual - pensionDeduction.annual,
+    monthly: primaryEmploymentGross.monthly - pensionDeduction.monthly,
+  });
   const payeAdjustedPayment = Object.freeze({
     annual: totalGrossIncome.annual - pensionDeduction.annual,
     monthly: totalGrossIncome.monthly - pensionDeduction.monthly,
@@ -121,6 +126,7 @@ export function derivePayePayBasis(input: PayBasisInput): PayePayBasis {
     pensionMethod,
     pensionDeduction,
     adjustedNetIncome,
+    primaryEmploymentPayePayment,
     payeAdjustedPayment,
     niableEmploymentEarnings,
     // Student Loan deductions are calculated separately for each employment.

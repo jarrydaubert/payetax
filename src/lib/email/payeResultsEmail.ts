@@ -31,18 +31,30 @@ function getPayeEmailYear(results: TaxCalculationResults, fallback?: string): st
   return year ? formatTaxYearForEmail(year) : fallback || '2025-26';
 }
 
+function getPayeEmailSummary(results: TaxCalculationResults) {
+  const primaryJobPaye = results.taxCodeBasis?.payeScope === 'primary-employment';
+  const combinedGross = primaryJobPaye ? results.calculationBasis?.pay.totalGrossIncome : undefined;
+  const grossAnnual = combinedGross?.annual ?? results.grossSalary.annually;
+  const grossMonthly = combinedGross?.monthly ?? results.grossSalary.monthly;
+  const deductions = results.incomeTax.annually + results.nationalInsurance.annually;
+  const effectiveRate = grossAnnual > 0 ? ((deductions / grossAnnual) * 100).toFixed(1) : '0';
+
+  const effectiveRateLabel = primaryJobPaye
+    ? `${effectiveRate}% of combined gross income in estimated tax and NI`
+    : `${effectiveRate}% effective tax rate`;
+
+  return { grossAnnual, grossMonthly, effectiveRateLabel, primaryJobPaye };
+}
+
 export function generatePayeEmailText(
   results: TaxCalculationResults,
   fallbackTaxYear?: string,
 ): string {
-  const effectiveRate =
-    results.grossSalary.annually > 0
-      ? (
-          ((results.incomeTax.annually + results.nationalInsurance.annually) /
-            results.grossSalary.annually) *
-          100
-        ).toFixed(1)
-      : '0';
+  const { grossAnnual, grossMonthly, effectiveRateLabel, primaryJobPaye } =
+    getPayeEmailSummary(results);
+  const labelWidth = primaryJobPaye ? 23 : 20;
+  const grossLabel = primaryJobPaye ? 'Combined Gross Income:' : 'Gross Salary:';
+  const incomeTaxLabel = primaryJobPaye ? 'Primary Job PAYE:' : 'Income Tax:';
 
   const year = getPayeEmailYear(results, fallbackTaxYear);
 
@@ -52,13 +64,13 @@ ${year}
 ${'='.repeat(40)}
 
 TAKE-HOME PAY: ${formatCurrency(results.netPay.annually)}/year
-(${effectiveRate}% effective tax rate)
+(${effectiveRateLabel})
 
 BREAKDOWN
 ---------
-Gross Salary:       ${formatCurrency(results.grossSalary.annually)}  (${formatCurrency(results.grossSalary.monthly)}/mo)
-Income Tax:         -${formatCurrency(results.incomeTax.annually)}  (-${formatCurrency(results.incomeTax.monthly)}/mo)
-National Insurance: -${formatCurrency(results.nationalInsurance.annually)}  (-${formatCurrency(results.nationalInsurance.monthly)}/mo)`;
+${grossLabel.padEnd(labelWidth)}${formatCurrency(grossAnnual)}  (${formatCurrency(grossMonthly)}/mo)
+${incomeTaxLabel.padEnd(labelWidth)}-${formatCurrency(results.incomeTax.annually)}  (-${formatCurrency(results.incomeTax.monthly)}/mo)
+${'National Insurance:'.padEnd(labelWidth)}-${formatCurrency(results.nationalInsurance.annually)}  (-${formatCurrency(results.nationalInsurance.monthly)}/mo)`;
 
   if (results.pensionContribution.annually > 0) {
     text += `
@@ -111,14 +123,8 @@ export function generatePayeEmailHtml(
   const safeTaxCodeBasis = results.taxCodeBasis
     ? escapeHtml(getTaxCodeBasisExplanation(results.taxCodeBasis))
     : null;
-  const effectiveRate =
-    results.grossSalary.annually > 0
-      ? (
-          ((results.incomeTax.annually + results.nationalInsurance.annually) /
-            results.grossSalary.annually) *
-          100
-        ).toFixed(1)
-      : '0';
+  const { grossAnnual, grossMonthly, effectiveRateLabel, primaryJobPaye } =
+    getPayeEmailSummary(results);
 
   return `
 <!DOCTYPE html>
@@ -142,7 +148,7 @@ export function generatePayeEmailHtml(
 </head>
 <body style="margin: 0; padding: 0; background-color: #f8f5ed; color: #07111f; font-family: Arial, Helvetica, sans-serif;">
   <div style="display: none; max-height: 0; overflow: hidden; opacity: 0; color: transparent; font-size: 1px; line-height: 1px;">
-    Your take-home pay: ${formatCurrency(results.netPay.annually)} per year (${effectiveRate}% effective tax rate).
+    Your take-home pay: ${formatCurrency(results.netPay.annually)} per year (${effectiveRateLabel}).
     ${'&nbsp;'.repeat(40)}
   </div>
 
@@ -187,7 +193,7 @@ export function generatePayeEmailHtml(
               <div style="border: 1px solid #123a66; border-left: 4px solid #123a66; background-color: #f2eee4; padding: 20px 22px; margin-bottom: 24px;">
                 <p style="margin: 0 0 8px; color: #123a66; font-family: Menlo, Consolas, monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700;">Take-home pay</p>
                 <p class="money-xl" style="margin: 0; color: #2f6f4e; font-family: Menlo, Consolas, monospace; font-size: 42px; font-weight: 700; line-height: 1.08; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(results.netPay.annually)}</p>
-                <p style="margin: 10px 0 0; color: #465468; font-size: 14px; line-height: 1.5; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(results.netPay.monthly)}/month. ${effectiveRate}% effective tax rate.</p>
+                <p style="margin: 10px 0 0; color: #465468; font-size: 14px; line-height: 1.5; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(results.netPay.monthly)}/month. ${effectiveRateLabel}.</p>
               </div>
 
               <table style="width: 100%; border-collapse: collapse; color: #07111f; font-size: 14px; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">
@@ -200,12 +206,12 @@ export function generatePayeEmailHtml(
         </thead>
         <tbody>
           <tr style="border-bottom: 1px solid #e1dbce;">
-            <td style="padding: 14px 0; color: #07111f; font-weight: 700;">Gross salary</td>
-            <td style="padding: 14px 0; text-align: right; color: #07111f; font-family: Menlo, Consolas, monospace; font-weight: 700;">${formatCurrency(results.grossSalary.annually)}</td>
-            <td class="mobile-hide" style="padding: 14px 0; text-align: right; color: #465468; font-family: Menlo, Consolas, monospace;">${formatCurrency(results.grossSalary.monthly)}</td>
+            <td style="padding: 14px 0; color: #07111f; font-weight: 700;">${primaryJobPaye ? 'Combined gross income' : 'Gross salary'}</td>
+            <td style="padding: 14px 0; text-align: right; color: #07111f; font-family: Menlo, Consolas, monospace; font-weight: 700;">${formatCurrency(grossAnnual)}</td>
+            <td class="mobile-hide" style="padding: 14px 0; text-align: right; color: #465468; font-family: Menlo, Consolas, monospace;">${formatCurrency(grossMonthly)}</td>
           </tr>
           <tr style="border-bottom: 1px solid #e1dbce;">
-            <td style="padding: 14px 0; color: #a6453c;">Income tax</td>
+            <td style="padding: 14px 0; color: #a6453c;">${primaryJobPaye ? 'Primary job PAYE' : 'Income tax'}</td>
             <td style="padding: 14px 0; text-align: right; color: #a6453c; font-family: Menlo, Consolas, monospace;">-${formatCurrency(results.incomeTax.annually)}</td>
             <td class="mobile-hide" style="padding: 14px 0; text-align: right; color: #465468; font-family: Menlo, Consolas, monospace;">-${formatCurrency(results.incomeTax.monthly)}</td>
           </tr>

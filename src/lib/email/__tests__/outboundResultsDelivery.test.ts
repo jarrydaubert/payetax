@@ -107,6 +107,43 @@ describe('sendPayeResultsEmail', () => {
     },
   );
 
+  it.each(['net-pay', 'salary-sacrifice'] as const)(
+    'emails primary job PAYE and combined cash with a %s pension',
+    async (pensionMethod) => {
+      await sendPayeResultsEmail({
+        email: 'user@example.com',
+        input: {
+          ...PAYE_INPUT,
+          salary: 1000,
+          payPeriod: 'monthly',
+          taxCode: 'K2500 M1',
+          pensionContribution: 100,
+          pensionContributionType: 'amount',
+          pensionMethod,
+          hoursPerWeek: 15,
+          incomeSources: [{ type: 'rental', amount: 200, period: 'monthly' }],
+        },
+      });
+
+      const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+      const payload = JSON.parse(String(init.body));
+      expect(payload.subject).toContain('£7,800');
+      expect(payload.textContent).toMatch(/Primary Job PAYE:\s+-£5,400\.00\s+\(-£450\.00\/mo\)/);
+      expect(payload.htmlContent).toMatch(
+        /Primary job PAYE<\/td>\s*<td[^>]*>-£5,400\.00<\/td>\s*<td[^>]*>-£450\.00<\/td>/,
+      );
+      for (const output of [payload.htmlContent, payload.textContent]) {
+        expect(output).toMatch(/combined gross income/i);
+        expect(output).toContain('£14,400');
+        expect(output).toMatch(/primary job PAYE/i);
+        expect(output).toContain('£650');
+        expect(output).toContain('We assume this code belongs to your primary job.');
+        expect(output).toContain('including tax another payer may withhold.');
+        expect(output).toContain('37.5% of combined gross income in estimated tax and NI');
+      }
+    },
+  );
+
   it('rejects unaffordable net-pay deductions before reaching the provider', async () => {
     const result = await sendPayeResultsEmail({
       email: 'user@example.com',

@@ -104,6 +104,7 @@ export function buildResultsTableRows({
   const isKCode = results.taxCodeBasis
     ? results.taxCodeBasis.periodAdjustment === 'additional-pay'
     : parsedTaxCode.isValid && parsedTaxCode.isKCode;
+  const primaryJobPaye = results.taxCodeBasis?.payeScope === 'primary-employment';
   const taxFreeLabel =
     results.taxCodeBasis?.kind === 'supplied-code'
       ? 'Code Tax-Free Amount'
@@ -182,7 +183,7 @@ export function buildResultsTableRows({
     {
       id: 'total-taxable',
       kind: 'taxable',
-      category: 'Total Taxable',
+      category: primaryJobPaye ? 'Primary Job Taxable Pay' : 'Total Taxable',
       annual: results.taxableIncome,
       whatIfAnnual: whatIfResults?.taxableIncome,
       percentage: calculatePercentage(results.taxableIncome, grossAnnual),
@@ -190,7 +191,7 @@ export function buildResultsTableRows({
     {
       id: 'income-tax',
       kind: 'incomeTax',
-      category: 'Total Tax Due',
+      category: primaryJobPaye ? 'Primary Job PAYE' : 'Total Tax Due',
       annual: results.incomeTax.annually,
       whatIfAnnual: whatIfResults?.incomeTax.annually,
       valuesByPeriod: results.incomeTax,
