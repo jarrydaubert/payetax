@@ -43,7 +43,7 @@ function verifyAmounts(
     if (!fields.includes(field)) throw new Error(`${label}: unknown expected field ${field}`);
   }
 
-  const observations = [];
+  const observations: string[] = [];
   for (const field of fields) {
     const fieldLabel = `${label}.${field}`;
     if (!Object.hasOwn(expected, field)) {
@@ -64,7 +64,12 @@ function verifyAmounts(
       const observed = finiteAmount(reference.observed, `${fieldLabel} observed`);
       if (independent === observed)
         throw new Error(`${fieldLabel}: amounts agree; resolve the gap`);
-      observations.push({ field, independent, observed, actual: result });
+      if (result !== observed) {
+        throw new Error(
+          `${fieldLabel}: open observation changed from £${observed} to £${result} (independent £${independent}). Reconcile the reference.`,
+        );
+      }
+      observations.push(field);
       continue;
     }
 
@@ -197,18 +202,11 @@ describe('B · profitable consultancy', () => {
         );
 
         // These checks record current divergence. A change must be reconciled with the official workings.
-        expect(differences.map(({ field }) => field)).toEqual([
+        expect(differences).toEqual([
           strategy === 'allSalary' ? 'incomeTax' : 'dividendTax',
           'totalPersonalTax',
           'takeHome',
         ]);
-        for (const { field, actual, observed, independent } of differences) {
-          if (actual !== observed) {
-            throw new Error(
-              `B ${label}.${field}: open observation changed from £${observed} to £${actual} (independent £${independent}). Reconcile the reference.`,
-            );
-          }
-        }
       },
     );
   });
@@ -299,7 +297,7 @@ describe('Director reference assertion controls', () => {
     ).toThrow(message);
   });
 
-  it('rejects malformed or resolved rounding observations', () => {
+  it('rejects malformed, resolved or changed rounding observations', () => {
     const { comparison } = submit(recruiter.input);
     const actual = comparison.strategies.allDividends;
     expect(() =>
@@ -324,6 +322,14 @@ describe('Director reference assertion controls', () => {
         actual,
       ),
     ).toThrow('salary: amounts agree');
+    expect(() =>
+      verifyAmounts(
+        'control',
+        financialFields,
+        { ...expected, corporationTax: { independent: 1573.19, observed: 1573.2 } },
+        { ...actual, corporationTax: 1573.19 },
+      ),
+    ).toThrow('corporationTax: open observation changed');
   });
 
   it('rejects missing results and missing, unknown or non-finite expectations', () => {

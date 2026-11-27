@@ -14,11 +14,15 @@
 
 import { readFile } from 'node:fs/promises';
 import { type BrowserContext, expect, type Locator, type Page, test } from '@playwright/test';
-import type { TaxYear } from '../src/constants/taxRates';
+import { CURRENT_TAX_YEAR, type TaxYear } from '../src/constants/taxRates';
 import { calculateStrategyComparison } from '../src/lib/tax/strategyComparison';
 import { formatCurrency } from '../src/lib/utils';
 import type { DirectorEmailInput } from '../src/lib/validation/emailValidation';
-import { contractor, recruiter } from '../src/test/directorReferenceFixtures/referenceCompanies';
+import {
+  contractor,
+  recruiter,
+  referenceTaxYear,
+} from '../src/test/directorReferenceFixtures/referenceCompanies';
 import { checkVisibleInputHelp } from './helpers/input-help';
 
 const DIRECTOR_WELCOME_DISMISS_KEY = 'directorGuideWelcome:dismissed:v1';
@@ -1625,9 +1629,16 @@ const referenceWholePounds = new Intl.NumberFormat('en-GB', {
   maximumFractionDigits: 0,
 });
 
+function expectDirectorReferenceYear() {
+  expect(CURRENT_TAX_YEAR, 'Director reference year requires a fixture review').toBe(
+    referenceTaxYear,
+  );
+}
+
 test('JGF-170 A: compares affordably funded low-profit recruiter strategies @critical', async ({
   page,
 }) => {
+  expectDirectorReferenceYear();
   await openDirectorGuide(page);
   // Wait for hydration before entering the first amounts, as in the other Director journeys.
   await page.waitForLoadState('networkidle');
@@ -1712,6 +1723,7 @@ test('JGF-170 A: compares affordably funded low-profit recruiter strategies @cri
 test('JGF-37 / JGF-170 C: uses only the submitted cash and reserves to cap the draw @critical', async ({
   page,
 }) => {
+  expectDirectorReferenceYear();
   await openDirectorGuide(page);
   await page.waitForLoadState('networkidle');
   await selectEngland(page);
@@ -1727,7 +1739,8 @@ test('JGF-37 / JGF-170 C: uses only the submitted cash and reserves to cap the d
   const poundsAndPence = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' });
   const currency = (value: number) =>
     (Number.isInteger(value) ? referenceWholePounds : poundsAndPence).format(value);
-  const { blank, payable, bufferShort, zeroBank, withPayroll } = contractor.cash;
+  const { blank, explicitZero, payable, exhausted, bufferShort, zeroBank, withPayroll } =
+    contractor.cash;
   const expectDraw = async (
     expected: (typeof contractor.cash)[keyof typeof contractor.cash]['expected'],
   ) => {
@@ -1808,9 +1821,21 @@ test('JGF-37 / JGF-170 C: uses only the submitted cash and reserves to cap the d
   await expectDraw(payable.expected);
 
   await ensureInputsPanelIsVisible(page, bank);
+  await fillCurrencyInput(commitments, exhausted.input.additionalCommittedCash);
+  await calculateAndView(page);
+  await expectDraw(exhausted.expected);
+
+  await ensureInputsPanelIsVisible(page, bank);
   await fillCurrencyInput(commitments, bufferShort.input.additionalCommittedCash);
   await calculateAndView(page);
   await expectDraw(bufferShort.expected);
+
+  await ensureInputsPanelIsVisible(page, bank);
+  await fillCurrencyInput(commitments, explicitZero.input.additionalCommittedCash);
+  await calculateAndView(page);
+  await expectDraw(explicitZero.expected);
+  await expect(panel.getByText(/Additional commitments were left blank/)).toHaveCount(0);
+  await expect(panel).toContainText('deducts £0 in additional commitments');
 
   await ensureInputsPanelIsVisible(page, bank);
   await replaceText(commitments, '');
