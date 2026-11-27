@@ -40,6 +40,7 @@ export interface SafeDrawInput {
   monthsRemaining: number;
   cashInBank: number;
   companyTaxReserve?: number;
+  additionalCommittedCash?: number;
   minimumMonthlyDraw: number;
   runwayMonths: number;
   monthlyExpenses: number | undefined;
@@ -136,6 +137,7 @@ export function calculateSafeMonthlyDraw(input: SafeDrawInput): SafeDrawResult {
   const annualTakeHome = sanitizeNonNegative(input.annualTakeHome);
   const cashInBank = sanitizeNonNegative(input.cashInBank);
   const companyTaxReserve = sanitizeNonNegative(input.companyTaxReserve);
+  const additionalCommittedCash = sanitizeNonNegative(input.additionalCommittedCash);
   const minimumMonthlyDraw = sanitizeNonNegative(input.minimumMonthlyDraw);
   const runwayMonths = Math.max(0, Math.floor(input.runwayMonths));
   const monthlyExpenses = sanitizeNonNegative(input.monthlyExpenses);
@@ -143,11 +145,13 @@ export function calculateSafeMonthlyDraw(input: SafeDrawInput): SafeDrawResult {
   const taxBasedMonthlyDraw =
     monthsRemaining > 0 ? roundToPence(annualTakeHome / monthsRemaining) : 0;
   const requiredBuffer = roundToPence(runwayMonths * (minimumMonthlyDraw + monthlyExpenses));
-  const cashAfterTax = roundToPence(Math.max(0, cashInBank - companyTaxReserve));
-  const cashBasedCeiling = roundToPence(Math.max(0, cashAfterTax - requiredBuffer));
+  const cashAfterReserves = roundToPence(
+    Math.max(0, cashInBank - companyTaxReserve - additionalCommittedCash),
+  );
+  const cashBasedCeiling = roundToPence(Math.max(0, cashAfterReserves - requiredBuffer));
   const safeMonthlyDraw = Math.min(taxBasedMonthlyDraw, cashBasedCeiling);
   const spendingShortfall = roundToPence(Math.max(0, minimumMonthlyDraw - safeMonthlyDraw));
-  const shortfall = roundToPence(Math.max(0, requiredBuffer - cashAfterTax));
+  const shortfall = roundToPence(Math.max(0, requiredBuffer - cashAfterReserves));
   const hasBufferShortfall = shortfall > 0;
   const hasContractEndRisk = monthsRemaining <= runwayMonths;
 

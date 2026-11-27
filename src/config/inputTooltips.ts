@@ -141,7 +141,7 @@ export const INPUT_TOOLTIPS = {
   directorCashInBank: {
     title: 'Cash In Bank',
     description:
-      "The money currently in your company's bank account, available for bills and paying yourself. Use the bank balance rather than profit shown in your accounts.",
+      "Enter the current balance in your company's bank account before setting aside reserves or additional commitments.",
   },
   directorMinimumMonthlyDraw: {
     title: 'Minimum Monthly Draw',

@@ -120,8 +120,13 @@ test.describe('Director Intelligence recruiter regression', () => {
     await expect(page.getByRole('heading', { name: 'Compare Strategies' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Monthly Draw Estimate' })).toBeVisible();
     await expect(
-      page.getByText('Available this month', { exact: true }).locator('..'),
-    ).toContainText('£0/mo');
+      page
+        .getByRole('heading', { name: 'Monthly Draw Estimate' })
+        .locator('..')
+        .getByText('Estimated draw this month', { exact: true })
+        .locator('..')
+        .getByText('£0', { exact: true }),
+    ).toBeVisible();
     await expect(
       page.getByText('£533/mo below your spending target', { exact: true }),
     ).toBeVisible();

@@ -196,6 +196,41 @@ describe('variableIncome helpers', () => {
       expect(result.spendingShortfall).toBe(899.4);
     });
 
+    // £8,500 less £2,850 reserved tax and 3 × (£900 + £250) leaves £2,200
+    // before additional commitments. £12,150 projected take-home caps the draw at £1,012.50.
+    it.each([
+      [8500, undefined, 2200, 1012.5, 0, 0],
+      [8500, 0, 2200, 1012.5, 0, 0],
+      [8500, 1500, 700, 700, 200, 0],
+      [8500, 2200, 0, 0, 900, 0],
+      [8500, 2500, 0, 0, 900, 300],
+      [0, undefined, 0, 0, 900, 3450],
+    ])(
+      'with £%i in bank and %s committed, cash headroom is £%i and the draw is £%i',
+      (cashInBank, additionalCommittedCash, cashBasedCeiling, draw, spendingGap, bufferGap) => {
+        const result = calculateSafeMonthlyDraw({
+          annualTakeHome: 12150,
+          monthsRemaining: 12,
+          cashInBank,
+          companyTaxReserve: 2850,
+          additionalCommittedCash,
+          minimumMonthlyDraw: 900,
+          runwayMonths: 3,
+          monthlyExpenses: 250,
+        });
+
+        expect(result).toMatchObject({
+          taxBasedMonthlyDraw: 1012.5,
+          requiredBuffer: 3450,
+          cashBasedCeiling,
+          safeMonthlyDraw: draw,
+          spendingShortfall: spendingGap,
+          shortfall: bufferGap,
+          hasBufferShortfall: bufferGap > 0,
+        });
+      },
+    );
+
     it('has no projected draw outside the projection period', () => {
       const result = calculateSafeMonthlyDraw({
         annualTakeHome: 24000,

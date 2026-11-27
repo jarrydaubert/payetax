@@ -18,11 +18,11 @@ interface SummaryCardsProps {
 
 export function SummaryCards({ className, monthlyDraw }: SummaryCardsProps) {
   const { activeScenario } = useActiveDirectorScenario();
-  const mode = useSubmittedDirectorForm()?.mode;
-  const isMonthlyMode = mode === 'monthly';
+  const formData = useSubmittedDirectorForm();
+  const isMonthlyMode = formData?.mode === 'monthly';
 
   const hasResults = activeScenario !== null;
-  const monthlyLabel = isMonthlyMode ? 'Monthly Draw Estimate' : 'Average Monthly Take-Home';
+  const monthlyLabel = isMonthlyMode ? 'Estimated draw this month' : 'Average Monthly Take-Home';
   const monthlyDrawLabel = isMonthlyMode
     ? formatCurrencyInputValue(monthlyDraw) || '—'
     : hasResults
@@ -37,7 +37,9 @@ export function SummaryCards({ className, monthlyDraw }: SummaryCardsProps) {
       label: monthlyLabel,
       value: monthlyDrawLabel,
       subtext: isMonthlyMode
-        ? 'Based on current cash and projected take-home'
+        ? formData.additionalCommittedCash === undefined
+          ? 'Additional commitments were left blank and are excluded'
+          : 'After submitted commitments, tax reserve and buffer'
         : 'After all taxes (illustrative)',
       highlight: true,
       ariaDescription:

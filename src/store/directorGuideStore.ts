@@ -148,6 +148,7 @@ export interface DirectorFormData {
   monthlyExpenses: number | undefined;
   contractStartMonth: number; // 1-12
   cashInBank: number;
+  additionalCommittedCash?: number;
   minimumMonthlyDraw: number;
   runwayMonths: number;
 }
@@ -159,6 +160,7 @@ export type DirectorInputField =
   | 'monthlyIncome'
   | 'monthlyExpenses'
   | 'cashInBank'
+  | 'additionalCommittedCash'
   | 'minimumMonthlyDraw'
   | 'ytdSalary'
   | 'ytdDividends'
@@ -205,6 +207,7 @@ const FIELDS_UNUSED_BY_MODE: Record<DirectorGuideMode, ReadonlySet<DirectorInput
     'monthlyIncome',
     'monthlyExpenses',
     'cashInBank',
+    'additionalCommittedCash',
     'minimumMonthlyDraw',
   ]),
   monthly: new Set<DirectorInputField>(['revenue', 'expenses']),
@@ -274,18 +277,24 @@ function validateDirectorFields(state: DirectorGuideState) {
 
 export function hasCurrentDirectorResults(state: DirectorGuideState) {
   const scenario = state.calculatedDraftScenario;
+  // A commitment-only draft leaves the last submitted results visible.
+  const submittedCommitment = state.calculatedFormData?.additionalCommittedCash;
+  const comparableForm =
+    state.formData.additionalCommittedCash === submittedCommitment
+      ? state.formData
+      : { ...state.formData, additionalCommittedCash: submittedCommitment };
   return (
     scenario !== null &&
     !(state.isCalculating || state.error) &&
     state.strategyComparison !== null &&
     state.calculatedStrategy !== null &&
-    shallow(state.calculatedFormData, state.formData) &&
+    shallow(state.calculatedFormData, comparableForm) &&
     scenario.selectedStrategy === state.selectedStrategy &&
     scenario.sliderSalary === state.sliderSalary &&
     scenario.profitWhatIfPercent === state.profitWhatIfPercent &&
     scenario.objective === state.objective &&
     !hasUnappliedYourSetup(state) &&
-    !hasBlockingInputErrors(state)
+    getBlockingInputFields(state).every((field) => field === 'additionalCommittedCash')
   );
 }
 
@@ -364,6 +373,7 @@ interface DirectorGuideActions {
   setMonthlyExpenses: (amount: number | undefined) => void;
   setContractStartMonth: (month: number) => void;
   setCashInBank: (amount: number) => void;
+  setAdditionalCommittedCash: (amount: number | undefined) => void;
   setMinimumMonthlyDraw: (amount: number) => void;
   setRunwayMonths: (months: number) => void;
 
@@ -416,6 +426,7 @@ const defaultFormData: DirectorFormData = {
   monthlyExpenses: undefined,
   contractStartMonth: 4,
   cashInBank: 0,
+  additionalCommittedCash: undefined,
   minimumMonthlyDraw: 0,
   runwayMonths: 3,
 };
@@ -483,6 +494,7 @@ const PersistedDirectorFormDataSchema = z
     monthlyExpenses: CurrencyAmountSchema.optional(),
     contractStartMonth: z.number().int().min(1).max(12).optional(),
     cashInBank: CurrencyAmountSchema.optional(),
+    additionalCommittedCash: CurrencyAmountSchema.optional(),
     minimumMonthlyDraw: CurrencyAmountSchema.optional(),
     runwayMonths: z.number().int().min(0).max(36).optional(),
   })
@@ -835,6 +847,14 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
           }));
         },
 
+        setAdditionalCommittedCash: (amount) => {
+          const validated = CurrencyAmountSchema.optional().safeParse(amount);
+          if (!validated.success) return;
+          set((state) => ({
+            formData: { ...state.formData, additionalCommittedCash: validated.data },
+          }));
+        },
+
         setMinimumMonthlyDraw: (amount) => {
           const validated = CurrencyAmountSchema.safeParse(amount);
           if (!validated.success) return;
@@ -902,10 +922,14 @@ export const useDirectorGuideStore = create<DirectorGuideStore>()(
 
           const validation = validateDirectorFields(state);
           if (!validation.valid) {
+            const commitmentOnly =
+              validation.fields.length === 1 &&
+              validation.fields[0] === 'additionalCommittedCash' &&
+              !hasUnappliedYourSetup(state);
             set({
-              error: validation.error,
+              error: commitmentOnly ? null : validation.error,
               fieldValidationSummary:
-                validation.fields.length > 1
+                commitmentOnly || validation.fields.length > 1
                   ? {
                       mode: formData.mode,
                       fields: validation.fields,
@@ -1203,6 +1227,16 @@ export function useHasDirectorInputErrors() {
   return useDirectorGuideStore(hasBlockingInputErrors);
 }
 
+export function useHasUnsubmittedDirectorCommitment() {
+  return useDirectorGuideStore(
+    (state) =>
+      state.calculatedFormData?.mode === 'monthly' &&
+      (Boolean(state.inputErrors.additionalCommittedCash) ||
+        state.formData.additionalCommittedCash !==
+          state.calculatedFormData.additionalCommittedCash),
+  );
+}
+
 /**
  * Hook for every field's invalid text (including fields the current mode does not use)
  */
@@ -1307,6 +1341,7 @@ export function useDirectorGuideActions() {
       setMonthlyExpenses: state.setMonthlyExpenses,
       setContractStartMonth: state.setContractStartMonth,
       setCashInBank: state.setCashInBank,
+      setAdditionalCommittedCash: state.setAdditionalCommittedCash,
       setMinimumMonthlyDraw: state.setMinimumMonthlyDraw,
       setRunwayMonths: state.setRunwayMonths,
       // UI actions
