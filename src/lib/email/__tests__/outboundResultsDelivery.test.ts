@@ -45,25 +45,34 @@ describe('sendPayeResultsEmail', () => {
     }
   });
 
-  it('recomputes results server-side and emails them to the requested recipient', async () => {
-    const result = await sendPayeResultsEmail({ email: 'user@example.com', input: PAYE_INPUT });
+  it.each([[undefined], [[{ type: 'rental', amount: 0, period: 'monthly' }]]] as const)(
+    'recomputes and emails salary figures with additional income %j',
+    async (incomeSources) => {
+      const result = await sendPayeResultsEmail({
+        email: 'user@example.com',
+        input: { ...PAYE_INPUT, incomeSources: incomeSources ? [...incomeSources] : undefined },
+      });
 
-    expect(result).toEqual({ ok: true });
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({ ok: true });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
 
-    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    const payload = JSON.parse(String(init.body));
+      const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+      const payload = JSON.parse(String(init.body));
 
-    expect(payload.to).toEqual([{ email: 'user@example.com' }]);
-    // Subject embeds the server-computed annual take-home, not client-supplied data.
-    expect(payload.subject).toMatch(/^Your UK Tax Calculation - £[\d,]+(\.\d{2})? take-home$/);
-    expect(payload.htmlContent).toContain('2026-27');
-    for (const output of [payload.htmlContent, payload.textContent]) {
-      expect(output).not.toMatch(
-        /pension|salary sacrifice|relief at source|employer national insurance/i,
-      );
-    }
-  });
+      expect(payload.to).toEqual([{ email: 'user@example.com' }]);
+      // Subject embeds the server-computed annual take-home, not client-supplied data.
+      expect(payload.subject).toMatch(/^Your UK Tax Calculation - £[\d,]+(\.\d{2})? take-home$/);
+      expect(payload.htmlContent).toContain('2026-27');
+      for (const output of [payload.htmlContent, payload.textContent]) {
+        expect(output).toMatch(/gross salary/i);
+        expect(output).toContain('£50,000.00');
+        expect(output).toContain('£4,166.67');
+        expect(output).not.toMatch(
+          /pension|salary sacrifice|relief at source|employer national insurance/i,
+        );
+      }
+    },
+  );
 
   it.each([
     ['net-pay', 'Net pay', '35,703.60'],

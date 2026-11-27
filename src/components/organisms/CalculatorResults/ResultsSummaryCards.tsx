@@ -83,7 +83,11 @@ export function ResultsSummaryCards({ results, input, marginalTaxRate }: Results
             icon={Wallet}
             variant='success'
             delay={0}
-            tooltip='Your yearly pay after Income Tax, National Insurance, pension contributions and student loan repayments.'
+            tooltip={
+              primaryJobPaye
+                ? 'Your yearly income after the deductions shown. It includes other income before any separate tax or withholding on it.'
+                : 'Your yearly pay after Income Tax, National Insurance, pension contributions and student loan repayments.'
+            }
           />
         </motion.div>
         <motion.div

@@ -33,11 +33,13 @@ function getPayeEmailYear(results: TaxCalculationResults, fallback?: string): st
 
 function getPayeEmailSummary(results: TaxCalculationResults) {
   const primaryJobPaye = results.taxCodeBasis?.payeScope === 'primary-employment';
-  const totalGross = results.calculationBasis?.pay.totalGrossIncome;
+  const pay = results.calculationBasis?.pay;
+  const totalGross = pay?.totalGrossIncome;
   const grossAnnual =
     totalGross?.annual ?? results.incomeBreakdown?.total ?? results.grossSalary.annually;
   const grossMonthly = totalGross?.monthly ?? results.grossSalary.monthly;
-  const hasCombinedGross = Boolean(results.incomeBreakdown);
+  const primaryGross = pay?.primaryEmploymentGross.annual ?? results.grossSalary.annually;
+  const hasCombinedGross = grossAnnual > primaryGross;
   const deductions = results.incomeTax.annually + results.nationalInsurance.annually;
   const effectiveRate = grossAnnual > 0 ? ((deductions / grossAnnual) * 100).toFixed(1) : '0';
 
