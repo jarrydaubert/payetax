@@ -220,6 +220,7 @@ export const contractor = {
       employerNI: 1135.5,
       employeeNI: 0,
       taxableProfit: 1894.5,
+      // Exact £359.955 uses the portfolio's half-up CT planning convention.
       corporationTax: 359.96,
       dividends: 1534.54,
       incomeTax: 0,

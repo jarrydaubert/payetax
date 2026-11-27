@@ -78,7 +78,7 @@ function verifyAmounts(
 
 function submit(input: Partial<DirectorFormData>, strategy?: DirectorStrategyKey) {
   const store = useDirectorGuideStore;
-  store.getState().clearStaleState();
+  store.setState(store.getInitialState(), true);
   store.setState(({ formData }) => ({ formData: { ...formData, ...input } }));
   if (strategy) store.getState().setSelectedStrategy(strategy);
   store.getState().calculate();
@@ -101,7 +101,7 @@ beforeAll(() => {
   expect(CURRENT_TAX_YEAR).toBe(referenceTaxYear);
 });
 
-afterEach(() => useDirectorGuideStore.getState().clearStaleState());
+afterEach(() => useDirectorGuideStore.setState(useDirectorGuideStore.getInitialState(), true));
 
 describe('A · low-profit recruiter', () => {
   it('publishes the affordable salary, LEL setup and all-dividend comparison', () => {
@@ -186,7 +186,7 @@ describe('B · profitable consultancy', () => {
         expected: consultancy.expected.tradingLoss,
       },
     ] as const)(
-      'checks supported components and reports the open differences for $label',
+      'checks supported components and characterises the open differences for $label',
       ({ label, input, strategy, expected }) => {
         const { comparison, selected } = submit(input, strategy);
         const differences = verifyAmounts(
@@ -216,7 +216,7 @@ describe('B · profitable consultancy', () => {
 
 describe('C · cash-constrained contractor', () => {
   it.each(Object.entries(contractor.cash))(
-    'publishes the projection and cash result for %s',
+    'applies the cash helper to the submitted figures for %s',
     (variant, scenario) => {
       const strategy = variant === 'withPayroll' ? 'optimalMix' : 'allDividends';
       const { form, selected, projection, comparison } = submit(
@@ -276,6 +276,33 @@ describe('Director reference assertion controls', () => {
     expect(() =>
       verifyAmounts('control', financialFields, expected, { ...actual, ...change }),
     ).toThrow(message);
+  });
+
+  it('rejects malformed or resolved rounding observations', () => {
+    const { comparison } = submit(recruiter.input);
+    const actual = comparison.strategies.allDividends;
+    expect(() =>
+      verifyAmounts(
+        'control',
+        financialFields,
+        {
+          ...expected,
+          salary: { independent: 0, observed: 0, extra: 1 },
+        },
+        actual,
+      ),
+    ).toThrow('salary: invalid unresolved observation');
+    expect(() =>
+      verifyAmounts(
+        'control',
+        financialFields,
+        {
+          ...expected,
+          salary: { independent: 0, observed: 0 },
+        },
+        actual,
+      ),
+    ).toThrow('salary: amounts agree');
   });
 
   it('rejects missing results and missing, unknown or non-finite expectations', () => {

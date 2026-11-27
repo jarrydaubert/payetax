@@ -1648,11 +1648,17 @@ test('JGF-170 A: compares affordably funded low-profit recruiter strategies @cri
   const date = amount('Company Accounting Period End');
   await date.fill(recruiter.input.accountingPeriodEnd);
   await date.blur();
+  const strategies = page.getByRole('region', { name: 'Strategy comparison' });
+  await expect(strategies).toHaveCount(0);
+  await calculateAndView(page);
+  await expect(strategies.getByRole('heading', { name: 'Your Setup' })).toBeVisible();
+  await expect(strategies.getByText('Not set.', { exact: true })).toBeVisible();
+
+  await ensureInputsPanelIsVisible(page);
   await button('Full Inputs').click();
   await fillCurrencyInput(amount('Your Current Salary'), recruiter.input.yourSetupSalary);
   await fillCurrencyInput(amount('Your Current Dividends'), recruiter.input.yourSetupDividends);
   await button('Apply').click();
-  const strategies = page.getByRole('region', { name: 'Strategy comparison' });
   await expect(strategies).toHaveCount(0);
   await calculateAndView(page);
 
@@ -1718,12 +1724,9 @@ test('JGF-37 / JGF-170 C: uses only the submitted cash and reserves to cap the d
     .filter({ visible: true });
   const panel = page.getByRole('heading', { name: 'Monthly Draw Estimate' }).locator('..');
   const draw = panel.getByText('Estimated draw this month', { exact: true }).locator('..');
-  const currency = new Intl.NumberFormat('en-GB', {
-    style: 'currency',
-    currency: 'GBP',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format;
+  const poundsAndPence = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' });
+  const currency = (value: number) =>
+    (Number.isInteger(value) ? referenceWholePounds : poundsAndPence).format(value);
   const { blank, payable, bufferShort, zeroBank, withPayroll } = contractor.cash;
   const expectDraw = async (
     expected: (typeof contractor.cash)[keyof typeof contractor.cash]['expected'],

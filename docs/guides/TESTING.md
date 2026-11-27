@@ -181,7 +181,8 @@ The three calculation-evidence layers have different jobs within the broader tes
 1. **Independent full-calculation fixtures.** The PAYE JSON suites and the Director
    reference portfolio anchor representative calculations to official sources. Keep the
    expected amounts independent of production constants, output and generated golden masters.
-   Resolve disagreements against the derivation and primary evidence before changing either side.
+   Never copy engine output into an independent expectation. A separately named observation may
+   record a divergence as evidence. Resolve disagreements against the derivation and primary evidence.
 2. **TypeScript rule and boundary tests.** Pin mechanics, invariants, validation, band edges,
    rounding, regional behaviour and cross-route consistency. Use statutory numbers independent
    of stored thresholds where a boundary assertion must detect policy drift.
@@ -210,7 +211,9 @@ The PAYE loader reads every JSON file in `src/test/payeVerificationFixtures/` as
 The [Director financial references](../../src/test/directorReferenceFixtures/README.md) live
 alongside it. The portfolio includes five fictional companies with source-backed workings,
 explicit periods and scope limits. The Jest suite submits A, B and C through the production
-Director store and checks the material financial components exactly. The amount assertions
+Director store and checks material financial components exactly. In C, Jest also exercises the
+production cash helper with submitted figures. The browser covers how the route combines those
+figures and both company reserves. The amount assertions
 reject unknown or missing fields and non-finite values, with negative controls using
 submitted results. Named observations keep the four open B rounding discrepancies explicit.
 D and E remain reproducible references with owners until the applicable product behaviour
