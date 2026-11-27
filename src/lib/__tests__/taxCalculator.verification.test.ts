@@ -10,6 +10,9 @@
  *   bunx jest src/lib/__tests__/taxCalculator.verification.test.ts
  */
 
+import { mkdtempSync, rmdirSync, unlinkSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import type { PayPeriod } from '@/constants/taxRates';
 import { getPayePensionInputIssue } from '@/lib/tax';
 import { decodeTaxCode } from '@/lib/tax-code-decoder';
@@ -33,12 +36,21 @@ const CHECKED_PERIODS: PayPeriod[] = [
   'daily',
 ];
 
+function requireFiniteNumber(value: unknown, label: string): void {
+  if (!Number.isFinite(value)) {
+    throw new Error(`${label}: expected a finite number, got ${String(value)}`);
+  }
+}
+
 function expectWithinTolerance(
   actual: number,
   expected: number,
   tolerancePence: number,
   label: string,
 ): void {
+  requireFiniteNumber(actual, `${label} actual`);
+  requireFiniteNumber(expected, `${label} expected`);
+  requireFiniteNumber(tolerancePence, `${label} tolerancePence`);
   const differencePence = Math.abs(actual - expected) * 100;
   if (differencePence > tolerancePence) {
     throw new Error(
@@ -54,9 +66,14 @@ function checkInvariant(
 ): void {
   switch (invariant) {
     case 'employee-ni-is-zero':
+      requireFiniteNumber(
+        result.nationalInsurance.annually,
+        `${scenario.id} nationalInsurance.annually`,
+      );
       expect(result.nationalInsurance.annually).toBe(0);
       break;
     case 'employer-ni-is-positive':
+      requireFiniteNumber(result.employerNI, `${scenario.id} employerNI`);
       expect(result.employerNI).toBeGreaterThan(0);
       break;
     case 'income-tax-within-overriding-limit':
@@ -65,11 +82,14 @@ function checkInvariant(
       // as a pre-tax deduction, so the payment base is gross minus pension.
       for (const period of CHECKED_PERIODS) {
         const paymentBase = result.grossSalary[period] - result.pensionContribution[period];
+        requireFiniteNumber(paymentBase, `${scenario.id} payePayment.${period}`);
+        requireFiniteNumber(result.incomeTax[period], `${scenario.id} incomeTax.${period}`);
         // Half-penny headroom absorbs pence rounding of scaled period values.
         expect(result.incomeTax[period]).toBeLessThanOrEqual(paymentBase * 0.5 + 0.005);
       }
       break;
     case 'tax-free-amount-is-standard-personal-allowance':
+      requireFiniteNumber(result.taxFreeAmount, `${scenario.id} taxFreeAmount`);
       expect(result.taxFreeAmount).toBe(12570);
       break;
     default: {
@@ -78,6 +98,133 @@ function checkInvariant(
     }
   }
 }
+
+describe('PAYE verification numerical controls', () => {
+  it.each([
+    ['NaN actual', NaN, 200, 0, 'actual'],
+    ['missing actual', undefined as unknown as number, 200, 0, 'actual'],
+    ['NaN expected', 200, NaN, 0, 'expected'],
+    ['infinite expected', 200, Infinity, 0, 'expected'],
+    ['matching infinities', Infinity, Infinity, 0, 'actual'],
+    ['NaN tolerance', 201, 200, NaN, 'tolerancePence'],
+    ['infinite tolerance', 201, 200, Infinity, 'tolerancePence'],
+  ] as const)(
+    'rejects %s in the monetary assertion',
+    (_case, actual, expected, tolerance, field) => {
+      expect(() =>
+        expectWithinTolerance(actual, expected, tolerance, 'control incomeTax.monthly'),
+      ).toThrow(`control incomeTax.monthly ${field}: expected a finite number`);
+    },
+  );
+
+  it('honours zero and positive tolerances for finite amounts', () => {
+    expectWithinTolerance(200, 200, 0, 'control incomeTax.monthly');
+    expectWithinTolerance(200.01, 200, 2, 'control incomeTax.monthly');
+    expect(() => expectWithinTolerance(201, 200, 2, 'control incomeTax.monthly')).toThrow(
+      'control incomeTax.monthly: expected 200 ±2p from official sources, got 201',
+    );
+  });
+
+  it.each([
+    [
+      'employer-ni-is-positive',
+      'employerNI',
+      (result: TaxCalculationResults) => ({
+        ...result,
+        employerNI: Infinity,
+      }),
+    ],
+    [
+      'income-tax-within-overriding-limit',
+      'incomeTax.annually',
+      (result: TaxCalculationResults) => ({
+        ...result,
+        incomeTax: { ...result.incomeTax, annually: -Infinity },
+      }),
+    ],
+    [
+      'income-tax-within-overriding-limit',
+      'payePayment.annually',
+      (result: TaxCalculationResults) => ({
+        ...result,
+        grossSalary: { ...result.grossSalary, annually: Infinity },
+      }),
+    ],
+  ] as const)('rejects an invalid %s invariant operand in %s', (invariant, field, corrupt) => {
+    const scenario = suites
+      .flatMap(({ scenarios }) => scenarios)
+      .find(({ id }) => id === 'uk-40k-1257L');
+    if (!scenario) throw new Error('Missing independent £40,000 fixture');
+    const finite = calculateTax(scenario.input);
+    checkInvariant(invariant, scenario, finite);
+    expect(() => checkInvariant(invariant, scenario, corrupt(finite))).toThrow(
+      `uk-40k-1257L ${field}: expected a finite number`,
+    );
+  });
+
+  it.each([
+    ['overflow tolerance', 'tolerancePence', { tolerancePence: 'overflow' }, {}],
+    ['negative tolerance', 'tolerancePence', { tolerancePence: -1 }, {}],
+    [
+      'overflow money',
+      'expected.incomeTaxAnnual',
+      {},
+      { expected: { incomeTaxAnnual: 'overflow' } },
+    ],
+    [
+      'overflow exact amount',
+      'expected.taxableIncomeAnnual',
+      {},
+      { expected: { taxableIncomeAnnual: 'overflow' } },
+    ],
+    [
+      'overflow band rate',
+      'expected.taxBandRates',
+      {},
+      { expected: { taxBandRates: ['overflow'] } },
+    ],
+    [
+      'overflow decoder amount',
+      'decoder.amount',
+      {},
+      { decoder: { isValid: true, amount: 'overflow', meaningIncludes: 'allowance' } },
+    ],
+  ] as const)('rejects %s during fixture loading', (_case, field, suitePatch, scenarioPatch) => {
+    const directory = mkdtempSync(join(tmpdir(), 'payetax-paye-fixture-'));
+    const file = join(directory, 'control.json');
+    const fixture = {
+      suite: 'Numeric control',
+      source: {
+        authority: 'Control',
+        urls: ['control'],
+        taxYear: '2026-2027',
+        verifiedOn: '2026-11-26',
+      },
+      tolerancePence: 0,
+      scenarios: [
+        {
+          id: 'negative-control',
+          description: 'intentionally invalid expectation',
+          input: { salary: 1000, taxCode: 'BR' },
+          expected: { incomeTaxAnnual: 200 },
+          ...scenarioPatch,
+        },
+      ],
+      ...suitePatch,
+    };
+    writeFileSync(file, JSON.stringify(fixture).replaceAll('"overflow"', '1e309'), 'utf8');
+    try {
+      const diagnostic =
+        field === 'tolerancePence' ? '"tolerancePence"' : `scenario "negative-control" ${field}`;
+      expect(() => loadVerificationSuites(directory)).toThrow(
+        `Invalid verification fixture control.json: ${diagnostic}`,
+      );
+    } finally {
+      unlinkSync(file);
+      rmdirSync(directory);
+    }
+  });
+});
 
 describe('PAYE verification fixtures', () => {
   it('loads all fixture suites with scenarios', () => {
@@ -103,6 +250,7 @@ describe('PAYE verification fixtures', () => {
               );
             }
             if (expected.taxFreeAmount !== undefined) {
+              requireFiniteNumber(result.taxFreeAmount, `${scenario.id} taxFreeAmount`);
               expect(result.taxFreeAmount).toBe(expected.taxFreeAmount);
             }
             if (expected.incomeTaxAnnual !== undefined) {
@@ -186,10 +334,15 @@ describe('PAYE verification fixtures', () => {
               );
             }
             if (expected.taxableIncomeAnnual !== undefined) {
+              requireFiniteNumber(result.taxableIncome, `${scenario.id} taxableIncomeAnnual`);
               expect(result.taxableIncome).toBe(expected.taxableIncomeAnnual);
             }
             if (expected.taxBandRates !== undefined) {
-              expect(result.taxBands.map((band) => band.rate)).toEqual(expected.taxBandRates);
+              const rates = result.taxBands.map(({ rate }, index) => {
+                requireFiniteNumber(rate, `${scenario.id} taxBands[${index}].rate`);
+                return rate;
+              });
+              expect(rates).toEqual(expected.taxBandRates);
             }
           }
 
@@ -200,6 +353,9 @@ describe('PAYE verification fixtures', () => {
           if (scenario.decoder) {
             const decoded = decodeTaxCode(scenario.input.taxCode);
             expect(decoded.isValid).toBe(scenario.decoder.isValid);
+            if (decoded.amount !== null) {
+              requireFiniteNumber(decoded.amount, `${scenario.id} decoder.amount`);
+            }
             expect(decoded.amount).toBe(scenario.decoder.amount);
             expect(decoded.meaning.toLowerCase()).toContain(
               scenario.decoder.meaningIncludes.toLowerCase(),

@@ -467,9 +467,8 @@ export function calculateTax(
   // 3. Calculate adjusted salary and taxable income (annual and monthly)
   // ---------------
 
-  // A supplied K-family code is modeled on the primary employment's payment.
-  const usesPrimaryEmploymentPaye = hasExplicitValidTaxCode && taxCodeResult.isKCode;
-  const monthlyPayePayment = usesPrimaryEmploymentPaye
+  // A supplied code belongs to the primary job; the policy estimate uses combined income.
+  const monthlyPayePayment = hasExplicitValidTaxCode
     ? payBasis.primaryEmploymentPayePayment.monthly
     : payBasis.payeAdjustedPayment.monthly;
 
@@ -493,7 +492,7 @@ export function calculateTax(
   // If there's taxable income, calculate tax bands
   if (monthlyTaxableIncome > 0) {
     // Handle special tax codes that override normal band calculations
-    // These codes tax ALL income at a single rate, ignoring progressive bands.
+    // These codes apply one rate to the payer's taxable pay.
     // The rate depends on the regime: rUK BR/D0/D1 map to basic/higher/additional,
     // while Scottish SBR/SD0/SD1/SD2/SD3 map to basic/intermediate/higher/advanced/top.
     // The regime comes from the CODE's prefix, not the region toggle — HMRC bakes
@@ -574,8 +573,7 @@ export function calculateTax(
   // Overriding limit: PAYE Regulations 2003 (SI 2003/2682) reg 2 caps the tax
   // deducted from a relevant payment at 50% of that payment. Originally a K-code
   // rule, it was extended to all tax codes from 6 April 2015 (SI 2014/2689).
-  // Use the same payer's payment for coded PAYE and its cap. Other code families
-  // retain the existing combined-income projection. Floor the cap to the penny.
+  // Use the same payment basis for coded PAYE and its cap. Floor the cap to the penny.
   const monthlyOverridingLimit = Math.floor(Math.max(0, monthlyPayePayment) * 0.5 * 100) / 100;
   if (monthlyTax > monthlyOverridingLimit) {
     monthlyTax = monthlyOverridingLimit;
@@ -833,7 +831,7 @@ export function calculateTax(
           : 'policy-derived',
       appliedCode: hasExplicitValidTaxCode ? taxCodeResult.normalizedCode : null,
       policyDerivedTaxFreeAmount,
-      ...(usesPrimaryEmploymentPaye && input.incomeSources?.some((source) => source.amount > 0)
+      ...(hasExplicitValidTaxCode && input.incomeSources?.some((source) => source.amount > 0)
         ? { payeScope: 'primary-employment' }
         : {}),
       ...(marriageAllowanceAdjustment > 0 ? { marriageAllowanceAdjustment } : {}),

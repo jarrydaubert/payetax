@@ -45,25 +45,34 @@ describe('sendPayeResultsEmail', () => {
     }
   });
 
-  it('recomputes results server-side and emails them to the requested recipient', async () => {
-    const result = await sendPayeResultsEmail({ email: 'user@example.com', input: PAYE_INPUT });
+  it.each([[undefined], [[{ type: 'rental', amount: 0, period: 'monthly' }]]] as const)(
+    'recomputes and emails salary figures with additional income %j',
+    async (incomeSources) => {
+      const result = await sendPayeResultsEmail({
+        email: 'user@example.com',
+        input: { ...PAYE_INPUT, incomeSources: incomeSources ? [...incomeSources] : undefined },
+      });
 
-    expect(result).toEqual({ ok: true });
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({ ok: true });
+      expect(fetchMock).toHaveBeenCalledTimes(1);
 
-    const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    const payload = JSON.parse(String(init.body));
+      const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+      const payload = JSON.parse(String(init.body));
 
-    expect(payload.to).toEqual([{ email: 'user@example.com' }]);
-    // Subject embeds the server-computed annual take-home, not client-supplied data.
-    expect(payload.subject).toMatch(/^Your UK Tax Calculation - £[\d,]+(\.\d{2})? take-home$/);
-    expect(payload.htmlContent).toContain('2026-27');
-    for (const output of [payload.htmlContent, payload.textContent]) {
-      expect(output).not.toMatch(
-        /pension|salary sacrifice|relief at source|employer national insurance/i,
-      );
-    }
-  });
+      expect(payload.to).toEqual([{ email: 'user@example.com' }]);
+      // Subject embeds the server-computed annual take-home, not client-supplied data.
+      expect(payload.subject).toMatch(/^Your UK Tax Calculation - £[\d,]+(\.\d{2})? take-home$/);
+      expect(payload.htmlContent).toContain('2026-27');
+      for (const output of [payload.htmlContent, payload.textContent]) {
+        expect(output).toMatch(/gross salary/i);
+        expect(output).toContain('£50,000.00');
+        expect(output).toContain('£4,166.67');
+        expect(output).not.toMatch(
+          /pension|salary sacrifice|relief at source|employer national insurance/i,
+        );
+      }
+    },
+  );
 
   it.each([
     ['net-pay', 'Net pay', '35,703.60'],
@@ -140,6 +149,55 @@ describe('sendPayeResultsEmail', () => {
         expect(output).toContain('We assume this code belongs to your primary job.');
         expect(output).toContain('including tax another payer may withhold.');
         expect(output).toContain('37.5% of combined gross income in estimated tax and NI');
+      }
+    },
+  );
+
+  it.each([
+    ['BR M1', 'Primary job PAYE', '£2,400.00', '£200.00', '£33,600.00', '£2,800.00', '6.7%'],
+    ['', 'Income tax', '£4,682.40', '£390.20', '£31,317.60', '£2,609.80', '13.0%'],
+  ])(
+    'emails matching combined gross, tax and cash for code "%s"',
+    async (taxCode, taxLabel, annualTax, monthlyTax, annualCash, monthlyCash, share) => {
+      // Independent monthly working is in mixed-br-m1-primary-paye and
+      // mixed-blank-code-combined-projection. Annualise by 12 and divide the
+      // tax plus zero employee NI by £36,000 combined gross for the share.
+      await sendPayeResultsEmail({
+        email: 'user@example.com',
+        input: {
+          ...PAYE_INPUT,
+          salary: 1000,
+          payPeriod: 'monthly',
+          taxCode,
+          incomeSources: [{ type: 'rental', amount: 2000, period: 'monthly' }],
+        },
+      });
+
+      expect(fetchMock).toHaveBeenCalledTimes(1);
+      const [, init] = fetchMock.mock.calls[0] as [string, RequestInit];
+      const payload = JSON.parse(String(init.body));
+      expect(payload.subject).toContain(annualCash);
+      expect(payload.textContent).toMatch(
+        /Combined Gross Income:\s+£36,000\.00\s+\(£3,000\.00\/mo\)/,
+      );
+      expect(payload.htmlContent).toMatch(
+        /Combined gross income<\/td>\s*<td[^>]*>£36,000\.00<\/td>\s*<td[^>]*>£3,000\.00<\/td>/,
+      );
+      for (const output of [payload.htmlContent, payload.textContent]) {
+        expect(output.toLowerCase()).toContain(taxLabel.toLowerCase());
+        expect(output).toContain(`-${annualTax}`);
+        expect(output).toContain(`-${monthlyTax}`);
+        expect(output).toContain(annualCash);
+        expect(output).toContain(monthlyCash);
+        expect(output).toContain(share);
+        if (taxCode) {
+          expect(output).toContain('We assume this code belongs to your primary job.');
+          expect(output).toContain('including tax another payer may withhold.');
+        } else {
+          expect(output).toContain('No code was supplied');
+          expect(output).toContain('using the income you entered');
+          expect(output).not.toMatch(/primary job PAYE/i);
+        }
       }
     },
   );

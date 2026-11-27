@@ -64,6 +64,22 @@ Personal Allowance taper for the blank-code cases.
 | `scot-sbr-30k`, `scot-sd0-30k`, `scot-sd1-30k`, `scot-sd2-30k`, `scot-sd3-30k` | HMRC code letters and Scottish Resolution. Apply 20%, 21%, 42%, 45% and 48% respectively to £2,500/month, with the shared NI calculation. |
 | `ruk-br-30k`, `ruk-d0-30k`, `ruk-d1-30k` | HMRC code letters and rUK rate table. Apply 20%, 40% and 45% respectively to £2,500/month. |
 
+## Mixed-income PAYE and combined-income projections
+
+All cases use 2026–27 and Month 1. The [PAYE Regulations, regs 4, 21 and 27](https://www.legislation.gov.uk/uksi/2003/2682/made/data.xht)
+tie the code to the payer's relevant payment. [SI 2014/2689, regs 3 and 5](https://www.legislation.gov.uk/uksi/2014/2689/pdfs/uksi_20142689_en.pdf)
+sets the overriding limit at 50% of that payment for all codes. Use the shared Tables A and
+employee NI derivations above. The £1,000 monthly wage is below the £1,048 monthly NI primary
+threshold, and rent is excluded from Class 1 NI.
+
+| Scenario ID | Sources and working |
+| --- | --- |
+| `mixed-br-m1-primary-paye` | [HMRC PAYE11025](https://www.gov.uk/hmrc-internal-manuals/paye-manual/paye11025) and PAYE routines §9. £1,000 × 20% = £200, below the £500 overriding limit. Cash is £1,000 + £2,000 − £200. |
+| `mixed-br-m1-net-pay-pension` | PAYE Regulations reg 4 and PAYE routines §9. Relevant pay is £1,000 − £100 under net pay. £900 × 20% = £180, below the £450 limit. Cash is £900 + £200 − £180. |
+| `mixed-s0t-m1-primary-paye` | PAYE11025 and PAYE routines §§4.4 and 8.3. On £1,000 with zero free pay, the [2026–27 Scottish rate resolution](https://www.parliament.scot/chamber-and-committees/votes-and-motions/S6M-20844) gives £3,967 / 12 of starter-rate pay at 19%, then the remaining pay at 20%. Round down to £196.69. |
+| `mixed-c1257l-m1-primary-paye` | Tables A and PAYE routines §§4.3 and 8.3. The £1,048.26 free pay exceeds £1,000 Welsh primary wages. PAYE is zero and combined cash is £3,000. |
+| `mixed-blank-code-combined-projection` | This is PayeTax's blank-code estimate using HMRC Tables A and PAYE formula 1. £3,000 − £1,048.26 leaves £1,951 whole-pound taxable pay at 20%, giving £390.20. Cash is £2,609.80. |
+
 ## Scottish top-rate history
 
 All cases are Scottish monthly projections. The historical rate and code come from the

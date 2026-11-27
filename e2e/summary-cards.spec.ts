@@ -211,7 +211,24 @@ test.describe('Summary card mouse and keyboard', () => {
     });
     await page.keyboard.press('Shift+Tab');
     await expect(summary(page).getByRole('button').nth(3)).toBeFocused();
-    await expect(page.getByRole('tooltip')).toHaveText(/share of your gross pay/);
+    await expect(page.getByRole('tooltip')).toHaveText(/share of your total gross income/);
+  });
+
+  test('annual take-home help explains other income before separate tax', async ({ page }) => {
+    await page.getByRole('button', { name: 'Additional Income Sources', exact: true }).click();
+    await page.getByTestId('add-income-source').click();
+    await page.getByTestId('income-source-0-type').click();
+    await page.getByRole('option', { name: 'Rental Income', exact: true }).click();
+    await page.getByTestId('income-source-0-amount').fill('10000');
+    await page.getByTestId('calculate-button').click();
+
+    await expect(page.getByTestId('tax-code-basis-notice')).toContainText('your primary job');
+    const card = summary(page).getByRole('button', { name: /Annual Take-Home/ });
+    await card.hover();
+    await expect(card).toHaveAccessibleDescription(
+      'Your yearly income after the deductions shown. It includes other income before any separate tax or withholding on it.',
+    );
+    await page.screenshot({ path: test.info().outputPath('mixed-income-take-home-help.png') });
   });
 
   test('narrow mouse viewport retains hover help and input help stays click-only', async ({

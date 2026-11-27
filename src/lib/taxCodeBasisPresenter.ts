@@ -19,8 +19,8 @@ export function getTaxCodeBasisExplanation(basis: TaxCodeCalculationBasis): stri
   if (basis.kind !== 'supplied-code') {
     const estimate =
       basis.kind === 'policy-derived'
-        ? 'Basis: policy-derived PAYE estimate. No code was supplied, so PayeTax estimated the tax-free amount from the selected year, adjusted net income and allowance answers.'
-        : 'Basis: policy-derived fallback. The supplied code was not usable, so PayeTax estimated the tax-free amount from the selected year, adjusted net income and allowance answers.';
+        ? 'Basis: policy-derived PAYE estimate. No code was supplied, so PayeTax estimated Income Tax using the income you entered. The tax-free amount is based on the selected year, adjusted net income and your allowance answers.'
+        : 'Basis: policy-derived fallback. The supplied code was not usable, so PayeTax estimated Income Tax using the income you entered. The tax-free amount is based on the selected year, adjusted net income and your allowance answers.';
     const marriageAllowance = basis.marriageAllowanceAdjustment
       ? 'This PAYE estimate assumes an approved Marriage Allowance transfer. Payroll withholding can differ from the annual tax reduction, especially when estimated coding changes at a band boundary. Enter your HMRC tax code for an estimate based on that code.'
       : '';

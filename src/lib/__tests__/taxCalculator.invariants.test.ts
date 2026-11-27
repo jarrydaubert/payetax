@@ -56,21 +56,33 @@ describe('Tax Calculator invariants', () => {
     expect(r.netPay.annually).toBeCloseTo(expectedNet, 2);
   });
 
-  it('non-employment income increases gross and tax, but does not change NI or PAYE student loan', () => {
-    const base = calculateTax(createInput({ salary: 30000, studentLoanPlans: ['plan2'] }));
-    const withRental = calculateTax(
-      createInput({
-        salary: 30000,
-        studentLoanPlans: ['plan2'],
+  it.each([
+    ['', 457],
+    ['1257L', 290.2],
+  ])(
+    'adds rent to gross and uses the matching PAYE scope for code "%s"',
+    (taxCode, monthlyTaxWithRent) => {
+      const input = createInput({ salary: 30000, taxCode, studentLoanPlans: ['plan2'] });
+      const base = calculateTax(input);
+      const withRental = calculateTax({
+        ...input,
         incomeSources: [{ id: 'r1', type: 'rental', amount: 10000, period: 'annually' }],
-      }),
-    );
+      });
 
-    expect(totalGrossAnnual(withRental)).toBe(40000);
-    expect(withRental.incomeTax.annually).toBeGreaterThan(base.incomeTax.annually);
-    expect(withRental.nationalInsurance.annually).toBeCloseTo(base.nationalInsurance.annually, 2);
-    expect(withRental.studentLoan.annually).toBeCloseTo(base.studentLoan.annually, 2);
-  });
+      // 2025/26, Month 1 Tables A free pay of £1,048.26 leaves £1,451 of
+      // £2,500 wages or £2,285 of £40,000/12 combined pay at 20%.
+      expect(totalGrossAnnual(base)).toBe(30000);
+      expect(totalGrossAnnual(withRental)).toBe(40000);
+      expect(base.incomeTax.monthly).toBe(290.2);
+      expect(withRental.incomeTax.monthly).toBe(monthlyTaxWithRent);
+      // NI and Plan 2 are both calculated on the £2,500 wage. Their monthly
+      // thresholds are £1,048 at 8% and £2,372.50 at 9% (down to whole pounds).
+      for (const result of [base, withRental]) {
+        expect(result.nationalInsurance.monthly).toBe(116.16);
+        expect(result.studentLoan.monthly).toBe(11);
+      }
+    },
+  );
 
   it('BR tax code implies 0 allowance and a single-rate income tax calculation', () => {
     const r = calculateTax(createInput({ salary: 25000, taxCode: 'BR' }));
