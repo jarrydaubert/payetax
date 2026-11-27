@@ -261,6 +261,27 @@ describe('C · cash-constrained contractor', () => {
   );
 });
 
+it('starts with clean figure defaults after another company has submitted', () => {
+  submit({
+    ...consultancy.input,
+    ...consultancy.otherJob,
+    ...consultancy.employerPension,
+    ...consultancy.tradingLoss,
+    yourSetupSalary: recruiter.input.yourSetupSalary,
+    yourSetupDividends: recruiter.input.yourSetupDividends,
+  });
+  const { form } = submit({ ...contractor.input, ...contractor.cash.blank.input }, 'allDividends');
+  expect(form).toMatchObject({
+    associatedCompaniesCount: 1,
+    otherIncome: 0,
+    hasOtherPAYEEmployment: false,
+    pensionContribution: 0,
+    lossesBroughtForward: 0,
+    yourSetupSalary: undefined,
+    yourSetupDividends: undefined,
+  });
+});
+
 describe('Director reference assertion controls', () => {
   const expected = recruiter.expected.allDividends;
 
