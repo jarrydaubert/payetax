@@ -92,7 +92,6 @@ Primary files:
 - `e2e/display-periods.spec.ts`
 - `e2e/tax-code-validation.spec.ts`
 - `e2e/director-guide-critical.spec.ts`
-- `e2e/director-guide-recruiter-regression.spec.ts`
 - `e2e/homepage-portal-stability.spec.ts`
 
 ### Accessibility
@@ -179,18 +178,19 @@ Primary files and scripts:
 
 The three calculation-evidence layers have different jobs within the broader test layers below:
 
-1. **Independent full-calculation fixtures.** JSON suites under
-   `src/test/payeVerificationFixtures/` contain hand/independently derived expected results
-   anchored to official sources. They are the statutory correctness oracle for representative
-   full-calculation interactions. Never update expectations by copying `calculateTax()` output,
-   canonical policy objects or generated golden-master values. Resolve disagreements against
-   the fixture derivation and primary evidence before changing either side.
+1. **Independent full-calculation fixtures.** The PAYE JSON suites and the Director
+   reference portfolio anchor representative calculations to official sources. Keep the
+   expected amounts independent of production constants, output and generated golden masters.
+   Never copy engine output into an independent expectation. A separately named observation may
+   record a divergence as evidence. Resolve disagreements against the derivation and primary evidence.
 2. **TypeScript rule and boundary tests.** Pin mechanics, invariants, validation, band edges,
    rounding, regional behaviour and cross-route consistency. Use statutory numbers independent
    of stored thresholds where a boundary assertion must detect policy drift.
-3. **Generated golden masters and browser E2E.** Derive from canonical policy and the production
-   engine to catch browser, input, rendering, extraction and presentation regression.
-   UI/engine agreement cannot establish legal correctness.
+3. **Golden masters and browser E2E.** Generated golden masters use production output to
+   catch rendering and extraction regressions. The Director reference journeys use selected
+   independent expected amounts to check the submitted route. Browser-to-engine agreement
+   alone cannot establish legal correctness.
+
 
 Keep the portfolio compact and representative, not an exhaustive JSON matrix or test-only
 calculator. Do not claim exhaustive year, band, income-composition or pension-method coverage.
@@ -208,8 +208,24 @@ Distinguish published figures from derived outputs and calculator conventions. R
 unresolved evidence gap in Linear with the scenario ID, owner and next step.
 
 The PAYE loader reads every JSON file in `src/test/payeVerificationFixtures/` as a PAYE suite.
-Director fixtures need a separate directory or a suite-type discriminator; introduce the first
-minimal set with the first Director engine slice and reconcile this guide with that change.
+The [Director financial references](../../src/test/directorReferenceFixtures/README.md) live
+alongside it. The portfolio includes five fictional companies with source-backed workings,
+explicit periods and scope limits. The Jest suite submits A, B and C through the production
+Director store and checks material financial components exactly. In C, Jest also exercises the
+production cash helper with submitted figures. The browser covers how the route combines those
+figures and both company reserves. The amount assertions
+reject unknown or missing fields and non-finite values, with negative controls using
+submitted results. Named observations keep the four open B rounding discrepancies explicit.
+D and E remain reproducible references with owners until the applicable product behaviour
+is supported or corrected.
+
+The Director critical browser spec runs two representative journeys from the same inputs.
+A covers the annual strategy comparison and C exercises the existing committed-cash journey,
+including draft handling, both reserve components and a zero-cash boundary. Use Jest for the
+remaining numerical permutations. This is the compact portfolio for
+[JGF-105](https://linear.app/jgf-projects/issue/JGF-105) and candidate browser selection for
+[JGF-164](https://linear.app/jgf-projects/issue/JGF-164). The current CI selection remains in
+`package.json` and the workflows.
 
 Tax-domain (`check:tax-imports` and `check:tax-facts`) baselines, test-skip baselines and advisory
 allowlists are shrink-only. Reduce them in the same PR that removes debt; do not add broad

@@ -14,10 +14,15 @@
 
 import { readFile } from 'node:fs/promises';
 import { type BrowserContext, expect, type Locator, type Page, test } from '@playwright/test';
-import type { TaxYear } from '../src/constants/taxRates';
+import { CURRENT_TAX_YEAR, type TaxYear } from '../src/constants/taxRates';
 import { calculateStrategyComparison } from '../src/lib/tax/strategyComparison';
 import { formatCurrency } from '../src/lib/utils';
 import type { DirectorEmailInput } from '../src/lib/validation/emailValidation';
+import {
+  contractor,
+  recruiter,
+  referenceTaxYear,
+} from '../src/test/directorReferenceFixtures/referenceCompanies';
 import { checkVisibleInputHelp } from './helpers/input-help';
 
 const DIRECTOR_WELCOME_DISMISS_KEY = 'directorGuideWelcome:dismissed:v1';
@@ -144,9 +149,11 @@ async function suppressWelcomeDialog(page: Page): Promise<void> {
   }, DIRECTOR_WELCOME_DISMISS_KEY);
 }
 
-async function ensureInputsPanelIsVisible(page: Page): Promise<void> {
-  const revenueInput = visibleInputByTestId(page, 'director-revenue-input');
-  if (await revenueInput.isVisible().catch(() => false)) {
+async function ensureInputsPanelIsVisible(
+  page: Page,
+  input = visibleInputByTestId(page, 'director-revenue-input'),
+): Promise<void> {
+  if (await input.isVisible().catch(() => false)) {
     return;
   }
 
@@ -155,7 +162,7 @@ async function ensureInputsPanelIsVisible(page: Page): Promise<void> {
     await openInputsButton.click();
   }
 
-  await expect(revenueInput).toBeVisible();
+  await expect(input).toBeVisible();
 }
 
 async function closeInputsPanelIfOpen(page: Page): Promise<void> {
@@ -1616,95 +1623,193 @@ test.describe('Director resolved monthly financials @critical', () => {
   });
 });
 
-test('DI-03: projected income cannot fund a withdrawal from zero cash @critical', async ({
-  page,
-}) => {
-  await openDirectorGuide(page);
-  await page.waitForLoadState('networkidle');
-  await selectEngland(page);
-  const amount = (name: string) =>
-    page.getByRole('textbox', { name, exact: true }).filter({ visible: true });
-  await page
-    .getByRole('button', { name: 'Monthly', exact: true })
-    .filter({ visible: true })
-    .click();
-  await fillCurrencyInput(amount('Monthly Contract Income'), 4000);
-  await fillCurrencyInput(amount('Monthly Business Expenses'), 1000);
-  await fillCurrencyInput(amount('Cash In Bank'), 0);
-  await fillCurrencyInput(amount('Minimum Monthly Draw'), 900);
-  await calculateAndView(page);
-
-  const draw = page
-    .getByRole('heading', { name: 'Monthly Draw Estimate' })
-    .locator('..')
-    .getByText('Estimated draw this month', { exact: true })
-    .locator('..');
-  await expect(draw.getByText('£0', { exact: true })).toBeVisible();
-  await expect(page.getByText('£900/mo below your spending target')).toBeVisible();
-  await expect(
-    page.getByRole('article', { name: 'Estimated draw this month of £0' }),
-  ).toBeVisible();
+const referenceWholePounds = new Intl.NumberFormat('en-GB', {
+  style: 'currency',
+  currency: 'GBP',
+  maximumFractionDigits: 0,
 });
 
-test('JGF-37: deducts additional committed cash only from the submitted estimate @critical', async ({
+function expectDirectorReferenceYear() {
+  expect(CURRENT_TAX_YEAR, 'Director reference year requires a fixture review').toBe(
+    referenceTaxYear,
+  );
+}
+
+test('JGF-170 A: compares affordably funded low-profit recruiter strategies @critical', async ({
   page,
 }) => {
+  expectDirectorReferenceYear();
   await openDirectorGuide(page);
+  // Wait for hydration before entering the first amounts, as in the other Director journeys.
+  await page.waitForLoadState('networkidle');
   await selectEngland(page);
+  await fillCurrencyInput(
+    visibleInputByTestId(page, 'director-revenue-input'),
+    recruiter.input.revenue,
+  );
+  await fillCurrencyInput(
+    visibleInputByTestId(page, 'director-expenses-input'),
+    recruiter.input.expenses,
+  );
+
+  const button = (name: string) =>
+    page.getByRole('button', { name, exact: true }).filter({ visible: true });
   const amount = (name: string) =>
     page.getByRole('textbox', { name, exact: true }).filter({ visible: true });
-  const commitments = amount('Additional committed cash');
-  const bank = amount('Cash In Bank');
-  const openInputs = page.getByRole('button', { name: 'Open calculator inputs' });
-  const panel = page.getByRole('heading', { name: 'Monthly Draw Estimate' }).locator('..');
-  const draw = panel.getByText('Estimated draw this month', { exact: true }).locator('..');
-  const expectDraw = async (value: string) => {
-    await expect(draw.getByText(value, { exact: true })).toBeVisible();
-    await expect(
-      page.getByRole('article', { name: `Estimated draw this month of ${value}`, exact: true }),
-    ).toBeVisible();
-  };
-  await page
-    .getByRole('button', { name: 'Monthly', exact: true })
-    .filter({ visible: true })
-    .click();
-  await fillCurrencyInput(amount('Monthly Contract Income'), 1500);
-  await fillCurrencyInput(amount('Monthly Business Expenses'), 250);
-  await fillCurrencyInput(bank, 8500);
-  await fillCurrencyInput(amount('Minimum Monthly Draw'), 900);
+  const date = amount('Company Accounting Period End');
+  await date.fill(recruiter.input.accountingPeriodEnd);
+  await date.blur();
+  const strategies = page.getByRole('region', { name: 'Strategy comparison' });
+  await expect(strategies).toHaveCount(0);
+  await calculateAndView(page);
+  await expect(strategies.getByRole('heading', { name: 'Your Setup' })).toBeVisible();
+  await expect(strategies.getByText('Not set.', { exact: true })).toBeVisible();
+
+  await ensureInputsPanelIsVisible(page);
+  await button('Full Inputs').click();
+  await fillCurrencyInput(amount('Your Current Salary'), recruiter.input.yourSetupSalary);
+  await fillCurrencyInput(amount('Your Current Dividends'), recruiter.input.yourSetupDividends);
+  await button('Apply').click();
+  await expect(strategies).toHaveCount(0);
+  await calculateAndView(page);
+
+  const currency = referenceWholePounds.format;
+  const cases = [
+    ['All Salary', recruiter.expected.allSalary],
+    ['All Dividends', recruiter.expected.allDividends],
+    ['Your Setup', recruiter.expected.yourSetup],
+  ] as const;
+  for (const [name, expected] of cases) {
+    const heading = strategies.getByRole('heading', { name, exact: true });
+    const card =
+      name === 'Your Setup'
+        ? heading.locator('../../..')
+        : strategies
+            .getByRole('article')
+            .filter({ has: page.getByRole('heading', { name, exact: true }) });
+    for (const [label, value] of [
+      ['Salary', expected.salary],
+      ['Dividends', expected.dividends],
+      ['Total NI', expected.employerNI + expected.employeeNI],
+      ['Take-Home', expected.takeHome],
+    ] as const) {
+      await expect(
+        card
+          .getByText(label, { exact: true })
+          .locator('..')
+          .getByText(currency(value), { exact: true }),
+      ).toBeVisible();
+    }
+  }
+  await expect(detailRowValue(page, 'Corporation Tax', 'Corp Tax Due')).toHaveText(
+    currency(recruiter.expected.allSalary.corporationTax),
+  );
+
+  await ensureInputsPanelIsVisible(page);
   await selectDropdownOption(
     page,
     page.getByRole('combobox', { name: 'Strategy', exact: true }).filter({ visible: true }),
     'All Dividends',
   );
+  await calculateAndView(page);
+  await expect(detailRowValue(page, 'Corporation Tax', 'Taxable Profit')).toHaveText(
+    currency(recruiter.expected.allDividends.taxableProfit),
+  );
+  await expect(detailRowValue(page, 'Corporation Tax', 'Corp Tax Due')).toHaveText(
+    currency(recruiter.expected.allDividends.corporationTax),
+  );
+});
+
+test('JGF-37 / JGF-170 C: uses only the submitted cash and reserves to cap the draw @critical', async ({
+  page,
+}) => {
+  expectDirectorReferenceYear();
+  await openDirectorGuide(page);
+  await page.waitForLoadState('networkidle');
+  await selectEngland(page);
+  const amount = (name: string) =>
+    page.getByRole('textbox', { name, exact: true }).filter({ visible: true });
+  const commitments = amount('Additional committed cash');
+  const bank = amount('Cash In Bank');
+  const strategy = page
+    .getByRole('combobox', { name: 'Strategy', exact: true })
+    .filter({ visible: true });
+  const panel = page.getByRole('heading', { name: 'Monthly Draw Estimate' }).locator('..');
+  const draw = panel.getByText('Estimated draw this month', { exact: true }).locator('..');
+  const poundsAndPence = new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'GBP' });
+  const currency = (value: number) =>
+    (Number.isInteger(value) ? referenceWholePounds : poundsAndPence).format(value);
+  const { blank, explicitZero, payable, exhausted, bufferShort, zeroBank, withPayroll } =
+    contractor.cash;
+  const expectDraw = async (
+    expected: (typeof contractor.cash)[keyof typeof contractor.cash]['expected'],
+  ) => {
+    const value = currency(expected.safeMonthlyDraw);
+    await expect(draw.getByText(value, { exact: true })).toBeVisible();
+    await expect(
+      page.getByRole('article', { name: `Estimated draw this month of ${value}`, exact: true }),
+    ).toBeVisible();
+    await expect(panel.getByText(currency(expected.requiredBuffer), { exact: true })).toBeVisible();
+    if (expected.spendingShortfall > 0) {
+      await expect(panel).toContainText(
+        `${currency(expected.spendingShortfall)}/mo below your spending target`,
+      );
+    } else {
+      await expect(panel.getByText(/below your spending target/)).toHaveCount(0);
+    }
+    await expect(panel).toContainText(
+      expected.shortfall > 0 ? `Shortfall ${currency(expected.shortfall)}` : 'On track',
+    );
+  };
+
+  await page
+    .getByRole('button', { name: 'Monthly', exact: true })
+    .filter({ visible: true })
+    .click();
+  await fillCurrencyInput(amount('Monthly Contract Income'), contractor.input.monthlyIncome);
+  await fillCurrencyInput(amount('Monthly Business Expenses'), contractor.input.monthlyExpenses);
+  await fillCurrencyInput(bank, blank.input.cashInBank);
+  await fillCurrencyInput(amount('Minimum Monthly Draw'), contractor.input.minimumMonthlyDraw);
+  const runway = page
+    .getByRole('spinbutton', { name: 'Runway Target (months)' })
+    .filter({ visible: true });
+  await runway.fill(String(contractor.input.runwayMonths));
+  const date = amount('Company Accounting Period End');
+  await date.fill(contractor.input.accountingPeriodEnd);
+  await date.blur();
+  await expect(
+    page.getByRole('combobox', { name: 'Contract Start Month' }).filter({ visible: true }),
+  ).toHaveText('April');
+  await selectDropdownOption(page, strategy, 'All Dividends');
   await expect(commitments).toHaveValue('');
   await expect(commitments).toHaveAccessibleDescription(/costs covered by your buffer/);
   await calculateAndView(page);
 
-  // £15,000 profit less £2,850 Corporation Tax leaves £12,150 within the Personal Allowance.
-  // £1,012.50 projected take-home caps the draw until commitments reduce £2,200 cash headroom.
-  await expectDraw('£1,012.50');
-  await expect(panel.getByText('£3,450', { exact: true })).toBeVisible();
+  await expectDraw(blank.expected);
   await expect(panel).toContainText('Additional commitments were left blank');
   await expect(
-    page.getByRole('article', { name: 'Corporation tax of £2,850 to set aside' }),
+    page.getByRole('article', {
+      name: `Corporation tax of ${currency(contractor.expected.allDividends.corporationTax)} to set aside`,
+      exact: true,
+    }),
   ).toBeVisible();
 
-  if (await openInputs.isVisible()) await openInputs.click();
-  await fillCurrencyInput(commitments, 1500);
-  await expect(bank).toHaveValue('£8,500');
+  await ensureInputsPanelIsVisible(page, bank);
+  await fillCurrencyInput(commitments, payable.input.additionalCommittedCash);
+  await expect(bank).toHaveValue(currency(blank.input.cashInBank));
   await closeInputsPanelIfOpen(page);
-  await expectDraw('£1,012.50');
+  await expectDraw(blank.expected);
   await expect(panel).toContainText('Additional commitments were left blank');
   await expect(
     page.getByRole('status').filter({ hasText: 'Showing results from your last calculation' }),
   ).toBeVisible();
   await calculateAndView(page);
-  await expectDraw('£700');
-  await expect(panel).toContainText('£200/mo below your spending target');
-  await expect(panel).toContainText('deducts £1,500 in additional commitments');
+  await expectDraw(payable.expected);
+  await expect(panel).toContainText(
+    `deducts ${currency(payable.input.additionalCommittedCash)} in additional commitments`,
+  );
 
-  if (await openInputs.isVisible()) await openInputs.click();
+  await ensureInputsPanelIsVisible(page, bank);
   await fillCurrencyInput(commitments, -1);
   await expect(commitments).toHaveAttribute('aria-invalid', 'true');
   await expect(commitments).toHaveAccessibleDescription(/Negative amounts are not supported/);
@@ -1713,21 +1818,46 @@ test('JGF-37: deducts additional committed cash only from the submitted estimate
     page.getByRole('alert').filter({ hasText: 'Check 1 field before calculating.' }),
   ).toBeVisible();
   await closeInputsPanelIfOpen(page);
-  await expectDraw('£700');
+  await expectDraw(payable.expected);
 
-  if (await openInputs.isVisible()) await openInputs.click();
-  await fillCurrencyInput(commitments, 2500);
+  await ensureInputsPanelIsVisible(page, bank);
+  await fillCurrencyInput(commitments, exhausted.input.additionalCommittedCash);
   await calculateAndView(page);
-  await expectDraw('£0');
-  await expect(panel).toContainText('Shortfall £300');
-  await expect(panel).toContainText('£900/mo below your spending target');
+  await expectDraw(exhausted.expected);
 
-  if (await openInputs.isVisible()) await openInputs.click();
+  await ensureInputsPanelIsVisible(page, bank);
+  await fillCurrencyInput(commitments, bufferShort.input.additionalCommittedCash);
+  await calculateAndView(page);
+  await expectDraw(bufferShort.expected);
+
+  await ensureInputsPanelIsVisible(page, bank);
+  await fillCurrencyInput(commitments, explicitZero.input.additionalCommittedCash);
+  await calculateAndView(page);
+  await expectDraw(explicitZero.expected);
+  await expect(panel.getByText(/Additional commitments were left blank/)).toHaveCount(0);
+  await expect(panel).toContainText('deducts £0 in additional commitments');
+
+  await ensureInputsPanelIsVisible(page, bank);
   await replaceText(commitments, '');
   await commitments.blur();
   await calculateAndView(page);
-  await expectDraw('£1,012.50');
+  await expectDraw(blank.expected);
   await expect(panel).toContainText('Additional commitments were left blank');
+
+  await ensureInputsPanelIsVisible(page, bank);
+  await fillCurrencyInput(bank, zeroBank.input.cashInBank);
+  await calculateAndView(page);
+  await expectDraw(zeroBank.expected);
+
+  // Keep the legacy recruiter's useful proof that employer NI reduces the monthly buffer.
+  await ensureInputsPanelIsVisible(page, bank);
+  await fillCurrencyInput(bank, withPayroll.input.cashInBank);
+  await selectDropdownOption(page, strategy, 'Baseline Mix');
+  await calculateAndView(page);
+  await expectDraw(withPayroll.expected);
+  await expect(detailRowValue(page, 'Tax Summary', 'Employer NI (company)')).toHaveText(
+    referenceWholePounds.format(contractor.expected.optimalMix.employerNI),
+  );
 });
 
 test.describe('Director Intelligence currency inputs @critical', () => {
