@@ -252,12 +252,16 @@ describe('DirectorDashboard (normal mode)', () => {
     });
 
     render(<DirectorDashboard />);
+    const drawPanel = () =>
+      screen.queryByRole('heading', { name: 'Monthly Draw Estimate' })?.parentElement ?? null;
+    const drawAmount = () =>
+      screen.getByText('Estimated draw this month', { exact: true }).nextElementSibling;
     // The £5,700 buffer leaves £2,300 after the baseline's £3,000 reserve.
-    expect(screen.getByText('£2,300/mo')).toBeInTheDocument();
+    expect(drawAmount()).toHaveTextContent(/^£2,300$/);
     expect(screen.getByText('£5,700')).toBeInTheDocument();
 
     act(() => useDirectorGuideStore.getState().setSelectedStrategy('allDividends'));
-    expect(screen.queryByText('£2,300/mo')).not.toBeInTheDocument();
+    expect(drawPanel()).not.toBeInTheDocument();
     expect(screen.queryByText('£600/mo below your spending target')).not.toBeInTheDocument();
 
     act(() => {
@@ -266,7 +270,7 @@ describe('DirectorDashboard (normal mode)', () => {
       state.setProfitWhatIfPercent(-45);
       state.setObjective('minimizeNI');
     });
-    expect(screen.queryByText('£2,300/mo')).not.toBeInTheDocument();
+    expect(drawPanel()).not.toBeInTheDocument();
 
     // All Dividends holds £2,000 more in company tax reserves than the recommendation.
     act(() =>
@@ -280,7 +284,7 @@ describe('DirectorDashboard (normal mode)', () => {
         },
       }),
     );
-    expect(screen.getByText('£300/mo')).toBeInTheDocument();
+    expect(drawAmount()).toHaveTextContent(/^£300$/);
     expect(screen.getByText('£600/mo below your spending target')).toBeInTheDocument();
 
     act(() => useDirectorGuideStore.getState().setCashInBank(12000));

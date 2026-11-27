@@ -57,6 +57,7 @@ import {
   useDirectorGuideActions,
   useDirectorGuideStore,
   useHasDirectorInputErrors,
+  useHasUnsubmittedDirectorCommitment,
   useMonthlyModeOutput,
   useStrategyComparison,
   useSubmittedDirectorForm,
@@ -81,6 +82,7 @@ export function DirectorDashboard() {
   const monthlyModeOutput = useMonthlyModeOutput();
   const { activeScenario, isProfitWhatIfActive } = useActiveDirectorScenario();
   const hasInputErrors = useHasDirectorInputErrors();
+  const hasUnsubmittedCommitment = useHasUnsubmittedDirectorCommitment();
   const calculationError = useDirectorError();
   const hasPreviousSubmission = useDirectorGuideStore((state) => state.strategyComparison !== null);
   const { calculate, reset } = useDirectorGuideActions();
@@ -91,6 +93,7 @@ export function DirectorDashboard() {
           companyTaxReserve: activeScenario.corporationTax + activeScenario.employerNI,
           monthsRemaining: monthlyModeOutput.monthsRemaining,
           cashInBank: formData.cashInBank,
+          additionalCommittedCash: formData.additionalCommittedCash,
           minimumMonthlyDraw: formData.minimumMonthlyDraw,
           runwayMonths: formData.runwayMonths,
           monthlyExpenses: formData.monthlyExpenses,
@@ -289,20 +292,22 @@ export function DirectorDashboard() {
             {/* Results */}
             <p
               role='status'
-              data-testid={hasInputErrors ? 'director-results-paused' : undefined}
+              data-testid={hasInputErrors && !hasComparison ? 'director-results-paused' : undefined}
               className={cn(
                 hasInputErrors
                   ? 'mb-4 rounded-sm border border-warning/40 bg-card p-4 text-sm text-foreground'
                   : 'mb-3 text-sm text-muted-foreground',
               )}
             >
-              {hasInputErrors
-                ? 'Results are paused until every amount is valid. Check the amounts in Your Numbers.'
-                : hasComparison
-                  ? 'Results are up to date.'
-                  : calculationError || hasPreviousSubmission
-                    ? 'Select Calculate in Your Numbers to see current results.'
-                    : ''}
+              {hasComparison && hasUnsubmittedCommitment
+                ? 'Showing results from your last calculation. Check the committed cash amount and select Calculate to update.'
+                : hasInputErrors
+                  ? 'Results are paused until every amount is valid. Check the amounts in Your Numbers.'
+                  : hasComparison
+                    ? 'Results are up to date.'
+                    : calculationError || hasPreviousSubmission
+                      ? 'Select Calculate in Your Numbers to see current results.'
+                      : ''}
             </p>
             {hasComparison && formData ? (
               <div className='space-y-6'>
@@ -378,10 +383,10 @@ export function DirectorDashboard() {
                         <div className='mt-2 grid gap-3 md:grid-cols-3'>
                           <div>
                             <div className='text-xs text-muted-foreground'>
-                              Available this month
+                              Estimated draw this month
                             </div>
                             <div className='font-mono font-semibold text-foreground'>
-                              {formatCurrencyInputValue(monthlyDraw.safeMonthlyDraw)}/mo
+                              {formatCurrencyInputValue(monthlyDraw.safeMonthlyDraw)}
                             </div>
                           </div>
                           <div>
@@ -411,9 +416,12 @@ export function DirectorDashboard() {
                           </p>
                         )}
                         <p className='mt-2 text-xs text-muted-foreground'>
-                          Uses current cash after the buffer and company tax and employer NI
-                          estimated for the full projection period. Projected monthly take-home caps
-                          the draw.
+                          This estimate covers this month only. It uses bank cash after the buffer
+                          and the Corporation Tax and employer NI reserve for the full projection
+                          period. Projected monthly take-home caps the draw.{' '}
+                          {formData.additionalCommittedCash === undefined
+                            ? 'Additional commitments were left blank, so they are excluded.'
+                            : `The estimate deducts ${formatCurrencyInputValue(formData.additionalCommittedCash)} in additional commitments.`}
                           {isProfitWhatIfActive &&
                             ' Take-home and tax reserves use the simulated profit. The buffer uses your submitted monthly running costs.'}
                         </p>

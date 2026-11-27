@@ -146,7 +146,9 @@ describe('Director Intelligence dashboard components', () => {
       });
 
       render(<SummaryCards monthlyDraw={0} />);
-      expect(screen.getByRole('article', { name: 'Monthly Draw Estimate of £0' })).toBeVisible();
+      expect(
+        screen.getByRole('article', { name: 'Estimated draw this month of £0' }),
+      ).toBeVisible();
     });
   });
 

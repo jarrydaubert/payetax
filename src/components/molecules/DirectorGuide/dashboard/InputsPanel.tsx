@@ -134,6 +134,7 @@ export function InputsPanel({ onReset, onCalculate, className }: InputsPanelProp
     monthlyExpenses: formData.monthlyExpenses,
     contractStartMonth: formData.contractStartMonth,
     cashInBank: formData.cashInBank,
+    additionalCommittedCash: formData.additionalCommittedCash,
     minimumMonthlyDraw: formData.minimumMonthlyDraw,
     runwayMonths: formData.runwayMonths,
   }));
@@ -243,6 +244,7 @@ export function InputsPanel({ onReset, onCalculate, className }: InputsPanelProp
     monthlyExpenses: `${baseId}-monthly-expenses`,
     contractStartMonth: `${baseId}-contract-start-month`,
     cashInBank: `${baseId}-cash-in-bank`,
+    additionalCommittedCash: `${baseId}-additional-committed-cash`,
     minimumMonthlyDraw: `${baseId}-minimum-monthly-draw`,
     runwayMonths: `${baseId}-runway-months`,
     includesVat: `${baseId}-includes-vat`,
@@ -273,6 +275,7 @@ export function InputsPanel({ onReset, onCalculate, className }: InputsPanelProp
     monthlyExpenses: [ids.monthlyExpenses, 'Monthly Business Expenses'],
     contractStartMonth: [ids.contractStartMonth, 'Contract Start Month'],
     cashInBank: [ids.cashInBank, 'Cash In Bank'],
+    additionalCommittedCash: [ids.additionalCommittedCash, 'Additional committed cash'],
     minimumMonthlyDraw: [ids.minimumMonthlyDraw, 'Minimum Monthly Draw'],
     region: [ids.region, 'Income Tax Region'],
     accountingPeriodEnd: [ids.accountingPeriodEnd, 'Company Accounting Period End'],
@@ -468,6 +471,28 @@ export function InputsPanel({ onReset, onCalculate, className }: InputsPanelProp
                 placeholder='£0'
                 className={INPUT_CLASS}
               />
+            </Field>
+
+            <Field label='Additional committed cash' id={ids.additionalCommittedCash}>
+              <CurrencyInput
+                key='additionalCommittedCash'
+                id={ids.additionalCommittedCash}
+                value={formData.additionalCommittedCash}
+                onValueChange={actions.setAdditionalCommittedCash}
+                onValidityChange={validityFor('additionalCommittedCash')}
+                invalidDraft={inputErrors.additionalCommittedCash}
+                placeholder='Optional'
+                aria-describedby={`${ids.additionalCommittedCash}-help`}
+                className={INPUT_CLASS}
+              />
+              <p
+                id={`${ids.additionalCommittedCash}-help`}
+                className='text-xs text-muted-foreground'
+              >
+                Enter unpaid amounts you need to set aside now, such as a one-off bill. Leave out
+                payments already made, costs covered by your buffer, and Corporation Tax or employer
+                NI covered by the estimate.
+              </p>
             </Field>
 
             <Field

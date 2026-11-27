@@ -696,6 +696,32 @@ describe('DirectorGuideStore', () => {
   });
 
   describe('Persisted State Hydration Guards', () => {
+    it('restores older monthly figures with blank commitments and remembers new amounts as drafts', async () => {
+      localStorage.setItem(
+        DIRECTOR_STORAGE_KEY,
+        JSON.stringify({
+          state: { formData: { mode: 'monthly', cashInBank: 8500 } },
+          version: 4,
+        }),
+      );
+      await rememberFigures(true);
+      await useDirectorGuideStore.persist.rehydrate();
+      const store = useDirectorGuideStore.getState();
+      expect(store.formData.cashInBank).toBe(8500);
+      expect(store.formData.additionalCommittedCash).toBeUndefined();
+
+      store.setAdditionalCommittedCash(1500.25);
+      const saved = localStorage.getItem(DIRECTOR_STORAGE_KEY) ?? '';
+      store.reset();
+      expect(useDirectorGuideStore.getState().formData.additionalCommittedCash).toBeUndefined();
+      localStorage.setItem(DIRECTOR_STORAGE_KEY, saved);
+      await useDirectorGuideStore.persist.rehydrate();
+      expect(useDirectorGuideStore.getState()).toMatchObject({
+        formData: { mode: 'monthly', cashInBank: 8500, additionalCommittedCash: 1500.25 },
+        calculatedFormData: null,
+      });
+    });
+
     it('restores a saved named draft on a fresh visit without replacing live exploration', async () => {
       const store = useDirectorGuideStore.getState();
       store.setSelectedStrategy('allSalary');
