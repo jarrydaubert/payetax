@@ -118,8 +118,9 @@ Warnings:
 
 ## Regression Anchors
 
-- The recommended Director strategy is checked against independently derived low-profit fixtures in `src/lib/tax/__tests__/strategyComparison.salaryScenario.test.ts` and through the rendered route in `e2e/director-guide-critical.spec.ts`.
-- The recruiter “feast or famine” case is exercised through the rendered route in `e2e/director-guide-recruiter-regression.spec.ts`.
+- The [Director financial references](../../src/test/directorReferenceFixtures/README.md)
+  include the fictional recruiter and committed-cash cases. The submitted calculation is
+  exercised in Jest and both journeys run in `e2e/director-guide-critical.spec.ts`.
 - Monthly mode behavior is anchored in `src/lib/tax/variableIncome.ts` tests plus store/component coverage.
 
 ## References
