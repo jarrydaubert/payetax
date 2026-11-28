@@ -2184,7 +2184,6 @@ test.describe('Director input help @critical', () => {
       await expect(help).toContainText(guidance);
       await expect(link).toBeVisible();
       await trigger.press('ArrowDown');
-      await page.keyboard.press('Tab');
       await expect(link).toBeFocused();
       await page.keyboard.press('Escape');
       await expect(trigger).toBeFocused();

@@ -57,7 +57,9 @@ export function HelpPopover({
         onKeyDown={(event) => {
           if (open && event.key === 'ArrowDown') {
             event.preventDefault();
-            contentRef.current?.focus({ preventScroll: true });
+            const content = contentRef.current;
+            const sourceLink = content?.querySelector<HTMLAnchorElement>('a[href]');
+            (sourceLink ?? content)?.focus({ preventScroll: true });
           }
         }}
         onMouseDown={(event) => {
