@@ -170,6 +170,8 @@ describe('Dividend Tax Calculator', () => {
         const result = calculateDividendTax(20000, 5000, LEGACY_TAX_YEAR);
 
         expect(result.allowanceUsed).toBe(7570 + 500); // Unused PA + dividend allowance
+        expect(result.personalAllowanceUsed).toBe(7570);
+        expect(result.dividendNilRateUsed).toBe(500);
         expect(result.taxableDividends).toBe(11930);
         expect(result.dividendTax).toBeCloseTo(1043.88, 2);
       });

@@ -1,5 +1,6 @@
 import { RESULTS_EMAIL_FROM } from '@/constants/contact';
 import type { PayPeriod, TaxYear } from '@/constants/taxRates';
+import { projectDirectorFinancials } from '@/lib/directorFinancialPresentation';
 import {
   generateDirectorEmailHtml,
   generateDirectorEmailText,
@@ -59,32 +60,21 @@ export function sendDirectorResultsEmail(args: {
 }): Promise<OutboundResultsDeliveryResult> {
   const normalizedTaxYear = resolveTaxYear(args.taxYear);
   const comparison = calculateStrategyComparison(args.input, normalizedTaxYear);
-  const strategies = {
-    allSalary: comparison.strategies.allSalary,
-    optimalMix: comparison.strategies.optimalMix,
-    allDividends: comparison.strategies.allDividends,
+  const recommendedStrategy = comparison.strategies[comparison.recommended];
+  const report = {
+    strategyName: recommendedStrategy.name,
+    financials: projectDirectorFinancials(comparison.grossProfit, recommendedStrategy),
+    savingsVsAllSalary: comparison.savingsVsAllSalary,
+    taxYear: args.taxYear,
   };
-  const recommendedStrategy = strategies[comparison.recommended];
 
   return sendOutboundEmail(
     {
       from: process.env.BREVO_FROM_EMAIL || RESULTS_EMAIL_FROM,
       to: args.email,
       subject: `Director Tax Strategy Report - ${formatCurrency(recommendedStrategy.takeHome)} Take-Home`,
-      html: generateDirectorEmailHtml({
-        grossProfit: comparison.grossProfit,
-        strategies,
-        recommended: comparison.recommended,
-        savingsVsAllSalary: comparison.savingsVsAllSalary,
-        taxYear: args.taxYear,
-      }),
-      text: generateDirectorEmailText({
-        grossProfit: comparison.grossProfit,
-        strategies,
-        recommended: comparison.recommended,
-        savingsVsAllSalary: comparison.savingsVsAllSalary,
-        taxYear: args.taxYear,
-      }),
+      html: generateDirectorEmailHtml(report),
+      text: generateDirectorEmailText(report),
     },
     'send-director-results',
   );

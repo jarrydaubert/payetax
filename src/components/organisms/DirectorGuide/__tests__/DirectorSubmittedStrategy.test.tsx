@@ -1,4 +1,4 @@
-import { act, render, renderHook, screen } from '@testing-library/react';
+import { act, render, renderHook, screen, within } from '@testing-library/react';
 import { StrategyComparisonTable } from '@/components/molecules/DirectorGuide/calculator/StrategyComparisonTable';
 import { TaxPots } from '@/components/molecules/DirectorGuide/calculator/TaxPots';
 import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario';
@@ -7,12 +7,20 @@ import { EducationPanel } from '@/components/molecules/DirectorGuide/dashboard/E
 import { RecommendationHero } from '@/components/molecules/DirectorGuide/dashboard/RecommendationHero';
 import { SummaryCards } from '@/components/molecules/DirectorGuide/dashboard/SummaryCards';
 import { useDirectorEmailUnavailableReason } from '@/components/molecules/DirectorGuide/useDirectorEmailUnavailableReason';
+import { formatCurrency } from '@/lib/utils';
 import { hasCurrentDirectorResults, useDirectorGuideStore } from '@/store/directorGuideStore';
+import { consultancy } from '@/test/directorReferenceFixtures/referenceCompanies';
 
 jest.mock('@/lib/tax', () => ({
   ...jest.requireActual('@/lib/tax'),
   resolveTaxYear: () => '2026-2027',
 }));
+
+function detailAmount(title: string, label: string) {
+  const card = screen.getByRole('heading', { name: title }).parentElement;
+  if (!card) throw new Error('Expected a detail card');
+  return within(card).getByText(label, { exact: true }).nextElementSibling;
+}
 
 describe('submitted Director strategies (JGF-148)', () => {
   beforeEach(() => {
@@ -51,7 +59,7 @@ describe('submitted Director strategies (JGF-148)', () => {
       '£70,217 salary + £0 dividends',
     );
     expect(screen.getByRole('region', { name: 'Financial summary' })).toHaveTextContent('£70,217');
-    expect(screen.getByText('£815/mo')).toBeInTheDocument();
+    expect(screen.getByText(/£815.22\/mo average/)).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { name: 'All Salary', level: 4 }).closest('article'),
     ).toHaveTextContent('Displayed Result');
@@ -87,7 +95,6 @@ describe('submitted Director strategies (JGF-148)', () => {
         salary,
         dividends: 0,
         employerNI: ni,
-        companyCost: revenue - 20000,
       });
     },
   );
@@ -377,9 +384,140 @@ describe('submitted Director exploration (JGF-149)', () => {
     );
     expect(screen.getByRole('heading', { name: 'Custom salary and profit' })).toBeVisible();
     expect(screen.getByText('£12,570 salary + £37,499 dividends')).toBeVisible();
-    expect(screen.getByText('Scenario Gross Profit').parentElement).toHaveTextContent('£60,000');
-    expect(screen.getByText('Student Loan').parentElement).toHaveTextContent('£4,506');
+    expect(screen.getAllByText('Adjusted company profit')).toHaveLength(2);
+    expect(
+      screen.getByRole('heading', { name: 'Corporation Tax' }).parentElement,
+    ).toHaveTextContent('£60,000.00');
+    expect(
+      screen.getByText('Student loan from this scenario', { exact: true }).parentElement,
+    ).toHaveTextContent('-£4,506.17');
+    expect(screen.getByText('Estimated annual take-home').parentElement).toHaveTextContent(
+      '£29,361.39',
+    );
     expect(screen.getByText(/Salary already paid/)).toHaveTextContent('£12,570.00');
+  });
+
+  it('reconciles canonical B with Plan 2 and keeps the retained setup amount out of tax', () => {
+    const store = useDirectorGuideStore.getState();
+    store.setRevenue(consultancy.input.revenue);
+    store.setExpenses(consultancy.input.expenses);
+    store.setAssociatedCompaniesCount(consultancy.input.associatedCompaniesCount);
+    store.setYourSetupSalary(consultancy.expected.optimalMix.salary);
+    store.setYourSetupDividends(20000);
+    store.setStudentLoanPlans(['plan2']);
+    store.setSelectedStrategy('optimalMix');
+    store.calculate();
+    render(
+      <>
+        <DetailCards />
+        <TaxPots />
+        <StrategyComparisonTable />
+      </>,
+    );
+
+    expect(detailAmount('Personal Take-Home', 'Student loan from this scenario')).toHaveTextContent(
+      '-£3,040.78',
+    );
+    expect(detailAmount('Personal Take-Home', 'Estimated annual take-home')).toHaveTextContent(
+      '£51,519.41',
+    );
+    expect(screen.getByText('Personal tax and loan budget').parentElement).toHaveTextContent(
+      '£11,652.05 annually',
+    );
+    // The same company tax and payroll budget applies to the partial distribution.
+    expect(screen.getByText('Company tax and NI budget').parentElement).toHaveTextContent(
+      '£16,828.54 annually',
+    );
+    const setup = screen.getByRole('heading', { name: 'Your Setup' }).parentElement?.parentElement
+      ?.parentElement;
+    if (!setup) throw new Error('Expected the Your Setup card');
+    expect(within(setup).getByText('Profit retained this period').parentElement).toHaveTextContent(
+      '£30,601',
+    );
+    expect(within(setup).getByText('Total Tax').parentElement).toHaveTextContent('£17,789');
+    expect(within(setup).getByText('Total NI').parentElement).toHaveTextContent('£1,136');
+    expect(setup).not.toHaveTextContent(/effective rate/i);
+  });
+
+  it('explains canonical B’s pension and loss on their own bases, including the floors', () => {
+    const store = useDirectorGuideStore.getState();
+    store.setRevenue(consultancy.input.revenue);
+    store.setExpenses(consultancy.input.expenses);
+    store.setAssociatedCompaniesCount(consultancy.input.associatedCompaniesCount);
+    store.setOtherIncome(consultancy.otherJob.otherIncome);
+    store.setHasOtherPAYEEmployment(true);
+    store.setPensionContribution(consultancy.employerPension.pensionContribution);
+    store.setSelectedStrategy('optimalMix');
+    store.calculate();
+    render(<DetailCards />);
+
+    const expected = consultancy.expected.employerPension;
+    expect(detailAmount('Corporation Tax', 'Profit after employer pension')).toHaveTextContent(
+      '£70,000.00',
+    );
+    expect(detailAmount('Corporation Tax', 'Taxable profit')).toHaveTextContent(
+      formatCurrency(expected.taxableProfit),
+    );
+    expect(detailAmount('Company Allocation', 'Employer pension')).toHaveTextContent(
+      formatCurrency(-expected.pension),
+    );
+    expect(detailAmount('Personal Take-Home', 'Estimated annual take-home')).toHaveTextContent(
+      formatCurrency(expected.takeHome.observed),
+    );
+
+    act(() => {
+      store.setExpenses(consultancy.input.expenses + expected.pension);
+      store.setIsPensionAlreadyDeducted(true);
+      store.calculate();
+    });
+    expect(screen.queryByText('Employer pension', { exact: true })).not.toBeInTheDocument();
+    expect(detailAmount('Company Allocation', 'Profit retained this period')).toHaveTextContent(
+      '£0.00',
+    );
+    expect(detailAmount('Corporation Tax', 'Taxable profit')).toHaveTextContent(
+      formatCurrency(expected.taxableProfit),
+    );
+
+    act(() => {
+      store.setExpenses(consultancy.input.expenses);
+      store.setIsPensionAlreadyDeducted(false);
+      store.setPensionContribution(90000);
+      store.calculate();
+    });
+    expect(detailAmount('Corporation Tax', 'Profit after employer pension')).toHaveTextContent(
+      '-£10,000.00',
+    );
+    expect(detailAmount('Company Allocation', 'Deficit against period profit')).toHaveTextContent(
+      '-£10,000.00',
+    );
+
+    act(() => {
+      store.setPensionContribution(0);
+      store.setOtherIncome(0);
+      store.setSelectedStrategy('allDividends');
+      store.setLossesBroughtForward(consultancy.tradingLoss.lossesBroughtForward);
+      store.calculate();
+    });
+    expect(detailAmount('Corporation Tax', 'Trading loss relief used')).toHaveTextContent(
+      formatCurrency(-consultancy.tradingLoss.lossesBroughtForward),
+    );
+    expect(detailAmount('Corporation Tax', 'Taxable profit')).toHaveTextContent(
+      formatCurrency(consultancy.expected.tradingLoss.taxableProfit),
+    );
+    expect(detailAmount('Company Allocation', 'Gross dividends')).toHaveTextContent(
+      formatCurrency(-consultancy.expected.tradingLoss.dividends),
+    );
+    act(() => {
+      store.setLossesBroughtForward(100000);
+      store.calculate();
+    });
+    expect(detailAmount('Corporation Tax', 'Trading loss relief used')).toHaveTextContent(
+      formatCurrency(-consultancy.grossProfit),
+    );
+    expect(detailAmount('Corporation Tax', 'Taxable profit')).toHaveTextContent('£0.00');
+    expect(detailAmount('Company Allocation', 'Gross dividends')).toHaveTextContent(
+      formatCurrency(-consultancy.grossProfit),
+    );
   });
 
   it('changes only the reference on objective submission and excludes comparisons below the minimum', () => {
@@ -452,6 +590,10 @@ describe('submitted Director exploration (JGF-149)', () => {
       grossProfitAfterPension: 52500,
     });
     expect(result.current.activeScenario).toMatchObject({ salary: 0, pension: 6000 });
+    render(<DetailCards />);
+    expect(detailAmount('Corporation Tax', 'Profit after employer pension')).toHaveTextContent(
+      '£52,500.00',
+    );
   });
 
   it('enforces both the shared allowance-aware company budget and the salary minimum at the penny', () => {
@@ -466,8 +608,15 @@ describe('submitted Director exploration (JGF-149)', () => {
       salary: 78043.48,
       employerNI: 1956.52,
       class1ANI: 1500,
-      companyCost: 80000,
     });
+    render(<DetailCards />);
+    expect(detailAmount('Company Allocation', 'Employer NI (incl. Class 1A)')).toHaveTextContent(
+      '-£1,956.52',
+    );
+    expect(detailAmount('Company Allocation', 'Profit retained this period')).toHaveTextContent(
+      '£0.00',
+    );
+    expect(detailAmount('Personal Take-Home', 'Gross salary')).toHaveTextContent('£78,043.48');
     act(() => {
       store.setSliderSalary(78043.49);
       store.calculate();

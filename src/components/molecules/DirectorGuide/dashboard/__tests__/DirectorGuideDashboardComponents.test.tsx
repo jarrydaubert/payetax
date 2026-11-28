@@ -4,7 +4,6 @@ import { calculateSalaryScenario } from '@/lib/tax/strategyComparison';
 import { useDirectorGuideStore } from '@/store/directorGuideStore';
 import { DashboardLayout } from '../DashboardLayout';
 import { DetailCards } from '../DetailCards';
-import { MoneyFlowChart } from '../MoneyFlowChart';
 import { SidebarNav } from '../SidebarNav';
 import { SummaryCards } from '../SummaryCards';
 
@@ -34,11 +33,17 @@ function createStrategy(name: string, overrides: Partial<Record<string, number |
     incomeTax: 1500,
     corporationTax: 2000,
     dividendTax: 500,
+    dividendPersonalAllowanceUsed: 0,
+    dividendNilRateUsed: 0,
+    dividendsSubjectToTax: 0,
+    lossReliefUsed: 0,
     studentLoan: 0,
     totalPersonalTax: 2500,
-    companyCost: 0,
     takeHome: 36000,
-    effectiveRate: 25,
+    taxableProfit: 20000,
+    retainedProfit: 0,
+    companyShortfall: 0,
+    class1ANI: 0,
     ...overrides,
   };
 }
@@ -105,6 +110,10 @@ describe('Director Intelligence dashboard components', () => {
       incomeTax: 2500,
       corporationTax: 3000,
       dividendTax: 700,
+      dividendPersonalAllowanceUsed: 0,
+      dividendNilRateUsed: 0,
+      dividendsSubjectToTax: 0,
+      lossReliefUsed: 0,
       studentLoan: 0,
       pension: 0,
       companyCarBIK: 0,
@@ -153,40 +162,20 @@ describe('Director Intelligence dashboard components', () => {
   });
 
   describe('DetailCards', () => {
-    it('renders salary, dividend, corporation, and summary cards', () => {
+    it('renders the company and personal workings', () => {
       setStoreState({ strategyComparison: createComparison() as never });
 
       render(<DetailCards />);
-      expect(screen.getByText('Salary Breakdown')).toBeInTheDocument();
+      expect(screen.getByText('Personal Take-Home')).toBeInTheDocument();
       expect(screen.getByText('Dividend Breakdown')).toBeInTheDocument();
-      expect(screen.getByText('Corporation Tax')).toBeInTheDocument();
-      expect(screen.getByText('Tax Summary')).toBeInTheDocument();
+      expect(screen.getByRole('heading', { name: 'Corporation Tax' })).toBeInTheDocument();
+      expect(screen.getByText('Company Allocation')).toBeInTheDocument();
     });
 
     it('keeps the recommendation when a slider value exists', () => {
       setStoreState({ strategyComparison: createComparison() as never, sliderSalary: 20000 });
 
       render(<DetailCards />);
-      expect(mockCalculateSalaryScenario).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('MoneyFlowChart', () => {
-    it('renders bar chart rows for profit allocation', () => {
-      setStoreState({ strategyComparison: createComparison() as never });
-
-      render(<MoneyFlowChart />);
-      expect(screen.getByText('Money Flow')).toBeInTheDocument();
-      expect(screen.getByText('Gross Profit')).toBeInTheDocument();
-      expect(screen.getByText('Your Take-Home')).toBeInTheDocument();
-      expect(screen.getByText('Company Taxes')).toBeInTheDocument();
-      expect(screen.getByText('Retained')).toBeInTheDocument();
-    });
-
-    it('keeps the recommendation when a slider value exists', () => {
-      setStoreState({ strategyComparison: createComparison() as never, sliderSalary: 20000 });
-
-      render(<MoneyFlowChart />);
       expect(mockCalculateSalaryScenario).not.toHaveBeenCalled();
     });
   });

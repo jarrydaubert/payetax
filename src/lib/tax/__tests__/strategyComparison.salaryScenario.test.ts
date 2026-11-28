@@ -47,7 +47,6 @@ describe('Strategy Comparison helpers', () => {
         corporationTax: 0,
         dividends: 0,
         takeHome: salary,
-        companyCost: revenue,
       });
     },
   );
@@ -364,14 +363,16 @@ describe('Strategy Comparison helpers', () => {
       incomeTax: 286,
       corporationTax: 21725,
       taxableProfit: 86900,
+      lossReliefUsed: 5000,
+      dividendPersonalAllowanceUsed: 0,
+      dividendNilRateUsed: 500,
+      dividendsSubjectToTax: 69675,
       dividendTax: 14572.82,
       studentLoan: 4869.9,
       totalPersonalTax: 19728.72,
-      companyCost: 27325,
       retainedProfit: 0,
       companyShortfall: 0,
       takeHome: 55446.28,
-      effectiveRate: 43.13,
     });
 
     const scenario = calculateSalaryScenario({

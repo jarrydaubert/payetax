@@ -14,10 +14,10 @@ interface RecommendationHeroProps {
 }
 
 export function RecommendationHero({ className }: RecommendationHeroProps) {
-  const { comparison, selectedStrategy, activeScenario, exploration, isRecommended } =
+  const { comparison, selectedStrategy, activeScenario, financials, exploration, isRecommended } =
     useActiveDirectorScenario();
 
-  if (!(comparison && selectedStrategy && activeScenario)) return null;
+  if (!(comparison && selectedStrategy && activeScenario && financials)) return null;
 
   const label = isRecommended ? 'Recommended strategy' : 'Displayed strategy';
   const namedStrategy = comparison.strategies[selectedStrategy].name;
@@ -29,8 +29,6 @@ export function RecommendationHero({ className }: RecommendationHeroProps) {
   } else if (!exploration && selectedStrategy !== 'optimalMix') {
     heading = STRATEGY_LABEL[selectedStrategy];
   }
-  const totalTax =
-    activeScenario.corporationTax + activeScenario.employerNI + activeScenario.totalPersonalTax;
   const savingsVsAllSalary = activeScenario.takeHome - comparison.strategies.allSalary.takeHome;
 
   return (
@@ -60,8 +58,7 @@ export function RecommendationHero({ className }: RecommendationHeroProps) {
               {formatCurrency(activeScenario.takeHome, 0)}
             </div>
             <div className='mt-1 text-sm text-muted-foreground'>
-              ≈ {formatCurrency(activeScenario.takeHome / 12, 0)}/mo ·{' '}
-              {activeScenario.effectiveRate.toFixed(1)}% effective tax rate
+              ≈ {formatCurrency(activeScenario.takeHome / 12, 0)}/mo
             </div>
           </div>
         </div>
@@ -69,12 +66,22 @@ export function RecommendationHero({ className }: RecommendationHeroProps) {
         <dl className='grid grid-cols-2 gap-4 border-t border-border/60 pt-4 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-6'>
           <div>
             <dt className='text-xs tracking-wider text-muted-foreground uppercase'>
-              Total tax to set aside
+              Estimated tax and NI
             </dt>
             <dd className='mt-1 font-mono text-xl font-semibold text-foreground'>
-              {formatCurrency(totalTax, 0)}
+              {formatCurrency(financials.totalTax + financials.totalNI, 0)}
             </dd>
           </div>
+          {activeScenario.studentLoan > 0 && (
+            <div>
+              <dt className='text-xs tracking-wider text-muted-foreground uppercase'>
+                Estimated student loan from this scenario
+              </dt>
+              <dd className='mt-1 font-mono text-xl font-semibold text-foreground'>
+                {formatCurrency(activeScenario.studentLoan, 0)}
+              </dd>
+            </div>
+          )}
           {savingsVsAllSalary > 0 && (
             <div>
               <dt className='text-xs tracking-wider text-muted-foreground uppercase'>

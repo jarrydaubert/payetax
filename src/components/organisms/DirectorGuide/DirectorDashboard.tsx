@@ -5,7 +5,7 @@
  * 4-panel layout matching the original mockup:
  * - Sidebar nav (60px)
  * - Inputs panel (280px)
- * - Main content: Summary Cards → Slider → Detail Cards → Chart
+ * - Main content: Summary Cards → Slider → Detail Cards
  * - Education panel (320px)
  */
 'use client';
@@ -25,7 +25,6 @@ import {
   DetailCards,
   EducationPanel,
   InputsPanel,
-  MoneyFlowChart,
   RecommendationHero,
   SidebarNav,
   SummaryCards,
@@ -80,17 +79,17 @@ export function DirectorDashboard() {
   const formData = useSubmittedDirectorForm();
   const comparison = useStrategyComparison();
   const monthlyModeOutput = useMonthlyModeOutput();
-  const { activeScenario, isProfitWhatIfActive } = useActiveDirectorScenario();
+  const { activeScenario, financials, isProfitWhatIfActive } = useActiveDirectorScenario();
   const hasInputErrors = useHasDirectorInputErrors();
   const hasUnsubmittedCommitment = useHasUnsubmittedDirectorCommitment();
   const calculationError = useDirectorError();
   const hasPreviousSubmission = useDirectorGuideStore((state) => state.strategyComparison !== null);
   const { calculate, reset } = useDirectorGuideActions();
   const monthlyDraw =
-    formData?.mode === 'monthly' && monthlyModeOutput && activeScenario
+    formData?.mode === 'monthly' && monthlyModeOutput && financials
       ? calculateSafeMonthlyDraw({
-          annualTakeHome: activeScenario.takeHome,
-          companyTaxReserve: activeScenario.corporationTax + activeScenario.employerNI,
+          annualTakeHome: financials.scenario.takeHome,
+          companyTaxReserve: financials.companyTaxBudget,
           monthsRemaining: monthlyModeOutput.monthsRemaining,
           cashInBank: formData.cashInBank,
           additionalCommittedCash: formData.additionalCommittedCash,
@@ -452,7 +451,7 @@ export function DirectorDashboard() {
                       <DetailCards />
                     </section>
 
-                    <section aria-label='Company and personal tax pots'>
+                    <section aria-label='Projected company and personal budgets'>
                       <TaxPots />
                     </section>
 
@@ -460,14 +459,8 @@ export function DirectorDashboard() {
                       <PensionGapWarning />
                     </section>
 
-                    <section
-                      data-director-section='director-key-dates'
-                      aria-label='Money flow and key dates'
-                    >
-                      <div className='grid gap-4 md:grid-cols-2'>
-                        <MoneyFlowChart />
-                        <KeyDates />
-                      </div>
+                    <section data-director-section='director-key-dates' aria-label='Key dates'>
+                      <KeyDates />
                     </section>
                   </>
                 )}

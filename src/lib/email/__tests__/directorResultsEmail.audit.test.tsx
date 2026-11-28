@@ -38,7 +38,6 @@ jest.mock('@/components/molecules/DirectorGuide/dashboard', () => ({
   DetailCards: () => null,
   EducationPanel: () => null,
   InputsPanel: () => null,
-  MoneyFlowChart: () => null,
   RecommendationHero: () => null,
   SidebarNav: () => null,
   SummaryCards: () => null,
@@ -147,24 +146,31 @@ describe('Director display → email payload → server → HTML/text audit', ()
       expect(row(message.html, 'Dividends')).toBe(formatCurrency(reported.dividends));
       expect(row(message.html, 'Employer pension')).toBe(formatCurrency(reported.pension));
       expect(row(message.html, 'Corporation Tax')).toBe(formatCurrency(reported.corporationTax));
-      expect(row(message.html, 'Personal tax')).toBe(formatCurrency(reported.totalPersonalTax));
-      expect(row(message.html, 'Take-home pay')).toBe(formatCurrency(reported.takeHome));
-      expect(row(message.html, 'Company tax pot')).toBe(
+      expect(row(message.html, 'Salary and dividends before deductions')).toBe(
+        formatCurrency(reported.salary + reported.dividends),
+      );
+      expect(row(message.html, 'Personal deductions')).toBe(
+        formatCurrency(reported.totalPersonalTax),
+      );
+      expect(row(message.html, 'Estimated take-home pay')).toBe(formatCurrency(reported.takeHome));
+      expect(row(message.html, 'Company tax and NI budget')).toBe(
         formatCurrency(reported.corporationTax + reported.employerNI),
       );
       const displayPot = reported.incomeTax + reported.dividendTax + reported.studentLoan;
-      expect(row(message.html, 'Personal tax pot')).toBe(formatCurrency(displayPot));
+      expect(row(message.html, 'Personal tax and loan budget')).toBe(formatCurrency(displayPot));
       for (const [label, value] of [
         ['Monthly Take-Home', reported.takeHome / 12],
         ['Annual Take-Home', reported.takeHome],
-        ['Total Company Cost', reported.companyCost],
+        ['Company tax and NI budget', reported.corporationTax + reported.employerNI],
+        ['Personal tax and loan budget', displayPot],
+        ['Personal deductions', reported.totalPersonalTax],
         ['Salary', reported.salary],
         ['Dividends', reported.dividends],
         ['Pension', reported.pension],
         ['Income Tax', reported.incomeTax],
         ['Employee NI', reported.employeeNI],
         ['Dividend Tax', reported.dividendTax],
-        ['Student Loan', reported.studentLoan],
+        ['Student loan from this scenario', reported.studentLoan],
         ['Corporation Tax', reported.corporationTax],
         ['Employer NI', reported.employerNI],
       ] as const)
@@ -172,13 +178,17 @@ describe('Director display → email payload → server → HTML/text audit', ()
       expect(message.html).toContain('2026-27');
       expect(message.text).toContain('2026-27');
       for (const content of [message.html, message.text]) {
+        expect(content).toContain('The personal budget excludes employee NI');
         expect(content).not.toMatch(
-          /Rates used|Personal Allowance|Basic Rate band|Higher Rate band|Dividend Allowance|Small Profits Rate|Main CT Rate/i,
+          /Total Company Cost|effective rate|Rates used|Personal Allowance|Basic Rate band|Higher Rate band|Dividend Allowance|Small Profits Rate|Main CT Rate/i,
         );
       }
       expect(message.html).not.toMatch(/NaN|undefined|Infinity/);
       expect(message.text).not.toMatch(/NaN|undefined|Infinity/);
       if (!sample.blocked) {
+        expect(row(message.html, 'Personal tax and loan budget')).toBe(
+          formatCurrency(result.current.display.financials?.personalBudget ?? NaN),
+        );
         expect(result.current.display.activeScenario).toEqual(
           expect.objectContaining({
             salary: reported.salary,
@@ -199,7 +209,7 @@ describe('Director display → email payload → server → HTML/text audit', ()
       }
       if (sample.id === 'minimum-salary') {
         expect(reported.employeeNI).toBeGreaterThan(0);
-        expect(row(message.html, 'Personal tax pot')).not.toBe(
+        expect(row(message.html, 'Personal tax and loan budget')).not.toBe(
           formatCurrency(reported.totalPersonalTax),
         );
       }

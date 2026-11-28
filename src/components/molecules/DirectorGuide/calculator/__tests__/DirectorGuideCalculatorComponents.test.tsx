@@ -6,7 +6,6 @@ import { KeyDates } from '../KeyDates';
 import { PensionGapWarning } from '../PensionGapWarning';
 import { SalarySlider } from '../SalarySlider';
 import { StrategyComparisonTable } from '../StrategyComparisonTable';
-import { TaxBreakdownTable } from '../TaxBreakdownTable';
 import { TaxPots } from '../TaxPots';
 
 jest.mock('@/lib/tax/strategyComparison', () => {
@@ -67,11 +66,13 @@ function createStrategy(name: string, overrides: Partial<Record<string, number |
     incomeTax: 1500,
     corporationTax: 2000,
     dividendTax: 500,
+    dividendPersonalAllowanceUsed: 0,
+    dividendNilRateUsed: 0,
+    dividendsSubjectToTax: 0,
+    lossReliefUsed: 0,
     studentLoan: 0,
     totalPersonalTax: 2500,
-    companyCost: 0,
     takeHome: 35000,
-    effectiveRate: 25,
     ...overrides,
   };
 }
@@ -143,6 +144,10 @@ describe('Director Intelligence calculator components', () => {
       incomeTax: 2500,
       corporationTax: 3000,
       dividendTax: 700,
+      dividendPersonalAllowanceUsed: 0,
+      dividendNilRateUsed: 0,
+      dividendsSubjectToTax: 0,
+      lossReliefUsed: 0,
       studentLoan: 200,
       pension: 0,
       companyCarBIK: 0,
@@ -409,27 +414,14 @@ describe('Director Intelligence calculator components', () => {
     });
   });
 
-  describe('TaxBreakdownTable', () => {
-    it('renders student loan row when plans selected', () => {
-      setStoreState({
-        formData: { ...useDirectorGuideStore.getState().formData, studentLoanPlans: ['plan1'] },
-        strategyComparison: createComparison() as never,
-      });
-
-      render(<TaxBreakdownTable />);
-      expect(screen.getByText('Detailed Tax Breakdown')).toBeInTheDocument();
-      expect(screen.getByText('Student Loan')).toBeInTheDocument();
-    });
-  });
-
   describe('TaxPots', () => {
     it('renders company and personal pots with monthly totals', () => {
       setStoreState({ strategyComparison: createComparison() as never });
 
       render(<TaxPots />);
-      expect(screen.getByText('Company Tax Pot')).toBeInTheDocument();
-      expect(screen.getByText('Personal Tax Pot')).toBeInTheDocument();
-      expect(screen.getByText(/Illustrative set-aside/i)).toBeInTheDocument();
+      expect(screen.getByText('Company tax and NI budget')).toBeInTheDocument();
+      expect(screen.getByText('Personal tax and loan budget')).toBeInTheDocument();
+      expect(screen.getByText(/Illustrative annual budgets/i)).toBeInTheDocument();
     });
 
     it('keeps the recommended tax pots when a slider value exists', () => {
@@ -437,7 +429,7 @@ describe('Director Intelligence calculator components', () => {
 
       render(<TaxPots />);
       expect(mockCalculateSalaryScenario).not.toHaveBeenCalled();
-      expect(screen.getByText('Personal Tax Pot')).toBeInTheDocument();
+      expect(screen.getByText('Personal tax and loan budget')).toBeInTheDocument();
     });
   });
 });

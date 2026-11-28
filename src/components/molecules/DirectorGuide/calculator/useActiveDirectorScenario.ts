@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
+import { projectDirectorFinancials } from '@/lib/directorFinancialPresentation';
 import type { SalaryScenarioResult } from '@/lib/tax';
 import { useDirectorGuideStore, useStrategyComparison } from '@/store/directorGuideStore';
 
@@ -40,5 +41,9 @@ export function useActiveDirectorScenario() {
     isProfitWhatIfActive: profitWhatIfPercent !== 0,
     comparison,
     activeScenario,
+    financials:
+      comparison && activeScenario
+        ? projectDirectorFinancials(comparison.grossProfit, activeScenario)
+        : null,
   };
 }

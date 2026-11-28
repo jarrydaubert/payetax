@@ -39,8 +39,6 @@ export {
 export {
   type DirectorEmailInput,
   DirectorEmailInputSchema,
-  type DirectorStrategy,
-  DirectorStrategySchema,
   EmailSchema,
   type PayeEmailInput,
   PayeEmailInputSchema,

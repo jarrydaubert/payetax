@@ -285,7 +285,9 @@ test.describe('Director result currentness @critical', () => {
   }
 
   function profit(page: Page, amount: string) {
-    return page.getByRole('listitem', { name: `Gross Profit: ${amount}, 100% of total` });
+    return detailRowValue(page, 'Company Allocation', 'Profit after business expenses').filter({
+      hasText: `${amount}.00`,
+    });
   }
 
   async function expectResultsWithheld(page: Page) {
@@ -350,8 +352,12 @@ test.describe('Director result currentness @critical', () => {
     async function expectAllSalary() {
       await expect(hero).toContainText('£70,217 salary + £0 dividends');
       await expect(page.getByRole('region', { name: 'Summary cards' })).toContainText('£70,217');
-      await expect(detailRowValue(page, 'Salary Breakdown', 'Gross Salary')).toHaveText('£70,217');
-      await expect(detailRowValue(page, 'Dividend Breakdown', 'Gross Dividends')).toHaveText('£0');
+      await expect(detailRowValue(page, 'Personal Take-Home', 'Gross salary')).toHaveText(
+        '£70,217.39',
+      );
+      await expect(detailRowValue(page, 'Dividend Breakdown', 'Gross dividends')).toHaveText(
+        '£0.00',
+      );
       const card = page
         .getByRole('region', { name: 'Strategy comparison' })
         .getByRole('article')
@@ -470,8 +476,8 @@ test.describe('Director result currentness @critical', () => {
     await expectResultsWithheld(page);
     await calculateAndView(page);
 
-    await expect(detailRowValue(page, 'Corporation Tax', 'Scenario Gross Profit')).toHaveText(
-      '£13,500',
+    await expect(detailRowValue(page, 'Corporation Tax', 'Adjusted company profit')).toHaveText(
+      '£13,500.00',
     );
     await expect(detailRowValue(page, 'Corporation Tax', 'Revenue')).toHaveCount(0);
     await expect(page.getByText('£5,700', { exact: true })).toBeVisible();
@@ -707,8 +713,8 @@ test.describe('Director result currentness @critical', () => {
 
 test.describe('Director Intelligence critical @critical', () => {
   for (const { revenue, salary, employerNI } of [
-    { revenue: 10000, salary: '£9,348', employerNI: '£652' },
-    { revenue: 13000, salary: '£11,957', employerNI: '£1,043' },
+    { revenue: 10000, salary: '£9,347.83', employerNI: '-£652.17' },
+    { revenue: 13000, salary: '£11,956.52', employerNI: '-£1,043.48' },
   ]) {
     test(`JGF-56: renders affordable pay and zero dividends at £${revenue} revenue`, async ({
       page,
@@ -720,11 +726,13 @@ test.describe('Director Intelligence critical @critical', () => {
       await calculateAndView(page);
 
       await expect(page.getByTestId('director-survival-mode')).toHaveCount(0);
-      await expect(detailRowValue(page, 'Salary Breakdown', 'Gross Salary')).toHaveText(salary);
-      await expect(detailRowValue(page, 'Tax Summary', 'Employer NI (company)')).toHaveText(
+      await expect(detailRowValue(page, 'Personal Take-Home', 'Gross salary')).toHaveText(salary);
+      await expect(detailRowValue(page, 'Company Allocation', 'Employer NI')).toHaveText(
         employerNI,
       );
-      await expect(detailRowValue(page, 'Dividend Breakdown', 'Gross Dividends')).toHaveText('£0');
+      await expect(detailRowValue(page, 'Dividend Breakdown', 'Gross dividends')).toHaveText(
+        '£0.00',
+      );
     });
   }
 
@@ -778,9 +786,12 @@ test.describe('Director Intelligence critical @critical', () => {
     await expect(allDividends).toContainText('£15,706');
     await expect(yourSetup).toContainText('£15,706');
     await expect(
-      detailRowValue(page, 'Tax Summary', 'Extra Income Tax on other income'),
-    ).toHaveText('£5,028');
-    await expect(detailRowValue(page, 'Salary Breakdown', 'Income Tax')).toHaveText('£2,000');
+      detailRowValue(page, 'Personal Take-Home', 'Extra Income Tax on other income'),
+    ).toHaveText('-£5,028.00');
+    // The displayed £5,001 salary falls wholly in the 40% band on top of other income.
+    await expect(
+      detailRowValue(page, 'Personal Take-Home', 'Income Tax on salary and benefits'),
+    ).toHaveText('-£2,000.40');
     expect(diagnostics).toEqual([]);
   });
 
@@ -907,9 +918,11 @@ test.describe('Director Intelligence critical @critical', () => {
       .click();
     await calculateAndView(page);
 
-    const employeeNI = detailRowValue(page, 'Salary Breakdown', 'Employee NI');
-    await expect(detailRowValue(page, 'Salary Breakdown', 'Gross Salary')).toHaveText('£12,570');
-    await expect(employeeNI).toHaveText('£0');
+    const employeeNI = detailRowValue(page, 'Personal Take-Home', 'Employee NI');
+    await expect(detailRowValue(page, 'Personal Take-Home', 'Gross salary')).toHaveText(
+      '£12,570.00',
+    );
+    await expect(employeeNI).toHaveText('£0.00');
     const notes = page.getByRole('region', { name: 'About this estimate' });
     await expect(notes).toHaveCount(0);
     await testInfo.attach('other-paye-off', {
@@ -925,7 +938,7 @@ test.describe('Director Intelligence critical @critical', () => {
     await otherPAYE.click();
     await expect(otherPAYE).toBeChecked();
     await calculateAndView(page);
-    await expect(employeeNI).toHaveText('£0');
+    await expect(employeeNI).toHaveText('£0.00');
     const strategies = page.getByRole('region', { name: 'Strategy comparison' });
     // The £30,000 external pay leaves this salary in the 20% Income Tax band.
     // £12,570 − £2,514 Income Tax − £0 employee NI = £10,056 take-home.
@@ -985,7 +998,7 @@ test.describe('Director Intelligence critical @critical', () => {
     );
     await calculateAndView(page);
 
-    const salary = detailRowValue(page, 'Salary Breakdown', 'Gross Salary');
+    const salary = detailRowValue(page, 'Personal Take-Home', 'Gross salary');
     const warning = page.getByRole('status').filter({ hasText: 'short of your minimum' });
     const strategies = page.getByRole('region', { name: 'Strategy comparison' });
     const displayed = strategies.getByRole('article').filter({
@@ -1005,7 +1018,7 @@ test.describe('Director Intelligence critical @critical', () => {
     await expect(mix).toContainText('£100,586');
     // All Salary also meets the floor and has the higher take-home of the feasible strategies.
     await expect(displayed).toContainText('All Salary');
-    await expect(salary).toHaveText('£174,565');
+    await expect(salary).toHaveText('£174,565.22');
     await expect(page.getByRole('button', { name: 'Email My Results' })).toBeDisabled();
     await expect(warning).toHaveCount(0);
     await testInfo.attach('feasible-minimum', {
@@ -1021,7 +1034,7 @@ test.describe('Director Intelligence critical @critical', () => {
       'The highest affordable salary is £50,217.39, which falls £9,782.61 short of your minimum.',
     );
     await expect(displayed).toContainText('Baseline Mix');
-    await expect(salary).toHaveText('£50,217');
+    await expect(salary).toHaveText('£50,217.39');
     await expect(strategies.getByRole('button')).toHaveCount(0);
     await expect(strategies.getByRole('slider')).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Email My Results' })).toBeEnabled();
@@ -1095,7 +1108,16 @@ test.describe('Director Intelligence critical @critical', () => {
       .getByRole('status')
       .filter({ hasText: 'Class 1A National Insurance bill' });
     await expect(shortfall).toContainText('£500.00. The full-year strategies have £0 available');
-    await expect(detailRowValue(page, 'Dividend Breakdown', 'Gross Dividends')).toHaveText('£0');
+    await expect(
+      detailRowValue(page, 'Company Allocation', 'Employer NI (incl. Class 1A)'),
+    ).toHaveText('-£1,500.00');
+    await expect(
+      detailRowValue(page, 'Company Allocation', 'Deficit against period profit'),
+    ).toHaveText('-£500.00');
+    await expect(
+      detailRowValue(page, 'Personal Take-Home', 'Estimated annual take-home'),
+    ).toHaveText('£0.00');
+    await expect(detailRowValue(page, 'Dividend Breakdown', 'Gross dividends')).toHaveText('£0.00');
     await expect(page.getByText('Exceeds Profit', { exact: true })).toBeVisible();
     await expect(
       page.getByText(
@@ -1483,9 +1505,9 @@ async function selectEngland(page: Page): Promise<void> {
 function detailRowValue(page: Page, cardTitle: string, rowLabel: string): Locator {
   return page
     .locator('[data-director-section="director-details"] div.rounded-sm')
-    .filter({ has: page.getByText(cardTitle, { exact: true }) })
+    .filter({ has: page.getByRole('heading', { name: cardTitle, exact: true }) })
     .getByText(rowLabel, { exact: true })
-    .locator('xpath=following-sibling::span[1]');
+    .locator('xpath=following-sibling::dd[1]');
 }
 
 test.describe('Director resolved monthly financials @critical', () => {
@@ -1520,11 +1542,11 @@ test.describe('Director resolved monthly financials @critical', () => {
     await calculateAndView(page);
 
     // April through March: £48,000 - £12,000 - £12,570 salary - £1,135.50 NI.
-    await expect(company('Revenue')).toHaveText('£48,000');
-    await expect(company('Business Expenses')).toHaveText('-£12,000');
-    await expect(company('Salary + Employer NI')).toHaveText('-£13,706');
-    await expect(company('Taxable Profit')).toHaveText('£22,295');
-    await expect(company('Corp Tax Due')).toHaveText('£4,236');
+    await expect(company('Revenue')).toHaveText('£48,000.00');
+    await expect(company('Business expenses')).toHaveText('-£12,000.00');
+    await expect(company('Salary + Employer NI')).toHaveText('-£13,705.50');
+    await expect(company('Taxable profit')).toHaveText('£22,294.50');
+    await expect(company('Estimated Corporation Tax')).toHaveText('£4,235.96');
 
     const openInputs = page.getByRole('button', { name: 'Open calculator inputs' });
     if (await openInputs.isVisible()) await openInputs.click();
@@ -1538,27 +1560,27 @@ test.describe('Director resolved monthly financials @critical', () => {
     await calculateAndView(page);
 
     // October through March: £24,000 - £6,000 - £3,000 pension - £13,705.50 payroll.
-    await expect(company('Revenue')).toHaveText('£24,000');
-    await expect(company('Business Expenses')).toHaveText('-£6,000');
-    await expect(company('Employer Pension')).toHaveText('-£3,000');
-    await expect(company('Taxable Profit')).toHaveText('£1,295');
-    await expect(company('Corp Tax Due')).toHaveText('£246');
+    await expect(company('Revenue')).toHaveText('£24,000.00');
+    await expect(company('Business expenses')).toHaveText('-£6,000.00');
+    await expect(company('Employer pension')).toHaveText('-£3,000.00');
+    await expect(company('Taxable profit')).toHaveText('£1,294.50');
+    await expect(company('Estimated Corporation Tax')).toHaveText('£245.96');
 
     if (await openInputs.isVisible()) await openInputs.click();
     await mode('Annual').click();
     await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 27000);
     await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 7000);
     await calculateAndView(page);
-    await expect(company('Revenue')).toHaveText('£27,000');
-    await expect(company('Business Expenses')).toHaveText('-£7,000');
-    await expect(company('Taxable Profit')).toHaveText('£3,295');
+    await expect(company('Revenue')).toHaveText('£27,000.00');
+    await expect(company('Business expenses')).toHaveText('-£7,000.00');
+    await expect(company('Taxable profit')).toHaveText('£3,294.50');
 
     if (await openInputs.isVisible()) await openInputs.click();
     await mode('Monthly').click();
     await calculateAndView(page);
-    await expect(company('Revenue')).toHaveText('£24,000');
-    await expect(company('Business Expenses')).toHaveText('-£6,000');
-    await expect(company('Taxable Profit')).toHaveText('£1,295');
+    await expect(company('Revenue')).toHaveText('£24,000.00');
+    await expect(company('Business expenses')).toHaveText('-£6,000.00');
+    await expect(company('Taxable profit')).toHaveText('£1,294.50');
 
     if (await openInputs.isVisible()) await openInputs.click();
     await openPensionInputs(page);
@@ -1567,9 +1589,9 @@ test.describe('Director resolved monthly financials @critical', () => {
       .filter({ visible: true })
       .click();
     await calculateAndView(page);
-    await expect(company('Taxable Profit')).toHaveText('£4,295');
-    await expect(company('Corp Tax Due')).toHaveText('£816');
-    await expect(company('Employer Pension')).toHaveCount(0);
+    await expect(company('Taxable profit')).toHaveText('£4,294.50');
+    await expect(company('Estimated Corporation Tax')).toHaveText('£815.96');
+    await expect(company('Employer pension')).toHaveCount(0);
   });
 
   test('DI-06: survival loss includes the projected trading loss and undeducted pension', async ({
@@ -1701,8 +1723,8 @@ test('JGF-170 A: compares affordably funded low-profit recruiter strategies @cri
       ).toBeVisible();
     }
   }
-  await expect(detailRowValue(page, 'Corporation Tax', 'Corp Tax Due')).toHaveText(
-    currency(recruiter.expected.allSalary.corporationTax),
+  await expect(detailRowValue(page, 'Corporation Tax', 'Estimated Corporation Tax')).toHaveText(
+    formatCurrency(recruiter.expected.allSalary.corporationTax),
   );
 
   await ensureInputsPanelIsVisible(page);
@@ -1712,12 +1734,18 @@ test('JGF-170 A: compares affordably funded low-profit recruiter strategies @cri
     'All Dividends',
   );
   await calculateAndView(page);
-  await expect(detailRowValue(page, 'Corporation Tax', 'Taxable Profit')).toHaveText(
-    currency(recruiter.expected.allDividends.taxableProfit),
+  await expect(detailRowValue(page, 'Corporation Tax', 'Taxable profit')).toHaveText(
+    formatCurrency(recruiter.expected.allDividends.taxableProfit),
   );
-  await expect(detailRowValue(page, 'Corporation Tax', 'Corp Tax Due')).toHaveText(
-    currency(recruiter.expected.allDividends.corporationTax),
+  await expect(detailRowValue(page, 'Corporation Tax', 'Estimated Corporation Tax')).toHaveText(
+    formatCurrency(recruiter.expected.allDividends.corporationTax),
   );
+  const dividend = (label: string) => detailRowValue(page, 'Dividend Breakdown', label);
+  await expect(dividend('Personal Allowance used')).toHaveText(
+    formatCurrency(-recruiter.expected.allDividends.dividends),
+  );
+  await expect(dividend('Dividend allowance used at nil rate')).toHaveText('£0.00');
+  await expect(dividend('Dividends subject to positive rates')).toHaveText('£0.00');
 });
 
 test('JGF-37 / JGF-170 C: uses only the submitted cash and reserves to cap the draw @critical', async ({
@@ -1855,8 +1883,8 @@ test('JGF-37 / JGF-170 C: uses only the submitted cash and reserves to cap the d
   await selectDropdownOption(page, strategy, 'Baseline Mix');
   await calculateAndView(page);
   await expectDraw(withPayroll.expected);
-  await expect(detailRowValue(page, 'Tax Summary', 'Employer NI (company)')).toHaveText(
-    referenceWholePounds.format(contractor.expected.optimalMix.employerNI),
+  await expect(detailRowValue(page, 'Company Allocation', 'Employer NI')).toHaveText(
+    formatCurrency(-contractor.expected.optimalMix.employerNI),
   );
 });
 
@@ -1888,9 +1916,9 @@ test.describe('Director Intelligence currency inputs @critical', () => {
 
     // £30,000.80 - £10,000.95 - £12,570 salary - £1,135.50 employer NI = £6,294.35.
     await expect(detailRowValue(page, 'Corporation Tax', 'Salary + Employer NI')).toHaveText(
-      '-£13,706',
+      '-£13,705.50',
     );
-    await expect(detailRowValue(page, 'Corporation Tax', 'Taxable Profit')).toHaveText('£6,294');
+    await expect(detailRowValue(page, 'Corporation Tax', 'Taxable profit')).toHaveText('£6,294.35');
   });
 
   test('a mid-string edit keeps the caret and the amount @critical', async ({ page }) => {
@@ -1945,8 +1973,8 @@ test.describe('Director Intelligence currency inputs @critical', () => {
     await calculateAndView(page);
     await expect(recommendation).toBeVisible();
     await expect(
-      page.getByRole('listitem', { name: 'Gross Profit: £80,000, 100% of total' }),
-    ).toBeVisible();
+      detailRowValue(page, 'Company Allocation', 'Profit after business expenses'),
+    ).toHaveText('£80,000.00');
     await expect(emailCta).toBeEnabled();
     await expect(sidebarEmail).toBeEnabled();
     await expect(calendar).toBeVisible();
@@ -2029,8 +2057,8 @@ test.describe('Director Intelligence currency inputs @critical', () => {
     await calculateAndView(page);
     await expect(recommendation).toBeVisible();
     await expect(
-      page.getByRole('listitem', { name: 'Gross Profit: £95,000, 100% of total' }),
-    ).toBeVisible();
+      detailRowValue(page, 'Company Allocation', 'Profit after business expenses'),
+    ).toHaveText('£95,000.00');
     await expect(emailCta).toBeEnabled();
     await expect(sidebarEmail).toBeEnabled();
     await expect(calendar).toBeVisible();

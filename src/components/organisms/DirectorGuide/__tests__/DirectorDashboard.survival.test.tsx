@@ -25,11 +25,13 @@ function createEmptyComparison(grossProfit: number) {
     incomeTax: 0,
     corporationTax: 0,
     dividendTax: 0,
+    dividendPersonalAllowanceUsed: 0,
+    dividendNilRateUsed: 0,
+    dividendsSubjectToTax: 0,
+    lossReliefUsed: 0,
     studentLoan: 0,
     totalPersonalTax: 0,
-    companyCost: 0,
     takeHome: 0,
-    effectiveRate: 0,
   };
 
   return {

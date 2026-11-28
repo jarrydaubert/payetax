@@ -34,11 +34,6 @@ const BASELINE_ENTRIES = [
     ['type:YourSetupResult'],
   ],
   [
-    'src/components/molecules/DirectorGuide/dashboard/DetailCards.tsx',
-    '@/constants/taxRates',
-    ['CURRENT_TAX_YEAR', 'TAX_RATES'],
-  ],
-  [
     'src/components/molecules/DirectorGuide/dashboard/EducationPanel.tsx',
     '@/constants/taxRates',
     ['CURRENT_TAX_YEAR', 'CURRENT_TAX_YEAR_DISPLAY', 'TAX_RATES'],

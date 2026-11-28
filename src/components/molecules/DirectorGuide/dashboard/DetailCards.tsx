@@ -1,269 +1,141 @@
-// src/components/molecules/DirectorGuide/dashboard/DetailCards.tsx
-/**
- * Detail Cards - 4 breakdown cards (Salary, Dividend, Corp Tax, Tax Summary)
- *
- * Rewired to use new strategy comparison store.
- * Matches the mockup design.
- */
 'use client';
 
 import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/calculator/useActiveDirectorScenario';
-import { CURRENT_TAX_YEAR, TAX_RATES } from '@/constants/taxRates';
-import { cn, formatCurrency } from '@/lib/utils';
+import { roundToPence } from '@/lib/tax';
+import { formatCurrency } from '@/lib/utils';
 import { useMonthlyModeOutput, useSubmittedDirectorForm } from '@/store/directorGuideStore';
 
-const TAX_YEAR = CURRENT_TAX_YEAR;
-const DIVIDEND_ALLOWANCE = TAX_RATES[TAX_YEAR].dividendAllowance;
+type DetailRow = [label: string, amount: number];
 
-interface DetailCardsProps {
-  className?: string;
-}
-
-export function DetailCards({ className }: DetailCardsProps) {
-  const { activeScenario, comparison, isProfitWhatIfActive } = useActiveDirectorScenario();
+export function DetailCards() {
+  const { financials, isProfitWhatIfActive } = useActiveDirectorScenario();
   const formData = useSubmittedDirectorForm();
   const monthlyOutput = useMonthlyModeOutput();
-  if (!(formData && activeScenario && comparison)) return null;
+  if (!(formData && financials)) return null;
 
-  const { mode, revenue, expenses, lossesBroughtForward } = formData;
-  const pension = formData.isPensionAlreadyDeducted ? 0 : formData.pensionContribution;
-  const resolvedRevenue = mode === 'monthly' ? monthlyOutput?.projectedRevenue : revenue;
-  const resolvedExpenses = mode === 'monthly' ? monthlyOutput?.projectedExpenses : expenses;
-  if (resolvedRevenue === undefined || resolvedExpenses === undefined) return null;
-  const { taperTaxOnOtherIncome = 0 } = activeScenario;
-  const incomeTaxOnSalaryAndBenefits = activeScenario.incomeTax - taperTaxOnOtherIncome;
+  const {
+    companyBalance,
+    companyBalanceLabel,
+    profitAfterBusinessExpenses,
+    profitAfterPension,
+    scenario,
+  } = financials;
+  const revenue = formData.mode === 'monthly' ? monthlyOutput?.projectedRevenue : formData.revenue;
+  const expenses =
+    formData.mode === 'monthly' ? monthlyOutput?.projectedExpenses : formData.expenses;
+  if (revenue === undefined || expenses === undefined) return null;
+
+  const profitLabel = isProfitWhatIfActive
+    ? 'Adjusted company profit'
+    : 'Profit after business expenses';
+  const employerNILabel = scenario.class1ANI > 0 ? 'Employer NI (incl. Class 1A)' : 'Employer NI';
+  const taperTax = scenario.taperTaxOnOtherIncome ?? 0;
+  const taxableProfitLabel =
+    roundToPence(profitAfterPension - scenario.salary - scenario.employerNI) < 0
+      ? 'Taxable profit (floored at £0)'
+      : 'Taxable profit';
 
   return (
-    <div className={cn('grid grid-cols-2 gap-4 max-lg:grid-cols-1', className)}>
-      {/* Salary Breakdown */}
-      <DetailCard
-        title='Salary Breakdown'
-        badge='Via payroll'
-        rows={[
-          { label: 'Gross Salary', value: formatCurrency(activeScenario.salary, 0) },
-          {
-            label: 'Income Tax',
-            value: formatCurrency(incomeTaxOnSalaryAndBenefits, 0),
-            positive: incomeTaxOnSalaryAndBenefits === 0,
-          },
-          {
-            label: 'Employee NI',
-            value: formatCurrency(activeScenario.employeeNI, 0),
-            positive: activeScenario.employeeNI === 0,
-          },
-          {
-            label:
-              activeScenario.companyCarBIK > 0
-                ? 'Employer NI + Class 1A (company)'
-                : 'Employer NI (company cost)',
-            value:
-              activeScenario.employerNI > 0
-                ? `-${formatCurrency(activeScenario.employerNI, 0)}`
-                : '£0',
-            negative: activeScenario.employerNI > 0,
-          },
-        ]}
-        total={{
-          label: 'Net Salary',
-          value: formatCurrency(
-            activeScenario.salary - incomeTaxOnSalaryAndBenefits - activeScenario.employeeNI,
-            0,
-          ),
-        }}
-      />
-
-      {/* Dividend Breakdown */}
-      <DetailCard
-        title='Dividend Breakdown'
-        badge='Rate varies by band'
-        rows={[
-          { label: 'Gross Dividends', value: formatCurrency(activeScenario.dividends, 0) },
-          {
-            label: 'Dividend Allowance',
-            value: `${formatCurrency(DIVIDEND_ALLOWANCE, 0)} tax-free`,
-            positive: true,
-          },
-          {
-            label: 'Taxable Amount',
-            value: formatCurrency(Math.max(0, activeScenario.dividends - DIVIDEND_ALLOWANCE), 0),
-          },
-          {
-            label: 'Dividend Tax',
-            value:
-              activeScenario.dividendTax > 0
-                ? `-${formatCurrency(activeScenario.dividendTax, 0)}`
-                : '£0',
-            negative: activeScenario.dividendTax > 0,
-          },
-        ]}
-        total={{
-          label: 'Net Dividends',
-          value: formatCurrency(activeScenario.dividends - activeScenario.dividendTax, 0),
-        }}
-      />
-
-      {/* Corporation Tax */}
+    <div className='grid grid-cols-2 gap-4 max-lg:grid-cols-1'>
       <DetailCard
         title='Corporation Tax'
-        badge='Rate varies by profit'
         rows={[
-          ...(isProfitWhatIfActive
-            ? [
-                {
-                  label: 'Scenario Gross Profit',
-                  value: formatCurrency(comparison.grossProfit, 0),
-                },
-              ]
-            : [
-                { label: 'Revenue', value: formatCurrency(resolvedRevenue, 0) },
-                {
-                  label: 'Business Expenses',
-                  value: resolvedExpenses > 0 ? `-${formatCurrency(resolvedExpenses, 0)}` : '£0',
-                  negative: resolvedExpenses > 0,
-                },
-              ]),
-          ...(pension > 0
-            ? [
-                {
-                  label: 'Employer Pension',
-                  value: `-${formatCurrency(pension, 0)}`,
-                  negative: true,
-                },
-              ]
+          ...(!isProfitWhatIfActive
+            ? ([
+                ['Revenue', revenue],
+                ['Business expenses', -expenses],
+              ] satisfies DetailRow[])
             : []),
-          {
-            label:
-              activeScenario.class1ANI > 0
-                ? 'Salary + Employer NI (incl. Class 1A)'
-                : 'Salary + Employer NI',
-            value: `-${formatCurrency(activeScenario.salary + activeScenario.employerNI, 0)}`,
-            negative: true,
-          },
-          ...(lossesBroughtForward > 0
-            ? [
-                {
-                  label: 'Losses Brought Forward',
-                  value: `-${formatCurrency(lossesBroughtForward, 0)}`,
-                  negative: true,
-                },
-              ]
+          [profitLabel, profitAfterBusinessExpenses],
+          ...(scenario.pension > 0
+            ? ([
+                ['Employer pension', -scenario.pension],
+                ['Profit after employer pension', profitAfterPension],
+              ] satisfies DetailRow[])
             : []),
-          { label: 'Taxable Profit', value: formatCurrency(activeScenario.taxableProfit, 0) },
+          [`Salary + ${employerNILabel}`, -(scenario.salary + scenario.employerNI)],
+          ...(scenario.lossReliefUsed > 0
+            ? ([['Trading loss relief used', -scenario.lossReliefUsed]] satisfies DetailRow[])
+            : []),
+          [taxableProfitLabel, scenario.taxableProfit],
         ]}
-        total={{
-          label: 'Corp Tax Due',
-          value: formatCurrency(activeScenario.corporationTax, 0),
-        }}
+        total={['Estimated Corporation Tax', scenario.corporationTax]}
       />
 
-      {/* Tax Summary */}
       <DetailCard
-        title='Tax Summary'
+        title='Company Allocation'
         rows={[
-          {
-            label: 'Corporation Tax (company)',
-            value: formatCurrency(activeScenario.corporationTax, 0),
-          },
-          {
-            label:
-              activeScenario.companyCarBIK > 0
-                ? 'Employer NI + Class 1A (company)'
-                : 'Employer NI (company)',
-            value: formatCurrency(activeScenario.employerNI, 0),
-          },
-          { label: 'Dividend Tax (you)', value: formatCurrency(activeScenario.dividendTax, 0) },
-          {
-            label: 'Personal Tax (salary)',
-            value: formatCurrency(incomeTaxOnSalaryAndBenefits + activeScenario.employeeNI, 0),
-          },
-          ...(taperTaxOnOtherIncome > 0
-            ? [
-                {
-                  label: 'Extra Income Tax on other income',
-                  value: formatCurrency(taperTaxOnOtherIncome, 0),
-                },
-              ]
+          [profitLabel, profitAfterBusinessExpenses],
+          ...(scenario.pension > 0
+            ? ([['Employer pension', -scenario.pension]] satisfies DetailRow[])
+            : []),
+          ['Gross salary', -scenario.salary],
+          [employerNILabel, -scenario.employerNI],
+          ['Corporation Tax', -scenario.corporationTax],
+          ['Gross dividends', -scenario.dividends],
+        ]}
+        total={[companyBalanceLabel, companyBalance]}
+      />
+
+      <DetailCard
+        title='Dividend Breakdown'
+        rows={[
+          ['Gross dividends', scenario.dividends],
+          ['Personal Allowance used', -scenario.dividendPersonalAllowanceUsed],
+          ['Dividend allowance used at nil rate', -scenario.dividendNilRateUsed],
+          ['Dividends subject to positive rates', scenario.dividendsSubjectToTax],
+        ]}
+        total={['Estimated dividend tax', scenario.dividendTax]}
+      />
+
+      <DetailCard
+        title='Personal Take-Home'
+        rows={[
+          ['Gross salary', scenario.salary],
+          ['Gross dividends', scenario.dividends],
+          ['Income Tax on salary and benefits', -(scenario.incomeTax - taperTax)],
+          ...(taperTax > 0
+            ? ([['Extra Income Tax on other income', -taperTax]] satisfies DetailRow[])
+            : []),
+          ['Employee NI', -scenario.employeeNI],
+          ['Dividend tax', -scenario.dividendTax],
+          ...(scenario.studentLoan > 0
+            ? ([['Student loan from this scenario', -scenario.studentLoan]] satisfies DetailRow[])
             : []),
         ]}
-        total={{
-          label: 'All Taxes & NI',
-          value: formatCurrency(
-            activeScenario.corporationTax +
-              activeScenario.employerNI +
-              activeScenario.dividendTax +
-              activeScenario.incomeTax +
-              activeScenario.employeeNI,
-            0,
-          ),
-          isError: true,
-        }}
+        total={['Estimated annual take-home', scenario.takeHome]}
       />
     </div>
   );
 }
 
-interface DetailRow {
-  label: string;
-  value: string;
-  positive?: boolean;
-  negative?: boolean;
-}
-
-interface DetailCardProps {
+function DetailCard({
+  title,
+  rows,
+  total,
+}: {
   title: string;
-  badge?: string;
   rows: DetailRow[];
-  total: {
-    label: string;
-    value: string;
-    isError?: boolean;
-  };
-}
-
-function DetailCard({ title, badge, rows, total }: DetailCardProps) {
+  total: DetailRow;
+}) {
   return (
     <div className='rounded-sm border border-border/60 bg-card p-5'>
-      <div className='mb-4 flex items-center justify-between'>
-        <span className='font-semibold text-foreground'>{title}</span>
-        {badge && (
-          <span className='rounded border border-primary/30 bg-primary/10 px-2 py-1 text-xs text-primary'>
-            {badge}
-          </span>
-        )}
-      </div>
-
-      <div>
-        {rows.map((row) => (
+      <h3 className='mb-3 font-semibold text-foreground'>{title}</h3>
+      <dl className='text-sm'>
+        {rows.map(([label, amount]) => (
           <div
-            key={row.label}
-            className='flex items-center justify-between border-b border-border/50 py-2.5 last:border-b-0'
+            key={label}
+            className='flex justify-between gap-2 border-b border-border/50 py-2.5 last:border-b-0'
           >
-            <span className='text-sm text-muted-foreground'>{row.label}</span>
-            <span
-              className={cn(
-                'font-mono text-sm',
-                row.positive && 'text-success',
-                row.negative && 'text-destructive',
-                !(row.positive || row.negative) && 'text-foreground',
-              )}
-            >
-              {row.value}
-            </span>
+            <dt className='text-muted-foreground'>{label}</dt>
+            <dd className='shrink-0 font-mono'>{formatCurrency(amount === 0 ? 0 : amount)}</dd>
           </div>
         ))}
-      </div>
-
-      <div className='mt-2 flex items-center justify-between border-t border-border/70 pt-3'>
-        <span className='font-semibold text-foreground'>{total.label}</span>
-        <span
-          className={cn(
-            'font-mono text-lg font-semibold',
-            total.isError ? 'text-destructive' : 'text-primary',
-          )}
-        >
-          {total.value}
-        </span>
-      </div>
+        <div className='mt-2 flex justify-between gap-2 border-t border-border/70 pt-3 font-semibold'>
+          <dt>{total[0]}</dt>
+          <dd className='shrink-0 font-mono'>{formatCurrency(total[1])}</dd>
+        </div>
+      </dl>
     </div>
   );
 }
