@@ -2098,6 +2098,58 @@ test.describe('Director Intelligence currency inputs @critical', () => {
 });
 
 test.describe('Director input help @critical', () => {
+  test('JGF-51: revenue instructions identify the invoice amount to enter in both modes', async ({
+    page,
+  }) => {
+    await openDirectorGuide(page);
+    const revenueBasis =
+      /add up the amounts before VAT on your invoices.*if you do not charge VAT, use the full sales amount/i;
+    const vatCheckbox = page.getByRole('checkbox', { name: /revenue includes VAT/i });
+    const annualRevenue = visibleInputByTestId(page, 'director-revenue-input');
+    await expect(annualRevenue).toHaveAccessibleDescription(revenueBasis);
+    await expect(page.getByText(revenueBasis).filter({ visible: true })).toBeVisible();
+    await expect(vatCheckbox).toHaveCount(0);
+
+    const annualHelp = visibleInputByTestId(page, 'tooltip-trigger-directorRevenue');
+    await annualHelp.click();
+    await expect(page.getByTestId('tooltip-content-directorRevenue')).toContainText(
+      'If an invoice shows £800 plus £160 VAT, include £800 in your sales total.',
+    );
+    await expect(page.getByRole('link', { name: 'HMRC VAT invoice guidance' })).toBeVisible();
+    await page.keyboard.press('Escape');
+    await fillCurrencyInput(annualRevenue, 800);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 0);
+    await selectEngland(page);
+    await calculateAndView(page);
+    await expect(detailRowValue(page, 'Corporation Tax', 'Revenue')).toHaveText('£800.00');
+
+    await ensureInputsPanelIsVisible(page);
+    await page
+      .getByRole('button', { name: 'Monthly', exact: true })
+      .filter({ visible: true })
+      .click();
+    const monthlyIncome = page
+      .getByRole('textbox', { name: 'Monthly Contract Income', exact: true })
+      .filter({ visible: true });
+    await expect(monthlyIncome).toHaveAccessibleDescription(revenueBasis);
+    await expect(page.getByText(revenueBasis).filter({ visible: true })).toBeVisible();
+    await expect(vatCheckbox).toHaveCount(0);
+    await fillCurrencyInput(monthlyIncome, 1200);
+    await fillCurrencyInput(
+      page
+        .getByRole('textbox', { name: 'Monthly Business Expenses', exact: true })
+        .filter({ visible: true }),
+      0,
+    );
+    await selectDropdownOption(
+      page,
+      page.getByRole('combobox', { name: 'Contract Start Month' }).filter({ visible: true }),
+      'April',
+    );
+    await calculateAndView(page);
+    await expect(detailRowValue(page, 'Corporation Tax', 'Revenue')).toHaveText('£14,400.00');
+  });
+
   test.use({ hasTouch: true });
 
   test('help works in annual, full and monthly inputs, including the mobile drawer', async ({
@@ -2191,7 +2243,7 @@ test.describe('Director input help @critical', () => {
     await visibleButton('Monthly').click();
     const monthly = await checkVisibleInputHelp(page);
     expect(monthly).toContain('tooltip-trigger-directorRunwayMonths');
-    expect(new Set([...annual, ...monthly]).size).toBe(26);
+    expect(new Set([...annual, ...monthly]).size).toBe(25);
     await expect(page.getByRole('dialog', { name: 'Your Numbers' })).toBeVisible();
   });
 
@@ -2257,7 +2309,6 @@ test.describe('Director input help @critical', () => {
     await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 100000);
     await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 20000);
     await selectEngland(page);
-    await page.locator('[data-testid="director-includes-vat-checkbox"]:visible').check();
     await page
       .getByRole('button', { name: 'Full Inputs', exact: true })
       .filter({ visible: true })
@@ -2278,7 +2329,8 @@ test.describe('Director input help @critical', () => {
     );
     await calculateAndView(page);
     const notes = page.getByTestId('director-estimate-notes');
-    await expect(notes).toContainText('VAT has not been removed');
+    await expect(notes).not.toContainText('An earlier entry was marked as including VAT.');
+    await expect(notes).not.toContainText('VAT has not been removed');
     await expect(notes).toContainText(
       'your other job has a separate National Insurance calculation',
     );

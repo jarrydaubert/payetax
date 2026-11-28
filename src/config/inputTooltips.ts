@@ -30,6 +30,14 @@ export const TooltipContentSchema = z.object({
 /** Tooltip content structure - inferred from Zod schema for single source of truth */
 export type TooltipContent = z.infer<typeof TooltipContentSchema>;
 
+export const DIRECTOR_REVENUE_BASIS =
+  'Add up the amounts before VAT on your invoices. If you do not charge VAT, use the full sales amount.';
+
+const vatInvoiceSource = {
+  label: 'HMRC VAT invoice guidance',
+  url: 'https://www.gov.uk/hmrc-internal-manuals/vat-trader-records/vatrec5010',
+};
+
 export const INPUT_TOOLTIPS = {
   salary: {
     title: 'Gross Salary',
@@ -112,12 +120,9 @@ export const INPUT_TOOLTIPS = {
   directorRevenue: {
     title: 'Annual Revenue',
     description:
-      "Your company's total sales for the year, before business expenses. Enter revenue, not profit.",
-  },
-  directorIncludesVat: {
-    title: 'Revenue Includes VAT',
-    description: 'Select if your revenue figure includes VAT.',
-    note: 'VAT is not subtracted from your revenue in the estimate.',
+      "Your company's total sales for the year, before business expenses and any VAT you charge.",
+    note: 'If an invoice shows £800 plus £160 VAT, include £800 in your sales total.',
+    source: vatInvoiceSource,
   },
   directorExpenses: {
     title: 'Business Expenses',
@@ -126,8 +131,10 @@ export const INPUT_TOOLTIPS = {
   },
   directorMonthlyIncome: {
     title: 'Monthly Contract Income',
-    description: 'What you expect to invoice each month, before business expenses.',
+    description:
+      'What you expect to invoice each month, before business expenses and any VAT you charge.',
     note: 'We assume this stays the same from your selected start month through March.',
+    source: vatInvoiceSource,
   },
   directorMonthlyExpenses: {
     title: 'Monthly Business Expenses',

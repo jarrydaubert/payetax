@@ -116,7 +116,12 @@ describe('DirectorGuide InputsPanel', () => {
   it('shows annual fields by default and switches to monthly fields', () => {
     render(<InputsPanel />);
 
-    expect(screen.getByLabelText('Annual Revenue')).toBeInTheDocument();
+    const revenueBasis =
+      /add up the amounts before VAT on your invoices.*use the full sales amount/i;
+    expect(screen.getByLabelText('Annual Revenue')).toHaveAccessibleDescription(revenueBasis);
+    expect(
+      screen.queryByRole('checkbox', { name: /revenue includes VAT/i }),
+    ).not.toBeInTheDocument();
     expect(screen.getByLabelText('Business Expenses')).toBeInTheDocument();
     expect(screen.queryByText('Total invoiced before expenses')).not.toBeInTheDocument();
     expect(
@@ -127,7 +132,12 @@ describe('DirectorGuide InputsPanel', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Monthly' }));
 
     expect(useDirectorGuideStore.getState().formData.mode).toBe('monthly');
-    expect(screen.getByLabelText('Monthly Contract Income')).toBeInTheDocument();
+    expect(screen.getByLabelText('Monthly Contract Income')).toHaveAccessibleDescription(
+      revenueBasis,
+    );
+    expect(
+      screen.queryByRole('checkbox', { name: /revenue includes VAT/i }),
+    ).not.toBeInTheDocument();
     expect(screen.getByLabelText('Monthly Business Expenses')).toBeInTheDocument();
     expect(screen.queryByText('Typical gross invoicing per month')).not.toBeInTheDocument();
     expect(
@@ -386,7 +396,10 @@ describe('DirectorGuide InputsPanel', () => {
       expect(input).toHaveValue('-500');
       expect(input).toHaveAttribute('aria-invalid', 'true');
       const error = screen.getByText(CURRENCY_INPUT_ERRORS.negative);
-      expect(input.getAttribute('aria-describedby')?.split(' ')).toEqual([error.id]);
+      expect(input.getAttribute('aria-describedby')?.split(' ')).toContain(error.id);
+      expect(input).toHaveAccessibleDescription(
+        /add up the amounts before VAT on your invoices.*negative/i,
+      );
     });
 
     it.each([

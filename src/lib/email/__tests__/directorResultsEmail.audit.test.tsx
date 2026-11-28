@@ -112,6 +112,7 @@ describe('Director display → email payload → server → HTML/text audit', ()
       );
       const current = useDirectorGuideStore.getState().formData;
       expect(request.input.region).toBe(current.region);
+      expect(request.input.includesVat).toBe(sample.id === 'vat-flag');
       expect(request.input.pensionContribution).toBe(
         current.isPensionAlreadyDeducted ? 0 : current.pensionContribution,
       );

@@ -226,7 +226,7 @@ export function calculateStrategyComparison(
 
   // Calculate gross profit (after pension - employer contribution reduces distributable profit)
   const pensionContribution = input.pensionContribution ?? 0;
-  // Spec: VAT status is warnings/education only (do NOT adjust revenue in calculations).
+  // Use the revenue supplied. The legacy VAT flag is metadata for guidance.
   const grossProfitBeforePension = input.revenue - input.expenses;
   const grossProfit = roundToPence(Math.max(0, grossProfitBeforePension - pensionContribution));
 

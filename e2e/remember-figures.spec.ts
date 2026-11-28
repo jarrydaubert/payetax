@@ -199,11 +199,13 @@ test('Director legacy Restore is keyboard reachable and remembers the input acro
   page,
 }) => {
   await open(page, '/tools/director-guide');
+  const snapshots = legacyFigureSnapshots(Date.now());
+  snapshots[directorKey].state.formData.includesVat = true;
   await page.evaluate((snapshots) => {
     for (const [key, snapshot] of Object.entries(snapshots)) {
       localStorage.setItem(key, JSON.stringify(snapshot));
     }
-  }, legacyFigureSnapshots(Date.now()));
+  }, snapshots);
   await page.reload({ waitUntil: 'networkidle' });
   const restore = page.getByRole('button', { name: 'Restore saved figures and remember' });
   const legacyClear = page.getByRole('button', { name: 'Clear figures and start fresh' });
@@ -226,6 +228,26 @@ test('Director legacy Restore is keyboard reachable and remembers the input acro
   await expect(revenue(page)).toHaveValue('£87,654.32');
   await page.reload({ waitUntil: 'networkidle' });
   await expect(checkbox(page)).toBeChecked();
+  await expect(revenue(page)).toHaveValue('£87,654.32');
+  await expect(revenue(page)).toHaveAccessibleDescription(
+    /add up the amounts before VAT on your invoices.*saved figures were marked as including VAT/i,
+  );
+  await expect(
+    page.getByText(
+      'Your saved figures were marked as including VAT. Check this amount before calculating.',
+    ),
+  ).toBeVisible();
+  await expect(page.getByRole('checkbox', { name: /revenue includes VAT/i })).toHaveCount(0);
+  const notes = page.getByTestId('director-estimate-notes');
+  await expect(notes).toHaveCount(0);
+  await page.getByTestId('director-expenses-input').filter({ visible: true }).fill('20000');
+  await page.getByTestId('director-region-select').filter({ visible: true }).click();
+  await page.getByRole('option', { name: 'England, Wales, or Northern Ireland' }).press('Enter');
+  await page.getByRole('button', { name: 'Calculate', exact: true }).click();
+  await expect(notes).toContainText('An earlier entry was marked as including VAT.');
+  await expect(notes).toContainText(
+    'Check that the sales figure for this estimate excludes any VAT you charged.',
+  );
   await expect(revenue(page)).toHaveValue('£87,654.32');
 });
 
