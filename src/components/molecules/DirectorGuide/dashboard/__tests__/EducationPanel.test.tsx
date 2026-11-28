@@ -145,7 +145,7 @@ describe('DirectorGuide EducationPanel', () => {
       ).toBeVisible();
       expect(
         screen.getByText(
-          /in the next 30 days, notify HMRC by the end of that period, counted from when the expectation arose/i,
+          /taxable turnover in the next 30 days alone to go over the threshold, notify HMRC by the end of that period, counted from when the expectation arose/i,
         ),
       ).toBeVisible();
       expect(screen.getByRole('link', { name: /VAT registration rules/i })).toHaveAttribute(

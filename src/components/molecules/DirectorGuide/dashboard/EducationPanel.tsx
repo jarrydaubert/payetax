@@ -125,9 +125,9 @@ export function EducationPanel({ className, monthlyDraw }: EducationPanelProps) 
             <>
               If your business is UK-established, check your taxable turnover excluding VAT. If
               rolling 12-month taxable turnover went over {formatCurrency(VAT_THRESHOLD, 0)}, notify
-              HMRC within 30 days of the end of that month. If you expect to go over the threshold
-              in the next 30 days, notify HMRC by the end of that period, counted from when the
-              expectation arose.{' '}
+              HMRC within 30 days of the end of that month. If you expect taxable turnover in the
+              next 30 days alone to go over the threshold, notify HMRC by the end of that period,
+              counted from when the expectation arose.{' '}
               <a
                 href='https://www.gov.uk/register-for-vat'
                 className='underline underline-offset-2'
