@@ -254,7 +254,7 @@ describe('C · cash-constrained contractor', () => {
       });
       expect(verifyAmounts(`C ${variant} cash`, cashFields, scenario.expected, draw)).toEqual([]);
       expect(draw.hasBufferShortfall).toBe(scenario.expected.shortfall > 0);
-      expect(draw.hasContractEndRisk).toBe(false);
+      expect(draw.runwayTargetReachesProjectionEnd).toBe(false);
     },
   );
 });

@@ -125,7 +125,7 @@ describe('variableIncome helpers', () => {
       expect(result.cashBasedCeiling).toBe(9000);
       expect(result.safeMonthlyDraw).toBe(4000);
       expect(result.hasBufferShortfall).toBe(false);
-      expect(result.hasContractEndRisk).toBe(false);
+      expect(result.runwayTargetReachesProjectionEnd).toBe(false);
     });
 
     it('protects the buffer when cash falls short of it', () => {
@@ -144,7 +144,7 @@ describe('variableIncome helpers', () => {
       expect(result.spendingShortfall).toBe(1000);
       expect(result.shortfall).toBe(3700);
       expect(result.hasBufferShortfall).toBe(true);
-      expect(result.hasContractEndRisk).toBe(false);
+      expect(result.runwayTargetReachesProjectionEnd).toBe(false);
     });
 
     it('cannot fund a £900 spending target from zero cash even with projected income', () => {
@@ -211,7 +211,7 @@ describe('variableIncome helpers', () => {
       expect(result.spendingShortfall).toBe(900);
     });
 
-    it('flags contract-end risk when runway target is longer than months remaining', () => {
+    it('identifies when the runway target is longer than the projection', () => {
       const result = calculateSafeMonthlyDraw({
         annualTakeHome: 9000,
         monthsRemaining: 2,
@@ -221,7 +221,7 @@ describe('variableIncome helpers', () => {
         monthlyExpenses: 300,
       });
 
-      expect(result.hasContractEndRisk).toBe(true);
+      expect(result.runwayTargetReachesProjectionEnd).toBe(true);
     });
   });
 });

@@ -15,7 +15,6 @@ const DIRECTOR_GUIDE_POA = PAYMENTS_ON_ACCOUNT[CURRENT_TAX_YEAR];
 
 export const DIRECTOR_GUIDE_BUSINESS_THRESHOLDS = {
   vatRegistration: DIRECTOR_GUIDE_RATES.vatRegistrationThreshold,
-  vatApproaching: DIRECTOR_GUIDE_RATES.vatRegistrationThreshold - 5_000,
   hicbcStart: DIRECTOR_GUIDE_RATES.hicbc.start,
   hicbcEnd: DIRECTOR_GUIDE_RATES.hicbc.end,
   // Educational early-warning threshold (UX). Deliberately BELOW the statutory

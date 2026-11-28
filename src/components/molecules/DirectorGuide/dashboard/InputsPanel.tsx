@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { DIRECTOR_REVENUE_BASIS } from '@/config/inputTooltips';
 import { CURRENT_TAX_YEAR, type StudentLoanPlan, TAX_RATES } from '@/constants/taxRates';
 import { formatCurrencyInputValue } from '@/lib/currencyInput';
 import { trackStrategySelected } from '@/lib/directorGuideAnalytics';
@@ -108,6 +109,7 @@ export function InputsPanel({ onReset, onCalculate, className }: InputsPanelProp
   } = useDirectorValidationSummary();
   const isCalculating = useIsCalculating();
   const calculationErrorId = `${baseId}-calculation-error`;
+  const revenueBasisId = `${baseId}-revenue-basis`;
 
   const formData = useDirectorFormSlice((formData) => ({
     mode: formData.mode,
@@ -141,6 +143,16 @@ export function InputsPanel({ onReset, onCalculate, className }: InputsPanelProp
   const actions = useDirectorGuideActions();
   const isMonthlyMode = formData.mode === 'monthly';
   const selectedRegion = formData.region ?? '';
+  const revenueBasis = (
+    <div id={revenueBasisId} className='space-y-1 text-xs text-muted-foreground'>
+      <p>{DIRECTOR_REVENUE_BASIS}</p>
+      {formData.includesVat && (
+        <p>
+          Your saved figures were marked as including VAT. Check this amount before calculating.
+        </p>
+      )}
+    </div>
+  );
 
   const validityFor = (field: DirectorInputField) => (invalid: CurrencyInputInvalidDraft | null) =>
     actions.setInputError(field, invalid);
@@ -247,7 +259,6 @@ export function InputsPanel({ onReset, onCalculate, className }: InputsPanelProp
     additionalCommittedCash: `${baseId}-additional-committed-cash`,
     minimumMonthlyDraw: `${baseId}-minimum-monthly-draw`,
     runwayMonths: `${baseId}-runway-months`,
-    includesVat: `${baseId}-includes-vat`,
     expenses: `${baseId}-expenses`,
     region: `${baseId}-region`,
     accountingPeriodEnd: `${baseId}-accounting-period-end`,
@@ -406,9 +417,11 @@ export function InputsPanel({ onReset, onCalculate, className }: InputsPanelProp
                 onValueChange={actions.setMonthlyIncome}
                 onValidityChange={validityFor('monthlyIncome')}
                 invalidDraft={inputErrors.monthlyIncome}
+                aria-describedby={revenueBasisId}
                 placeholder='£0'
                 className={INPUT_CLASS}
               />
+              {revenueBasis}
             </Field>
 
             <Field
@@ -540,9 +553,11 @@ export function InputsPanel({ onReset, onCalculate, className }: InputsPanelProp
                 onValueChange={actions.setRevenue}
                 onValidityChange={validityFor('revenue')}
                 invalidDraft={inputErrors.revenue}
+                aria-describedby={revenueBasisId}
                 placeholder='£0'
                 className={INPUT_CLASS}
               />
+              {revenueBasis}
             </Field>
 
             <Field label='Business Expenses' id={ids.expenses} tooltipFieldName='directorExpenses'>
@@ -560,20 +575,6 @@ export function InputsPanel({ onReset, onCalculate, className }: InputsPanelProp
             </Field>
           </>
         )}
-
-        <div className='flex items-center gap-2'>
-          <Checkbox
-            id={ids.includesVat}
-            data-testid='director-includes-vat-checkbox'
-            checked={formData.includesVat}
-            onCheckedChange={(checked) => actions.setIncludesVat(checked === true)}
-            className='border-border data-[state=checked]:bg-primary'
-          />
-          <Label htmlFor={ids.includesVat} className='cursor-pointer text-sm text-muted-foreground'>
-            Revenue includes VAT
-          </Label>
-          <LabelTooltip fieldName='directorIncludesVat' />
-        </div>
 
         <Field label='Income Tax Region' id={ids.region} tooltipFieldName='region'>
           <Select value={selectedRegion} onValueChange={(v) => actions.setRegion(v as Region)}>

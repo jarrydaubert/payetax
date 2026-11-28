@@ -139,6 +139,8 @@ describe('Director results route → real orchestration/templates', () => {
           expect(content).toContain('This report does not include company deadlines.');
           expect(content).toContain('follow the company accounting period');
           expect(content).toContain('Instalment rules may change when Corporation Tax is due.');
+          expect(content).toContain('including Scottish Government rates for Scottish Income Tax.');
+          expect(content).not.toContain('Based on HMRC rates');
           expect(content).toContain('https://www.gov.uk/pay-corporation-tax');
           expect(content).toContain('https://www.gov.uk/company-tax-returns');
           expect(content).toContain(

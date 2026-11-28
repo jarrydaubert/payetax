@@ -320,8 +320,8 @@ export function DirectorDashboard() {
                   >
                     {formData.includesVat && (
                       <p>
-                        VAT has not been removed from the revenue you entered, so this estimate may
-                        be too high.
+                        An earlier entry was marked as including VAT. Check that the sales figure
+                        for this estimate excludes any VAT you charged.
                       </p>
                     )}
                     {formData.hasOtherPAYEEmployment && (

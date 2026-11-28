@@ -80,7 +80,7 @@ describe('Strategy Optimization', () => {
       expect(result.strategies.yourSetup?.deltaVsOptimal).toBeGreaterThan(0);
     });
 
-    it('should treat VAT status as warning-only (includesVat does not change results)', () => {
+    it('does not adjust revenue or results based on the legacy VAT flag', () => {
       const base = createInput(100000);
       const withVatFlag = { ...base, includesVat: true };
       const withoutVatFlag = { ...base, includesVat: false };

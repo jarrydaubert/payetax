@@ -107,8 +107,12 @@ describe('Director Intelligence input components', () => {
     expect(useDirectorGuideStore.getState().formData.revenue).toBe(100000);
     expect(useDirectorGuideStore.getState().formData.expenses).toBe(20000);
 
-    fireEvent.click(screen.getByLabelText('Revenue includes VAT (warnings only)'));
-    expect(useDirectorGuideStore.getState().formData.includesVat).toBe(true);
+    expect(screen.getByLabelText('Annual Revenue')).toHaveAccessibleDescription(
+      /add up the amounts before VAT on your invoices.*use the full sales amount/i,
+    );
+    expect(
+      screen.queryByRole('checkbox', { name: /revenue includes VAT/i }),
+    ).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByText('Scotland'));
     expect(useDirectorGuideStore.getState().formData.region).toBe('scotland');

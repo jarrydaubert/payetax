@@ -4,7 +4,7 @@
  * What bugs will these tests find?
  * - Regressions that stop `/tools/director-guide` from producing results
  * - Survival Mode regressions (profit <= 0 should show Survival panel and hide strategy UI)
- * - VAT warning gating regressions (VAT warnings must show based on revenue even in Survival Mode)
+ * - VAT guidance claiming registration based only on a projection
  * - Email flow regressions (dialog opens and POST succeeds)
  * - Currency-input regressions (DI-01): pence scaled or dropped, pasted/formatted amounts
  *   misread, negative/malformed text silently converted, caret jumping during edits
@@ -20,6 +20,7 @@ import { formatCurrency } from '../src/lib/utils';
 import type { DirectorEmailInput } from '../src/lib/validation/emailValidation';
 import {
   contractor,
+  lossMakingStudio,
   recruiter,
   referenceTaxYear,
 } from '../src/test/directorReferenceFixtures/referenceCompanies';
@@ -158,7 +159,8 @@ async function ensureInputsPanelIsVisible(
   }
 
   const openInputsButton = page.getByRole('button', { name: /open calculator inputs/i });
-  if (await openInputsButton.isVisible().catch(() => false)) {
+  await expect(input.or(openInputsButton).first()).toBeVisible();
+  if (!(await input.isVisible())) {
     await openInputsButton.click();
   }
 
@@ -199,23 +201,6 @@ async function calculateAndView(page: Page) {
   }
   await currentCalculateButton(page).click();
   await closeInputsPanelIfOpen(page);
-}
-
-async function ensureLearnPanelIsVisible(page: Page): Promise<void> {
-  const vatWarnings = page.getByText('VAT Registration Required');
-  if ((await firstVisible(vatWarnings)) !== null) {
-    return;
-  }
-
-  const openLearnButtons = page.getByRole('button', { name: /show learn panel/i });
-  const openLearnButton = await firstVisible(openLearnButtons);
-  if (openLearnButton) {
-    await openLearnButton.click();
-  }
-
-  await expect
-    .poll(async () => ((await firstVisible(vatWarnings)) ? 'visible' : 'hidden'))
-    .toBe('visible');
 }
 
 test('JGF-150: a complete draft does not publish until Calculate @critical', async ({ page }) => {
@@ -1413,8 +1398,9 @@ test.describe('Director Intelligence critical @critical', () => {
     await expect(page.getByLabel('Email address')).toBeHidden();
   });
 
-  test('Survival mode: shows Survival panel and VAT warning (ungated) @critical', async ({
+  test('JGF-51: Survival explains the period loss and shows VAT guidance without a verdict @critical', async ({
     page,
+    isMobile,
   }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await suppressWelcomeDialog(page);
@@ -1422,14 +1408,13 @@ test.describe('Director Intelligence critical @critical', () => {
     await dismissWelcomeDialogIfPresent(page);
     await ensureInputsPanelIsVisible(page);
 
-    // Zero profit: Survival Mode.
     const revenueInput = visibleInputByTestId(page, 'director-revenue-input');
     const expensesInput = visibleInputByTestId(page, 'director-expenses-input');
 
-    await fillCurrencyInput(revenueInput, 90000);
-    await fillCurrencyInput(expensesInput, 90000);
-    await expectNumericValue(revenueInput, 90000);
-    await expectNumericValue(expensesInput, 90000);
+    await fillCurrencyInput(revenueInput, lossMakingStudio.input.revenue);
+    await fillCurrencyInput(expensesInput, lossMakingStudio.input.expenses);
+    await expectNumericValue(revenueInput, lossMakingStudio.input.revenue);
+    await expectNumericValue(expensesInput, lossMakingStudio.input.expenses);
 
     await selectDropdownOption(
       page,
@@ -1439,11 +1424,30 @@ test.describe('Director Intelligence critical @critical', () => {
 
     await calculateAndView(page);
 
-    await expect(page.getByTestId('director-survival-mode')).toBeVisible();
+    const survival = page.getByTestId('director-survival-mode');
+    await expect(survival).toBeVisible();
+    await expect(survival).toContainText('no current-period profit available for dividends');
+    await expect(survival).toContainText('check accumulated realised profits and losses');
+    await expect(survival).not.toContainText("Dividends aren't possible");
+    await expect(survival).toContainText('Other work, voluntary contributions and NI credits');
     await expect(page.getByRole('heading', { name: 'Compare Strategies' })).toBeHidden();
 
-    // VAT warning text should still be present for high-revenue survival cases.
-    await ensureLearnPanelIsVisible(page);
+    await ensureInputsPanelIsVisible(page);
+    await fillCurrencyInput(revenueInput, 90000);
+    await fillCurrencyInput(expensesInput, 90000);
+    await expect(survival).toHaveCount(0);
+    await calculateAndView(page);
+    await expect(survival).toBeVisible();
+    const openLearn = await firstVisible(page.getByRole('button', { name: 'Show learn panel' }));
+    if (openLearn) await openLearn.click();
+    const learn = isMobile
+      ? page.getByRole('dialog', { name: 'Learn' })
+      : page
+          .getByRole('complementary')
+          .filter({ has: page.getByRole('heading', { name: 'Assumptions' }) });
+    await expect(learn.getByRole('link', { name: /VAT registration rules/i })).toBeVisible();
+    await expect(learn.getByText('VAT Registration Required')).toHaveCount(0);
+    await expect(learn.getByText(/counted from when the expectation arose/i)).toBeVisible();
   });
 });
 
@@ -2094,6 +2098,58 @@ test.describe('Director Intelligence currency inputs @critical', () => {
 });
 
 test.describe('Director input help @critical', () => {
+  test('JGF-51: revenue instructions identify the invoice amount to enter in both modes', async ({
+    page,
+  }) => {
+    await openDirectorGuide(page);
+    const revenueBasis =
+      /add up the amounts before VAT on your invoices.*if you do not charge VAT, use the full sales amount/i;
+    const vatCheckbox = page.getByRole('checkbox', { name: /revenue includes VAT/i });
+    const annualRevenue = visibleInputByTestId(page, 'director-revenue-input');
+    await expect(annualRevenue).toHaveAccessibleDescription(revenueBasis);
+    await expect(page.getByText(revenueBasis).filter({ visible: true })).toBeVisible();
+    await expect(vatCheckbox).toHaveCount(0);
+
+    const annualHelp = visibleInputByTestId(page, 'tooltip-trigger-directorRevenue');
+    await annualHelp.click();
+    await expect(page.getByTestId('tooltip-content-directorRevenue')).toContainText(
+      'If an invoice shows £800 plus £160 VAT, include £800 in your sales total.',
+    );
+    await expect(page.getByRole('link', { name: 'HMRC VAT invoice guidance' })).toBeVisible();
+    await page.keyboard.press('Escape');
+    await fillCurrencyInput(annualRevenue, 800);
+    await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 0);
+    await selectEngland(page);
+    await calculateAndView(page);
+    await expect(detailRowValue(page, 'Corporation Tax', 'Revenue')).toHaveText('£800.00');
+
+    await ensureInputsPanelIsVisible(page);
+    await page
+      .getByRole('button', { name: 'Monthly', exact: true })
+      .filter({ visible: true })
+      .click();
+    const monthlyIncome = page
+      .getByRole('textbox', { name: 'Monthly Contract Income', exact: true })
+      .filter({ visible: true });
+    await expect(monthlyIncome).toHaveAccessibleDescription(revenueBasis);
+    await expect(page.getByText(revenueBasis).filter({ visible: true })).toBeVisible();
+    await expect(vatCheckbox).toHaveCount(0);
+    await fillCurrencyInput(monthlyIncome, 1200);
+    await fillCurrencyInput(
+      page
+        .getByRole('textbox', { name: 'Monthly Business Expenses', exact: true })
+        .filter({ visible: true }),
+      0,
+    );
+    await selectDropdownOption(
+      page,
+      page.getByRole('combobox', { name: 'Contract Start Month' }).filter({ visible: true }),
+      'April',
+    );
+    await calculateAndView(page);
+    await expect(detailRowValue(page, 'Corporation Tax', 'Revenue')).toHaveText('£14,400.00');
+  });
+
   test.use({ hasTouch: true });
 
   test('help works in annual, full and monthly inputs, including the mobile drawer', async ({
@@ -2165,10 +2221,29 @@ test.describe('Director input help @critical', () => {
     const annual = await checkVisibleInputHelp(page);
     expect(annual).toContain('tooltip-trigger-directorPensionDeducted');
     expect(annual).toContain('tooltip-trigger-directorYearEnd');
+    for (const [field, guidance, source] of [
+      [
+        'directorEmploymentAllowance',
+        /only employee liable for secondary Class 1/i,
+        'HMRC single-director eligibility guidance',
+      ],
+      ['directorYtdDividends', /due and payable since 6 April/i, 'HMRC dividend timing guidance'],
+    ] as const) {
+      const trigger = visibleInputByTestId(page, `tooltip-trigger-${field}`);
+      await trigger.tap();
+      const help = page.getByTestId(`tooltip-content-${field}`);
+      const link = help.getByRole('link', { name: source });
+      await expect(help).toContainText(guidance);
+      await expect(link).toBeVisible();
+      await trigger.press('ArrowDown');
+      await expect(link).toBeFocused();
+      await page.keyboard.press('Escape');
+      await expect(trigger).toBeFocused();
+    }
     await visibleButton('Monthly').click();
     const monthly = await checkVisibleInputHelp(page);
     expect(monthly).toContain('tooltip-trigger-directorRunwayMonths');
-    expect(new Set([...annual, ...monthly]).size).toBe(26);
+    expect(new Set([...annual, ...monthly]).size).toBe(25);
     await expect(page.getByRole('dialog', { name: 'Your Numbers' })).toBeVisible();
   });
 
@@ -2234,7 +2309,6 @@ test.describe('Director input help @critical', () => {
     await fillCurrencyInput(visibleInputByTestId(page, 'director-revenue-input'), 100000);
     await fillCurrencyInput(visibleInputByTestId(page, 'director-expenses-input'), 20000);
     await selectEngland(page);
-    await page.locator('[data-testid="director-includes-vat-checkbox"]:visible').check();
     await page
       .getByRole('button', { name: 'Full Inputs', exact: true })
       .filter({ visible: true })
@@ -2255,7 +2329,8 @@ test.describe('Director input help @critical', () => {
     );
     await calculateAndView(page);
     const notes = page.getByTestId('director-estimate-notes');
-    await expect(notes).toContainText('VAT has not been removed');
+    await expect(notes).not.toContainText('An earlier entry was marked as including VAT.');
+    await expect(notes).not.toContainText('VAT has not been removed');
     await expect(notes).toContainText(
       'your other job has a separate National Insurance calculation',
     );

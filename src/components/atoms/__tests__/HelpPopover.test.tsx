@@ -46,6 +46,11 @@ it('toggles with Enter and Space, exposes help without moving focus, and dismiss
   await user.tab();
   expect(screen.getByRole('textbox')).toHaveFocus();
   expect(screen.queryByRole('region')).not.toBeInTheDocument();
+  trigger.focus();
+  await user.keyboard('{Enter}{ArrowDown}');
+  expect(screen.getByRole('region', { name: 'Salary help' })).toHaveFocus();
+  await user.keyboard('{Escape}');
+  await waitFor(() => expect(trigger).toHaveFocus());
 });
 
 it('supports repeated touch, a close button and outside input interaction', async () => {
@@ -65,6 +70,27 @@ it('supports repeated touch, a close button and outside input interaction', asyn
   await user.click(screen.getByRole('textbox'));
   await waitFor(() => expect(screen.queryByRole('region')).not.toBeInTheDocument());
   expect(screen.getByRole('textbox')).toHaveFocus();
+});
+
+it('reaches a source link by Tab or Arrow Down and restores focus on Escape', async () => {
+  const user = userEvent.setup();
+  render(
+    <HelpPopover label='Salary help' trigger={<button type='button'>Salary help</button>}>
+      <a href='https://example.com/guidance'>Source guidance</a>
+    </HelpPopover>,
+  );
+  const trigger = screen.getByRole('button', { name: 'Salary help' });
+  trigger.focus();
+  await user.keyboard('{Enter}');
+  screen.getByRole('region', { name: 'Salary help' }).focus();
+  await user.tab();
+  expect(screen.getByRole('link', { name: 'Source guidance' })).toHaveFocus();
+  await user.keyboard('{Escape}');
+  await waitFor(() => expect(trigger).toHaveFocus());
+  await user.keyboard('{Enter}{ArrowDown}');
+  expect(screen.getByRole('link', { name: 'Source guidance' })).toHaveFocus();
+  await user.keyboard('{Escape}');
+  await waitFor(() => expect(trigger).toHaveFocus());
 });
 
 function Drawer() {

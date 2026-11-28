@@ -9,7 +9,6 @@
 import { useId } from 'react';
 import { LabelTooltip } from '@/components/atoms/LabelTooltip';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -19,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { DIRECTOR_REVENUE_BASIS } from '@/config/inputTooltips';
 import type { Region } from '@/lib/validation/directorValidation';
 import { useDirectorFormSlice, useDirectorGuideActions } from '@/store/directorGuideStore';
 import { AccountingPeriodEndInput } from './AccountingPeriodEndInput';
@@ -27,14 +27,13 @@ export function CoreInputs() {
   const id = useId();
   const formData = useDirectorFormSlice((state) => ({
     revenue: state.revenue,
-    includesVat: state.includesVat,
     expenses: state.expenses,
     region: state.region,
   }));
-  const { setRegion, setRevenue, setIncludesVat, setExpenses } = useDirectorGuideActions();
+  const { setRegion, setRevenue, setExpenses } = useDirectorGuideActions();
 
   const revenueId = `${id}-revenue`;
-  const vatId = `${id}-vat`;
+  const revenueBasisId = `${id}-revenue-basis`;
   const expensesId = `${id}-expenses`;
   const regionId = `${id}-region`;
 
@@ -55,19 +54,13 @@ export function CoreInputs() {
                 type='number'
                 value={formData.revenue ?? ''}
                 onChange={(e) => setRevenue(parseFloat(e.target.value) || 0)}
+                aria-describedby={revenueBasisId}
                 placeholder='100000'
               />
             </div>
-            <div className='flex items-center gap-2'>
-              <Checkbox
-                id={vatId}
-                checked={formData.includesVat}
-                onCheckedChange={(checked) => setIncludesVat(checked === true)}
-              />
-              <Label htmlFor={vatId} className='text-sm'>
-                Revenue includes VAT (warnings only)
-              </Label>
-            </div>
+            <p id={revenueBasisId} className='text-xs text-muted-foreground'>
+              {DIRECTOR_REVENUE_BASIS}
+            </p>
           </div>
 
           {/* Expenses */}

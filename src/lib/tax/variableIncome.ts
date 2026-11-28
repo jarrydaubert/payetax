@@ -54,7 +54,7 @@ export interface SafeDrawResult {
   spendingShortfall: number;
   shortfall: number;
   hasBufferShortfall: boolean;
-  hasContractEndRisk: boolean;
+  runwayTargetReachesProjectionEnd: boolean;
 }
 
 const TAX_YEAR_MONTHS = [4, 5, 6, 7, 8, 9, 10, 11, 12, 1, 2, 3] as const;
@@ -153,7 +153,7 @@ export function calculateSafeMonthlyDraw(input: SafeDrawInput): SafeDrawResult {
   const spendingShortfall = roundToPence(Math.max(0, minimumMonthlyDraw - safeMonthlyDraw));
   const shortfall = roundToPence(Math.max(0, requiredBuffer - cashAfterReserves));
   const hasBufferShortfall = shortfall > 0;
-  const hasContractEndRisk = monthsRemaining <= runwayMonths;
+  const runwayTargetReachesProjectionEnd = monthsRemaining <= runwayMonths;
 
   return {
     taxBasedMonthlyDraw,
@@ -163,6 +163,6 @@ export function calculateSafeMonthlyDraw(input: SafeDrawInput): SafeDrawResult {
     spendingShortfall,
     shortfall,
     hasBufferShortfall,
-    hasContractEndRisk,
+    runwayTargetReachesProjectionEnd,
   };
 }
