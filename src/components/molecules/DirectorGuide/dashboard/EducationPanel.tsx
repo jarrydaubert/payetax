@@ -9,7 +9,7 @@ import { useActiveDirectorScenario } from '@/components/molecules/DirectorGuide/
 import { CURRENT_TAX_YEAR, CURRENT_TAX_YEAR_DISPLAY, TAX_RATES } from '@/constants/taxRates';
 import { getSection455Rate, type SafeDrawResult } from '@/lib/tax';
 import { DIRECTOR_GUIDE_BUSINESS_THRESHOLDS } from '@/lib/tax/businessThresholds';
-import { cn } from '@/lib/utils';
+import { cn, formatCurrency } from '@/lib/utils';
 import {
   type DirectorFormData,
   useMonthlyModeOutput,
@@ -26,12 +26,7 @@ if (!rates) {
 }
 
 // Extract constants from validated rates
-const PERSONAL_ALLOWANCE = rates.personalAllowance;
 const PA_TAPER_THRESHOLD = rates.personalAllowanceReductionThreshold;
-// PA taper end: threshold + (PA × 2) since PA reduces £1 for every £2 over threshold
-const PA_TAPER_END = PA_TAPER_THRESHOLD + PERSONAL_ALLOWANCE * 2; // 100,000 + 25,140 = 125,140
-const SECONDARY_THRESHOLD = rates.nationalInsurance.employer.A.secondary.threshold;
-const LEL = rates.nationalInsurance.lowerEarningsLimit;
 const section455Rate = getSection455Rate(TAX_YEAR);
 const section455Percent = section455Rate?.toLocaleString('en-GB', {
   style: 'percent',
@@ -40,7 +35,6 @@ const section455Percent = section455Rate?.toLocaleString('en-GB', {
 
 const {
   vatRegistration: VAT_THRESHOLD,
-  vatApproaching: VAT_APPROACHING,
   hicbcStart: HICBC_START,
   hicbcEnd: HICBC_END,
   pensionTaperWarning: PENSION_TAPER_THRESHOLD,
@@ -61,14 +55,12 @@ type EducationPanelFormData = Pick<
   DirectorFormData,
   | 'mode'
   | 'region'
-  | 'revenue'
   | 'otherIncome'
   | 'ytdSalary'
   | 'ytdDividends'
   | 'ytdDrawings'
   | 'hasEmploymentAllowance'
   | 'studentLoanPlans'
-  | 'includesVat'
   | 'pensionContribution'
   | 'companyCarBIK'
   | 'associatedCompaniesCount'
@@ -83,13 +75,10 @@ export function EducationPanel({ className, monthlyDraw }: EducationPanelProps) 
   const isMonthlyMode = formData?.mode === 'monthly';
 
   const hasResults = activeScenario !== null;
-  const revenue = isMonthlyMode
-    ? (monthlyModeOutput?.projectedRevenue ?? 0)
-    : (formData?.revenue ?? 0);
   const salary = activeScenario?.salary ?? 0;
   const dividends = activeScenario?.dividends ?? 0;
 
-  // Calculate total income for PA taper / HICBC warnings
+  // Gross income is used only for the existing pension allowance prompt.
   const totalIncome = hasResults ? (formData?.otherIncome ?? 0) + salary + dividends : 0;
 
   // Compute total already taken from YTD fields
@@ -115,8 +104,7 @@ export function EducationPanel({ className, monthlyDraw }: EducationPanelProps) 
         },
         {
           title: 'What Are Dividends?',
-          description:
-            'Payments from company profits to shareholders, taxed at lower rates than salary. Must be paid from retained profits after Corporation Tax.',
+          description: 'Payments to shareholders out of profits available for distribution.',
           show: dividends > 0,
         },
         {
@@ -131,15 +119,68 @@ export function EducationPanel({ className, monthlyDraw }: EducationPanelProps) 
             'Tax-efficient: company deducts from CT, you pay no tax or NI. Annual allowance £60k (includes all contributions). Can carry forward unused allowance from previous 3 years.',
           show: true,
         },
+        {
+          title: 'VAT Registration',
+          description: (
+            <>
+              If your business is UK-established, check your taxable turnover excluding VAT. If
+              rolling 12-month taxable turnover went over {formatCurrency(VAT_THRESHOLD, 0)}, notify
+              HMRC within 30 days of the end of that month. If you expect to go over the threshold
+              in the next 30 days, notify HMRC by the end of that period, counted from when the
+              expectation arose.{' '}
+              <a
+                href='https://www.gov.uk/register-for-vat'
+                className='underline underline-offset-2'
+              >
+                Check HMRC’s VAT registration rules
+              </a>
+            </>
+          ),
+          show: Boolean(formData),
+        },
+        {
+          title: 'Personal Allowance Taper',
+          description: (
+            <>
+              If your adjusted net income exceeds {formatCurrency(PA_TAPER_THRESHOLD, 0)}, your
+              Personal Allowance falls by £1 for every £2 above that amount. The tax impact depends
+              on your region and mix of income.{' '}
+              <a
+                href='https://www.gov.uk/guidance/adjusted-net-income'
+                className='underline underline-offset-2'
+              >
+                Work out your adjusted net income
+              </a>
+            </>
+          ),
+          show: hasResults,
+        },
+        {
+          title: 'High Income Child Benefit Charge',
+          description: (
+            <>
+              If you or your partner receive Child Benefit, check both individual adjusted net
+              incomes. The charge may apply to the person with the higher income above{' '}
+              {formatCurrency(HICBC_START, 0)} and reaches 100% of the benefit from{' '}
+              {formatCurrency(HICBC_END, 0)}.{' '}
+              <a
+                href='https://www.gov.uk/child-benefit-tax-charge'
+                className='underline underline-offset-2'
+              >
+                Check when the charge applies and how to pay it
+              </a>
+            </>
+          ),
+          show: Boolean(formData),
+        },
       ].filter((card) => card.show),
-    [dividends],
+    [dividends, formData, hasResults],
   );
 
   const sortedWarnings = useMemo(() => {
     if (!formData) return [];
     const visibleWarnings = buildWarnings({
       hasResults,
-      revenue,
       salary,
       dividends,
       totalIncome,
@@ -169,7 +210,6 @@ export function EducationPanel({ className, monthlyDraw }: EducationPanelProps) 
     monthlyDraw,
     monthlyModeOutput,
     personalTax,
-    revenue,
     salary,
     totalIncome,
   ]);
@@ -259,7 +299,10 @@ export function EducationPanel({ className, monthlyDraw }: EducationPanelProps) 
             </div>
             <ul className='space-y-1 text-xs text-muted-foreground'>
               <li>• Compares salary vs dividend extraction strategies</li>
-              <li>• Uses current HMRC rates (single source of truth)</li>
+              <li>
+                • Uses published UK tax rates, including Scottish Government rates for Scottish
+                Income Tax
+              </li>
               <li>
                 • Assumes single director and standalone company
                 {isMonthlyMode ? ', with monthly run-rate projection' : ', with a full-year view'}
@@ -275,7 +318,7 @@ export function EducationPanel({ className, monthlyDraw }: EducationPanelProps) 
               <li>• IR35 status considerations</li>
               <li>• Pension carry-forward from previous years</li>
               <li>• MPAA (Money Purchase Annual Allowance) - £10k limit if pension accessed</li>
-              <li>• Dividend timing (declaration vs payment date)</li>
+              <li>• Uses annual dividend totals</li>
             </ul>
           </div>
           <div className='rounded-[10px] border border-primary/20 bg-primary/5 p-4'>
@@ -296,8 +339,7 @@ export function EducationPanel({ className, monthlyDraw }: EducationPanelProps) 
           <div className='rounded-[10px] border border-warning/20 bg-warning/5 p-3'>
             <p className='text-xs leading-relaxed text-warning'>
               <strong>Disclaimer:</strong> For illustrative purposes only. Not financial or tax
-              advice. Consult a qualified accountant for advice specific to your situation. Based on
-              HMRC rates for {TAX_YEAR} which may change.
+              advice. Consult a qualified accountant for advice specific to your situation.
             </p>
           </div>
         </div>
@@ -312,7 +354,6 @@ export function EducationPanel({ className, monthlyDraw }: EducationPanelProps) 
 
 interface WarningContext {
   hasResults: boolean;
-  revenue: number;
   salary: number;
   dividends: number;
   totalIncome: number;
@@ -336,7 +377,6 @@ interface Warning {
 function buildWarnings(ctx: WarningContext): Warning[] {
   const {
     hasResults,
-    revenue,
     salary,
     dividends,
     totalIncome,
@@ -353,9 +393,6 @@ function buildWarnings(ctx: WarningContext): Warning[] {
   const isOverdrawn = hasResults && alreadyTaken > grossExtraction;
   const hasDrawings = formData.ytdDrawings > 0;
   const hasDividends = dividends > 0;
-  const vatNote = formData.includesVat
-    ? ' (If your turnover figure includes VAT, HMRC thresholds use VAT-exclusive taxable turnover — treat this as an estimate.)'
-    : '';
 
   return [
     // CRITICAL warnings first
@@ -368,21 +405,6 @@ function buildWarnings(ctx: WarningContext): Warning[] {
           ).toLocaleString()}. Consider reducing drawings or increasing runway cash.`
         : 'Current cash is below your required runway buffer.',
       show: isMonthlyMode && Boolean(monthlyDraw?.hasBufferShortfall),
-      isCritical: true,
-    },
-    {
-      id: 'monthly-contract-end-risk',
-      title: 'Contract-End Risk',
-      description:
-        'Your runway target is at or above months remaining in this tax year. Plan for income gaps now.',
-      show: isMonthlyMode && Boolean(monthlyDraw?.hasContractEndRisk),
-      isCritical: true,
-    },
-    {
-      id: 'pension-gap',
-      title: 'Inefficient Salary Zone',
-      description: `Your salary is between £${SECONDARY_THRESHOLD.toLocaleString()} and £${LEL.toLocaleString()}. Employer NI applies here, but NI credits are not earned. NI credits typically require earnings around £${LEL.toLocaleString()} (illustrative).`,
-      show: hasResults && salary > SECONDARY_THRESHOLD && salary < LEL,
       isCritical: true,
     },
     {
@@ -414,19 +436,6 @@ function buildWarnings(ctx: WarningContext): Warning[] {
       // Show overdrawn only if NOT showing S455 (avoid duplication)
       show: isOverdrawn && !hasDrawings,
     },
-    {
-      id: 'vat-mandatory',
-      title: 'VAT Registration Required',
-      description: `Revenue exceeds £${VAT_THRESHOLD.toLocaleString()} threshold. VAT registration is mandatory within 30 days of exceeding.${vatNote}`,
-      show: revenue >= VAT_THRESHOLD,
-    },
-    {
-      id: 'pa-taper',
-      title: 'Personal Allowance Taper',
-      description:
-        'Income over £100k reduces your Personal Allowance by £1 for every £2. This creates an effective 60% tax rate between £100k-£125k.',
-      show: totalIncome > PA_TAPER_THRESHOLD && totalIncome <= PA_TAPER_END,
-    },
 
     // MEDIUM priority warnings
     {
@@ -435,18 +444,6 @@ function buildWarnings(ctx: WarningContext): Warning[] {
       description:
         'At this profit level, an accountant could save you serious money with advanced strategies.',
       show: hasResults && grossProfit > HIGH_PROFIT_COMPLEXITY_THRESHOLD,
-    },
-    {
-      id: 'hicbc',
-      title: 'High Income Child Benefit Charge',
-      description: `If you or your partner claim Child Benefit and your income is £${(HICBC_START / 1000).toFixed(0)}k-£${(HICBC_END / 1000).toFixed(0)}k, you may owe HICBC via Self Assessment.`,
-      show: totalIncome >= HICBC_START && totalIncome <= HICBC_END,
-    },
-    {
-      id: 'vat-approaching',
-      title: 'VAT Threshold Approaching',
-      description: `Revenue approaching £${VAT_THRESHOLD.toLocaleString()} VAT threshold. Monitor closely; voluntary registration may be possible depending on your circumstances.${vatNote}`,
-      show: revenue >= VAT_APPROACHING && revenue < VAT_THRESHOLD,
     },
     {
       id: 'pension-taper',
@@ -465,8 +462,9 @@ function buildWarnings(ctx: WarningContext): Warning[] {
     {
       id: 'mid-year-assumption',
       title: 'Mid-Year Projection Assumption',
-      description:
-        'Monthly mode projects a flat monthly run-rate through March. Real income timing may differ.',
+      description: monthlyDraw?.runwayTargetReachesProjectionEnd
+        ? 'Monthly mode projects a flat run-rate through March. Your runway target is at least as long as the period modelled.'
+        : 'Monthly mode projects a flat run-rate through March. Real income timing may differ.',
       show: isMonthlyMode,
     },
     {
@@ -528,15 +526,36 @@ function buildWarnings(ctx: WarningContext): Warning[] {
     {
       id: 'dividend-timing',
       title: 'Dividend Timing Matters',
-      description:
-        'Dividends are taxed in the tax year they are declared (not paid). Board minutes and dividend vouchers are legally required. Timing around 5 April affects the tax year.',
+      description: (
+        <>
+          Check when the dividend becomes due and payable. For final dividends, use the payment date
+          set in the resolution, or the declaration date if none is set. Interim dividends generally
+          count when paid, including when credited to an account you can draw on.{' '}
+          <a
+            href='https://www.gov.uk/hmrc-internal-manuals/company-taxation-manual/ctm15205'
+            className='underline underline-offset-2'
+          >
+            Check HMRC’s dividend timing guidance
+          </a>
+        </>
+      ),
       show: hasDividends,
     },
     {
       id: 'distributable',
       title: 'Verify Distributable Profits',
-      description:
-        'Dividends can only be paid from distributable profits (retained earnings). Your last filed accounts show retained earnings.',
+      description: (
+        <>
+          Before paying dividends, use the relevant accounts to check accumulated realised profits
+          available for distribution after realised losses.{' '}
+          <a
+            href='https://www.legislation.gov.uk/ukpga/2006/46/part/23'
+            className='underline underline-offset-2'
+          >
+            Check the Companies Act rules
+          </a>
+        </>
+      ),
       show: hasDividends,
     },
   ];
@@ -548,7 +567,7 @@ function buildWarnings(ctx: WarningContext): Warning[] {
 
 interface LearnCardProps {
   title: string;
-  description: string;
+  description: ReactNode;
 }
 
 function PanelSection({

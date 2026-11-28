@@ -24,6 +24,7 @@ export const TooltipContentSchema = z.object({
   title: z.string().min(1, 'Tooltip title is required'),
   description: z.string().min(10, 'Description must be at least 10 characters'),
   note: z.string().min(10, 'Note must be at least 10 characters').optional(),
+  source: z.object({ label: z.string().min(1), url: z.url({ protocol: /^https$/ }) }).optional(),
 });
 
 /** Tooltip content structure - inferred from Zod schema for single source of truth */
@@ -116,7 +117,7 @@ export const INPUT_TOOLTIPS = {
   directorIncludesVat: {
     title: 'Revenue Includes VAT',
     description: 'Select if your revenue figure includes VAT.',
-    note: 'This changes VAT warnings. VAT is not subtracted from your revenue.',
+    note: 'VAT is not subtracted from your revenue in the estimate.',
   },
   directorExpenses: {
     title: 'Business Expenses',
@@ -167,7 +168,11 @@ export const INPUT_TOOLTIPS = {
   directorYtdDividends: {
     title: 'Dividends Already Taken',
     description:
-      'Dividends declared since 6 April. These are included when we work out how much you have already taken from the company.',
+      'Enter dividends that became due and payable since 6 April. Use the date set for payment of a final dividend, or the declaration date if none was set. An interim dividend generally counts when paid, including when credited to an account you can draw on.',
+    source: {
+      label: 'HMRC dividend timing guidance',
+      url: 'https://www.gov.uk/hmrc-internal-manuals/company-taxation-manual/ctm15205',
+    },
   },
   directorYtdDrawings: {
     title: 'Other Drawings',
@@ -187,7 +192,11 @@ export const INPUT_TOOLTIPS = {
   directorEmploymentAllowance: {
     title: 'Employment Allowance',
     description:
-      'Select only if your company qualifies for this reduction in employer National Insurance. A company with just one director and no other employees usually cannot claim.',
+      'Select only if your company qualifies. A single-director company cannot claim if its director is the only employee liable for secondary Class 1 National Insurance. An extra employee paid below the Secondary Threshold does not qualify the company.',
+    source: {
+      label: 'HMRC single-director eligibility guidance',
+      url: 'https://www.gov.uk/government/publications/employment-allowance-more-detailed-guidance/single-director-companies-and-employment-allowance-further-employer-guidance',
+    },
   },
   directorStudentLoans: {
     title: 'Student Loans',

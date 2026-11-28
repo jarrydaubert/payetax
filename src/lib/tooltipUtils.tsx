@@ -29,6 +29,11 @@ export function formatTooltipText(content: TooltipContent): React.ReactNode {
       {content.note && (
         <div className='border-t border-border pt-2 whitespace-pre-line'>{content.note}</div>
       )}
+      {content.source && (
+        <a href={content.source.url} className='inline-block underline underline-offset-2'>
+          {content.source.label}
+        </a>
+      )}
     </div>
   );
 }

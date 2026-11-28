@@ -140,7 +140,7 @@ DISCLAIMERS
 For illustrative purposes only.
 Not financial or tax advice.
 Consult a qualified accountant for advice specific to your situation.
-Based on HMRC rates for ${year} which may change.
+Based on published UK tax rates for ${year}, including Scottish Government rates for Scottish Income Tax.
 
 Recalculate: ${BASE_URL}/tools/director-guide
 `.trim();
@@ -338,7 +338,7 @@ export function generateDirectorEmailHtml({
               <p style="margin: 0; color: #536174; font-size: 12px; line-height: 1.7;">
                 For illustrative purposes only. Not financial or tax advice.
                 <br>Consult a qualified accountant for advice specific to your situation.
-                <br>Based on HMRC rates${safeTaxYear ? ` for ${safeTaxYear}` : ''} which may change.
+                <br>Based on published UK tax rates${safeTaxYear ? ` for ${safeTaxYear}` : ''}, including Scottish Government rates for Scottish Income Tax.
               </p>
               <p style="margin: 14px 0 0; color: #7d8795; font-size: 12px;">
                 <a href="${BASE_URL}" style="color: #123a66; text-decoration: none;">payetax.co.uk</a>

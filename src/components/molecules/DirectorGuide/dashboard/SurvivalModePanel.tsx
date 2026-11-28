@@ -2,7 +2,7 @@
 /**
  * Survival Mode Panel
  *
- * Spec: profit <= 0 -> show a distinct state with an NI-credits threshold example.
+ * Spec: profit <= 0 -> show a distinct state with an illustrative payroll cost.
  * Avoid rendering the normal strategy comparison UI, which becomes misleading with no profit.
  */
 'use client';
@@ -28,12 +28,8 @@ export function SurvivalModePanel({ className }: { className?: string }) {
   // The comparison's post-pension profit is floored at zero for extraction.
   const profitBeforeSalary = comparison.grossProfit - pensionForProfit;
 
-  // Profit <= 0 means no distributable profit; paying salary can deepen the loss.
+  // Paying a salary can deepen the projected loss.
   const companyLossIfPaySalary = Math.max(0, -(profitBeforeSalary - niCreditsSalary - employerNI));
-
-  const noteIfOtherPAYE = formData.hasOtherPAYEEmployment
-    ? 'Your other PAYE job may already count towards a qualifying year. Check your National Insurance record.'
-    : null;
 
   return (
     <section
@@ -47,23 +43,33 @@ export function SurvivalModePanel({ className }: { className?: string }) {
         <div>
           <h2 className='font-display text-xl font-semibold text-foreground'>Survival Mode</h2>
           <p className='mt-1 text-sm text-muted-foreground'>
-            Your company has no distributable profit this year. Dividends aren&apos;t possible.
+            This projection shows no current-period profit available for dividends. Before paying
+            dividends, check accumulated realised profits and losses in the relevant accounts.{' '}
+            <a
+              href='https://www.legislation.gov.uk/ukpga/2006/46/part/23'
+              className='underline underline-offset-2'
+            >
+              Check the Companies Act rules
+            </a>
           </p>
         </div>
       </div>
 
       <div className='rounded-sm border border-border/70 bg-background p-4'>
-        <div className='mb-2 font-medium text-foreground'>NI credits threshold (illustrative)</div>
+        <div className='mb-2 font-medium text-foreground'>Illustrative payroll cost</div>
         <div className='text-sm text-muted-foreground'>
-          NI credits typically require earnings around{' '}
-          <span className='font-semibold text-foreground'>
-            {formatCurrency(niCreditsSalary, 0)}
-          </span>
-          . This example shows the trade-off if you pay a salary to keep a qualifying year (even if
-          it creates a company loss).
+          This example uses the annual National Insurance Lower Earnings Limit. Pay at this level
+          may help build a qualifying year. Other work, voluntary contributions and NI credits may
+          also count.{' '}
+          <a
+            href='https://www.gov.uk/check-national-insurance-record'
+            className='underline underline-offset-2'
+          >
+            Check your National Insurance record
+          </a>
         </div>
 
-        <div className='mt-4 grid gap-3 md:grid-cols-3'>
+        <div className='mt-4 grid gap-3 md:grid-cols-2'>
           <div className='rounded-sm border border-border/70 bg-background p-3'>
             <div className='text-xs text-muted-foreground'>Company loss (estimate)</div>
             <div className='font-mono font-semibold text-warning'>
@@ -71,24 +77,18 @@ export function SurvivalModePanel({ className }: { className?: string }) {
             </div>
           </div>
           <div className='rounded-sm border border-border/70 bg-background p-3'>
-            <div className='text-xs text-muted-foreground'>Take-home (approx)</div>
+            <div className='text-xs text-muted-foreground'>Illustrative gross salary</div>
             <div className='font-mono font-semibold text-success'>
               {formatCurrency(Math.round(niCreditsSalary), 0)}
             </div>
           </div>
-          <div className='rounded-sm border border-border/70 bg-background p-3'>
-            <div className='text-xs text-muted-foreground'>NI credits</div>
-            <div className='font-mono font-semibold text-foreground'>Yes (qualifying year)</div>
-          </div>
         </div>
-
-        {noteIfOtherPAYE && <p className='mt-3 text-xs text-muted-foreground'>{noteIfOtherPAYE}</p>}
       </div>
 
       <div className='mt-4 text-xs text-muted-foreground'>
         Alternative: pay{' '}
         <span className='font-semibold text-foreground'>{formatCurrency(0, 0)}</span> salary (no
-        additional company loss created by payroll), but you may miss an NI qualifying year.
+        additional company loss created by payroll).
       </div>
     </section>
   );

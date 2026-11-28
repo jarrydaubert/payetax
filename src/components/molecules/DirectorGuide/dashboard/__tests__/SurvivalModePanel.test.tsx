@@ -34,6 +34,15 @@ describe('DirectorGuide SurvivalModePanel', () => {
 
     expect(screen.getByTestId('director-survival-mode')).toBeInTheDocument();
     expect(screen.getByText('Survival Mode')).toBeInTheDocument();
+    expect(
+      screen.getByText(/check accumulated realised profits and losses in the relevant accounts/i),
+    ).toBeVisible();
+    expect(screen.queryByText(/aren't possible|yes \(qualifying year\)/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/other work, voluntary contributions and NI credits/i)).toBeVisible();
+    expect(screen.getByRole('link', { name: 'Check the Companies Act rules' })).toHaveAttribute(
+      'href',
+      'https://www.legislation.gov.uk/ukpga/2006/46/part/23',
+    );
     expect(container.querySelector('[class*="bg-gradient"]')).not.toBeInTheDocument();
 
     // 2026-27 LEL is £6,708.

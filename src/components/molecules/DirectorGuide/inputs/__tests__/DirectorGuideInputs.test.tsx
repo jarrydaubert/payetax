@@ -107,7 +107,7 @@ describe('Director Intelligence input components', () => {
     expect(useDirectorGuideStore.getState().formData.revenue).toBe(100000);
     expect(useDirectorGuideStore.getState().formData.expenses).toBe(20000);
 
-    fireEvent.click(screen.getByLabelText('Revenue includes VAT (warnings only)'));
+    fireEvent.click(screen.getByLabelText('Revenue includes VAT'));
     expect(useDirectorGuideStore.getState().formData.includesVat).toBe(true);
 
     fireEvent.click(screen.getByText('Scotland'));

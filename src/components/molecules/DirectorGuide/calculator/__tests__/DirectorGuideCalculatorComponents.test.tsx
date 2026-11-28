@@ -156,37 +156,40 @@ describe('Director Intelligence calculator components', () => {
   });
 
   describe('PensionGapWarning', () => {
-    it('shows qualifying status when salary is above LEL', () => {
+    it('shows a potential NI contribution at the annual Lower Earnings Limit', () => {
       setStoreState({
         strategyComparison: createComparison({
           strategies: {
             allSalary: createStrategy('All Salary'),
-            optimalMix: createStrategy('Baseline Mix', { salary: 7000 }),
+            optimalMix: createStrategy('Baseline Mix', { salary: 6708 }),
             allDividends: createStrategy('All Dividends'),
           },
         }) as never,
       });
 
       render(<PensionGapWarning />);
-      expect(screen.getByText(/State Pension: Qualifying Year/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/reaches the annual Lower Earnings Limit of £6,708/i),
+      ).toHaveTextContent('Pay at this level may help build a qualifying year.');
     });
 
-    it('warns about the gap zone between NI threshold and LEL', () => {
+    it('describes pay just below the limit without estimating a cost or recommending more salary', () => {
       setStoreState({
         strategyComparison: createComparison({
           strategies: {
             allSalary: createStrategy('All Salary'),
-            optimalMix: createStrategy('Baseline Mix', { salary: 5500 }),
+            optimalMix: createStrategy('Baseline Mix', { salary: 6707 }),
             allDividends: createStrategy('All Dividends'),
           },
         }) as never,
       });
 
       render(<PensionGapWarning />);
-      expect(screen.getByText(/Inefficient Salary Zone/i)).toBeInTheDocument();
+      expect(screen.getByText(/is below the annual Lower Earnings Limit/i)).toBeVisible();
+      expect(screen.queryByText(/increase to|employer cost|company pays/i)).not.toBeInTheDocument();
     });
 
-    it('shows neutral info when salary is below threshold', () => {
+    it('acknowledges other qualifying contributions and credits at zero director salary', () => {
       setStoreState({
         strategyComparison: createComparison({
           strategies: {
@@ -198,7 +201,13 @@ describe('Director Intelligence calculator components', () => {
       });
 
       render(<PensionGapWarning />);
-      expect(screen.getByText(/No Credits This Year/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Other work, voluntary contributions and NI credits may also count/i),
+      ).toBeVisible();
+      expect(
+        screen.getByRole('link', { name: /Check your National Insurance record/i }),
+      ).toHaveAttribute('href', 'https://www.gov.uk/check-national-insurance-record');
+      expect(screen.queryByText(/No Credits This Year/i)).not.toBeInTheDocument();
     });
   });
 

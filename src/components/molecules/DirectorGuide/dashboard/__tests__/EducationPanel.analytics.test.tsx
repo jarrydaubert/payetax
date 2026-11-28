@@ -27,7 +27,7 @@ describe('EducationPanel warning analytics', () => {
     });
   });
 
-  test('shows a VAT warning without sending financial warning telemetry', () => {
+  test('shows VAT guidance without sending financial warning telemetry', () => {
     setDirectorGuideState({
       strategyComparison: null,
       formData: { ...useDirectorGuideStore.getState().formData, revenue: 91000 },
@@ -41,7 +41,7 @@ describe('EducationPanel warning analytics', () => {
 
     render(<EducationPanel />);
 
-    expect(screen.getByText('VAT Registration Required')).toBeVisible();
+    expect(screen.getByRole('link', { name: /VAT registration rules/i })).toBeVisible();
     expect(trackEvent).not.toHaveBeenCalled();
   });
 });
