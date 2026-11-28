@@ -59,7 +59,7 @@ const NORMAL_WORKFLOW_ITEMS = [
   { id: 'director-summary', label: 'Summary', icon: BarChart3 },
   { id: 'director-strategy', label: 'Strategy Table', icon: FileSearch },
   { id: 'director-details', label: 'Breakdowns', icon: BookOpen },
-  { id: 'director-key-dates', label: 'Money Flow', icon: MapPin },
+  { id: 'director-key-dates', label: 'Key Dates', icon: MapPin },
 ] as const;
 
 const SURVIVAL_WORKFLOW_ITEMS = [

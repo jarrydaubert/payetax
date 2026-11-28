@@ -168,42 +168,6 @@ export const SendResultsRequestSchema = z
 // DIRECTOR CALCULATOR EMAIL SCHEMAS
 // ============================================================================
 
-// Reasonable bounds for director calculator values (prevents abuse/garbage)
-const MAX_MONEY = 10_000_000; // £10M max
-const moneyField = z.number().finite().min(0).max(MAX_MONEY);
-const rateField = z.number().finite().min(0).max(100);
-
-/**
- * Director strategy results for email
- * All monetary fields bounded 0-10M, rates 0-100%
- */
-export const DirectorStrategySchema = z.object({
-  name: z.string().max(100),
-  salary: moneyField,
-  dividends: moneyField,
-  pension: moneyField,
-  companyCarBIK: moneyField,
-  employerNI: moneyField,
-  employeeNI: moneyField,
-  incomeTax: moneyField,
-  corporationTax: moneyField,
-  dividendTax: moneyField,
-  studentLoan: moneyField,
-  totalPersonalTax: moneyField,
-  companyCost: moneyField,
-  takeHome: moneyField,
-  effectiveRate: rateField,
-});
-
-/**
- * All strategies comparison for comprehensive director email
- */
-export const AllStrategiesSchema = z.object({
-  allSalary: DirectorStrategySchema,
-  optimalMix: DirectorStrategySchema,
-  allDividends: DirectorStrategySchema,
-});
-
 /**
  * Input schema for director email requests (server recomputes results)
  */
@@ -251,6 +215,5 @@ export type TaxBand = z.infer<typeof TaxBandSchema>;
 export type PayeResults = z.infer<typeof PayeResultsSchema>;
 export type PayeEmailInput = z.infer<typeof PayeEmailInputSchema>;
 export type SendResultsRequest = z.infer<typeof SendResultsRequestSchema>;
-export type DirectorStrategy = z.infer<typeof DirectorStrategySchema>;
 export type DirectorEmailInput = z.infer<typeof DirectorEmailInputSchema>;
 export type SendDirectorResultsRequest = z.infer<typeof SendDirectorResultsRequestSchema>;

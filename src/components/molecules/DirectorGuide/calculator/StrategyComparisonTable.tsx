@@ -7,6 +7,7 @@
 'use client';
 
 import { AlertTriangle, Banknote, PiggyBank, Split, User } from 'lucide-react';
+import { projectDirectorFinancials } from '@/lib/directorFinancialPresentation';
 import { roundToPence } from '@/lib/tax';
 import type { YourSetupResult } from '@/lib/tax/strategyComparison';
 import { cn, formatCurrency } from '@/lib/utils';
@@ -72,9 +73,7 @@ export function StrategyComparisonTable() {
     : null;
   const objectiveReferenceTakeHome = objectiveReference?.takeHome ?? 0;
   const objectiveReferenceTotalTax = objectiveReference
-    ? objectiveReference.totalPersonalTax +
-      objectiveReference.corporationTax +
-      objectiveReference.employerNI
+    ? projectDirectorFinancials(comparison.grossProfit, objectiveReference).totalTax
     : 0;
   const objectiveReferenceTotalNI = objectiveReference
     ? objectiveReference.employeeNI + objectiveReference.employerNI
@@ -169,8 +168,7 @@ export function StrategyComparisonTable() {
               : isObjectiveReference
                 ? objectiveBadge
                 : null;
-          const totalTax = data.totalPersonalTax + data.corporationTax + data.employerNI;
-          const totalNI = data.employeeNI + data.employerNI;
+          const { totalTax, totalNI } = projectDirectorFinancials(comparison.grossProfit, data);
           const takeHomeDelta = data.takeHome - objectiveReferenceTakeHome;
           const niDelta = totalNI - objectiveReferenceTotalNI;
           const isReference = isObjectiveReference && !comparisonOnly;
@@ -234,6 +232,12 @@ export function StrategyComparisonTable() {
                   <span className='text-muted-foreground'>Total NI</span>
                   <span className='font-mono text-foreground/90'>{formatCurrency(totalNI, 0)}</span>
                 </div>
+                {data.studentLoan > 0 && (
+                  <div className='flex justify-between'>
+                    <span className='text-muted-foreground'>Scenario student loan</span>
+                    <span className='font-mono'>{formatCurrency(data.studentLoan, 0)}</span>
+                  </div>
+                )}
                 <div className='mt-2 flex justify-between border-t border-border/40 pt-2'>
                   <span className='font-medium text-muted-foreground'>Take-Home</span>
                   <span className='font-mono font-semibold text-success'>
@@ -286,11 +290,6 @@ export function StrategyComparisonTable() {
                   </>
                 )}
               </div>
-
-              {/* Effective Rate */}
-              <div className='mt-2 text-right text-xs text-muted-foreground'>
-                {data.effectiveRate.toFixed(1)}% effective rate
-              </div>
             </article>
           );
         })}
@@ -299,6 +298,7 @@ export function StrategyComparisonTable() {
       {/* Your Setup Card (4th card) */}
       <YourSetupCard
         yourSetup={comparison.strategies.yourSetup}
+        profitAfterBusinessExpenses={comparison.grossProfit}
         objective={objective}
         objectiveReferenceTakeHome={objectiveReferenceTakeHome}
         objectiveReferenceTotalNI={objectiveReferenceTotalNI}
@@ -311,6 +311,7 @@ export function StrategyComparisonTable() {
 
 interface YourSetupCardProps {
   yourSetup?: YourSetupResult;
+  profitAfterBusinessExpenses: number;
   objective: StrategyObjective;
   objectiveReferenceTakeHome: number;
   objectiveReferenceTotalNI: number;
@@ -320,6 +321,7 @@ interface YourSetupCardProps {
 
 function YourSetupCard({
   yourSetup,
+  profitAfterBusinessExpenses,
   objective,
   objectiveReferenceTakeHome,
   objectiveReferenceTotalNI,
@@ -346,8 +348,10 @@ function YourSetupCard({
     );
   }
 
-  const totalTax = yourSetup.totalPersonalTax + yourSetup.corporationTax + yourSetup.employerNI;
-  const totalNI = yourSetup.employeeNI + yourSetup.employerNI;
+  const { totalTax, totalNI, companyBalance } = projectDirectorFinancials(
+    profitAfterBusinessExpenses,
+    yourSetup,
+  );
   const takeHomeDelta = yourSetup.takeHome - objectiveReferenceTakeHome;
   const niDelta = totalNI - objectiveReferenceTotalNI;
   const takeHomeReference = compareWithDisplayed ? 'the displayed result' : 'max take-home';
@@ -404,6 +408,12 @@ function YourSetupCard({
           <span className='text-muted-foreground'>Total NI</span>
           <span className='font-mono text-foreground/90'>{formatCurrency(totalNI, 0)}</span>
         </div>
+        {yourSetup.studentLoan > 0 && (
+          <div className='flex justify-between'>
+            <span className='text-muted-foreground'>Scenario student loan</span>
+            <span className='font-mono'>{formatCurrency(yourSetup.studentLoan, 0)}</span>
+          </div>
+        )}
         <div className='mt-2 flex justify-between border-t border-border/40 pt-2'>
           <span className='font-medium text-muted-foreground'>Take-Home</span>
           <span className='font-mono font-semibold text-success'>
@@ -411,6 +421,13 @@ function YourSetupCard({
           </span>
         </div>
       </div>
+
+      {companyBalance > 0 && (
+        <div className='mt-2 flex justify-between gap-2 text-sm'>
+          <span className='text-muted-foreground'>Profit retained this period</span>
+          <span className='font-mono'>{formatCurrency(companyBalance, 0)}</span>
+        </div>
+      )}
 
       {/* Delta vs Optimal */}
       {hasObjectiveReference && (
@@ -459,11 +476,6 @@ function YourSetupCard({
           </p>
         </div>
       )}
-
-      {/* Effective Rate */}
-      <div className='mt-2 text-right text-xs text-muted-foreground'>
-        {yourSetup.effectiveRate.toFixed(1)}% effective rate
-      </div>
     </div>
   );
 }

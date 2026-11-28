@@ -7,9 +7,12 @@
  * - Financial summary and reserve presentation
  */
 
+import {
+  DIRECTOR_BUDGET_NOTE,
+  type DirectorFinancialPresentation,
+} from '@/lib/directorFinancialPresentation';
 import { resolveTaxYear } from '@/lib/tax';
 import { formatCurrency } from '@/lib/utils';
-import type { DirectorStrategy } from '@/lib/validation/emailValidation';
 
 export function escapeHtml(str: string): string {
   return str
@@ -42,15 +45,11 @@ function formatTaxYearLabel(taxYear?: string): string {
   return `${start}-${end?.slice(-2) ?? ''}`;
 }
 
-type DirectorEmailStrategy = DirectorStrategy & {
-  companyShortfall?: number;
-  minimumSalaryShortfall?: number;
-};
-
-interface AllStrategies {
-  allSalary: DirectorEmailStrategy;
-  optimalMix: DirectorEmailStrategy;
-  allDividends: DirectorEmailStrategy;
+interface DirectorEmailArgs {
+  strategyName: string;
+  financials: DirectorFinancialPresentation;
+  savingsVsAllSalary: number;
+  taxYear?: string;
 }
 
 function describeCompanyShortfall(amount = 0): string {
@@ -62,21 +61,24 @@ function describeCompanyShortfall(amount = 0): string {
 function describeMinimumSalaryShortfall({
   salary,
   minimumSalaryShortfall = 0,
-}: DirectorEmailStrategy): string {
+}: DirectorFinancialPresentation['scenario']): string {
   return minimumSalaryShortfall > 0
     ? `The highest affordable salary is ${formatCurrency(salary)}, which falls ${formatCurrency(minimumSalaryShortfall)} short of your minimum.`
     : '';
 }
 
-export function generateDirectorEmailText(args: {
-  grossProfit: number;
-  strategies: AllStrategies;
-  recommended: 'allSalary' | 'optimalMix' | 'allDividends';
-  savingsVsAllSalary: number;
-  taxYear?: string;
-}): string {
-  const { grossProfit, strategies, recommended, savingsVsAllSalary, taxYear } = args;
-  const strategy = strategies[recommended];
+export function generateDirectorEmailText({
+  strategyName,
+  financials,
+  savingsVsAllSalary,
+  taxYear,
+}: DirectorEmailArgs): string {
+  const {
+    scenario: strategy,
+    profitAfterBusinessExpenses,
+    companyBalance,
+    companyBalanceLabel,
+  } = financials;
   const year = formatTaxYearLabel(taxYear);
   const companyShortfall = describeCompanyShortfall(strategy.companyShortfall);
   const minimumSalaryShortfall = describeMinimumSalaryShortfall(strategy);
@@ -88,10 +90,9 @@ ${'='.repeat(50)}
 
 EXECUTIVE SUMMARY
 -----------------
-Scenario Summary: ${strategy.name}
+Scenario Summary: ${strategyName}
 Monthly Take-Home: ${formatCurrency(strategy.takeHome / 12)}
 Annual Take-Home: ${formatCurrency(strategy.takeHome)}
-Total Company Cost: ${formatCurrency(strategy.companyCost)}
 ${companyShortfall ? `\n${companyShortfall}\n` : ''}
 ${minimumSalaryShortfall ? `\n${minimumSalaryShortfall}\n` : ''}
 
@@ -99,22 +100,30 @@ SAVINGS vs All Salary: ${formatCurrency(savingsVsAllSalary)}
 
 COMPANY OVERVIEW
 ---------------
-Gross Profit Available: ${formatCurrency(grossProfit)}
+Profit after business expenses: ${formatCurrency(profitAfterBusinessExpenses)}
 
 COMPARISON BREAKDOWN
 --------------------
 Salary: ${formatCurrency(strategy.salary)}
 Dividends: ${formatCurrency(strategy.dividends)}
 Pension: ${formatCurrency(strategy.pension)}
+Corporation Tax: ${formatCurrency(strategy.corporationTax)}
+Employer NI: ${formatCurrency(strategy.employerNI)}
+${companyBalanceLabel}: ${formatCurrency(companyBalance)}
 
-TAX BREAKDOWN (Annual)
----------------------
+ESTIMATED PERSONAL DEDUCTIONS (Annual)
+--------------------------------------
 Income Tax: ${formatCurrency(strategy.incomeTax)}
 Employee NI: ${formatCurrency(strategy.employeeNI)}
 Dividend Tax: ${formatCurrency(strategy.dividendTax)}
-Student Loan: ${formatCurrency(strategy.studentLoan)}
-Corporation Tax: ${formatCurrency(strategy.corporationTax)}
-Employer NI: ${formatCurrency(strategy.employerNI)}
+Student loan from this scenario: ${formatCurrency(strategy.studentLoan)}
+Personal deductions: ${formatCurrency(financials.personalDeductions)}
+
+PROJECTED BUDGETS (Annual)
+--------------------------
+Company tax and NI budget: ${formatCurrency(financials.companyTaxBudget)}
+Personal tax and loan budget: ${formatCurrency(financials.personalBudget)}
+${DIRECTOR_BUDGET_NOTE}
 
 TAX DATE REMINDER
 -----------------
@@ -137,20 +146,22 @@ Recalculate: ${BASE_URL}/tools/director-guide
 `.trim();
 }
 
-export function generateDirectorEmailHtml(args: {
-  grossProfit: number;
-  strategies: AllStrategies;
-  recommended: 'allSalary' | 'optimalMix' | 'allDividends';
-  savingsVsAllSalary: number;
-  taxYear?: string;
-  generatedDate?: string;
-}): string {
-  const { grossProfit, strategies, recommended, savingsVsAllSalary, taxYear, generatedDate } = args;
-
-  const strategy = strategies[recommended];
+export function generateDirectorEmailHtml({
+  strategyName,
+  financials,
+  savingsVsAllSalary,
+  taxYear,
+  generatedDate,
+}: DirectorEmailArgs & { generatedDate?: string }): string {
+  const {
+    scenario: strategy,
+    profitAfterBusinessExpenses,
+    companyBalance,
+    companyBalanceLabel,
+  } = financials;
   const companyShortfall = describeCompanyShortfall(strategy.companyShortfall);
   const minimumSalaryShortfall = describeMinimumSalaryShortfall(strategy);
-  const safeStrategyName = escapeHtml(strategy.name);
+  const safeStrategyName = escapeHtml(strategyName);
   const safeTaxYear = escapeHtml(formatTaxYearLabel(taxYear));
   const safeGeneratedDate =
     generatedDate ??
@@ -218,15 +229,15 @@ export function generateDirectorEmailHtml(args: {
               <div style="border: 1px solid #123a66; border-left: 4px solid #123a66; background-color: #f2eee4; padding: 20px 22px; margin-bottom: 24px;">
                 <p style="margin: 0 0 8px; color: #123a66; font-family: Menlo, Consolas, monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700;">Annual take-home</p>
                 <p class="money-xl" style="margin: 0; color: #123a66; font-family: Menlo, Consolas, monospace; font-size: 42px; font-weight: 700; line-height: 1.08; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(strategy.takeHome)}</p>
-                <p style="margin: 10px 0 0; color: #465468; font-size: 14px; line-height: 1.5; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(strategy.takeHome / 12)}/month. ${strategy.effectiveRate.toFixed(1)}% effective rate.</p>
+                <p style="margin: 10px 0 0; color: #465468; font-size: 14px; line-height: 1.5; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(strategy.takeHome / 12)}/month</p>
               </div>
 
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="width: 100%; border-collapse: separate; border-spacing: 0 12px; table-layout: fixed;">
                 <tr>
                   <td class="stack" style="width: 50%; padding-right: 6px; vertical-align: top;">
                     <div style="border: 1px solid #cec6b7; background-color: #f8f5ed; padding: 16px;">
-                      <p style="margin: 0 0 6px; color: #536174; font-family: Menlo, Consolas, monospace; font-size: 11px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase;">Gross profit</p>
-                      <p style="margin: 0; color: #07111f; font-family: Menlo, Consolas, monospace; font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(grossProfit)}</p>
+                      <p style="margin: 0 0 6px; color: #536174; font-family: Menlo, Consolas, monospace; font-size: 11px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase;">Profit after business expenses</p>
+                      <p style="margin: 0; color: #07111f; font-family: Menlo, Consolas, monospace; font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">${formatCurrency(profitAfterBusinessExpenses)}</p>
                     </div>
                   </td>
                   <td class="stack" style="width: 50%; padding-left: 6px; vertical-align: top;">
@@ -240,7 +251,7 @@ export function generateDirectorEmailHtml(args: {
 
               <table style="width: 100%; border-collapse: collapse; color: #07111f; font-size: 14px; font-variant-numeric: tabular-nums; font-feature-settings: 'tnum' 1, 'lnum' 1;">
                 <tr style="border-bottom: 2px solid #cec6b7;">
-                  <th style="text-align: left; padding: 10px 0; color: #536174; font-family: Menlo, Consolas, monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1.8px;">Strategy line</th>
+                  <th style="text-align: left; padding: 10px 0; color: #536174; font-family: Menlo, Consolas, monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1.8px;">Estimated company allocation</th>
                   <th style="text-align: right; padding: 10px 0; color: #536174; font-family: Menlo, Consolas, monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1.8px;">Annual</th>
                 </tr>
                 <tr style="border-bottom: 1px solid #e1dbce;">
@@ -259,12 +270,27 @@ export function generateDirectorEmailHtml(args: {
                   <td style="padding: 14px 0; color: #a6453c;">Corporation Tax</td>
                   <td style="padding: 14px 0; text-align: right; color: #a6453c; font-family: Menlo, Consolas, monospace;">${formatCurrency(strategy.corporationTax)}</td>
                 </tr>
+                <tr>
+                  <td style="padding: 14px 0; color: #07111f;">Employer NI</td>
+                  <td style="padding: 14px 0; text-align: right; font-family: Menlo, Consolas, monospace;">${formatCurrency(strategy.employerNI)}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 14px 0; color: #07111f;">${companyBalanceLabel}</td>
+                  <td style="padding: 14px 0; text-align: right; font-family: Menlo, Consolas, monospace;">${formatCurrency(companyBalance)}</td>
+                </tr>
+                <tr>
+                  <th colspan="2" style="text-align: left; padding: 14px 0 8px; color: #536174; font-size: 13px;">Personal cash from this company</th>
+                </tr>
                 <tr style="border-bottom: 1px solid #e1dbce;">
-                  <td style="padding: 14px 0; color: #a6453c;">Personal tax</td>
-                  <td style="padding: 14px 0; text-align: right; color: #a6453c; font-family: Menlo, Consolas, monospace;">${formatCurrency(strategy.totalPersonalTax)}</td>
+                  <td style="padding: 14px 0; color: #07111f;">Salary and dividends before deductions</td>
+                  <td style="padding: 14px 0; text-align: right; font-family: Menlo, Consolas, monospace;">${formatCurrency(financials.grossPersonalCash)}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #e1dbce;">
+                  <td style="padding: 14px 0; color: #a6453c;">Personal deductions</td>
+                  <td style="padding: 14px 0; text-align: right; color: #a6453c; font-family: Menlo, Consolas, monospace;">${formatCurrency(financials.personalDeductions)}</td>
                 </tr>
                 <tr style="background: #eef4ed; border-top: 2px solid #cec6b7;">
-                  <td style="padding: 14px 10px; color: #2f6f4e; font-weight: 700;">Take-home pay</td>
+                  <td style="padding: 14px 10px; color: #2f6f4e; font-weight: 700;">Estimated take-home pay</td>
                   <td style="padding: 14px 10px; text-align: right; color: #2f6f4e; font-family: Menlo, Consolas, monospace; font-weight: 700;">${formatCurrency(strategy.takeHome)}</td>
                 </tr>
               </table>
@@ -273,7 +299,7 @@ export function generateDirectorEmailHtml(args: {
 
           <tr>
             <td class="email-card" style="padding: 28px 32px; border-right: 1px solid #cec6b7; border-bottom: 1px solid #cec6b7; border-left: 1px solid #cec6b7; background-color: #fffdf7;">
-              <h3 style="margin: 0 0 16px; color: #07111f; font-family: Georgia, 'Times New Roman', serif; font-size: 24px; line-height: 1.1;">Tax dates and pots</h3>
+              <h3 style="margin: 0 0 16px; color: #07111f; font-family: Georgia, 'Times New Roman', serif; font-size: 24px; line-height: 1.1;">Tax dates and projected budgets</h3>
               <p style="margin: 0 0 12px; color: #465468; font-size: 14px; line-height: 1.5;">
                 <strong style="color: #07111f;">${escapeHtml(getSelfAssessmentReminder(taxYear))}</strong>
                 ${PAYMENTS_ON_ACCOUNT_NOTE}
@@ -287,14 +313,15 @@ export function generateDirectorEmailHtml(args: {
               </p>
               <table style="width: 100%; border-collapse: collapse; color: #07111f; font-size: 14px;">
                 <tr style="border-bottom: 1px solid #e1dbce;">
-                  <td style="padding: 12px 0; color: #465468;">Company tax pot</td>
-                  <td style="padding: 12px 0; text-align: right; color: #123a66; font-family: Menlo, Consolas, monospace;">${formatCurrency(strategy.corporationTax + strategy.employerNI)}</td>
+                  <td style="padding: 12px 0; color: #465468;">Company tax and NI budget</td>
+                  <td style="padding: 12px 0; text-align: right; color: #123a66; font-family: Menlo, Consolas, monospace;">${formatCurrency(financials.companyTaxBudget)}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 12px 0; color: #465468;">Personal tax pot</td>
-                  <td style="padding: 12px 0; text-align: right; color: #123a66; font-family: Menlo, Consolas, monospace;">${formatCurrency(strategy.incomeTax + strategy.dividendTax + strategy.studentLoan)}</td>
+                  <td style="padding: 12px 0; color: #465468;">Personal tax and loan budget</td>
+                  <td style="padding: 12px 0; text-align: right; color: #123a66; font-family: Menlo, Consolas, monospace;">${formatCurrency(financials.personalBudget)}</td>
                 </tr>
               </table>
+              <p style="margin: 12px 0 0; color: #465468; font-size: 14px;">${DIRECTOR_BUDGET_NOTE}</p>
             </td>
           </tr>
 

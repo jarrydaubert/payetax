@@ -54,8 +54,10 @@ export interface DividendBandBreakdown {
 export interface DividendTaxResult {
   /** Total dividends input */
   totalDividends: number;
-  /** Amount covered by dividend allowance (tax-free) */
+  /** Total dividends covered by Personal Allowance and the dividend nil rate */
   allowanceUsed: number;
+  personalAllowanceUsed: number;
+  dividendNilRateUsed: number;
   /** Taxable dividends after allowance */
   taxableDividends: number;
   /** Total dividend tax due */
@@ -105,6 +107,8 @@ export function calculateDividendTax(
     return {
       totalDividends: Number.isFinite(dividends) ? dividends : 0,
       allowanceUsed: 0,
+      personalAllowanceUsed: 0,
+      dividendNilRateUsed: 0,
       taxableDividends: 0,
       dividendTax: 0,
       effectiveRate: 0,
@@ -166,6 +170,8 @@ export function calculateDividendTax(
     return {
       totalDividends: dividends,
       allowanceUsed: dividendsSheltered + allowanceUsed, // Total tax-free amount
+      personalAllowanceUsed: dividendsSheltered,
+      dividendNilRateUsed: allowanceUsed,
       taxableDividends: 0,
       dividendTax: 0,
       effectiveRate: 0,
@@ -258,6 +264,8 @@ export function calculateDividendTax(
   return {
     totalDividends: dividends,
     allowanceUsed: dividendsSheltered + allowanceUsed, // Total tax-free (PA + DA)
+    personalAllowanceUsed: dividendsSheltered,
+    dividendNilRateUsed: allowanceUsed,
     taxableDividends,
     dividendTax: roundToPence(totalTax),
     effectiveRate: roundToFourDecimals(effectiveRate),

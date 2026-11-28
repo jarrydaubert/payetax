@@ -20,8 +20,6 @@ function strategy(overrides: Record<string, number> = {}) {
     pension: 0,
     companyCarBIK: 0,
     totalPersonalTax: 5000,
-    companyCost: 0,
-    effectiveRate: 18.4,
     takeHome: 45000,
     ...overrides,
   };
@@ -48,6 +46,7 @@ describe('RecommendationHero', () => {
       comparison: result,
       selectedStrategy: 'optimalMix',
       isRecommended: true,
+      financials: { totalTax: 13000, totalNI: 0 },
       activeScenario: result.strategies.optimalMix,
     });
 
@@ -65,6 +64,7 @@ describe('RecommendationHero', () => {
       comparison: result,
       selectedStrategy: 'allSalary',
       isRecommended: true,
+      financials: { totalTax: 13000, totalNI: 0 },
       activeScenario: result.strategies.allSalary,
     });
 

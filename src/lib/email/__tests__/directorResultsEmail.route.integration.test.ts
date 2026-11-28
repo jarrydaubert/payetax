@@ -122,7 +122,7 @@ describe('Director results route → real orchestration/templates', () => {
           expect.objectContaining({
             to: 'audit@example.com',
             subject: expect.stringContaining('Director Tax Strategy Report'),
-            html: expect.stringContaining('Personal tax pot'),
+            html: expect.stringContaining('Personal tax and loan budget'),
             text: expect.stringContaining('Employee NI:'),
           }),
           'send-director-results',

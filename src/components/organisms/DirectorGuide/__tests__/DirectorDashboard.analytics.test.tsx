@@ -56,7 +56,6 @@ jest.mock('@/components/molecules/DirectorGuide/dashboard', () => ({
       Calculate
     </button>
   ),
-  MoneyFlowChart: () => null,
   RecommendationHero: () => null,
   SidebarNav: () => null,
   SummaryCards: () => null,

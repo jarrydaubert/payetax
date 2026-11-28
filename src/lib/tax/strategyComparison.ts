@@ -17,7 +17,7 @@ import {
 } from '@/constants/taxRates';
 import type { Region } from '@/lib/validation/directorValidation';
 import { getCorporationTax } from './corporationTax';
-import { getDividendTax } from './dividendTax';
+import { calculateDividendTax } from './dividendTax';
 import { getEmployeeNI } from './employeeNI';
 import { getEmployerNI } from './employerNI';
 import { getIncomeTax } from './incomeTax';
@@ -113,7 +113,7 @@ interface CompanyBudget {
   taxableProfit: number;
   corporationTax: number;
   dividends: number;
-  companyCost: number; // Salary and company tax liabilities, excluding dividends
+  lossReliefUsed: number;
   retainedProfit: number;
   companyShortfall: number;
 }
@@ -125,11 +125,13 @@ export interface SalaryScenarioResult extends CompanyBudget {
   incomeTax: number;
   taperTaxOnOtherIncome?: number; // Extra tax on other income, included in incomeTax
   dividendTax: number;
+  dividendPersonalAllowanceUsed: number;
+  dividendNilRateUsed: number;
+  dividendsSubjectToTax: number;
   studentLoan: number; // Additional annual repayment attributable to this extraction
   pension: number;
   companyCarBIK: number;
   totalPersonalTax: number;
-  effectiveRate: number;
   takeHome: number;
 }
 
@@ -184,6 +186,7 @@ function calculateCompanyBudget(
   const employerNI = roundToPence(getSecondaryNI(salary, opts) + class1ANI);
   const profitAfterPayroll = roundToPence(grossProfit - salary - employerNI);
   const taxableProfit = roundToPence(Math.max(0, profitAfterPayroll - lossesBroughtForward));
+  const lossReliefUsed = roundToPence(Math.max(0, profitAfterPayroll - taxableProfit));
   const corporationTax = getCorporationTax(taxableProfit, taxYear, opts.associatedCompaniesCount);
   const distributableProfit = roundToPence(profitAfterPayroll - corporationTax);
   const dividends = requestedDividends ?? Math.max(0, distributableProfit);
@@ -195,7 +198,7 @@ function calculateCompanyBudget(
     taxableProfit,
     corporationTax,
     dividends,
-    companyCost: roundToPence(salary + employerNI + corporationTax),
+    lossReliefUsed,
     retainedProfit: Math.max(0, balance),
     companyShortfall: Math.max(0, -balance),
   };
@@ -306,13 +309,11 @@ function calculateAllSalaryStrategy(opts: StrategyCalcOptions, salary: number): 
   const employeeNI = getEmployeeNI(salary, taxYear);
   const attributedTax = calculateAttributedIncomeTax(opts, salary, 0);
   const { incomeTax } = attributedTax;
-  const dividendTax = 0;
 
   const studentLoan = calculateAttributedStudentLoan(opts, salary, 0);
 
-  const totalPersonalTax = incomeTax + employeeNI + dividendTax + studentLoan;
+  const totalPersonalTax = incomeTax + employeeNI + studentLoan;
   const takeHome = salary - incomeTax - employeeNI - studentLoan;
-  const effectiveRate = grossProfit > 0 ? ((grossProfit - takeHome) / grossProfit) * 100 : 0;
 
   return {
     ...budget,
@@ -323,11 +324,10 @@ function calculateAllSalaryStrategy(opts: StrategyCalcOptions, salary: number): 
     employeeNI: roundToPence(employeeNI),
     ...attributedTax,
     incomeTax: roundToPence(incomeTax),
-    dividendTax,
+    ...directorDividendBreakdown(0, 0, taxYear),
     studentLoan,
     totalPersonalTax: roundToPence(totalPersonalTax),
     takeHome: roundToPence(takeHome),
-    effectiveRate: roundToPence(effectiveRate),
   };
 }
 
@@ -376,7 +376,7 @@ function calculateSalaryScenarioInternal(
   salary: number,
   opts: StrategyCalcOptions,
 ): SalaryScenarioResult {
-  const { grossProfit, taxYear, otherIncome, pension, companyCarBIK } = opts;
+  const { taxYear, otherIncome, pension, companyCarBIK } = opts;
 
   const budget = calculateCompanyBudget(opts, salary);
   const { dividends } = budget;
@@ -385,14 +385,17 @@ function calculateSalaryScenarioInternal(
   const attributedTax = calculateAttributedIncomeTax(opts, salary, dividends);
   const { incomeTax } = attributedTax;
 
-  // Dividend tax - BIK uses up some of the tax bands
-  const dividendTax = getDividendTax(dividends, salary + otherIncome + companyCarBIK, taxYear);
+  const dividendBreakdown = directorDividendBreakdown(
+    dividends,
+    salary + otherIncome + companyCarBIK,
+    taxYear,
+  );
+  const { dividendTax } = dividendBreakdown;
 
   const studentLoan = calculateAttributedStudentLoan(opts, salary, dividends);
 
   const totalPersonalTax = incomeTax + employeeNI + dividendTax + studentLoan;
   const takeHome = salary + dividends - incomeTax - employeeNI - dividendTax - studentLoan;
-  const effectiveRate = grossProfit > 0 ? ((grossProfit - takeHome) / grossProfit) * 100 : 0;
 
   return {
     ...budget,
@@ -400,12 +403,11 @@ function calculateSalaryScenarioInternal(
     employeeNI: roundToPence(employeeNI),
     ...attributedTax,
     incomeTax: roundToPence(incomeTax),
-    dividendTax: roundToPence(dividendTax),
+    ...dividendBreakdown,
     studentLoan,
     pension: roundToPence(pension),
     companyCarBIK: roundToPence(companyCarBIK),
     totalPersonalTax: roundToPence(totalPersonalTax),
-    effectiveRate: roundToPence(effectiveRate),
     takeHome,
   };
 }
@@ -492,14 +494,17 @@ function calculateAllDividendsStrategy(opts: StrategyCalcOptions): StrategyResul
   const attributedTax = calculateAttributedIncomeTax(opts, 0, dividends);
   const { incomeTax } = attributedTax;
 
-  // Dividend tax - BIK uses up some of the tax bands
-  const dividendTax = getDividendTax(dividends, otherIncome + companyCarBIK, taxYear);
+  const dividendBreakdown = directorDividendBreakdown(
+    dividends,
+    otherIncome + companyCarBIK,
+    taxYear,
+  );
+  const { dividendTax } = dividendBreakdown;
 
   const studentLoan = calculateAttributedStudentLoan(opts, 0, dividends);
 
   const totalPersonalTax = incomeTax + dividendTax + studentLoan;
   const takeHome = dividends - incomeTax - dividendTax - studentLoan;
-  const effectiveRate = grossProfit > 0 ? ((grossProfit - takeHome) / grossProfit) * 100 : 0;
 
   return {
     ...budget,
@@ -510,11 +515,10 @@ function calculateAllDividendsStrategy(opts: StrategyCalcOptions): StrategyResul
     companyCarBIK: roundToPence(companyCarBIK),
     ...attributedTax,
     incomeTax: roundToPence(incomeTax),
-    dividendTax: roundToPence(dividendTax),
+    ...dividendBreakdown,
     studentLoan,
     totalPersonalTax: roundToPence(totalPersonalTax),
     takeHome: roundToPence(takeHome),
-    effectiveRate: roundToPence(effectiveRate),
   };
 }
 
@@ -528,7 +532,7 @@ function calculateYourSetupStrategy(
   userDividends: number,
   optimalTakeHome: number,
 ): YourSetupResult {
-  const { grossProfit, taxYear, otherIncome, pension, companyCarBIK } = opts;
+  const { taxYear, otherIncome, pension, companyCarBIK } = opts;
 
   const salary = roundToPence(userSalary);
   const budget = calculateCompanyBudget(opts, salary, roundToPence(userDividends));
@@ -540,14 +544,17 @@ function calculateYourSetupStrategy(
   const attributedTax = calculateAttributedIncomeTax(opts, salary, dividends);
   const { incomeTax } = attributedTax;
 
-  // Dividend tax
-  const dividendTax = getDividendTax(dividends, salary + otherIncome + companyCarBIK, taxYear);
+  const dividendBreakdown = directorDividendBreakdown(
+    dividends,
+    salary + otherIncome + companyCarBIK,
+    taxYear,
+  );
+  const { dividendTax } = dividendBreakdown;
 
   const studentLoan = calculateAttributedStudentLoan(opts, salary, dividends);
 
   const totalPersonalTax = incomeTax + employeeNI + dividendTax + studentLoan;
   const takeHome = salary + dividends - incomeTax - employeeNI - dividendTax - studentLoan;
-  const effectiveRate = grossProfit > 0 ? ((grossProfit - takeHome) / grossProfit) * 100 : 0;
 
   // Delta vs optimal (positive = paying more tax / getting less take-home)
   const deltaVsOptimal = optimalTakeHome - takeHome;
@@ -561,11 +568,10 @@ function calculateYourSetupStrategy(
     employeeNI: roundToPence(employeeNI),
     ...attributedTax,
     incomeTax: roundToPence(incomeTax),
-    dividendTax: roundToPence(dividendTax),
+    ...dividendBreakdown,
     studentLoan,
     totalPersonalTax: roundToPence(totalPersonalTax),
     takeHome: roundToPence(takeHome),
-    effectiveRate: roundToPence(effectiveRate),
     deltaVsOptimal: roundToPence(deltaVsOptimal),
     exceedsProfit: budget.companyShortfall > 0,
   };
@@ -574,6 +580,16 @@ function calculateYourSetupStrategy(
 // ============================================================================
 // HELPERS
 // ============================================================================
+
+function directorDividendBreakdown(dividends: number, otherIncome: number, taxYear: TaxYear) {
+  const result = calculateDividendTax(dividends, otherIncome, taxYear);
+  return {
+    dividendTax: result.dividendTax,
+    dividendPersonalAllowanceUsed: result.personalAllowanceUsed,
+    dividendNilRateUsed: result.dividendNilRateUsed,
+    dividendsSubjectToTax: result.taxableDividends,
+  };
+}
 
 function calculateAttributedIncomeTax(
   { otherIncome, companyCarBIK, region, taxYear }: StrategyCalcOptions,
@@ -624,10 +640,9 @@ function createEmptyResult(name: string, opts: StrategyCalcOptions): StrategyRes
     companyCarBIK: roundToPence(opts.companyCarBIK),
     employeeNI: 0,
     incomeTax: 0,
-    dividendTax: 0,
+    ...directorDividendBreakdown(0, 0, opts.taxYear),
     studentLoan: 0,
     totalPersonalTax: 0,
     takeHome: 0,
-    effectiveRate: 0,
   };
 }

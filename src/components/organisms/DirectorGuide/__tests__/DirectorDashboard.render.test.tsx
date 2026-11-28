@@ -58,7 +58,6 @@ jest.mock('@/components/molecules/DirectorGuide/dashboard', () => ({
       Inputs Panel
     </button>
   ),
-  MoneyFlowChart: () => <div>Money Flow</div>,
   RecommendationHero: () => <div>Recommendation Hero</div>,
   SidebarNav: ({ onEmailResults }: { onEmailResults?: () => void }) => (
     <div>
@@ -90,13 +89,15 @@ function createComparison(grossProfit: number) {
     corporationTax: 2000,
     taxableProfit: 0,
     dividendTax: 500,
+    dividendPersonalAllowanceUsed: 0,
+    dividendNilRateUsed: 0,
+    dividendsSubjectToTax: 0,
+    lossReliefUsed: 0,
     studentLoan: 0,
     totalPersonalTax: 2500,
-    companyCost: 0,
     retainedProfit: 0,
     companyShortfall: 0,
     takeHome: 35000,
-    effectiveRate: 25,
   };
 
   return {

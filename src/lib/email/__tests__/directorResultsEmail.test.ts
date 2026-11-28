@@ -1,44 +1,39 @@
-import { CURRENT_TAX_YEAR } from '@/constants/taxRates';
+import { projectDirectorFinancials } from '@/lib/directorFinancialPresentation';
 import {
   escapeHtml,
   generateDirectorEmailHtml,
   generateDirectorEmailText,
 } from '@/lib/email/directorResultsEmail';
-import type { DirectorStrategy } from '@/lib/validation/emailValidation';
+import { calculateStrategyComparison } from '@/lib/tax';
+import {
+  consultancy,
+  recruiter,
+  referenceTaxYear,
+} from '@/test/directorReferenceFixtures/referenceCompanies';
 
 describe('directorResultsEmail', () => {
   test('personal reserve excludes payroll NI while deduction totals retain it', () => {
-    const strategy: DirectorStrategy = {
-      name: 'Synthetic reserve fixture',
-      salary: 20000,
-      dividends: 10000,
-      pension: 0,
-      companyCarBIK: 0,
-      employerNI: 900,
-      employeeNI: 600,
-      incomeTax: 1200,
-      corporationTax: 2000,
-      dividendTax: 800,
-      studentLoan: 300,
-      totalPersonalTax: 2900,
-      companyCost: 22900,
-      takeHome: 27100,
-      effectiveRate: 17.63,
-    };
+    const comparison = calculateStrategyComparison(
+      { ...consultancy.input, includesVat: false, studentLoanPlans: ['plan2'] },
+      referenceTaxYear,
+    );
+    const strategy = comparison.strategies.allSalary;
     const args = {
-      grossProfit: 32900,
-      strategies: { allSalary: strategy, optimalMix: strategy, allDividends: strategy },
-      recommended: 'optimalMix' as const,
+      strategyName: strategy.name,
+      financials: projectDirectorFinancials(comparison.grossProfit, strategy),
       savingsVsAllSalary: 0,
-      taxYear: CURRENT_TAX_YEAR,
+      taxYear: referenceTaxYear,
     };
     const html = generateDirectorEmailHtml(args);
-    // Hand arithmetic for these synthetic amounts: 1,200 + 800 + 300 = 2,300 reserve;
-    // adding the 600 payroll NI still gives 2,900 overall personal deductions.
-    expect(html).toMatch(/Personal tax pot<\/td>\s*<td[^>]*>£2,300\.00<\/td>/);
-    expect(html).toMatch(/Personal tax<\/td>\s*<td[^>]*>£2,900\.00<\/td>/);
-    expect(generateDirectorEmailText(args)).toContain('Employee NI: £600.00');
-    expect(generateDirectorEmailText(args)).toContain('Annual Take-Home: £27,100.00');
+    // B's documented one-penny Income Tax observation applies here too.
+    // £15,518.96 Income Tax + £3,674.92 loan = £19,193.88 budget.
+    // Adding £3,414.95 employee NI gives £22,608.83 personal deductions.
+    expect(html).toMatch(/Personal tax and loan budget<\/td>\s*<td[^>]*>£19,193\.88<\/td>/);
+    expect(html).toMatch(/Personal deductions<\/td>\s*<td[^>]*>£22,608\.83<\/td>/);
+    const text = generateDirectorEmailText(args);
+    expect(text).toContain('Employee NI: £3,414.95');
+    expect(text).toContain('Personal tax and loan budget: £19,193.88');
+    expect(text).toContain('Annual Take-Home: £47,608.56');
   });
 
   test('escapeHtml escapes dangerous characters', () => {
@@ -48,28 +43,16 @@ describe('directorResultsEmail', () => {
   });
 
   test('HTML template escapes strategy.name (prevents injection)', () => {
-    const strategy: DirectorStrategy = {
-      name: `<img src=x onerror=alert(1)>`,
-      salary: 0,
-      dividends: 0,
-      pension: 0,
-      companyCarBIK: 0,
-      employerNI: 0,
-      employeeNI: 0,
-      incomeTax: 0,
-      corporationTax: 0,
-      dividendTax: 0,
-      studentLoan: 0,
-      totalPersonalTax: 0,
-      companyCost: 0,
-      takeHome: 0,
-      effectiveRate: 0,
-    };
-
+    const comparison = calculateStrategyComparison(
+      { ...recruiter.input, includesVat: false },
+      '2025-2026',
+    );
     const html = generateDirectorEmailHtml({
-      grossProfit: 0,
-      strategies: { allSalary: strategy, optimalMix: strategy, allDividends: strategy },
-      recommended: 'optimalMix',
+      strategyName: '<img src=x onerror=alert(1)>',
+      financials: projectDirectorFinancials(
+        comparison.grossProfit,
+        comparison.strategies.allSalary,
+      ),
       savingsVsAllSalary: 0,
       taxYear: '2025-26',
       generatedDate: '2 Feb 2026',

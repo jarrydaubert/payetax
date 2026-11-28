@@ -38,7 +38,6 @@ describe('Director salary affordability (JGF-45)', () => {
         salary,
         employerNI,
         dividends: 0,
-        companyCost: 80000,
         companyShortfall: 0,
       };
       expect(strategies.allSalary).toMatchObject(expected);
@@ -77,7 +76,7 @@ describe('Director salary affordability (JGF-45)', () => {
           hasEmploymentAllowance: allowance,
           targetSalary: 100000,
         }),
-      ).toMatchObject({ salary, dividends: 0, companyCost: profit });
+      ).toMatchObject({ salary, dividends: 0, retainedProfit: 0, companyShortfall: 0 });
     },
   );
 
@@ -146,7 +145,9 @@ describe('Director company budget (JGF-43)', () => {
       corporationTax: 17052.5,
       dividends: 61447.5,
     });
-    expect(allDividends.companyCost + allDividends.dividends).toBeCloseTo(80000, 2);
+    expect(
+      allDividends.corporationTax + allDividends.employerNI + allDividends.dividends,
+    ).toBeCloseTo(80000, 2);
   });
 
   it('deducts both classes of employer NI from mix and custom-salary estimates', () => {
@@ -245,18 +246,18 @@ describe('Director company budget (JGF-43)', () => {
         const outgoings =
           scenario.salary + scenario.employerNI + scenario.corporationTax + scenario.dividends;
         expect(Math.abs(Math.round((outgoings - profit) * 100))).toBeLessThanOrEqual(1);
-        expect(scenario.companyCost + scenario.dividends + scenario.retainedProfit).toBeCloseTo(
-          profit,
-          2,
-        );
+        expect(scenario.retainedProfit).toBe(0);
         expect(scenario.companyShortfall).toBe(0);
       }
       if (!yourSetup) throw new Error('Expected Your Setup for the entered salary and dividends');
-      expect(yourSetup.companyCost + yourSetup.dividends).toBeLessThan(profit);
-      expect(yourSetup.companyCost + yourSetup.dividends + yourSetup.retainedProfit).toBeCloseTo(
-        profit,
-        2,
-      );
+      expect(yourSetup.retainedProfit).toBeGreaterThan(0);
+      expect(
+        yourSetup.salary +
+          yourSetup.employerNI +
+          yourSetup.corporationTax +
+          yourSetup.dividends +
+          yourSetup.retainedProfit,
+      ).toBeCloseTo(profit, 2);
     },
   );
 
@@ -286,7 +287,6 @@ describe('Director company budget (JGF-43)', () => {
           corporationTax: 0,
           dividends: 0,
           retainedProfit: 0,
-          companyCost: 1500,
           companyShortfall: 1500 - profit,
         });
       }

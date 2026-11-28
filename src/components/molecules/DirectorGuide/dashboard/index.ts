@@ -9,7 +9,6 @@ export { DashboardLayout } from './DashboardLayout';
 export { DetailCards } from './DetailCards';
 export { EducationPanel } from './EducationPanel';
 export { InputsPanel } from './InputsPanel';
-export { MoneyFlowChart } from './MoneyFlowChart';
 export { RecommendationHero } from './RecommendationHero';
 export { SidebarNav } from './SidebarNav';
 export { SummaryCards } from './SummaryCards';

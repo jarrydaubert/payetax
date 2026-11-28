@@ -133,7 +133,6 @@ describe('Outputs', () => {
       expect(card).toHaveProperty('salary');
       expect(card).toHaveProperty('dividends');
       expect(card).toHaveProperty('totalPersonalTax');
-      expect(card).toHaveProperty('effectiveRate');
       expect(card).toHaveProperty('takeHome');
     });
 
